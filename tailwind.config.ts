@@ -57,6 +57,19 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        walmart: {
+          blue: "#0071ce",
+          "blue-dark": "#0052a3",
+          yellow: "#FFC220",
+          "yellow-dark": "#FFB800",
+          gray: "#f7f7f7",
+          "gray-light": "#fafafa",
+          text: "#1a1a1a",
+          "text-secondary": "#666666",
+        },
+      },
+      fontFamily: {
+        sans: ["Inter", "system-ui", "-apple-system", "sans-serif"],
       },
       borderRadius: {
         lg: "var(--radius)",
