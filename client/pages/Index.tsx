@@ -1,62 +1,386 @@
-import { DemoResponse } from "@shared/api";
-import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import {
+  ShoppingCart,
+  QrCode,
+  Star,
+  TrendingUp,
+  Users,
+  Zap,
+  ArrowRight,
+  Package,
+  BarChart3,
+  AlertCircle,
+} from "lucide-react";
 
 export default function Index() {
-  const [exampleFromServer, setExampleFromServer] = useState("");
-  // Fetch users on component mount
-  useEffect(() => {
-    fetchDemo();
-  }, []);
-
-  // Example of how to fetch data from the server (if needed)
-  const fetchDemo = async () => {
-    try {
-      const response = await fetch("/api/demo");
-      const data = (await response.json()) as DemoResponse;
-      setExampleFromServer(data.message);
-    } catch (error) {
-      console.error("Error fetching hello:", error);
-    }
-  };
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200">
-      <div className="text-center">
-        {/* TODO: FUSION_GENERATION_APP_PLACEHOLDER replace everything here with the actual app! */}
-        <h1 className="text-2xl font-semibold text-slate-800 flex items-center justify-center gap-3">
-          <svg
-            className="animate-spin h-8 w-8 text-slate-400"
-            viewBox="0 0 50 50"
-          >
-            <circle
-              className="opacity-30"
-              cx="25"
-              cy="25"
-              r="20"
-              stroke="currentColor"
-              strokeWidth="5"
-              fill="none"
-            />
-            <circle
-              className="text-slate-600"
-              cx="25"
-              cy="25"
-              r="20"
-              stroke="currentColor"
-              strokeWidth="5"
-              fill="none"
-              strokeDasharray="100"
-              strokeDashoffset="75"
-            />
-          </svg>
-          Generating your app...
-        </h1>
-        <p className="mt-4 text-slate-600 max-w-md">
-          Watch the chat on the left for updates that might need your attention
-          to finish generating
-        </p>
-        <p className="mt-4 hidden max-w-md">{exampleFromServer}</p>
-      </div>
+    <div className="min-h-screen flex flex-col bg-white">
+      <Header />
+
+      {/* Hero Section */}
+      <section className="bg-gradient-to-r from-walmart-blue to-walmart-blue-dark text-white py-16 md:py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            {/* Left side - Content */}
+            <div>
+              <h1 className="text-4xl md:text-5xl font-bold mb-6">
+                Bem-vindo ao Vitrii
+              </h1>
+              <p className="text-xl text-blue-100 mb-8">
+                O marketplace inteligente que conecta vendedores e compradores
+                com tecnologia QR Code revolucionária.
+              </p>
+
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link
+                  to="/auth/signup"
+                  className="bg-walmart-yellow text-walmart-text px-8 py-3 rounded-lg font-semibold hover:bg-walmart-yellow-dark transition-colors text-center"
+                >
+                  Começar Agora
+                </Link>
+                <Link
+                  to="/browse"
+                  className="bg-white text-walmart-blue px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors text-center"
+                >
+                  Ver Anúncios
+                </Link>
+              </div>
+
+              {/* Stats */}
+              <div className="grid grid-cols-2 gap-6 mt-12">
+                <div>
+                  <div className="text-3xl font-bold">10K+</div>
+                  <div className="text-blue-100">Produtos Ativos</div>
+                </div>
+                <div>
+                  <div className="text-3xl font-bold">2.5K+</div>
+                  <div className="text-blue-100">Lojas Cadastradas</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right side - Illustration */}
+            <div className="hidden md:flex justify-center">
+              <div className="w-80 h-80 bg-white bg-opacity-10 rounded-lg flex items-center justify-center">
+                <ShoppingCart className="w-32 h-32 text-walmart-yellow opacity-75" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Two Main Features Section */}
+      <section className="py-16 md:py-24 bg-walmart-gray-light">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-walmart-text mb-4">
+              Nossas Principais Funcionalidades
+            </h2>
+            <p className="text-xl text-walmart-text-secondary max-w-2xl mx-auto">
+              Duas soluções poderosas para transformar seu negócio
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Feature 1: Marketplace */}
+            <div className="vitrii-card p-8">
+              <div className="w-16 h-16 bg-walmart-blue bg-opacity-10 rounded-lg flex items-center justify-center mb-6">
+                <Package className="w-8 h-8 text-walmart-blue" />
+              </div>
+              <h3 className="text-2xl font-bold text-walmart-text mb-4">
+                Anúncios de Produtos e Serviços
+              </h3>
+              <p className="text-walmart-text-secondary mb-6">
+                Marketplace completo similar ao Mercado Livre. Poste até 3
+                anúncios gratuitamente, depois pague apenas por dia por anúncio
+                via Pix. Controle total sobre seus produtos, preços e estoque.
+              </p>
+
+              <ul className="space-y-3 mb-8">
+                <li className="flex items-center space-x-3">
+                  <div className="w-6 h-6 rounded-full bg-walmart-yellow flex items-center justify-center text-walmart-text text-sm font-bold">
+                    ✓
+                  </div>
+                  <span className="text-walmart-text">
+                    3 anúncios gratuitos
+                  </span>
+                </li>
+                <li className="flex items-center space-x-3">
+                  <div className="w-6 h-6 rounded-full bg-walmart-yellow flex items-center justify-center text-walmart-text text-sm font-bold">
+                    ✓
+                  </div>
+                  <span className="text-walmart-text">
+                    Tabela de preços flexível
+                  </span>
+                </li>
+                <li className="flex items-center space-x-3">
+                  <div className="w-6 h-6 rounded-full bg-walmart-yellow flex items-center justify-center text-walmart-text text-sm font-bold">
+                    ✓
+                  </div>
+                  <span className="text-walmart-text">
+                    Controle de estoque
+                  </span>
+                </li>
+                <li className="flex items-center space-x-3">
+                  <div className="w-6 h-6 rounded-full bg-walmart-yellow flex items-center justify-center text-walmart-text text-sm font-bold">
+                    ✓
+                  </div>
+                  <span className="text-walmart-text">
+                    Pagamento via Pix
+                  </span>
+                </li>
+              </ul>
+
+              <Link
+                to="/sell"
+                className="inline-flex items-center space-x-2 text-walmart-blue font-semibold hover:space-x-3 transition-all"
+              >
+                <span>Saiba Mais</span>
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+            </div>
+
+            {/* Feature 2: QR Code */}
+            <div className="vitrii-card p-8">
+              <div className="w-16 h-16 bg-walmart-blue bg-opacity-10 rounded-lg flex items-center justify-center mb-6">
+                <QrCode className="w-8 h-8 text-walmart-blue" />
+              </div>
+              <h3 className="text-2xl font-bold text-walmart-text mb-4">
+                Vitrines com QR Code
+              </h3>
+              <p className="text-walmart-text-secondary mb-6">
+                Coloque QR Codes na sua loja para que clientes vejam produtos,
+                tamanhos, cores, estoque e preços em tempo real. Eles podem
+                chamar atendentes direto do app, que recebem notificações e
+                alertas sonoros.
+              </p>
+
+              <ul className="space-y-3 mb-8">
+                <li className="flex items-center space-x-3">
+                  <div className="w-6 h-6 rounded-full bg-walmart-yellow flex items-center justify-center text-walmart-text text-sm font-bold">
+                    ✓
+                  </div>
+                  <span className="text-walmart-text">
+                    QR Codes dinâmicos
+                  </span>
+                </li>
+                <li className="flex items-center space-x-3">
+                  <div className="w-6 h-6 rounded-full bg-walmart-yellow flex items-center justify-center text-walmart-text text-sm font-bold">
+                    ✓
+                  </div>
+                  <span className="text-walmart-text">
+                    Informações em tempo real
+                  </span>
+                </li>
+                <li className="flex items-center space-x-3">
+                  <div className="w-6 h-6 rounded-full bg-walmart-yellow flex items-center justify-center text-walmart-text text-sm font-bold">
+                    ✓
+                  </div>
+                  <span className="text-walmart-text">
+                    Sistema de alertas
+                  </span>
+                </li>
+                <li className="flex items-center space-x-3">
+                  <div className="w-6 h-6 rounded-full bg-walmart-yellow flex items-center justify-center text-walmart-text text-sm font-bold">
+                    ✓
+                  </div>
+                  <span className="text-walmart-text">
+                    Notificações inteligentes
+                  </span>
+                </li>
+              </ul>
+
+              <Link
+                to="/qrcode"
+                className="inline-flex items-center space-x-2 text-walmart-blue font-semibold hover:space-x-3 transition-all"
+              >
+                <span>Saiba Mais</span>
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Why Choose Vitrii Section */}
+      <section className="py-16 md:py-24">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-walmart-text mb-4">
+              Por que escolher Vitrii?
+            </h2>
+            <p className="text-xl text-walmart-text-secondary">
+              Recursos que transformam seu negócio
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Reason 1 */}
+            <div className="text-center">
+              <div className="w-16 h-16 bg-walmart-blue bg-opacity-10 rounded-lg flex items-center justify-center mx-auto mb-6">
+                <Zap className="w-8 h-8 text-walmart-blue" />
+              </div>
+              <h3 className="text-xl font-bold text-walmart-text mb-3">
+                Rápido e Fácil
+              </h3>
+              <p className="text-walmart-text-secondary">
+                Comece em minutos. Cadastre sua loja, adicione produtos e comece
+                a vender ou comprar sem complicações.
+              </p>
+            </div>
+
+            {/* Reason 2 */}
+            <div className="text-center">
+              <div className="w-16 h-16 bg-walmart-blue bg-opacity-10 rounded-lg flex items-center justify-center mx-auto mb-6">
+                <Users className="w-8 h-8 text-walmart-blue" />
+              </div>
+              <h3 className="text-xl font-bold text-walmart-text mb-3">
+                Comunidade Ativa
+              </h3>
+              <p className="text-walmart-text-secondary">
+                Conecte-se com milhares de vendedores e compradores. Cresça sua
+                rede e suas vendas.
+              </p>
+            </div>
+
+            {/* Reason 3 */}
+            <div className="text-center">
+              <div className="w-16 h-16 bg-walmart-blue bg-opacity-10 rounded-lg flex items-center justify-center mx-auto mb-6">
+                <BarChart3 className="w-8 h-8 text-walmart-blue" />
+              </div>
+              <h3 className="text-xl font-bold text-walmart-text mb-3">
+                Análises Completas
+              </h3>
+              <p className="text-walmart-text-secondary">
+                Acompanhe suas vendas, clientes e performance com dashboards
+                detalhados.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Listings Section */}
+      <section className="py-16 md:py-24 bg-walmart-gray-light">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center mb-12">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold text-walmart-text mb-2">
+                Anúncios em Destaque
+              </h2>
+              <p className="text-walmart-text-secondary">
+                Veja os produtos e serviços mais procurados
+              </p>
+            </div>
+            <Link
+              to="/browse"
+              className="hidden md:inline-flex items-center space-x-2 text-walmart-blue font-semibold hover:space-x-3 transition-all"
+            >
+              <span>Ver Todos</span>
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+
+          {/* Featured Cards Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[1, 2, 3, 4].map((item) => (
+              <div
+                key={item}
+                className="vitrii-card overflow-hidden hover:scale-105 transition-transform duration-200"
+              >
+                {/* Image Placeholder */}
+                <div className="w-full h-48 bg-gradient-to-br from-walmart-blue to-walmart-blue-dark flex items-center justify-center">
+                  <Package className="w-12 h-12 text-white opacity-50" />
+                </div>
+
+                {/* Content */}
+                <div className="p-4">
+                  <h4 className="font-semibold text-walmart-text mb-2">
+                    Produto Exemplo {item}
+                  </h4>
+                  <p className="text-sm text-walmart-text-secondary mb-3">
+                    Descrição breve do produto ou serviço
+                  </p>
+
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="text-2xl font-bold text-walmart-blue">
+                      R$ {(100 + item * 50).toFixed(2)}
+                    </span>
+                    <div className="flex items-center space-x-1">
+                      <Star className="w-4 h-4 fill-walmart-yellow text-walmart-yellow" />
+                      <span className="text-sm font-semibold">5.0</span>
+                    </div>
+                  </div>
+
+                  <button className="w-full bg-walmart-blue text-white py-2 rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors">
+                    Ver Detalhes
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-center mt-12 lg:hidden">
+            <Link
+              to="/browse"
+              className="inline-flex items-center space-x-2 text-walmart-blue font-semibold hover:space-x-3 transition-all"
+            >
+              <span>Ver Todos os Anúncios</span>
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Call to Action Section */}
+      <section className="py-16 md:py-24 bg-walmart-blue text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">
+            Pronto para crescer seu negócio?
+          </h2>
+          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+            Junte-se a milhares de vendedores que já estão transformando seus
+            negócios com Vitrii.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link
+              to="/auth/signup"
+              className="bg-walmart-yellow text-walmart-text px-8 py-3 rounded-lg font-semibold hover:bg-walmart-yellow-dark transition-colors inline-block"
+            >
+              Comece Grátis
+            </Link>
+            <Link
+              to="/browse"
+              className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:bg-opacity-10 transition-colors inline-block"
+            >
+              Explorar Marketplace
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Info Banner */}
+      <section className="bg-blue-50 border-t-4 border-walmart-blue py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-start space-x-4">
+          <AlertCircle className="w-6 h-6 text-walmart-blue flex-shrink-0 mt-1" />
+          <div>
+            <h3 className="font-semibold text-walmart-text mb-1">
+              Informação Importante
+            </h3>
+            <p className="text-walmart-text-secondary text-sm">
+              Vitrii é um marketplace seguro com autenticação via Google ou
+              Usuário/Senha. Suas transações são protegidas e dados
+              criptografados.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <Footer />
     </div>
   );
 }
