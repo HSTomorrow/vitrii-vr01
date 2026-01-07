@@ -252,6 +252,21 @@ export default function CreateProductoModal({
               />
             </div>
 
+            {/* Tipo */}
+            <div>
+              <label className="block text-sm font-semibold text-walmart-text mb-2">
+                Tipo *
+              </label>
+              <select
+                value={formData.tipo}
+                onChange={(e) => handleInputChange("tipo", e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+              >
+                <option value="produto">Produto</option>
+                <option value="servico">Serviço</option>
+              </select>
+            </div>
+
             {/* Variantes/Tabelas de Preço */}
             <div>
               <div className="flex items-center justify-between mb-2">
