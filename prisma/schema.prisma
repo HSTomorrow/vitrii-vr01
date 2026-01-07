@@ -81,6 +81,43 @@ model UsuarioLoja {
 }
 
 // ============================================================================
+// EQUIPE DE VENDA (Sales Team)
+// ============================================================================
+model EquipeDeVenda {
+  id            Int       @id @default(autoincrement())
+  lojaId        Int
+  nome          String    @db.VarChar(255)
+  descricao     String?   @db.Text
+  dataCriacao   DateTime  @default(now())
+  dataAtualizacao DateTime @updatedAt
+
+  // Relations
+  loja          Loja      @relation(fields: [lojaId], references: [id], onDelete: Cascade)
+  membros       MembroEquipe[]
+  anuncios      Anuncio[]
+
+  @@map("equipes_de_venda")
+}
+
+// ============================================================================
+// MEMBRO DA EQUIPE DE VENDA (Sales Team Member)
+// ============================================================================
+model MembroEquipe {
+  id            Int       @id @default(autoincrement())
+  equipeId      Int
+  usuarioId     Int
+  dataCriacao   DateTime  @default(now())
+  dataAtualizacao DateTime @updatedAt
+
+  // Relations
+  equipe        EquipeDeVenda @relation(fields: [equipeId], references: [id], onDelete: Cascade)
+  usuario       Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@unique([equipeId, usuarioId])
+  @@map("membros_equipe")
+}
+
+// ============================================================================
 // GRUPOS DE PRODUTOS E SERVIÇOS
 // ============================================================================
 model GrupoDeProductos {
