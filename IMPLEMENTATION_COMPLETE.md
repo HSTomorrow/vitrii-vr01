@@ -465,12 +465,13 @@ POST /api/agendas/:agendaId/waitlist/promote
 
 ## 📊 Statistics
 
-- **Total Lines of Code**: ~8,000+
-- **Database Models**: 15+
-- **API Endpoints**: 60+
-- **Frontend Components**: 20+
+- **Total Lines of Code**: ~9,500+
+- **Database Models**: 17 (Added Funcionalidade, UsuarioXFuncionalidade)
+- **API Endpoints**: 73+ (Added 13 RBAC endpoints)
+- **Frontend Components**: 21+ (Added AdminDashboard)
 - **Frontend Pages**: 15+
-- **Documentation Pages**: 6
+- **Documentation Pages**: 8 (Added RBAC guides)
+- **Pre-seeded Funcionalidades**: 14
 
 ## 🙏 Acknowledgments
 
