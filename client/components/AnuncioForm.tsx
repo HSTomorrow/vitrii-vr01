@@ -54,6 +54,7 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
     dataValidade: getDefaultValidityDate(),
     equipeDeVendaId: 0,
     isDoacao: false,
+    destaque: false,
   });
 
   // Fetch lojas
