@@ -222,6 +222,12 @@ export function createServer() {
     getUsuariosDisponiveis,
   );
 
+  // Favoritos (Favorites) routes
+  app.get("/api/favoritos", getFavoritos);
+  app.get("/api/favoritos/check", checkFavorito);
+  app.post("/api/favoritos/toggle", toggleFavorito);
+  app.get("/api/anuncios/:anuncioId/favoritos/count", getFavoritoCount);
+
   // QR Codes routes
   app.post("/api/qrcodes/generate", generateQRCode);
   app.get("/api/anuncios/:anuncioId/qrcodes", getQRCodesForAd);
