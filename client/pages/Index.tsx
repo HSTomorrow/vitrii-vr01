@@ -164,7 +164,7 @@ export default function Index() {
               destacados.map((anuncio: any) => (
                 <div
                   key={anuncio.id}
-                  className="vitrii-card overflow-hidden hover:scale-105 transition-transform duration-200 cursor-pointer"
+                  className="vitrii-card overflow-hidden hover:scale-105 transition-transform duration-200 cursor-pointer relative"
                 >
                   {/* Image */}
                   <div className="w-full h-48 bg-gradient-to-br from-walmart-blue to-walmart-blue-dark flex items-center justify-center overflow-hidden">
@@ -178,6 +178,40 @@ export default function Index() {
                       <Package className="w-12 h-12 text-white opacity-50" />
                     )}
                   </div>
+
+                  {/* Store Logo Badge */}
+                  {anuncio.loja?.fotoUrl && (
+                    <div className="absolute bottom-3 left-3 z-10 w-10 h-10 rounded-full bg-white border-2 border-walmart-blue overflow-hidden flex items-center justify-center shadow-md">
+                      <img
+                        src={anuncio.loja.fotoUrl}
+                        alt={anuncio.loja.nome}
+                        className="w-full h-full object-cover"
+                        title={anuncio.loja.nome}
+                      />
+                    </div>
+                  )}
+
+                  {/* Favorito Heart Button */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (!user) {
+                        toast.error("Faça login para adicionar favoritos");
+                        navigate("/auth/signin");
+                      } else {
+                        toggleFavoritoMutation.mutate(anuncio.id);
+                      }
+                    }}
+                    disabled={toggleFavoritoMutation.isPending}
+                    className="absolute top-3 right-3 z-10 p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
+                    title={favoritos.has(anuncio.id) ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+                  >
+                    <Heart
+                      className={`w-5 h-5 transition-colors ${
+                        favoritos.has(anuncio.id) ? "fill-red-500 text-red-500" : "text-gray-400"
+                      }`}
+                    />
+                  </button>
 
                   {/* Content */}
                   <div className="p-4 flex flex-col h-full">
@@ -326,6 +360,40 @@ export default function Index() {
                       <Package className="w-12 h-12 text-white opacity-50" />
                     )}
                   </div>
+
+                  {/* Store Logo Badge */}
+                  {anuncio.loja?.fotoUrl && (
+                    <div className="absolute bottom-3 left-3 z-10 w-10 h-10 rounded-full bg-white border-2 border-green-500 overflow-hidden flex items-center justify-center shadow-md">
+                      <img
+                        src={anuncio.loja.fotoUrl}
+                        alt={anuncio.loja.nome}
+                        className="w-full h-full object-cover"
+                        title={anuncio.loja.nome}
+                      />
+                    </div>
+                  )}
+
+                  {/* Favorito Heart Button */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (!user) {
+                        toast.error("Faça login para adicionar favoritos");
+                        navigate("/auth/signin");
+                      } else {
+                        toggleFavoritoMutation.mutate(anuncio.id);
+                      }
+                    }}
+                    disabled={toggleFavoritoMutation.isPending}
+                    className="absolute top-3 left-3 z-10 p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
+                    title={favoritos.has(anuncio.id) ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+                  >
+                    <Heart
+                      className={`w-5 h-5 transition-colors ${
+                        favoritos.has(anuncio.id) ? "fill-red-500 text-red-500" : "text-gray-400"
+                      }`}
+                    />
+                  </button>
 
                   {/* Content */}
                   <div className="p-4 flex flex-col h-full">
