@@ -13,6 +13,9 @@ import Sell from "./pages/Sell";
 import QRCodePage from "./pages/QRCode";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
+import CriarAnuncio from "./pages/CriarAnuncio";
+import AnuncioDetalhe from "./pages/AnuncioDetalhe";
+import EditarAnuncio from "./pages/EditarAnuncio";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +34,9 @@ const App = () => (
           <Route path="/qrcode" element={<QRCodePage />} />
           <Route path="/auth/signin" element={<SignIn />} />
           <Route path="/auth/signup" element={<SignUp />} />
+          <Route path="/anuncio/criar" element={<CriarAnuncio />} />
+          <Route path="/anuncio/:id" element={<AnuncioDetalhe />} />
+          <Route path="/anuncio/:id/editar" element={<EditarAnuncio />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
