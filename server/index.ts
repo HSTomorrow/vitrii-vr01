@@ -43,6 +43,14 @@ export function createServer() {
 
   app.get("/api/demo", handleDemo);
 
+  // Usuários routes
+  app.get("/api/usuarios", getUsuarios);
+  app.get("/api/usuarios/:id", getUsuarioById);
+  app.post("/api/auth/signup", signUpUsuario);
+  app.post("/api/usuarios", createUsuario);
+  app.put("/api/usuarios/:id", updateUsuario);
+  app.delete("/api/usuarios/:id", deleteUsuario);
+
   // Lojas routes
   app.get("/api/lojas", getLojas);
   app.get("/api/lojas/:id", getLojaById);
