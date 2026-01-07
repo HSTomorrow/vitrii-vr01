@@ -37,6 +37,7 @@ interface Anuncio {
 
 export default function AdminManageAds() {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [expandedAd, setExpandedAd] = useState<number | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>("todos");
