@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -17,7 +16,7 @@ async function main() {
         "⚠️  Admin user already exists! Credentials:",
       );
       console.log("   Email: admin@vitrii.com.br");
-      console.log("   Password: Admin@2025");
+      console.log("   Senha: Admin@2025");
       console.log(
         "\n   If you need to change the password, update the database directly.",
       );
@@ -25,15 +24,12 @@ async function main() {
       return;
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash("Admin@2025", 10);
-
-    // Create ADM user
+    // Create ADM user (password stored as-is, matching current system)
     const admUser = await prisma.usuario.create({
       data: {
         nome: "Administrador Vitrii",
         email: "admin@vitrii.com.br",
-        senha: hashedPassword,
+        senha: "Admin@2025",
         cpf: "00000000000",
         telefone: "0000000000",
         endereco: "Sistema Administrativo",
