@@ -9,6 +9,7 @@ import {
   Plus,
   LogOut,
   Settings,
+  MessageSquare,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
