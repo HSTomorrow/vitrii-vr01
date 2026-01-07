@@ -357,10 +357,6 @@ model Mensagem {
   @@map("mensagens")
 }
 
-// Add relation to Anuncio for conversations
-// Add relation to Usuario for messages
-// Add relation to Loja for conversations
-
 // ============================================================================
 // CONTROLE DE ESTOQUE
 // ============================================================================
