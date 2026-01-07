@@ -48,6 +48,21 @@ Vitrii is a comprehensive Brazilian marketplace platform built with React, Node.
 - **Read status tracking** and indicators
 - **Conversation search & filtering**
 - **Ad-linked chats** for product-specific discussions
+
+### 6. ✅ Role-Based Access Control (RBAC)
+
+- **User types** (ADM/COMUM) for role management
+- **14 Pre-seeded funcionalidades** (permissions) covering:
+  - User management (MANAGE_USERS, VIEW_USERS, MANAGE_USER_PERMISSIONS)
+  - Ad management (MANAGE_ADS, VIEW_ALL_ADS, MANAGE_FEATURED_ADS)
+  - Store management (MANAGE_STORES, VIEW_ALL_STORES)
+  - Chat management (MANAGE_CHATS, VIEW_ALL_CHATS)
+  - Payment management (MANAGE_PAYMENTS, VIEW_PAYMENT_REPORTS)
+  - System management (VIEW_REPORTS, MANAGE_SITE)
+- **Admin Dashboard** for permission management
+- **Permission middleware** for API route protection
+- **Granular access control** at feature level
+- **User-Funcionalidade junction table** for flexible permission mapping
 - **Real-time polling** (every 3 seconds)
 - **Message notifications** support
 
