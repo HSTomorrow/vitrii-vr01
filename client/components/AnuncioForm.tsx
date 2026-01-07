@@ -127,7 +127,9 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
           lojaId: selectedLojaId,
           tabelaDePrecoId: data.tabelaDePrecoId > 0 ? data.tabelaDePrecoId : null,
           preco: data.preco ? parseFloat(data.preco) : null,
-          dataValidade: data.dataValidade || null,
+          dataValidade: data.dataValidade
+            ? new Date(data.dataValidade).toISOString()
+            : null,
           equipeDeVendaId: data.equipeDeVendaId > 0 ? data.equipeDeVendaId : null,
         }),
       });
