@@ -184,12 +184,30 @@ export default function Index() {
                       </div>
                     </div>
 
-                    <button
-                      onClick={() => navigate(`/anuncio/${anuncio.id}`)}
-                      className="w-full bg-walmart-blue text-white py-2 rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors"
-                    >
-                      Ver Detalhes
-                    </button>
+                    {anuncio.producto?.tipo === "servico" ? (
+                      <div className="flex gap-2">
+                        <Link
+                          to={`/agenda/loja/${anuncio.lojaId}`}
+                          className="flex-1 bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+                        >
+                          <Calendar className="w-4 h-4" />
+                          Agendar
+                        </Link>
+                        <button
+                          onClick={() => navigate(`/anuncio/${anuncio.id}`)}
+                          className="flex-1 bg-walmart-blue text-white py-2 rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors"
+                        >
+                          Detalhes
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => navigate(`/anuncio/${anuncio.id}`)}
+                        className="w-full bg-walmart-blue text-white py-2 rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors"
+                      >
+                        Ver Detalhes
+                      </button>
+                    )}
                   </div>
                 </div>
               ))
