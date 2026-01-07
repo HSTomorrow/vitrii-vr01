@@ -53,6 +53,7 @@ export default function App() {
               <Route path="/anuncio/:id" element={<AnuncioDetalhe />} />
               <Route path="/anuncio/:id/editar" element={<EditarAnuncio />} />
               <Route path="/buscar" element={<SearchAnuncios />} />
+              <Route path="/buscar-produtos" element={<SearchProdutos />} />
               <Route path="/cadastros/lojas" element={<CadastroLojas />} />
                 <Route path="/cadastros/grupos-productos" element={<CadastroGruposProductos />} />
                 <Route path="/cadastros/productos" element={<CadastroProdutos />} />
