@@ -304,6 +304,86 @@ export default function Sell() {
         </div>
       </section>
 
+      {/* My Ads Section */}
+      {anuncios.length > 0 && (
+        <section className="py-16 bg-walmart-gray-light">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-2xl font-bold text-walmart-text">Meus Anúncios</h2>
+              <Link
+                to="/anuncio/criar"
+                className="inline-flex items-center gap-2 bg-walmart-blue text-white px-4 py-2 rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors"
+              >
+                <Plus className="w-5 h-5" />
+                Novo Anúncio
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {anuncios.map((anuncio: any) => (
+                <Link
+                  key={anuncio.id}
+                  to={`/anuncio/${anuncio.id}`}
+                  className="bg-white rounded-lg overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow"
+                >
+                  <div className="aspect-video bg-walmart-gray-light flex items-center justify-center overflow-hidden">
+                    {anuncio.fotoUrl ? (
+                      <img
+                        src={anuncio.fotoUrl}
+                        alt={anuncio.titulo}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <ShoppingBag className="w-12 h-12 text-gray-400" />
+                    )}
+                  </div>
+                  <div className="p-4">
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="font-bold text-walmart-text flex-1 line-clamp-2">
+                        {anuncio.titulo}
+                      </h3>
+                      <span
+                        className={`px-2 py-1 rounded text-xs font-semibold whitespace-nowrap ml-2 ${
+                          statusColors[anuncio.status] || statusColors.em_edicao
+                        }`}
+                      >
+                        {statusLabels[anuncio.status] || anuncio.status}
+                      </span>
+                    </div>
+
+                    <p className="text-walmart-blue font-bold text-lg mb-3">
+                      R$ {anuncio.tabelaDePreco?.preco?.toFixed(2) || "0.00"}
+                    </p>
+
+                    <div className="flex gap-2 text-walmart-text-secondary text-sm mb-4">
+                      <div className="flex items-center gap-1">
+                        <Eye className="w-4 h-4" />
+                        <span>0</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <MessageSquare className="w-4 h-4" />
+                        <span>0</span>
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Link
+                        to={`/anuncio/${anuncio.id}/editar`}
+                        onClick={(e) => e.preventDefault()}
+                        className="flex-1 px-3 py-2 border border-walmart-blue text-walmart-blue rounded font-semibold hover:bg-blue-50 transition-colors flex items-center justify-center gap-1 text-sm"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                        Editar
+                      </Link>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* CTA Section */}
       <section className="py-16">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -318,11 +398,11 @@ export default function Sell() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              to="/auth/signup"
+              to="/anuncio/criar"
               className="inline-flex items-center justify-center space-x-2 bg-walmart-blue text-white px-8 py-3 rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors"
             >
-              <span>Criar Conta Grátis</span>
-              <ArrowRight className="w-5 h-5" />
+              <Plus className="w-5 h-5" />
+              <span>Publicar Anúncio</span>
             </Link>
             <Link
               to="/"
