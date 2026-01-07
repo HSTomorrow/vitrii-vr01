@@ -119,6 +119,7 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
         body: JSON.stringify({
           ...data,
           lojaId: selectedLojaId,
+          equipeDeVendaId: data.equipeDeVendaId > 0 ? data.equipeDeVendaId : null,
         }),
       });
 
