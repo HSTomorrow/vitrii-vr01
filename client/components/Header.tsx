@@ -131,6 +131,12 @@ export default function Header() {
                 QR Code
               </Link>
               <Link
+                to="/about"
+                className="px-4 py-2 text-walmart-text hover:bg-walmart-gray rounded-lg"
+              >
+                Sobre
+              </Link>
+              <Link
                 to="/auth/signin"
                 className="px-4 py-2 text-walmart-blue"
               >
