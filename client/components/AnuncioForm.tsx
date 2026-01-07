@@ -43,6 +43,8 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
     productId: 0,
     tabelaDePrecoId: 0,
     fotoUrl: "",
+    equipeDeVendaId: 0,
+    isDoacao: false,
   });
 
   // Fetch lojas
