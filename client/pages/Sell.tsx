@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 
 export default function Sell() {
+  const queryClient = useQueryClient();
+
   // Fetch user's ads
   const { data: anunciosData } = useQuery({
     queryKey: ["anuncios"],
@@ -25,6 +27,27 @@ export default function Sell() {
       const response = await fetch("/api/anuncios");
       if (!response.ok) throw new Error("Erro ao buscar anúncios");
       return response.json();
+    },
+  });
+
+  // Inactivate/Activate mutation
+  const toggleActiveMutation = useMutation({
+    mutationFn: async ({ anuncioId, activate }: { anuncioId: number; activate: boolean }) => {
+      const endpoint = activate ? "/activate" : "/inactivate";
+      const response = await fetch(`/api/anuncios/${anuncioId}${endpoint}`, {
+        method: "PATCH",
+      });
+      if (!response.ok) throw new Error("Erro ao atualizar anúncio");
+      return response.json();
+    },
+    onSuccess: (_, variables) => {
+      toast.success(
+        variables.activate ? "Anúncio reativado com sucesso" : "Anúncio inativado com sucesso"
+      );
+      queryClient.invalidateQueries({ queryKey: ["anuncios"] });
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : "Erro ao atualizar anúncio");
     },
   });
 
