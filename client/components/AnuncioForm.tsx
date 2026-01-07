@@ -223,10 +223,16 @@ export default function AnuncioForm({
           : "Anúncio criado com sucesso!",
       );
 
-      // If creating a new ad (not editing), redirect to checkout
+      // If creating a new ad (not editing)
       if (!anuncioId && result.data?.id) {
         setTimeout(() => {
-          navigate(`/checkout/${result.data.id}`);
+          // Donations go directly to ad detail (no payment needed)
+          // Regular ads go to checkout
+          if (result.data.isDoacao) {
+            navigate(`/anuncio/${result.data.id}`);
+          } else {
+            navigate(`/checkout/${result.data.id}`);
+          }
         }, 500);
       } else if (onSuccess) {
         onSuccess();
