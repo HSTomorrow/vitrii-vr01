@@ -79,6 +79,17 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
     enabled: selectedLojaId > 0,
   });
 
+  // Fetch equipes de venda for selected loja
+  const { data: equipesData } = useQuery({
+    queryKey: ["equipes-venda", selectedLojaId],
+    queryFn: async () => {
+      const response = await fetch(`/api/equipes-venda?lojaId=${selectedLojaId}`);
+      if (!response.ok) throw new Error("Erro ao buscar equipes");
+      return response.json();
+    },
+    enabled: selectedLojaId > 0,
+  });
+
   // Populate form with anuncio data when editing
   useEffect(() => {
     if (anuncioData?.data) {
