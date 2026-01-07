@@ -126,9 +126,9 @@ export const signInUsuario: RequestHandler = async (req, res) => {
       });
     }
 
-    // Check password (TODO: compare with bcrypt hashed password in production)
-    // For now, simple comparison (INSECURE - for development only)
-    if (usuario.senha !== senha) {
+    // Compare password with bcrypt hash
+    const isPasswordValid = await bcryptjs.compare(senha, usuario.senha);
+    if (!isPasswordValid) {
       return res.status(401).json({
         success: false,
         error: "Email ou senha incorretos",
