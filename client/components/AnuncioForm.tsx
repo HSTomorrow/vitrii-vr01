@@ -320,6 +320,46 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
               )}
             </div>
 
+            {/* Valor */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-semibold text-walmart-text mb-2">
+                  Valor (Preço) - Opcional
+                </label>
+                <div className="flex items-center">
+                  <span className="text-walmart-text font-semibold mr-2">R$</span>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={formData.preco}
+                    onChange={(e) => handleInputChange("preco", e.target.value)}
+                    placeholder="Deixar em branco para usar preço da variante"
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                  />
+                </div>
+                {selectedPriceTable && !formData.preco && (
+                  <p className="mt-2 text-sm text-walmart-text-secondary">
+                    Será usado preço da variante: R$ {Number(selectedPriceTable.preco).toFixed(2)}
+                  </p>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-walmart-text mb-2">
+                  Validade do Anúncio
+                </label>
+                <input
+                  type="date"
+                  value={formData.dataValidade}
+                  onChange={(e) => handleInputChange("dataValidade", e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                />
+                <p className="mt-2 text-sm text-walmart-text-secondary">
+                  Padrão: 7 dias a partir de hoje
+                </p>
+              </div>
+            </div>
+
             {/* Equipe de Venda */}
             <div>
               <label className="block text-sm font-semibold text-walmart-text mb-2">
