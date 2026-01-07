@@ -223,7 +223,7 @@ model Anuncio {
   productId     Int
   tabelaDePrecoId Int?
   equipeDeVendaId Int?
-  titulo        String    @db.VarChar(255)
+  titulo        String    @db.VarChar(50)
   descricao     String?   @db.Text
   fotoUrl       String?   @db.Text
   isDoacao      Boolean   @default(false)
