@@ -203,6 +203,29 @@ model TabelaDePreco {
 }
 
 // ============================================================================
+// AGENDA DE SERVIÇOS (Service Schedule)
+// ============================================================================
+model Agenda {
+  id            Int       @id @default(autoincrement())
+  lojaId        Int
+  productId     Int
+  usuarioId     Int?      // Service provider
+  dataHora      DateTime
+  descricao     String?   @db.Text
+  status        String    @default("disponivel") // "disponivel", "ocupado", "cancelado"
+  isActive      Boolean   @default(true)
+  dataCriacao   DateTime  @default(now())
+  dataAtualizacao DateTime @updatedAt
+
+  // Relations
+  loja          Loja      @relation(fields: [lojaId], references: [id], onDelete: Cascade)
+  producto      Producto  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  usuario       Usuario?  @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+
+  @@map("agendas")
+}
+
+// ============================================================================
 // QR CODES
 // ============================================================================
 model QRCode {
