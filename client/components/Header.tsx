@@ -1,9 +1,17 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { Menu, X, Search, ShoppingCart, User, Plus } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Menu, X, Search, ShoppingCart, User, Plus, LogOut } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-200">
@@ -68,27 +76,56 @@ export default function Header() {
               <ShoppingCart className="w-5 h-5 text-walmart-text" />
             </button>
 
-            <Link
-              to="/anuncio/criar"
-              className="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-walmart-yellow text-walmart-text rounded-lg hover:bg-walmart-yellow-dark transition-colors font-semibold"
-            >
-              <Plus className="w-4 h-4" />
-              <span className="hidden md:inline">Publicar</span>
-            </Link>
+            {user ? (
+              <>
+                <Link
+                  to="/anuncio/criar"
+                  className="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-walmart-yellow text-walmart-text rounded-lg hover:bg-walmart-yellow-dark transition-colors font-semibold"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span className="hidden md:inline">Publicar</span>
+                </Link>
 
-            <Link
-              to="/auth/signin"
-              className="px-4 py-2 text-walmart-blue hover:bg-blue-50 rounded-lg transition-colors hidden sm:block"
-            >
-              Entrar
-            </Link>
+                <div className="hidden sm:flex items-center space-x-2 px-4 py-2 bg-green-50 rounded-lg border border-green-200">
+                  <User className="w-4 h-4 text-green-600" />
+                  <span className="text-sm font-semibold text-green-800 hidden md:inline">
+                    {user.nome.split(" ")[0]}
+                  </span>
+                </div>
 
-            <Link
-              to="/auth/signup"
-              className="px-4 py-2 bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors hidden sm:block"
-            >
-              Cadastrar
-            </Link>
+                <button
+                  onClick={handleLogout}
+                  className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors hidden sm:flex items-center gap-2 font-semibold"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span className="hidden md:inline">Sair</span>
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/anuncio/criar"
+                  className="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-walmart-yellow text-walmart-text rounded-lg hover:bg-walmart-yellow-dark transition-colors font-semibold"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span className="hidden md:inline">Publicar</span>
+                </Link>
+
+                <Link
+                  to="/auth/signin"
+                  className="px-4 py-2 text-walmart-blue hover:bg-blue-50 rounded-lg transition-colors hidden sm:block"
+                >
+                  Entrar
+                </Link>
+
+                <Link
+                  to="/auth/signup"
+                  className="px-4 py-2 bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors hidden sm:block"
+                >
+                  Cadastrar
+                </Link>
+              </>
+            )}
 
             {/* Mobile menu button */}
             <button
