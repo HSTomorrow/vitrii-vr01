@@ -101,8 +101,12 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
         titulo: ad.titulo,
         descricao: ad.descricao || "",
         productId: ad.productId,
-        tabelaDePrecoId: ad.tabelaDePrecoId,
+        tabelaDePrecoId: ad.tabelaDePrecoId || 0,
         fotoUrl: ad.fotoUrl || "",
+        preco: ad.preco ? ad.preco.toString() : "",
+        dataValidade: ad.dataValidade
+          ? new Date(ad.dataValidade).toISOString().split('T')[0]
+          : "",
         equipeDeVendaId: ad.equipeDeVendaId || 0,
         isDoacao: ad.isDoacao || false,
       });
