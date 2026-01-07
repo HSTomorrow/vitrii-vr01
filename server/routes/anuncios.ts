@@ -203,6 +203,8 @@ export const createAnuncio: RequestHandler = async (req, res) => {
         isDoacao: validatedData.isDoacao,
         destaque: validatedData.destaque || false,
         isActive: validatedData.isActive !== false,
+        categoria: validatedData.categoria,
+        dadosCategoria: validatedData.dadosCategoria,
         status: "em_edicao",
       },
       include: {
