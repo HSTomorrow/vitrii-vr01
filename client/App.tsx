@@ -62,6 +62,8 @@ export default function App() {
                 <Route path="/cadastros/variantes" element={<CadastroVariantesLista />} />
                 <Route path="/cadastros/variantes/:productId" element={<CadastroVariantes />} />
                 <Route path="/cadastros/equipes-venda" element={<CadastroEquipeDeVenda />} />
+                <Route path="/agenda" element={<Agenda />} />
+                <Route path="/agenda/:lojaId" element={<Agenda />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
