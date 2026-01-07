@@ -14,6 +14,8 @@ import Sell from "./pages/Sell";
 import QRCodePage from "./pages/QRCode";
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import PerfilUsuario from "./pages/PerfilUsuario";
 import CriarAnuncio from "./pages/CriarAnuncio";
 import AnuncioDetalhe from "./pages/AnuncioDetalhe";
