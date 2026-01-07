@@ -117,6 +117,10 @@ export default function AdminManageAds() {
     mutationFn: async (anuncioId: number) => {
       const response = await fetch(`/api/anuncios/${anuncioId}`, {
         method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": user?.id ? String(user.id) : "",
+        },
       });
       if (!response.ok) throw new Error("Erro ao deletar anúncio");
       return response.json();
