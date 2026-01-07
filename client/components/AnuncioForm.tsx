@@ -288,6 +288,54 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
               )}
             </div>
 
+            {/* Equipe de Venda */}
+            <div>
+              <label className="block text-sm font-semibold text-walmart-text mb-2">
+                Equipe de Venda
+              </label>
+              {selectedLojaId > 0 ? (
+                <select
+                  value={formData.equipeDeVendaId}
+                  onChange={(e) =>
+                    handleInputChange("equipeDeVendaId", parseInt(e.target.value))
+                  }
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                >
+                  <option value={0}>Nenhuma equipe selecionada</option>
+                  {equipes.map((eq: EquipeDeVenda) => (
+                    <option key={eq.id} value={eq.id}>
+                      {eq.nome}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <div className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500">
+                  Selecione uma loja primeiro
+                </div>
+              )}
+            </div>
+
+            {/* Doação */}
+            <div className="flex items-center gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <input
+                type="checkbox"
+                id="isDoacao"
+                checked={formData.isDoacao}
+                onChange={(e) => {
+                  handleInputChange("isDoacao", e.target.checked);
+                }}
+                className="w-5 h-5 text-walmart-blue cursor-pointer rounded"
+              />
+              <label htmlFor="isDoacao" className="flex-1 cursor-pointer">
+                <p className="font-semibold text-walmart-text">
+                  Esta é uma doação
+                </p>
+                <p className="text-sm text-walmart-text-secondary">
+                  Marque esta opção para publicar como doação (valor zerado)
+                </p>
+              </label>
+            </div>
+
             {/* Título */}
             <div>
               <label className="block text-sm font-semibold text-walmart-text mb-2">
