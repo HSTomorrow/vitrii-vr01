@@ -134,10 +134,16 @@ export default function AdminManageAds() {
     }) => {
       const response = await fetch(`/api/anuncios/${anuncioId}/override-status`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": user?.id ? String(user.id) : "",
+        },
         body: JSON.stringify({ status }),
       });
-      if (!response.ok) throw new Error("Erro ao alterar status do anúncio");
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Erro ao alterar status do anúncio");
+      }
       return response.json();
     },
     onSuccess: (_, variables) => {
