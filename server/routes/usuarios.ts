@@ -87,6 +87,68 @@ export const getUsuarioById: RequestHandler = async (req, res) => {
   }
 };
 
+// SIGNIN - Authenticate user with email and password
+export const signInUsuario: RequestHandler = async (req, res) => {
+  try {
+    const { email, senha } = req.body;
+
+    // Validate input
+    if (!email || !senha) {
+      return res.status(400).json({
+        success: false,
+        error: "Email e senha são obrigatórios",
+      });
+    }
+
+    // Find user by email
+    const usuario = await prisma.usuario.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        nome: true,
+        email: true,
+        senha: true,
+        tipoUsuario: true,
+        cpf: true,
+        telefone: true,
+        endereco: true,
+        dataCriacao: true,
+      },
+    });
+
+    if (!usuario) {
+      return res.status(401).json({
+        success: false,
+        error: "Email ou senha incorretos",
+      });
+    }
+
+    // Check password (TODO: compare with bcrypt hashed password in production)
+    // For now, simple comparison (INSECURE - for development only)
+    if (usuario.senha !== senha) {
+      return res.status(401).json({
+        success: false,
+        error: "Email ou senha incorretos",
+      });
+    }
+
+    // Return user data (without password)
+    const { senha: _, ...usuarioSemSenha } = usuario;
+
+    res.status(200).json({
+      success: true,
+      data: usuarioSemSenha,
+      message: "Login realizado com sucesso",
+    });
+  } catch (error) {
+    console.error("Error signing in user:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao fazer login",
+    });
+  }
+};
+
 // SIGNUP - Create new user with basic info
 export const signUpUsuario: RequestHandler = async (req, res) => {
   try {
