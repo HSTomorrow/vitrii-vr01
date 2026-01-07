@@ -1,6 +1,9 @@
 import { RequestHandler } from "express";
 import prisma from "../lib/prisma";
 import { z } from "zod";
+import bcryptjs from "bcryptjs";
+import { sendPasswordResetEmail, sendWelcomeEmail } from "../lib/emailService";
+import crypto from "crypto";
 
 // Schema validation for signup (basic info only)
 const UsuarioSignUpSchema = z.object({
