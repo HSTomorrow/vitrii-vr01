@@ -29,22 +29,22 @@ export default function App() {
           <Toaster />
           <Sonner />
           <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/browse" element={<Browse />} />
-            <Route path="/sell" element={<Sell />} />
-            <Route path="/qrcode" element={<QRCodePage />} />
-            <Route path="/auth/signin" element={<SignIn />} />
-          <Route path="/auth/signup" element={<SignUp />} />
-          <Route path="/perfil" element={<PerfilUsuario />} />
-          <Route path="/anuncio/criar" element={<CriarAnuncio />} />
-            <Route path="/anuncio/:id" element={<AnuncioDetalhe />} />
-            <Route path="/anuncio/:id/editar" element={<EditarAnuncio />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/browse" element={<Browse />} />
+              <Route path="/sell" element={<Sell />} />
+              <Route path="/qrcode" element={<QRCodePage />} />
+              <Route path="/auth/signin" element={<SignIn />} />
+              <Route path="/auth/signup" element={<SignUp />} />
+              <Route path="/perfil" element={<PerfilUsuario />} />
+              <Route path="/anuncio/criar" element={<CriarAnuncio />} />
+              <Route path="/anuncio/:id" element={<AnuncioDetalhe />} />
+              <Route path="/anuncio/:id/editar" element={<EditarAnuncio />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
         </TooltipProvider>
       </AuthProvider>
     </QueryClientProvider>
