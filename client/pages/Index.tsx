@@ -19,11 +19,11 @@ import {
 export default function Index() {
   const navigate = useNavigate();
 
-  // Fetch featured ads
+  // Fetch featured ads (excluding donations)
   const { data: anunciosData, isLoading } = useQuery({
     queryKey: ["anuncios-destaque"],
     queryFn: async () => {
-      const response = await fetch("/api/anuncios?status=pago");
+      const response = await fetch("/api/anuncios?status=pago&isDoacao=false");
       if (!response.ok) throw new Error("Erro ao buscar anúncios");
       return response.json();
     },
