@@ -168,7 +168,7 @@ export default function Browse() {
                 {filtered.map((anuncio: any) => (
                   <div
                     key={anuncio.id}
-                    className="vitrii-card overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                    className="vitrii-card overflow-hidden hover:shadow-lg transition-shadow cursor-pointer relative"
                     onClick={() => navigate(`/anuncio/${anuncio.id}`)}
                   >
                     {/* Image */}
@@ -183,6 +183,18 @@ export default function Browse() {
                         <Package className="w-12 h-12 text-white opacity-50" />
                       )}
                     </div>
+
+                    {/* Store Logo Badge */}
+                    {anuncio.loja?.fotoUrl && (
+                      <div className="absolute bottom-3 left-3 z-10 w-10 h-10 rounded-full bg-white border-2 border-walmart-blue overflow-hidden flex items-center justify-center shadow-md">
+                        <img
+                          src={anuncio.loja.fotoUrl}
+                          alt={anuncio.loja.nome}
+                          className="w-full h-full object-cover"
+                          title={anuncio.loja.nome}
+                        />
+                      </div>
+                    )}
 
                     {/* Content */}
                     <div className="p-4">
