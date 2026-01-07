@@ -126,6 +126,8 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
           ...data,
           lojaId: selectedLojaId,
           tabelaDePrecoId: data.tabelaDePrecoId > 0 ? data.tabelaDePrecoId : null,
+          preco: data.preco ? parseFloat(data.preco) : null,
+          dataValidade: data.dataValidade || null,
           equipeDeVendaId: data.equipeDeVendaId > 0 ? data.equipeDeVendaId : null,
         }),
       });
