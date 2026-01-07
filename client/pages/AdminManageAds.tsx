@@ -333,6 +333,37 @@ export default function AdminManageAds() {
                       </div>
                     </div>
 
+                    {/* Status Control */}
+                    <div className="mb-4">
+                      <label className="block text-sm font-semibold text-walmart-text mb-2">
+                        Status do Anúncio
+                      </label>
+                      <div className="flex gap-2 flex-wrap">
+                        <select
+                          value={anuncio.status}
+                          onChange={(e) =>
+                            overrideStatusMutation.mutate({
+                              anuncioId: anuncio.id,
+                              status: e.target.value,
+                            })
+                          }
+                          disabled={overrideStatusMutation.isPending}
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-walmart-blue text-sm"
+                        >
+                          <option value="em_edicao">Em Edição</option>
+                          <option value="aguardando_pagamento">
+                            Aguardando Pagamento
+                          </option>
+                          <option value="pago">Pago (Publicado)</option>
+                          <option value="ativo">Ativo</option>
+                          <option value="historico">Histórico</option>
+                        </select>
+                      </div>
+                      <p className="text-xs text-walmart-text-secondary mt-1">
+                        Status atual: <span className="font-semibold">{anuncio.status}</span>
+                      </p>
+                    </div>
+
                     {/* Actions */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2 pt-4 border-t border-gray-300">
                       {/* Edit Button */}
