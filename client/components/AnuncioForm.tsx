@@ -113,6 +113,7 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
         productId: ad.productId,
         tabelaDePrecoId: ad.tabelaDePrecoId || 0,
         fotoUrl: ad.fotoUrl || "",
+        precoAnuncio: ad.precoAnuncio ? ad.precoAnuncio.toString() : "",
         dataValidade: ad.dataValidade
           ? new Date(ad.dataValidade).toISOString().split('T')[0]
           : getDefaultValidityDate(),
