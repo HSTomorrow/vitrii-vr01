@@ -112,41 +112,83 @@ export default function Index() {
 
           {/* Featured Cards Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {[1, 2, 3, 4].map((item) => (
-              <div
-                key={item}
-                className="vitrii-card overflow-hidden hover:scale-105 transition-transform duration-200"
-              >
-                {/* Image Placeholder */}
-                <div className="w-full h-48 bg-gradient-to-br from-walmart-blue to-walmart-blue-dark flex items-center justify-center">
-                  <Package className="w-12 h-12 text-white opacity-50" />
-                </div>
-
-                {/* Content */}
-                <div className="p-4">
-                  <h4 className="font-semibold text-walmart-text mb-2">
-                    Produto Exemplo {item}
-                  </h4>
-                  <p className="text-sm text-walmart-text-secondary mb-3">
-                    Descrição breve do produto ou serviço
-                  </p>
-
-                  <div className="flex justify-between items-center mb-4">
-                    <span className="text-2xl font-bold text-walmart-blue">
-                      R$ {(100 + item * 50).toFixed(2)}
-                    </span>
-                    <div className="flex items-center space-x-1">
-                      <Star className="w-4 h-4 fill-walmart-yellow text-walmart-yellow" />
-                      <span className="text-sm font-semibold">5.0</span>
+            {isLoading ? (
+              // Loading Skeleton
+              <>
+                {[1, 2, 3, 4].map((item) => (
+                  <div key={item} className="vitrii-card overflow-hidden animate-pulse">
+                    <div className="w-full h-48 bg-gray-300" />
+                    <div className="p-4 space-y-3">
+                      <div className="h-4 bg-gray-300 rounded" />
+                      <div className="h-3 bg-gray-300 rounded w-3/4" />
+                      <div className="h-4 bg-gray-300 rounded" />
+                      <div className="h-10 bg-gray-300 rounded" />
                     </div>
                   </div>
+                ))}
+              </>
+            ) : destacados.length > 0 ? (
+              // Display actual ads
+              destacados.map((anuncio: any) => (
+                <div
+                  key={anuncio.id}
+                  className="vitrii-card overflow-hidden hover:scale-105 transition-transform duration-200 cursor-pointer"
+                >
+                  {/* Image */}
+                  <div className="w-full h-48 bg-gradient-to-br from-walmart-blue to-walmart-blue-dark flex items-center justify-center overflow-hidden">
+                    {anuncio.fotoUrl ? (
+                      <img
+                        src={anuncio.fotoUrl}
+                        alt={anuncio.titulo}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <Package className="w-12 h-12 text-white opacity-50" />
+                    )}
+                  </div>
 
-                  <button className="w-full bg-walmart-blue text-white py-2 rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors">
-                    Ver Detalhes
-                  </button>
+                  {/* Content */}
+                  <div className="p-4">
+                    <h4 className="font-semibold text-walmart-text mb-2 line-clamp-2">
+                      {anuncio.titulo}
+                    </h4>
+                    <p className="text-sm text-walmart-text-secondary mb-3 line-clamp-2">
+                      {anuncio.descricao || "Produto em destaque"}
+                    </p>
+
+                    <div className="flex justify-between items-center mb-4">
+                      <span className="text-2xl font-bold text-walmart-blue">
+                        R$ {anuncio.tabelaDePreco?.preco?.toFixed(2) || "0.00"}
+                      </span>
+                      <div className="flex items-center space-x-1">
+                        <Star className="w-4 h-4 fill-walmart-yellow text-walmart-yellow" />
+                        <span className="text-sm font-semibold">5.0</span>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => navigate(`/anuncio/${anuncio.id}`)}
+                      className="w-full bg-walmart-blue text-white py-2 rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors"
+                    >
+                      Ver Detalhes
+                    </button>
+                  </div>
                 </div>
+              ))
+            ) : (
+              // No ads placeholder
+              <div className="col-span-full text-center py-12">
+                <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-walmart-text-secondary">Nenhum anúncio publicado ainda</p>
+                <Link
+                  to="/anuncio/criar"
+                  className="inline-flex items-center gap-2 text-walmart-blue font-semibold hover:underline mt-4"
+                >
+                  <Plus className="w-4 h-4" />
+                  Publique um Anúncio
+                </Link>
               </div>
-            ))}
+            )}
           </div>
 
           <div className="text-center mt-12 lg:hidden">
@@ -157,6 +199,36 @@ export default function Index() {
               <span>Ver Todos os Anúncios</span>
               <ArrowRight className="w-5 h-5" />
             </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Create Ad Section */}
+      <section className="py-16 md:py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-gradient-to-r from-walmart-blue to-walmart-blue-dark rounded-lg p-12 text-white text-center">
+            <Plus className="w-12 h-12 mx-auto mb-4 opacity-90" />
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Publique Seu Anúncio Agora
+            </h2>
+            <p className="text-blue-100 text-lg mb-8 max-w-2xl mx-auto">
+              Aproveite nossos 3 anúncios gratuitos e comece a vender seus produtos e serviços
+              para milhares de clientes potenciais
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                to="/anuncio/criar"
+                className="bg-walmart-yellow text-walmart-text px-8 py-3 rounded-lg font-semibold hover:bg-walmart-yellow-dark transition-colors"
+              >
+                Criar Anúncio
+              </Link>
+              <Link
+                to="/sell"
+                className="bg-white text-walmart-blue px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+              >
+                Gerenciar Anúncios
+              </Link>
+            </div>
           </div>
         </div>
       </section>
