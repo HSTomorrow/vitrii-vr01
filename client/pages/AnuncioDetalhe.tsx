@@ -51,6 +51,44 @@ export default function AnuncioDetalhe() {
     },
   });
 
+  // Inactivate mutation
+  const inactivateMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch(`/api/anuncios/${id}/inactivate`, {
+        method: "PATCH",
+      });
+      if (!response.ok) throw new Error("Erro ao inativar");
+      return response.json();
+    },
+    onSuccess: () => {
+      toast.success("Anúncio inativado com sucesso");
+      queryClient.invalidateQueries({ queryKey: ["anuncio", id] });
+      queryClient.invalidateQueries({ queryKey: ["anuncios"] });
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : "Erro ao inativar");
+    },
+  });
+
+  // Activate mutation
+  const activateMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch(`/api/anuncios/${id}/activate`, {
+        method: "PATCH",
+      });
+      if (!response.ok) throw new Error("Erro ao reativar");
+      return response.json();
+    },
+    onSuccess: () => {
+      toast.success("Anúncio reativado com sucesso");
+      queryClient.invalidateQueries({ queryKey: ["anuncio", id] });
+      queryClient.invalidateQueries({ queryKey: ["anuncios"] });
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : "Erro ao reativar");
+    },
+  });
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col bg-white">
