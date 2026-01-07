@@ -124,6 +124,8 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
         equipeDeVendaId: ad.equipeDeVendaId || 0,
         isDoacao: ad.isDoacao || false,
         destaque: ad.destaque || false,
+        categoria: ad.categoria || null,
+        dadosCategoria: ad.dadosCategoria || "",
       });
     }
   }, [anuncioData]);
