@@ -30,6 +30,7 @@ import SearchAnuncios from "./pages/SearchAnuncios";
 import SearchProdutos from "./pages/SearchProdutos";
 import Checkout from "./pages/Checkout";
 import Chat from "./pages/Chat";
+import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
