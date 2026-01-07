@@ -162,7 +162,7 @@ export default function CadastroProdutos() {
             onClick={() => {
               setIsFormOpen(!isFormOpen);
               setEditingId(null);
-              setFormData({ grupoId: "", nome: "", descricao: "", sku: "" });
+              setFormData({ grupoId: "", nome: "", descricao: "", sku: "", tipo: "produto" });
             }}
             className="flex items-center gap-2 px-4 py-2 bg-walmart-yellow text-walmart-text rounded-lg hover:bg-walmart-yellow-dark transition-colors font-semibold"
           >
