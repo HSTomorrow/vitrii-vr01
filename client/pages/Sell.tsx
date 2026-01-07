@@ -1,6 +1,7 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import {
   Plus,
   BarChart3,
@@ -8,6 +9,9 @@ import {
   Users,
   ArrowRight,
   AlertCircle,
+  Eye,
+  MessageSquare,
+  Edit2,
 } from "lucide-react";
 
 export default function Sell() {
