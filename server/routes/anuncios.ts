@@ -9,7 +9,9 @@ const AnuncioCreateSchema = z.object({
   tabelaDePrecoId: z.number().int().positive("Tabela de preço é obrigatória"),
   titulo: z.string().min(5, "Título deve ter pelo menos 5 caracteres").max(255),
   descricao: z.string().min(10, "Descrição deve ter pelo menos 10 caracteres").optional(),
-  fotoUrl: z.string().url("URL de foto inválida").optional(),
+  fotoUrl: z.string().optional(),
+  equipeDeVendaId: z.number().int().positive().optional().nullable(),
+  isDoacao: z.boolean().optional().default(false),
 });
 
 // GET all ads
