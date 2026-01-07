@@ -148,16 +148,28 @@ export const createAnuncio: RequestHandler = async (req, res) => {
       });
     }
 
-    // Verify that the price table belongs to the product
-    const tabelaDePreco = await prisma.tabelaDePreco.findUnique({
-      where: { id: validatedData.tabelaDePrecoId },
-    });
-
-    if (!tabelaDePreco || tabelaDePreco.productId !== validatedData.productId) {
-      return res.status(400).json({
-        success: false,
-        error: "Tabela de preço não pertence ao produto selecionado",
+    // Verify that the price table belongs to the product if provided
+    let tabelaDePreco = null;
+    if (validatedData.tabelaDePrecoId && validatedData.tabelaDePrecoId > 0) {
+      tabelaDePreco = await prisma.tabelaDePreco.findUnique({
+        where: { id: validatedData.tabelaDePrecoId },
       });
+
+      if (!tabelaDePreco || tabelaDePreco.productId !== validatedData.productId) {
+        return res.status(400).json({
+          success: false,
+          error: "Tabela de preço não pertence ao produto selecionado",
+        });
+      }
+    } else {
+      // If no table selected, get the first available price table for the product
+      tabelaDePreco = await prisma.tabelaDePreco.findFirst({
+        where: { productId: validatedData.productId },
+      });
+
+      if (tabelaDePreco) {
+        validatedData.tabelaDePrecoId = tabelaDePreco.id;
+      }
     }
 
     const anuncio = await prisma.anuncio.create({
