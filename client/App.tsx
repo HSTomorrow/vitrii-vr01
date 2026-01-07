@@ -23,6 +23,7 @@ import CadastroProdutos from "./pages/CadastroProdutos";
 import CadastroTabelasPreco from "./pages/CadastroTabelasPreco";
 import CadastroVariantesLista from "./pages/CadastroVariantesLista";
 import CadastroVariantes from "./pages/CadastroVariantes";
+import CadastroEquipeDeVenda from "./pages/CadastroEquipeDeVenda";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
