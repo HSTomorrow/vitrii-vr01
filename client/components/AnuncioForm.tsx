@@ -272,7 +272,7 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
                     <option key={pt.id} value={pt.id}>
                       {pt.tamanho && pt.cor
                         ? `${pt.tamanho} - ${pt.cor}`
-                        : pt.tamanho || pt.cor || `R$ ${pt.preco.toFixed(2)}`}
+                        : pt.tamanho || pt.cor || `R$ ${Number(pt.preco).toFixed(2)}`}
                     </option>
                   ))}
                 </select>
