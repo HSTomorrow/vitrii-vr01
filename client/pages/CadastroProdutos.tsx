@@ -27,6 +27,7 @@ interface Producto {
 }
 
 export default function CadastroProdutos() {
+  const navigate = useNavigate();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [selectedLojaId, setSelectedLojaId] = useState("");
