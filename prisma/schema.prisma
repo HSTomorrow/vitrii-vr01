@@ -177,6 +177,7 @@ model Producto {
   estoques      ProdutoEmEstoque[]
   movimentoEstoque MovimentoEstoque[]
   anuncios      Anuncio[]
+  agendas       Agenda[]
 
   @@map("productos")
 }
