@@ -42,8 +42,6 @@ export const getAnuncios: RequestHandler = async (req, res) => {
           select: {
             id: true,
             preco: true,
-            tamanho: true,
-            cor: true,
           },
         },
       },
@@ -100,8 +98,6 @@ export const getAnuncioById: RequestHandler = async (req, res) => {
               select: {
                 id: true,
                 preco: true,
-                tamanho: true,
-                cor: true,
               },
             },
           },
