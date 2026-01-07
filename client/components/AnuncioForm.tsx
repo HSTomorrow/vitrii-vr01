@@ -313,7 +313,7 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
             {/* Equipe de Venda */}
             <div>
               <label className="block text-sm font-semibold text-walmart-text mb-2">
-                Equipe de Venda
+                Equipe de Venda (Opcional)
               </label>
               {selectedLojaId > 0 ? (
                 <select
