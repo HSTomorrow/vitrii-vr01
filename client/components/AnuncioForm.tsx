@@ -283,7 +283,7 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
               )}
               {selectedPriceTable && (
                 <p className="mt-2 text-sm text-walmart-blue font-semibold">
-                  Preço: R$ {selectedPriceTable.preco.toFixed(2)}
+                  Preço: R$ {Number(selectedPriceTable.preco).toFixed(2)}
                 </p>
               )}
             </div>
