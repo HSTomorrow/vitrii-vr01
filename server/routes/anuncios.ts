@@ -320,6 +320,59 @@ export const updateAnuncioStatus: RequestHandler = async (req, res) => {
   }
 };
 
+// UPDATE ad status by ADM (force status without payment verification)
+export const overrideAnuncioStatus: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    // Validate status
+    const validStatuses = ["em_edicao", "aguardando_pagamento", "pago", "ativo", "historico"];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        error: "Status inválido",
+        details: `Status deve ser um dos seguintes: ${validStatuses.join(", ")}`,
+      });
+    }
+
+    // Check if ad exists
+    const anuncio = await prisma.anuncio.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!anuncio) {
+      return res.status(404).json({
+        success: false,
+        error: "Anúncio não encontrado",
+      });
+    }
+
+    // Update status
+    const updatedAnuncio = await prisma.anuncio.update({
+      where: { id: parseInt(id) },
+      data: { status },
+      include: {
+        loja: true,
+        producto: true,
+        tabelaDePreco: true,
+      },
+    });
+
+    res.json({
+      success: true,
+      data: updatedAnuncio,
+      message: `Status do anúncio alterado para "${status}" com sucesso (ADM override)`,
+    });
+  } catch (error) {
+    console.error("Error overriding ad status:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao alterar status do anúncio",
+    });
+  }
+};
+
 // DELETE ad (physical deletion)
 export const deleteAnuncio: RequestHandler = async (req, res) => {
   try {
