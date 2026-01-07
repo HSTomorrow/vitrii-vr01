@@ -59,7 +59,9 @@ export default function PaymentModal({
       onClose();
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Erro ao cancelar pagamento");
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao cancelar pagamento",
+      );
     },
   });
 
@@ -103,13 +105,18 @@ export default function PaymentModal({
 
   if (!isOpen || !payment) return null;
 
-  const isExpired = payment.status === "expirado" || payment.status === "cancelado";
+  const isExpired =
+    payment.status === "expirado" || payment.status === "cancelado";
   const isPaid = payment.status === "pago";
-  const isPending = payment.status === "pendente" || payment.status === "processando";
+  const isPending =
+    payment.status === "pendente" || payment.status === "processando";
 
   const expirationTime = new Date(payment.dataExpiracao);
   const now = new Date();
-  const timeRemaining = Math.max(0, Math.floor((expirationTime.getTime() - now.getTime()) / 1000));
+  const timeRemaining = Math.max(
+    0,
+    Math.floor((expirationTime.getTime() - now.getTime()) / 1000),
+  );
   const minutes = Math.floor(timeRemaining / 60);
   const seconds = timeRemaining % 60;
 
@@ -118,7 +125,9 @@ export default function PaymentModal({
       <div className="bg-white rounded-lg shadow-lg max-w-md w-full">
         {/* Header */}
         <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-walmart-text">Pagamento via Pix</h2>
+          <h2 className="text-xl font-bold text-walmart-text">
+            Pagamento via Pix
+          </h2>
           <button
             onClick={onClose}
             className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
@@ -134,7 +143,9 @@ export default function PaymentModal({
             <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-start gap-3">
               <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
               <div>
-                <p className="font-semibold text-green-800">Pagamento Confirmado!</p>
+                <p className="font-semibold text-green-800">
+                  Pagamento Confirmado!
+                </p>
                 <p className="text-sm text-green-700 mt-1">
                   Seu anúncio foi ativado com sucesso.
                 </p>
@@ -165,7 +176,7 @@ export default function PaymentModal({
                   <div className="bg-gray-100 p-4 rounded-lg flex justify-center">
                     <img
                       src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(
-                        payment.urlCopiaECola
+                        payment.urlCopiaECola,
                       )}`}
                       alt="Pix QR Code"
                       className="w-48 h-48"
@@ -204,9 +215,13 @@ export default function PaymentModal({
                   <Clock className="w-5 h-5 text-walmart-blue" />
                   <p className="text-sm text-walmart-text">
                     <span className="font-semibold">
-                      {String(minutes).padStart(2, "0")}:{String(seconds).padStart(2, "0")}
+                      {String(minutes).padStart(2, "0")}:
+                      {String(seconds).padStart(2, "0")}
                     </span>
-                    <span className="text-walmart-text-secondary"> para expiração</span>
+                    <span className="text-walmart-text-secondary">
+                      {" "}
+                      para expiração
+                    </span>
                   </p>
                 </div>
               </div>
@@ -218,8 +233,14 @@ export default function PaymentModal({
                 </p>
                 <div className="mt-2 flex justify-center gap-1">
                   <div className="w-2 h-2 bg-walmart-blue rounded-full animate-bounce" />
-                  <div className="w-2 h-2 bg-walmart-blue rounded-full animate-bounce" style={{ animationDelay: "0.1s" }} />
-                  <div className="w-2 h-2 bg-walmart-blue rounded-full animate-bounce" style={{ animationDelay: "0.2s" }} />
+                  <div
+                    className="w-2 h-2 bg-walmart-blue rounded-full animate-bounce"
+                    style={{ animationDelay: "0.1s" }}
+                  />
+                  <div
+                    className="w-2 h-2 bg-walmart-blue rounded-full animate-bounce"
+                    style={{ animationDelay: "0.2s" }}
+                  />
                 </div>
               </div>
             </>
@@ -228,7 +249,9 @@ export default function PaymentModal({
           {/* Valor */}
           <div className="border-t border-gray-200 pt-4">
             <div className="flex items-center justify-between">
-              <span className="text-walmart-text-secondary">Valor a pagar:</span>
+              <span className="text-walmart-text-secondary">
+                Valor a pagar:
+              </span>
               <span className="text-2xl font-bold text-walmart-blue">
                 R$ {Number(payment.valor).toFixed(2)}
               </span>
@@ -242,9 +265,15 @@ export default function PaymentModal({
             </p>
             <p>
               <strong>Status:</strong>{" "}
-              <span className={`font-semibold ${
-                isPaid ? "text-green-600" : isExpired ? "text-red-600" : "text-blue-600"
-              }`}>
+              <span
+                className={`font-semibold ${
+                  isPaid
+                    ? "text-green-600"
+                    : isExpired
+                      ? "text-red-600"
+                      : "text-blue-600"
+                }`}
+              >
                 {payment.status === "pendente" && "Aguardando pagamento"}
                 {payment.status === "processando" && "Processando"}
                 {payment.status === "pago" && "Pagamento confirmado"}

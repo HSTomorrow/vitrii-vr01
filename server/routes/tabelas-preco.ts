@@ -181,7 +181,9 @@ export const updateTabela: RequestHandler = async (req, res) => {
       updatePayload.preco = new Decimal(validatedData.preco.toString());
     }
     if (validatedData.precoCusto !== undefined) {
-      updatePayload.precoCusto = new Decimal(validatedData.precoCusto.toString());
+      updatePayload.precoCusto = new Decimal(
+        validatedData.precoCusto.toString(),
+      );
     }
     if (validatedData.productId !== undefined) {
       updatePayload.productId = validatedData.productId;

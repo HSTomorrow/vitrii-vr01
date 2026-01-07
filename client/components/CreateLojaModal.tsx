@@ -9,7 +9,11 @@ interface CreateLojaModalProps {
   onSuccess?: (lojaId: number) => void;
 }
 
-export default function CreateLojaModal({ isOpen, onClose, onSuccess }: CreateLojaModalProps) {
+export default function CreateLojaModal({
+  isOpen,
+  onClose,
+  onSuccess,
+}: CreateLojaModalProps) {
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     nome: "",
@@ -54,13 +58,21 @@ export default function CreateLojaModal({ isOpen, onClose, onSuccess }: CreateLo
       onClose();
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Erro ao criar loja");
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao criar loja",
+      );
     },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.nome || !formData.cnpjOuCpf || !formData.endereco || !formData.descricao || !formData.email) {
+    if (
+      !formData.nome ||
+      !formData.cnpjOuCpf ||
+      !formData.endereco ||
+      !formData.descricao ||
+      !formData.email
+    ) {
       toast.error("Preencha todos os campos obrigatórios");
       return;
     }
@@ -81,7 +93,9 @@ export default function CreateLojaModal({ isOpen, onClose, onSuccess }: CreateLo
       <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-walmart-text">Criar Nova Loja</h2>
+          <h2 className="text-xl font-bold text-walmart-text">
+            Criar Nova Loja
+          </h2>
           <button
             onClick={onClose}
             className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
@@ -114,7 +128,12 @@ export default function CreateLojaModal({ isOpen, onClose, onSuccess }: CreateLo
             <input
               type="text"
               value={formData.cnpjOuCpf}
-              onChange={(e) => handleInputChange("cnpjOuCpf", e.target.value.replace(/\D/g, ""))}
+              onChange={(e) =>
+                handleInputChange(
+                  "cnpjOuCpf",
+                  e.target.value.replace(/\D/g, ""),
+                )
+              }
               placeholder="Ex: 12345678901234"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
             />

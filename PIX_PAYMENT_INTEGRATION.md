@@ -49,6 +49,7 @@ CREATE TABLE pagamentos (
 ## Backend API Endpoints
 
 ### Create Payment
+
 ```
 POST /api/pagamentos
 Content-Type: application/json
@@ -75,6 +76,7 @@ Response:
 ```
 
 ### Get Payment Status
+
 ```
 GET /api/pagamentos/:id/status
 
@@ -90,6 +92,7 @@ Response:
 ```
 
 ### Get Payment by Anuncio ID
+
 ```
 GET /api/pagamentos/anuncio/:anuncioId
 
@@ -101,6 +104,7 @@ Response:
 ```
 
 ### Update Payment Status
+
 ```
 PATCH /api/pagamentos/:id/status
 Content-Type: application/json
@@ -113,6 +117,7 @@ Content-Type: application/json
 ```
 
 ### Cancel Payment
+
 ```
 DELETE /api/pagamentos/:id/cancel
 
@@ -124,6 +129,7 @@ Response:
 ```
 
 ### Webhook Handler
+
 ```
 POST /api/webhooks/pagamentos
 Content-Type: application/json
@@ -141,6 +147,7 @@ Content-Type: application/json
 ## Frontend Components
 
 ### 1. PaymentModal Component
+
 Located in `client/components/PaymentModal.tsx`
 
 - Displays Pix QR code
@@ -150,6 +157,7 @@ Located in `client/components/PaymentModal.tsx`
 - Cancel payment option
 
 **Usage:**
+
 ```tsx
 <PaymentModal
   isOpen={isOpen}
@@ -160,9 +168,11 @@ Located in `client/components/PaymentModal.tsx`
 ```
 
 ### 2. Checkout Page
+
 Located in `client/pages/Checkout.tsx`
 
 Complete checkout experience with:
+
 - Ad summary
 - Pix QR code display
 - Copy-paste code
@@ -241,13 +251,14 @@ Users get `FREE_ADS_LIMIT` (default 3) free ads. After that:
 To change ad cost:
 
 1. Update `.env`:
+
    ```env
    AD_COST=19.90
    ```
 
 2. Update AnuncioForm if needed:
    ```tsx
-   const adCost = process.env.AD_COST || 9.90;
+   const adCost = process.env.AD_COST || 9.9;
    ```
 
 ## Integration with Mercado Pago (Future)
@@ -255,25 +266,27 @@ To change ad cost:
 Current implementation uses mock QR codes. To integrate with real Mercado Pago:
 
 1. Install Mercado Pago SDK:
+
    ```bash
    npm install mercadopago
    ```
 
 2. Update `server/routes/pagamentos.ts`:
+
    ```typescript
    import { MercadoPagoConfig, Payment } from "mercadopago";
-   
+
    const client = new MercadoPagoConfig({
      accessToken: process.env.MERCADO_PAGO_ACCESS_TOKEN,
    });
-   
+
    // In createPagamento function:
    const paymentData = {
      transaction_amount: validatedData.valor,
      payment_method_id: "pix",
      payer: { email: "user@example.com" },
    };
-   
+
    const payment = new Payment(client);
    const result = await payment.create({ body: paymentData });
    ```
@@ -307,12 +320,12 @@ curl -X PATCH http://localhost:5000/api/pagamentos/1/status \
 
 ### Common Errors
 
-| Error | Cause | Solution |
-|-------|-------|----------|
-| "Pagamento não encontrado" | Payment doesn't exist | Ad may not be created yet |
+| Error                                      | Cause                   | Solution                           |
+| ------------------------------------------ | ----------------------- | ---------------------------------- |
+| "Pagamento não encontrado"                 | Payment doesn't exist   | Ad may not be created yet          |
 | "Já existe um pagamento para este anúncio" | Payment already created | User refreshed page multiple times |
-| "Código Pix expirado" | 30 minutes passed | Create new payment |
-| "Anúncio não encontrado" | Invalid ad ID | Check ad creation first |
+| "Código Pix expirado"                      | 30 minutes passed       | Create new payment                 |
+| "Anúncio não encontrado"                   | Invalid ad ID           | Check ad creation first            |
 
 ## Security Considerations
 

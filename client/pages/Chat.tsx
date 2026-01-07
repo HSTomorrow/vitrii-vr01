@@ -44,7 +44,9 @@ interface Conversa {
 
 export default function Chat() {
   const queryClient = useQueryClient();
-  const [selectedConversa, setSelectedConversa] = useState<Conversa | null>(null);
+  const [selectedConversa, setSelectedConversa] = useState<Conversa | null>(
+    null,
+  );
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [currentUserId] = useState(1); // In real app, get from auth context
   const [userType] = useState<"usuario" | "loja">("usuario"); // In real app, get from auth context
@@ -104,7 +106,9 @@ export default function Chat() {
             <ChevronLeft className="w-5 h-5 mr-1" />
             Voltar
           </Link>
-          <h1 className="text-2xl font-bold text-walmart-text">Minhas Mensagens</h1>
+          <h1 className="text-2xl font-bold text-walmart-text">
+            Minhas Mensagens
+          </h1>
           <button
             onClick={handleCreateConversa}
             className="flex items-center gap-2 px-4 py-2 bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors"
@@ -137,7 +141,8 @@ export default function Chat() {
                     {selectedConversa.assunto}
                   </h2>
                   <p className="text-sm text-walmart-text-secondary">
-                    com {selectedConversa.loja.nome} • {selectedConversa.usuario.nome}
+                    com {selectedConversa.loja.nome} •{" "}
+                    {selectedConversa.usuario.nome}
                   </p>
                   {selectedConversa.anuncio && (
                     <p className="text-sm text-gray-500 mt-2">

@@ -10,7 +10,12 @@ interface CreateGrupoModalProps {
   onSuccess?: (grupoId: number) => void;
 }
 
-export default function CreateGrupoModal({ isOpen, onClose, lojaId, onSuccess }: CreateGrupoModalProps) {
+export default function CreateGrupoModal({
+  isOpen,
+  onClose,
+  lojaId,
+  onSuccess,
+}: CreateGrupoModalProps) {
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     nome: "",
@@ -46,7 +51,9 @@ export default function CreateGrupoModal({ isOpen, onClose, lojaId, onSuccess }:
       onClose();
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Erro ao criar grupo");
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao criar grupo",
+      );
     },
   });
 
@@ -73,7 +80,9 @@ export default function CreateGrupoModal({ isOpen, onClose, lojaId, onSuccess }:
       <div className="bg-white rounded-lg shadow-lg max-w-xl w-full">
         {/* Header */}
         <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-walmart-text">Criar Novo Grupo de Produtos</h2>
+          <h2 className="text-xl font-bold text-walmart-text">
+            Criar Novo Grupo de Produtos
+          </h2>
           <button
             onClick={onClose}
             className="p-1 hover:bg-gray-100 rounded-lg transition-colors"

@@ -44,10 +44,8 @@ export default function ChatBox({
   useEffect(() => {
     if (messageInputRef.current) {
       messageInputRef.current.style.height = "auto";
-      messageInputRef.current.style.height = Math.min(
-        messageInputRef.current.scrollHeight,
-        120
-      ) + "px";
+      messageInputRef.current.style.height =
+        Math.min(messageInputRef.current.scrollHeight, 120) + "px";
     }
   }, [messageText]);
 
@@ -78,7 +76,9 @@ export default function ChatBox({
       queryClient.invalidateQueries({ queryKey: ["conversa", conversaId] });
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Erro ao enviar mensagem");
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao enviar mensagem",
+      );
     },
   });
 
@@ -156,7 +156,7 @@ export default function ChatBox({
       acc[date].push(msg);
       return acc;
     },
-    {} as Record<string, Message[]>
+    {} as Record<string, Message[]>,
   );
 
   return (
@@ -174,7 +174,9 @@ export default function ChatBox({
                 {/* Date Separator */}
                 <div className="flex items-center gap-3 my-4">
                   <div className="flex-1 h-px bg-gray-200" />
-                  <span className="text-xs text-walmart-text-secondary">{date}</span>
+                  <span className="text-xs text-walmart-text-secondary">
+                    {date}
+                  </span>
                   <div className="flex-1 h-px bg-gray-200" />
                 </div>
 
@@ -189,16 +191,16 @@ export default function ChatBox({
                       {/* Avatar */}
                       <div
                         className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-semibold flex-shrink-0 ${
-                          isCurrentUser
-                            ? "bg-walmart-blue"
-                            : "bg-gray-400"
+                          isCurrentUser ? "bg-walmart-blue" : "bg-gray-400"
                         }`}
                       >
                         {msg.remetente.nome.charAt(0).toUpperCase()}
                       </div>
 
                       {/* Message Content */}
-                      <div className={`flex flex-col ${isCurrentUser ? "items-end" : "items-start"}`}>
+                      <div
+                        className={`flex flex-col ${isCurrentUser ? "items-end" : "items-start"}`}
+                      >
                         <p className="text-xs text-walmart-text-secondary mb-1">
                           {msg.remetente.nome} • {formatTime(msg.dataCriacao)}
                         </p>

@@ -1,7 +1,13 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ChevronLeft, Upload, AlertCircle, CheckCircle, Plus } from "lucide-react";
+import {
+  ChevronLeft,
+  Upload,
+  AlertCircle,
+  CheckCircle,
+  Plus,
+} from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import CategoryFields from "./CategoryFields";
 import CreateLojaModal from "./CreateLojaModal";
@@ -41,10 +47,14 @@ interface EquipeDeVenda {
 const getDefaultValidityDate = () => {
   const date = new Date();
   date.setDate(date.getDate() + 7);
-  return date.toISOString().split('T')[0];
+  return date.toISOString().split("T")[0];
 };
 
-export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFormProps) {
+export default function AnuncioForm({
+  lojaId,
+  anuncioId,
+  onSuccess,
+}: AnuncioFormProps) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [selectedLojaId, setSelectedLojaId] = useState(lojaId || 0);
@@ -106,7 +116,9 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
   const { data: productosData } = useQuery({
     queryKey: ["produtos-anuncio", selectedLojaId],
     queryFn: async () => {
-      const response = await fetch(`/api/lojas/${selectedLojaId}/produtos-para-anuncio`);
+      const response = await fetch(
+        `/api/lojas/${selectedLojaId}/produtos-para-anuncio`,
+      );
       if (!response.ok) throw new Error("Erro ao buscar produtos");
       return response.json();
     },
@@ -117,10 +129,14 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
   const { data: equipesData } = useQuery({
     queryKey: ["equipes-venda", selectedLojaId],
     queryFn: async () => {
-      const response = await fetch(`/api/equipes-venda?lojaId=${selectedLojaId}`);
+      const response = await fetch(
+        `/api/equipes-venda?lojaId=${selectedLojaId}`,
+      );
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.details || error.error || "Erro ao buscar equipes");
+        throw new Error(
+          error.details || error.error || "Erro ao buscar equipes",
+        );
       }
       return response.json();
     },
@@ -140,7 +156,7 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
         fotoUrl: ad.fotoUrl || "",
         precoAnuncio: ad.precoAnuncio ? ad.precoAnuncio.toString() : "",
         dataValidade: ad.dataValidade
-          ? new Date(ad.dataValidade).toISOString().split('T')[0]
+          ? new Date(ad.dataValidade).toISOString().split("T")[0]
           : getDefaultValidityDate(),
         equipeDeVendaId: ad.equipeDeVendaId || 0,
         isDoacao: ad.isDoacao || false,
@@ -164,14 +180,18 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
           titulo: data.titulo,
           descricao: data.descricao,
           fotoUrl: data.fotoUrl,
-          precoAnuncio: data.precoAnuncio ? parseFloat(data.precoAnuncio) : null,
+          precoAnuncio: data.precoAnuncio
+            ? parseFloat(data.precoAnuncio)
+            : null,
           lojaId: selectedLojaId,
           productId: data.productId,
-          tabelaDePrecoId: data.tabelaDePrecoId > 0 ? data.tabelaDePrecoId : null,
+          tabelaDePrecoId:
+            data.tabelaDePrecoId > 0 ? data.tabelaDePrecoId : null,
           dataValidade: data.dataValidade
             ? new Date(data.dataValidade).toISOString()
             : null,
-          equipeDeVendaId: data.equipeDeVendaId > 0 ? data.equipeDeVendaId : null,
+          equipeDeVendaId:
+            data.equipeDeVendaId > 0 ? data.equipeDeVendaId : null,
           isDoacao: data.isDoacao,
           destaque: data.destaque,
           categoria: data.categoria,
@@ -181,7 +201,8 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
 
       if (!response.ok) {
         const errorData = await response.json();
-        const errorMsg = errorData.details || errorData.error || "Erro ao salvar anúncio";
+        const errorMsg =
+          errorData.details || errorData.error || "Erro ao salvar anúncio";
         throw new Error(errorMsg);
       }
 
@@ -189,7 +210,11 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
     },
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ["anuncios"] });
-      toast.success(anuncioId ? "Anúncio atualizado com sucesso!" : "Anúncio criado com sucesso!");
+      toast.success(
+        anuncioId
+          ? "Anúncio atualizado com sucesso!"
+          : "Anúncio criado com sucesso!",
+      );
 
       // If creating a new ad (not editing), redirect to checkout
       if (!anuncioId && result.data?.id) {
@@ -201,7 +226,8 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
       }
     },
     onError: (error) => {
-      const errorMsg = error instanceof Error ? error.message : "Erro ao salvar";
+      const errorMsg =
+        error instanceof Error ? error.message : "Erro ao salvar";
       toast.error(errorMsg);
     },
   });
@@ -210,7 +236,9 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
     e.preventDefault();
 
     if (!selectedLojaId || !formData.productId || !formData.tabelaDePrecoId) {
-      toast.error("Loja, Produto e Variante são obrigatórios (a variante define o preço)");
+      toast.error(
+        "Loja, Produto e Variante são obrigatórios (a variante define o preço)",
+      );
       return;
     }
 
@@ -235,7 +263,9 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
       handleInputChange("fotoUrl", data.url);
       toast.success("Imagem enviada com sucesso!");
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Erro ao fazer upload");
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao fazer upload",
+      );
     }
   };
 
@@ -251,11 +281,13 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
   const equipes = equipesData?.data || [];
 
   // Get selected product details
-  const selectedProducto = productos.find((p: Producto) => p.id === formData.productId);
+  const selectedProducto = productos.find(
+    (p: Producto) => p.id === formData.productId,
+  );
   const priceTables = selectedProducto?.tabelasDePreco || [];
 
   const selectedPriceTable = priceTables.find(
-    (pt) => pt.id === formData.tabelaDePrecoId
+    (pt) => pt.id === formData.tabelaDePrecoId,
   );
 
   return (
@@ -302,7 +334,11 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
                 value={selectedLojaId}
                 onChange={(e) => {
                   setSelectedLojaId(parseInt(e.target.value));
-                  setFormData((prev) => ({ ...prev, productId: 0, tabelaDePrecoId: 0 }));
+                  setFormData((prev) => ({
+                    ...prev,
+                    productId: 0,
+                    tabelaDePrecoId: 0,
+                  }));
                 }}
                 disabled={!!anuncioId}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent disabled:bg-gray-100"
@@ -358,11 +394,19 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
                   Selecione uma loja primeiro
                 </div>
               )}
-              {selectedProducto && (selectedProducto.grupo || selectedProducto.grupoDeProductos) && (
-                <p className="mt-2 text-sm text-walmart-text-secondary">
-                  Grupo: {(selectedProducto.grupo || selectedProducto.grupoDeProductos)?.nome}
-                </p>
-              )}
+              {selectedProducto &&
+                (selectedProducto.grupo ||
+                  selectedProducto.grupoDeProductos) && (
+                  <p className="mt-2 text-sm text-walmart-text-secondary">
+                    Grupo:{" "}
+                    {
+                      (
+                        selectedProducto.grupo ||
+                        selectedProducto.grupoDeProductos
+                      )?.nome
+                    }
+                  </p>
+                )}
             </div>
 
             {/* Tabela de Preço Selection */}
@@ -374,7 +418,10 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
                 <select
                   value={formData.tabelaDePrecoId}
                   onChange={(e) =>
-                    handleInputChange("tabelaDePrecoId", parseInt(e.target.value))
+                    handleInputChange(
+                      "tabelaDePrecoId",
+                      parseInt(e.target.value),
+                    )
                   }
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
                 >
@@ -383,7 +430,9 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
                     <option key={pt.id} value={pt.id}>
                       {pt.tamanho && pt.cor
                         ? `${pt.tamanho} - ${pt.cor}`
-                        : pt.tamanho || pt.cor || `R$ ${Number(pt.preco).toFixed(2)}`}
+                        : pt.tamanho ||
+                          pt.cor ||
+                          `R$ ${Number(pt.preco).toFixed(2)}`}
                     </option>
                   ))}
                 </select>
@@ -394,7 +443,8 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
               )}
               {selectedPriceTable && (
                 <p className="mt-2 text-sm text-walmart-blue font-semibold">
-                  Preço da Variante: R$ {Number(selectedPriceTable.preco).toFixed(2)}
+                  Preço da Variante: R${" "}
+                  {Number(selectedPriceTable.preco).toFixed(2)}
                 </p>
               )}
               {!selectedPriceTable && formData.productId > 0 && (
@@ -411,25 +461,36 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
                   Preço do Anúncio (Promoção/Desconto)
                 </label>
                 <div className="flex items-center">
-                  <span className="text-walmart-text font-semibold mr-2">R$</span>
+                  <span className="text-walmart-text font-semibold mr-2">
+                    R$
+                  </span>
                   <input
                     type="number"
                     step="0.01"
                     min="0"
                     value={formData.precoAnuncio}
-                    onChange={(e) => handleInputChange("precoAnuncio", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("precoAnuncio", e.target.value)
+                    }
                     placeholder={`Ex: ${Number(selectedPriceTable.preco).toFixed(2)}`}
                     className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
                   />
                 </div>
                 <p className="mt-2 text-sm text-walmart-text-secondary">
-                  Deixe em branco para usar o preço da variante: R$ {Number(selectedPriceTable.preco).toFixed(2)}
+                  Deixe em branco para usar o preço da variante: R${" "}
+                  {Number(selectedPriceTable.preco).toFixed(2)}
                 </p>
-                {formData.precoAnuncio && Number(formData.precoAnuncio) < Number(selectedPriceTable.preco) && (
-                  <p className="mt-2 text-sm text-green-600 font-semibold">
-                    ✓ Desconto aplicado! Economia: R$ {(Number(selectedPriceTable.preco) - Number(formData.precoAnuncio)).toFixed(2)}
-                  </p>
-                )}
+                {formData.precoAnuncio &&
+                  Number(formData.precoAnuncio) <
+                    Number(selectedPriceTable.preco) && (
+                    <p className="mt-2 text-sm text-green-600 font-semibold">
+                      ✓ Desconto aplicado! Economia: R${" "}
+                      {(
+                        Number(selectedPriceTable.preco) -
+                        Number(formData.precoAnuncio)
+                      ).toFixed(2)}
+                    </p>
+                  )}
               </div>
             )}
 
@@ -441,7 +502,9 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
               <input
                 type="date"
                 value={formData.dataValidade}
-                onChange={(e) => handleInputChange("dataValidade", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("dataValidade", e.target.value)
+                }
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
               />
               <p className="mt-2 text-sm text-walmart-text-secondary">
@@ -458,7 +521,10 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
                 <select
                   value={formData.equipeDeVendaId}
                   onChange={(e) =>
-                    handleInputChange("equipeDeVendaId", parseInt(e.target.value))
+                    handleInputChange(
+                      "equipeDeVendaId",
+                      parseInt(e.target.value),
+                    )
                   }
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
                 >
@@ -513,7 +579,8 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
                   ⭐ Destaque (Em Destaque)
                 </p>
                 <p className="text-sm text-walmart-text-secondary">
-                  Marque esta opção para colocar o anúncio em destaque na página principal
+                  Marque esta opção para colocar o anúncio em destaque na página
+                  principal
                 </p>
               </label>
             </div>
@@ -522,8 +589,12 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
             <CategoryFields
               categoria={formData.categoria}
               dadosCategoria={formData.dadosCategoria}
-              onCategoryChange={(categoria) => handleInputChange("categoria", categoria)}
-              onDadosChange={(dados) => handleInputChange("dadosCategoria", dados)}
+              onCategoryChange={(categoria) =>
+                handleInputChange("categoria", categoria)
+              }
+              onDadosChange={(dados) =>
+                handleInputChange("dadosCategoria", dados)
+              }
             />
 
             {/* Título */}
@@ -599,7 +670,9 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
                   <input
                     type="text"
                     value={formData.fotoUrl}
-                    onChange={(e) => handleInputChange("fotoUrl", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("fotoUrl", e.target.value)
+                    }
                     placeholder="Ou cole uma URL de imagem"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent text-sm"
                   />
@@ -636,8 +709,8 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
                 <div className="text-sm text-walmart-text">
                   <p className="font-semibold">Informações sobre Publicação</p>
                   <p className="mt-1 text-walmart-text-secondary">
-                    Você tem 3 anúncios gratuitos. Após isso, será cobrado R$ 9,90 por anúncio por
-                    dia via Pix.
+                    Você tem 3 anúncios gratuitos. Após isso, será cobrado R$
+                    9,90 por anúncio por dia via Pix.
                   </p>
                 </div>
               </div>

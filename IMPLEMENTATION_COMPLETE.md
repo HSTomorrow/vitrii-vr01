@@ -7,6 +7,7 @@ Vitrii is a comprehensive Brazilian marketplace platform built with React, Node.
 ## 🚀 Features Implemented
 
 ### 1. ✅ Core Ad System
+
 - **Create/Edit/Delete Ads** with full CRUD operations
 - **Category-specific fields** for Clothing, Cars, and Real Estate
 - **Featured ads (Destaque)** with special display
@@ -15,6 +16,7 @@ Vitrii is a comprehensive Brazilian marketplace platform built with React, Node.
 - **Ad validation** and error handling
 
 ### 2. ✅ Product Management
+
 - **Product catalog** with groups and categories
 - **Inline creation** of stores, groups, and products without page navigation
 - **Price variants** (size, color, price combinations)
@@ -22,6 +24,7 @@ Vitrii is a comprehensive Brazilian marketplace platform built with React, Node.
 - **Product search** with filtering
 
 ### 3. ✅ Pix Payment Integration
+
 - **Instant Pix QR code generation**
 - **Real-time payment confirmation** with polling
 - **Payment status tracking** (pending → processing → paid)
@@ -31,6 +34,7 @@ Vitrii is a comprehensive Brazilian marketplace platform built with React, Node.
 - **Webhook-ready** for payment provider integration
 
 ### 4. ✅ Service Scheduling (Agenda)
+
 - **Calendar-based availability management**
 - **Waitlist management** with FIFO promotion
 - **Overbooked slot handling**
@@ -38,6 +42,7 @@ Vitrii is a comprehensive Brazilian marketplace platform built with React, Node.
 - **Automatic promotion** when slots open up
 
 ### 5. ✅ Real-time Chat System
+
 - **Public & private conversations** between users and stores
 - **Message history** with timestamps
 - **Read status tracking** and indicators
@@ -47,18 +52,21 @@ Vitrii is a comprehensive Brazilian marketplace platform built with React, Node.
 - **Message notifications** support
 
 ### 6. ✅ Multi-tenancy & Data Isolation
+
 - **Store-level isolation** with lojaId filtering
 - **User-level isolation** with usuarioId filtering
 - **Logical deletion** (soft delete) for data preservation
 - **Role-based access control** foundations
 
 ### 7. ✅ QR Code System
+
 - **QR code generation** for products
 - **Direct ad links** via QR
 - **QR code tracking** and analytics
 - **Multiple QR codes per ad**
 
 ### 8. ✅ Advanced Search
+
 - **Multi-criteria filtering** by category, price, location
 - **Full-text search** on titles and descriptions
 - **Pagination** for large result sets
@@ -68,6 +76,7 @@ Vitrii is a comprehensive Brazilian marketplace platform built with React, Node.
 ## 📁 File Structure
 
 ### Backend Routes
+
 ```
 server/routes/
 ├── anuncios.ts       (Ad CRUD + status management)
@@ -85,6 +94,7 @@ server/routes/
 ```
 
 ### Frontend Components
+
 ```
 client/components/
 ├── AnuncioForm.tsx          (Ad form with inline creation)
@@ -102,6 +112,7 @@ client/components/
 ```
 
 ### Frontend Pages
+
 ```
 client/pages/
 ├── Chat.tsx              (Main chat page - /chat)
@@ -120,6 +131,7 @@ client/pages/
 ```
 
 ### Database Models
+
 ```
 prisma/schema.prisma
 ├── Usuario            (Users)
@@ -140,6 +152,7 @@ prisma/schema.prisma
 ## 🔧 Technology Stack
 
 ### Frontend
+
 - **React 18** with TypeScript
 - **React Router** for navigation
 - **TanStack React Query** for data fetching
@@ -148,6 +161,7 @@ prisma/schema.prisma
 - **Sonner** for notifications
 
 ### Backend
+
 - **Express.js** for REST API
 - **Node.js** runtime
 - **Prisma ORM** for database
@@ -155,12 +169,14 @@ prisma/schema.prisma
 - **Zod** for validation
 
 ### Authentication
+
 - Custom authentication context
 - Session-based auth (ready for JWT upgrade)
 
 ## 📊 Database Schema Highlights
 
 ### Key Relationships
+
 - **Anuncio → Loja, Producto, TabelaDePreco** (Product listing)
 - **Conversa → Usuario, Loja, Anuncio** (Messaging context)
 - **Mensagem → Conversa, Usuario** (Chat history)
@@ -168,48 +184,58 @@ prisma/schema.prisma
 - **Agenda → Loja, Producto, Usuario** (Service scheduling)
 
 ### Soft Deletion Pattern
+
 All tables support logical deletion via `isActive` boolean:
+
 ```sql
 WHERE isActive = true
 ```
 
 ### Multi-tenancy
+
 All queries filtered by `lojaId` and/or `usuarioId` for data isolation.
 
 ## 🔒 Security Features
 
 ✅ **Data Isolation**
+
 - Users can only access their own data
 - Stores can only manage their own products
 - Messages filtered by conversation ownership
 
 ✅ **Validation**
+
 - Zod schema validation on all inputs
 - Type-safe database queries with Prisma
 - SQL injection prevention via ORM
 
 ✅ **Soft Deletion**
+
 - No permanent data loss
 - Audit trail preserved
 - Logical deletion prevents orphaned records
 
 ✅ **CORS & Headers**
+
 - Ready for CORS configuration
 - Security headers can be added
 
 ## 📈 Performance Optimizations
 
 ✅ **Query Optimization**
+
 - Indexed queries on frequently used fields
 - Pagination for large datasets
 - Selective field fetching
 
 ✅ **Caching**
+
 - React Query caching strategy
 - Automatic refetch on mutations
 - Optional polling for real-time
 
 ✅ **Database**
+
 - Indexes on `conversaId, dataCriacao` for messages
 - Indexes on status fields for filtering
 - Unique constraints prevent duplicates
@@ -219,6 +245,7 @@ All queries filtered by `lojaId` and/or `usuarioId` for data isolation.
 ### Before Production Deployment
 
 1. **Environment Configuration**
+
    ```env
    DATABASE_URL=postgresql://...
    NODE_ENV=production
@@ -227,16 +254,19 @@ All queries filtered by `lojaId` and/or `usuarioId` for data isolation.
    ```
 
 2. **Database Migrations**
+
    ```bash
    npx prisma migrate deploy
    ```
 
 3. **Build Frontend**
+
    ```bash
    npm run build
    ```
 
 4. **Start Server**
+
    ```bash
    npm run start
    ```
@@ -273,6 +303,7 @@ Complete documentation files created:
 ## 🎯 Testing Checklist
 
 ### Core Features
+
 - [x] Create ad with payment flow
 - [x] Inline store/product creation
 - [x] Pix payment with QR code
@@ -283,12 +314,14 @@ Complete documentation files created:
 - [x] Waitlist promotion
 
 ### Data Management
+
 - [x] Ad filtering and search
 - [x] Multi-tenancy isolation
 - [x] Soft deletion support
 - [x] Data consistency
 
 ### UX/UI
+
 - [x] Responsive design
 - [x] Error handling
 - [x] Toast notifications
@@ -297,6 +330,7 @@ Complete documentation files created:
 ## 📞 API Endpoints Summary
 
 ### Ads (12 endpoints)
+
 ```
 GET/POST /api/anuncios
 GET/PUT/DELETE /api/anuncios/:id
@@ -307,6 +341,7 @@ GET /api/lojas/:lojaId/produtos-para-anuncio
 ```
 
 ### Payments (6 endpoints)
+
 ```
 POST /api/pagamentos
 GET /api/pagamentos/anuncio/:anuncioId
@@ -316,6 +351,7 @@ POST /api/webhooks/pagamentos
 ```
 
 ### Chat (6 endpoints)
+
 ```
 GET /api/conversas
 GET/POST /api/conversas/:id
@@ -326,6 +362,7 @@ PATCH /api/mensagens/:id/read
 ```
 
 ### Service Schedule (7 endpoints)
+
 ```
 GET/POST /api/agendas
 GET/PATCH/DELETE /api/agendas/:id/status
@@ -351,6 +388,7 @@ POST /api/agendas/:agendaId/waitlist/promote
 ## 🔮 Future Enhancements
 
 ### Short Term
+
 - [ ] WebSocket for real-time chat
 - [ ] Email notifications
 - [ ] SMS notifications
@@ -358,6 +396,7 @@ POST /api/agendas/:agendaId/waitlist/promote
 - [ ] Product reviews/ratings
 
 ### Medium Term
+
 - [ ] Multiple payment methods (credit card, debit)
 - [ ] Payment subscriptions for unlimited ads
 - [ ] Advanced analytics dashboard
@@ -366,6 +405,7 @@ POST /api/agendas/:agendaId/waitlist/promote
 - [ ] Mobile app (React Native)
 
 ### Long Term
+
 - [ ] Multi-language support
 - [ ] AI-powered product recommendations
 - [ ] Advanced fraud detection
@@ -396,6 +436,7 @@ MIT License - See LICENSE file for details
 ✅ **ALL FEATURES IMPLEMENTED AND TESTED**
 
 The Vitrii marketplace platform is feature-complete with:
+
 - Full ad management system
 - Real-time Pix payment integration
 - Complete chat messaging system

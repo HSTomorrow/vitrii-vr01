@@ -61,11 +61,11 @@ export default function CreateConversaModal({
 
   const lojas = lojasData?.data || [];
   const anuncios = (anunciosData?.data || []).filter((a: Anuncio) =>
-    a.titulo.toLowerCase().includes(searchAnuncios.toLowerCase())
+    a.titulo.toLowerCase().includes(searchAnuncios.toLowerCase()),
   );
 
   const filteredLojas = lojas.filter((loja: Loja) =>
-    loja.nome.toLowerCase().includes(searchLojas.toLowerCase())
+    loja.nome.toLowerCase().includes(searchLojas.toLowerCase()),
   );
 
   // Create conversation mutation
@@ -98,7 +98,9 @@ export default function CreateConversaModal({
       setSearchAnuncios("");
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Erro ao criar conversa");
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao criar conversa",
+      );
     },
   });
 
@@ -120,7 +122,9 @@ export default function CreateConversaModal({
       <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-0">
-          <h2 className="text-xl font-bold text-walmart-text">Iniciar Nova Conversa</h2>
+          <h2 className="text-xl font-bold text-walmart-text">
+            Iniciar Nova Conversa
+          </h2>
           <button
             onClick={onClose}
             className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
@@ -172,7 +176,9 @@ export default function CreateConversaModal({
                 </span>
                 <button
                   type="button"
-                  onClick={() => setFormData((prev) => ({ ...prev, lojaId: 0 }))}
+                  onClick={() =>
+                    setFormData((prev) => ({ ...prev, lojaId: 0 }))
+                  }
                   className="text-red-600 hover:text-red-700 text-sm"
                 >
                   ✕
@@ -205,12 +211,17 @@ export default function CreateConversaModal({
                       key={anuncio.id}
                       type="button"
                       onClick={() => {
-                        setFormData((prev) => ({ ...prev, anuncioId: anuncio.id }));
+                        setFormData((prev) => ({
+                          ...prev,
+                          anuncioId: anuncio.id,
+                        }));
                         setSearchAnuncios("");
                       }}
                       className="w-full text-left px-4 py-2 hover:bg-gray-100 border-b last:border-b-0"
                     >
-                      <p className="font-medium text-walmart-text">{anuncio.titulo}</p>
+                      <p className="font-medium text-walmart-text">
+                        {anuncio.titulo}
+                      </p>
                     </button>
                   ))}
                 </div>
@@ -219,11 +230,16 @@ export default function CreateConversaModal({
               {formData.anuncioId > 0 && (
                 <div className="mt-2 p-3 bg-green-50 rounded-lg flex items-center justify-between">
                   <span className="text-sm text-walmart-text font-medium">
-                    {anuncios.find((a: Anuncio) => a.id === formData.anuncioId)?.titulo}
+                    {
+                      anuncios.find((a: Anuncio) => a.id === formData.anuncioId)
+                        ?.titulo
+                    }
                   </span>
                   <button
                     type="button"
-                    onClick={() => setFormData((prev) => ({ ...prev, anuncioId: 0 }))}
+                    onClick={() =>
+                      setFormData((prev) => ({ ...prev, anuncioId: 0 }))
+                    }
                     className="text-red-600 hover:text-red-700 text-sm"
                   >
                     ✕
@@ -264,12 +280,17 @@ export default function CreateConversaModal({
                     value={tipo}
                     checked={formData.tipo === tipo}
                     onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, tipo: e.target.value as any }))
+                      setFormData((prev) => ({
+                        ...prev,
+                        tipo: e.target.value as any,
+                      }))
                     }
                     className="w-4 h-4"
                   />
                   <span className="text-sm text-walmart-text">
-                    {tipo === "privada" ? "Privada (apenas eu e a loja)" : "Pública"}
+                    {tipo === "privada"
+                      ? "Privada (apenas eu e a loja)"
+                      : "Pública"}
                   </span>
                 </label>
               ))}

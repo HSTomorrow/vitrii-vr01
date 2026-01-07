@@ -12,7 +12,10 @@ const ConversaCreateSchema = z.object({
 });
 
 const MensagemCreateSchema = z.object({
-  conteudo: z.string().min(1, "Mensagem não pode estar vazia").max(2000, "Mensagem muito longa"),
+  conteudo: z
+    .string()
+    .min(1, "Mensagem não pode estar vazia")
+    .max(2000, "Mensagem muito longa"),
   tipoRemetente: z.enum(["usuario", "loja"]),
 });
 

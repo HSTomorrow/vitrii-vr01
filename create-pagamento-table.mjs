@@ -36,7 +36,6 @@ async function main() {
     `;
 
     console.log("✅ Index on status created successfully!");
-
   } catch (error) {
     console.error("❌ Error creating Pagamento table:", error);
     process.exit(1);

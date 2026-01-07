@@ -63,6 +63,7 @@ CREATE TABLE mensagens (
 ### Conversation Endpoints
 
 #### Get All Conversations
+
 ```
 GET /api/conversas?usuarioId=123&lojaId=456&tipo=privada
 
@@ -86,6 +87,7 @@ Response:
 ```
 
 #### Get Conversation with Messages
+
 ```
 GET /api/conversas/:id
 
@@ -114,6 +116,7 @@ Response:
 ```
 
 #### Create Conversation
+
 ```
 POST /api/conversas
 Content-Type: application/json
@@ -135,6 +138,7 @@ Response:
 ```
 
 #### Delete Conversation
+
 ```
 DELETE /api/conversas/:id
 
@@ -149,6 +153,7 @@ Response:
 ### Message Endpoints
 
 #### Get Messages for Conversation
+
 ```
 GET /api/conversas/:conversaId/mensagens?limit=50&offset=0
 
@@ -163,6 +168,7 @@ Response:
 ```
 
 #### Create Message
+
 ```
 POST /api/mensagens
 Content-Type: application/json
@@ -190,6 +196,7 @@ Response:
 ```
 
 #### Mark Message as Read
+
 ```
 PATCH /api/mensagens/:id/read
 
@@ -201,6 +208,7 @@ Response:
 ```
 
 #### Mark Conversation as Read
+
 ```
 PATCH /api/conversas/:conversaId/read
 
@@ -212,6 +220,7 @@ Response:
 ```
 
 #### Get Unread Count
+
 ```
 GET /api/usuarios/:usuarioId/mensagens/unread
 
@@ -223,6 +232,7 @@ Response:
 ```
 
 #### Delete Message
+
 ```
 DELETE /api/mensagens/:id
 
@@ -236,9 +246,11 @@ Response:
 ## Frontend Components
 
 ### 1. ChatBox Component
+
 Located in `client/components/ChatBox.tsx`
 
 Displays messages with:
+
 - Auto-scrolling to latest message
 - Date separators
 - User avatars
@@ -247,6 +259,7 @@ Displays messages with:
 - Auto-growing textarea
 
 **Props:**
+
 ```typescript
 interface ChatBoxProps {
   conversaId: number;
@@ -258,9 +271,11 @@ interface ChatBoxProps {
 ```
 
 ### 2. ConversaList Component
+
 Located in `client/components/ConversaList.tsx`
 
 Shows list of conversations with:
+
 - Search functionality
 - Type filtering (public/private)
 - Last message preview
@@ -269,6 +284,7 @@ Shows list of conversations with:
 - Delete button
 
 **Props:**
+
 ```typescript
 interface ConversaListProps {
   usuarioId: number;
@@ -279,18 +295,22 @@ interface ConversaListProps {
 ```
 
 ### 3. CreateConversaModal Component
+
 Located in `client/components/CreateConversaModal.tsx`
 
 Modal for starting new conversations with:
+
 - Store search and selection
 - Ad selection (optional)
 - Subject field
 - Conversation type selection
 
 ### 4. Chat Page
+
 Located in `client/pages/Chat.tsx`
 
 Main chat interface combining:
+
 - ConversaList (left sidebar)
 - ChatBox (main area)
 - CreateConversaModal
@@ -334,7 +354,9 @@ The system uses polling (every 3 seconds) to check for new messages:
 ```typescript
 useQuery({
   queryKey: ["conversa", selectedConversa?.id],
-  queryFn: async () => { /* fetch conversa */ },
+  queryFn: async () => {
+    /* fetch conversa */
+  },
   refetchInterval: 3000, // Poll every 3 seconds
 });
 ```
@@ -344,16 +366,19 @@ This keeps messages fresh without WebSocket complexity. For production with heav
 ## Security & Privacy
 
 ### Multi-tenancy
+
 - Conversations filtered by `usuarioId` and `lojaId`
 - Users can only access their own conversations
 - Stores can only access conversations for their shop
 
 ### Data Protection
+
 - Soft deletion preserves history
 - Messages are never permanently deleted from DB
 - Read status tracks message visibility
 
 ### Authentication
+
 - In production, verify user authentication before:
   - Creating conversations
   - Sending messages
@@ -369,12 +394,14 @@ This keeps messages fresh without WebSocket complexity. For production with heav
 ## Best Practices
 
 ### For Users
+
 1. Use descriptive subject lines
 2. Ask clear questions in messages
 3. Be respectful in conversations
 4. Check for unread messages regularly
 
 ### For Developers
+
 1. Always validate message content length
 2. Implement rate limiting on message endpoints
 3. Archive old conversations periodically
@@ -515,6 +542,7 @@ For issues or questions:
 ✅ **Complete Chat System** - Users can now communicate via private and public conversations about products and services. The system includes real-time message updates, full conversation history, and read status tracking.
 
 The implementation is:
+
 - **Production-ready** (with authentication)
 - **Secure** (multi-tenant isolation)
 - **Scalable** (polling + optional WebSocket upgrade)

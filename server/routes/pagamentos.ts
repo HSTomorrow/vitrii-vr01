@@ -140,7 +140,9 @@ export const updatePagamentoStatus: RequestHandler = async (req, res) => {
         status: validatedData.status,
         pixId: validatedData.pixId,
         erroMsg: validatedData.erroMsg,
-        dataPagamento: validatedData.dataPagamento ? new Date(validatedData.dataPagamento) : undefined,
+        dataPagamento: validatedData.dataPagamento
+          ? new Date(validatedData.dataPagamento)
+          : undefined,
       },
       include: {
         anuncio: true,
@@ -156,7 +158,10 @@ export const updatePagamentoStatus: RequestHandler = async (req, res) => {
     }
 
     // If payment is cancelled/expired, update anuncio status back to "em_edicao"
-    if (validatedData.status === "cancelado" || validatedData.status === "expirado") {
+    if (
+      validatedData.status === "cancelado" ||
+      validatedData.status === "expirado"
+    ) {
       await prisma.anuncio.update({
         where: { id: pagamento.anuncioId },
         data: { status: "em_edicao" },
@@ -262,10 +267,11 @@ export const handlePaymentWebhook: RequestHandler = async (req, res) => {
             body: {
               status: newStatus,
               pixId: transaction_id,
-              dataPagamento: newStatus === "pago" ? new Date().toISOString() : undefined,
+              dataPagamento:
+                newStatus === "pago" ? new Date().toISOString() : undefined,
             },
           } as any,
-          res
+          res,
         );
         return;
       }

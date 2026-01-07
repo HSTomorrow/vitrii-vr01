@@ -101,7 +101,9 @@ export default function CreateProductoModal({
       onClose();
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Erro ao criar produto");
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao criar produto",
+      );
     },
   });
 
@@ -163,7 +165,9 @@ export default function CreateProductoModal({
         <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
           {/* Header */}
           <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-            <h2 className="text-xl font-bold text-walmart-text">Criar Novo Produto</h2>
+            <h2 className="text-xl font-bold text-walmart-text">
+              Criar Novo Produto
+            </h2>
             <button
               onClick={onClose}
               className="p-1 hover:bg-gray-100 rounded-lg transition-colors"

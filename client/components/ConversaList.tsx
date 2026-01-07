@@ -40,7 +40,9 @@ export default function ConversaList({
 }: ConversaListProps) {
   const queryClient = useQueryClient();
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterType, setFilterType] = useState<"todas" | "publica" | "privada">("todas");
+  const [filterType, setFilterType] = useState<"todas" | "publica" | "privada">(
+    "todas",
+  );
 
   // Fetch conversations
   const { data: conversasData, isLoading } = useQuery({
@@ -81,7 +83,9 @@ export default function ConversaList({
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["conversas", usuarioId, lojaId] });
+      queryClient.invalidateQueries({
+        queryKey: ["conversas", usuarioId, lojaId],
+      });
       toast.success("Conversa deletada");
     },
     onError: (error) => {
@@ -96,7 +100,10 @@ export default function ConversaList({
     yesterday.setDate(yesterday.getDate() - 1);
 
     if (date.toDateString() === today.toDateString()) {
-      return date.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+      return date.toLocaleTimeString("pt-BR", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
     }
 
     if (date.toDateString() === yesterday.toDateString()) {
@@ -151,13 +158,17 @@ export default function ConversaList({
       <div className="flex-1 overflow-y-auto">
         {isLoading ? (
           <div className="flex items-center justify-center h-full">
-            <p className="text-walmart-text-secondary">Carregando conversas...</p>
+            <p className="text-walmart-text-secondary">
+              Carregando conversas...
+            </p>
           </div>
         ) : filteredConversas.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full p-4 text-center">
             <MessageSquare className="w-12 h-12 text-gray-300 mb-2" />
             <p className="text-walmart-text-secondary">
-              {searchTerm ? "Nenhuma conversa encontrada" : "Nenhuma conversa ainda"}
+              {searchTerm
+                ? "Nenhuma conversa encontrada"
+                : "Nenhuma conversa ainda"}
             </p>
           </div>
         ) : (
@@ -194,7 +205,9 @@ export default function ConversaList({
 
                   <div className="flex flex-col items-end gap-2 flex-shrink-0">
                     <span className="text-xs text-walmart-text-secondary">
-                      {formatDate(conversa.dataUltimaMensagem || conversa.dataCriacao)}
+                      {formatDate(
+                        conversa.dataUltimaMensagem || conversa.dataCriacao,
+                      )}
                     </span>
                     <span
                       className={`text-xs px-2 py-1 rounded ${
