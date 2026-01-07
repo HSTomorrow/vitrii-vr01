@@ -431,3 +431,40 @@ model QRCodeChamada {
 
   @@map("qr_code_chamadas")
 }
+
+// ============================================================================
+// FUNCIONALIDADES (Features/Permissions)
+// ============================================================================
+model Funcionalidade {
+  id            Int       @id @default(autoincrement())
+  chave         String    @unique @db.VarChar(100) // e.g., "MANAGE_USERS", "MANAGE_ADS"
+  nome          String    @db.VarChar(255) // Display name
+  descricao     String?   @db.Text // Description
+  categoria     String    @db.VarChar(50) // Category: "users", "ads", "chat", "payments", "reports"
+  isActive      Boolean   @default(true)
+  dataCriacao   DateTime  @default(now())
+  dataAtualizacao DateTime @updatedAt
+
+  // Relations
+  usuarioXFuncionalidades UsuarioXFuncionalidade[]
+
+  @@map("funcionalidades")
+}
+
+// ============================================================================
+// USUÁRIO x FUNCIONALIDADE (User-Functionality Junction Table)
+// ============================================================================
+model UsuarioXFuncionalidade {
+  id            Int       @id @default(autoincrement())
+  usuarioId     Int
+  funcionalidadeId Int
+  dataCriacao   DateTime  @default(now())
+  dataAtualizacao DateTime @updatedAt
+
+  // Relations
+  usuario       Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  funcionalidade Funcionalidade @relation(fields: [funcionalidadeId], references: [id], onDelete: Cascade)
+
+  @@unique([usuarioId, funcionalidadeId])
+  @@map("usuarios_x_funcionalidades")
+}
