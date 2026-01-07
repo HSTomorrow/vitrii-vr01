@@ -21,7 +21,7 @@ model Usuario {
   cpf           String    @db.VarChar(11)
   telefone      String    @db.VarChar(20)
   endereco      String    @db.Text
-  tipoUsuario   String    @default("comum") // "comum" or "administrador"
+  tipoUsuario   String    @default("comum") // "comum", "adm" (administrador)
   isActive      Boolean   @default(true)
   dataCriacao   DateTime  @default(now())
   dataAtualizacao DateTime @updatedAt
@@ -34,6 +34,7 @@ model Usuario {
   agendas       Agenda[]
   conversas     Conversa[]
   mensagens     Mensagem[]
+  usuarioXFuncionalidades UsuarioXFuncionalidade[]
 
   @@map("usuarios")
 }
