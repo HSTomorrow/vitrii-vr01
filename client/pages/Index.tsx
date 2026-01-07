@@ -66,53 +66,31 @@ export default function Index() {
       <Header />
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-walmart-blue to-walmart-blue-dark text-white py-8 md:py-12">
+      <section className="bg-gradient-to-r from-walmart-blue to-walmart-blue-dark text-white py-6 md:py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            {/* Left side - Content */}
-            <div>
-              <h1 className="text-4xl md:text-5xl font-bold mb-6">
-                Bem-vindo ao Vitrii
-              </h1>
-              <p className="text-xl text-blue-100 mb-8">
-                O marketplace inteligente que conecta vendedores e compradores
-                com tecnologia QR Code revolucionária.
-              </p>
+          <div>
+            <h1 className="text-3xl md:text-4xl font-bold mb-4">
+              Bem-vindo ao Vitrii
+            </h1>
+            <p className="text-lg text-blue-100 mb-6">
+              O marketplace inteligente que conecta vendedores e compradores
+              com tecnologia QR Code revolucionária.
+            </p>
 
-              {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link
-                  to="/auth/signup"
-                  className="bg-walmart-yellow text-walmart-text px-8 py-3 rounded-lg font-semibold hover:bg-walmart-yellow-dark transition-colors text-center"
-                >
-                  Começar Agora
-                </Link>
-                <Link
-                  to="/browse"
-                  className="bg-white text-walmart-blue px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors text-center"
-                >
-                  Ver Anúncios
-                </Link>
-              </div>
-
-              {/* Stats */}
-              <div className="grid grid-cols-2 gap-6 mt-12">
-                <div>
-                  <div className="text-3xl font-bold">10K+</div>
-                  <div className="text-blue-100">Produtos Ativos</div>
-                </div>
-                <div>
-                  <div className="text-3xl font-bold">2.5K+</div>
-                  <div className="text-blue-100">Lojas Cadastradas</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Right side - Illustration */}
-            <div className="hidden md:flex justify-center">
-              <div className="w-80 h-80 bg-white bg-opacity-10 rounded-lg flex items-center justify-center">
-                <ShoppingCart className="w-32 h-32 text-walmart-yellow opacity-75" />
-              </div>
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link
+                to="/auth/signup"
+                className="bg-walmart-yellow text-walmart-text px-8 py-2 rounded-lg font-semibold hover:bg-walmart-yellow-dark transition-colors text-center"
+              >
+                Começar Agora
+              </Link>
+              <Link
+                to="/browse"
+                className="bg-white text-walmart-blue px-8 py-2 rounded-lg font-semibold hover:bg-blue-50 transition-colors text-center"
+              >
+                Ver Anúncios
+              </Link>
             </div>
           </div>
         </div>
