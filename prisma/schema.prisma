@@ -226,6 +226,7 @@ model Anuncio {
   titulo        String    @db.VarChar(50)
   descricao     String?   @db.Text
   fotoUrl       String?   @db.Text
+  precoAnuncio  Decimal?  @db.Decimal(10, 2)
   isDoacao      Boolean   @default(false)
   status        String    @default("em_edicao") // "em_edicao", "aguardando_pagamento", "pago", "historico"
   dataValidade  DateTime?
