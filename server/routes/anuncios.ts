@@ -193,6 +193,11 @@ export const createAnuncio: RequestHandler = async (req, res) => {
       ? new Date(validatedData.dataValidade)
       : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
+    // For donations: automatically set status to "pago" and zero out price
+    const isDoacao = validatedData.isDoacao || false;
+    const precoAnuncio = isDoacao ? null : validatedData.precoAnuncio;
+    const status = isDoacao ? "pago" : "em_edicao";
+
     const anuncio = await prisma.anuncio.create({
       data: {
         lojaId: validatedData.lojaId,
@@ -201,15 +206,15 @@ export const createAnuncio: RequestHandler = async (req, res) => {
         titulo: validatedData.titulo,
         descricao: validatedData.descricao,
         fotoUrl: validatedData.fotoUrl,
-        precoAnuncio: validatedData.precoAnuncio,
+        precoAnuncio,
         dataValidade,
         equipeDeVendaId: validatedData.equipeDeVendaId,
-        isDoacao: validatedData.isDoacao,
+        isDoacao,
         destaque: validatedData.destaque || false,
         isActive: validatedData.isActive !== false,
         categoria: validatedData.categoria,
         dadosCategoria: validatedData.dadosCategoria,
-        status: "em_edicao",
+        status,
       },
       include: {
         loja: true,
