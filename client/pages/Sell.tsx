@@ -347,34 +347,47 @@ export default function Sell() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {anuncios.map((anuncio: any) => (
-                <Link
+                <div
                   key={anuncio.id}
-                  to={`/anuncio/${anuncio.id}`}
-                  className="bg-white rounded-lg overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow"
+                  className={`bg-white rounded-lg overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow ${
+                    !anuncio.isActive ? "opacity-60" : ""
+                  }`}
                 >
-                  <div className="aspect-video bg-walmart-gray-light flex items-center justify-center overflow-hidden">
-                    {anuncio.fotoUrl ? (
-                      <img
-                        src={anuncio.fotoUrl}
-                        alt={anuncio.titulo}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <ShoppingBag className="w-12 h-12 text-gray-400" />
-                    )}
-                  </div>
+                  <Link
+                    to={`/anuncio/${anuncio.id}`}
+                    className="block"
+                  >
+                    <div className="aspect-video bg-walmart-gray-light flex items-center justify-center overflow-hidden">
+                      {anuncio.fotoUrl ? (
+                        <img
+                          src={anuncio.fotoUrl}
+                          alt={anuncio.titulo}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <ShoppingBag className="w-12 h-12 text-gray-400" />
+                      )}
+                    </div>
+                  </Link>
                   <div className="p-4">
                     <div className="flex items-start justify-between mb-2">
                       <h3 className="font-bold text-walmart-text flex-1 line-clamp-2">
                         {anuncio.titulo}
                       </h3>
-                      <span
-                        className={`px-2 py-1 rounded text-xs font-semibold whitespace-nowrap ml-2 ${
-                          statusColors[anuncio.status] || statusColors.em_edicao
-                        }`}
-                      >
-                        {statusLabels[anuncio.status] || anuncio.status}
-                      </span>
+                      <div className="flex gap-1 flex-col ml-2">
+                        <span
+                          className={`px-2 py-1 rounded text-xs font-semibold whitespace-nowrap ${
+                            statusColors[anuncio.status] || statusColors.em_edicao
+                          }`}
+                        >
+                          {statusLabels[anuncio.status] || anuncio.status}
+                        </span>
+                        {!anuncio.isActive && (
+                          <span className="px-2 py-1 rounded text-xs font-semibold whitespace-nowrap bg-gray-400 text-white">
+                            Inativo
+                          </span>
+                        )}
+                      </div>
                     </div>
 
                     <p className="text-walmart-blue font-bold text-lg mb-3">
@@ -393,17 +406,46 @@ export default function Sell() {
                     </div>
 
                     <div className="flex gap-2">
+                      {!anuncio.isActive && (
+                        <button
+                          onClick={() =>
+                            toggleActiveMutation.mutate({
+                              anuncioId: anuncio.id,
+                              activate: true,
+                            })
+                          }
+                          disabled={toggleActiveMutation.isPending}
+                          className="flex-1 px-3 py-2 bg-green-500 text-white rounded font-semibold hover:bg-green-600 transition-colors flex items-center justify-center gap-1 text-sm disabled:opacity-50"
+                        >
+                          <RotateCcw className="w-4 h-4" />
+                          Reativar
+                        </button>
+                      )}
                       <Link
                         to={`/anuncio/${anuncio.id}/editar`}
-                        onClick={(e) => e.preventDefault()}
                         className="flex-1 px-3 py-2 border border-walmart-blue text-walmart-blue rounded font-semibold hover:bg-blue-50 transition-colors flex items-center justify-center gap-1 text-sm"
                       >
                         <Edit2 className="w-4 h-4" />
                         Editar
                       </Link>
+                      {anuncio.isActive && (
+                        <button
+                          onClick={() =>
+                            toggleActiveMutation.mutate({
+                              anuncioId: anuncio.id,
+                              activate: false,
+                            })
+                          }
+                          disabled={toggleActiveMutation.isPending}
+                          className="flex-1 px-3 py-2 bg-orange-500 text-white rounded font-semibold hover:bg-orange-600 transition-colors flex items-center justify-center gap-1 text-sm disabled:opacity-50"
+                        >
+                          <Power className="w-4 h-4" />
+                          Inativar
+                        </button>
+                      )}
                     </div>
                   </div>
-                </Link>
+                </div>
               ))}
             </div>
           </div>
