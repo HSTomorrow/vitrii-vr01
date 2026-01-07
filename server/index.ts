@@ -101,6 +101,23 @@ import {
   getUnreadCount,
   deleteMensagem,
 } from "./routes/mensagens";
+import {
+  getFuncionalidades,
+  getFuncionalidadeById,
+  getFuncionalidadesByUsuario,
+  createFuncionalidade,
+  updateFuncionalidade,
+  deleteFuncionalidade,
+} from "./routes/funcionalidades";
+import {
+  grantFuncionalidade,
+  grantFuncionalidades,
+  revokeFuncionalidade,
+  revokeFuncionalidades,
+  listUserFuncionalidades,
+  grantAllFuncionalidades,
+  revokeAllFuncionalidades,
+} from "./routes/usuario-funcionalidades";
 import { uploadMiddleware, handleUpload } from "./routes/upload";
 
 export function createServer() {
