@@ -9,6 +9,8 @@ const TabelaPrecoCreateSchema = z.object({
   lojaId: z.number().int().positive("Loja é obrigatória"),
   preco: z.number().positive("Preço deve ser maior que zero"),
   precoCusto: z.number().optional(),
+  tamanho: z.string().optional(),
+  cor: z.string().optional(),
 });
 
 // GET all tabelas
