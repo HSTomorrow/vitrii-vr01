@@ -32,6 +32,8 @@ model Usuario {
   qrCodesVisitados QRCodeChamada[]
   membrosEquipe MembroEquipe[]
   agendas       Agenda[]
+  conversas     Conversa[]
+  mensagens     Mensagem[]
 
   @@map("usuarios")
 }
