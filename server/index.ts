@@ -51,6 +51,9 @@ import {
   createUsuario,
   updateUsuario,
   deleteUsuario,
+  forgotPassword,
+  resetPassword,
+  validateResetToken,
 } from "./routes/usuarios";
 import {
   getEquipes,
