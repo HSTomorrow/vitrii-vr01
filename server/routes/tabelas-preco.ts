@@ -132,6 +132,8 @@ export const createTabela: RequestHandler = async (req, res) => {
       data: {
         productId: validatedData.productId,
         lojaId: validatedData.lojaId,
+        tamanho: validatedData.tamanho || null,
+        cor: validatedData.cor || null,
         preco: new Decimal(validatedData.preco.toString()),
         precoCusto: validatedData.precoCusto
           ? new Decimal(validatedData.precoCusto.toString())
