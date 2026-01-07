@@ -79,6 +79,11 @@ export default function Footer() {
             <h4 className="font-semibold mb-4">Suporte</h4>
             <ul className="space-y-2 text-sm text-gray-300">
               <li>
+                <Link to="/about" className="hover:text-walmart-yellow transition-colors">
+                  Sobre o Vitrii
+                </Link>
+              </li>
+              <li>
                 <a href="#" className="hover:text-walmart-yellow transition-colors">
                   Central de Ajuda
                 </a>
