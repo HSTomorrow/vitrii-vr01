@@ -134,6 +134,8 @@ export default function AnuncioDetalhe() {
     historico: "Histórico",
   };
 
+  const isInactive = !anuncio.isActive;
+
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
