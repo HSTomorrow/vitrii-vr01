@@ -1,0 +1,375 @@
+import { useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { toast } from "sonner";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import { Plus, Trash2, Edit2 } from "lucide-react";
+
+interface Loja {
+  id: number;
+  nome: string;
+}
+
+interface Producto {
+  id: number;
+  nome: string;
+}
+
+interface TabelaDePreco {
+  id: number;
+  productId: number;
+  lojaId: number;
+  preco: number;
+  precoCusto?: number;
+  produto?: Producto;
+  loja?: Loja;
+}
+
+export default function CadastroTabelasPreco() {
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [selectedLojaId, setSelectedLojaId] = useState("");
+  const [selectedGrupoId, setSelectedGrupoId] = useState("");
+  const [formData, setFormData] = useState({
+    productId: "",
+    lojaId: "",
+    preco: "",
+    precoCusto: "",
+  });
+
+  // Fetch lojas
+  const { data: lojas = [] } = useQuery<Loja[]>({
+    queryKey: ["lojas"],
+    queryFn: async () => {
+      const response = await fetch("/api/lojas");
+      if (!response.ok) throw new Error("Erro ao buscar lojas");
+      const result = await response.json();
+      return result.data || [];
+    },
+  });
+
+  // Fetch grupos for selected loja
+  const { data: grupos = [] } = useQuery({
+    queryKey: ["grupos", selectedLojaId],
+    queryFn: async () => {
+      if (!selectedLojaId) return [];
+      const response = await fetch(`/api/lojas/${selectedLojaId}/grupos-productos`);
+      if (!response.ok) throw new Error("Erro ao buscar grupos");
+      const result = await response.json();
+      return result.data || [];
+    },
+    enabled: !!selectedLojaId,
+  });
+
+  // Fetch productos for selected grupo
+  const { data: productos = [] } = useQuery<Producto[]>({
+    queryKey: ["productos-grupo", selectedGrupoId],
+    queryFn: async () => {
+      if (!selectedGrupoId) return [];
+      const response = await fetch(`/api/grupos-productos/${selectedGrupoId}/productos`);
+      if (!response.ok) throw new Error("Erro ao buscar produtos");
+      const result = await response.json();
+      return result.data || [];
+    },
+    enabled: !!selectedGrupoId,
+  });
+
+  // Fetch tabelas
+  const { data: tabelas, refetch } = useQuery<TabelaDePreco[]>({
+    queryKey: ["tabelas-preco"],
+    queryFn: async () => {
+      const response = await fetch("/api/tabelas-preco");
+      if (!response.ok) throw new Error("Erro ao buscar tabelas");
+      const result = await response.json();
+      return result.data || [];
+    },
+  });
+
+  // Save tabela mutation
+  const saveTabelaMutation = useMutation({
+    mutationFn: async (data: typeof formData) => {
+      const url = editingId ? `/api/tabelas-preco/${editingId}` : "/api/tabelas-preco";
+      const method = editingId ? "PUT" : "POST";
+
+      const response = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          productId: parseInt(data.productId),
+          lojaId: parseInt(data.lojaId),
+          preco: parseFloat(data.preco),
+          precoCusto: data.precoCusto ? parseFloat(data.precoCusto) : undefined,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Erro ao salvar tabela de preço");
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      toast.success(editingId ? "Tabela atualizada com sucesso!" : "Tabela criada com sucesso!");
+      setFormData({ productId: "", lojaId: "", preco: "", precoCusto: "" });
+      setEditingId(null);
+      setIsFormOpen(false);
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : "Erro ao salvar tabela de preço");
+    },
+  });
+
+  // Delete tabela mutation
+  const deleteTabelaMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await fetch(`/api/tabelas-preco/${id}`, { method: "DELETE" });
+      if (!response.ok) throw new Error("Erro ao deletar tabela");
+      return response.json();
+    },
+    onSuccess: () => {
+      toast.success("Tabela deletada com sucesso!");
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : "Erro ao deletar tabela");
+    },
+  });
+
+  const handleEdit = (tabela: TabelaDePreco) => {
+    setFormData({
+      productId: tabela.productId.toString(),
+      lojaId: tabela.lojaId.toString(),
+      preco: tabela.preco.toString(),
+      precoCusto: tabela.precoCusto?.toString() || "",
+    });
+    setSelectedLojaId(tabela.lojaId.toString());
+    setEditingId(tabela.id);
+    setIsFormOpen(true);
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.productId || !formData.lojaId || !formData.preco) {
+      toast.error("Preencha todos os campos obrigatórios");
+      return;
+    }
+    saveTabelaMutation.mutate(formData);
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <Header />
+
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-walmart-text">Cadastro de Tabelas de Preço</h1>
+          <button
+            onClick={() => {
+              setIsFormOpen(!isFormOpen);
+              setEditingId(null);
+              setFormData({ productId: "", lojaId: "", preco: "", precoCusto: "" });
+              setSelectedLojaId("");
+              setSelectedGrupoId("");
+            }}
+            className="flex items-center gap-2 px-4 py-2 bg-walmart-yellow text-walmart-text rounded-lg hover:bg-walmart-yellow-dark transition-colors font-semibold"
+          >
+            <Plus className="w-5 h-5" />
+            Nova Tabela
+          </button>
+        </div>
+
+        {/* Form */}
+        {isFormOpen && (
+          <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+            <h2 className="text-xl font-bold text-walmart-text mb-6">
+              {editingId ? "Editar Tabela de Preço" : "Criar Nova Tabela de Preço"}
+            </h2>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                    Loja *
+                  </label>
+                  <select
+                    required
+                    value={selectedLojaId}
+                    onChange={(e) => {
+                      setSelectedLojaId(e.target.value);
+                      setSelectedGrupoId("");
+                      setFormData({ ...formData, lojaId: e.target.value, productId: "" });
+                    }}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+                  >
+                    <option value="">Selecione uma loja</option>
+                    {lojas.map((loja) => (
+                      <option key={loja.id} value={loja.id}>
+                        {loja.nome}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                    Grupo de Produtos *
+                  </label>
+                  <select
+                    required
+                    value={selectedGrupoId}
+                    onChange={(e) => {
+                      setSelectedGrupoId(e.target.value);
+                      setFormData({ ...formData, productId: "" });
+                    }}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+                    disabled={!selectedLojaId}
+                  >
+                    <option value="">Selecione um grupo</option>
+                    {grupos.map((grupo: any) => (
+                      <option key={grupo.id} value={grupo.id}>
+                        {grupo.nome}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                    Produto *
+                  </label>
+                  <select
+                    required
+                    value={formData.productId}
+                    onChange={(e) => setFormData({ ...formData, productId: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+                    disabled={!selectedGrupoId}
+                  >
+                    <option value="">Selecione um produto</option>
+                    {productos.map((producto) => (
+                      <option key={producto.id} value={producto.id}>
+                        {producto.nome}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                    Preço *
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    required
+                    value={formData.preco}
+                    onChange={(e) => setFormData({ ...formData, preco: e.target.value })}
+                    placeholder="0.00"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                    Preço de Custo (Opcional)
+                  </label>
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={formData.precoCusto}
+                    onChange={(e) => setFormData({ ...formData, precoCusto: e.target.value })}
+                    placeholder="0.00"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                <button
+                  type="submit"
+                  disabled={saveTabelaMutation.isPending}
+                  className="px-6 py-2 bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors font-semibold disabled:opacity-50"
+                >
+                  {saveTabelaMutation.isPending ? "Salvando..." : "Salvar"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsFormOpen(false);
+                    setEditingId(null);
+                  }}
+                  className="px-6 py-2 bg-gray-300 text-walmart-text rounded-lg hover:bg-gray-400 transition-colors font-semibold"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {/* Tabelas List */}
+        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-walmart-gray">
+                <tr>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">Loja</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">Produto</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">Preço</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">Preço de Custo</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">Ações</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {!tabelas || tabelas.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                      Nenhuma tabela cadastrada
+                    </td>
+                  </tr>
+                ) : (
+                  tabelas.map((tabela) => (
+                    <tr key={tabela.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 font-semibold text-walmart-text">
+                        {tabela.loja?.nome || "N/A"}
+                      </td>
+                      <td className="px-6 py-4 font-semibold text-walmart-text">
+                        {tabela.produto?.nome || "N/A"}
+                      </td>
+                      <td className="px-6 py-4 text-walmart-text">
+                        R$ {parseFloat(tabela.preco.toString()).toFixed(2)}
+                      </td>
+                      <td className="px-6 py-4 text-walmart-text">
+                        {tabela.precoCusto ? `R$ ${parseFloat(tabela.precoCusto.toString()).toFixed(2)}` : "-"}
+                      </td>
+                      <td className="px-6 py-4 flex gap-2">
+                        <button
+                          onClick={() => handleEdit(tabela)}
+                          className="p-2 text-walmart-blue hover:bg-blue-50 rounded-lg transition-colors"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (confirm("Tem certeza que deseja deletar esta tabela?")) {
+                              deleteTabelaMutation.mutate(tabela.id);
+                            }
+                          }}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+
+      <Footer />
+    </div>
+  );
+}
