@@ -276,9 +276,19 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Loja Selection */}
             <div>
-              <label className="block text-sm font-semibold text-walmart-text mb-2">
-                Loja *
-              </label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-semibold text-walmart-text">
+                  Loja *
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowCreateLoja(true)}
+                  className="inline-flex items-center gap-1 px-3 py-1 text-sm bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors"
+                >
+                  <Plus className="w-4 h-4" />
+                  Nova Loja
+                </button>
+              </div>
               <select
                 value={selectedLojaId}
                 onChange={(e) => {
