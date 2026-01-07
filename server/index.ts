@@ -150,6 +150,9 @@ export function createServer() {
   app.get("/api/usuarios/:id", getUsuarioById);
   app.post("/api/auth/signin", signInUsuario);
   app.post("/api/auth/signup", signUpUsuario);
+  app.post("/api/auth/forgot-password", forgotPassword);
+  app.post("/api/auth/reset-password", resetPassword);
+  app.get("/api/auth/validate-reset-token", validateResetToken);
   app.post("/api/usuarios", createUsuario);
   app.put("/api/usuarios/:id", updateUsuario);
   app.delete("/api/usuarios/:id", deleteUsuario);
