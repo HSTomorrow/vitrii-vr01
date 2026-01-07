@@ -15,6 +15,8 @@ import {
   Package,
   DollarSign,
   Calendar,
+  Power,
+  RotateCcw,
 } from "lucide-react";
 
 export default function AnuncioDetalhe() {
