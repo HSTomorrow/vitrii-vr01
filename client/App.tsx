@@ -28,6 +28,7 @@ import CadastroEquipeDeVenda from "./pages/CadastroEquipeDeVenda";
 import Agenda from "./pages/Agenda";
 import SearchAnuncios from "./pages/SearchAnuncios";
 import SearchProdutos from "./pages/SearchProdutos";
+import Checkout from "./pages/Checkout";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
