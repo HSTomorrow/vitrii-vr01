@@ -59,6 +59,7 @@ import {
   removerMembro,
   getUsuariosDisponiveis,
 } from "./routes/equipes-venda";
+import { uploadMiddleware, handleUpload } from "./routes/upload";
 
 export function createServer() {
   const app = express();
