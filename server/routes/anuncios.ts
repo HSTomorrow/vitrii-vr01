@@ -192,6 +192,7 @@ export const createAnuncio: RequestHandler = async (req, res) => {
         titulo: validatedData.titulo,
         descricao: validatedData.descricao,
         fotoUrl: validatedData.fotoUrl,
+        precoAnuncio: validatedData.precoAnuncio,
         dataValidade,
         equipeDeVendaId: validatedData.equipeDeVendaId,
         isDoacao: validatedData.isDoacao,
