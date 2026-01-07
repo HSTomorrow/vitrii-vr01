@@ -23,8 +23,11 @@ export const getTabelas: RequestHandler = async (req, res) => {
     const tabelas = await prisma.tabelaDePreco.findMany({
       where,
       include: {
-        produto: true,
-        loja: true,
+        produto: {
+          include: {
+            grupo: true,
+          },
+        },
       },
       orderBy: { dataCriacao: "desc" },
     });
