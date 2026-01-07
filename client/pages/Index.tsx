@@ -112,23 +112,23 @@ export default function Index() {
       <Header />
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-walmart-blue to-walmart-blue-dark text-white py-3 md:py-4">
+      <section className="bg-gradient-to-r from-walmart-blue to-walmart-blue-dark text-white py-2 md:py-3">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-2xl md:text-3xl font-bold">
+          <h1 className="text-lg md:text-xl font-bold">
             Bem-vindo ao Vitrii
           </h1>
         </div>
       </section>
 
       {/* Featured Listings Section */}
-      <section className="py-16 md:py-24 bg-walmart-gray-light">
+      <section className="py-8 md:py-12 bg-walmart-gray-light">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center mb-12">
+          <div className="flex justify-between items-center mb-8">
             <div>
-              <h2 className="text-3xl md:text-4xl font-bold text-walmart-text mb-2">
+              <h2 className="text-2xl md:text-3xl font-bold text-walmart-text mb-1">
                 Anúncios em Destaque
               </h2>
-              <p className="text-walmart-text-secondary">
+              <p className="text-sm text-walmart-text-secondary">
                 Veja os produtos e serviços mais procurados
               </p>
             </div>
@@ -264,14 +264,14 @@ export default function Index() {
       </section>
 
       {/* Donation Listings Section */}
-      <section className="py-16 md:py-24 bg-white">
+      <section className="py-8 md:py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center mb-12">
+          <div className="flex justify-between items-center mb-8">
             <div>
-              <h2 className="text-3xl md:text-4xl font-bold text-walmart-text mb-2">
+              <h2 className="text-2xl md:text-3xl font-bold text-walmart-text mb-1">
                 Anúncios de Doação
               </h2>
-              <p className="text-walmart-text-secondary">
+              <p className="text-sm text-walmart-text-secondary">
                 Encontre itens grátis disponíveis para retirada
               </p>
             </div>
@@ -412,14 +412,14 @@ export default function Index() {
       </section>
 
       {/* Create Ad Section */}
-      <section className="py-16 md:py-24 bg-white">
+      <section className="py-8 md:py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-r from-walmart-blue to-walmart-blue-dark rounded-lg p-12 text-white text-center">
+          <div className="bg-gradient-to-r from-walmart-blue to-walmart-blue-dark rounded-lg p-8 text-white text-center">
             <Plus className="w-12 h-12 mx-auto mb-4 opacity-90" />
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">
               Publique Seu Anúncio Agora
             </h2>
-            <p className="text-blue-100 text-lg mb-8 max-w-2xl mx-auto">
+            <p className="text-blue-100 text-base mb-8 max-w-2xl mx-auto">
               Aproveite nossos 3 anúncios gratuitos e comece a vender seus produtos e serviços
               para milhares de clientes potenciais
             </p>
@@ -442,13 +442,13 @@ export default function Index() {
       </section>
 
       {/* Why Choose Vitrii Section */}
-      <section className="py-16 md:py-24">
+      <section className="py-8 md:py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-walmart-text mb-4">
+          <div className="text-center mb-12">
+            <h2 className="text-2xl md:text-3xl font-bold text-walmart-text mb-3">
               Por que escolher Vitrii?
             </h2>
-            <p className="text-xl text-walmart-text-secondary">
+            <p className="text-sm text-walmart-text-secondary">
               Recursos que transformam seu negócio
             </p>
           </div>
@@ -500,12 +500,12 @@ export default function Index() {
       </section>
 
       {/* Call to Action Section */}
-      <section className="py-16 md:py-24 bg-walmart-blue text-white">
+      <section className="py-8 md:py-12 bg-walmart-blue text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
+          <h2 className="text-2xl md:text-3xl font-bold mb-4">
             Pronto para crescer seu negócio?
           </h2>
-          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-base text-blue-100 mb-6 max-w-2xl mx-auto">
             Junte-se a milhares de vendedores que já estão transformando seus
             negócios com Vitrii.
           </p>
