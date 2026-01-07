@@ -143,11 +143,33 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
     e.preventDefault();
 
     if (!selectedLojaId || !formData.productId || !formData.tabelaDePrecoId) {
-      toast.error("Por favor, preencha todos os campos obrigatórios");
+      toast.error("Loja, Produto e Variante são obrigatórios");
       return;
     }
 
     mutation.mutate(formData);
+  };
+
+  const handleFileUpload = async (file: File) => {
+    try {
+      const formDataFile = new FormData();
+      formDataFile.append("file", file);
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formDataFile,
+      });
+
+      if (!response.ok) {
+        throw new Error("Erro ao fazer upload da imagem");
+      }
+
+      const data = await response.json();
+      handleInputChange("fotoUrl", data.url);
+      toast.success("Imagem enviada com sucesso!");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Erro ao fazer upload");
+    }
   };
 
   const handleInputChange = (field: string, value: string | number) => {
