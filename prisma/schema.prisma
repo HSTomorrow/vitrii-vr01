@@ -236,6 +236,8 @@ model Anuncio {
   isDoacao      Boolean   @default(false)
   destaque      Boolean   @default(false) // Featured ads
   isActive      Boolean   @default(true) // Logical deletion
+  categoria     String?   @db.VarChar(50) // "roupas", "carros", "imoveis"
+  dadosCategoria String?   @db.Text // JSON string for category-specific data
   status        String    @default("em_edicao") // "em_edicao", "aguardando_pagamento", "pago", "historico"
   dataValidade  DateTime?
   dataCriacao   DateTime  @default(now())
