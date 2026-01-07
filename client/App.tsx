@@ -89,6 +89,7 @@ export default function App() {
                 <Route path="/checkout/:anuncioId" element={<Checkout />} />
                 <Route path="/chat" element={<Chat />} />
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                <Route path="/admin/anuncios" element={<AdminManageAds />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
