@@ -66,6 +66,12 @@ import {
   getUsuariosDisponiveis,
 } from "./routes/equipes-venda";
 import {
+  getFavoritos,
+  checkFavorito,
+  toggleFavorito,
+  getFavoritoCount,
+} from "./routes/favoritos";
+import {
   generateQRCode,
   getQRCodesForAd,
   trackQRCodeScan,
