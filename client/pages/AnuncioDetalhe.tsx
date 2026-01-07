@@ -155,11 +155,16 @@ export default function AnuncioDetalhe() {
           {/* Header with Status */}
           <div className="flex items-start justify-between mb-8">
             <div>
-              <div className="flex items-center gap-4 mb-2">
+              <div className="flex items-center gap-4 mb-2 flex-wrap">
                 <h1 className="text-4xl font-bold text-walmart-text">{anuncio.titulo}</h1>
                 <span className={`px-3 py-1 rounded-full text-sm font-semibold ${statusColors[anuncio.status] || statusColors.em_edicao}`}>
                   {statusLabels[anuncio.status] || anuncio.status}
                 </span>
+                {isInactive && (
+                  <span className="px-3 py-1 rounded-full text-sm font-semibold bg-gray-400 text-white">
+                    Inativo
+                  </span>
+                )}
               </div>
               <div className="flex items-center gap-4 text-walmart-text-secondary mt-2">
                 <div className="flex items-center gap-1">
