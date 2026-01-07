@@ -311,3 +311,236 @@ export const deleteUsuario: RequestHandler = async (req, res) => {
     });
   }
 };
+
+// FORGOT PASSWORD - Request password reset
+export const forgotPassword: RequestHandler = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        error: "Email é obrigatório",
+      });
+    }
+
+    // Find user by email
+    const usuario = await prisma.usuario.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        nome: true,
+        email: true,
+      },
+    });
+
+    if (!usuario) {
+      // Return success even if user not found (security best practice)
+      return res.status(200).json({
+        success: true,
+        message: "Se este email estiver cadastrado, você receberá um link para redefinir sua senha",
+      });
+    }
+
+    // Generate reset token
+    const token = crypto.randomBytes(32).toString("hex");
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour from now
+
+    // Save token to database
+    await prisma.passwordResetToken.create({
+      data: {
+        usuarioId: usuario.id,
+        token,
+        expiresAt,
+      },
+    });
+
+    // Generate reset link
+    const resetLink = `${process.env.APP_URL || "http://localhost:5173"}/reset-senha?token=${token}&email=${encodeURIComponent(usuario.email)}`;
+
+    // Send email
+    await sendPasswordResetEmail(usuario.email, resetLink, usuario.nome);
+
+    res.status(200).json({
+      success: true,
+      message: "Email para redefinição de senha enviado com sucesso",
+    });
+  } catch (error) {
+    console.error("Error in forgot password:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao processar solicitação",
+    });
+  }
+};
+
+// RESET PASSWORD - Verify token and update password
+export const resetPassword: RequestHandler = async (req, res) => {
+  try {
+    const { token, email, novaSenha, confirmarSenha } = req.body;
+
+    if (!token || !email || !novaSenha || !confirmarSenha) {
+      return res.status(400).json({
+        success: false,
+        error: "Todos os campos são obrigatórios",
+      });
+    }
+
+    if (novaSenha !== confirmarSenha) {
+      return res.status(400).json({
+        success: false,
+        error: "As senhas não conferem",
+      });
+    }
+
+    if (novaSenha.length < 6) {
+      return res.status(400).json({
+        success: false,
+        error: "Senha deve ter no mínimo 6 caracteres",
+      });
+    }
+
+    // Find user by email
+    const usuario = await prisma.usuario.findUnique({
+      where: { email },
+      select: { id: true },
+    });
+
+    if (!usuario) {
+      return res.status(404).json({
+        success: false,
+        error: "Usuário não encontrado",
+      });
+    }
+
+    // Find and validate reset token
+    const resetToken = await prisma.passwordResetToken.findUnique({
+      where: { token },
+    });
+
+    if (!resetToken) {
+      return res.status(400).json({
+        success: false,
+        error: "Token inválido",
+      });
+    }
+
+    if (resetToken.isUsed) {
+      return res.status(400).json({
+        success: false,
+        error: "Este token já foi utilizado",
+      });
+    }
+
+    if (resetToken.expiresAt < new Date()) {
+      return res.status(400).json({
+        success: false,
+        error: "Este token expirou. Solicite um novo link de redefinição",
+      });
+    }
+
+    if (resetToken.usuarioId !== usuario.id) {
+      return res.status(400).json({
+        success: false,
+        error: "Token inválido para este usuário",
+      });
+    }
+
+    // Hash new password
+    const senhaHash = await bcryptjs.hash(novaSenha, 10);
+
+    // Update user password and mark token as used
+    await Promise.all([
+      prisma.usuario.update({
+        where: { id: usuario.id },
+        data: { senha: senhaHash },
+      }),
+      prisma.passwordResetToken.update({
+        where: { id: resetToken.id },
+        data: { isUsed: true },
+      }),
+    ]);
+
+    res.status(200).json({
+      success: true,
+      message: "Senha redefinida com sucesso",
+    });
+  } catch (error) {
+    console.error("Error resetting password:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao redefinir senha",
+    });
+  }
+};
+
+// VALIDATE RESET TOKEN - Check if token is valid
+export const validateResetToken: RequestHandler = async (req, res) => {
+  try {
+    const { token, email } = req.query;
+
+    if (!token || !email) {
+      return res.status(400).json({
+        success: false,
+        error: "Token e email são obrigatórios",
+      });
+    }
+
+    // Find user by email
+    const usuario = await prisma.usuario.findUnique({
+      where: { email: email as string },
+      select: { id: true },
+    });
+
+    if (!usuario) {
+      return res.status(404).json({
+        success: false,
+        error: "Usuário não encontrado",
+      });
+    }
+
+    // Find and validate reset token
+    const resetToken = await prisma.passwordResetToken.findUnique({
+      where: { token: token as string },
+    });
+
+    if (!resetToken) {
+      return res.status(400).json({
+        success: false,
+        error: "Token inválido",
+      });
+    }
+
+    if (resetToken.isUsed) {
+      return res.status(400).json({
+        success: false,
+        error: "Este token já foi utilizado",
+      });
+    }
+
+    if (resetToken.expiresAt < new Date()) {
+      return res.status(400).json({
+        success: false,
+        error: "Este token expirou",
+      });
+    }
+
+    if (resetToken.usuarioId !== usuario.id) {
+      return res.status(400).json({
+        success: false,
+        error: "Token inválido para este usuário",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Token válido",
+    });
+  } catch (error) {
+    console.error("Error validating token:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao validar token",
+    });
+  }
+};
