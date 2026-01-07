@@ -226,9 +226,9 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
                   Selecione uma loja primeiro
                 </div>
               )}
-              {selectedProducto && (
+              {selectedProducto && (selectedProducto.grupo || selectedProducto.grupoDeProductos) && (
                 <p className="mt-2 text-sm text-walmart-text-secondary">
-                  Grupo: {selectedProducto.grupoDeProductos.nome}
+                  Grupo: {(selectedProducto.grupo || selectedProducto.grupoDeProductos)?.nome}
                 </p>
               )}
             </div>
