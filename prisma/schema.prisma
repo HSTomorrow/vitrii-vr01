@@ -1,3 +1,6 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -7,209 +10,344 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model agendas {
-  id              Int      @id @default(autoincrement())
-  lojaId          Int
-  productId       Int
-  usuarioId       Int?
-  dataHora        DateTime
-  descricao       String?
-  status          String   @default("disponivel")
-  isActive        Boolean  @default(true)
-  dataCriacao     DateTime @default(now())
-  dataAtualizacao DateTime
+// ============================================================================
+// USUÁRIOS (Users)
+// ============================================================================
+model Usuario {
+  id            Int       @id @default(autoincrement())
+  nome          String    @db.VarChar(255)
+  email         String    @unique @db.VarChar(255)
+  senha         String    @db.VarChar(255)
+  cpf           String    @db.VarChar(11)
+  telefone      String    @db.VarChar(20)
+  endereco      String    @db.Text
+  tipoUsuario   String    @default("comum") // "comum" or "administrador"
+  isActive      Boolean   @default(true)
+  dataCriacao   DateTime  @default(now())
+  dataAtualizacao DateTime @updatedAt
+
+  // Relations
+  usuarioLojas  UsuarioLoja[]
+  produtosVisualizados ProductoVisualizacao[]
+  qrCodesVisitados QRCodeChamada[]
+  membrosEquipe MembroEquipe[]
+  agendas       Agenda[]
+
+  @@map("usuarios")
 }
 
-model anuncios {
-  id               Int               @id @default(autoincrement())
-  lojaId           Int
-  titulo           String            @db.VarChar(50)
-  descricao        String?
-  categoria        String?           @db.VarChar(50)
-  status           String            @default("em_edicao")
-  dataCriacao      DateTime          @default(now())
-  dataAtualizacao  DateTime
-  productId        Int
-  equipeDeVendaId  Int?
-  isDoacao         Boolean           @default(false)
-  precoAnuncio     Decimal?          @db.Decimal(10, 2)
-  destaque         Boolean           @default(false)
-  isActive         Boolean           @default(true)
-  dadosCategoria   String?
-  dataValidade     DateTime?
-  fotoUrl          String?
-  tabelaDePrecoId  Int?
-  equipes_de_venda equipes_de_venda? @relation(fields: [equipeDeVendaId], references: [id])
+// ============================================================================
+// LOJAS (Stores)
+// ============================================================================
+model Loja {
+  id            Int       @id @default(autoincrement())
+  nome          String    @db.VarChar(255)
+  cnpjOuCpf     String    @unique @db.VarChar(18)
+  endereco      String    @db.Text
+  descricao     String    @db.Text
+  email         String    @db.VarChar(255)
+  site          String?   @db.VarChar(255)
+  instagram      String?   @db.VarChar(255)
+  facebook      String?   @db.VarChar(255)
+  fotoUrl       String?   @db.Text // URL da foto da loja
+  status        String    @default("ativa") // "ativa" or "inativa"
+  isActive      Boolean   @default(true)
+  dataCriacao   DateTime  @default(now())
+  dataAtualizacao DateTime @updatedAt
+
+  // Relations
+  usuarioLojas  UsuarioLoja[]
+  gruposDeProductos GrupoDeProductos[]
+  produtosEmEstoque ProdutoEmEstoque[]
+  movimentoEstoque MovimentoEstoque[]
+  anuncios      Anuncio[]
+  equipesDeVenda EquipeDeVenda[]
+  agendas       Agenda[]
+
+  @@map("lojas")
 }
 
-model equipes_de_venda {
-  id              Int              @id @default(autoincrement())
-  lojaId          Int
-  nome            String           @db.VarChar(255)
-  descricao       String?
-  dataCriacao     DateTime         @default(now())
-  dataAtualizacao DateTime
-  isActive        Boolean          @default(true)
-  anuncios        anuncios[]
-  lojas           lojas            @relation(fields: [lojaId], references: [id], onDelete: Cascade)
-  membros_equipe  membros_equipe[]
-}
+// ============================================================================
+// USUÁRIO x LOJA x TIPO DE USUÁRIO (User-Store-Role junction table)
+// ============================================================================
+model UsuarioLoja {
+  id            Int       @id @default(autoincrement())
+  usuarioId     Int
+  lojaId        Int
+  tipoUsuario   String    // "atendente", "gestor", "administrador"
+  dataCriacao   DateTime  @default(now())
+  dataAtualizacao DateTime @updatedAt
 
-model fotos_grupo {
-  id          Int      @id @default(autoincrement())
-  grupoId     Int
-  fotoUrl     String
-  ordem       Int      @default(1)
-  dataCriacao DateTime @default(now())
-}
-
-model grupos_de_productos {
-  id              Int      @id @default(autoincrement())
-  lojaId          Int
-  nome            String   @db.VarChar(255)
-  descricao       String?
-  dataCriacao     DateTime @default(now())
-  dataAtualizacao DateTime
-  isActive        Boolean  @default(true)
-}
-
-model lojas {
-  id                  Int                   @id @default(autoincrement())
-  nome                String                @db.VarChar(255)
-  descricao           String
-  email               String                @db.VarChar(255)
-  endereco            String
-  dataCriacao         DateTime              @default(now())
-  dataAtualizacao     DateTime
-  cnpjOuCpf           String                @unique @db.VarChar(18)
-  site                String?               @db.VarChar(255)
-  instagram           String?               @db.VarChar(255)
-  facebook            String?               @db.VarChar(255)
-  fotoUrl             String?
-  status              String                @default("ativa")
-  isActive            Boolean               @default(true)
-  equipes_de_venda    equipes_de_venda[]
-  movimentos_estoque  movimentos_estoque[]
-  produtos_em_estoque produtos_em_estoque[]
-  usuarios_lojas      usuarios_lojas[]
-}
-
-model membros_equipe {
-  id               Int              @id @default(autoincrement())
-  equipeId         Int
-  usuarioId        Int
-  dataCriacao      DateTime         @default(now())
-  dataAtualizacao  DateTime
-  equipes_de_venda equipes_de_venda @relation(fields: [equipeId], references: [id], onDelete: Cascade)
-  usuarios         usuarios         @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-
-  @@unique([equipeId, usuarioId])
-}
-
-model movimentos_estoque {
-  id                  Int                 @id @default(autoincrement())
-  lojaId              Int
-  productId           Int
-  tipo                String
-  quantidade          Int
-  motivoSaida         String?             @db.VarChar(255)
-  observacoes         String?
-  dataCriacao         DateTime            @default(now())
-  lojas               lojas               @relation(fields: [lojaId], references: [id], onDelete: Cascade)
-  produtos_em_estoque produtos_em_estoque @relation(fields: [lojaId, productId], references: [lojaId, productId], onDelete: Cascade)
-  productos           productos           @relation(fields: [productId], references: [id], onDelete: Cascade)
-}
-
-model producto_visualizacoes {
-  id               Int      @id @default(autoincrement())
-  usuarioId        Int?
-  productId        Int
-  dataVisualizacao DateTime @default(now())
-}
-
-model productos {
-  id                  Int                   @id @default(autoincrement())
-  grupoId             Int
-  nome                String                @db.VarChar(255)
-  descricao           String?
-  sku                 String?               @db.VarChar(100)
-  dataCriacao         DateTime              @default(now())
-  dataAtualizacao     DateTime
-  isActive            Boolean               @default(true)
-  movimentos_estoque  movimentos_estoque[]
-  produtos_em_estoque produtos_em_estoque[]
-}
-
-model produtos_em_estoque {
-  id                 Int                  @id @default(autoincrement())
-  lojaId             Int
-  productId          Int
-  quantidade         Int                  @default(0)
-  quantidadeMinima   Int?                 @default(0)
-  quantidadeMaxima   Int?
-  dataCriacao        DateTime             @default(now())
-  dataAtualizacao    DateTime
-  movimentos_estoque movimentos_estoque[]
-  lojas              lojas                @relation(fields: [lojaId], references: [id], onDelete: Cascade)
-  productos          productos            @relation(fields: [productId], references: [id], onDelete: Cascade)
-
-  @@unique([lojaId, productId])
-}
-
-model qr_code_chamadas {
-  id          Int      @id @default(autoincrement())
-  usuarioId   Int?
-  qrCodeId    Int
-  dataChamada DateTime @default(now())
-}
-
-model qr_codes {
-  id              Int      @id @default(autoincrement())
-  tabelaDePrecoId Int
-  codigo          String   @unique @db.VarChar(500)
-  descricao       String?
-  dataCriacao     DateTime @default(now())
-  dataAtualizacao DateTime
-}
-
-model tabelas_de_preco {
-  id              Int      @id @default(autoincrement())
-  productId       Int
-  lojaId          Int
-  preco           Decimal  @db.Decimal(10, 2)
-  precoCusto      Decimal? @db.Decimal(10, 2)
-  dataCriacao     DateTime @default(now())
-  dataAtualizacao DateTime
-  tamanho         String?  @db.VarChar(100)
-  cor             String?  @db.VarChar(100)
-  isActive        Boolean  @default(true)
-}
-
-model usuarios {
-  id              Int              @id @default(autoincrement())
-  nome            String           @db.VarChar(255)
-  email           String           @unique @db.VarChar(255)
-  senha           String           @db.VarChar(255)
-  cpf             String           @db.VarChar(11)
-  telefone        String           @db.VarChar(20)
-  tipoUsuario     String           @default("comum")
-  dataCriacao     DateTime         @default(now())
-  dataAtualizacao DateTime
-  endereco        String
-  isActive        Boolean          @default(true)
-  membros_equipe  membros_equipe[]
-  usuarios_lojas  usuarios_lojas[]
-}
-
-model usuarios_lojas {
-  id              Int      @id @default(autoincrement())
-  usuarioId       Int
-  lojaId          Int
-  dataCriacao     DateTime @default(now())
-  tipoUsuario     String
-  dataAtualizacao DateTime
-  lojas           lojas    @relation(fields: [lojaId], references: [id], onDelete: Cascade)
-  usuarios        usuarios @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  // Relations
+  usuario       Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  loja          Loja      @relation(fields: [lojaId], references: [id], onDelete: Cascade)
 
   @@unique([usuarioId, lojaId])
+  @@map("usuarios_lojas")
+}
+
+// ============================================================================
+// EQUIPE DE VENDA (Sales Team)
+// ============================================================================
+model EquipeDeVenda {
+  id            Int       @id @default(autoincrement())
+  lojaId        Int
+  nome          String    @db.VarChar(255)
+  descricao     String?   @db.Text
+  isActive      Boolean   @default(true)
+  dataCriacao   DateTime  @default(now())
+  dataAtualizacao DateTime @updatedAt
+
+  // Relations
+  loja          Loja      @relation(fields: [lojaId], references: [id], onDelete: Cascade)
+  membros       MembroEquipe[]
+  anuncios      Anuncio[]
+
+  @@map("equipes_de_venda")
+}
+
+// ============================================================================
+// MEMBRO DA EQUIPE DE VENDA (Sales Team Member)
+// ============================================================================
+model MembroEquipe {
+  id            Int       @id @default(autoincrement())
+  equipeId      Int
+  usuarioId     Int
+  dataCriacao   DateTime  @default(now())
+  dataAtualizacao DateTime @updatedAt
+
+  // Relations
+  equipe        EquipeDeVenda @relation(fields: [equipeId], references: [id], onDelete: Cascade)
+  usuario       Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@unique([equipeId, usuarioId])
+  @@map("membros_equipe")
+}
+
+// ============================================================================
+// GRUPOS DE PRODUTOS E SERVIÇOS
+// ============================================================================
+model GrupoDeProductos {
+  id            Int       @id @default(autoincrement())
+  lojaId        Int
+  nome          String    @db.VarChar(255)
+  descricao     String?   @db.Text
+  isActive      Boolean   @default(true)
+  dataCriacao   DateTime  @default(now())
+  dataAtualizacao DateTime @updatedAt
+
+  // Relations
+  loja          Loja      @relation(fields: [lojaId], references: [id], onDelete: Cascade)
+  fotos         FotoGrupo[]
+  produtos      Producto[]
+
+  @@map("grupos_de_productos")
+}
+
+// Fotos do Grupo de Produtos (até 5 fotos)
+model FotoGrupo {
+  id            Int       @id @default(autoincrement())
+  grupoId       Int
+  fotoUrl       String    @db.Text
+  ordem         Int       @default(1)
+  dataCriacao   DateTime  @default(now())
+
+  // Relations
+  grupo         GrupoDeProductos @relation(fields: [grupoId], references: [id], onDelete: Cascade)
+
+  @@map("fotos_grupo")
+}
+
+// ============================================================================
+// PRODUTOS E SERVIÇOS
+// ============================================================================
+model Producto {
+  id            Int       @id @default(autoincrement())
+  grupoId       Int
+  nome          String    @db.VarChar(255)
+  descricao     String?   @db.Text
+  sku           String?   @db.VarChar(100)
+  isActive      Boolean   @default(true)
+  dataCriacao   DateTime  @default(now())
+  dataAtualizacao DateTime @updatedAt
+
+  // Relations
+  grupo         GrupoDeProductos @relation(fields: [grupoId], references: [id], onDelete: Cascade)
+  tabelasDePreco TabelaDePreco[]
+  estoques      ProdutoEmEstoque[]
+  movimentoEstoque MovimentoEstoque[]
+  anuncios      Anuncio[]
+  agendas       Agenda[]
+
+  @@map("productos")
+}
+
+// ============================================================================
+// TABELA DE PREÇOS
+// ============================================================================
+model TabelaDePreco {
+  id            Int       @id @default(autoincrement())
+  productId     Int
+  lojaId        Int
+  tamanho       String?   @db.VarChar(100)
+  cor           String?   @db.VarChar(100)
+  preco         Decimal   @db.Decimal(10, 2)
+  precoCusto    Decimal?  @db.Decimal(10, 2)
+  isActive      Boolean   @default(true)
+  dataCriacao   DateTime  @default(now())
+  dataAtualizacao DateTime @updatedAt
+
+  // Relations
+  produto       Producto  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  qrCodes       QRCode[]
+  anuncios      Anuncio[]
+
+  @@map("tabelas_de_preco")
+}
+
+// ============================================================================
+// AGENDA DE SERVIÇOS (Service Schedule)
+// ============================================================================
+model Agenda {
+  id            Int       @id @default(autoincrement())
+  lojaId        Int
+  productId     Int
+  usuarioId     Int?      // Service provider
+  dataHora      DateTime
+  descricao     String?   @db.Text
+  status        String    @default("disponivel") // "disponivel", "ocupado", "cancelado"
+  isActive      Boolean   @default(true)
+  dataCriacao   DateTime  @default(now())
+  dataAtualizacao DateTime @updatedAt
+
+  // Relations
+  loja          Loja      @relation(fields: [lojaId], references: [id], onDelete: Cascade)
+  producto      Producto  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  usuario       Usuario?  @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+
+  @@map("agendas")
+}
+
+// ============================================================================
+// QR CODES
+// ============================================================================
+model QRCode {
+  id            Int       @id @default(autoincrement())
+  tabelaDePrecoId Int
+  codigo        String    @unique @db.VarChar(500)
+  descricao     String?   @db.Text
+  dataCriacao   DateTime  @default(now())
+  dataAtualizacao DateTime @updatedAt
+
+  // Relations
+  tabelaDePreco TabelaDePreco @relation(fields: [tabelaDePrecoId], references: [id], onDelete: Cascade)
+  chamadas      QRCodeChamada[]
+
+  @@map("qr_codes")
+}
+
+// ============================================================================
+// ANÚNCIOS (Listings)
+// ============================================================================
+model Anuncio {
+  id            Int       @id @default(autoincrement())
+  lojaId        Int
+  productId     Int
+  tabelaDePrecoId Int?
+  equipeDeVendaId Int?
+  titulo        String    @db.VarChar(50)
+  descricao     String?   @db.Text
+  fotoUrl       String?   @db.Text
+  precoAnuncio  Decimal?  @db.Decimal(10, 2)
+  isDoacao      Boolean   @default(false)
+  destaque      Boolean   @default(false) // Featured ads
+  isActive      Boolean   @default(true) // Logical deletion
+  categoria     String?   @db.VarChar(50) // "roupas", "carros", "imoveis"
+  dadosCategoria String?   @db.Text // JSON string for category-specific data
+  status        String    @default("em_edicao") // "em_edicao", "aguardando_pagamento", "pago", "historico"
+  dataValidade  DateTime?
+  dataCriacao   DateTime  @default(now())
+  dataAtualizacao DateTime @updatedAt
+
+  // Relations
+  loja          Loja      @relation(fields: [lojaId], references: [id], onDelete: Cascade)
+  producto      Producto  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  tabelaDePreco TabelaDePreco? @relation(fields: [tabelaDePrecoId], references: [id], onDelete: SetNull)
+  equipeDeVenda EquipeDeVenda? @relation(fields: [equipeDeVendaId], references: [id], onDelete: SetNull)
+
+  @@map("anuncios")
+}
+
+// ============================================================================
+// CONTROLE DE ESTOQUE
+// ============================================================================
+model ProdutoEmEstoque {
+  id            Int       @id @default(autoincrement())
+  lojaId        Int
+  productId     Int
+  quantidade    Int       @default(0)
+  quantidadeMinima Int?   @default(0)
+  quantidadeMaxima Int?
+  dataCriacao   DateTime  @default(now())
+  dataAtualizacao DateTime @updatedAt
+
+  // Relations
+  loja          Loja      @relation(fields: [lojaId], references: [id], onDelete: Cascade)
+  producto      Producto  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  movimentos    MovimentoEstoque[]
+
+  @@unique([lojaId, productId])
+  @@map("produtos_em_estoque")
+}
+
+// ============================================================================
+// MOVIMENTO DE ESTOQUE (Inventory movements/history)
+// ============================================================================
+model MovimentoEstoque {
+  id            Int       @id @default(autoincrement())
+  lojaId        Int
+  productId     Int
+  tipo          String    // "entrada", "saida", "ajuste"
+  quantidade    Int
+  motivoSaida   String?   @db.VarChar(255) // "venda", "devolucao", "perda", etc
+  observacoes   String?   @db.Text
+  dataCriacao   DateTime  @default(now())
+
+  // Relations
+  loja          Loja      @relation(fields: [lojaId], references: [id], onDelete: Cascade)
+  producto      Producto  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  produtoEmEstoque ProdutoEmEstoque @relation(fields: [lojaId, productId], references: [lojaId, productId], onDelete: Cascade)
+
+  @@map("movimentos_estoque")
+}
+
+// ============================================================================
+// CONTAGEM DE VISUALIZAÇÕES DE PRODUTOS
+// ============================================================================
+model ProductoVisualizacao {
+  id            Int       @id @default(autoincrement())
+  usuarioId     Int?      // Pode ser nulo se for visitante
+  productId     Int
+  dataVisualizacao DateTime @default(now())
+
+  // Relations
+  usuario       Usuario?  @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+
+  @@map("producto_visualizacoes")
+}
+
+// ============================================================================
+// CONTAGEM DE CHAMADAS DE QR CODE
+// ============================================================================
+model QRCodeChamada {
+  id            Int       @id @default(autoincrement())
+  usuarioId     Int?      // Pode ser nulo se for visitante
+  qrCodeId      Int
+  dataChamada   DateTime  @default(now())
+
+  // Relations
+  usuario       Usuario?  @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+  qrCode        QRCode    @relation(fields: [qrCodeId], references: [id], onDelete: Cascade)
+
+  @@map("qr_code_chamadas")
 }
