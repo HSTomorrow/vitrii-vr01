@@ -381,7 +381,7 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
             {/* Descrição */}
             <div>
               <label className="block text-sm font-semibold text-walmart-text mb-2">
-                Descrição
+                Descrição (Opcional)
               </label>
               <textarea
                 value={formData.descricao}
