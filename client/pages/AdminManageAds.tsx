@@ -93,6 +93,10 @@ export default function AdminManageAds() {
       const endpoint = activate ? "/activate" : "/inactivate";
       const response = await fetch(`/api/anuncios/${anuncioId}${endpoint}`, {
         method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": user?.id ? String(user.id) : "",
+        },
       });
       if (!response.ok) throw new Error("Erro ao atualizar anúncio");
       return response.json();
