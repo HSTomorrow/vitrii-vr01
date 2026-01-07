@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ChevronLeft, Upload, AlertCircle, CheckCircle } from "lucide-react";
+import { ChevronLeft, Upload, AlertCircle, CheckCircle, Plus } from "lucide-react";
 import { Link } from "react-router-dom";
 import CategoryFields from "./CategoryFields";
+import CreateLojaModal from "./CreateLojaModal";
+import CreateProductoModal from "./CreateProductoModal";
 
 interface AnuncioFormProps {
   lojaId?: number;
