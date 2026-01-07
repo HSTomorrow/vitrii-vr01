@@ -120,6 +120,7 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
           : getDefaultValidityDate(),
         equipeDeVendaId: ad.equipeDeVendaId || 0,
         isDoacao: ad.isDoacao || false,
+        destaque: ad.destaque || false,
       });
     }
   }, [anuncioData]);
