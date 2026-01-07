@@ -253,7 +253,13 @@ export const createAnuncio: RequestHandler = async (req, res) => {
 export const updateAnuncio: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
-    const updateData = AnuncioCreateSchema.partial().parse(req.body);
+    let updateData = AnuncioCreateSchema.partial().parse(req.body);
+
+    // If updating to donation, automatically set status to "pago" and zero price
+    if (updateData.isDoacao === true) {
+      updateData.status = "pago";
+      updateData.precoAnuncio = null;
+    }
 
     const anuncio = await prisma.anuncio.update({
       where: { id: parseInt(id) },
