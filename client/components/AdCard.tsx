@@ -10,6 +10,7 @@ interface AdCardProps {
   isFavorited?: boolean;
   onFavoritoToggle?: (anuncioId: number, isFavorited: boolean) => void;
   variant?: "featured" | "donation";
+  loja?: any;
 }
 
 export default function AdCard({
@@ -17,6 +18,7 @@ export default function AdCard({
   isFavorited = false,
   onFavoritoToggle,
   variant = "featured",
+  loja,
 }: AdCardProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -80,7 +82,7 @@ export default function AdCard({
           toggleFavoritoMutation.mutate(anuncio.id);
         }}
         disabled={toggleFavoritoMutation.isPending}
-        className="absolute top-3 left-3 z-10 p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
+        className="absolute top-3 right-3 z-10 p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
         title={isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"}
       >
         <Heart
@@ -89,6 +91,18 @@ export default function AdCard({
           }`}
         />
       </button>
+
+      {/* Store Logo Badge */}
+      {(loja?.fotoUrl || anuncio.loja?.fotoUrl) && (
+        <div className="absolute bottom-3 left-3 z-10 w-10 h-10 rounded-full bg-white border-2 border-walmart-blue overflow-hidden flex items-center justify-center shadow-md">
+          <img
+            src={loja?.fotoUrl || anuncio.loja?.fotoUrl}
+            alt={loja?.nome || anuncio.loja?.nome}
+            className="w-full h-full object-cover"
+            title={loja?.nome || anuncio.loja?.nome}
+          />
+        </div>
+      )}
 
       {/* Image */}
       <div className={`w-full h-48 bg-gradient-to-br ${backgroundColor} flex items-center justify-center overflow-hidden`}>
