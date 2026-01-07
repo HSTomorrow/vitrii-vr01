@@ -21,6 +21,7 @@ import {
 import {
   getUsuarios,
   getUsuarioById,
+  signInUsuario,
   signUpUsuario,
   createUsuario,
   updateUsuario,
@@ -46,6 +47,7 @@ export function createServer() {
   // Usuários routes
   app.get("/api/usuarios", getUsuarios);
   app.get("/api/usuarios/:id", getUsuarioById);
+  app.post("/api/auth/signin", signInUsuario);
   app.post("/api/auth/signup", signUpUsuario);
   app.post("/api/usuarios", createUsuario);
   app.put("/api/usuarios/:id", updateUsuario);
