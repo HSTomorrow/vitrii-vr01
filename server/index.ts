@@ -128,5 +128,15 @@ export function createServer() {
   app.patch("/api/anuncios/:id/status", updateAnuncioStatus);
   app.delete("/api/anuncios/:id", deleteAnuncio);
 
+  // Equipes de Venda routes
+  app.get("/api/equipes-venda", getEquipes);
+  app.get("/api/equipes-venda/:id", getEquipeById);
+  app.post("/api/equipes-venda", createEquipe);
+  app.put("/api/equipes-venda/:id", updateEquipe);
+  app.delete("/api/equipes-venda/:id", deleteEquipe);
+  app.post("/api/equipes-venda/:id/membros", adicionarMembro);
+  app.delete("/api/equipes-venda/:id/membros/:membroId", removerMembro);
+  app.get("/api/equipes-venda/:id/usuarios-disponiveis", getUsuariosDisponiveis);
+
   return app;
 }
