@@ -25,6 +25,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/about" element={<About />} />
           <Route path="/browse" element={<Browse />} />
           <Route path="/sell" element={<Sell />} />
           <Route path="/qrcode" element={<QRCodePage />} />
