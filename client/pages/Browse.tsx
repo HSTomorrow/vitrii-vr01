@@ -1,12 +1,9 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { Filter, Search, Star, Package, Heart, ArrowRight } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Filter, Search, Star, Package, Heart } from "lucide-react";
-import { Link } from "react-router-dom";
-import { ArrowRight } from "lucide-react";
-import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function Browse() {
