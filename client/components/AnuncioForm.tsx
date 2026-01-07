@@ -159,6 +159,7 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
 
   const lojas = lojasData?.data || [];
   const productos = productosData?.data || [];
+  const equipes = equipesData?.data || [];
 
   // Get selected product details
   const selectedProducto = productos.find((p: Producto) => p.id === formData.productId);
