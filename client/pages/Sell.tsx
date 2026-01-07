@@ -352,7 +352,7 @@ export default function Sell() {
                     </div>
 
                     <p className="text-walmart-blue font-bold text-lg mb-3">
-                      R$ {anuncio.tabelaDePreco?.preco?.toFixed(2) || "0.00"}
+                      R$ {anuncio.tabelaDePreco?.preco ? Number(anuncio.tabelaDePreco.preco).toFixed(2) : "0.00"}
                     </p>
 
                     <div className="flex gap-2 text-walmart-text-secondary text-sm mb-4">
