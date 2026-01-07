@@ -50,6 +50,7 @@ export const getAnuncios: RequestHandler = async (req, res) => {
             id: true,
             nome: true,
             descricao: true,
+            tipo: true,
           },
         },
         tabelaDePreco: {
