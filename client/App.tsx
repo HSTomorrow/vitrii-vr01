@@ -54,6 +54,7 @@ export default function App() {
               <Route path="/cadastros/tabelas-preco" element={<CadastroTabelasPreco />} />
               <Route path="/cadastros/variantes" element={<CadastroVariantesLista />} />
               <Route path="/cadastros/variantes/:productId" element={<CadastroVariantes />} />
+              <Route path="/cadastros/equipes-venda" element={<CadastroEquipeDeVenda />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
