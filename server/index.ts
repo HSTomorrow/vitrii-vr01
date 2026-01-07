@@ -172,5 +172,18 @@ export function createServer() {
   app.get("/api/qrcodes/:qrCodeId/stats", getQRCodeStats);
   app.delete("/api/qrcodes/:qrCodeId", deleteQRCode);
 
+  // Agendas (Service Schedule) routes
+  app.get("/api/agendas", getAgendas);
+  app.get("/api/agendas/:id", getAgendaById);
+  app.post("/api/agendas", createAgenda);
+  app.patch("/api/agendas/:id/status", updateAgendaStatus);
+  app.delete("/api/agendas/:id", deleteAgenda);
+
+  // Waitlist routes
+  app.post("/api/agendas/waitlist/add", addToWaitlist);
+  app.get("/api/agendas/:agendaId/waitlist", getWaitlist);
+  app.delete("/api/agendas/waitlist/:waitlistId", removeFromWaitlist);
+  app.post("/api/agendas/:agendaId/waitlist/promote", promoteFromWaitlist);
+
   return app;
 }
