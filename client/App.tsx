@@ -32,36 +32,38 @@ const queryClient = new QueryClient();
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/browse" element={<Browse />} />
-              <Route path="/sell" element={<Sell />} />
-              <Route path="/qrcode" element={<QRCodePage />} />
-              <Route path="/auth/signin" element={<SignIn />} />
-              <Route path="/auth/signup" element={<SignUp />} />
-              <Route path="/perfil" element={<PerfilUsuario />} />
-              <Route path="/anuncio/criar" element={<CriarAnuncio />} />
-              <Route path="/anuncio/:id" element={<AnuncioDetalhe />} />
-              <Route path="/anuncio/:id/editar" element={<EditarAnuncio />} />
-              <Route path="/cadastros/lojas" element={<CadastroLojas />} />
-              <Route path="/cadastros/grupos-productos" element={<CadastroGruposProductos />} />
-              <Route path="/cadastros/productos" element={<CadastroProdutos />} />
-              <Route path="/cadastros/tabelas-preco" element={<CadastroTabelasPreco />} />
-              <Route path="/cadastros/variantes" element={<CadastroVariantesLista />} />
-              <Route path="/cadastros/variantes/:productId" element={<CadastroVariantes />} />
-              <Route path="/cadastros/equipes-venda" element={<CadastroEquipeDeVenda />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </AuthProvider>
+      <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
+        <AuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/browse" element={<Browse />} />
+                <Route path="/sell" element={<Sell />} />
+                <Route path="/qrcode" element={<QRCodePage />} />
+                <Route path="/auth/signin" element={<SignIn />} />
+                <Route path="/auth/signup" element={<SignUp />} />
+                <Route path="/perfil" element={<PerfilUsuario />} />
+                <Route path="/anuncio/criar" element={<CriarAnuncio />} />
+                <Route path="/anuncio/:id" element={<AnuncioDetalhe />} />
+                <Route path="/anuncio/:id/editar" element={<EditarAnuncio />} />
+                <Route path="/cadastros/lojas" element={<CadastroLojas />} />
+                <Route path="/cadastros/grupos-productos" element={<CadastroGruposProductos />} />
+                <Route path="/cadastros/productos" element={<CadastroProdutos />} />
+                <Route path="/cadastros/tabelas-preco" element={<CadastroTabelasPreco />} />
+                <Route path="/cadastros/variantes" element={<CadastroVariantesLista />} />
+                <Route path="/cadastros/variantes/:productId" element={<CadastroVariantes />} />
+                <Route path="/cadastros/equipes-venda" element={<CadastroEquipeDeVenda />} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </BrowserRouter>
+          </TooltipProvider>
+        </AuthProvider>
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
