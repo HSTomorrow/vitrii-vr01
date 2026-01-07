@@ -78,6 +78,9 @@ export function createServer() {
 
   app.get("/api/demo", handleDemo);
 
+  // Upload route
+  app.post("/api/upload", uploadMiddleware, handleUpload);
+
   // Usuários routes
   app.get("/api/usuarios", getUsuarios);
   app.get("/api/usuarios/:id", getUsuarioById);
