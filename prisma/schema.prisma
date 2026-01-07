@@ -237,7 +237,6 @@ model MovimentoEstoque {
   producto      Producto  @relation(fields: [productId], references: [id], onDelete: Cascade)
   produtoEmEstoque ProdutoEmEstoque @relation(fields: [lojaId, productId], references: [lojaId, productId], onDelete: Cascade)
 
-  @@unique([lojaId, productId])
   @@map("movimentos_estoque")
 }
 
