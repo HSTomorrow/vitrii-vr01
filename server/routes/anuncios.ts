@@ -179,9 +179,29 @@ export const createAnuncio: RequestHandler = async (req, res) => {
       validatedData.tabelaDePrecoId = tabelaDePreco.id;
     }
 
+    // Set price: use manual preco if provided, otherwise use tabelaDePreco price
+    let preco = validatedData.preco;
+    if (!preco && tabelaDePreco) {
+      preco = tabelaDePreco.preco;
+    }
+
+    // Set validity: default to 7 days from now if not provided
+    const dataValidade = validatedData.dataValidade
+      ? new Date(validatedData.dataValidade)
+      : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+
     const anuncio = await prisma.anuncio.create({
       data: {
-        ...validatedData,
+        lojaId: validatedData.lojaId,
+        productId: validatedData.productId,
+        tabelaDePrecoId: validatedData.tabelaDePrecoId,
+        titulo: validatedData.titulo,
+        descricao: validatedData.descricao,
+        fotoUrl: validatedData.fotoUrl,
+        preco: preco ? parseFloat(preco.toString()) : null,
+        dataValidade,
+        equipeDeVendaId: validatedData.equipeDeVendaId,
+        isDoacao: validatedData.isDoacao,
         status: "em_edicao",
       },
       include: {
