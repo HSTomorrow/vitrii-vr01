@@ -56,6 +56,8 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
     equipeDeVendaId: 0,
     isDoacao: false,
     destaque: false,
+    categoria: null as string | null,
+    dadosCategoria: "",
   });
 
   // Fetch lojas
