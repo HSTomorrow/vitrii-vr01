@@ -29,8 +29,20 @@ export default function Index() {
     },
   });
 
+  // Fetch donation ads
+  const { data: doacoesData, isLoading: doacoesLoading } = useQuery({
+    queryKey: ["anuncios-doacoes"],
+    queryFn: async () => {
+      const response = await fetch("/api/anuncios?status=pago&isDoacao=true");
+      if (!response.ok) throw new Error("Erro ao buscar doações");
+      return response.json();
+    },
+  });
+
   const anuncios = anunciosData?.data || [];
-  const destacados = anuncios.slice(0, 4);
+  const destacados = anuncios.filter((a: any) => !a.isDoacao).slice(0, 4);
+  const doacoes = doacoesData?.data || [];
+  const destaqueDoacoes = doacoes.slice(0, 4);
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
