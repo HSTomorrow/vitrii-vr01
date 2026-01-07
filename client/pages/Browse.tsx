@@ -1,10 +1,35 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Filter, Search } from "lucide-react";
+import { Filter, Search, Star, Package } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 
 export default function Browse() {
+  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Fetch all published ads
+  const { data: anunciosData, isLoading } = useQuery({
+    queryKey: ["anuncios-browse", searchTerm],
+    queryFn: async () => {
+      const response = await fetch("/api/anuncios?status=pago");
+      if (!response.ok) throw new Error("Erro ao buscar anúncios");
+      return response.json();
+    },
+  });
+
+  const anuncios = anunciosData?.data || [];
+
+  // Filter by search term
+  const filtered = anuncios.filter(
+    (a: any) =>
+      a.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      a.descricao?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
@@ -86,36 +111,123 @@ export default function Browse() {
                 <input
                   type="text"
                   placeholder="Buscar produtos ou serviços..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                   className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-1 focus:ring-walmart-blue"
                 />
                 <Search className="absolute left-4 top-3.5 text-gray-400 w-5 h-5" />
               </div>
             </div>
 
-            {/* Placeholder Content */}
-            <div className="text-center py-16">
-              <div className="inline-flex items-center justify-center w-20 h-20 bg-walmart-gray-light rounded-full mb-6">
-                <Search className="w-10 h-10 text-walmart-text-secondary" />
+            {/* Ads Grid */}
+            {isLoading ? (
+              // Loading skeleton
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                  <div key={i} className="vitrii-card overflow-hidden animate-pulse">
+                    <div className="w-full h-48 bg-gray-300" />
+                    <div className="p-4 space-y-3">
+                      <div className="h-4 bg-gray-300 rounded" />
+                      <div className="h-3 bg-gray-300 rounded w-3/4" />
+                      <div className="h-4 bg-gray-300 rounded" />
+                      <div className="h-10 bg-gray-300 rounded" />
+                    </div>
+                  </div>
+                ))}
               </div>
-              <h2 className="text-2xl font-bold text-walmart-text mb-2">
-                Em Desenvolvimento
-              </h2>
-              <p className="text-walmart-text-secondary mb-6 max-w-md mx-auto">
-                A página de navegação de produtos está sendo melhorada para
-                oferecer a melhor experiência. Em breve você poderá filtrar,
-                buscar e explorar todos os anúncios.
-              </p>
+            ) : filtered.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                {filtered.map((anuncio: any) => (
+                  <div
+                    key={anuncio.id}
+                    className="vitrii-card overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+                    onClick={() => navigate(`/anuncio/${anuncio.id}`)}
+                  >
+                    {/* Image */}
+                    <div className="w-full h-48 bg-gradient-to-br from-walmart-blue to-walmart-blue-dark flex items-center justify-center overflow-hidden">
+                      {anuncio.fotoUrl ? (
+                        <img
+                          src={anuncio.fotoUrl}
+                          alt={anuncio.titulo}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <Package className="w-12 h-12 text-white opacity-50" />
+                      )}
+                    </div>
 
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link
-                  to="/"
-                  className="inline-flex items-center justify-center space-x-2 bg-walmart-blue text-white px-6 py-3 rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors"
-                >
-                  <span>Voltar para Home</span>
-                  <ArrowRight className="w-5 h-5" />
-                </Link>
+                    {/* Content */}
+                    <div className="p-4">
+                      <h4 className="font-semibold text-walmart-text mb-2 line-clamp-2">
+                        {anuncio.titulo}
+                      </h4>
+                      <p className="text-sm text-walmart-text-secondary mb-3 line-clamp-2">
+                        {anuncio.descricao || "Produto em destaque"}
+                      </p>
+
+                      <div className="flex justify-between items-center mb-4">
+                        <span className="text-2xl font-bold text-walmart-blue">
+                          R$ {anuncio.tabelaDePreco?.preco?.toFixed(2) || "0.00"}
+                        </span>
+                        <div className="flex items-center space-x-1">
+                          <Star className="w-4 h-4 fill-walmart-yellow text-walmart-yellow" />
+                          <span className="text-sm font-semibold">5.0</span>
+                        </div>
+                      </div>
+
+                      <div className="mb-4 p-3 bg-gray-50 rounded text-sm">
+                        <p className="text-walmart-text-secondary">
+                          <strong>{anuncio.loja?.nome || "Loja"}</strong>
+                        </p>
+                      </div>
+
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/anuncio/${anuncio.id}`);
+                        }}
+                        className="w-full bg-walmart-blue text-white py-2 rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors"
+                      >
+                        Ver Detalhes
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
-            </div>
+            ) : (
+              // No results
+              <div className="text-center py-16">
+                <div className="inline-flex items-center justify-center w-20 h-20 bg-walmart-gray-light rounded-full mb-6">
+                  <Package className="w-10 h-10 text-walmart-text-secondary" />
+                </div>
+                <h2 className="text-2xl font-bold text-walmart-text mb-2">
+                  Nenhum anúncio encontrado
+                </h2>
+                <p className="text-walmart-text-secondary mb-6 max-w-md mx-auto">
+                  {searchTerm
+                    ? `Não encontramos anúncios com "${searchTerm}". Tente outra busca.`
+                    : "Nenhum anúncio publicado ainda. Seja o primeiro a publicar!"}
+                </p>
+
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  {!searchTerm && (
+                    <Link
+                      to="/anuncio/criar"
+                      className="inline-flex items-center justify-center space-x-2 bg-walmart-blue text-white px-6 py-3 rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors"
+                    >
+                      <span>Publicar Anúncio</span>
+                      <ArrowRight className="w-5 h-5" />
+                    </Link>
+                  )}
+                  <Link
+                    to="/"
+                    className="inline-flex items-center justify-center space-x-2 border-2 border-walmart-blue text-walmart-blue px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+                  >
+                    <span>Voltar para Home</span>
+                  </Link>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
