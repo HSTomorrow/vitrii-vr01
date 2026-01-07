@@ -280,7 +280,7 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
             {/* Tabela de Preço Selection */}
             <div>
               <label className="block text-sm font-semibold text-walmart-text mb-2">
-                Variante (Tamanho/Cor) *
+                Variante (Tamanho/Cor) - Opcional
               </label>
               {formData.productId > 0 ? (
                 <select
