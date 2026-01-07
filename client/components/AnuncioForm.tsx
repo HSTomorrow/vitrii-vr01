@@ -314,7 +314,7 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
                   }
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
                 >
-                  <option value={0}>Nenhuma (opcional)</option>
+                  <option value={0}>Selecione uma variante</option>
                   {priceTables.map((pt) => (
                     <option key={pt.id} value={pt.id}>
                       {pt.tamanho && pt.cor
