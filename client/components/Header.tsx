@@ -180,24 +180,28 @@ export default function Header() {
               <Link
                 to="/browse"
                 className="px-4 py-2 text-walmart-text hover:bg-walmart-gray rounded-lg"
+                onClick={() => setIsMenuOpen(false)}
               >
-                Comprar
+                Ver Anúncios
               </Link>
               <Link
                 to="/sell"
                 className="px-4 py-2 text-walmart-text hover:bg-walmart-gray rounded-lg"
+                onClick={() => setIsMenuOpen(false)}
               >
                 Vender
               </Link>
               <Link
                 to="/qrcode"
                 className="px-4 py-2 text-walmart-text hover:bg-walmart-gray rounded-lg"
+                onClick={() => setIsMenuOpen(false)}
               >
                 QR Code
               </Link>
               <Link
                 to="/about"
                 className="px-4 py-2 text-walmart-text hover:bg-walmart-gray rounded-lg"
+                onClick={() => setIsMenuOpen(false)}
               >
                 Sobre
               </Link>
