@@ -154,5 +154,12 @@ export function createServer() {
   app.delete("/api/equipes-venda/:id/membros/:membroId", removerMembro);
   app.get("/api/equipes-venda/:id/usuarios-disponiveis", getUsuariosDisponiveis);
 
+  // QR Codes routes
+  app.post("/api/qrcodes/generate", generateQRCode);
+  app.get("/api/anuncios/:anuncioId/qrcodes", getQRCodesForAd);
+  app.post("/api/qrcodes/:qrCodeId/track", trackQRCodeScan);
+  app.get("/api/qrcodes/:qrCodeId/stats", getQRCodeStats);
+  app.delete("/api/qrcodes/:qrCodeId", deleteQRCode);
+
   return app;
 }
