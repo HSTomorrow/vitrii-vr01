@@ -163,7 +163,10 @@ export function createServer() {
   app.delete("/api/equipes-venda/:id", deleteEquipe);
   app.post("/api/equipes-venda/:id/membros", adicionarMembro);
   app.delete("/api/equipes-venda/:id/membros/:membroId", removerMembro);
-  app.get("/api/equipes-venda/:id/usuarios-disponiveis", getUsuariosDisponiveis);
+  app.get(
+    "/api/equipes-venda/:id/usuarios-disponiveis",
+    getUsuariosDisponiveis,
+  );
 
   // QR Codes routes
   app.post("/api/qrcodes/generate", generateQRCode);

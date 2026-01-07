@@ -1,6 +1,14 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { Calendar, Clock, Users, Plus, AlertCircle, CheckCircle2, XCircle } from "lucide-react";
+import {
+  Calendar,
+  Clock,
+  Users,
+  Plus,
+  AlertCircle,
+  CheckCircle2,
+  XCircle,
+} from "lucide-react";
 import { toast } from "sonner";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -216,8 +224,7 @@ export default function Agenda() {
   const agendaByTime = agendas
     .filter((a) => a.isActive && a.status !== "cancelado")
     .sort(
-      (a, b) =>
-        new Date(a.dataHora).getTime() - new Date(b.dataHora).getTime()
+      (a, b) => new Date(a.dataHora).getTime() - new Date(b.dataHora).getTime(),
     );
 
   return (
@@ -251,7 +258,7 @@ export default function Agenda() {
             <button
               onClick={() =>
                 setSelectedDate(
-                  new Date(selectedDate.getTime() - 24 * 60 * 60 * 1000)
+                  new Date(selectedDate.getTime() - 24 * 60 * 60 * 1000),
                 )
               }
               className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100"
@@ -267,7 +274,7 @@ export default function Agenda() {
             <button
               onClick={() =>
                 setSelectedDate(
-                  new Date(selectedDate.getTime() + 24 * 60 * 60 * 1000)
+                  new Date(selectedDate.getTime() + 24 * 60 * 60 * 1000),
                 )
               }
               className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100"
@@ -390,7 +397,8 @@ export default function Agenda() {
             <div className="bg-white rounded-lg shadow-md p-8 text-center">
               <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-3" />
               <p className="text-gray-600 text-lg">
-                Nenhum horário disponível para {selectedDate.toLocaleDateString("pt-BR")}
+                Nenhum horário disponível para{" "}
+                {selectedDate.toLocaleDateString("pt-BR")}
               </p>
               <button
                 onClick={() => setShowNewSlotForm(true)}
@@ -433,7 +441,7 @@ export default function Agenda() {
                               {
                                 hour: "2-digit",
                                 minute: "2-digit",
-                              }
+                              },
                             )}
                           </p>
                           {slot.usuario && (

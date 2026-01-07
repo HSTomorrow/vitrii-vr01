@@ -51,17 +51,35 @@ export default function App() {
                 <Route path="/auth/signup" element={<SignUp />} />
                 <Route path="/perfil" element={<PerfilUsuario />} />
                 <Route path="/anuncio/criar" element={<CriarAnuncio />} />
-              <Route path="/anuncio/:id" element={<AnuncioDetalhe />} />
-              <Route path="/anuncio/:id/editar" element={<EditarAnuncio />} />
-              <Route path="/buscar" element={<SearchAnuncios />} />
-              <Route path="/buscar-produtos" element={<SearchProdutos />} />
-              <Route path="/cadastros/lojas" element={<CadastroLojas />} />
-                <Route path="/cadastros/grupos-productos" element={<CadastroGruposProductos />} />
-                <Route path="/cadastros/productos" element={<CadastroProdutos />} />
-                <Route path="/cadastros/tabelas-preco" element={<CadastroTabelasPreco />} />
-                <Route path="/cadastros/variantes" element={<CadastroVariantesLista />} />
-                <Route path="/cadastros/variantes/:productId" element={<CadastroVariantes />} />
-                <Route path="/cadastros/equipes-venda" element={<CadastroEquipeDeVenda />} />
+                <Route path="/anuncio/:id" element={<AnuncioDetalhe />} />
+                <Route path="/anuncio/:id/editar" element={<EditarAnuncio />} />
+                <Route path="/buscar" element={<SearchAnuncios />} />
+                <Route path="/buscar-produtos" element={<SearchProdutos />} />
+                <Route path="/cadastros/lojas" element={<CadastroLojas />} />
+                <Route
+                  path="/cadastros/grupos-productos"
+                  element={<CadastroGruposProductos />}
+                />
+                <Route
+                  path="/cadastros/productos"
+                  element={<CadastroProdutos />}
+                />
+                <Route
+                  path="/cadastros/tabelas-preco"
+                  element={<CadastroTabelasPreco />}
+                />
+                <Route
+                  path="/cadastros/variantes"
+                  element={<CadastroVariantesLista />}
+                />
+                <Route
+                  path="/cadastros/variantes/:productId"
+                  element={<CadastroVariantes />}
+                />
+                <Route
+                  path="/cadastros/equipes-venda"
+                  element={<CadastroEquipeDeVenda />}
+                />
                 <Route path="/agenda" element={<Agenda />} />
                 <Route path="/agenda/:lojaId" element={<Agenda />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

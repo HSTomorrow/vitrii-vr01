@@ -1,6 +1,15 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, X, Search, ShoppingCart, User, Plus, LogOut, Settings } from "lucide-react";
+import {
+  Menu,
+  X,
+  Search,
+  ShoppingCart,
+  User,
+  Plus,
+  LogOut,
+  Settings,
+} from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function Header() {
@@ -81,7 +90,9 @@ export default function Header() {
                 className="flex items-center gap-2 p-2 hover:bg-walmart-gray rounded-lg transition-colors hidden sm:flex"
               >
                 <Settings className="w-5 h-5 text-walmart-text" />
-                <span className="text-sm font-semibold text-walmart-text hidden md:inline">Cadastros</span>
+                <span className="text-sm font-semibold text-walmart-text hidden md:inline">
+                  Cadastros
+                </span>
               </button>
 
               {isCadastrosOpen && (

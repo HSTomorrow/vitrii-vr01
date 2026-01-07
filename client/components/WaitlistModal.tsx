@@ -124,12 +124,9 @@ export default function WaitlistModal({
     }
 
     try {
-      const response = await fetch(
-        `/api/agendas/waitlist/${waitlistId}`,
-        {
-          method: "DELETE",
-        }
-      );
+      const response = await fetch(`/api/agendas/waitlist/${waitlistId}`, {
+        method: "DELETE",
+      });
 
       const data = await response.json();
 
@@ -151,12 +148,9 @@ export default function WaitlistModal({
     }
 
     try {
-      const response = await fetch(
-        `/api/agendas/${slot.id}/waitlist/promote`,
-        {
-          method: "POST",
-        }
-      );
+      const response = await fetch(`/api/agendas/${slot.id}/waitlist/promote`, {
+        method: "POST",
+      });
 
       const data = await response.json();
 
@@ -218,7 +212,9 @@ export default function WaitlistModal({
                 <p>{slot.usuario.telefone}</p>
               </div>
             ) : (
-              <p className="text-sm text-red-600">Horário ocupado sem detalhe</p>
+              <p className="text-sm text-red-600">
+                Horário ocupado sem detalhe
+              </p>
             )}
           </div>
 

@@ -9,7 +9,10 @@ const AgendaCreateSchema = z.object({
   dataHora: z.string().datetime("Data e hora devem estar em formato ISO"),
   descricao: z.string().optional().nullable(),
   usuarioId: z.number().int().positive().optional().nullable(),
-  status: z.enum(["disponivel", "ocupado", "cancelado"]).optional().default("disponivel"),
+  status: z
+    .enum(["disponivel", "ocupado", "cancelado"])
+    .optional()
+    .default("disponivel"),
   isActive: z.boolean().optional().default(true),
 });
 
@@ -19,7 +22,7 @@ export const getAgendas: RequestHandler = async (req, res) => {
     const { lojaId, productId, dataInicio, dataFim, status } = req.query;
 
     const where: any = { isActive: true };
-    
+
     if (lojaId) where.lojaId = parseInt(lojaId as string);
     if (productId) where.productId = parseInt(productId as string);
     if (status) where.status = status;
