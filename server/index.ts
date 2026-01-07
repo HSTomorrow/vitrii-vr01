@@ -83,6 +83,33 @@ export function createServer() {
   app.delete("/api/lojas/:id", deleteLoja);
   app.get("/api/lojas/:lojaId/produtos-para-anuncio", getProdutosParaAnuncio);
 
+  // Grupos de Productos routes
+  app.get("/api/grupos-productos", getGrupos);
+  app.get("/api/grupos-productos/:id", getGrupoById);
+  app.get("/api/grupos-productos/:id/productos", getProductosOfGrupo);
+  app.get("/api/lojas/:lojaId/grupos-productos", (req, res) => {
+    // Delegate to getGrupos with lojaId query param
+    req.query.lojaId = req.params.lojaId;
+    return getGrupos(req, res);
+  });
+  app.post("/api/grupos-productos", createGrupo);
+  app.put("/api/grupos-productos/:id", updateGrupo);
+  app.delete("/api/grupos-productos/:id", deleteGrupo);
+
+  // Productos routes
+  app.get("/api/productos", getProductos);
+  app.get("/api/productos/:id", getProductoById);
+  app.post("/api/productos", createProducto);
+  app.put("/api/productos/:id", updateProducto);
+  app.delete("/api/productos/:id", deleteProducto);
+
+  // Tabelas de Preço routes
+  app.get("/api/tabelas-preco", getTabelas);
+  app.get("/api/tabelas-preco/:id", getTabelaById);
+  app.post("/api/tabelas-preco", createTabela);
+  app.put("/api/tabelas-preco/:id", updateTabela);
+  app.delete("/api/tabelas-preco/:id", deleteTabela);
+
   // Anúncios routes
   app.get("/api/anuncios", getAnuncios);
   app.get("/api/anuncios/:id", getAnuncioById);
