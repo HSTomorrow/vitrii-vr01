@@ -215,6 +215,125 @@ export default function Index() {
         </div>
       </section>
 
+      {/* Donation Listings Section */}
+      <section className="py-16 md:py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center mb-12">
+            <div>
+              <h2 className="text-3xl md:text-4xl font-bold text-walmart-text mb-2">
+                Anúncios de Doação
+              </h2>
+              <p className="text-walmart-text-secondary">
+                Encontre itens grátis disponíveis para retirada
+              </p>
+            </div>
+            <Link
+              to="/browse?filter=doacao"
+              className="hidden md:inline-flex items-center space-x-2 text-walmart-blue font-semibold hover:space-x-3 transition-all"
+            >
+              <span>Ver Todas</span>
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+
+          {/* Donation Cards Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {doacoesLoading ? (
+              // Loading Skeleton
+              <>
+                {[1, 2, 3, 4].map((item) => (
+                  <div key={item} className="vitrii-card overflow-hidden animate-pulse">
+                    <div className="w-full h-48 bg-gray-300" />
+                    <div className="p-4 space-y-3">
+                      <div className="h-4 bg-gray-300 rounded" />
+                      <div className="h-3 bg-gray-300 rounded w-3/4" />
+                      <div className="h-4 bg-gray-300 rounded" />
+                      <div className="h-10 bg-gray-300 rounded" />
+                    </div>
+                  </div>
+                ))}
+              </>
+            ) : destaqueDoacoes.length > 0 ? (
+              // Display actual donation ads
+              destaqueDoacoes.map((anuncio: any) => (
+                <div
+                  key={anuncio.id}
+                  className="vitrii-card overflow-hidden hover:scale-105 transition-transform duration-200 cursor-pointer relative"
+                >
+                  {/* Donation Badge */}
+                  <div className="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold z-10">
+                    GRÁTIS
+                  </div>
+
+                  {/* Image */}
+                  <div className="w-full h-48 bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center overflow-hidden">
+                    {anuncio.fotoUrl ? (
+                      <img
+                        src={anuncio.fotoUrl}
+                        alt={anuncio.titulo}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <Package className="w-12 h-12 text-white opacity-50" />
+                    )}
+                  </div>
+
+                  {/* Content */}
+                  <div className="p-4">
+                    <h4 className="font-semibold text-walmart-text mb-2 line-clamp-2">
+                      {anuncio.titulo}
+                    </h4>
+                    <p className="text-sm text-walmart-text-secondary mb-3 line-clamp-2">
+                      {anuncio.descricao || "Item disponível para doação"}
+                    </p>
+
+                    <div className="flex justify-between items-center mb-4">
+                      <span className="text-lg font-bold text-green-600">
+                        Grátis
+                      </span>
+                      <div className="flex items-center space-x-1">
+                        <Star className="w-4 h-4 fill-walmart-yellow text-walmart-yellow" />
+                        <span className="text-sm font-semibold">5.0</span>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => navigate(`/anuncio/${anuncio.id}`)}
+                      className="w-full bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors"
+                    >
+                      Ver Detalhes
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              // No donation ads placeholder
+              <div className="col-span-full text-center py-12">
+                <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-walmart-text-secondary">Nenhuma doação publicada ainda</p>
+                <Link
+                  to="/anuncio/criar"
+                  className="inline-flex items-center gap-2 text-walmart-blue font-semibold hover:underline mt-4"
+                >
+                  <Plus className="w-4 h-4" />
+                  Publique uma Doação
+                </Link>
+              </div>
+            )}
+          </div>
+
+          <div className="text-center mt-12 lg:hidden">
+            <Link
+              to="/browse?filter=doacao"
+              className="inline-flex items-center space-x-2 text-walmart-blue font-semibold hover:space-x-3 transition-all"
+            >
+              <span>Ver Todas as Doações</span>
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Create Ad Section */}
       <section className="py-16 md:py-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
