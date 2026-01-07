@@ -69,6 +69,14 @@ export default function Header() {
             </button>
 
             <Link
+              to="/anuncio/criar"
+              className="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-walmart-yellow text-walmart-text rounded-lg hover:bg-walmart-yellow-dark transition-colors font-semibold"
+            >
+              <Plus className="w-4 h-4" />
+              <span className="hidden md:inline">Publicar</span>
+            </Link>
+
+            <Link
               to="/auth/signin"
               className="px-4 py-2 text-walmart-blue hover:bg-blue-50 rounded-lg transition-colors hidden sm:block"
             >
