@@ -2,14 +2,25 @@ import { RequestHandler } from "express";
 import prisma from "../lib/prisma";
 import { z } from "zod";
 
-// Schema validation
-const UsuarioCreateSchema = z.object({
-  nome: z.string().min(1, "Nome é obrigatório"),
+// Schema validation for signup (basic info only)
+const UsuarioSignUpSchema = z.object({
+  nome: z.string().min(3, "Nome deve ter pelo menos 3 caracteres").max(255),
   email: z.string().email("Email inválido"),
   senha: z.string().min(6, "Senha deve ter no mínimo 6 caracteres"),
-  cpf: z.string().regex(/^\d{11}$/, "CPF deve ter 11 dígitos"),
-  telefone: z.string().min(10, "Telefone inválido"),
-  endereco: z.string().min(1, "Endereço é obrigatório"),
+  confirmarSenha: z.string(),
+}).refine((data) => data.senha === data.confirmarSenha, {
+  message: "Senhas não conferem",
+  path: ["confirmarSenha"],
+});
+
+// Schema validation for full user (with additional info)
+const UsuarioCreateSchema = z.object({
+  nome: z.string().min(3, "Nome deve ter pelo menos 3 caracteres").max(255),
+  email: z.string().email("Email inválido"),
+  senha: z.string().min(6, "Senha deve ter no mínimo 6 caracteres"),
+  cpf: z.string().regex(/^\d{11}$/, "CPF deve ter 11 dígitos").optional(),
+  telefone: z.string().min(10, "Telefone inválido").optional(),
+  endereco: z.string().min(1, "Endereço é obrigatório").optional(),
 });
 
 // GET all users
