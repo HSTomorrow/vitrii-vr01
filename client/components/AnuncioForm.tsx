@@ -147,6 +147,7 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
             : null,
           equipeDeVendaId: data.equipeDeVendaId > 0 ? data.equipeDeVendaId : null,
           isDoacao: data.isDoacao,
+          destaque: data.destaque,
         }),
       });
 
