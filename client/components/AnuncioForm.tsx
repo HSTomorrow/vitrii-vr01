@@ -46,6 +46,7 @@ const getDefaultValidityDate = () => {
 
 export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFormProps) {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [selectedLojaId, setSelectedLojaId] = useState(lojaId || 0);
   const [showCreateLoja, setShowCreateLoja] = useState(false);
   const [showCreateProducto, setShowCreateProducto] = useState(false);
