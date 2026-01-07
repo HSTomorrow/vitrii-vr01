@@ -54,7 +54,11 @@ export const getTabelaById: RequestHandler = async (req, res) => {
     const tabela = await prisma.tabelaDePreco.findUnique({
       where: { id: parseInt(id) },
       include: {
-        produto: true,
+        produto: {
+          include: {
+            grupo: true,
+          },
+        },
         qrCodes: true,
         anuncios: true,
       },
@@ -132,8 +136,11 @@ export const createTabela: RequestHandler = async (req, res) => {
           : undefined,
       },
       include: {
-        produto: true,
-        loja: true,
+        produto: {
+          include: {
+            grupo: true,
+          },
+        },
       },
     });
 
@@ -183,8 +190,11 @@ export const updateTabela: RequestHandler = async (req, res) => {
       where: { id: parseInt(id) },
       data: updatePayload,
       include: {
-        produto: true,
-        loja: true,
+        produto: {
+          include: {
+            grupo: true,
+          },
+        },
       },
     });
 
