@@ -6,7 +6,7 @@ import { z } from "zod";
 const AnuncioCreateSchema = z.object({
   lojaId: z.number().int().positive("Loja é obrigatória"),
   productId: z.number().int().positive("Produto é obrigatório"),
-  tabelaDePrecoId: z.number().int().positive("Tabela de preço é obrigatória"),
+  tabelaDePrecoId: z.number().int().optional().nullable(),
   titulo: z.string().min(5, "Título deve ter pelo menos 5 caracteres").max(255),
   descricao: z.string().min(10, "Descrição deve ter pelo menos 10 caracteres").optional(),
   fotoUrl: z.string().optional(),
