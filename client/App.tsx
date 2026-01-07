@@ -17,6 +17,10 @@ import PerfilUsuario from "./pages/PerfilUsuario";
 import CriarAnuncio from "./pages/CriarAnuncio";
 import AnuncioDetalhe from "./pages/AnuncioDetalhe";
 import EditarAnuncio from "./pages/EditarAnuncio";
+import CadastroLojas from "./pages/CadastroLojas";
+import CadastroGruposProductos from "./pages/CadastroGruposProductos";
+import CadastroProdutos from "./pages/CadastroProdutos";
+import CadastroTabelasPreco from "./pages/CadastroTabelasPreco";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
