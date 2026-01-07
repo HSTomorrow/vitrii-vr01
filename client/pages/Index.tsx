@@ -6,11 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
 import {
-  QrCode,
   Star,
-  TrendingUp,
-  Users,
-  Zap,
   ArrowRight,
   Package,
   BarChart3,
@@ -19,21 +15,16 @@ import {
   MapPin,
   Calendar,
   Heart,
+  Users,
+  Zap,
 } from "lucide-react";
 
-// Helper function to extract municipality from address
 const extractMunicipality = (endereco: string): string => {
   if (!endereco) return "Localização desconhecida";
-
-  // Split by comma and get the second-to-last part (usually city)
-  // Format is typically: "Rua X, 123, Cidade, Estado CEP"
   const parts = endereco.split(",");
-
   if (parts.length >= 2) {
-    // Get the second-to-last part (city)
     return parts[parts.length - 2].trim();
   }
-
   return endereco.split(" ").slice(-2, -1)[0] || "Localização";
 };
 
@@ -42,7 +33,6 @@ export default function Index() {
   const { user } = useAuth();
   const [favoritos, setFavoritos] = useState<Set<number>>(new Set());
 
-  // Toggle favorito mutation
   const toggleFavoritoMutation = useMutation({
     mutationFn: async (anuncioId: number) => {
       if (!user) {
@@ -81,7 +71,6 @@ export default function Index() {
     },
   });
 
-  // Fetch featured ads (excluding donations)
   const { data: anunciosData, isLoading } = useQuery({
     queryKey: ["anuncios-destaque"],
     queryFn: async () => {
@@ -91,7 +80,6 @@ export default function Index() {
     },
   });
 
-  // Fetch donation ads
   const { data: doacoesData, isLoading: doacoesLoading } = useQuery({
     queryKey: ["anuncios-doacoes"],
     queryFn: async () => {
@@ -143,7 +131,6 @@ export default function Index() {
           {/* Featured Cards Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
             {isLoading ? (
-              // Loading Skeleton
               <>
                 {[1, 2, 3, 4, 5].map((item) => (
                   <div key={item} className="vitrii-card overflow-hidden animate-pulse">
@@ -159,13 +146,11 @@ export default function Index() {
                 ))}
               </>
             ) : destacados.length > 0 ? (
-              // Display actual ads
               destacados.map((anuncio: any) => (
                 <div
                   key={anuncio.id}
                   className="vitrii-card overflow-hidden hover:scale-105 transition-transform duration-200 cursor-pointer relative"
                 >
-                  {/* Image */}
                   <div className="w-full h-48 bg-gradient-to-br from-walmart-blue to-walmart-blue-dark flex items-center justify-center overflow-hidden">
                     {anuncio.fotoUrl ? (
                       <img
@@ -178,7 +163,6 @@ export default function Index() {
                     )}
                   </div>
 
-                  {/* Store Logo Badge */}
                   {anuncio.loja?.fotoUrl && (
                     <div className="absolute bottom-3 left-3 z-10 w-10 h-10 rounded-full bg-white border-2 border-walmart-blue overflow-hidden flex items-center justify-center shadow-md">
                       <img
@@ -190,7 +174,6 @@ export default function Index() {
                     </div>
                   )}
 
-                  {/* Favorito Heart Button */}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -212,7 +195,6 @@ export default function Index() {
                     />
                   </button>
 
-                  {/* Content */}
                   <div className="p-4 flex flex-col h-full">
                     <div>
                       <h4 className="font-semibold text-walmart-text mb-2 line-clamp-2">
@@ -222,7 +204,6 @@ export default function Index() {
                         {anuncio.descricao || "Produto em destaque"}
                       </p>
 
-                      {/* Municipality */}
                       <div className="flex items-center gap-1 mb-3 text-xs text-walmart-text-secondary">
                         <MapPin className="w-3 h-3" />
                         <span className="truncate">
@@ -269,7 +250,6 @@ export default function Index() {
                 </div>
               ))
             ) : (
-              // No ads placeholder
               <div className="col-span-full text-center py-12">
                 <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                 <p className="text-walmart-text-secondary">Nenhum anúncio publicado ainda</p>
@@ -320,7 +300,6 @@ export default function Index() {
           {/* Donation Cards Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
             {doacoesLoading ? (
-              // Loading Skeleton
               <>
                 {[1, 2, 3, 4, 5].map((item) => (
                   <div key={item} className="vitrii-card overflow-hidden animate-pulse">
@@ -336,18 +315,15 @@ export default function Index() {
                 ))}
               </>
             ) : destaqueDoacoes.length > 0 ? (
-              // Display actual donation ads
               destaqueDoacoes.map((anuncio: any) => (
                 <div
                   key={anuncio.id}
                   className="vitrii-card overflow-hidden hover:scale-105 transition-transform duration-200 cursor-pointer relative"
                 >
-                  {/* Donation Badge */}
                   <div className="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold z-10">
                     GRÁTIS
                   </div>
 
-                  {/* Image */}
                   <div className="w-full h-48 bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center overflow-hidden">
                     {anuncio.fotoUrl ? (
                       <img
@@ -360,7 +336,6 @@ export default function Index() {
                     )}
                   </div>
 
-                  {/* Store Logo Badge */}
                   {anuncio.loja?.fotoUrl && (
                     <div className="absolute bottom-3 left-3 z-10 w-10 h-10 rounded-full bg-white border-2 border-green-500 overflow-hidden flex items-center justify-center shadow-md">
                       <img
@@ -372,7 +347,6 @@ export default function Index() {
                     </div>
                   )}
 
-                  {/* Favorito Heart Button */}
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -394,7 +368,6 @@ export default function Index() {
                     />
                   </button>
 
-                  {/* Content */}
                   <div className="p-4 flex flex-col h-full">
                     <div>
                       <h4 className="font-semibold text-walmart-text mb-2 line-clamp-2">
@@ -404,7 +377,6 @@ export default function Index() {
                         {anuncio.descricao || "Item disponível para doação"}
                       </p>
 
-                      {/* Municipality */}
                       <div className="flex items-center gap-1 mb-3 text-xs text-walmart-text-secondary">
                         <MapPin className="w-3 h-3" />
                         <span className="truncate">
@@ -451,7 +423,6 @@ export default function Index() {
                 </div>
               ))
             ) : (
-              // No donation ads placeholder
               <div className="col-span-full text-center py-12">
                 <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                 <p className="text-walmart-text-secondary">Nenhuma doação publicada ainda</p>
@@ -521,7 +492,6 @@ export default function Index() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Reason 1 */}
             <div className="text-center">
               <div className="w-16 h-16 bg-walmart-blue bg-opacity-10 rounded-lg flex items-center justify-center mx-auto mb-6">
                 <Zap className="w-8 h-8 text-walmart-blue" />
@@ -535,7 +505,6 @@ export default function Index() {
               </p>
             </div>
 
-            {/* Reason 2 */}
             <div className="text-center">
               <div className="w-16 h-16 bg-walmart-blue bg-opacity-10 rounded-lg flex items-center justify-center mx-auto mb-6">
                 <Users className="w-8 h-8 text-walmart-blue" />
@@ -549,7 +518,6 @@ export default function Index() {
               </p>
             </div>
 
-            {/* Reason 3 */}
             <div className="text-center">
               <div className="w-16 h-16 bg-walmart-blue bg-opacity-10 rounded-lg flex items-center justify-center mx-auto mb-6">
                 <BarChart3 className="w-8 h-8 text-walmart-blue" />
