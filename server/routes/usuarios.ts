@@ -169,12 +169,14 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
       });
     }
 
-    // In production, hash the password with bcrypt
+    // Hash password with bcrypt
+    const senhaHash = await bcryptjs.hash(validatedData.senha, 10);
+
     const usuario = await prisma.usuario.create({
       data: {
         nome: validatedData.nome,
         email: validatedData.email,
-        senha: validatedData.senha, // TODO: hash password
+        senha: senhaHash,
         cpf: "",
         telefone: "",
         endereco: "",
@@ -188,6 +190,9 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
         dataCriacao: true,
       },
     });
+
+    // Send welcome email
+    await sendWelcomeEmail(usuario.email, usuario.nome);
 
     res.status(201).json({
       success: true,
