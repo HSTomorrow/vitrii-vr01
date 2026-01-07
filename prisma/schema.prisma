@@ -283,7 +283,7 @@ model Anuncio {
   equipeDeVenda EquipeDeVenda? @relation(fields: [equipeDeVendaId], references: [id], onDelete: SetNull)
   pagamento     Pagamento?
   conversas     Conversa[]
-  favoritadosPor Favorito[]
+  favoritos     Favorito[]
 
   @@map("anuncios")
 }
