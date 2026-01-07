@@ -87,6 +87,7 @@ export default function App() {
                 <Route path="/agenda/:lojaId" element={<Agenda />} />
                 <Route path="/checkout/:anuncioId" element={<Checkout />} />
                 <Route path="/chat" element={<Chat />} />
+                <Route path="/admin/dashboard" element={<AdminDashboard />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
