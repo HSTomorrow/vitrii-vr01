@@ -177,15 +177,25 @@ export default function Index() {
                   </div>
 
                   {/* Content */}
-                  <div className="p-4">
-                    <h4 className="font-semibold text-walmart-text mb-2 line-clamp-2">
-                      {anuncio.titulo}
-                    </h4>
-                    <p className="text-sm text-walmart-text-secondary mb-3 line-clamp-2">
-                      {anuncio.descricao || "Produto em destaque"}
-                    </p>
+                  <div className="p-4 flex flex-col h-full">
+                    <div>
+                      <h4 className="font-semibold text-walmart-text mb-2 line-clamp-2">
+                        {anuncio.titulo}
+                      </h4>
+                      <p className="text-sm text-walmart-text-secondary mb-3 line-clamp-2">
+                        {anuncio.descricao || "Produto em destaque"}
+                      </p>
 
-                    <div className="flex justify-between items-center mb-4">
+                      {/* Municipality */}
+                      <div className="flex items-center gap-1 mb-3 text-xs text-walmart-text-secondary">
+                        <MapPin className="w-3 h-3" />
+                        <span className="truncate">
+                          {extractMunicipality(anuncio.loja?.endereco || "")}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-center mb-4 mt-auto">
                       <span className="text-2xl font-bold text-walmart-blue">
                         R$ {anuncio.tabelaDePreco?.preco ? Number(anuncio.tabelaDePreco.preco).toFixed(2) : "0.00"}
                       </span>
