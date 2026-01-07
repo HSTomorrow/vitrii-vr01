@@ -244,6 +244,20 @@ export default function CadastroProdutos() {
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
                   />
                 </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                    Tipo *
+                  </label>
+                  <select
+                    value={formData.tipo}
+                    onChange={(e) => setFormData({ ...formData, tipo: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+                  >
+                    <option value="produto">Produto</option>
+                    <option value="servico">Serviço</option>
+                  </select>
+                </div>
               </div>
 
               <div>
