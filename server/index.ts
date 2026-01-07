@@ -49,6 +49,16 @@ import {
   updateUsuario,
   deleteUsuario,
 } from "./routes/usuarios";
+import {
+  getEquipes,
+  getEquipeById,
+  createEquipe,
+  updateEquipe,
+  deleteEquipe,
+  adicionarMembro,
+  removerMembro,
+  getUsuariosDisponiveis,
+} from "./routes/equipes-venda";
 
 export function createServer() {
   const app = express();
