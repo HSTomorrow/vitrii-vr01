@@ -68,6 +68,17 @@ import {
   getQRCodeStats,
   deleteQRCode,
 } from "./routes/qrcodes";
+import {
+  getAgendas,
+  getAgendaById,
+  createAgenda,
+  updateAgendaStatus,
+  deleteAgenda,
+  addToWaitlist,
+  getWaitlist,
+  removeFromWaitlist,
+  promoteFromWaitlist,
+} from "./routes/agendas";
 import { uploadMiddleware, handleUpload } from "./routes/upload";
 
 export function createServer() {
