@@ -663,6 +663,21 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
           </form>
         </div>
       </div>
+
+      {/* Create Loja Modal */}
+      <CreateLojaModal
+        isOpen={showCreateLoja}
+        onClose={() => setShowCreateLoja(false)}
+        onSuccess={handleLojaCreated}
+      />
+
+      {/* Create Producto Modal */}
+      <CreateProductoModal
+        isOpen={showCreateProducto}
+        onClose={() => setShowCreateProducto(false)}
+        lojaId={selectedLojaId}
+        onSuccess={handleProductoCreated}
+      />
     </div>
   );
 }
