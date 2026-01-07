@@ -1,0 +1,271 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// USUÁRIOS (Users)
+// ============================================================================
+model Usuario {
+  id            Int       @id @default(autoincrement())
+  nome          String    @db.VarChar(255)
+  email         String    @unique @db.VarChar(255)
+  senha         String    @db.VarChar(255)
+  cpf           String    @unique @db.VarChar(11)
+  telefone      String    @db.VarChar(20)
+  endereco      String    @db.Text
+  tipoUsuario   String    @default("comum") // "comum" or "administrador"
+  dataCriacao   DateTime  @default(now())
+  dataAtualizacao DateTime @updatedAt
+
+  // Relations
+  usuarioLojas  UsuarioLoja[]
+  produtosVisualizados ProductoVisualizacao[]
+  qrCodesVisitados QRCodeChamada[]
+
+  @@map("usuarios")
+}
+
+// ============================================================================
+// LOJAS (Stores)
+// ============================================================================
+model Loja {
+  id            Int       @id @default(autoincrement())
+  nome          String    @db.VarChar(255)
+  cnpjOuCpf     String    @unique @db.VarChar(18)
+  endereco      String    @db.Text
+  descricao     String    @db.Text
+  email         String    @db.VarChar(255)
+  site          String?   @db.VarChar(255)
+  instagram      String?   @db.VarChar(255)
+  facebook      String?   @db.VarChar(255)
+  fotoUrl       String?   @db.Text // URL da foto da loja
+  status        String    @default("ativa") // "ativa" or "inativa"
+  dataCriacao   DateTime  @default(now())
+  dataAtualizacao DateTime @updatedAt
+
+  // Relations
+  usuarioLojas  UsuarioLoja[]
+  gruposDeProductos GrupoDeProductos[]
+  produtosEmEstoque ProdutoEmEstoque[]
+  movimentoEstoque MovimentoEstoque[]
+  anuncios      Anuncio[]
+
+  @@map("lojas")
+}
+
+// ============================================================================
+// USUÁRIO x LOJA x TIPO DE USUÁRIO (User-Store-Role junction table)
+// ============================================================================
+model UsuarioLoja {
+  id            Int       @id @default(autoincrement())
+  usuarioId     Int
+  lojaId        Int
+  tipoUsuario   String    // "atendente", "gestor", "administrador"
+  dataCriacao   DateTime  @default(now())
+  dataAtualizacao DateTime @updatedAt
+
+  // Relations
+  usuario       Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  loja          Loja      @relation(fields: [lojaId], references: [id], onDelete: Cascade)
+
+  @@unique([usuarioId, lojaId])
+  @@map("usuarios_lojas")
+}
+
+// ============================================================================
+// GRUPOS DE PRODUTOS E SERVIÇOS
+// ============================================================================
+model GrupoDeProductos {
+  id            Int       @id @default(autoincrement())
+  lojaId        Int
+  nome          String    @db.VarChar(255)
+  descricao     String?   @db.Text
+  dataCriacao   DateTime  @default(now())
+  dataAtualizacao DateTime @updatedAt
+
+  // Relations
+  loja          Loja      @relation(fields: [lojaId], references: [id], onDelete: Cascade)
+  fotos         FotoGrupo[]
+  produtos      Producto[]
+
+  @@map("grupos_de_productos")
+}
+
+// Fotos do Grupo de Produtos (até 5 fotos)
+model FotoGrupo {
+  id            Int       @id @default(autoincrement())
+  grupoId       Int
+  fotoUrl       String    @db.Text
+  ordem         Int       @default(1)
+  dataCriacao   DateTime  @default(now())
+
+  // Relations
+  grupo         GrupoDeProductos @relation(fields: [grupoId], references: [id], onDelete: Cascade)
+
+  @@map("fotos_grupo")
+}
+
+// ============================================================================
+// PRODUTOS E SERVIÇOS
+// ============================================================================
+model Producto {
+  id            Int       @id @default(autoincrement())
+  grupoId       Int
+  nome          String    @db.VarChar(255)
+  descricao     String?   @db.Text
+  sku           String?   @db.VarChar(100)
+  dataCriacao   DateTime  @default(now())
+  dataAtualizacao DateTime @updatedAt
+
+  // Relations
+  grupo         GrupoDeProductos @relation(fields: [grupoId], references: [id], onDelete: Cascade)
+  tabelasDePreco TabelaDePreco[]
+  estoques      ProdutoEmEstoque[]
+  movimentoEstoque MovimentoEstoque[]
+  anuncios      Anuncio[]
+
+  @@map("productos")
+}
+
+// ============================================================================
+// TABELA DE PREÇOS
+// ============================================================================
+model TabelaDePreco {
+  id            Int       @id @default(autoincrement())
+  productId     Int
+  lojaId        Int
+  preco         Decimal   @db.Decimal(10, 2)
+  precoCusto    Decimal?  @db.Decimal(10, 2)
+  dataCriacao   DateTime  @default(now())
+  dataAtualizacao DateTime @updatedAt
+
+  // Relations
+  produto       Producto  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  qrCodes       QRCode[]
+  anuncios      Anuncio[]
+
+  @@map("tabelas_de_preco")
+}
+
+// ============================================================================
+// QR CODES
+// ============================================================================
+model QRCode {
+  id            Int       @id @default(autoincrement())
+  tabelaDePrecoId Int
+  codigo        String    @unique @db.VarChar(500)
+  descricao     String?   @db.Text
+  dataCriacao   DateTime  @default(now())
+  dataAtualizacao DateTime @updatedAt
+
+  // Relations
+  tabelaDePreco TabelaDePreco @relation(fields: [tabelaDePrecoId], references: [id], onDelete: Cascade)
+  chamadas      QRCodeChamada[]
+
+  @@map("qr_codes")
+}
+
+// ============================================================================
+// ANÚNCIOS (Listings)
+// ============================================================================
+model Anuncio {
+  id            Int       @id @default(autoincrement())
+  lojaId        Int
+  productId     Int
+  tabelaDePrecoId Int
+  titulo        String    @db.VarChar(255)
+  descricao     String?   @db.Text
+  fotoUrl       String?   @db.Text
+  status        String    @default("em_edicao") // "em_edicao", "aguardando_pagamento", "pago", "historico"
+  dataValidade  DateTime?
+  dataCriacao   DateTime  @default(now())
+  dataAtualizacao DateTime @updatedAt
+
+  // Relations
+  loja          Loja      @relation(fields: [lojaId], references: [id], onDelete: Cascade)
+  producto      Producto  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  tabelaDePreco TabelaDePreco @relation(fields: [tabelaDePrecoId], references: [id], onDelete: Cascade)
+
+  @@map("anuncios")
+}
+
+// ============================================================================
+// CONTROLE DE ESTOQUE
+// ============================================================================
+model ProdutoEmEstoque {
+  id            Int       @id @default(autoincrement())
+  lojaId        Int
+  productId     Int
+  quantidade    Int       @default(0)
+  quantidadeMinima Int?   @default(0)
+  quantidadeMaxima Int?
+  dataCriacao   DateTime  @default(now())
+  dataAtualizacao DateTime @updatedAt
+
+  // Relations
+  loja          Loja      @relation(fields: [lojaId], references: [id], onDelete: Cascade)
+  producto      Producto  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  movimentos    MovimentoEstoque[]
+
+  @@unique([lojaId, productId])
+  @@map("produtos_em_estoque")
+}
+
+// ============================================================================
+// MOVIMENTO DE ESTOQUE (Inventory movements/history)
+// ============================================================================
+model MovimentoEstoque {
+  id            Int       @id @default(autoincrement())
+  lojaId        Int
+  productId     Int
+  tipo          String    // "entrada", "saida", "ajuste"
+  quantidade    Int
+  motivoSaida   String?   @db.VarChar(255) // "venda", "devolucao", "perda", etc
+  observacoes   String?   @db.Text
+  dataCriacao   DateTime  @default(now())
+
+  // Relations
+  loja          Loja      @relation(fields: [lojaId], references: [id], onDelete: Cascade)
+  producto      Producto  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("movimentos_estoque")
+}
+
+// ============================================================================
+// CONTAGEM DE VISUALIZAÇÕES DE PRODUTOS
+// ============================================================================
+model ProductoVisualizacao {
+  id            Int       @id @default(autoincrement())
+  usuarioId     Int?      // Pode ser nulo se for visitante
+  productId     Int
+  dataVisualizacao DateTime @default(now())
+
+  // Relations
+  usuario       Usuario?  @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+
+  @@map("producto_visualizacoes")
+}
+
+// ============================================================================
+// CONTAGEM DE CHAMADAS DE QR CODE
+// ============================================================================
+model QRCodeChamada {
+  id            Int       @id @default(autoincrement())
+  usuarioId     Int?      // Pode ser nulo se for visitante
+  qrCodeId      Int
+  dataChamada   DateTime  @default(now())
+
+  // Relations
+  usuario       Usuario?  @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+  qrCode        QRCode    @relation(fields: [qrCodeId], references: [id], onDelete: Cascade)
+
+  @@map("qr_code_chamadas")
+}
