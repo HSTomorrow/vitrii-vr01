@@ -427,12 +427,12 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
                 type="text"
                 value={formData.titulo}
                 onChange={(e) => handleInputChange("titulo", e.target.value)}
-                placeholder="Ex: Camiseta Azul Premium"
-                maxLength={255}
+                placeholder="Ex: Camiseta Azul"
+                maxLength={50}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
               />
               <p className="mt-1 text-sm text-walmart-text-secondary">
-                {formData.titulo.length}/255 caracteres
+                {formData.titulo.length}/50 caracteres
               </p>
             </div>
 
