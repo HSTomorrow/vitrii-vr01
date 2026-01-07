@@ -29,6 +29,11 @@ interface Loja {
   nome: string;
 }
 
+interface EquipeDeVenda {
+  id: number;
+  nome: string;
+}
+
 export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFormProps) {
   const queryClient = useQueryClient();
   const [selectedLojaId, setSelectedLojaId] = useState(lojaId || 0);
