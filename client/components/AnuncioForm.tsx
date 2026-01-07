@@ -14,7 +14,8 @@ interface Producto {
   id: number;
   nome: string;
   descricao?: string;
-  grupoDeProductos: { id: number; nome: string };
+  grupo?: { id: number; nome: string };
+  grupoDeProductos?: { id: number; nome: string };
   tabelasDePreco: Array<{
     id: number;
     preco: number;
