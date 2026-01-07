@@ -507,7 +507,7 @@ export default function AnuncioForm({
             {selectedPriceTable && (
               <div>
                 <label className="block text-sm font-semibold text-walmart-text mb-2">
-                  Preço do Anúncio (Promoção/Desconto)
+                  Preço do Anúncio {formData.isDoacao ? "(Desabilitado - Doação)" : "(Promoção/Desconto)"}
                 </label>
                 <div className="flex items-center">
                   <span className="text-walmart-text font-semibold mr-2">
@@ -521,15 +521,21 @@ export default function AnuncioForm({
                     onChange={(e) =>
                       handleInputChange("precoAnuncio", e.target.value)
                     }
-                    placeholder={`Ex: ${Number(selectedPriceTable.preco).toFixed(2)}`}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                    disabled={formData.isDoacao}
+                    placeholder={formData.isDoacao ? "Grátis (doação)" : `Ex: ${Number(selectedPriceTable.preco).toFixed(2)}`}
+                    className={`flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent ${
+                      formData.isDoacao ? "bg-gray-100 cursor-not-allowed" : ""
+                    }`}
                   />
                 </div>
                 <p className="mt-2 text-sm text-walmart-text-secondary">
-                  Deixe em branco para usar o preço da variante: R${" "}
-                  {Number(selectedPriceTable.preco).toFixed(2)}
+                  {formData.isDoacao
+                    ? "Este anúncio será publicado como doação, sem custo."
+                    : `Deixe em branco para usar o preço da variante: R$ ${Number(selectedPriceTable.preco).toFixed(2)}`
+                  }
                 </p>
                 {formData.precoAnuncio &&
+                  !formData.isDoacao &&
                   Number(formData.precoAnuncio) <
                     Number(selectedPriceTable.preco) && (
                     <p className="mt-2 text-sm text-green-600 font-semibold">
