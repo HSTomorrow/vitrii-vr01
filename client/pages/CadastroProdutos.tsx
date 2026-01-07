@@ -36,6 +36,7 @@ export default function CadastroProdutos() {
     nome: "",
     descricao: "",
     sku: "",
+    tipo: "produto",
   });
 
   // Fetch lojas
