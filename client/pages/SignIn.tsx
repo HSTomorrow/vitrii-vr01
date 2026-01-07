@@ -156,8 +156,8 @@ export default function SignIn() {
               )}
             </div>
 
-            {/* Remember Me */}
-            <div>
+            {/* Remember Me and Forgot Password */}
+            <div className="flex justify-between items-center">
               <label className="flex items-center space-x-2 cursor-pointer">
                 <input
                   type="checkbox"
@@ -169,6 +169,12 @@ export default function SignIn() {
                   Manter-me conectado
                 </span>
               </label>
+              <Link
+                to="/esqueci-senha"
+                className="text-sm text-walmart-blue font-semibold hover:underline"
+              >
+                Esqueci minha senha
+              </Link>
             </div>
 
             {/* Submit Button */}
