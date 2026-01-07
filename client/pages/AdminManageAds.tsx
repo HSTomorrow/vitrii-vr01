@@ -63,7 +63,10 @@ export default function AdminManageAds() {
     }) => {
       const response = await fetch(`/api/anuncios/${anuncioId}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": user?.id ? String(user.id) : "",
+        },
         body: JSON.stringify({ destaque: !destaque }),
       });
       if (!response.ok) throw new Error("Erro ao atualizar anúncio");
