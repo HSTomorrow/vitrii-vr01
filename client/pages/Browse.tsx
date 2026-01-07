@@ -28,12 +28,18 @@ export default function Browse() {
 
   const anuncios = anunciosData?.data || [];
 
-  // Filter by search term
-  const filtered = anuncios.filter(
-    (a: any) =>
+  // Filter by search term and favorites
+  const filtered = anuncios.filter((a: any) => {
+    const matchesSearch =
       a.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      a.descricao?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+      a.descricao?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    if (showFavoritesOnly && user) {
+      return matchesSearch && userFavoritos.has(a.id);
+    }
+
+    return matchesSearch;
+  });
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
