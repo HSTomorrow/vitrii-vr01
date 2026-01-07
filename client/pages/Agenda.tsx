@@ -14,6 +14,16 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import WaitlistModal from "../components/WaitlistModal";
 
+interface Loja {
+  id: number;
+  nome: string;
+}
+
+interface Producto {
+  id: number;
+  nome: string;
+}
+
 interface AgendaSlot {
   id: number;
   lojaId: number;
@@ -42,24 +52,16 @@ interface AgendaSlot {
   };
 }
 
-interface WaitlistEntry {
-  id: number;
-  usuarioId?: number;
-  usuario?: {
-    id: number;
-    nome: string;
-    email: string;
-    telefone: string;
-  };
-}
-
 export default function Agenda() {
   const navigate = useNavigate();
   const { lojaId } = useParams<{ lojaId?: string }>();
 
   const [agendas, setAgendas] = useState<AgendaSlot[]>([]);
+  const [lojas, setLojas] = useState<Loja[]>([]);
+  const [productos, setProductos] = useState<Producto[]>([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [loading, setLoading] = useState(true);
+  const [loadingSelects, setLoadingSelects] = useState(false);
   const [showNewSlotForm, setShowNewSlotForm] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState<AgendaSlot | null>(null);
   const [waitlistOpen, setWaitlistOpen] = useState(false);
@@ -71,6 +73,36 @@ export default function Agenda() {
     dataHora: "",
     descricao: "",
   });
+
+  // Load lojas and productos on mount
+  useEffect(() => {
+    loadSelects();
+  }, []);
+
+  const loadSelects = async () => {
+    try {
+      setLoadingSelects(true);
+      const [lojasRes, productosRes] = await Promise.all([
+        fetch("/api/lojas"),
+        fetch("/api/productos"),
+      ]);
+
+      const lojasData = await lojasRes.json();
+      const productosData = await productosRes.json();
+
+      if (lojasData.success) {
+        setLojas(lojasData.data || []);
+      }
+      if (productosData.success) {
+        setProductos(productosData.data || []);
+      }
+    } catch (error) {
+      console.error("Error loading selects:", error);
+      toast.error("Erro ao carregar lojas e produtos");
+    } finally {
+      setLoadingSelects(false);
+    }
+  };
 
   // Load agendas
   useEffect(() => {
@@ -299,43 +331,65 @@ export default function Agenda() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Loja
+                      Loja *
                     </label>
-                    <input
-                      type="number"
-                      value={formData.lojaId}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          lojaId: parseInt(e.target.value),
-                        })
-                      }
-                      placeholder="ID da loja"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                      required
-                    />
+                    {loadingSelects ? (
+                      <div className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500">
+                        Carregando...
+                      </div>
+                    ) : (
+                      <select
+                        value={formData.lojaId}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            lojaId: parseInt(e.target.value),
+                          })
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        required
+                      >
+                        <option value={0}>Selecione uma loja</option>
+                        {lojas.map((loja) => (
+                          <option key={loja.id} value={loja.id}>
+                            {loja.nome}
+                          </option>
+                        ))}
+                      </select>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Produto
+                      Produto *
                     </label>
-                    <input
-                      type="number"
-                      value={formData.productId}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          productId: parseInt(e.target.value),
-                        })
-                      }
-                      placeholder="ID do produto"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                      required
-                    />
+                    {loadingSelects ? (
+                      <div className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500">
+                        Carregando...
+                      </div>
+                    ) : (
+                      <select
+                        value={formData.productId}
+                        onChange={(e) =>
+                          setFormData({
+                            ...formData,
+                            productId: parseInt(e.target.value),
+                          })
+                        }
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                        required
+                      >
+                        <option value={0}>Selecione um produto</option>
+                        {productos.map((producto) => (
+                          <option key={producto.id} value={producto.id}>
+                            {producto.nome}
+                          </option>
+                        ))}
+                      </select>
+                    )}
                   </div>
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Data e Hora
+                      Data e Hora *
                     </label>
                     <input
                       type="datetime-local"
@@ -390,7 +444,7 @@ export default function Agenda() {
           {/* Agenda slots */}
           {loading ? (
             <div className="text-center py-12">
-              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500" />
               <p className="text-gray-600 mt-4">Carregando horários...</p>
             </div>
           ) : agendaByTime.length === 0 ? (
