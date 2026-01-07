@@ -174,17 +174,52 @@ export default function AnuncioDetalhe() {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-2">
-              <Link
-                to={`/anuncio/${id}/editar`}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors font-semibold"
-              >
-                <Edit className="w-4 h-4" />
-                Editar
-              </Link>
+            <div className="flex gap-2 flex-wrap">
+              {!isInactive && (
+                <Link
+                  to={`/anuncio/${id}/editar`}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors font-semibold"
+                >
+                  <Edit className="w-4 h-4" />
+                  Editar
+                </Link>
+              )}
               <button
                 onClick={() => {
-                  if (confirm("Tem certeza que deseja deletar este anúncio?")) {
+                  if (isInactive) {
+                    activateMutation.mutate();
+                  } else {
+                    if (
+                      confirm(
+                        "Tem certeza que deseja inativar este anúncio? Ele deixará de aparecer na busca."
+                      )
+                    ) {
+                      inactivateMutation.mutate();
+                    }
+                  }
+                }}
+                disabled={inactivateMutation.isPending || activateMutation.isPending}
+                className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors disabled:opacity-50 ${
+                  isInactive
+                    ? "bg-green-500 text-white hover:bg-green-600"
+                    : "bg-orange-500 text-white hover:bg-orange-600"
+                }`}
+              >
+                {isInactive ? (
+                  <>
+                    <RotateCcw className="w-4 h-4" />
+                    Reativar
+                  </>
+                ) : (
+                  <>
+                    <Power className="w-4 h-4" />
+                    Inativar
+                  </>
+                )}
+              </button>
+              <button
+                onClick={() => {
+                  if (confirm("Tem certeza que deseja deletar este anúncio? Isso não pode ser desfeito.")) {
                     deleteMutation.mutate();
                   }
                 }}
