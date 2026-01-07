@@ -64,6 +64,22 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
     dadosCategoria: "",
   });
 
+  // Handlers for inline creation
+  const handleLojaCreated = (newLojaId: number) => {
+    setSelectedLojaId(newLojaId);
+    setFormData((prev) => ({ ...prev, productId: 0, tabelaDePrecoId: 0 }));
+    setShowCreateLoja(false);
+  };
+
+  const handleProductoCreated = (newProductoId: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      productId: newProductoId,
+      tabelaDePrecoId: 0,
+    }));
+    setShowCreateProducto(false);
+  };
+
   // Fetch lojas
   const { data: lojasData } = useQuery({
     queryKey: ["lojas"],
