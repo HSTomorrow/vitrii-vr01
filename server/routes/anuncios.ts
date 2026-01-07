@@ -199,6 +199,8 @@ export const createAnuncio: RequestHandler = async (req, res) => {
         dataValidade,
         equipeDeVendaId: validatedData.equipeDeVendaId,
         isDoacao: validatedData.isDoacao,
+        destaque: validatedData.destaque || false,
+        isActive: validatedData.isActive !== false,
         status: "em_edicao",
       },
       include: {
