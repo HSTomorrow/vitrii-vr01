@@ -62,7 +62,7 @@ export default function Header() {
               to="/browse"
               className="text-walmart-text-secondary hover:text-walmart-blue transition-colors"
             >
-              Comprar
+              Ver Anúncios
             </Link>
             <Link
               to="/sell"
