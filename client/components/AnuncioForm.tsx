@@ -101,6 +101,8 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
         productId: ad.productId,
         tabelaDePrecoId: ad.tabelaDePrecoId,
         fotoUrl: ad.fotoUrl || "",
+        equipeDeVendaId: ad.equipeDeVendaId || 0,
+        isDoacao: ad.isDoacao || false,
       });
     }
   }, [anuncioData]);
