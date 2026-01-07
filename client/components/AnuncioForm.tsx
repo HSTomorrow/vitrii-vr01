@@ -333,7 +333,7 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
               )}
               {selectedPriceTable && (
                 <p className="mt-2 text-sm text-walmart-blue font-semibold">
-                  Preço do Anúncio: R$ {Number(selectedPriceTable.preco).toFixed(2)}
+                  Preço da Variante: R$ {Number(selectedPriceTable.preco).toFixed(2)}
                 </p>
               )}
               {!selectedPriceTable && formData.productId > 0 && (
@@ -342,6 +342,35 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
                 </p>
               )}
             </div>
+
+            {/* Preço Anúncio (Promoção/Desconto) */}
+            {selectedPriceTable && (
+              <div>
+                <label className="block text-sm font-semibold text-walmart-text mb-2">
+                  Preço do Anúncio (Promoção/Desconto)
+                </label>
+                <div className="flex items-center">
+                  <span className="text-walmart-text font-semibold mr-2">R$</span>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.precoAnuncio}
+                    onChange={(e) => handleInputChange("precoAnuncio", e.target.value)}
+                    placeholder={`Ex: ${Number(selectedPriceTable.preco).toFixed(2)}`}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                  />
+                </div>
+                <p className="mt-2 text-sm text-walmart-text-secondary">
+                  Deixe em branco para usar o preço da variante: R$ {Number(selectedPriceTable.preco).toFixed(2)}
+                </p>
+                {formData.precoAnuncio && Number(formData.precoAnuncio) < Number(selectedPriceTable.preco) && (
+                  <p className="mt-2 text-sm text-green-600 font-semibold">
+                    ✓ Desconto aplicado! Economia: R$ {(Number(selectedPriceTable.preco) - Number(formData.precoAnuncio)).toFixed(2)}
+                  </p>
+                )}
+              </div>
+            )}
 
             {/* Validade do Anúncio */}
             <div>
