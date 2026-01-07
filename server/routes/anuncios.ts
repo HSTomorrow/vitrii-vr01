@@ -110,16 +110,10 @@ export const getAnuncioById: RequestHandler = async (req, res) => {
         },
         producto: {
           include: {
-            grupoDeProductos: {
+            grupo: {
               select: {
                 id: true,
                 nome: true,
-              },
-            },
-            tabelasDePreco: {
-              select: {
-                id: true,
-                preco: true,
               },
             },
           },
