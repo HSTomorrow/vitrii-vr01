@@ -116,9 +116,16 @@ export default function Header() {
                   <Link
                     to="/cadastros/variantes"
                     onClick={() => setIsCadastrosOpen(false)}
-                    className="block px-4 py-3 text-sm font-semibold text-walmart-text hover:bg-walmart-gray rounded-b-lg transition-colors"
+                    className="block px-4 py-3 text-sm font-semibold text-walmart-text hover:bg-walmart-gray transition-colors"
                   >
                     Variantes
+                  </Link>
+                  <Link
+                    to="/cadastros/equipes-venda"
+                    onClick={() => setIsCadastrosOpen(false)}
+                    className="block px-4 py-3 text-sm font-semibold text-walmart-text hover:bg-walmart-gray rounded-b-lg transition-colors"
+                  >
+                    Equipes de Venda
                   </Link>
                 </div>
               )}
