@@ -76,6 +76,16 @@ export default function Header() {
               <MessageSquare className="w-5 h-5 text-walmart-text" />
             </Link>
 
+            {user && (
+              <Link
+                to="/favoritos"
+                className="p-2 hover:bg-walmart-gray rounded-lg transition-colors"
+                title="Meus favoritos"
+              >
+                <Heart className="w-5 h-5 text-walmart-text" />
+              </Link>
+            )}
+
             {user ? (
               <>
                 <Link
