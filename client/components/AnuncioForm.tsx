@@ -439,6 +439,27 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
               </label>
             </div>
 
+            {/* Destaque (Featured) */}
+            <div className="flex items-center gap-3 p-4 bg-yellow-50 border border-walmart-yellow rounded-lg">
+              <input
+                type="checkbox"
+                id="destaque"
+                checked={formData.destaque}
+                onChange={(e) => {
+                  handleInputChange("destaque", e.target.checked);
+                }}
+                className="w-5 h-5 text-walmart-yellow cursor-pointer rounded"
+              />
+              <label htmlFor="destaque" className="flex-1 cursor-pointer">
+                <p className="font-semibold text-walmart-text">
+                  ⭐ Destaque (Em Destaque)
+                </p>
+                <p className="text-sm text-walmart-text-secondary">
+                  Marque esta opção para colocar o anúncio em destaque na página principal
+                </p>
+              </label>
+            </div>
+
             {/* Título */}
             <div>
               <label className="block text-sm font-semibold text-walmart-text mb-2">
