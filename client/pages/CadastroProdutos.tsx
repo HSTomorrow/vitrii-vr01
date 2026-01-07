@@ -101,7 +101,7 @@ export default function CadastroProdutos() {
     },
     onSuccess: () => {
       toast.success(editingId ? "Produto atualizado com sucesso!" : "Produto criado com sucesso!");
-      setFormData({ grupoId: "", nome: "", descricao: "", sku: "" });
+      setFormData({ grupoId: "", nome: "", descricao: "", sku: "", tipo: "produto" });
       setEditingId(null);
       setIsFormOpen(false);
       refetch();
