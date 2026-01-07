@@ -187,10 +187,18 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
 
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ["anuncios"] });
       toast.success(anuncioId ? "Anúncio atualizado com sucesso!" : "Anúncio criado com sucesso!");
-      if (onSuccess) onSuccess();
+
+      // If creating a new ad (not editing), redirect to checkout
+      if (!anuncioId && result.data?.id) {
+        setTimeout(() => {
+          navigate(`/checkout/${result.data.id}`);
+        }, 500);
+      } else if (onSuccess) {
+        onSuccess();
+      }
     },
     onError: (error) => {
       const errorMsg = error instanceof Error ? error.message : "Erro ao salvar";
