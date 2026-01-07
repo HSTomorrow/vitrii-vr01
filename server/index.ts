@@ -8,6 +8,7 @@ import {
   createAnuncio,
   updateAnuncio,
   updateAnuncioStatus,
+  overrideAnuncioStatus,
   deleteAnuncio,
   inactivateAnuncio,
   activateAnuncio,
