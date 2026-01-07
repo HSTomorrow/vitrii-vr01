@@ -63,24 +63,6 @@ export default function Header() {
             >
               Ver Anúncios
             </Link>
-            <Link
-              to="/sell"
-              className="text-walmart-text-secondary hover:text-walmart-blue transition-colors"
-            >
-              Vender
-            </Link>
-            <Link
-              to="/qrcode"
-              className="text-walmart-text-secondary hover:text-walmart-blue transition-colors"
-            >
-              QR Code
-            </Link>
-            <Link
-              to="/about"
-              className="text-walmart-text-secondary hover:text-walmart-blue transition-colors"
-            >
-              Sobre
-            </Link>
           </nav>
 
           {/* Right side - Auth and actions */}
