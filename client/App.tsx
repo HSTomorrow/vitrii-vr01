@@ -25,6 +25,7 @@ import CadastroTabelasPreco from "./pages/CadastroTabelasPreco";
 import CadastroVariantesLista from "./pages/CadastroVariantesLista";
 import CadastroVariantes from "./pages/CadastroVariantes";
 import CadastroEquipeDeVenda from "./pages/CadastroEquipeDeVenda";
+import Agenda from "./pages/Agenda";
 import SearchAnuncios from "./pages/SearchAnuncios";
 import SearchProdutos from "./pages/SearchProdutos";
 import NotFound from "./pages/NotFound";
