@@ -34,6 +34,7 @@
 ## 🛠 Tech Stack
 
 ### Frontend
+
 - **React 18** with TypeScript
 - **Vite** for fast development
 - **TailwindCSS** for styling
@@ -43,6 +44,7 @@
 - **Lucide Icons** for UI icons
 
 ### Backend
+
 - **Express.js** for REST API
 - **PostgreSQL** for database
 - **Prisma ORM** for database management
@@ -50,6 +52,7 @@
 - **Multer** for file uploads
 
 ### Infrastructure
+
 - **Docker** for containerization
 - **Supabase/Neon** for managed PostgreSQL
 - **Netlify** for deployment
@@ -106,6 +109,7 @@ vitrii-vr01/
 ## 🚀 Getting Started
 
 ### Prerequisites
+
 - Node.js 16+
 - PostgreSQL 12+
 - pnpm (recommended) or npm
@@ -113,12 +117,14 @@ vitrii-vr01/
 ### Installation
 
 1. **Clone the repository**
+
 ```bash
 git clone https://github.com/HSTW-Herestomorrow/vitrii-vr01.git
 cd vitrii-vr01
 ```
 
 2. **Install dependencies**
+
 ```bash
 pnpm install
 # or
@@ -126,22 +132,26 @@ npm install
 ```
 
 3. **Set up environment variables**
+
 ```bash
 cp .env.example .env
 ```
 
 Edit `.env` and add your database URL:
+
 ```
 DATABASE_URL="postgresql://user:password@localhost:5432/vitrii"
 ```
 
 4. **Set up database**
+
 ```bash
 npx prisma migrate dev
 npx prisma generate
 ```
 
 5. **Start development server**
+
 ```bash
 pnpm run dev
 ```
@@ -153,28 +163,33 @@ The application will be available at `http://localhost:8080`
 ## 📖 API Endpoints
 
 ### Authentication
+
 - `POST /api/auth/signup` - Register new user
 - `POST /api/auth/signin` - Sign in user
 
 ### Users
+
 - `GET /api/usuarios` - List all users
 - `GET /api/usuarios/:id` - Get user details
 - `PUT /api/usuarios/:id` - Update user
 - `DELETE /api/usuarios/:id` - Delete user
 
 ### Stores (Lojas)
+
 - `GET /api/lojas` - List all stores
 - `GET /api/lojas/:id` - Get store details
 - `POST /api/lojas` - Create store
 - `PUT /api/lojas/:id` - Update store
 
 ### Products
+
 - `GET /api/productos` - List products
 - `GET /api/productos/:id` - Get product details
 - `POST /api/productos` - Create product
 - `PUT /api/productos/:id` - Update product
 
 ### Ads (Anúncios)
+
 - `GET /api/anuncios` - List ads (with filters for featured, status)
 - `GET /api/anuncios/:id` - Get ad details
 - `POST /api/anuncios` - Create ad
@@ -184,6 +199,7 @@ The application will be available at `http://localhost:8080`
 - `PATCH /api/anuncios/:id/activate` - Reactivate ad
 
 ### Service Schedule (Agenda)
+
 - `GET /api/agendas` - List time slots
 - `GET /api/agendas/:id` - Get slot details
 - `POST /api/agendas` - Create new slot
@@ -191,18 +207,21 @@ The application will be available at `http://localhost:8080`
 - `DELETE /api/agendas/:id` - Cancel slot
 
 ### Waiting List
+
 - `POST /api/agendas/waitlist/add` - Add to waiting list
 - `GET /api/agendas/:agendaId/waitlist` - View waiting list
 - `DELETE /api/agendas/waitlist/:waitlistId` - Remove from list
 - `POST /api/agendas/:agendaId/waitlist/promote` - Promote next person
 
 ### QR Codes
+
 - `POST /api/qrcodes/generate` - Generate QR code
 - `GET /api/anuncios/:anuncioId/qrcodes` - Get ad QR codes
 - `POST /api/qrcodes/:qrCodeId/track` - Track QR code scan
 - `GET /api/qrcodes/:qrCodeId/stats` - Get QR code stats
 
 ### Sales Teams
+
 - `GET /api/equipes-venda` - List teams
 - `POST /api/equipes-venda` - Create team
 - `POST /api/equipes-venda/:id/membros` - Add team member
@@ -213,6 +232,7 @@ The application will be available at `http://localhost:8080`
 ## 🎨 Features in Detail
 
 ### 1. Ad Management
+
 - Create listings with title, description, photos, and pricing
 - Support for multiple categories (Clothes, Cars, Real Estate)
 - Category-specific fields (size/color for clothes, mileage for cars, etc.)
@@ -221,6 +241,7 @@ The application will be available at `http://localhost:8080`
 - Featured/highlighted ads for premium placement
 
 ### 2. Service Scheduling
+
 - Create available time slots for services
 - Book appointments with customers
 - Automatic waiting list when slots are full
@@ -229,23 +250,27 @@ The application will be available at `http://localhost:8080`
 - Cancel or reschedule appointments
 
 ### 3. QR Code System
+
 - Generate unique QR codes for each ad
 - Direct links to product details
 - Track scans and visit statistics
 - Multiple QR codes per ad variant
 
 ### 4. Search & Discovery
+
 - Advanced filtering by category, price, store, featured status
 - Sort by most recent or most featured
 - Search products by store with pricing variants
 - Save search preferences
 
 ### 5. Multi-Tenancy
+
 - Isolated data per store/user
 - Role-based access (attendent, manager, admin)
 - User-store relationships for permission management
 
 ### 6. Inventory Management
+
 - Track product quantities in each store
 - Record inventory movements (entry, exit, adjustment)
 - Set minimum/maximum stock levels
@@ -284,18 +309,22 @@ The project uses PostgreSQL with Prisma ORM. Key models:
 ## 📦 Deployment
 
 ### Production Build
+
 ```bash
 pnpm run build
 ```
 
 ### Docker Deployment
+
 ```bash
 docker build -t vitrii:latest .
 docker run -p 8080:8080 vitrii:latest
 ```
 
 ### Environment Variables
+
 Key variables to configure:
+
 - `DATABASE_URL` - PostgreSQL connection string
 - `BASE_URL` - Frontend base URL for QR codes
 - `NODE_ENV` - Set to "production" for production builds
@@ -313,6 +342,7 @@ We welcome contributions! Please follow these steps:
 5. Open a Pull Request
 
 ### Development Guidelines
+
 - Write clean, readable code
 - Follow the existing code style
 - Add comments for complex logic
@@ -347,6 +377,7 @@ We welcome contributions! Please follow these steps:
 ## 📞 Support & Contact
 
 For support, questions, or feedback:
+
 - 📧 Email: support@vitrii.com
 - 🐙 GitHub Issues: [Report Bug](https://github.com/HSTW-Herestomorrow/vitrii-vr01/issues)
 - 💬 Discussions: [Start Discussion](https://github.com/HSTW-Herestomorrow/vitrii-vr01/discussions)

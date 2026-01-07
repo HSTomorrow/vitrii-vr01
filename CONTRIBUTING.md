@@ -9,27 +9,32 @@ Be respectful, inclusive, and professional in all interactions. We're building a
 ## 🚀 Getting Started
 
 ### 1. Fork the Repository
+
 ```bash
 # Click "Fork" on GitHub to create your own copy
 ```
 
 ### 2. Clone Your Fork
+
 ```bash
 git clone https://github.com/YOUR_USERNAME/vitrii-vr01.git
 cd vitrii-vr01
 ```
 
 ### 3. Add Upstream Remote
+
 ```bash
 git remote add upstream https://github.com/HSTW-Herestomorrow/vitrii-vr01.git
 ```
 
 ### 4. Install Dependencies
+
 ```bash
 pnpm install
 ```
 
 ### 5. Create a Feature Branch
+
 ```bash
 git checkout -b feature/your-feature-name
 # or for bug fixes:
@@ -39,12 +44,14 @@ git checkout -b fix/bug-name
 ## 📝 Development Guidelines
 
 ### Code Style
+
 - **TypeScript**: Use strict typing, avoid `any` type
 - **React**: Use functional components with hooks
 - **Naming**: Use descriptive, camelCase names
 - **Formatting**: Follow existing code style in the file
 
 ### File Organization
+
 ```
 client/
 ├── pages/          # Full page components
@@ -67,30 +74,35 @@ server/
 ### While Writing Code
 
 1. **Follow TypeScript best practices**
+
    ```typescript
    // ✅ Good
    interface User {
      id: number;
      name: string;
    }
-   
+
    // ❌ Avoid
-   const user: any = { /* ... */ };
+   const user: any = {
+     /* ... */
+   };
    ```
 
 2. **Add meaningful comments**
+
    ```typescript
    // Calculate total cost including tax
    const total = price * (1 + taxRate);
    ```
 
 3. **Keep functions small and focused**
+
    ```typescript
    // ✅ Good - single responsibility
    function getUserById(id: number) {
      return prisma.usuario.findUnique({ where: { id } });
    }
-   
+
    // ❌ Avoid - doing too much
    function processUserAndSendEmail(id) {
      // ... 50 lines of logic
@@ -98,10 +110,11 @@ server/
    ```
 
 4. **Use meaningful variable names**
+
    ```typescript
    // ✅ Good
    const isUserActive = user.isActive;
-   
+
    // ❌ Avoid
    const x = u.a;
    ```
@@ -121,23 +134,27 @@ pnpm run type-check
 ## 📋 Types of Contributions
 
 ### Bug Fixes
+
 1. Create an issue describing the bug
 2. Create a branch: `fix/bug-description`
 3. Fix the issue with tests if applicable
 4. Submit PR with detailed description
 
 ### Features
+
 1. Discuss feature in an issue first
 2. Create a branch: `feature/feature-name`
 3. Implement with tests where applicable
 4. Submit PR with feature documentation
 
 ### Documentation
+
 1. Update README.md, CONTRIBUTING.md, or code comments
 2. Improve clarity and correctness
 3. Add examples if helpful
 
 ### Performance Improvements
+
 1. Benchmark before/after
 2. Document the improvement
 3. Explain why it matters
@@ -145,32 +162,41 @@ pnpm run type-check
 ## 🔄 Submitting a Pull Request
 
 ### PR Title
+
 Use clear, descriptive titles:
+
 - ✅ `feat: Add waiting list management to Agenda`
 - ✅ `fix: Correct dropdown selection in Agenda form`
 - ✅ `docs: Update README with API endpoints`
 - ❌ `Update stuff`
 
 ### PR Description
+
 ```markdown
 ## Description
+
 Brief description of what this PR does.
 
 ## Type of Change
+
 - [ ] Bug fix
 - [ ] New feature
 - [ ] Breaking change
 - [ ] Documentation update
 
 ## How to Test
+
 Steps to verify the changes:
+
 1. ...
 2. ...
 
 ## Screenshots (if applicable)
+
 Include before/after screenshots for UI changes.
 
 ## Checklist
+
 - [ ] Code follows style guidelines
 - [ ] Self-review completed
 - [ ] Comments added for complex logic
@@ -196,20 +222,22 @@ pnpm run type-check      # Check TypeScript
 ### Adding a New API Route
 
 1. **Create route file** in `server/routes/`
+
    ```typescript
    // server/routes/my-feature.ts
    import { RequestHandler } from "express";
    import prisma from "../lib/prisma";
-   
+
    export const getMyData: RequestHandler = async (req, res) => {
      // Implementation
    };
    ```
 
 2. **Register route** in `server/index.ts`
+
    ```typescript
    import { getMyData } from "./routes/my-feature";
-   
+
    app.get("/api/my-feature", getMyData);
    ```
 
@@ -224,6 +252,7 @@ pnpm run type-check      # Check TypeScript
 ### Adding a New Page
 
 1. **Create page** in `client/pages/MyPage.tsx`
+
    ```typescript
    export default function MyPage() {
      return (
@@ -237,9 +266,10 @@ pnpm run type-check      # Check TypeScript
    ```
 
 2. **Add route** in `client/App.tsx`
+
    ```typescript
    import MyPage from "./pages/MyPage";
-   
+
    <Route path="/my-page" element={<MyPage />} />
    ```
 
@@ -289,12 +319,14 @@ vitrii-vr01/
 ## 🔍 Code Review Process
 
 When you submit a PR:
+
 1. Automated checks run (TypeScript, etc.)
 2. Maintainers review the code
 3. Changes may be requested
 4. Once approved, PR is merged
 
 ### What We Look For
+
 - ✅ Code quality and style
 - ✅ Proper error handling
 - ✅ Type safety

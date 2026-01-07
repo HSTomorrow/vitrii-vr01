@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Added - Core Features
 
 **Database & Multi-Tenancy**
+
 - PostgreSQL with Prisma ORM
 - Multi-tenant data isolation
 - User-store relationships with role-based access
@@ -19,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support for 16 core database models
 
 **Ad Management System**
+
 - Create, read, update, delete (CRUD) ads
 - Ad status management (draft → awaiting payment → published → archived)
 - Featured/highlighted ads for premium placement
@@ -30,6 +32,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Image upload support
 
 **Service Scheduling (Agenda)**
+
 - Create available time slots
 - Book appointments
 - View and manage waiting lists
@@ -39,6 +42,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Time slot status tracking (available, occupied, canceled)
 
 **QR Code System**
+
 - Generate unique QR codes per ad
 - Direct links to product/ad details
 - Scan tracking and visit statistics
@@ -46,6 +50,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Base64 data URL generation
 
 **Search & Discovery**
+
 - Advanced ad search with multi-criteria filtering
   - Filter by category
   - Price range (min/max)
@@ -59,18 +64,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Pagination support
 
 **Inventory Management**
+
 - Stock level tracking per store
 - Inventory movement history (entry, exit, adjustment)
 - Minimum/maximum stock alerts
 - Movement reason tracking (sale, return, loss, etc.)
 
 **Pricing & Variants**
+
 - Price table management with variants
 - Size, color, or custom variant support
 - Cost price tracking
 - Product variant active/inactive toggle
 
 **User & Store Management**
+
 - User registration and authentication
 - JWT-based secure login
 - Store creation and management
@@ -80,12 +88,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Administrator (administrador)
 
 **Sales Teams**
+
 - Create and manage sales teams per store
 - Add/remove team members
 - Team-based ad assignment
 - Team member availability tracking
 
 **Frontend Features**
+
 - Responsive design (mobile, tablet, desktop)
 - Header navigation with dropdown menus
 - Footer with links and information
@@ -96,6 +106,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Error handling
 
 **API Endpoints**
+
 - 40+ RESTful API endpoints
 - Proper HTTP status codes
 - JSON request/response format
@@ -105,6 +116,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 #### Technology Stack
 
 **Frontend**
+
 - React 18 with TypeScript
 - Vite for build tooling
 - TailwindCSS for styling
@@ -114,6 +126,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Lucide Icons
 
 **Backend**
+
 - Express.js server
 - PostgreSQL database
 - Prisma ORM
@@ -121,12 +134,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Multer for file uploads
 
 **Infrastructure**
+
 - Docker support
 - Environment variable configuration
 - CORS enabled
 - Static file serving
 
 #### Documentation
+
 - Comprehensive README.md
 - Contributing guidelines
 - MIT License
@@ -166,12 +181,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Planned Features
 
 #### Payment Integration
+
 - [ ] Pix payment gateway integration
 - [ ] Payment status tracking
 - [ ] Invoice generation
 - [ ] Transaction history
 
 #### Real-time Chat
+
 - [ ] Direct messaging between users
 - [ ] Public chat for ads
 - [ ] Private messages
@@ -180,12 +197,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [ ] Typing indicators
 
 #### Enhanced Ad Creation
+
 - [ ] Inline product creation (no page navigation)
 - [ ] Inline store creation
 - [ ] Quick variant addition
 - [ ] Bulk import/export
 
 #### Advanced Features
+
 - [ ] Review and rating system
 - [ ] User reputation/trust score
 - [ ] Promotional coupons/discounts
@@ -193,12 +212,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [ ] Advanced reporting
 
 #### Notifications
+
 - [ ] Email notifications
 - [ ] SMS notifications (optional)
 - [ ] Push notifications
 - [ ] Notification preferences
 
 #### Performance
+
 - [ ] Query optimization
 - [ ] Caching strategies
 - [ ] Image optimization
@@ -210,6 +231,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Version History Summary
 
 ### 1.0.0-beta (Current)
+
 - ✅ Complete core marketplace functionality
 - ✅ Service scheduling with waiting lists
 - ✅ QR code generation and tracking
