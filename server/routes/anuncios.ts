@@ -136,9 +136,12 @@ export const createAnuncio: RequestHandler = async (req, res) => {
     // Verify that the product belongs to the store
     const producto = await prisma.producto.findUnique({
       where: { id: validatedData.productId },
+      include: {
+        grupo: true,
+      },
     });
 
-    if (!producto || producto.lojaId !== validatedData.lojaId) {
+    if (!producto || producto.grupo.lojaId !== validatedData.lojaId) {
       return res.status(400).json({
         success: false,
         error: "Produto não pertence à loja selecionada",
