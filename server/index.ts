@@ -249,5 +249,22 @@ export function createServer() {
   app.get("/api/usuarios/:usuarioId/mensagens/unread", getUnreadCount);
   app.delete("/api/mensagens/:id", deleteMensagem);
 
+  // Funcionalidades (Features/Permissions) routes
+  app.get("/api/funcionalidades", getFuncionalidades);
+  app.get("/api/funcionalidades/:id", getFuncionalidadeById);
+  app.get("/api/usuarios/:usuarioId/funcionalidades", getFuncionalidadesByUsuario);
+  app.post("/api/funcionalidades", createFuncionalidade);
+  app.put("/api/funcionalidades/:id", updateFuncionalidade);
+  app.delete("/api/funcionalidades/:id", deleteFuncionalidade);
+
+  // Usuario x Funcionalidades (User-Permission mapping) routes
+  app.post("/api/usuarios/:usuarioId/funcionalidades/grant", grantFuncionalidade);
+  app.post("/api/usuarios/:usuarioId/funcionalidades/grant-multiple", grantFuncionalidades);
+  app.delete("/api/usuarios/:usuarioId/funcionalidades/:funcionalidadeId", revokeFuncionalidade);
+  app.post("/api/usuarios/:usuarioId/funcionalidades/revoke-multiple", revokeFuncionalidades);
+  app.get("/api/usuarios-funcionalidades", listUserFuncionalidades);
+  app.post("/api/usuarios/:usuarioId/funcionalidades/grant-all", grantAllFuncionalidades);
+  app.post("/api/usuarios/:usuarioId/funcionalidades/revoke-all", revokeAllFuncionalidades);
+
   return app;
 }
