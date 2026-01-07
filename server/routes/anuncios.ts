@@ -260,10 +260,13 @@ export const updateAnuncio: RequestHandler = async (req, res) => {
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
+      const errorMessages = error.errors
+        .map((err) => `${err.path.join(".")}: ${err.message}`)
+        .join("; ");
       return res.status(400).json({
         success: false,
         error: "Dados inválidos",
-        details: error.errors,
+        details: errorMessages,
       });
     }
 
@@ -271,6 +274,7 @@ export const updateAnuncio: RequestHandler = async (req, res) => {
     res.status(500).json({
       success: false,
       error: "Erro ao atualizar anúncio",
+      details: error instanceof Error ? error.message : "Erro desconhecido",
     });
   }
 };
