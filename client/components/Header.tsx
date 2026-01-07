@@ -151,6 +151,14 @@ export default function Header() {
               )}
             </div>
 
+            <Link
+              to="/chat"
+              className="p-2 hover:bg-walmart-gray rounded-lg transition-colors"
+              title="Minhas mensagens"
+            >
+              <MessageSquare className="w-5 h-5 text-walmart-text" />
+            </Link>
+
             <button className="p-2 hover:bg-walmart-gray rounded-lg transition-colors">
               <ShoppingCart className="w-5 h-5 text-walmart-text" />
             </button>
