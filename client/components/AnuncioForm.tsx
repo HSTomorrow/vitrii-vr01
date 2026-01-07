@@ -34,6 +34,13 @@ interface EquipeDeVenda {
   nome: string;
 }
 
+// Calculate default validity date (7 days from today)
+const getDefaultValidityDate = () => {
+  const date = new Date();
+  date.setDate(date.getDate() + 7);
+  return date.toISOString().split('T')[0];
+};
+
 export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFormProps) {
   const queryClient = useQueryClient();
   const [selectedLojaId, setSelectedLojaId] = useState(lojaId || 0);
@@ -44,7 +51,7 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
     tabelaDePrecoId: 0,
     fotoUrl: "",
     preco: "",
-    dataValidade: "",
+    dataValidade: getDefaultValidityDate(),
     equipeDeVendaId: 0,
     isDoacao: false,
   });
