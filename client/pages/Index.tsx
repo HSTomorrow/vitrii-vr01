@@ -269,12 +269,13 @@ export default function Index() {
             {doacoesLoading ? (
               // Loading Skeleton
               <>
-                {[1, 2, 3, 4].map((item) => (
+                {[1, 2, 3, 4, 5].map((item) => (
                   <div key={item} className="vitrii-card overflow-hidden animate-pulse">
                     <div className="w-full h-48 bg-gray-300" />
                     <div className="p-4 space-y-3">
                       <div className="h-4 bg-gray-300 rounded" />
                       <div className="h-3 bg-gray-300 rounded w-3/4" />
+                      <div className="h-3 bg-gray-300 rounded w-1/2" />
                       <div className="h-4 bg-gray-300 rounded" />
                       <div className="h-10 bg-gray-300 rounded" />
                     </div>
