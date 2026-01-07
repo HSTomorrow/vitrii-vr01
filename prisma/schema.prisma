@@ -234,6 +234,8 @@ model Anuncio {
   fotoUrl       String?   @db.Text
   precoAnuncio  Decimal?  @db.Decimal(10, 2)
   isDoacao      Boolean   @default(false)
+  destaque      Boolean   @default(false) // Featured ads
+  isActive      Boolean   @default(true) // Logical deletion
   status        String    @default("em_edicao") // "em_edicao", "aguardando_pagamento", "pago", "historico"
   dataValidade  DateTime?
   dataCriacao   DateTime  @default(now())
