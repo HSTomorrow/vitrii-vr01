@@ -278,6 +278,7 @@ model Anuncio {
   tabelaDePreco TabelaDePreco? @relation(fields: [tabelaDePrecoId], references: [id], onDelete: SetNull)
   equipeDeVenda EquipeDeVenda? @relation(fields: [equipeDeVendaId], references: [id], onDelete: SetNull)
   pagamento     Pagamento?
+  conversas     Conversa[]
 
   @@map("anuncios")
 }
