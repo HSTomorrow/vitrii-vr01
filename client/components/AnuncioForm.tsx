@@ -143,8 +143,8 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!selectedLojaId || !formData.productId || !formData.tabelaDePrecoId) {
-      toast.error("Loja, Produto e Variante são obrigatórios");
+    if (!selectedLojaId || !formData.productId) {
+      toast.error("Loja e Produto são obrigatórios");
       return;
     }
 
