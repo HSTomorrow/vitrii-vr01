@@ -1,4 +1,5 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import {
@@ -12,9 +13,25 @@ import {
   Package,
   BarChart3,
   AlertCircle,
+  Plus,
 } from "lucide-react";
 
 export default function Index() {
+  const navigate = useNavigate();
+
+  // Fetch featured ads
+  const { data: anunciosData, isLoading } = useQuery({
+    queryKey: ["anuncios-destaque"],
+    queryFn: async () => {
+      const response = await fetch("/api/anuncios?status=pago");
+      if (!response.ok) throw new Error("Erro ao buscar anúncios");
+      return response.json();
+    },
+  });
+
+  const anuncios = anunciosData?.data || [];
+  const destacados = anuncios.slice(0, 4);
+
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
