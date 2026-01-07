@@ -10,7 +10,6 @@ const AnuncioCreateSchema = z.object({
   titulo: z.string().min(5, "Título deve ter pelo menos 5 caracteres").max(255),
   descricao: z.string().optional().nullable(),
   fotoUrl: z.string().optional().nullable(),
-  preco: z.number().positive("Preço deve ser maior que 0").optional().nullable(),
   dataValidade: z.string().optional().nullable(),
   equipeDeVendaId: z.number().int().positive().optional().nullable(),
   isDoacao: z.boolean().optional().default(false),
