@@ -49,7 +49,7 @@ export default function Index() {
       if (!user) {
         toast.error("Faça login para adicionar favoritos");
         navigate("/auth/signin");
-        return;
+        throw new Error("Not logged in");
       }
 
       const response = await fetch("/api/favoritos/toggle", {
@@ -62,20 +62,23 @@ export default function Index() {
       });
 
       if (!response.ok) throw new Error("Erro ao adicionar favorito");
-      return response.json();
+      return { ...await response.json(), anuncioId };
     },
     onSuccess: (data) => {
       setFavoritos((prev) => {
         const newFavoritos = new Set(prev);
-        // Find the anuncioId from the request - this is a bit hacky but works
         if (data.isFavorited) {
-          // If it's newly favorited, we'd need to pass the ID separately
+          newFavoritos.add(data.anuncioId);
           toast.success("Adicionado aos favoritos!");
         } else {
+          newFavoritos.delete(data.anuncioId);
           toast.success("Removido dos favoritos");
         }
         return newFavoritos;
       });
+    },
+    onError: () => {
+      // Error is handled, don't show double toast
     },
   });
 
