@@ -46,10 +46,11 @@ export const generateQRCode: RequestHandler = async (req, res) => {
 
     // Save QR code to database (using tabelaDePrecoId if available, otherwise null)
     const tabelaDePrecoId = anuncio.tabelaDePrecoId || null;
-    
+
+    // Store the data URL as the codigo for now
     const qrCode = await prisma.qRCode.create({
       data: {
-        codigo,
+        codigo: qrCodeDataUrl, // Store the data URL for easy retrieval
         tabelaDePrecoId: tabelaDePrecoId ? tabelaDePrecoId : undefined,
         descricao: req.body.descricao,
       },
@@ -60,9 +61,8 @@ export const generateQRCode: RequestHandler = async (req, res) => {
       success: true,
       data: {
         id: qrCode.id,
-        codigo: qrCode.codigo,
+        codigo: qrCodeDataUrl, // Return the data URL directly
         descricao: qrCode.descricao,
-        qrCodeImage: qrCodeDataUrl,
         directLink: adLink,
         anuncioId,
       },
