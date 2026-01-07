@@ -87,6 +87,20 @@ import {
   handlePaymentWebhook,
   cancelPagamento,
 } from "./routes/pagamentos";
+import {
+  getConversas,
+  getConversaById,
+  createConversa,
+  deleteConversa,
+} from "./routes/conversas";
+import {
+  getMensagensConversa,
+  createMensagem,
+  markMensagemAsRead,
+  markConversaAsRead,
+  getUnreadCount,
+  deleteMensagem,
+} from "./routes/mensagens";
 import { uploadMiddleware, handleUpload } from "./routes/upload";
 
 export function createServer() {
