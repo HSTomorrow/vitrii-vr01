@@ -284,6 +284,16 @@ export default function Header() {
                     >
                       Tabelas de Preço
                     </Link>
+                    <Link
+                      to="/cadastros/variantes"
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        setIsCadastrosOpen(false);
+                      }}
+                      className="block px-4 py-2 text-sm text-walmart-text hover:bg-walmart-gray rounded-lg"
+                    >
+                      Variantes
+                    </Link>
                   </div>
                 )}
               </div>
