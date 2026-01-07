@@ -598,7 +598,12 @@ export default function AnuncioForm({
                 id="isDoacao"
                 checked={formData.isDoacao}
                 onChange={(e) => {
-                  handleInputChange("isDoacao", e.target.checked);
+                  const isChecked = e.target.checked;
+                  handleInputChange("isDoacao", isChecked);
+                  // Zero out price when marking as donation
+                  if (isChecked) {
+                    handleInputChange("precoAnuncio", "");
+                  }
                 }}
                 className="w-5 h-5 text-walmart-blue cursor-pointer rounded"
               />
@@ -607,7 +612,7 @@ export default function AnuncioForm({
                   Esta é uma doação
                 </p>
                 <p className="text-sm text-walmart-text-secondary">
-                  Marque esta opção para publicar como doação (valor zerado)
+                  Marque esta opção para publicar como doação. Será publicado gratuitamente, sem necessidade de pagamento.
                 </p>
               </label>
             </div>
