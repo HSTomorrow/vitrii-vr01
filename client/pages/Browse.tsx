@@ -3,13 +3,18 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Filter, Search, Star, Package } from "lucide-react";
+import { Filter, Search, Star, Package, Heart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
+import { useState } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function Browse() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [userFavoritos, setUserFavoritos] = useState<Set<number>>(new Set());
 
   // Fetch all published ads
   const { data: anunciosData, isLoading } = useQuery({
