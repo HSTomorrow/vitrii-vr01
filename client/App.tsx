@@ -58,6 +58,7 @@ export default function App() {
                 <Route path="/auth/signup" element={<SignUp />} />
                 <Route path="/esqueci-senha" element={<ForgotPassword />} />
                 <Route path="/reset-senha" element={<ResetPassword />} />
+                <Route path="/favoritos" element={<Favoritos />} />
                 <Route path="/perfil" element={<PerfilUsuario />} />
                 <Route path="/anuncio/criar" element={<CriarAnuncio />} />
                 <Route path="/anuncio/:id" element={<AnuncioDetalhe />} />
