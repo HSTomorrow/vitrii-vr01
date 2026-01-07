@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, X, Search, ShoppingCart, User, Plus, LogOut } from "lucide-react";
+import { Menu, X, Search, ShoppingCart, User, Plus, LogOut, Settings } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isCadastrosOpen, setIsCadastrosOpen] = useState(false);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
