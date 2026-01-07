@@ -65,6 +65,7 @@ model Loja {
   anuncios      Anuncio[]
   equipesDeVenda EquipeDeVenda[]
   agendas       Agenda[]
+  conversas     Conversa[]
 
   @@map("lojas")
 }
