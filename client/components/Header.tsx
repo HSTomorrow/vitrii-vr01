@@ -73,6 +73,50 @@ export default function Header() {
 
           {/* Right side - Cart and Auth */}
           <div className="flex items-center space-x-4">
+            {/* Cadastros Menu */}
+            <div className="relative">
+              <button
+                onClick={() => setIsCadastrosOpen(!isCadastrosOpen)}
+                className="flex items-center gap-2 p-2 hover:bg-walmart-gray rounded-lg transition-colors hidden sm:flex"
+              >
+                <Settings className="w-5 h-5 text-walmart-text" />
+                <span className="text-sm font-semibold text-walmart-text hidden md:inline">Cadastros</span>
+              </button>
+
+              {isCadastrosOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+                  <Link
+                    to="/cadastros/lojas"
+                    onClick={() => setIsCadastrosOpen(false)}
+                    className="block px-4 py-3 text-sm font-semibold text-walmart-text hover:bg-walmart-gray rounded-t-lg transition-colors"
+                  >
+                    Cadastro de Lojas
+                  </Link>
+                  <Link
+                    to="/cadastros/grupos-productos"
+                    onClick={() => setIsCadastrosOpen(false)}
+                    className="block px-4 py-3 text-sm font-semibold text-walmart-text hover:bg-walmart-gray transition-colors"
+                  >
+                    Grupos de Produtos
+                  </Link>
+                  <Link
+                    to="/cadastros/productos"
+                    onClick={() => setIsCadastrosOpen(false)}
+                    className="block px-4 py-3 text-sm font-semibold text-walmart-text hover:bg-walmart-gray transition-colors"
+                  >
+                    Cadastro de Produtos
+                  </Link>
+                  <Link
+                    to="/cadastros/tabelas-preco"
+                    onClick={() => setIsCadastrosOpen(false)}
+                    className="block px-4 py-3 text-sm font-semibold text-walmart-text hover:bg-walmart-gray rounded-b-lg transition-colors"
+                  >
+                    Tabelas de Preço
+                  </Link>
+                </div>
+              )}
+            </div>
+
             <button className="p-2 hover:bg-walmart-gray rounded-lg transition-colors">
               <ShoppingCart className="w-5 h-5 text-walmart-text" />
             </button>
