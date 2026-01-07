@@ -187,7 +187,7 @@ export default function CadastroVariantesLista() {
                       {producto.grupo?.nome}
                     </p>
                   </div>
-                  <div className="p-2 bg-walmart-yellow-light rounded-lg">
+                  <div className="p-2 bg-yellow-50 rounded-lg">
                     <Palette className="w-5 h-5 text-walmart-yellow" />
                   </div>
                 </div>
