@@ -18,6 +18,14 @@ import {
   updateLoja,
   deleteLoja,
 } from "./routes/lojas";
+import {
+  getUsuarios,
+  getUsuarioById,
+  signUpUsuario,
+  createUsuario,
+  updateUsuario,
+  deleteUsuario,
+} from "./routes/usuarios";
 
 export function createServer() {
   const app = express();
