@@ -179,12 +179,6 @@ export const createAnuncio: RequestHandler = async (req, res) => {
       validatedData.tabelaDePrecoId = tabelaDePreco.id;
     }
 
-    // Set price: use manual preco if provided, otherwise use tabelaDePreco price
-    let preco = validatedData.preco;
-    if (!preco && tabelaDePreco) {
-      preco = tabelaDePreco.preco;
-    }
-
     // Set validity: default to 7 days from now if not provided
     const dataValidade = validatedData.dataValidade
       ? new Date(validatedData.dataValidade)
@@ -198,7 +192,6 @@ export const createAnuncio: RequestHandler = async (req, res) => {
         titulo: validatedData.titulo,
         descricao: validatedData.descricao,
         fotoUrl: validatedData.fotoUrl,
-        preco: preco ? parseFloat(preco.toString()) : null,
         dataValidade,
         equipeDeVendaId: validatedData.equipeDeVendaId,
         isDoacao: validatedData.isDoacao,
