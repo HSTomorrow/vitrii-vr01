@@ -61,6 +61,13 @@ import {
   removerMembro,
   getUsuariosDisponiveis,
 } from "./routes/equipes-venda";
+import {
+  generateQRCode,
+  getQRCodesForAd,
+  trackQRCodeScan,
+  getQRCodeStats,
+  deleteQRCode,
+} from "./routes/qrcodes";
 import { uploadMiddleware, handleUpload } from "./routes/upload";
 
 export function createServer() {
