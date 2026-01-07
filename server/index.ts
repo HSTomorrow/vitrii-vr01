@@ -9,6 +9,8 @@ import {
   updateAnuncio,
   updateAnuncioStatus,
   deleteAnuncio,
+  inactivateAnuncio,
+  activateAnuncio,
   getProdutosParaAnuncio,
 } from "./routes/anuncios";
 import {
