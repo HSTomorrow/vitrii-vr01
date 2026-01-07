@@ -467,6 +467,14 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
               </label>
             </div>
 
+            {/* Category-Specific Fields */}
+            <CategoryFields
+              categoria={formData.categoria}
+              dadosCategoria={formData.dadosCategoria}
+              onCategoryChange={(categoria) => handleInputChange("categoria", categoria)}
+              onDadosChange={(dados) => handleInputChange("dadosCategoria", dados)}
+            />
+
             {/* Título */}
             <div>
               <label className="block text-sm font-semibold text-walmart-text mb-2">
