@@ -120,6 +120,7 @@ import {
   revokeAllFuncionalidades,
 } from "./routes/usuario-funcionalidades";
 import { uploadMiddleware, handleUpload } from "./routes/upload";
+import { extractUserId, requireAdmin } from "./middleware/permissionGuard";
 
 export function createServer() {
   const app = express();
