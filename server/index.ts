@@ -196,5 +196,13 @@ export function createServer() {
   app.delete("/api/agendas/waitlist/:waitlistId", removeFromWaitlist);
   app.post("/api/agendas/:agendaId/waitlist/promote", promoteFromWaitlist);
 
+  // Pagamentos (Payment) routes
+  app.get("/api/pagamentos/anuncio/:anuncioId", getPagamentoByAnuncioId);
+  app.get("/api/pagamentos/:id/status", getPagamentoStatus);
+  app.post("/api/pagamentos", createPagamento);
+  app.patch("/api/pagamentos/:id/status", updatePagamentoStatus);
+  app.delete("/api/pagamentos/:id/cancel", cancelPagamento);
+  app.post("/api/webhooks/pagamentos", handlePaymentWebhook);
+
   return app;
 }
