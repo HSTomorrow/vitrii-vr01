@@ -79,6 +79,14 @@ import {
   removeFromWaitlist,
   promoteFromWaitlist,
 } from "./routes/agendas";
+import {
+  getPagamentoByAnuncioId,
+  createPagamento,
+  updatePagamentoStatus,
+  getPagamentoStatus,
+  handlePaymentWebhook,
+  cancelPagamento,
+} from "./routes/pagamentos";
 import { uploadMiddleware, handleUpload } from "./routes/upload";
 
 export function createServer() {
