@@ -145,7 +145,8 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
       if (onSuccess) onSuccess();
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Erro ao salvar");
+      const errorMsg = error instanceof Error ? error.message : "Erro ao salvar";
+      toast.error(errorMsg);
     },
   });
 
