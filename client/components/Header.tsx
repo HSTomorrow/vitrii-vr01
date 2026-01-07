@@ -54,6 +54,12 @@ export default function Header() {
             >
               QR Code
             </Link>
+            <Link
+              to="/about"
+              className="text-walmart-text-secondary hover:text-walmart-blue transition-colors"
+            >
+              Sobre
+            </Link>
           </nav>
 
           {/* Right side - Cart and Auth */}
