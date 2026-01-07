@@ -121,6 +121,33 @@ export default function AdminManageAds() {
     },
   });
 
+  // Mutation to override ad status (ADM only)
+  const overrideStatusMutation = useMutation({
+    mutationFn: async ({
+      anuncioId,
+      status,
+    }: {
+      anuncioId: number;
+      status: string;
+    }) => {
+      const response = await fetch(`/api/anuncios/${anuncioId}/override-status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      if (!response.ok) throw new Error("Erro ao alterar status do anúncio");
+      return response.json();
+    },
+    onSuccess: (_, variables) => {
+      toast.success(`Anúncio alterado para "${variables.status}" com sucesso`);
+      queryClient.invalidateQueries({ queryKey: ["admin-anuncios"] });
+      setExpandedAd(null);
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : "Erro ao alterar status");
+    },
+  });
+
   const anuncios = anunciosData?.data || [];
 
   const filteredAnuncios = anuncios.filter((a: Anuncio) => {
