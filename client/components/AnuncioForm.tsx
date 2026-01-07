@@ -86,7 +86,10 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
     queryKey: ["equipes-venda", selectedLojaId],
     queryFn: async () => {
       const response = await fetch(`/api/equipes-venda?lojaId=${selectedLojaId}`);
-      if (!response.ok) throw new Error("Erro ao buscar equipes");
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.details || error.error || "Erro ao buscar equipes");
+      }
       return response.json();
     },
     enabled: selectedLojaId > 0,
