@@ -309,9 +309,21 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
 
             {/* Produto Selection */}
             <div>
-              <label className="block text-sm font-semibold text-walmart-text mb-2">
-                Produto *
-              </label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-semibold text-walmart-text">
+                  Produto *
+                </label>
+                {selectedLojaId > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setShowCreateProducto(true)}
+                    className="inline-flex items-center gap-1 px-3 py-1 text-sm bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Novo Produto
+                  </button>
+                )}
+              </div>
               {selectedLojaId > 0 ? (
                 <select
                   value={formData.productId}
