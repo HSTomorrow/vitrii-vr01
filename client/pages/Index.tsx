@@ -21,9 +21,6 @@ import {
   Calendar,
   Heart,
 } from "lucide-react";
-import { useAuth } from "@/contexts/AuthContext";
-import { useMutation } from "@tanstack/react-query";
-import { toast } from "sonner";
 
 // Helper function to extract municipality from address
 const extractMunicipality = (endereco: string): string => {
