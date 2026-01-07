@@ -16,6 +16,8 @@ const AnuncioCreateSchema = z.object({
   isDoacao: z.boolean().optional().default(false),
   destaque: z.boolean().optional().default(false),
   isActive: z.boolean().optional().default(true),
+  categoria: z.enum(["roupas", "carros", "imoveis"]).optional().nullable(),
+  dadosCategoria: z.string().optional().nullable(), // JSON string
 });
 
 // GET all ads
