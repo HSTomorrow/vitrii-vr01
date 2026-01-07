@@ -316,7 +316,7 @@ export const updateAnuncioStatus: RequestHandler = async (req, res) => {
   }
 };
 
-// DELETE ad
+// DELETE ad (physical deletion)
 export const deleteAnuncio: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
@@ -334,6 +334,64 @@ export const deleteAnuncio: RequestHandler = async (req, res) => {
     res.status(500).json({
       success: false,
       error: "Erro ao deletar anúncio",
+    });
+  }
+};
+
+// INACTIVATE ad (logical deletion)
+export const inactivateAnuncio: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const anuncio = await prisma.anuncio.update({
+      where: { id: parseInt(id) },
+      data: { isActive: false },
+      include: {
+        loja: true,
+        producto: true,
+        tabelaDePreco: true,
+      },
+    });
+
+    res.json({
+      success: true,
+      message: "Anúncio inativado com sucesso",
+      data: anuncio,
+    });
+  } catch (error) {
+    console.error("Error inactivating ad:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao inativar anúncio",
+    });
+  }
+};
+
+// ACTIVATE ad (reactivate inactive ad)
+export const activateAnuncio: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const anuncio = await prisma.anuncio.update({
+      where: { id: parseInt(id) },
+      data: { isActive: true },
+      include: {
+        loja: true,
+        producto: true,
+        tabelaDePreco: true,
+      },
+    });
+
+    res.json({
+      success: true,
+      message: "Anúncio reativado com sucesso",
+      data: anuncio,
+    });
+  } catch (error) {
+    console.error("Error activating ad:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao reativar anúncio",
     });
   }
 };
