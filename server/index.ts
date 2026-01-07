@@ -192,6 +192,7 @@ export function createServer() {
   app.post("/api/anuncios", createAnuncio);
   app.put("/api/anuncios/:id", updateAnuncio);
   app.patch("/api/anuncios/:id/status", updateAnuncioStatus);
+  app.patch("/api/anuncios/:id/override-status", extractUserId, requireAdmin, overrideAnuncioStatus);
   app.patch("/api/anuncios/:id/inactivate", inactivateAnuncio);
   app.patch("/api/anuncios/:id/activate", activateAnuncio);
   app.delete("/api/anuncios/:id", deleteAnuncio);
