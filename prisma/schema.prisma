@@ -306,6 +306,58 @@ model Pagamento {
 }
 
 // ============================================================================
+// CONVERSAS (Chat Conversations)
+// ============================================================================
+model Conversa {
+  id            Int       @id @default(autoincrement())
+  usuarioId     Int       // Buyer/Initiator
+  lojaId        Int       // Seller (store)
+  anuncioId     Int?      // Related ad (optional)
+  tipo          String    @default("privada") // "publica", "privada"
+  assunto       String    @db.VarChar(255) // Conversation subject
+  ultimaMensagem String?  @db.Text // Last message preview
+  dataUltimaMensagem DateTime? // Last message date for sorting
+  isActive      Boolean   @default(true) // Logical deletion
+  dataCriacao   DateTime  @default(now())
+  dataAtualizacao DateTime @updatedAt
+
+  // Relations
+  usuario       Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  loja          Loja      @relation(fields: [lojaId], references: [id], onDelete: Cascade)
+  anuncio       Anuncio?  @relation(fields: [anuncioId], references: [id], onDelete: SetNull)
+  mensagens     Mensagem[]
+
+  @@unique([usuarioId, lojaId, anuncioId])
+  @@map("conversas")
+}
+
+// ============================================================================
+// MENSAGENS (Chat Messages)
+// ============================================================================
+model Mensagem {
+  id            Int       @id @default(autoincrement())
+  conversaId    Int
+  remetentId    Int       // Sender
+  tipoRemetente String    // "usuario", "loja" (for easier querying)
+  conteudo      String    @db.Text
+  lido          Boolean   @default(false)
+  isActive      Boolean   @default(true) // Logical deletion
+  dataCriacao   DateTime  @default(now())
+  dataAtualizacao DateTime @updatedAt
+
+  // Relations
+  conversa      Conversa  @relation(fields: [conversaId], references: [id], onDelete: Cascade)
+  remetente     Usuario   @relation(fields: [remetentId], references: [id], onDelete: Cascade)
+
+  @@index([conversaId, dataCriacao]) // For efficient message fetching
+  @@map("mensagens")
+}
+
+// Add relation to Anuncio for conversations
+// Add relation to Usuario for messages
+// Add relation to Loja for conversations
+
+// ============================================================================
 // CONTROLE DE ESTOQUE
 // ============================================================================
 model ProdutoEmEstoque {
