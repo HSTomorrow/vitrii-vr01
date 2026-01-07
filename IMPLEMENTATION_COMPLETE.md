@@ -388,6 +388,27 @@ GET/POST /api/conversas/:id
 DELETE /api/conversas/:id
 GET /api/conversas/:conversaId/mensagens
 POST/DELETE /api/mensagens/:id
+
+### RBAC - Funcionalidades (6 endpoints)
+
+```
+GET /api/funcionalidades
+GET /api/funcionalidades/:id
+POST /api/funcionalidades
+PUT /api/funcionalidades/:id
+DELETE /api/funcionalidades/:id
+GET /api/usuarios/:usuarioId/funcionalidades
+
+### RBAC - User Permissions (7 endpoints)
+
+```
+POST /api/usuarios/:usuarioId/funcionalidades/grant
+POST /api/usuarios/:usuarioId/funcionalidades/grant-multiple
+DELETE /api/usuarios/:usuarioId/funcionalidades/:funcionalidadeId
+POST /api/usuarios/:usuarioId/funcionalidades/revoke-multiple
+GET /api/usuarios-funcionalidades
+POST /api/usuarios/:usuarioId/funcionalidades/grant-all
+POST /api/usuarios/:usuarioId/funcionalidades/revoke-all
 PATCH /api/mensagens/:id/read
 ```
 
