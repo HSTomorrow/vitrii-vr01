@@ -36,6 +36,7 @@ model Usuario {
   mensagens     Mensagem[]
   usuarioXFuncionalidades UsuarioXFuncionalidade[]
   passwordResetTokens PasswordResetToken[]
+  favoritos     Favorito[]
 
   @@map("usuarios")
 }
