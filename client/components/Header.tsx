@@ -176,14 +176,24 @@ export default function Header() {
                 </Link>
 
                 {user.tipoUsuario === "adm" && (
-                  <Link
-                    to="/admin/dashboard"
-                    className="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200 transition-colors font-semibold"
-                    title="Painel de Administrador"
-                  >
-                    <Shield className="w-4 h-4" />
-                    <span className="hidden md:inline">Administrador</span>
-                  </Link>
+                  <div className="hidden sm:flex gap-2">
+                    <Link
+                      to="/admin/dashboard"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200 transition-colors font-semibold"
+                      title="Painel de Administrador"
+                    >
+                      <Shield className="w-4 h-4" />
+                      <span className="hidden md:inline">Administrador</span>
+                    </Link>
+                    <Link
+                      to="/admin/anuncios"
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors font-semibold"
+                      title="Gerenciar Anúncios"
+                    >
+                      <FileText className="w-4 h-4" />
+                      <span className="hidden md:inline">Anúncios</span>
+                    </Link>
+                  </div>
                 )}
 
                 <div className="hidden sm:flex items-center space-x-2 px-4 py-2 bg-green-50 rounded-lg border border-green-200">
