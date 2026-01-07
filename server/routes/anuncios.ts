@@ -52,7 +52,7 @@ export const getAnuncios: RequestHandler = async (req, res) => {
           },
         },
       },
-      orderBy: { dataCriacao: "desc" },
+      orderBy: [{ destaque: "desc" }, { dataCriacao: "desc" }], // Featured ads first
     });
 
     res.json({
