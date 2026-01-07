@@ -167,9 +167,14 @@ export const createAnuncio: RequestHandler = async (req, res) => {
         where: { productId: validatedData.productId },
       });
 
-      if (tabelaDePreco) {
-        validatedData.tabelaDePrecoId = tabelaDePreco.id;
+      if (!tabelaDePreco) {
+        return res.status(400).json({
+          success: false,
+          error: "Nenhuma tabela de preços disponível para este produto. Por favor, crie pelo menos uma variante.",
+        });
       }
+
+      validatedData.tabelaDePrecoId = tabelaDePreco.id;
     }
 
     const anuncio = await prisma.anuncio.create({
