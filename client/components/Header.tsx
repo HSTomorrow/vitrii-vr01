@@ -174,6 +174,17 @@ export default function Header() {
                   <span className="hidden md:inline">Publicar</span>
                 </Link>
 
+                {user.tipoUsuario === "adm" && (
+                  <Link
+                    to="/admin/dashboard"
+                    className="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200 transition-colors font-semibold"
+                    title="Painel de Administrador"
+                  >
+                    <Shield className="w-4 h-4" />
+                    <span className="hidden md:inline">Administrador</span>
+                  </Link>
+                )}
+
                 <div className="hidden sm:flex items-center space-x-2 px-4 py-2 bg-green-50 rounded-lg border border-green-200">
                   <User className="w-4 h-4 text-green-600" />
                   <span className="text-sm font-semibold text-green-800 hidden md:inline">
