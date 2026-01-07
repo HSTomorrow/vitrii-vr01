@@ -29,8 +29,10 @@ export const getAnuncios: RequestHandler = async (req, res) => {
     if (lojaId) where.lojaId = parseInt(lojaId as string);
     if (status) where.status = status;
     if (includeInactive === "true") delete where.isActive; // Override to include inactive
-    if (isDoacao === "true") where.isDoacao = true;
-    if (isDoacao === "false") where.isDoacao = false;
+    // Handle isDoacao parameter
+    if (isDoacao !== undefined) {
+      where.isDoacao = isDoacao === "true";
+    }
 
     const anuncios = await prisma.anuncio.findMany({
       where,
