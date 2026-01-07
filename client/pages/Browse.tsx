@@ -167,7 +167,7 @@ export default function Browse() {
 
                       <div className="flex justify-between items-center mb-4">
                         <span className="text-2xl font-bold text-walmart-blue">
-                          R$ {anuncio.tabelaDePreco?.preco?.toFixed(2) || "0.00"}
+                          R$ {anuncio.tabelaDePreco?.preco ? Number(anuncio.tabelaDePreco.preco).toFixed(2) : "0.00"}
                         </span>
                         <div className="flex items-center space-x-1">
                           <Star className="w-4 h-4 fill-walmart-yellow text-walmart-yellow" />
