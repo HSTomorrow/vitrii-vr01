@@ -126,14 +126,17 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...data,
+          titulo: data.titulo,
+          descricao: data.descricao,
+          fotoUrl: data.fotoUrl,
           lojaId: selectedLojaId,
+          productId: data.productId,
           tabelaDePrecoId: data.tabelaDePrecoId > 0 ? data.tabelaDePrecoId : null,
-          preco: data.preco ? parseFloat(data.preco) : null,
           dataValidade: data.dataValidade
             ? new Date(data.dataValidade).toISOString()
             : null,
           equipeDeVendaId: data.equipeDeVendaId > 0 ? data.equipeDeVendaId : null,
+          isDoacao: data.isDoacao,
         }),
       });
 
