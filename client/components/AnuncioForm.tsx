@@ -150,6 +150,8 @@ export default function AnuncioForm({
   useEffect(() => {
     if (anuncioData?.data) {
       const ad = anuncioData.data;
+      console.log("Loading anuncio data for editing:", ad);
+
       setSelectedLojaId(ad.lojaId);
       setFormData({
         titulo: ad.titulo,
@@ -167,6 +169,8 @@ export default function AnuncioForm({
         categoria: ad.categoria || null,
         dadosCategoria: ad.dadosCategoria || "",
       });
+
+      toast.success("Anúncio carregado com sucesso");
     }
   }, [anuncioData]);
 
