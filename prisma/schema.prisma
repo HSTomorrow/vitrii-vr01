@@ -92,6 +92,7 @@ model EquipeDeVenda {
   lojaId        Int
   nome          String    @db.VarChar(255)
   descricao     String?   @db.Text
+  isActive      Boolean   @default(true)
   dataCriacao   DateTime  @default(now())
   dataAtualizacao DateTime @updatedAt
 
@@ -129,6 +130,7 @@ model GrupoDeProductos {
   lojaId        Int
   nome          String    @db.VarChar(255)
   descricao     String?   @db.Text
+  isActive      Boolean   @default(true)
   dataCriacao   DateTime  @default(now())
   dataAtualizacao DateTime @updatedAt
 
@@ -163,6 +165,7 @@ model Producto {
   nome          String    @db.VarChar(255)
   descricao     String?   @db.Text
   sku           String?   @db.VarChar(100)
+  isActive      Boolean   @default(true)
   dataCriacao   DateTime  @default(now())
   dataAtualizacao DateTime @updatedAt
 
@@ -187,6 +190,7 @@ model TabelaDePreco {
   cor           String?   @db.VarChar(100)
   preco         Decimal   @db.Decimal(10, 2)
   precoCusto    Decimal?  @db.Decimal(10, 2)
+  isActive      Boolean   @default(true)
   dataCriacao   DateTime  @default(now())
   dataAtualizacao DateTime @updatedAt
 
