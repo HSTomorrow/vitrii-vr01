@@ -33,14 +33,9 @@ export default function Index() {
   const { data: doacoesData, isLoading: doacoesLoading } = useQuery({
     queryKey: ["anuncios-doacoes"],
     queryFn: async () => {
-      const response = await fetch("/api/anuncios?status=pago");
+      const response = await fetch("/api/anuncios?status=pago&isDoacao=true");
       if (!response.ok) throw new Error("Erro ao buscar doações");
-      const data = await response.json();
-      // Filter for donation ads on client side
-      return {
-        ...data,
-        data: data.data?.filter((a: any) => a.isDoacao) || [],
-      };
+      return response.json();
     },
   });
 
