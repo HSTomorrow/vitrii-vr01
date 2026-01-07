@@ -87,22 +87,82 @@ export const getUsuarioById: RequestHandler = async (req, res) => {
   }
 };
 
-// CREATE new user
-export const createUsuario: RequestHandler = async (req, res) => {
+// SIGNUP - Create new user with basic info
+export const signUpUsuario: RequestHandler = async (req, res) => {
   try {
-    const validatedData = UsuarioCreateSchema.parse(req.body);
+    const validatedData = UsuarioSignUpSchema.parse(req.body);
 
-    // Check if user already exists
-    const existingUser = await prisma.usuario.findFirst({
-      where: {
-        OR: [{ email: validatedData.email }, { cpf: validatedData.cpf }],
-      },
+    // Check if user already exists by email
+    const existingUser = await prisma.usuario.findUnique({
+      where: { email: validatedData.email },
     });
 
     if (existingUser) {
       return res.status(400).json({
         success: false,
-        error: "Email ou CPF já cadastrado",
+        error: "Email já cadastrado",
+      });
+    }
+
+    // In production, hash the password with bcrypt
+    const usuario = await prisma.usuario.create({
+      data: {
+        nome: validatedData.nome,
+        email: validatedData.email,
+        senha: validatedData.senha, // TODO: hash password
+        cpf: "",
+        telefone: "",
+        endereco: "",
+        tipoUsuario: "comum",
+      },
+      select: {
+        id: true,
+        nome: true,
+        email: true,
+        tipoUsuario: true,
+        dataCriacao: true,
+      },
+    });
+
+    res.status(201).json({
+      success: true,
+      data: usuario,
+      message: "Conta criada com sucesso!",
+    });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        success: false,
+        error: "Dados inválidos",
+        details: error.errors.map((e) => ({
+          field: e.path.join("."),
+          message: e.message,
+        })),
+      });
+    }
+
+    console.error("Error signing up user:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao criar conta",
+    });
+  }
+};
+
+// CREATE new user with full info (for profile update later)
+export const createUsuario: RequestHandler = async (req, res) => {
+  try {
+    const validatedData = UsuarioCreateSchema.parse(req.body);
+
+    // Check if user already exists
+    const existingUser = await prisma.usuario.findUnique({
+      where: { email: validatedData.email },
+    });
+
+    if (existingUser) {
+      return res.status(400).json({
+        success: false,
+        error: "Email já cadastrado",
       });
     }
 
