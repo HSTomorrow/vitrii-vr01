@@ -7,10 +7,17 @@ const AnuncioCreateSchema = z.object({
   lojaId: z.number().int().positive("Loja é obrigatória"),
   productId: z.number().int().positive("Produto é obrigatório"),
   tabelaDePrecoId: z.number().int().optional().nullable(),
-  titulo: z.string().min(5, "Título deve ter pelo menos 5 caracteres").max(50, "Título não pode ter mais de 50 caracteres"),
+  titulo: z
+    .string()
+    .min(5, "Título deve ter pelo menos 5 caracteres")
+    .max(50, "Título não pode ter mais de 50 caracteres"),
   descricao: z.string().optional().nullable(),
   fotoUrl: z.string().optional().nullable(),
-  precoAnuncio: z.number().positive("Preço do anúncio deve ser maior que 0").optional().nullable(),
+  precoAnuncio: z
+    .number()
+    .positive("Preço do anúncio deve ser maior que 0")
+    .optional()
+    .nullable(),
   dataValidade: z.string().optional().nullable(),
   equipeDeVendaId: z.number().int().positive().optional().nullable(),
   isDoacao: z.boolean().optional().default(false),
@@ -168,7 +175,10 @@ export const createAnuncio: RequestHandler = async (req, res) => {
         where: { id: validatedData.tabelaDePrecoId },
       });
 
-      if (!tabelaDePreco || tabelaDePreco.productId !== validatedData.productId) {
+      if (
+        !tabelaDePreco ||
+        tabelaDePreco.productId !== validatedData.productId
+      ) {
         return res.status(400).json({
           success: false,
           error: "Tabela de preço não pertence ao produto selecionado",
@@ -183,7 +193,8 @@ export const createAnuncio: RequestHandler = async (req, res) => {
       if (!tabelaDePreco) {
         return res.status(400).json({
           success: false,
-          error: "Nenhuma tabela de preços disponível para este produto. Por favor, crie pelo menos uma variante.",
+          error:
+            "Nenhuma tabela de preços disponível para este produto. Por favor, crie pelo menos uma variante.",
         });
       }
 
@@ -305,7 +316,12 @@ export const updateAnuncioStatus: RequestHandler = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
-    const validStatuses = ["em_edicao", "aguardando_pagamento", "pago", "historico"];
+    const validStatuses = [
+      "em_edicao",
+      "aguardando_pagamento",
+      "pago",
+      "historico",
+    ];
     if (!validStatuses.includes(status)) {
       return res.status(400).json({
         success: false,
@@ -344,7 +360,13 @@ export const overrideAnuncioStatus: RequestHandler = async (req, res) => {
     const { status } = req.body;
 
     // Validate status
-    const validStatuses = ["em_edicao", "aguardando_pagamento", "pago", "ativo", "historico"];
+    const validStatuses = [
+      "em_edicao",
+      "aguardando_pagamento",
+      "pago",
+      "ativo",
+      "historico",
+    ];
     if (!validStatuses.includes(status)) {
       return res.status(400).json({
         success: false,

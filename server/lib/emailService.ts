@@ -40,7 +40,7 @@ initializeTransporter().catch(console.error);
 export async function sendPasswordResetEmail(
   email: string,
   resetLink: string,
-  userName: string
+  userName: string,
 ): Promise<boolean> {
   try {
     const mailOptions = {
@@ -123,7 +123,7 @@ export async function sendPasswordResetEmail(
 
 export async function sendWelcomeEmail(
   email: string,
-  userName: string
+  userName: string,
 ): Promise<boolean> {
   try {
     const mailOptions = {

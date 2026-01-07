@@ -57,11 +57,10 @@ export const checkPermission = (
         : [requiredPermissions];
 
       // Fetch user's funcionalidades
-      const userFuncionalidades =
-        await prisma.usuarioXFuncionalidade.findMany({
-          where: { usuarioId: userId },
-          include: { funcionalidade: true },
-        });
+      const userFuncionalidades = await prisma.usuarioXFuncionalidade.findMany({
+        where: { usuarioId: userId },
+        include: { funcionalidade: true },
+      });
 
       const userPermissionChaves = userFuncionalidades.map(
         (uf) => uf.funcionalidade.chave,

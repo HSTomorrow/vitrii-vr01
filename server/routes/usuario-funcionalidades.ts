@@ -139,10 +139,9 @@ export const grantFuncionalidades: RequestHandler = async (req, res) => {
     }
 
     // Check all funcionalidades exist
-    const funcionalidades =
-      await prisma.funcionalidade.findMany({
-        where: { id: { in: validatedData.funcionalidadeIds } },
-      });
+    const funcionalidades = await prisma.funcionalidade.findMany({
+      where: { id: { in: validatedData.funcionalidadeIds } },
+    });
 
     if (funcionalidades.length !== validatedData.funcionalidadeIds.length) {
       return res.status(404).json({
@@ -404,10 +403,9 @@ export const grantAllFuncionalidades: RequestHandler = async (req, res) => {
     }
 
     // Get all active funcionalidades
-    const allFuncionalidades =
-      await prisma.funcionalidade.findMany({
-        where: { isActive: true },
-      });
+    const allFuncionalidades = await prisma.funcionalidade.findMany({
+      where: { isActive: true },
+    });
 
     // Get existing relationships
     const existing = await prisma.usuarioXFuncionalidade.findMany({

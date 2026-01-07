@@ -30,10 +30,16 @@ export default function ForgotPassword() {
     },
     onSuccess: () => {
       setEmailSent(true);
-      toast.success("Email enviado com sucesso! Verifique sua caixa de entrada.");
+      toast.success(
+        "Email enviado com sucesso! Verifique sua caixa de entrada.",
+      );
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Erro ao processar solicitação");
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Erro ao processar solicitação",
+      );
     },
   });
 
@@ -80,24 +86,29 @@ export default function ForgotPassword() {
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Mail className="w-8 h-8 text-green-600" />
               </div>
-              <h1 className="text-3xl font-bold text-walmart-text">Email Enviado</h1>
+              <h1 className="text-3xl font-bold text-walmart-text">
+                Email Enviado
+              </h1>
             </div>
 
             <div className="bg-green-50 border-l-4 border-green-500 rounded p-4 mb-6 text-left">
               <div className="flex gap-3">
                 <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h3 className="font-semibold text-green-900">Verifique seu email</h3>
+                  <h3 className="font-semibold text-green-900">
+                    Verifique seu email
+                  </h3>
                   <p className="text-sm text-green-800 mt-1">
-                    Enviamos um link para redefinir sua senha para <strong>{email}</strong>
+                    Enviamos um link para redefinir sua senha para{" "}
+                    <strong>{email}</strong>
                   </p>
                 </div>
               </div>
             </div>
 
             <p className="text-walmart-text-secondary mb-6">
-              O link para redefinir sua senha expira em 1 hora. Se não receber o email,
-              verifique sua pasta de spam ou solicite um novo link.
+              O link para redefinir sua senha expira em 1 hora. Se não receber o
+              email, verifique sua pasta de spam ou solicite um novo link.
             </p>
 
             <div className="space-y-3">
@@ -143,7 +154,9 @@ export default function ForgotPassword() {
       <div className="flex-1 max-w-lg mx-auto w-full px-4 sm:px-6 lg:px-8 py-12">
         <div className="bg-walmart-gray-light rounded-lg p-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-walmart-text">Esqueci minha Senha</h1>
+            <h1 className="text-3xl font-bold text-walmart-text">
+              Esqueci minha Senha
+            </h1>
             <p className="text-walmart-text-secondary mt-2">
               Não se preocupe, vamos ajudar você a recuperar sua conta
             </p>

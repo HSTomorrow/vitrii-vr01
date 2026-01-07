@@ -63,8 +63,12 @@ export default function AdCard({
   };
 
   const isDonation = variant === "donation";
-  const backgroundColor = isDonation ? "from-green-400 to-green-600" : "from-walmart-blue to-walmart-blue-dark";
-  const buttonClass = isDonation ? "bg-green-600 hover:bg-green-700" : "bg-walmart-blue hover:bg-walmart-blue-dark";
+  const backgroundColor = isDonation
+    ? "from-green-400 to-green-600"
+    : "from-walmart-blue to-walmart-blue-dark";
+  const buttonClass = isDonation
+    ? "bg-green-600 hover:bg-green-700"
+    : "bg-walmart-blue hover:bg-walmart-blue-dark";
   const badgeColor = isDonation ? "bg-green-500" : "bg-walmart-blue";
 
   return (
@@ -83,7 +87,9 @@ export default function AdCard({
         }}
         disabled={toggleFavoritoMutation.isPending}
         className="absolute top-3 right-3 z-10 p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
-        title={isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+        title={
+          isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"
+        }
       >
         <Heart
           className={`w-5 h-5 transition-colors ${
@@ -105,7 +111,9 @@ export default function AdCard({
       )}
 
       {/* Image */}
-      <div className={`w-full h-48 bg-gradient-to-br ${backgroundColor} flex items-center justify-center overflow-hidden`}>
+      <div
+        className={`w-full h-48 bg-gradient-to-br ${backgroundColor} flex items-center justify-center overflow-hidden`}
+      >
         {anuncio.fotoUrl ? (
           <img
             src={anuncio.fotoUrl}
@@ -124,7 +132,10 @@ export default function AdCard({
             {anuncio.titulo}
           </h4>
           <p className="text-sm text-walmart-text-secondary mb-3 line-clamp-2">
-            {anuncio.descricao || (isDonation ? "Item disponível para doação" : "Produto em destaque")}
+            {anuncio.descricao ||
+              (isDonation
+                ? "Item disponível para doação"
+                : "Produto em destaque")}
           </p>
 
           {/* Municipality */}
@@ -137,8 +148,12 @@ export default function AdCard({
         </div>
 
         <div className="flex justify-between items-center mb-4 mt-auto">
-          <span className={`text-2xl font-bold ${isDonation ? "text-green-600" : "text-walmart-blue"}`}>
-            {isDonation ? "Grátis" : `R$ ${anuncio.tabelaDePreco?.preco ? Number(anuncio.tabelaDePreco.preco).toFixed(2) : "0.00"}`}
+          <span
+            className={`text-2xl font-bold ${isDonation ? "text-green-600" : "text-walmart-blue"}`}
+          >
+            {isDonation
+              ? "Grátis"
+              : `R$ ${anuncio.tabelaDePreco?.preco ? Number(anuncio.tabelaDePreco.preco).toFixed(2) : "0.00"}`}
           </span>
           <div className="flex items-center space-x-1">
             <Star className="w-4 h-4 fill-walmart-yellow text-walmart-yellow" />

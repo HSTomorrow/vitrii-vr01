@@ -6,22 +6,27 @@ import { sendPasswordResetEmail, sendWelcomeEmail } from "../lib/emailService";
 import crypto from "crypto";
 
 // Schema validation for signup (basic info only)
-const UsuarioSignUpSchema = z.object({
-  nome: z.string().min(3, "Nome deve ter pelo menos 3 caracteres").max(255),
-  email: z.string().email("Email inválido"),
-  senha: z.string().min(6, "Senha deve ter no mínimo 6 caracteres"),
-  confirmarSenha: z.string(),
-}).refine((data) => data.senha === data.confirmarSenha, {
-  message: "Senhas não conferem",
-  path: ["confirmarSenha"],
-});
+const UsuarioSignUpSchema = z
+  .object({
+    nome: z.string().min(3, "Nome deve ter pelo menos 3 caracteres").max(255),
+    email: z.string().email("Email inválido"),
+    senha: z.string().min(6, "Senha deve ter no mínimo 6 caracteres"),
+    confirmarSenha: z.string(),
+  })
+  .refine((data) => data.senha === data.confirmarSenha, {
+    message: "Senhas não conferem",
+    path: ["confirmarSenha"],
+  });
 
 // Schema validation for full user (with additional info)
 const UsuarioCreateSchema = z.object({
   nome: z.string().min(3, "Nome deve ter pelo menos 3 caracteres").max(255),
   email: z.string().email("Email inválido"),
   senha: z.string().min(6, "Senha deve ter no mínimo 6 caracteres"),
-  cpf: z.string().regex(/^\d{11}$/, "CPF deve ter 11 dígitos").optional(),
+  cpf: z
+    .string()
+    .regex(/^\d{11}$/, "CPF deve ter 11 dígitos")
+    .optional(),
   telefone: z.string().min(10, "Telefone inválido").optional(),
   endereco: z.string().min(1, "Endereço é obrigatório").optional(),
 });
@@ -338,7 +343,8 @@ export const forgotPassword: RequestHandler = async (req, res) => {
       // Return success even if user not found (security best practice)
       return res.status(200).json({
         success: true,
-        message: "Se este email estiver cadastrado, você receberá um link para redefinir sua senha",
+        message:
+          "Se este email estiver cadastrado, você receberá um link para redefinir sua senha",
       });
     }
 

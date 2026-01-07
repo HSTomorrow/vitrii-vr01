@@ -96,12 +96,7 @@ export default function Browse() {
                   <label className="block font-semibold text-walmart-text mb-3">
                     Preço
                   </label>
-                  <input
-                    type="range"
-                    min="0"
-                    max="5000"
-                    className="w-full"
-                  />
+                  <input type="range" min="0" max="5000" className="w-full" />
                 </div>
 
                 {user && (
@@ -149,7 +144,10 @@ export default function Browse() {
               // Loading skeleton
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {[1, 2, 3, 4, 5, 6].map((i) => (
-                  <div key={i} className="vitrii-card overflow-hidden animate-pulse">
+                  <div
+                    key={i}
+                    className="vitrii-card overflow-hidden animate-pulse"
+                  >
                     <div className="w-full h-48 bg-gray-300" />
                     <div className="p-4 space-y-3">
                       <div className="h-4 bg-gray-300 rounded" />
@@ -204,7 +202,10 @@ export default function Browse() {
 
                       <div className="flex justify-between items-center mb-4">
                         <span className="text-2xl font-bold text-walmart-blue">
-                          R$ {anuncio.tabelaDePreco?.preco ? Number(anuncio.tabelaDePreco.preco).toFixed(2) : "0.00"}
+                          R${" "}
+                          {anuncio.tabelaDePreco?.preco
+                            ? Number(anuncio.tabelaDePreco.preco).toFixed(2)
+                            : "0.00"}
                         </span>
                         <div className="flex items-center space-x-1">
                           <Star className="w-4 h-4 fill-walmart-yellow text-walmart-yellow" />

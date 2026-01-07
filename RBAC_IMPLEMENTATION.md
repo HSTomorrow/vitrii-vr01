@@ -9,6 +9,7 @@ The Vitrii marketplace now includes a comprehensive Role-Based Access Control (R
 ### 1. Database Models
 
 #### `Funcionalidade` Table
+
 Stores all available features/permissions in the system.
 
 ```sql
@@ -25,6 +26,7 @@ CREATE TABLE funcionalidades (
 ```
 
 #### `UsuarioXFuncionalidade` Table
+
 Junction table mapping users to their permissions.
 
 ```sql
@@ -39,6 +41,7 @@ CREATE TABLE usuarios_x_funcionalidades (
 ```
 
 #### Updated `Usuario` Model
+
 Added support for "adm" (administrator) user type.
 
 ```typescript
@@ -54,40 +57,48 @@ model Usuario {
 **14 Core Funcionalidades** are pre-seeded in the database:
 
 #### User Management
+
 - **MANAGE_USERS** - Criar, editar, deletar usuários
 - **VIEW_USERS** - Visualizar lista de usuários e detalhes
 - **MANAGE_USER_PERMISSIONS** - Atribuir e remover funcionalidades de usuários
 
 #### Ad Management
+
 - **MANAGE_ADS** - Criar, editar, deletar anúncios
 - **VIEW_ALL_ADS** - Visualizar anúncios de todas as lojas
 - **MANAGE_FEATURED_ADS** - Marcar anúncios como em destaque
 
 #### Store Management
+
 - **MANAGE_STORES** - Criar, editar, deletar lojas
 - **VIEW_ALL_STORES** - Visualizar todas as lojas do sistema
 
 #### Chat Management
+
 - **MANAGE_CHATS** - Visualizar e gerenciar todas as conversas
 - **VIEW_ALL_CHATS** - Visualizar conversas de todos os usuários
 
 #### Payment Management
+
 - **MANAGE_PAYMENTS** - Visualizar e gerenciar pagamentos
 - **VIEW_PAYMENT_REPORTS** - Visualizar relatórios de pagamento
 
 #### Reports
+
 - **VIEW_REPORTS** - Acessar relatórios gerais do sistema
 - **MANAGE_SITE** - Acesso total ao site e configurações
 
 ## User Types
 
 ### 1. ADM (Administrator)
+
 - Automatically has access to ALL funcionalidades
 - Can manage other users and their permissions
 - Can manage all platform features
 - Cannot have permissions individually revoked (they always have all)
 
 ### 2. COMUM (Common User)
+
 - Has only explicitly granted permissions
 - Default user type for new registrations
 - Can be promoted to ADM
@@ -97,6 +108,7 @@ model Usuario {
 ### Funcionalidades Management
 
 #### Get All Funcionalidades
+
 ```
 GET /api/funcionalidades
 Query Parameters:
@@ -112,6 +124,7 @@ Response:
 ```
 
 #### Get Funcionalidade by ID
+
 ```
 GET /api/funcionalidades/:id
 
@@ -131,6 +144,7 @@ Response:
 ```
 
 #### Create Funcionalidade
+
 ```
 POST /api/funcionalidades
 Body:
@@ -145,6 +159,7 @@ Response: 201 Created with funcionalidade object
 ```
 
 #### Update Funcionalidade
+
 ```
 PUT /api/funcionalidades/:id
 Body: { chave?, nome?, descricao?, categoria?, isActive? }
@@ -153,6 +168,7 @@ Response: { "success": true, "data": Funcionalidade }
 ```
 
 #### Delete Funcionalidade (Soft Delete)
+
 ```
 DELETE /api/funcionalidades/:id
 
@@ -162,6 +178,7 @@ Response: { "success": true, "data": Funcionalidade, "message": "..." }
 ### User Permissions Management
 
 #### Get User's Funcionalidades
+
 ```
 GET /api/usuarios/:usuarioId/funcionalidades
 
@@ -177,6 +194,7 @@ Response:
 ```
 
 #### Grant Single Funcionalidade
+
 ```
 POST /api/usuarios/:usuarioId/funcionalidades/grant
 Body:
@@ -189,6 +207,7 @@ Response: 201 Created
 ```
 
 #### Grant Multiple Funcionalidades
+
 ```
 POST /api/usuarios/:usuarioId/funcionalidades/grant-multiple
 Body:
@@ -201,6 +220,7 @@ Response: 201 Created
 ```
 
 #### Revoke Single Funcionalidade
+
 ```
 DELETE /api/usuarios/:usuarioId/funcionalidades/:funcionalidadeId
 
@@ -208,6 +228,7 @@ Response: { "success": true, "message": "..." }
 ```
 
 #### Revoke Multiple Funcionalidades
+
 ```
 POST /api/usuarios/:usuarioId/funcionalidades/revoke-multiple
 Body:
@@ -220,6 +241,7 @@ Response: { "success": true, "data": { funcionalidadesCount: number } }
 ```
 
 #### Grant All Funcionalidades to User
+
 ```
 POST /api/usuarios/:usuarioId/funcionalidades/grant-all
 
@@ -227,6 +249,7 @@ Response: 201 Created
 ```
 
 #### Revoke All Funcionalidades from User
+
 ```
 POST /api/usuarios/:usuarioId/funcionalidades/revoke-all
 
@@ -234,6 +257,7 @@ Response: { "success": true, "data": { funcionalidadesCount: number } }
 ```
 
 #### List All User-Funcionalidade Relationships
+
 ```
 GET /api/usuarios-funcionalidades
 Query Parameters:
@@ -251,11 +275,13 @@ Response:
 ## Frontend - Admin Dashboard
 
 ### Location
+
 `client/pages/AdminDashboard.tsx` (Route: `/admin/dashboard`)
 
 ### Features
 
 #### Users Tab
+
 - **Search & Filter** - Find users by name or email
 - **User List** - Display all users with their type (ADM/COMUM)
 - **User Details** - Expand to manage permissions
@@ -267,6 +293,7 @@ Response:
 - **ADM Protection** - ADM users show info but cannot have permissions revoked
 
 #### Funcionalidades Tab
+
 - **Browse All Permissions** - View all available features
 - **Categorized Display** - Grouped by category
 - **Feature Details** - See feature description and key
@@ -275,11 +302,13 @@ Response:
 ## Permission Guard Middleware
 
 ### Location
+
 `server/middleware/permissionGuard.ts`
 
 ### Key Functions
 
 #### `checkPermission(requiredPermissions, requireAll)`
+
 Middleware to verify user has specific permission(s).
 
 ```typescript
@@ -287,13 +316,22 @@ Middleware to verify user has specific permission(s).
 app.get("/api/sensitive-route", checkPermission("MANAGE_USERS"), handler);
 
 // Example: Check multiple permissions (requires all)
-app.post("/api/admin-route", checkPermission(["MANAGE_USERS", "MANAGE_ADS"], true), handler);
+app.post(
+  "/api/admin-route",
+  checkPermission(["MANAGE_USERS", "MANAGE_ADS"], true),
+  handler,
+);
 
 // Example: Check multiple permissions (requires at least one)
-app.get("/api/view-reports", checkPermission(["VIEW_REPORTS", "VIEW_PAYMENT_REPORTS"]), handler);
+app.get(
+  "/api/view-reports",
+  checkPermission(["VIEW_REPORTS", "VIEW_PAYMENT_REPORTS"]),
+  handler,
+);
 ```
 
 #### `requireAdmin()`
+
 Middleware to ensure user is ADM.
 
 ```typescript
@@ -301,6 +339,7 @@ app.delete("/api/users/:id", requireAdmin, handler);
 ```
 
 #### `userHasPermission(userId, permissionChave)`
+
 Utility function for checking permissions within route handlers.
 
 ```typescript
@@ -360,24 +399,27 @@ if (!canManage) {
 
 ```typescript
 // Example: Protect user deletion
-app.delete("/api/usuarios/:id", 
+app.delete(
+  "/api/usuarios/:id",
   extractUserId,
-  checkPermission("MANAGE_USERS"), 
-  deleteUsuario
+  checkPermission("MANAGE_USERS"),
+  deleteUsuario,
 );
 
 // Example: Protect admin routes
-app.post("/api/funcionalidades", 
+app.post(
+  "/api/funcionalidades",
   extractUserId,
-  requireAdmin, 
-  createFuncionalidade
+  requireAdmin,
+  createFuncionalidade,
 );
 
 // Example: Multiple permissions (any one)
-app.get("/api/reports", 
+app.get(
+  "/api/reports",
   extractUserId,
-  checkPermission(["VIEW_REPORTS", "MANAGE_SITE"]), 
-  getReports
+  checkPermission(["VIEW_REPORTS", "MANAGE_SITE"]),
+  getReports,
 );
 ```
 
@@ -394,15 +436,18 @@ curl -H "X-User-Id: 2" http://localhost:5000/api/usuarios
 ## Database Operations
 
 ### Seed Funcionalidades
+
 ```bash
 node create-rbac-tables.mjs
 ```
 
 This script:
+
 1. Creates 14 pre-defined funcionalidades
 2. Grants all funcionalidades to any existing ADM users
 
 ### Grant Permissions to User
+
 ```bash
 curl -X POST http://localhost:5000/api/usuarios/2/funcionalidades/grant \
   -H "Content-Type: application/json" \
@@ -413,6 +458,7 @@ curl -X POST http://localhost:5000/api/usuarios/2/funcionalidades/grant \
 ```
 
 ### Promote User to ADM
+
 ```bash
 # Update user type to "adm"
 curl -X PUT http://localhost:5000/api/usuarios/2 \
@@ -439,16 +485,19 @@ curl -X PUT http://localhost:5000/api/usuarios/2 \
 ## Troubleshooting
 
 ### User Can't Access Admin Dashboard
+
 - Check if user type is "adm"
 - Verify user is authenticated
 - Check browser console for errors
 
 ### Permission Denied on Route
+
 - Verify user has required permission via `/api/usuarios/:id/funcionalidades`
 - Check if permission key matches exactly
 - Ensure middleware is applied in correct order
 
 ### Funcionalidade Not Showing
+
 - Verify funcionalidade has `isActive = true`
 - Check database directly:
   ```sql
@@ -458,6 +507,7 @@ curl -X PUT http://localhost:5000/api/usuarios/2 \
 ## Files Modified/Created
 
 ### New Files
+
 - `server/routes/funcionalidades.ts` - Funcionalidades CRUD
 - `server/routes/usuario-funcionalidades.ts` - Permission management
 - `server/middleware/permissionGuard.ts` - RBAC middleware
@@ -465,6 +515,7 @@ curl -X PUT http://localhost:5000/api/usuarios/2 \
 - `create-rbac-tables.mjs` - Database setup script
 
 ### Modified Files
+
 - `prisma/schema.prisma` - Added Funcionalidade and UsuarioXFuncionalidade models
 - `server/index.ts` - Added RBAC routes
 - `client/App.tsx` - Added admin dashboard route
@@ -473,6 +524,7 @@ curl -X PUT http://localhost:5000/api/usuarios/2 \
 ## Summary
 
 The RBAC system provides:
+
 - ✅ Granular permission control
 - ✅ User type system (ADM/COMUM)
 - ✅ Permission management interface

@@ -51,7 +51,7 @@ export default function Index() {
       });
 
       if (!response.ok) throw new Error("Erro ao adicionar favorito");
-      return { ...await response.json(), anuncioId };
+      return { ...(await response.json()), anuncioId };
     },
     onSuccess: (data) => {
       setFavoritos((prev) => {
@@ -101,9 +101,7 @@ export default function Index() {
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-walmart-blue to-walmart-blue-dark text-white py-2 md:py-3">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-lg md:text-xl font-bold">
-            Bem-vindo ao Vitrii
-          </h1>
+          <h1 className="text-lg md:text-xl font-bold">Bem-vindo ao Vitrii</h1>
         </div>
       </section>
 
@@ -133,7 +131,10 @@ export default function Index() {
             {isLoading ? (
               <>
                 {[1, 2, 3, 4, 5].map((item) => (
-                  <div key={item} className="vitrii-card overflow-hidden animate-pulse">
+                  <div
+                    key={item}
+                    className="vitrii-card overflow-hidden animate-pulse"
+                  >
                     <div className="w-full h-48 bg-gray-300" />
                     <div className="p-4 space-y-3">
                       <div className="h-4 bg-gray-300 rounded" />
@@ -186,11 +187,17 @@ export default function Index() {
                     }}
                     disabled={toggleFavoritoMutation.isPending}
                     className="absolute top-3 right-3 z-10 p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
-                    title={favoritos.has(anuncio.id) ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+                    title={
+                      favoritos.has(anuncio.id)
+                        ? "Remover dos favoritos"
+                        : "Adicionar aos favoritos"
+                    }
                   >
                     <Heart
                       className={`w-5 h-5 transition-colors ${
-                        favoritos.has(anuncio.id) ? "fill-red-500 text-red-500" : "text-gray-400"
+                        favoritos.has(anuncio.id)
+                          ? "fill-red-500 text-red-500"
+                          : "text-gray-400"
                       }`}
                     />
                   </button>
@@ -214,7 +221,10 @@ export default function Index() {
 
                     <div className="flex justify-between items-center mb-4 mt-auto">
                       <span className="text-2xl font-bold text-walmart-blue">
-                        R$ {anuncio.tabelaDePreco?.preco ? Number(anuncio.tabelaDePreco.preco).toFixed(2) : "0.00"}
+                        R${" "}
+                        {anuncio.tabelaDePreco?.preco
+                          ? Number(anuncio.tabelaDePreco.preco).toFixed(2)
+                          : "0.00"}
                       </span>
                       <div className="flex items-center space-x-1">
                         <Star className="w-4 h-4 fill-walmart-yellow text-walmart-yellow" />
@@ -252,7 +262,9 @@ export default function Index() {
             ) : (
               <div className="col-span-full text-center py-12">
                 <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-walmart-text-secondary">Nenhum anúncio publicado ainda</p>
+                <p className="text-walmart-text-secondary">
+                  Nenhum anúncio publicado ainda
+                </p>
                 <Link
                   to="/anuncio/criar"
                   className="inline-flex items-center gap-2 text-walmart-blue font-semibold hover:underline mt-4"
@@ -302,7 +314,10 @@ export default function Index() {
             {doacoesLoading ? (
               <>
                 {[1, 2, 3, 4, 5].map((item) => (
-                  <div key={item} className="vitrii-card overflow-hidden animate-pulse">
+                  <div
+                    key={item}
+                    className="vitrii-card overflow-hidden animate-pulse"
+                  >
                     <div className="w-full h-48 bg-gray-300" />
                     <div className="p-4 space-y-3">
                       <div className="h-4 bg-gray-300 rounded" />
@@ -359,11 +374,17 @@ export default function Index() {
                     }}
                     disabled={toggleFavoritoMutation.isPending}
                     className="absolute top-3 left-3 z-10 p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
-                    title={favoritos.has(anuncio.id) ? "Remover dos favoritos" : "Adicionar aos favoritos"}
+                    title={
+                      favoritos.has(anuncio.id)
+                        ? "Remover dos favoritos"
+                        : "Adicionar aos favoritos"
+                    }
                   >
                     <Heart
                       className={`w-5 h-5 transition-colors ${
-                        favoritos.has(anuncio.id) ? "fill-red-500 text-red-500" : "text-gray-400"
+                        favoritos.has(anuncio.id)
+                          ? "fill-red-500 text-red-500"
+                          : "text-gray-400"
                       }`}
                     />
                   </button>
@@ -425,7 +446,9 @@ export default function Index() {
             ) : (
               <div className="col-span-full text-center py-12">
                 <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-walmart-text-secondary">Nenhuma doação publicada ainda</p>
+                <p className="text-walmart-text-secondary">
+                  Nenhuma doação publicada ainda
+                </p>
                 <Link
                   to="/anuncio/criar"
                   className="inline-flex items-center gap-2 text-walmart-blue font-semibold hover:underline mt-4"
@@ -458,8 +481,8 @@ export default function Index() {
               Publique Seu Anúncio Agora
             </h2>
             <p className="text-blue-100 text-base mb-8 max-w-2xl mx-auto">
-              Aproveite nossos 3 anúncios gratuitos e comece a vender seus produtos e serviços
-              para milhares de clientes potenciais
+              Aproveite nossos 3 anúncios gratuitos e comece a vender seus
+              produtos e serviços para milhares de clientes potenciais
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link

@@ -392,6 +392,7 @@ POST/DELETE /api/mensagens/:id
 ### RBAC - Funcionalidades (6 endpoints)
 
 ```
+
 GET /api/funcionalidades
 GET /api/funcionalidades/:id
 POST /api/funcionalidades

@@ -102,7 +102,11 @@ export default function AnuncioForm({
   });
 
   // Fetch anuncio if editing
-  const { data: anuncioData, isLoading: isLoadingAnuncio, error: anuncioError } = useQuery({
+  const {
+    data: anuncioData,
+    isLoading: isLoadingAnuncio,
+    error: anuncioError,
+  } = useQuery({
     queryKey: ["anuncio", anuncioId],
     queryFn: async () => {
       const response = await fetch(`/api/anuncios/${anuncioId}`);
@@ -310,7 +314,9 @@ export default function AnuncioForm({
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-walmart-blue mx-auto mb-4"></div>
-            <p className="text-walmart-text-secondary text-lg">Carregando anúncio...</p>
+            <p className="text-walmart-text-secondary text-lg">
+              Carregando anúncio...
+            </p>
           </div>
         </div>
       </div>
@@ -513,7 +519,10 @@ export default function AnuncioForm({
             {selectedPriceTable && (
               <div>
                 <label className="block text-sm font-semibold text-walmart-text mb-2">
-                  Preço do Anúncio {formData.isDoacao ? "(Desabilitado - Doação)" : "(Promoção/Desconto)"}
+                  Preço do Anúncio{" "}
+                  {formData.isDoacao
+                    ? "(Desabilitado - Doação)"
+                    : "(Promoção/Desconto)"}
                 </label>
                 <div className="flex items-center">
                   <span className="text-walmart-text font-semibold mr-2">
@@ -528,7 +537,11 @@ export default function AnuncioForm({
                       handleInputChange("precoAnuncio", e.target.value)
                     }
                     disabled={formData.isDoacao}
-                    placeholder={formData.isDoacao ? "Grátis (doação)" : `Ex: ${Number(selectedPriceTable.preco).toFixed(2)}`}
+                    placeholder={
+                      formData.isDoacao
+                        ? "Grátis (doação)"
+                        : `Ex: ${Number(selectedPriceTable.preco).toFixed(2)}`
+                    }
                     className={`flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent ${
                       formData.isDoacao ? "bg-gray-100 cursor-not-allowed" : ""
                     }`}
@@ -537,8 +550,7 @@ export default function AnuncioForm({
                 <p className="mt-2 text-sm text-walmart-text-secondary">
                   {formData.isDoacao
                     ? "Este anúncio será publicado como doação, sem custo."
-                    : `Deixe em branco para usar o preço da variante: R$ ${Number(selectedPriceTable.preco).toFixed(2)}`
-                  }
+                    : `Deixe em branco para usar o preço da variante: R$ ${Number(selectedPriceTable.preco).toFixed(2)}`}
                 </p>
                 {formData.precoAnuncio &&
                   !formData.isDoacao &&
@@ -624,7 +636,8 @@ export default function AnuncioForm({
                   Esta é uma doação
                 </p>
                 <p className="text-sm text-walmart-text-secondary">
-                  Marque esta opção para publicar como doação. Será publicado gratuitamente, sem necessidade de pagamento.
+                  Marque esta opção para publicar como doação. Será publicado
+                  gratuitamente, sem necessidade de pagamento.
                 </p>
               </label>
             </div>

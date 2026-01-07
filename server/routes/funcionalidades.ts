@@ -8,17 +8,13 @@ const FuncionalidadeCreateSchema = z.object({
     .string()
     .min(3, "Chave deve ter pelo menos 3 caracteres")
     .max(100)
-    .regex(/^[A-Z_]+$/, "Chave deve conter apenas letras maiúsculas e underscore"),
+    .regex(
+      /^[A-Z_]+$/,
+      "Chave deve conter apenas letras maiúsculas e underscore",
+    ),
   nome: z.string().min(3, "Nome deve ter pelo menos 3 caracteres").max(255),
   descricao: z.string().min(3).max(1000).optional(),
-  categoria: z.enum([
-    "users",
-    "ads",
-    "stores",
-    "chat",
-    "payments",
-    "reports",
-  ]),
+  categoria: z.enum(["users", "ads", "stores", "chat", "payments", "reports"]),
 });
 
 const FuncionalidadeUpdateSchema = FuncionalidadeCreateSchema.partial();
@@ -101,10 +97,7 @@ export const getFuncionalidadeById: RequestHandler = async (req, res) => {
 };
 
 // GET funcionalidades by user ID
-export const getFuncionalidadesByUsuario: RequestHandler = async (
-  req,
-  res,
-) => {
+export const getFuncionalidadesByUsuario: RequestHandler = async (req, res) => {
   try {
     const { usuarioId } = req.params;
 
@@ -128,11 +121,10 @@ export const getFuncionalidadesByUsuario: RequestHandler = async (
 
     // If user is ADM, return all funcionalidades
     if (usuario.tipoUsuario === "adm") {
-      const todasFuncionalidades =
-        await prisma.funcionalidade.findMany({
-          where: { isActive: true },
-          orderBy: [{ categoria: "asc" }, { nome: "asc" }],
-        });
+      const todasFuncionalidades = await prisma.funcionalidade.findMany({
+        where: { isActive: true },
+        orderBy: [{ categoria: "asc" }, { nome: "asc" }],
+      });
 
       return res.json({
         success: true,

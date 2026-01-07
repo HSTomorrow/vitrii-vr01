@@ -55,7 +55,9 @@ export default function CadastroProdutos() {
     queryKey: ["grupos", selectedLojaId],
     queryFn: async () => {
       if (!selectedLojaId) return [];
-      const response = await fetch(`/api/lojas/${selectedLojaId}/grupos-productos`);
+      const response = await fetch(
+        `/api/lojas/${selectedLojaId}/grupos-productos`,
+      );
       if (!response.ok) throw new Error("Erro ao buscar grupos");
       const result = await response.json();
       return result.data || [];
@@ -100,21 +102,35 @@ export default function CadastroProdutos() {
       return response.json();
     },
     onSuccess: () => {
-      toast.success(editingId ? "Produto atualizado com sucesso!" : "Produto criado com sucesso!");
-      setFormData({ grupoId: "", nome: "", descricao: "", sku: "", tipo: "produto" });
+      toast.success(
+        editingId
+          ? "Produto atualizado com sucesso!"
+          : "Produto criado com sucesso!",
+      );
+      setFormData({
+        grupoId: "",
+        nome: "",
+        descricao: "",
+        sku: "",
+        tipo: "produto",
+      });
       setEditingId(null);
       setIsFormOpen(false);
       refetch();
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Erro ao salvar produto");
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao salvar produto",
+      );
     },
   });
 
   // Delete producto mutation
   const deleteProductoMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await fetch(`/api/productos/${id}`, { method: "DELETE" });
+      const response = await fetch(`/api/productos/${id}`, {
+        method: "DELETE",
+      });
       if (!response.ok) throw new Error("Erro ao deletar produto");
       return response.json();
     },
@@ -123,7 +139,9 @@ export default function CadastroProdutos() {
       refetch();
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Erro ao deletar produto");
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao deletar produto",
+      );
     },
   });
 
@@ -157,12 +175,20 @@ export default function CadastroProdutos() {
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-walmart-text">Cadastro de Produtos</h1>
+          <h1 className="text-3xl font-bold text-walmart-text">
+            Cadastro de Produtos
+          </h1>
           <button
             onClick={() => {
               setIsFormOpen(!isFormOpen);
               setEditingId(null);
-              setFormData({ grupoId: "", nome: "", descricao: "", sku: "", tipo: "produto" });
+              setFormData({
+                grupoId: "",
+                nome: "",
+                descricao: "",
+                sku: "",
+                tipo: "produto",
+              });
             }}
             className="flex items-center gap-2 px-4 py-2 bg-walmart-yellow text-walmart-text rounded-lg hover:bg-walmart-yellow-dark transition-colors font-semibold"
           >
@@ -208,7 +234,9 @@ export default function CadastroProdutos() {
                   <select
                     required
                     value={formData.grupoId}
-                    onChange={(e) => setFormData({ ...formData, grupoId: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, grupoId: e.target.value })
+                    }
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
                   >
                     <option value="">Selecione um grupo</option>
@@ -228,7 +256,9 @@ export default function CadastroProdutos() {
                     type="text"
                     required
                     value={formData.nome}
-                    onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, nome: e.target.value })
+                    }
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
                   />
                 </div>
@@ -240,7 +270,9 @@ export default function CadastroProdutos() {
                   <input
                     type="text"
                     value={formData.sku}
-                    onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, sku: e.target.value })
+                    }
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
                   />
                 </div>
@@ -251,7 +283,9 @@ export default function CadastroProdutos() {
                   </label>
                   <select
                     value={formData.tipo}
-                    onChange={(e) => setFormData({ ...formData, tipo: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, tipo: e.target.value })
+                    }
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
                   >
                     <option value="produto">Produto</option>
@@ -266,7 +300,9 @@ export default function CadastroProdutos() {
                 </label>
                 <textarea
                   value={formData.descricao}
-                  onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, descricao: e.target.value })
+                  }
                   rows={3}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
                 />
@@ -301,30 +337,53 @@ export default function CadastroProdutos() {
             <table className="w-full">
               <thead className="bg-walmart-gray">
                 <tr>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">Nome</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">Grupo</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">SKU</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">Descrição</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">Ações</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">
+                    Nome
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">
+                    Grupo
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">
+                    SKU
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">
+                    Descrição
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">
+                    Ações
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {!productos || productos.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                    <td
+                      colSpan={5}
+                      className="px-6 py-4 text-center text-gray-500"
+                    >
                       Nenhum produto cadastrado
                     </td>
                   </tr>
                 ) : (
                   productos.map((producto) => (
                     <tr key={producto.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 font-semibold text-walmart-text">{producto.nome}</td>
-                      <td className="px-6 py-4 text-walmart-text">{producto.grupo?.nome || "N/A"}</td>
-                      <td className="px-6 py-4 text-walmart-text">{producto.sku || "-"}</td>
-                      <td className="px-6 py-4 text-walmart-text">{producto.descricao || "-"}</td>
+                      <td className="px-6 py-4 font-semibold text-walmart-text">
+                        {producto.nome}
+                      </td>
+                      <td className="px-6 py-4 text-walmart-text">
+                        {producto.grupo?.nome || "N/A"}
+                      </td>
+                      <td className="px-6 py-4 text-walmart-text">
+                        {producto.sku || "-"}
+                      </td>
+                      <td className="px-6 py-4 text-walmart-text">
+                        {producto.descricao || "-"}
+                      </td>
                       <td className="px-6 py-4 flex gap-2">
                         <button
-                          onClick={() => navigate(`/cadastros/variantes/${producto.id}`)}
+                          onClick={() =>
+                            navigate(`/cadastros/variantes/${producto.id}`)
+                          }
                           className="p-2 text-walmart-blue hover:bg-blue-50 rounded-lg transition-colors"
                           title="Editar Variantes"
                         >
@@ -338,7 +397,11 @@ export default function CadastroProdutos() {
                         </button>
                         <button
                           onClick={() => {
-                            if (confirm("Tem certeza que deseja deletar este produto?")) {
+                            if (
+                              confirm(
+                                "Tem certeza que deseja deletar este produto?",
+                              )
+                            ) {
                               deleteProductoMutation.mutate(producto.id);
                             }
                           }}

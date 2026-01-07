@@ -24,7 +24,7 @@ export default function ResetPassword() {
     queryKey: ["validate-reset-token", token, email],
     queryFn: async () => {
       const response = await fetch(
-        `/api/auth/validate-reset-token?token=${token}&email=${encodeURIComponent(email)}`
+        `/api/auth/validate-reset-token?token=${token}&email=${encodeURIComponent(email)}`,
       );
       if (!response.ok) {
         const error = await response.json();
@@ -45,7 +45,11 @@ export default function ResetPassword() {
         toast.error(error.message);
       }
     }
-  }, [validateTokenQuery.isSuccess, validateTokenQuery.isError, validateTokenQuery.error]);
+  }, [
+    validateTokenQuery.isSuccess,
+    validateTokenQuery.isError,
+    validateTokenQuery.error,
+  ]);
 
   // Reset password mutation
   const resetPasswordMutation = useMutation({
@@ -75,7 +79,9 @@ export default function ResetPassword() {
       }, 1500);
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Erro ao redefinir senha");
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao redefinir senha",
+      );
     },
   });
 
@@ -106,7 +112,11 @@ export default function ResetPassword() {
       newErrors.confirmarSenha = "Confirmação de senha é obrigatória";
     }
 
-    if (formData.novaSenha && formData.confirmarSenha && formData.novaSenha !== formData.confirmarSenha) {
+    if (
+      formData.novaSenha &&
+      formData.confirmarSenha &&
+      formData.novaSenha !== formData.confirmarSenha
+    ) {
       newErrors.confirmarSenha = "As senhas não conferem";
     }
 
@@ -146,11 +156,14 @@ export default function ResetPassword() {
               <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <AlertCircle className="w-8 h-8 text-red-600" />
               </div>
-              <h1 className="text-3xl font-bold text-walmart-text">Link Inválido ou Expirado</h1>
+              <h1 className="text-3xl font-bold text-walmart-text">
+                Link Inválido ou Expirado
+              </h1>
             </div>
 
             <p className="text-walmart-text-secondary mb-6">
-              O link para redefinir sua senha é inválido ou expirou. Por favor, solicite um novo link.
+              O link para redefinir sua senha é inválido ou expirou. Por favor,
+              solicite um novo link.
             </p>
 
             <div className="space-y-3">
@@ -192,7 +205,9 @@ export default function ResetPassword() {
       <div className="flex-1 max-w-lg mx-auto w-full px-4 sm:px-6 lg:px-8 py-12">
         <div className="bg-walmart-gray-light rounded-lg p-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-walmart-text">Redefinir Senha</h1>
+            <h1 className="text-3xl font-bold text-walmart-text">
+              Redefinir Senha
+            </h1>
             <p className="text-walmart-text-secondary mt-2">
               Digite sua nova senha abaixo
             </p>
@@ -201,7 +216,9 @@ export default function ResetPassword() {
           <div className="bg-blue-50 border-l-4 border-blue-500 rounded p-4 mb-8 flex gap-3">
             <Lock className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
             <div>
-              <h3 className="font-semibold text-blue-900">Crie uma senha forte</h3>
+              <h3 className="font-semibold text-blue-900">
+                Crie uma senha forte
+              </h3>
               <p className="text-sm text-blue-800 mt-1">
                 Use uma combinação de letras, números e símbolos.
               </p>
@@ -241,7 +258,9 @@ export default function ResetPassword() {
               <input
                 type="password"
                 value={formData.confirmarSenha}
-                onChange={(e) => handleInputChange("confirmarSenha", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("confirmarSenha", e.target.value)
+                }
                 placeholder="Confirme sua nova senha"
                 className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-1 transition-colors ${
                   errors.confirmarSenha

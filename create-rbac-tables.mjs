@@ -116,9 +116,7 @@ async function main() {
         const created = await prisma.funcionalidade.create({
           data: func,
         });
-        console.log(
-          `   ✓ Created: ${created.chave} - ${created.nome}`,
-        );
+        console.log(`   ✓ Created: ${created.chave} - ${created.nome}`);
       }
 
       console.log(

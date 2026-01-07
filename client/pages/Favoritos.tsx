@@ -21,7 +21,10 @@ export default function Favoritos() {
           <div className="bg-blue-50 border-l-4 border-blue-500 rounded p-4 inline-block">
             <p className="text-walmart-text">
               Por favor,{" "}
-              <button onClick={() => navigate("/auth/signin")} className="text-walmart-blue font-semibold hover:underline">
+              <button
+                onClick={() => navigate("/auth/signin")}
+                className="text-walmart-blue font-semibold hover:underline"
+              >
                 faça login
               </button>{" "}
               para ver seus favoritos
@@ -57,14 +60,18 @@ export default function Favoritos() {
             Meus Favoritos
           </h1>
           <p className="text-walmart-text-secondary">
-            {anuncios.length} anúncio{anuncios.length !== 1 ? "s" : ""} salvo{anuncios.length !== 1 ? "s" : ""}
+            {anuncios.length} anúncio{anuncios.length !== 1 ? "s" : ""} salvo
+            {anuncios.length !== 1 ? "s" : ""}
           </p>
         </div>
 
         {isLoading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
             {[1, 2, 3, 4, 5].map((i) => (
-              <div key={i} className="vitrii-card overflow-hidden animate-pulse">
+              <div
+                key={i}
+                className="vitrii-card overflow-hidden animate-pulse"
+              >
                 <div className="w-full h-48 bg-gray-300" />
                 <div className="p-4 space-y-3">
                   <div className="h-4 bg-gray-300 rounded" />
@@ -84,7 +91,9 @@ export default function Favoritos() {
                 onFavoritoToggle={(id, isFavorited) => {
                   if (!isFavorited) {
                     // Remove from list if unfavorited
-                    const newFavoritos = anuncios.filter((a: any) => a.id !== id);
+                    const newFavoritos = anuncios.filter(
+                      (a: any) => a.id !== id,
+                    );
                     favoritosData.data = newFavoritos;
                   }
                 }}

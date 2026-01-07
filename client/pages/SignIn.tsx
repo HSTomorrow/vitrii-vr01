@@ -41,7 +41,9 @@ export default function SignIn() {
       }, 1000);
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Erro ao fazer login");
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao fazer login",
+      );
     },
   });
 
@@ -100,7 +102,9 @@ export default function SignIn() {
           <div className="bg-green-50 border-l-4 border-green-500 rounded p-4 mb-8 flex gap-3">
             <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
             <div>
-              <h3 className="font-semibold text-green-900">Bem-vindo de volta!</h3>
+              <h3 className="font-semibold text-green-900">
+                Bem-vindo de volta!
+              </h3>
               <p className="text-sm text-green-800 mt-1">
                 Faça login para acessar sua conta e gerenciar seus anúncios.
               </p>

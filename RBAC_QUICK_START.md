@@ -3,6 +3,7 @@
 ## What Was Built
 
 A complete **Role-Based Access Control (RBAC)** system for Vitrii that allows administrators to:
+
 - Manage user types (ADM or COMUM)
 - Grant/revoke specific permissions to users
 - Control access to all platform features
@@ -19,14 +20,17 @@ A complete **Role-Based Access Control (RBAC)** system for Vitrii that allows ad
 ## Quick Setup
 
 ### 1. Database is Ready ✅
+
 The RBAC tables and 14 funcionalidades have been automatically created and seeded.
 
 ### 2. Access Admin Dashboard
+
 1. Sign in as an ADM user
 2. Click "Administrador" button in header (yellow button with shield icon)
 3. Or navigate directly to `/admin/dashboard`
 
 ### 3. Manage Users & Permissions
+
 1. Go to **Usuários** tab
 2. Search for a user
 3. Click to expand user details
@@ -35,11 +39,13 @@ The RBAC tables and 14 funcionalidades have been automatically created and seede
 ## Creating Your First ADM User
 
 ### Option A: Database Update
+
 ```sql
 UPDATE usuarios SET tipoUsuario = 'adm' WHERE email = 'your-email@example.com';
 ```
 
 ### Option B: Via API
+
 ```bash
 curl -X PUT http://localhost:5000/api/usuarios/1 \
   -H "Content-Type: application/json" \
@@ -51,59 +57,68 @@ After that, log out and log back in. The "Administrador" button will appear!
 ## Available Permissions
 
 ### User Management (3)
+
 - **MANAGE_USERS** - Create/Edit/Delete users
 - **VIEW_USERS** - View user list and details
 - **MANAGE_USER_PERMISSIONS** - Grant/revoke permissions
 
 ### Ad Management (3)
+
 - **MANAGE_ADS** - Create/Edit/Delete ads
 - **VIEW_ALL_ADS** - View all ads in system
 - **MANAGE_FEATURED_ADS** - Mark ads as featured
 
 ### Store Management (2)
+
 - **MANAGE_STORES** - Create/Edit/Delete stores
 - **VIEW_ALL_STORES** - View all stores
 
 ### Chat Management (2)
+
 - **MANAGE_CHATS** - Manage all conversations
 - **VIEW_ALL_CHATS** - View all chats
 
 ### Payment Management (2)
+
 - **MANAGE_PAYMENTS** - Manage payments
 - **VIEW_PAYMENT_REPORTS** - View payment reports
 
 ### System (2)
+
 - **VIEW_REPORTS** - View system reports
 - **MANAGE_SITE** - Full admin access
 
 ## Using Permissions in Your Code
 
 ### Example 1: Protect an API Route
+
 ```typescript
 // In server/index.ts
 import { extractUserId, checkPermission } from "./middleware/permissionGuard";
 
 // Only users with MANAGE_USERS permission can access
-app.delete("/api/usuarios/:id", 
+app.delete(
+  "/api/usuarios/:id",
   extractUserId,
   checkPermission("MANAGE_USERS"),
-  deleteUsuario
+  deleteUsuario,
 );
 ```
 
 ### Example 2: Check Permission in Handler
+
 ```typescript
 // In a route handler
 import { userHasPermission } from "../middleware/permissionGuard";
 
 export const sensitiveAction: RequestHandler = async (req, res) => {
   const userId = req.params.usuarioId;
-  
+
   const canManage = await userHasPermission(userId, "MANAGE_USERS");
   if (!canManage) {
     return res.status(403).json({ error: "Acesso negado" });
   }
-  
+
   // Continue with action...
 };
 ```
@@ -111,6 +126,7 @@ export const sensitiveAction: RequestHandler = async (req, res) => {
 ## Admin Dashboard Features
 
 ### Users Tab
+
 - **Search Bar** - Find users by name or email
 - **User Cards** - Shows user info and type
 - **Expand Details** - Click to see/manage permissions
@@ -118,6 +134,7 @@ export const sensitiveAction: RequestHandler = async (req, res) => {
 - **Grant All / Revoke All** - Bulk operations
 
 ### Funcionalidades Tab
+
 - **Browse All Permissions** - View all 14 available features
 - **Grouped by Category** - Organized for easy browsing
 - **Feature Details** - See description and key
@@ -125,6 +142,7 @@ export const sensitiveAction: RequestHandler = async (req, res) => {
 ## Common Tasks
 
 ### Grant Permission to User
+
 1. Open Admin Dashboard
 2. Search for user
 3. Expand user details
@@ -132,6 +150,7 @@ export const sensitiveAction: RequestHandler = async (req, res) => {
 5. Done! ✅
 
 ### Remove Permission from User
+
 1. Open Admin Dashboard
 2. Search for user
 3. Expand user details
@@ -139,6 +158,7 @@ export const sensitiveAction: RequestHandler = async (req, res) => {
 5. Done! ✅
 
 ### Make User an Administrator
+
 ```bash
 # Via Admin Dashboard:
 1. Can't be done directly (for security)
@@ -151,6 +171,7 @@ curl -X PUT http://localhost:5000/api/usuarios/USER_ID \
 ```
 
 ### View User's Permissions
+
 ```bash
 curl http://localhost:5000/api/usuarios/USER_ID/funcionalidades
 ```
@@ -185,6 +206,7 @@ Database:
 ## API Endpoints
 
 ### View Permissions
+
 ```
 GET /api/funcionalidades
 GET /api/usuarios/:usuarioId/funcionalidades
@@ -192,6 +214,7 @@ GET /api/usuarios-funcionalidades
 ```
 
 ### Manage Permissions
+
 ```
 POST /api/usuarios/:usuarioId/funcionalidades/grant
 POST /api/usuarios/:usuarioId/funcionalidades/grant-multiple
@@ -202,6 +225,7 @@ POST /api/usuarios/:usuarioId/funcionalidades/revoke-all
 ```
 
 ### Manage Features (Admin only)
+
 ```
 POST /api/funcionalidades
 PUT /api/funcionalidades/:id
@@ -211,6 +235,7 @@ DELETE /api/funcionalidades/:id
 ## User Types
 
 ### ADM (Administrator)
+
 - ✅ Can access admin dashboard
 - ✅ Can manage all users and permissions
 - ✅ Can manage all platform features
@@ -218,6 +243,7 @@ DELETE /api/funcionalidades/:id
 - ❌ Can't have individual permissions revoked
 
 ### COMUM (Common User)
+
 - ❌ Can't access admin dashboard
 - ❌ Can't see permission management
 - ✅ Has only explicitly granted permissions
@@ -226,12 +252,14 @@ DELETE /api/funcionalidades/:id
 ## Testing
 
 ### Test Admin Access
+
 1. Create/update a user to type "adm"
 2. Sign in as that user
 3. Should see "Administrador" button in header
 4. Click it to go to admin dashboard
 
 ### Test Permission Guard
+
 ```bash
 # As ADM (should work)
 curl -H "X-User-Id: 1" http://localhost:5000/api/usuarios
@@ -251,16 +279,19 @@ curl -H "X-User-Id: 2" http://localhost:5000/api/usuarios
 ## Troubleshooting
 
 ### Can't see Admin button in header?
+
 - User must be logged in ✅
 - User must have `tipoUsuario = 'adm'` ✅
 - Try refreshing the page ✅
 
 ### "Acesso negado" error?
+
 - Check if user has required permission
 - View permissions: `GET /api/usuarios/:id/funcionalidades`
 - Grant permission via admin dashboard ✅
 
 ### Admin Dashboard not loading?
+
 - Clear browser cache
 - Check browser console for errors
 - Verify user is ADM type
@@ -277,6 +308,7 @@ curl -H "X-User-Id: 2" http://localhost:5000/api/usuarios
 ## Support
 
 For issues or questions:
+
 1. Check `RBAC_IMPLEMENTATION.md` for detailed docs
 2. Review code in `server/middleware/permissionGuard.ts`
 3. Check API responses for error messages
@@ -286,6 +318,7 @@ For issues or questions:
 ✅ **RBAC System Ready!**
 
 You now have:
+
 - ✅ Complete permission management system
 - ✅ Admin dashboard
 - ✅ 14 pre-configured permissions

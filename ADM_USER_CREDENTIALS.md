@@ -24,6 +24,7 @@ Status:   Ativo
 Após fazer login como ADM, você terá acesso a 2 painéis administrativos na barra de header:
 
 ### 1️⃣ **Painel de Administrador** (Amarelo 🟨)
+
 - **Rota**: `/admin/dashboard`
 - **O que faz**:
   - Gerenciar usuários do sistema
@@ -32,6 +33,7 @@ Após fazer login como ADM, você terá acesso a 2 painéis administrativos na b
   - Consultar quais funcionalidades cada usuário tem acesso
 
 ### 2️⃣ **Gerenciar Anúncios** (Laranja 🟧)
+
 - **Rota**: `/admin/anuncios`
 - **O que faz**:
   - Visualizar TODOS os anúncios da plataforma
@@ -50,34 +52,41 @@ Após fazer login como ADM, você terá acesso a 2 painéis administrativos na b
 Como usuário ADM, você tem acesso automático a TODAS as 14 funcionalidades do sistema:
 
 ### Gerenciamento de Usuários (3)
+
 ✅ MANAGE_USERS - Criar, editar, deletar usuários  
 ✅ VIEW_USERS - Visualizar lista de usuários  
 ✅ MANAGE_USER_PERMISSIONS - Gerenciar permissões de usuários
 
 ### Gerenciamento de Anúncios (3)
+
 ✅ MANAGE_ADS - Criar, editar, deletar anúncios  
 ✅ VIEW_ALL_ADS - Visualizar todos os anúncios  
 ✅ MANAGE_FEATURED_ADS - Marcar anúncios como em destaque
 
 ### Gerenciamento de Lojas (2)
+
 ✅ MANAGE_STORES - Criar, editar, deletar lojas  
 ✅ VIEW_ALL_STORES - Visualizar todas as lojas
 
 ### Gerenciamento de Chat (2)
+
 ✅ MANAGE_CHATS - Gerenciar conversas  
 ✅ VIEW_ALL_CHATS - Visualizar todas as conversas
 
 ### Gerenciamento de Pagamentos (2)
+
 ✅ MANAGE_PAYMENTS - Gerenciar pagamentos  
 ✅ VIEW_PAYMENT_REPORTS - Visualizar relatórios de pagamento
 
 ### Relatórios e Sistema (2)
+
 ✅ VIEW_REPORTS - Acessar relatórios  
 ✅ MANAGE_SITE - Acesso total ao site
 
 ## Recursos do Painel de Anúncios
 
 ### Busca e Filtros
+
 - **Search Bar**: Busque por título, nome da loja ou produto
 - **Status Filter**: Filtro para todos, apenas ativos, apenas inativos, ou em destaque
 
@@ -106,6 +115,7 @@ Ao expandir um anúncio, você pode:
 ### Informações Exibidas
 
 Para cada anúncio, você pode ver:
+
 - Foto/thumbnail do anúncio
 - Título completo
 - Loja e produto associados
@@ -160,17 +170,19 @@ Todas as 14 funcionalidades foram automaticamente concedidas na tabela `usuarios
 ## Mudança de Senha (Futura)
 
 Para mudar a senha quando implementado:
+
 1. Acesse a página de perfil
 2. Procure por "Alterar Senha"
 3. Digite a senha atual
 4. Digite a nova senha
 5. Confirme a nova senha
 
-*Nota: Esta funcionalidade pode ser implementada em atualizações futuras*
+_Nota: Esta funcionalidade pode ser implementada em atualizações futuras_
 
 ## Notas de Segurança
 
 ⚠️ **Importante para Produção**:
+
 - Esta configuração é para DESENVOLVIMENTO
 - A senha está armazenada em texto simples (não é seguro para produção)
 - Para produção, implemente hash de senhas com bcryptjs
@@ -181,16 +193,19 @@ Para mudar a senha quando implementado:
 ## Troubleshooting
 
 ### "Acesso negado" ao acessar painel ADM?
+
 - Verifique se está logado como ADM
 - Limpe o cache do navegador
 - Faça logout e login novamente
 
 ### Não vejo os botões de ADM no header?
+
 - Verifique se está logado
 - Confirme que o tipo de usuário é "adm"
 - Atualize a página
 
 ### Não consigo editar um anúncio?
+
 - Clique no botão **"Editar"** dentro da lista de anúncios
 - Isso levará para a página de edição completa
 - Faça as mudanças necessárias
@@ -199,17 +214,20 @@ Para mudar a senha quando implementado:
 ## Arquivos Criados/Modificados
 
 ### Arquivos Novos
+
 - `client/pages/AdminManageAds.tsx` - Painel de gerenciamento de anúncios (410 linhas)
 - `create-adm-user.mjs` - Script para criar usuário ADM
 - `ADM_USER_CREDENTIALS.md` - Este arquivo
 
 ### Arquivos Modificados
+
 - `client/App.tsx` - Adicionada rota `/admin/anuncios`
 - `client/components/Header.tsx` - Adicionado botão "Anúncios" para ADM
 
 ## Próximas Etapas
 
 Após fazer login como ADM, você pode:
+
 1. ✅ Explorar o Painel de Administrador
 2. ✅ Gerenciar anúncios do sistema
 3. ✅ Atribuir permissões a outros usuários
@@ -218,6 +236,7 @@ Após fazer login como ADM, você pode:
 ## Suporte
 
 Para problemas ou dúvidas:
+
 1. Verifique a documentação completa em `RBAC_IMPLEMENTATION.md`
 2. Consulte o código em `client/pages/AdminManageAds.tsx`
 3. Verifique os logs do servidor
@@ -227,6 +246,7 @@ Para problemas ou dúvidas:
 ## ✅ Setup Concluído!
 
 O usuário ADM foi criado com sucesso e tem acesso a:
+
 - ✅ Painel de Administrador (gerenciar usuários/permissões)
 - ✅ Painel de Anúncios (editar qualquer anúncio)
 - ✅ Todas as 14 funcionalidades do sistema

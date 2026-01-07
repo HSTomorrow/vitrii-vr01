@@ -46,7 +46,9 @@ interface UsuarioXFuncionalidade {
 
 export default function AdminDashboard() {
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState<"usuarios" | "funcionalidades">("usuarios");
+  const [activeTab, setActiveTab] = useState<"usuarios" | "funcionalidades">(
+    "usuarios",
+  );
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUsuario, setSelectedUsuario] = useState<number | null>(null);
   const [expandedUser, setExpandedUser] = useState<number | null>(null);
@@ -76,8 +78,11 @@ export default function AdminDashboard() {
     queryKey: ["usuario-funcionalidades", selectedUsuario],
     queryFn: async () => {
       if (!selectedUsuario) return null;
-      const response = await fetch(`/api/usuarios/${selectedUsuario}/funcionalidades`);
-      if (!response.ok) throw new Error("Erro ao buscar funcionalidades do usuário");
+      const response = await fetch(
+        `/api/usuarios/${selectedUsuario}/funcionalidades`,
+      );
+      if (!response.ok)
+        throw new Error("Erro ao buscar funcionalidades do usuário");
       return response.json();
     },
     enabled: !!selectedUsuario,
@@ -115,7 +120,11 @@ export default function AdminDashboard() {
       }
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Erro ao conceder funcionalidade");
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Erro ao conceder funcionalidade",
+      );
     },
   });
 
@@ -149,7 +158,11 @@ export default function AdminDashboard() {
       }
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Erro ao revogar funcionalidade");
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Erro ao revogar funcionalidade",
+      );
     },
   });
 
@@ -177,7 +190,11 @@ export default function AdminDashboard() {
       }
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Erro ao conceder funcionalidades");
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Erro ao conceder funcionalidades",
+      );
     },
   });
 
@@ -205,7 +222,11 @@ export default function AdminDashboard() {
       }
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Erro ao revogar funcionalidades");
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Erro ao revogar funcionalidades",
+      );
     },
   });
 
@@ -213,9 +234,10 @@ export default function AdminDashboard() {
   const funcionalidades = funcionalidadesData?.data || [];
   const usuarioFunc = usuarioFuncData?.data;
 
-  const filteredUsuarios = usuarios.filter((u: Usuario) =>
-    u.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    u.email.toLowerCase().includes(searchTerm.toLowerCase()),
+  const filteredUsuarios = usuarios.filter(
+    (u: Usuario) =>
+      u.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      u.email.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
   const categoriasMap = new Map<string, Funcionalidade[]>();
@@ -235,7 +257,9 @@ export default function AdminDashboard() {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <Shield className="w-8 h-8 text-walmart-blue" />
-            <h1 className="text-3xl font-bold text-walmart-text">Painel de Administrador</h1>
+            <h1 className="text-3xl font-bold text-walmart-text">
+              Painel de Administrador
+            </h1>
           </div>
           <p className="text-walmart-text-secondary">
             Gerencie usuários e suas permissões de acesso no sistema
@@ -293,12 +317,16 @@ export default function AdminDashboard() {
 
             {usuariosLoading ? (
               <div className="text-center py-8">
-                <p className="text-walmart-text-secondary">Carregando usuários...</p>
+                <p className="text-walmart-text-secondary">
+                  Carregando usuários...
+                </p>
               </div>
             ) : filteredUsuarios.length === 0 ? (
               <div className="text-center py-8">
                 <AlertCircle className="w-12 h-12 text-walmart-text-secondary mx-auto mb-2" />
-                <p className="text-walmart-text-secondary">Nenhum usuário encontrado</p>
+                <p className="text-walmart-text-secondary">
+                  Nenhum usuário encontrado
+                </p>
               </div>
             ) : (
               <div className="space-y-3">
@@ -310,7 +338,9 @@ export default function AdminDashboard() {
                     <div
                       className="flex items-center justify-between cursor-pointer"
                       onClick={() =>
-                        setExpandedUser(expandedUser === usuario.id ? null : usuario.id)
+                        setExpandedUser(
+                          expandedUser === usuario.id ? null : usuario.id,
+                        )
                       }
                     >
                       <div className="flex items-center gap-4 flex-1">
@@ -318,19 +348,27 @@ export default function AdminDashboard() {
                           {usuario.nome.charAt(0).toUpperCase()}
                         </div>
                         <div>
-                          <h3 className="font-semibold text-walmart-text">{usuario.nome}</h3>
-                          <p className="text-sm text-walmart-text-secondary">{usuario.email}</p>
+                          <h3 className="font-semibold text-walmart-text">
+                            {usuario.nome}
+                          </h3>
+                          <p className="text-sm text-walmart-text-secondary">
+                            {usuario.email}
+                          </p>
                         </div>
                         <div className="ml-auto">
                           {usuario.tipoUsuario === "adm" ? (
                             <div className="flex items-center gap-2 px-3 py-1 bg-yellow-100 rounded-full">
                               <Shield className="w-4 h-4 text-yellow-700" />
-                              <span className="text-sm font-semibold text-yellow-700">ADM</span>
+                              <span className="text-sm font-semibold text-yellow-700">
+                                ADM
+                              </span>
                             </div>
                           ) : (
                             <div className="flex items-center gap-2 px-3 py-1 bg-blue-100 rounded-full">
                               <Users className="w-4 h-4 text-blue-700" />
-                              <span className="text-sm font-semibold text-blue-700">Comum</span>
+                              <span className="text-sm font-semibold text-blue-700">
+                                Comum
+                              </span>
                             </div>
                           )}
                         </div>
@@ -350,9 +388,12 @@ export default function AdminDashboard() {
                             <div className="flex items-start gap-3">
                               <AlertCircle className="w-5 h-5 text-yellow-700 mt-0.5 flex-shrink-0" />
                               <div>
-                                <p className="font-semibold text-yellow-900">Usuário Administrador</p>
+                                <p className="font-semibold text-yellow-900">
+                                  Usuário Administrador
+                                </p>
                                 <p className="text-sm text-yellow-800 mt-1">
-                                  Este usuário tem acesso automático a todas as funcionalidades do sistema.
+                                  Este usuário tem acesso automático a todas as
+                                  funcionalidades do sistema.
                                 </p>
                               </div>
                             </div>
@@ -378,7 +419,9 @@ export default function AdminDashboard() {
                                   <div className="flex gap-2">
                                     <button
                                       onClick={() =>
-                                        grantAllFuncionalidadesMutation.mutate(usuario.id)
+                                        grantAllFuncionalidadesMutation.mutate(
+                                          usuario.id,
+                                        )
                                       }
                                       disabled={
                                         grantAllFuncionalidadesMutation.isPending ||
@@ -391,11 +434,14 @@ export default function AdminDashboard() {
                                     </button>
                                     <button
                                       onClick={() =>
-                                        revokeAllFuncionalidadesMutation.mutate(usuario.id)
+                                        revokeAllFuncionalidadesMutation.mutate(
+                                          usuario.id,
+                                        )
                                       }
                                       disabled={
                                         revokeAllFuncionalidadesMutation.isPending ||
-                                        usuarioFunc.funcionalidades?.length === 0
+                                        usuarioFunc.funcionalidades?.length ===
+                                          0
                                       }
                                       className="text-sm px-2 py-1 bg-red-100 text-red-700 rounded hover:bg-red-200 transition disabled:opacity-50"
                                     >
@@ -410,49 +456,61 @@ export default function AdminDashboard() {
                                   </p>
                                 ) : (
                                   <div className="grid grid-cols-1 gap-2">
-                                    {Array.from(categoriasMap).map(([categoria, funcs]) => (
-                                      <div key={categoria} className="space-y-2">
-                                        <h5 className="text-sm font-semibold text-walmart-text-secondary capitalize">
-                                          {categoria === "users"
-                                            ? "Usuários"
-                                            : categoria === "ads"
-                                              ? "Anúncios"
-                                              : categoria === "stores"
-                                                ? "Lojas"
-                                                : categoria === "chat"
-                                                  ? "Chat"
-                                                  : categoria === "payments"
-                                                    ? "Pagamentos"
-                                                    : "Relatórios"}
-                                        </h5>
-                                        <div className="grid grid-cols-1 gap-1 ml-2">
-                                          {funcs.map((func: Funcionalidade) => (
-                                            <div
-                                              key={func.id}
-                                              className="flex items-center justify-between bg-white p-2 rounded border border-gray-200"
-                                            >
-                                              <div>
-                                                <p className="text-sm font-medium text-walmart-text">
-                                                  {func.nome}
-                                                </p>
-                                              </div>
-                                              <button
-                                                onClick={() =>
-                                                  revokeFuncionalidadeMutation.mutate({
-                                                    usuarioId: usuario.id,
-                                                    funcionalidadeId: func.id,
-                                                  })
-                                                }
-                                                disabled={revokeFuncionalidadeMutation.isPending}
-                                                className="text-red-600 hover:text-red-800 transition disabled:opacity-50"
-                                              >
-                                                <XCircle className="w-4 h-4" />
-                                              </button>
-                                            </div>
-                                          ))}
+                                    {Array.from(categoriasMap).map(
+                                      ([categoria, funcs]) => (
+                                        <div
+                                          key={categoria}
+                                          className="space-y-2"
+                                        >
+                                          <h5 className="text-sm font-semibold text-walmart-text-secondary capitalize">
+                                            {categoria === "users"
+                                              ? "Usuários"
+                                              : categoria === "ads"
+                                                ? "Anúncios"
+                                                : categoria === "stores"
+                                                  ? "Lojas"
+                                                  : categoria === "chat"
+                                                    ? "Chat"
+                                                    : categoria === "payments"
+                                                      ? "Pagamentos"
+                                                      : "Relatórios"}
+                                          </h5>
+                                          <div className="grid grid-cols-1 gap-1 ml-2">
+                                            {funcs.map(
+                                              (func: Funcionalidade) => (
+                                                <div
+                                                  key={func.id}
+                                                  className="flex items-center justify-between bg-white p-2 rounded border border-gray-200"
+                                                >
+                                                  <div>
+                                                    <p className="text-sm font-medium text-walmart-text">
+                                                      {func.nome}
+                                                    </p>
+                                                  </div>
+                                                  <button
+                                                    onClick={() =>
+                                                      revokeFuncionalidadeMutation.mutate(
+                                                        {
+                                                          usuarioId: usuario.id,
+                                                          funcionalidadeId:
+                                                            func.id,
+                                                        },
+                                                      )
+                                                    }
+                                                    disabled={
+                                                      revokeFuncionalidadeMutation.isPending
+                                                    }
+                                                    className="text-red-600 hover:text-red-800 transition disabled:opacity-50"
+                                                  >
+                                                    <XCircle className="w-4 h-4" />
+                                                  </button>
+                                                </div>
+                                              ),
+                                            )}
+                                          </div>
                                         </div>
-                                      </div>
-                                    ))}
+                                      ),
+                                    )}
                                   </div>
                                 )}
 
@@ -466,7 +524,8 @@ export default function AdminDashboard() {
                                       .filter(
                                         (f: Funcionalidade) =>
                                           !usuarioFunc.funcionalidades?.some(
-                                            (uf: Funcionalidade) => uf.id === f.id,
+                                            (uf: Funcionalidade) =>
+                                              uf.id === f.id,
                                           ),
                                       )
                                       .map((func: Funcionalidade) => (
@@ -481,12 +540,16 @@ export default function AdminDashboard() {
                                           </div>
                                           <button
                                             onClick={() =>
-                                              grantFuncionalidadeMutation.mutate({
-                                                usuarioId: usuario.id,
-                                                funcionalidadeId: func.id,
-                                              })
+                                              grantFuncionalidadeMutation.mutate(
+                                                {
+                                                  usuarioId: usuario.id,
+                                                  funcionalidadeId: func.id,
+                                                },
+                                              )
                                             }
-                                            disabled={grantFuncionalidadeMutation.isPending}
+                                            disabled={
+                                              grantFuncionalidadeMutation.isPending
+                                            }
                                             className="text-green-600 hover:text-green-800 transition disabled:opacity-50"
                                           >
                                             <CheckCircle2 className="w-4 h-4" />
@@ -513,12 +576,16 @@ export default function AdminDashboard() {
           <div className="space-y-6">
             {funcLoading ? (
               <div className="text-center py-8">
-                <p className="text-walmart-text-secondary">Carregando funcionalidades...</p>
+                <p className="text-walmart-text-secondary">
+                  Carregando funcionalidades...
+                </p>
               </div>
             ) : funcionalidades.length === 0 ? (
               <div className="text-center py-8">
                 <AlertCircle className="w-12 h-12 text-walmart-text-secondary mx-auto mb-2" />
-                <p className="text-walmart-text-secondary">Nenhuma funcionalidade encontrada</p>
+                <p className="text-walmart-text-secondary">
+                  Nenhuma funcionalidade encontrada
+                </p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -527,7 +594,8 @@ export default function AdminDashboard() {
                     funcionalidades.map((f: Funcionalidade) => [
                       f.categoria,
                       funcionalidades.filter(
-                        (func: Funcionalidade) => func.categoria === f.categoria,
+                        (func: Funcionalidade) =>
+                          func.categoria === f.categoria,
                       ),
                     ]),
                   ),
@@ -554,7 +622,9 @@ export default function AdminDashboard() {
                         >
                           <div className="flex items-start justify-between mb-2">
                             <div>
-                              <h4 className="font-semibold text-walmart-text">{func.nome}</h4>
+                              <h4 className="font-semibold text-walmart-text">
+                                {func.nome}
+                              </h4>
                               <p className="text-xs text-walmart-text-secondary font-mono">
                                 {func.chave}
                               </p>

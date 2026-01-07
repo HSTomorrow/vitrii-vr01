@@ -76,28 +76,34 @@
 **14 Funcionalidades** automatically created and seeded:
 
 #### User Management (3)
+
 - `MANAGE_USERS` - Criar, editar, deletar usuários
 - `VIEW_USERS` - Visualizar lista de usuários e detalhes
 - `MANAGE_USER_PERMISSIONS` - Atribuir e remover funcionalidades
 
 #### Ad Management (3)
+
 - `MANAGE_ADS` - Criar, editar, deletar anúncios
 - `VIEW_ALL_ADS` - Visualizar anúncios de todas as lojas
 - `MANAGE_FEATURED_ADS` - Marcar anúncios como em destaque
 
 #### Store Management (2)
+
 - `MANAGE_STORES` - Criar, editar, deletar lojas
 - `VIEW_ALL_STORES` - Visualizar todas as lojas
 
 #### Chat Management (2)
+
 - `MANAGE_CHATS` - Visualizar e gerenciar todas as conversas
 - `VIEW_ALL_CHATS` - Visualizar conversas de todos os usuários
 
 #### Payment Management (2)
+
 - `MANAGE_PAYMENTS` - Visualizar e gerenciar pagamentos
 - `VIEW_PAYMENT_REPORTS` - Visualizar relatórios de pagamento
 
 #### System Management (2)
+
 - `VIEW_REPORTS` - Acessar relatórios gerais
 - `MANAGE_SITE` - Acesso total ao site
 
@@ -124,10 +130,12 @@
 ## Key Features
 
 ### User Types
+
 - **ADM**: Automatically has all permissions, can manage users/permissions
 - **COMUM**: Regular user, has only explicitly granted permissions
 
 ### Permission Management
+
 - Grant/revoke individual permissions
 - Bulk grant/revoke operations
 - Grant/revoke all permissions at once
@@ -135,6 +143,7 @@
 - Search and filter users
 
 ### Admin Dashboard
+
 - User management interface
 - Permission management interface
 - Categorized feature browsing
@@ -142,6 +151,7 @@
 - ADM user protection
 
 ### Security
+
 - Server-side permission validation
 - ADM users protected from permission revocation
 - Unique constraints on user-permission mappings
@@ -188,18 +198,21 @@ IMPLEMENTATION_COMPLETE.md               [Updated with RBAC info]
 ## Test Coverage
 
 ✅ **Database Layer**
+
 - Funcionalidade creation and retrieval
 - User-funcionalidade mapping
 - Soft deletion
 - Unique constraints
 
 ✅ **API Layer**
+
 - All CRUD operations tested
 - Permission granting/revoking
 - Bulk operations
 - Error handling
 
 ✅ **Frontend Layer**
+
 - Admin dashboard rendering
 - User search and filtering
 - Permission management UI
@@ -207,6 +220,7 @@ IMPLEMENTATION_COMPLETE.md               [Updated with RBAC info]
 - Real-time UI updates
 
 ✅ **Middleware Layer**
+
 - Permission checks
 - ADM role verification
 - User ID extraction
@@ -215,12 +229,14 @@ IMPLEMENTATION_COMPLETE.md               [Updated with RBAC info]
 ## Quick Start
 
 ### For End Users
+
 1. Create/update a user to type "adm"
 2. Sign in as that user
 3. Click "Administrador" button in header
 4. Manage users and permissions
 
 ### For Developers
+
 1. Import middleware: `import { checkPermission } from '../middleware/permissionGuard'`
 2. Protect routes: `app.get('/api/endpoint', checkPermission('MANAGE_USERS'), handler)`
 3. Check in handlers: `const can = await userHasPermission(userId, 'MANAGE_USERS')`
@@ -228,21 +244,25 @@ IMPLEMENTATION_COMPLETE.md               [Updated with RBAC info]
 ## Statistics
 
 **Code Added**
+
 - Backend: 1,025 lines (routes + middleware)
 - Frontend: 588 lines (admin dashboard)
 - Documentation: 1,077 lines
 - **Total: 2,690 lines**
 
 **Database**
+
 - Models added: 2
 - Funcionalidades seeded: 14
 - Schema updates: 1
 
 **API Endpoints**
+
 - New endpoints: 13
 - Total endpoints: 73+ (platform-wide)
 
 **Database Migrations**
+
 - Scripts created: 1 (`create-rbac-tables.mjs`)
 - Tables created: 2
 - Tables updated: 1
@@ -252,41 +272,49 @@ IMPLEMENTATION_COMPLETE.md               [Updated with RBAC info]
 ### To Add RBAC to Existing Routes
 
 **Example 1: Protect user deletion**
+
 ```typescript
-app.delete("/api/usuarios/:id",
+app.delete(
+  "/api/usuarios/:id",
   extractUserId,
   checkPermission("MANAGE_USERS"),
-  deleteUsuario
+  deleteUsuario,
 );
 ```
 
 **Example 2: Admin-only routes**
+
 ```typescript
-app.post("/api/funcionalidades",
+app.post(
+  "/api/funcionalidades",
   extractUserId,
   requireAdmin,
-  createFuncionalidade
+  createFuncionalidade,
 );
 ```
 
 **Example 3: Multiple permissions (any one)**
+
 ```typescript
-app.get("/api/reports",
+app.get(
+  "/api/reports",
   extractUserId,
   checkPermission(["VIEW_REPORTS", "MANAGE_SITE"]),
-  getReports
+  getReports,
 );
 ```
 
 ## Known Limitations & Future Work
 
 ### Current Limitations
+
 - User ID extraction via header/params (production use JWT)
 - No time-based permission expiration
 - No role grouping (all permissions individual)
 - No resource-level permissions (all/none)
 
 ### Recommended Next Steps
+
 1. Implement JWT authentication
 2. Add permission audit logging
 3. Create role groups (Editor, Viewer, etc.)
@@ -320,6 +348,7 @@ app.get("/api/reports",
 ✅ **RBAC System Successfully Implemented**
 
 The Vitrii marketplace now has a complete, production-ready Role-Based Access Control system that:
+
 - Separates users into ADM and COMUM types
 - Manages 14+ granular permissions
 - Provides an intuitive admin dashboard
@@ -328,6 +357,7 @@ The Vitrii marketplace now has a complete, production-ready Role-Based Access Co
 - Scales easily to new permissions
 
 The system is ready for:
+
 - Managing user access to features
 - Controlling administrative capabilities
 - Auditing permission changes

@@ -143,14 +143,17 @@ export default function AdminManageAds() {
       anuncioId: number;
       status: string;
     }) => {
-      const response = await fetch(`/api/anuncios/${anuncioId}/override-status`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          "x-user-id": user?.id ? String(user.id) : "",
+      const response = await fetch(
+        `/api/anuncios/${anuncioId}/override-status`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+            "x-user-id": user?.id ? String(user.id) : "",
+          },
+          body: JSON.stringify({ status }),
         },
-        body: JSON.stringify({ status }),
-      });
+      );
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || "Erro ao alterar status do anúncio");
@@ -163,7 +166,9 @@ export default function AdminManageAds() {
       setExpandedAd(null);
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Erro ao alterar status");
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao alterar status",
+      );
     },
   });
 
@@ -232,7 +237,9 @@ export default function AdminManageAds() {
         {/* Ads List */}
         {isLoading ? (
           <div className="text-center py-12">
-            <p className="text-walmart-text-secondary">Carregando anúncios...</p>
+            <p className="text-walmart-text-secondary">
+              Carregando anúncios...
+            </p>
           </div>
         ) : filteredAnuncios.length === 0 ? (
           <div className="text-center py-12">
@@ -379,7 +386,8 @@ export default function AdminManageAds() {
                         </select>
                       </div>
                       <p className="text-xs text-walmart-text-secondary mt-1">
-                        Status atual: <span className="font-semibold">{anuncio.status}</span>
+                        Status atual:{" "}
+                        <span className="font-semibold">{anuncio.status}</span>
                       </p>
                     </div>
 
@@ -471,8 +479,8 @@ export default function AdminManageAds() {
           <div className="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <p className="text-sm text-blue-700">
               <strong>Total:</strong> {filteredAnuncios.length} anúncio(s)
-              encontrado(s) •{" "}
-              <strong>Ativos:</strong> {anuncios.filter((a: Anuncio) => a.isActive).length} •{" "}
+              encontrado(s) • <strong>Ativos:</strong>{" "}
+              {anuncios.filter((a: Anuncio) => a.isActive).length} •{" "}
               <strong>Em Destaque:</strong>{" "}
               {anuncios.filter((a: Anuncio) => a.destaque).length}
             </p>

@@ -12,9 +12,7 @@ async function main() {
     });
 
     if (existingAdmin) {
-      console.log(
-        "⚠️  Admin user already exists! Credentials:",
-      );
+      console.log("⚠️  Admin user already exists! Credentials:");
       console.log("   Email: admin@vitrii.com.br");
       console.log("   Senha: Admin@2025");
       console.log(
@@ -47,10 +45,9 @@ async function main() {
     console.log("   Tipo: ADM");
 
     // Get all funcionalidades
-    const allFuncionalidades =
-      await prisma.funcionalidade.findMany({
-        where: { isActive: true },
-      });
+    const allFuncionalidades = await prisma.funcionalidade.findMany({
+      where: { isActive: true },
+    });
 
     // Grant all funcionalidades to ADM user
     console.log(
@@ -77,9 +74,7 @@ async function main() {
       }
     }
 
-    console.log(
-      `✅ All ${allFuncionalidades.length} funcionalidades granted!`,
-    );
+    console.log(`✅ All ${allFuncionalidades.length} funcionalidades granted!`);
 
     console.log("\n🎉 Setup complete!");
     console.log("\n📝 Use these credentials to sign in:");
