@@ -222,9 +222,11 @@ model Anuncio {
   lojaId        Int
   productId     Int
   tabelaDePrecoId Int
+  equipeDeVendaId Int?
   titulo        String    @db.VarChar(255)
   descricao     String?   @db.Text
   fotoUrl       String?   @db.Text
+  isDoacao      Boolean   @default(false)
   status        String    @default("em_edicao") // "em_edicao", "aguardando_pagamento", "pago", "historico"
   dataValidade  DateTime?
   dataCriacao   DateTime  @default(now())
@@ -234,6 +236,7 @@ model Anuncio {
   loja          Loja      @relation(fields: [lojaId], references: [id], onDelete: Cascade)
   producto      Producto  @relation(fields: [productId], references: [id], onDelete: Cascade)
   tabelaDePreco TabelaDePreco @relation(fields: [tabelaDePrecoId], references: [id], onDelete: Cascade)
+  equipeDeVenda EquipeDeVenda? @relation(fields: [equipeDeVendaId], references: [id], onDelete: SetNull)
 
   @@map("anuncios")
 }
