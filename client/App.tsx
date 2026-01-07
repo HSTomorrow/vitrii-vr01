@@ -21,6 +21,7 @@ import CadastroLojas from "./pages/CadastroLojas";
 import CadastroGruposProductos from "./pages/CadastroGruposProductos";
 import CadastroProdutos from "./pages/CadastroProdutos";
 import CadastroTabelasPreco from "./pages/CadastroTabelasPreco";
+import CadastroVariantes from "./pages/CadastroVariantes";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
