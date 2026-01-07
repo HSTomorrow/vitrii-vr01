@@ -307,6 +307,13 @@ export default function CadastroProdutos() {
                       <td className="px-6 py-4 text-walmart-text">{producto.descricao || "-"}</td>
                       <td className="px-6 py-4 flex gap-2">
                         <button
+                          onClick={() => navigate(`/cadastros/variantes/${producto.id}`)}
+                          className="p-2 text-walmart-blue hover:bg-blue-50 rounded-lg transition-colors"
+                          title="Editar Variantes"
+                        >
+                          <Palette className="w-4 h-4" />
+                        </button>
+                        <button
                           onClick={() => handleEdit(producto)}
                           className="p-2 text-walmart-blue hover:bg-blue-50 rounded-lg transition-colors"
                         >
