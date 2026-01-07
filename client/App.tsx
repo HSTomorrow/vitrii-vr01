@@ -49,9 +49,10 @@ export default function App() {
                 <Route path="/auth/signup" element={<SignUp />} />
                 <Route path="/perfil" element={<PerfilUsuario />} />
                 <Route path="/anuncio/criar" element={<CriarAnuncio />} />
-                <Route path="/anuncio/:id" element={<AnuncioDetalhe />} />
-                <Route path="/anuncio/:id/editar" element={<EditarAnuncio />} />
-                <Route path="/cadastros/lojas" element={<CadastroLojas />} />
+              <Route path="/anuncio/:id" element={<AnuncioDetalhe />} />
+              <Route path="/anuncio/:id/editar" element={<EditarAnuncio />} />
+              <Route path="/buscar" element={<SearchAnuncios />} />
+              <Route path="/cadastros/lojas" element={<CadastroLojas />} />
                 <Route path="/cadastros/grupos-productos" element={<CadastroGruposProductos />} />
                 <Route path="/cadastros/productos" element={<CadastroProdutos />} />
                 <Route path="/cadastros/tabelas-preco" element={<CadastroTabelasPreco />} />
