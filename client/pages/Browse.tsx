@@ -107,6 +107,23 @@ export default function Browse() {
                   />
                 </div>
 
+                {user && (
+                  <div className="border-t border-gray-200 pt-6">
+                    <label className="flex items-center space-x-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={showFavoritesOnly}
+                        onChange={(e) => setShowFavoritesOnly(e.target.checked)}
+                        className="rounded"
+                      />
+                      <Heart className="w-4 h-4 text-red-500" />
+                      <span className="text-walmart-text-secondary">
+                        Apenas Favoritos
+                      </span>
+                    </label>
+                  </div>
+                )}
+
                 <button className="w-full bg-walmart-blue text-white py-2 rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors">
                   Aplicar Filtros
                 </button>
