@@ -14,7 +14,24 @@ import {
   BarChart3,
   AlertCircle,
   Plus,
+  MapPin,
 } from "lucide-react";
+
+// Helper function to extract municipality from address
+const extractMunicipality = (endereco: string): string => {
+  if (!endereco) return "Localização desconhecida";
+
+  // Split by comma and get the second-to-last part (usually city)
+  // Format is typically: "Rua X, 123, Cidade, Estado CEP"
+  const parts = endereco.split(",");
+
+  if (parts.length >= 2) {
+    // Get the second-to-last part (city)
+    return parts[parts.length - 2].trim();
+  }
+
+  return endereco.split(" ").slice(-2, -1)[0] || "Localização";
+};
 
 export default function Index() {
   const navigate = useNavigate();
