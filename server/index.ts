@@ -2,6 +2,15 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
+import {
+  getAnuncios,
+  getAnuncioById,
+  createAnuncio,
+  updateAnuncio,
+  updateAnuncioStatus,
+  deleteAnuncio,
+  getProdutosParaAnuncio,
+} from "./routes/anuncios";
 
 export function createServer() {
   const app = express();
@@ -18,6 +27,15 @@ export function createServer() {
   });
 
   app.get("/api/demo", handleDemo);
+
+  // Anúncios routes
+  app.get("/api/anuncios", getAnuncios);
+  app.get("/api/anuncios/:id", getAnuncioById);
+  app.post("/api/anuncios", createAnuncio);
+  app.put("/api/anuncios/:id", updateAnuncio);
+  app.patch("/api/anuncios/:id/status", updateAnuncioStatus);
+  app.delete("/api/anuncios/:id", deleteAnuncio);
+  app.get("/api/lojas/:lojaId/produtos-para-anuncio", getProdutosParaAnuncio);
 
   return app;
 }
