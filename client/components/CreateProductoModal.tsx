@@ -115,6 +115,7 @@ export default function CreateProductoModal({
       nome: "",
       descricao: "",
       sku: "",
+      tipo: "produto",
     });
     setTabelas([{ tamanho: "", cor: "", preco: "" }]);
   };
