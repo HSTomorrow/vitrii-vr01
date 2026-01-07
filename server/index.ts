@@ -19,6 +19,28 @@ import {
   deleteLoja,
 } from "./routes/lojas";
 import {
+  getGrupos,
+  getGrupoById,
+  getProductosOfGrupo,
+  createGrupo,
+  updateGrupo,
+  deleteGrupo,
+} from "./routes/grupos-productos";
+import {
+  getProductos,
+  getProductoById,
+  createProducto,
+  updateProducto,
+  deleteProducto,
+} from "./routes/productos";
+import {
+  getTabelas,
+  getTabelaById,
+  createTabela,
+  updateTabela,
+  deleteTabela,
+} from "./routes/tabelas-preco";
+import {
   getUsuarios,
   getUsuarioById,
   signInUsuario,
