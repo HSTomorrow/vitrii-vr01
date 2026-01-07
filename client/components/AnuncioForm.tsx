@@ -136,6 +136,7 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
           titulo: data.titulo,
           descricao: data.descricao,
           fotoUrl: data.fotoUrl,
+          precoAnuncio: data.precoAnuncio ? parseFloat(data.precoAnuncio) : null,
           lojaId: selectedLojaId,
           productId: data.productId,
           tabelaDePrecoId: data.tabelaDePrecoId > 0 ? data.tabelaDePrecoId : null,
