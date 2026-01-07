@@ -1,0 +1,376 @@
+import { useState, useEffect } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { ChevronLeft, Upload, AlertCircle, CheckCircle } from "lucide-react";
+import { Link } from "react-router-dom";
+
+interface AnuncioFormProps {
+  lojaId?: number;
+  anuncioId?: number;
+  onSuccess?: () => void;
+}
+
+interface Producto {
+  id: number;
+  nome: string;
+  descricao?: string;
+  grupoDeProductos: { id: number; nome: string };
+  tabelasDePreco: Array<{
+    id: number;
+    preco: number;
+    tamanho?: string;
+    cor?: string;
+  }>;
+}
+
+interface Loja {
+  id: number;
+  nome: string;
+}
+
+export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFormProps) {
+  const queryClient = useQueryClient();
+  const [selectedLojaId, setSelectedLojaId] = useState(lojaId || 0);
+  const [formData, setFormData] = useState({
+    titulo: "",
+    descricao: "",
+    productId: 0,
+    tabelaDePrecoId: 0,
+    fotoUrl: "",
+  });
+
+  // Fetch lojas
+  const { data: lojasData } = useQuery({
+    queryKey: ["lojas"],
+    queryFn: async () => {
+      const response = await fetch("/api/lojas");
+      if (!response.ok) throw new Error("Erro ao buscar lojas");
+      return response.json();
+    },
+  });
+
+  // Fetch anuncio if editing
+  const { data: anuncioData } = useQuery({
+    queryKey: ["anuncio", anuncioId],
+    queryFn: async () => {
+      const response = await fetch(`/api/anuncios/${anuncioId}`);
+      if (!response.ok) throw new Error("Erro ao buscar anúncio");
+      return response.json();
+    },
+    enabled: !!anuncioId,
+  });
+
+  // Fetch productos for selected loja
+  const { data: productosData } = useQuery({
+    queryKey: ["produtos-anuncio", selectedLojaId],
+    queryFn: async () => {
+      const response = await fetch(`/api/lojas/${selectedLojaId}/produtos-para-anuncio`);
+      if (!response.ok) throw new Error("Erro ao buscar produtos");
+      return response.json();
+    },
+    enabled: selectedLojaId > 0,
+  });
+
+  // Populate form with anuncio data when editing
+  useEffect(() => {
+    if (anuncioData?.data) {
+      const ad = anuncioData.data;
+      setSelectedLojaId(ad.lojaId);
+      setFormData({
+        titulo: ad.titulo,
+        descricao: ad.descricao || "",
+        productId: ad.productId,
+        tabelaDePrecoId: ad.tabelaDePrecoId,
+        fotoUrl: ad.fotoUrl || "",
+      });
+    }
+  }, [anuncioData]);
+
+  // Create/update mutation
+  const mutation = useMutation({
+    mutationFn: async (data: any) => {
+      const url = anuncioId ? `/api/anuncios/${anuncioId}` : "/api/anuncios";
+      const method = anuncioId ? "PUT" : "POST";
+
+      const response = await fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...data,
+          lojaId: selectedLojaId,
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Erro ao salvar anúncio");
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["anuncios"] });
+      toast.success(anuncioId ? "Anúncio atualizado com sucesso!" : "Anúncio criado com sucesso!");
+      if (onSuccess) onSuccess();
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : "Erro ao salvar");
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!selectedLojaId || !formData.productId || !formData.tabelaDePrecoId) {
+      toast.error("Por favor, preencha todos os campos obrigatórios");
+      return;
+    }
+
+    mutation.mutate(formData);
+  };
+
+  const handleInputChange = (field: string, value: string | number) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const lojas = lojasData?.data || [];
+  const productos = productosData?.data || [];
+
+  // Get selected product details
+  const selectedProducto = productos.find((p: Producto) => p.id === formData.productId);
+  const priceTables = selectedProducto?.tabelasDePreco || [];
+
+  const selectedPriceTable = priceTables.find(
+    (pt) => pt.id === formData.tabelaDePrecoId
+  );
+
+  return (
+    <div className="min-h-screen bg-walmart-gray-light py-12">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="mb-8">
+          <Link
+            to="/sell"
+            className="inline-flex items-center text-walmart-blue hover:text-walmart-blue-dark font-semibold mb-4"
+          >
+            <ChevronLeft className="w-5 h-5 mr-1" />
+            Voltar
+          </Link>
+          <h1 className="text-3xl font-bold text-walmart-text">
+            {anuncioId ? "Editar Anúncio" : "Novo Anúncio"}
+          </h1>
+          <p className="text-walmart-text-secondary mt-2">
+            {anuncioId
+              ? "Atualize os detalhes do seu anúncio"
+              : "Crie um novo anúncio para seus produtos e serviços"}
+          </p>
+        </div>
+
+        {/* Form */}
+        <div className="bg-white rounded-lg shadow-md p-8">
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Loja Selection */}
+            <div>
+              <label className="block text-sm font-semibold text-walmart-text mb-2">
+                Loja *
+              </label>
+              <select
+                value={selectedLojaId}
+                onChange={(e) => {
+                  setSelectedLojaId(parseInt(e.target.value));
+                  setFormData((prev) => ({ ...prev, productId: 0, tabelaDePrecoId: 0 }));
+                }}
+                disabled={!!anuncioId}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent disabled:bg-gray-100"
+              >
+                <option value={0}>Selecione uma loja</option>
+                {lojas.map((loja: Loja) => (
+                  <option key={loja.id} value={loja.id}>
+                    {loja.nome}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* Produto Selection */}
+            <div>
+              <label className="block text-sm font-semibold text-walmart-text mb-2">
+                Produto *
+              </label>
+              {selectedLojaId > 0 ? (
+                <select
+                  value={formData.productId}
+                  onChange={(e) => {
+                    const productId = parseInt(e.target.value);
+                    setFormData((prev) => ({
+                      ...prev,
+                      productId,
+                      tabelaDePrecoId: 0,
+                    }));
+                  }}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                >
+                  <option value={0}>Selecione um produto</option>
+                  {productos.map((p: Producto) => (
+                    <option key={p.id} value={p.id}>
+                      {p.nome}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <div className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500">
+                  Selecione uma loja primeiro
+                </div>
+              )}
+              {selectedProducto && (
+                <p className="mt-2 text-sm text-walmart-text-secondary">
+                  Grupo: {selectedProducto.grupoDeProductos.nome}
+                </p>
+              )}
+            </div>
+
+            {/* Tabela de Preço Selection */}
+            <div>
+              <label className="block text-sm font-semibold text-walmart-text mb-2">
+                Variante (Tamanho/Cor) *
+              </label>
+              {formData.productId > 0 ? (
+                <select
+                  value={formData.tabelaDePrecoId}
+                  onChange={(e) =>
+                    handleInputChange("tabelaDePrecoId", parseInt(e.target.value))
+                  }
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                >
+                  <option value={0}>Selecione uma variante</option>
+                  {priceTables.map((pt) => (
+                    <option key={pt.id} value={pt.id}>
+                      {pt.tamanho && pt.cor
+                        ? `${pt.tamanho} - ${pt.cor}`
+                        : pt.tamanho || pt.cor || `R$ ${pt.preco.toFixed(2)}`}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <div className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500">
+                  Selecione um produto primeiro
+                </div>
+              )}
+              {selectedPriceTable && (
+                <p className="mt-2 text-sm text-walmart-blue font-semibold">
+                  Preço: R$ {selectedPriceTable.preco.toFixed(2)}
+                </p>
+              )}
+            </div>
+
+            {/* Título */}
+            <div>
+              <label className="block text-sm font-semibold text-walmart-text mb-2">
+                Título do Anúncio *
+              </label>
+              <input
+                type="text"
+                value={formData.titulo}
+                onChange={(e) => handleInputChange("titulo", e.target.value)}
+                placeholder="Ex: Camiseta Azul Premium"
+                maxLength={255}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+              />
+              <p className="mt-1 text-sm text-walmart-text-secondary">
+                {formData.titulo.length}/255 caracteres
+              </p>
+            </div>
+
+            {/* Descrição */}
+            <div>
+              <label className="block text-sm font-semibold text-walmart-text mb-2">
+                Descrição
+              </label>
+              <textarea
+                value={formData.descricao}
+                onChange={(e) => handleInputChange("descricao", e.target.value)}
+                placeholder="Descreva o produto em detalhes..."
+                rows={5}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+              />
+            </div>
+
+            {/* Foto URL */}
+            <div>
+              <label className="block text-sm font-semibold text-walmart-text mb-2">
+                URL da Foto
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="url"
+                  value={formData.fotoUrl}
+                  onChange={(e) => handleInputChange("fotoUrl", e.target.value)}
+                  placeholder="https://exemplo.com/foto.jpg"
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                />
+                <button
+                  type="button"
+                  className="px-4 py-2 bg-walmart-gray-light rounded-lg hover:bg-gray-300 transition-colors flex items-center gap-2"
+                >
+                  <Upload className="w-4 h-4" />
+                  Upload
+                </button>
+              </div>
+              {formData.fotoUrl && (
+                <img
+                  src={formData.fotoUrl}
+                  alt="Preview"
+                  className="mt-4 h-40 object-cover rounded-lg"
+                />
+              )}
+            </div>
+
+            {/* Info Box */}
+            <div className="bg-blue-50 border-l-4 border-walmart-blue p-4 rounded">
+              <div className="flex gap-3">
+                <AlertCircle className="w-5 h-5 text-walmart-blue flex-shrink-0 mt-0.5" />
+                <div className="text-sm text-walmart-text">
+                  <p className="font-semibold">Informações sobre Publicação</p>
+                  <p className="mt-1 text-walmart-text-secondary">
+                    Você tem 3 anúncios gratuitos. Após isso, será cobrado R$ 9,90 por anúncio por
+                    dia via Pix.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Buttons */}
+            <div className="flex gap-4 pt-6 border-t">
+              <Link
+                to="/sell"
+                className="flex-1 px-4 py-3 border-2 border-walmart-blue text-walmart-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors text-center"
+              >
+                Cancelar
+              </Link>
+              <button
+                type="submit"
+                disabled={mutation.isPending}
+                className="flex-1 px-4 py-3 bg-walmart-blue text-white rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {mutation.isPending ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+                    Salvando...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="w-5 h-5" />
+                    {anuncioId ? "Atualizar" : "Publicar"} Anúncio
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+}
