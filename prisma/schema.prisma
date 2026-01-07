@@ -274,8 +274,35 @@ model Anuncio {
   producto      Producto  @relation(fields: [productId], references: [id], onDelete: Cascade)
   tabelaDePreco TabelaDePreco? @relation(fields: [tabelaDePrecoId], references: [id], onDelete: SetNull)
   equipeDeVenda EquipeDeVenda? @relation(fields: [equipeDeVendaId], references: [id], onDelete: SetNull)
+  pagamento     Pagamento?
 
   @@map("anuncios")
+}
+
+// ============================================================================
+// PAGAMENTOS (Payments - Pix/Payments)
+// ============================================================================
+model Pagamento {
+  id            Int       @id @default(autoincrement())
+  anuncioId     Int       @unique
+  valor         Decimal   @db.Decimal(10, 2)
+  status        String    @default("pendente") // "pendente", "processando", "pago", "cancelado", "expirado"
+  tipo          String    @default("pix") // "pix", "credito", "debito"
+  provedor      String    @default("mercado-pago") // Payment provider: "mercado-pago", "stripe", etc.
+  idExterno     String?   @db.VarChar(255) // External payment ID from provider
+  qrCode        String?   @db.Text // Pix QR Code string
+  urlCopiaECola String?   @db.Text // Pix Copy-and-paste URL
+  pixId         String?   @db.VarChar(255) // Pix transaction ID
+  erroMsg       String?   @db.Text // Error message if payment failed
+  dataExpiracao DateTime? // Expiration date for Pix QR code
+  dataPagamento DateTime? // Actual payment date
+  dataCriacao   DateTime  @default(now())
+  dataAtualizacao DateTime @updatedAt
+
+  // Relations
+  anuncio       Anuncio   @relation(fields: [anuncioId], references: [id], onDelete: Cascade)
+
+  @@map("pagamentos")
 }
 
 // ============================================================================
