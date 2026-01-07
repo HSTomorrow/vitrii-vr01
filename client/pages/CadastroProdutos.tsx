@@ -88,6 +88,7 @@ export default function CadastroProdutos() {
           nome: data.nome,
           descricao: data.descricao,
           sku: data.sku,
+          tipo: data.tipo,
         }),
       });
 
