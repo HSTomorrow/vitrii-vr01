@@ -469,3 +469,20 @@ model UsuarioXFuncionalidade {
   @@unique([usuarioId, funcionalidadeId])
   @@map("usuarios_x_funcionalidades")
 }
+
+// ============================================================================
+// PASSWORD RESET TOKENS (Password Recovery)
+// ============================================================================
+model PasswordResetToken {
+  id            Int       @id @default(autoincrement())
+  usuarioId     Int
+  token         String    @unique @db.VarChar(255)
+  expiresAt     DateTime  // Expiration time for token
+  isUsed        Boolean   @default(false)
+  dataCriacao   DateTime  @default(now())
+
+  // Relations
+  usuario       Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@map("password_reset_tokens")
+}
