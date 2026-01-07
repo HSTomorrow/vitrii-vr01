@@ -4,7 +4,6 @@ import {
   Menu,
   X,
   Search,
-  ShoppingCart,
   User,
   Plus,
   LogOut,
