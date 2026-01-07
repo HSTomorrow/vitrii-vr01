@@ -62,6 +62,7 @@ model Loja {
   movimentoEstoque MovimentoEstoque[]
   anuncios      Anuncio[]
   equipesDeVenda EquipeDeVenda[]
+  agendas       Agenda[]
 
   @@map("lojas")
 }
