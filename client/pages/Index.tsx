@@ -66,33 +66,11 @@ export default function Index() {
       <Header />
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-walmart-blue to-walmart-blue-dark text-white py-6 md:py-8">
+      <section className="bg-gradient-to-r from-walmart-blue to-walmart-blue-dark text-white py-3 md:py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold mb-4">
-              Bem-vindo ao Vitrii
-            </h1>
-            <p className="text-lg text-blue-100 mb-6">
-              O marketplace inteligente que conecta vendedores e compradores
-              com tecnologia QR Code revolucionária.
-            </p>
-
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link
-                to="/auth/signup"
-                className="bg-walmart-yellow text-walmart-text px-8 py-2 rounded-lg font-semibold hover:bg-walmart-yellow-dark transition-colors text-center"
-              >
-                Começar Agora
-              </Link>
-              <Link
-                to="/browse"
-                className="bg-white text-walmart-blue px-8 py-2 rounded-lg font-semibold hover:bg-blue-50 transition-colors text-center"
-              >
-                Ver Anúncios
-              </Link>
-            </div>
-          </div>
+          <h1 className="text-2xl md:text-3xl font-bold">
+            Bem-vindo ao Vitrii
+          </h1>
         </div>
       </section>
 
