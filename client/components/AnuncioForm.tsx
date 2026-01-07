@@ -293,6 +293,48 @@ export default function AnuncioForm({
     (pt) => pt.id === formData.tabelaDePrecoId,
   );
 
+  // Show loading state while fetching anuncio for editing
+  if (anuncioId && isLoadingAnuncio) {
+    return (
+      <div className="min-h-screen bg-walmart-gray-light py-12">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-walmart-blue mx-auto mb-4"></div>
+            <p className="text-walmart-text-secondary text-lg">Carregando anúncio...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state if anuncio failed to load
+  if (anuncioId && anuncioError) {
+    return (
+      <div className="min-h-screen bg-walmart-gray-light py-12">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+            <AlertCircle className="w-12 h-12 text-red-600 mx-auto mb-3" />
+            <h2 className="text-lg font-semibold text-red-800 mb-2">
+              Erro ao Carregar Anúncio
+            </h2>
+            <p className="text-red-700 mb-4">
+              {anuncioError instanceof Error
+                ? anuncioError.message
+                : "Não foi possível carregar o anúncio"}
+            </p>
+            <Link
+              to="/sell"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors"
+            >
+              <ChevronLeft className="w-4 h-4" />
+              Voltar
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-walmart-gray-light py-12">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
