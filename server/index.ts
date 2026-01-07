@@ -218,5 +218,19 @@ export function createServer() {
   app.delete("/api/pagamentos/:id/cancel", cancelPagamento);
   app.post("/api/webhooks/pagamentos", handlePaymentWebhook);
 
+  // Conversas (Chat Conversations) routes
+  app.get("/api/conversas", getConversas);
+  app.get("/api/conversas/:id", getConversaById);
+  app.post("/api/conversas", createConversa);
+  app.delete("/api/conversas/:id", deleteConversa);
+
+  // Mensagens (Chat Messages) routes
+  app.get("/api/conversas/:conversaId/mensagens", getMensagensConversa);
+  app.post("/api/mensagens", createMensagem);
+  app.patch("/api/mensagens/:id/read", markMensagemAsRead);
+  app.patch("/api/conversas/:conversaId/read", markConversaAsRead);
+  app.get("/api/usuarios/:usuarioId/mensagens/unread", getUnreadCount);
+  app.delete("/api/mensagens/:id", deleteMensagem);
+
   return app;
 }
