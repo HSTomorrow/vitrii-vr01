@@ -40,7 +40,7 @@ export default function Index() {
   });
 
   const anuncios = anunciosData?.data || [];
-  const destacados = anuncios.filter((a: any) => !a.isDoacao).slice(0, 4);
+  const destacados = anuncios.slice(0, 4);
   const doacoes = doacoesData?.data || [];
   const destaqueDoacoes = doacoes.slice(0, 4);
 
