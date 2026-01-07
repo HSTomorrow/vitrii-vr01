@@ -390,34 +390,75 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
               />
             </div>
 
-            {/* Foto URL */}
+            {/* Foto */}
             <div>
               <label className="block text-sm font-semibold text-walmart-text mb-2">
-                URL da Foto
+                Foto (Opcional)
               </label>
-              <div className="flex gap-2">
-                <input
-                  type="url"
-                  value={formData.fotoUrl}
-                  onChange={(e) => handleInputChange("fotoUrl", e.target.value)}
-                  placeholder="https://exemplo.com/foto.jpg"
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
-                />
-                <button
-                  type="button"
-                  className="px-4 py-2 bg-walmart-gray-light rounded-lg hover:bg-gray-300 transition-colors flex items-center gap-2"
-                >
-                  <Upload className="w-4 h-4" />
-                  Upload
-                </button>
+              <div className="space-y-3">
+                {/* File Upload Input */}
+                <div className="relative">
+                  <input
+                    type="file"
+                    id="file-upload"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        if (file.size > 5 * 1024 * 1024) {
+                          toast.error("Arquivo deve ter no máximo 5MB");
+                          return;
+                        }
+                        handleFileUpload(file);
+                        e.target.value = "";
+                      }
+                    }}
+                    className="hidden"
+                  />
+                  <label
+                    htmlFor="file-upload"
+                    className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-walmart-blue rounded-lg cursor-pointer hover:bg-blue-50 transition-colors"
+                  >
+                    <Upload className="w-5 h-5 text-walmart-blue" />
+                    <span className="font-semibold text-walmart-text">
+                      Clique para fazer upload ou arraste uma imagem
+                    </span>
+                  </label>
+                </div>
+
+                {/* URL Input (Alternative) */}
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={formData.fotoUrl}
+                    onChange={(e) => handleInputChange("fotoUrl", e.target.value)}
+                    placeholder="Ou cole uma URL de imagem"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent text-sm"
+                  />
+                </div>
+
+                {/* Preview */}
+                {formData.fotoUrl && (
+                  <div className="relative">
+                    <img
+                      src={formData.fotoUrl}
+                      alt="Preview"
+                      className="h-40 w-full object-cover rounded-lg"
+                      onError={() => {
+                        toast.error("Não foi possível carregar a imagem");
+                        handleInputChange("fotoUrl", "");
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleInputChange("fotoUrl", "")}
+                      className="absolute top-2 right-2 px-3 py-1 bg-red-500 text-white rounded-lg text-sm font-semibold hover:bg-red-600"
+                    >
+                      Remover
+                    </button>
+                  </div>
+                )}
               </div>
-              {formData.fotoUrl && (
-                <img
-                  src={formData.fotoUrl}
-                  alt="Preview"
-                  className="mt-4 h-40 object-cover rounded-lg"
-                />
-              )}
             </div>
 
             {/* Info Box */}
