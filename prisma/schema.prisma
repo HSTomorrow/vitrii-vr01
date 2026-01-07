@@ -29,6 +29,7 @@ model Usuario {
   usuarioLojas  UsuarioLoja[]
   produtosVisualizados ProductoVisualizacao[]
   qrCodesVisitados QRCodeChamada[]
+  membrosEquipe MembroEquipe[]
 
   @@map("usuarios")
 }
