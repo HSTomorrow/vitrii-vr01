@@ -11,6 +11,13 @@ import {
   deleteAnuncio,
   getProdutosParaAnuncio,
 } from "./routes/anuncios";
+import {
+  getLojas,
+  getLojaById,
+  createLoja,
+  updateLoja,
+  deleteLoja,
+} from "./routes/lojas";
 
 export function createServer() {
   const app = express();
@@ -28,6 +35,14 @@ export function createServer() {
 
   app.get("/api/demo", handleDemo);
 
+  // Lojas routes
+  app.get("/api/lojas", getLojas);
+  app.get("/api/lojas/:id", getLojaById);
+  app.post("/api/lojas", createLoja);
+  app.put("/api/lojas/:id", updateLoja);
+  app.delete("/api/lojas/:id", deleteLoja);
+  app.get("/api/lojas/:lojaId/produtos-para-anuncio", getProdutosParaAnuncio);
+
   // Anúncios routes
   app.get("/api/anuncios", getAnuncios);
   app.get("/api/anuncios/:id", getAnuncioById);
@@ -35,7 +50,6 @@ export function createServer() {
   app.put("/api/anuncios/:id", updateAnuncio);
   app.patch("/api/anuncios/:id/status", updateAnuncioStatus);
   app.delete("/api/anuncios/:id", deleteAnuncio);
-  app.get("/api/lojas/:lojaId/produtos-para-anuncio", getProdutosParaAnuncio);
 
   return app;
 }
