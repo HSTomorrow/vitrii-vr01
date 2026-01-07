@@ -14,6 +14,8 @@ const AnuncioCreateSchema = z.object({
   dataValidade: z.string().optional().nullable(),
   equipeDeVendaId: z.number().int().positive().optional().nullable(),
   isDoacao: z.boolean().optional().default(false),
+  destaque: z.boolean().optional().default(false),
+  isActive: z.boolean().optional().default(true),
 });
 
 // GET all ads
