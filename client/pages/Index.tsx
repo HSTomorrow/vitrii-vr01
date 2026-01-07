@@ -49,7 +49,7 @@ export default function Index() {
       <Header />
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-walmart-blue to-walmart-blue-dark text-white py-16 md:py-24">
+      <section className="bg-gradient-to-r from-walmart-blue to-walmart-blue-dark text-white py-8 md:py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             {/* Left side - Content */}
