@@ -133,8 +133,9 @@ export default function AnuncioForm({ lojaId, anuncioId, onSuccess }: AnuncioFor
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Erro ao salvar anúncio");
+        const errorData = await response.json();
+        const errorMsg = errorData.details || errorData.error || "Erro ao salvar anúncio";
+        throw new Error(errorMsg);
       }
 
       return response.json();
