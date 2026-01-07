@@ -7,7 +7,7 @@ const AnuncioCreateSchema = z.object({
   lojaId: z.number().int().positive("Loja é obrigatória"),
   productId: z.number().int().positive("Produto é obrigatório"),
   tabelaDePrecoId: z.number().int().optional().nullable(),
-  titulo: z.string().min(5, "Título deve ter pelo menos 5 caracteres").max(255),
+  titulo: z.string().min(5, "Título deve ter pelo menos 5 caracteres").max(50, "Título não pode ter mais de 50 caracteres"),
   descricao: z.string().optional().nullable(),
   fotoUrl: z.string().optional().nullable(),
   dataValidade: z.string().optional().nullable(),
