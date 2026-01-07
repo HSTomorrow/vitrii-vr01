@@ -112,6 +112,7 @@ export const getEquipeById: RequestHandler = async (req, res) => {
     res.status(500).json({
       success: false,
       error: "Erro ao buscar equipe de venda",
+      details: error instanceof Error ? error.message : "Erro desconhecido",
     });
   }
 };
