@@ -102,11 +102,14 @@ export default function AnuncioForm({
   });
 
   // Fetch anuncio if editing
-  const { data: anuncioData } = useQuery({
+  const { data: anuncioData, isLoading: isLoadingAnuncio, error: anuncioError } = useQuery({
     queryKey: ["anuncio", anuncioId],
     queryFn: async () => {
       const response = await fetch(`/api/anuncios/${anuncioId}`);
-      if (!response.ok) throw new Error("Erro ao buscar anúncio");
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Erro ao buscar anúncio");
+      }
       return response.json();
     },
     enabled: !!anuncioId,
