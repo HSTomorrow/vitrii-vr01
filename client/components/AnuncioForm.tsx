@@ -9,6 +9,7 @@ import {
   Plus,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import CategoryFields from "./CategoryFields";
 import CreateAnuncianteModal from "./CreateLojaModal";
 import CreateProductoModal from "./CreateProductoModal";
