@@ -299,8 +299,8 @@ export default function AdminManageAds() {
                           {anuncio.status}
                         </span>
                         {anuncio.isDoacao && (
-                          <span className="text-xs px-2 py-1 bg-purple-100 text-purple-700 rounded">
-                            Doação
+                          <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded">
+                            Gratuito
                           </span>
                         )}
                       </div>
