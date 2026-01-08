@@ -9,7 +9,7 @@ const AnuncianteCreateSchema = z.object({
   endereco: z.string().min(1, "Endereço é obrigatório"),
   cidade: z.string().min(1, "Cidade é obrigatória"),
   estado: z.string().length(2, "Estado deve ter 2 caracteres (ex: MG, SP, RJ)"),
-  descricao: z.string().min(1, "Descrição é obrigatória"),
+  descricao: z.string().optional(),
   email: z.string().email("Email inválido"),
   site: z.string().optional(),
   instagram: z.string().optional(),
