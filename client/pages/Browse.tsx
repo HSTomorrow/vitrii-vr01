@@ -180,13 +180,13 @@ export default function Browse() {
                     </div>
 
                     {/* Store Logo Badge */}
-                    {anuncio.loja?.fotoUrl && (
+                    {anuncio.anunciante?.fotoUrl && (
                       <div className="absolute bottom-3 left-3 z-10 w-10 h-10 rounded-full bg-white border-2 border-walmart-blue overflow-hidden flex items-center justify-center shadow-md">
                         <img
-                          src={anuncio.loja.fotoUrl}
-                          alt={anuncio.loja.nome}
+                          src={anuncio.anunciante.fotoUrl}
+                          alt={anuncio.anunciante.nome}
                           className="w-full h-full object-cover"
-                          title={anuncio.loja.nome}
+                          title={anuncio.anunciante.nome}
                         />
                       </div>
                     )}
@@ -215,7 +215,7 @@ export default function Browse() {
 
                       <div className="mb-4 p-3 bg-gray-50 rounded text-sm">
                         <p className="text-walmart-text-secondary">
-                          <strong>{anuncio.loja?.nome || "Loja"}</strong>
+                          <strong>{anuncio.anunciante?.nome || "Anunciante"}</strong>
                         </p>
                       </div>
 
