@@ -419,7 +419,7 @@ export default function AnuncioForm({
                 <label className="block text-sm font-semibold text-walmart-text">
                   Produto *
                 </label>
-                {selectedLojaId > 0 && (
+                {selectedAnuncianteId > 0 && (
                   <button
                     type="button"
                     onClick={() => setShowCreateProducto(true)}
@@ -430,7 +430,7 @@ export default function AnuncioForm({
                   </button>
                 )}
               </div>
-              {selectedLojaId > 0 ? (
+              {selectedAnuncianteId > 0 ? (
                 <select
                   value={formData.productId}
                   onChange={(e) => {
@@ -590,7 +590,7 @@ export default function AnuncioForm({
               <label className="block text-sm font-semibold text-walmart-text mb-2">
                 Equipe de Venda (Opcional)
               </label>
-              {selectedLojaId > 0 ? (
+              {selectedAnuncianteId > 0 ? (
                 <select
                   value={formData.equipeDeVendaId}
                   onChange={(e) =>
@@ -836,7 +836,7 @@ export default function AnuncioForm({
       <CreateProductoModal
         isOpen={showCreateProducto}
         onClose={() => setShowCreateProducto(false)}
-        lojaId={selectedLojaId}
+        lojaId={selectedAnuncianteId}
         onSuccess={handleProductoCreated}
       />
     </div>
