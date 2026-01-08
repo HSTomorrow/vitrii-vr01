@@ -264,18 +264,6 @@ export default function AnuncioForm({
       return;
     }
 
-    // For regular products/services, variant is required
-    // For special types (evento, agenda_recorrente, doacao), price table is optional
-    const productType = selectedProducto?.tipo;
-    const isSpecialType = ["evento", "agenda_recorrente", "doacao"].includes(productType || "");
-
-    if (!isSpecialType && !formData.tabelaDePrecoId) {
-      toast.error(
-        "Anunciante, Produto e Variante são obrigatórios (a variante define o preço)",
-      );
-      return;
-    }
-
     mutation.mutate(formData);
   };
 
@@ -549,10 +537,7 @@ export default function AnuncioForm({
             {/* Preço do Anúncio - Sempre Visível */}
             <div>
               <label className="block text-sm font-semibold text-walmart-text mb-2">
-                Valor do Anúncio *{" "}
-                {formData.isDoacao
-                  ? "(Desabilitado - Doação)"
-                  : ""}
+                Valor do Anúncio {formData.isDoacao ? "(Gratuito)" : ""}
               </label>
               <div className="flex items-center">
                 <span className="text-walmart-text font-semibold mr-2">
@@ -569,7 +554,7 @@ export default function AnuncioForm({
                   disabled={formData.isDoacao}
                   placeholder={
                     formData.isDoacao
-                      ? "Grátis (doação)"
+                      ? "0.00"
                       : selectedPriceTable
                         ? `Ex: ${Number(selectedPriceTable.preco).toFixed(2)}`
                         : "Ex: 99.90"
@@ -581,10 +566,10 @@ export default function AnuncioForm({
               </div>
               <p className="mt-2 text-sm text-walmart-text-secondary">
                 {formData.isDoacao
-                  ? "Este anúncio será publicado como doação, sem custo."
+                  ? "Este anúncio será publicado como gratuito."
                   : selectedPriceTable
                     ? `Deixe em branco para usar o preço da variante: R$ ${Number(selectedPriceTable.preco).toFixed(2)}`
-                    : "Digite o valor que deseja cobrar pelo anúncio"}
+                    : "Digite o valor que deseja cobrar pelo anúncio. Deixe vazio para usar o preço da variante."}
               </p>
               {formData.precoAnuncio &&
                 !formData.isDoacao &&
@@ -649,8 +634,8 @@ export default function AnuncioForm({
               )}
             </div>
 
-            {/* Doação */}
-            <div className="flex items-center gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            {/* Gratuito */}
+            <div className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg">
               <input
                 type="checkbox"
                 id="isDoacao"
@@ -658,20 +643,16 @@ export default function AnuncioForm({
                 onChange={(e) => {
                   const isChecked = e.target.checked;
                   handleInputChange("isDoacao", isChecked);
-                  // Zero out price when marking as donation
+                  // Zero out price when marking as free
                   if (isChecked) {
-                    handleInputChange("precoAnuncio", "");
+                    handleInputChange("precoAnuncio", "0");
                   }
                 }}
-                className="w-5 h-5 text-walmart-blue cursor-pointer rounded"
+                className="w-5 h-5 text-green-600 cursor-pointer rounded"
               />
               <label htmlFor="isDoacao" className="flex-1 cursor-pointer">
                 <p className="font-semibold text-walmart-text">
-                  Esta é uma doação
-                </p>
-                <p className="text-sm text-walmart-text-secondary">
-                  Marque esta opção para publicar como doação. Será publicado
-                  gratuitamente, sem necessidade de pagamento.
+                  Este produto/serviço/evento é gratuito
                 </p>
               </label>
             </div>
