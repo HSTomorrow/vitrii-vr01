@@ -379,6 +379,9 @@ export default function CadastroAnunciantes() {
                     Endereço
                   </th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">
+                    Cidade/Estado
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">
                     Ações
                   </th>
                 </tr>
