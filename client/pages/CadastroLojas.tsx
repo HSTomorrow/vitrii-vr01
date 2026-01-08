@@ -124,6 +124,8 @@ export default function CadastroAnunciantes() {
       nome: loja.nome,
       cnpjOuCpf: loja.cnpjOuCpf,
       endereco: loja.endereco,
+      cidade: loja.cidade,
+      estado: loja.estado,
       descricao: loja.descricao,
       email: loja.email,
       site: loja.site || "",
