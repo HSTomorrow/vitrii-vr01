@@ -158,16 +158,16 @@ export const extractUserId: RequestHandler = (req, res, next) => {
     // 4. Headers (for API key or custom header)
 
     const userIdSource =
-      req.params.usuarioId ||
-      req.query.usuarioId ||
-      req.body.usuarioId ||
+      req.params?.usuarioId ||
+      req.query?.usuarioId ||
+      req.body?.usuarioId ||
       req.headers["x-user-id"];
 
     if (userIdSource) {
       const parsedId = parseInt(userIdSource as string, 10);
       if (!isNaN(parsedId)) {
         req.userId = parsedId;
-        console.log(`[extractUserId] Successfully extracted user ID: ${parsedId}`);
+        console.log(`[extractUserId] Successfully extracted user ID: ${parsedId} from source: ${userIdSource}`);
       } else {
         console.warn(`[extractUserId] Invalid user ID format: ${userIdSource}`);
       }
