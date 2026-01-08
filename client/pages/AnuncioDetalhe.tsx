@@ -293,10 +293,10 @@ export default function AnuncioDetalhe() {
                 <p className="text-sm opacity-90 mb-1">Preço</p>
                 <div className="flex items-baseline">
                   <span className="text-4xl font-bold">
-                    R$ {Number(anuncio.tabelaDePreco.preco).toFixed(2)}
+                    R$ {Number(anuncio.precoAnuncio || anuncio.tabelaDePreco?.preco || 0).toFixed(2)}
                   </span>
                 </div>
-                {(anuncio.tabelaDePreco.tamanho || anuncio.tabelaDePreco.cor) && (
+                {anuncio.tabelaDePreco && (anuncio.tabelaDePreco.tamanho || anuncio.tabelaDePreco.cor) && (
                   <div className="mt-4 pt-4 border-t border-blue-400">
                     {anuncio.tabelaDePreco.tamanho && (
                       <p className="text-sm">
