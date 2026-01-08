@@ -71,64 +71,44 @@ export default function Index() {
     },
   });
 
-  const { data: anunciosData, isLoading } = useQuery({
-    queryKey: ["anuncios-destaque"],
+  // Fetch all paid ads without filtering by type - we'll filter on client side
+  const { data: allAnunciosData, isLoading: allAnunciosLoading } = useQuery({
+    queryKey: ["anuncios-all-paid"],
     queryFn: async () => {
-      const response = await fetch("/api/anuncios?status=pago&isDoacao=false");
+      const response = await fetch("/api/anuncios?status=pago");
       if (!response.ok) throw new Error("Erro ao buscar anúncios");
       return response.json();
     },
   });
 
-  const { data: doacoesData, isLoading: doacoesLoading } = useQuery({
-    queryKey: ["anuncios-doacoes"],
-    queryFn: async () => {
-      const response = await fetch("/api/anuncios?status=pago&isDoacao=true");
-      if (!response.ok) throw new Error("Erro ao buscar itens gratuitos");
-      return response.json();
-    },
-  });
+  const allAnuncios = allAnunciosData?.data || [];
 
-  const { data: eventosData, isLoading: eventosLoading } = useQuery({
-    queryKey: ["anuncios-eventos"],
-    queryFn: async () => {
-      const response = await fetch("/api/anuncios?status=pago");
-      if (!response.ok) throw new Error("Erro ao buscar eventos");
-      const data = await response.json();
-      // Filter for eventos by checking producto.tipo === "evento"
-      return {
-        ...data,
-        data: (data.data || []).filter((anuncio: any) =>
-          anuncio.producto?.tipo === "evento"
-        ),
-      };
-    },
-  });
+  // Filter anuncios by type and gratuito status
+  const destacados = allAnuncios
+    .filter((anuncio: any) =>
+      !anuncio.isDoacao &&
+      anuncio.destaque &&
+      ["produto", "servico"].includes(anuncio.producto?.tipo)
+    )
+    .slice(0, 20);
 
-  const { data: agendaRecorrenteData, isLoading: agendaLoading } = useQuery({
-    queryKey: ["anuncios-agenda-recorrente"],
-    queryFn: async () => {
-      const response = await fetch("/api/anuncios?status=pago");
-      if (!response.ok) throw new Error("Erro ao buscar agendas");
-      const data = await response.json();
-      // Filter for agenda_recorrente by checking producto.tipo === "agenda_recorrente"
-      return {
-        ...data,
-        data: (data.data || []).filter((anuncio: any) =>
-          anuncio.producto?.tipo === "agenda_recorrente"
-        ),
-      };
-    },
-  });
+  const destaqueDoacoes = allAnuncios
+    .filter((anuncio: any) => anuncio.isDoacao)
+    .slice(0, 20);
 
-  const anuncios = anunciosData?.data || [];
-  const destacados = anuncios.slice(0, 20);
-  const doacoes = doacoesData?.data || [];
-  const destaqueDoacoes = doacoes.slice(0, 20);
-  const eventos = eventosData?.data || [];
-  const destaqueEventos = eventos.slice(0, 20);
-  const agendas = agendaRecorrenteData?.data || [];
-  const destaqueAgendas = agendas.slice(0, 20);
+  const destaqueEventos = allAnuncios
+    .filter((anuncio: any) =>
+      !anuncio.isDoacao &&
+      anuncio.producto?.tipo === "evento"
+    )
+    .slice(0, 20);
+
+  const destaqueAgendas = allAnuncios
+    .filter((anuncio: any) =>
+      !anuncio.isDoacao &&
+      anuncio.producto?.tipo === "agenda_recorrente"
+    )
+    .slice(0, 20);
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
