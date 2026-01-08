@@ -369,13 +369,13 @@ export default function Index() {
                     )}
                   </div>
 
-                  {anuncio.loja?.fotoUrl && (
+                  {anuncio.anunciante?.fotoUrl && (
                     <div className="absolute bottom-3 left-3 z-10 w-10 h-10 rounded-full bg-white border-2 border-green-500 overflow-hidden flex items-center justify-center shadow-md">
                       <img
-                        src={anuncio.loja.fotoUrl}
-                        alt={anuncio.loja.nome}
+                        src={anuncio.anunciante.fotoUrl}
+                        alt={anuncio.anunciante.nome}
                         className="w-full h-full object-cover"
-                        title={anuncio.loja.nome}
+                        title={anuncio.anunciante.nome}
                       />
                     </div>
                   )}
