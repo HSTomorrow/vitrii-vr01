@@ -410,10 +410,10 @@ export default function AnuncioForm({
                 disabled={!!anuncioId}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent disabled:bg-gray-100"
               >
-                <option value={0}>Selecione uma loja</option>
-                {lojas.map((loja: Loja) => (
-                  <option key={loja.id} value={loja.id}>
-                    {loja.nome}
+                <option value={0}>Selecione um anunciante</option>
+                {anunciantes.map((anunciante: Anunciante) => (
+                  <option key={anunciante.id} value={anunciante.id}>
+                    {anunciante.nome}
                   </option>
                 ))}
               </select>
