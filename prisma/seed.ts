@@ -376,7 +376,7 @@ async function main() {
         nome: "Administrador",
         email: "admin@vitrii.com",
         senha: adminPassword,
-        cpf: "000.000.000-00",
+        cpf: "00000000000",
         telefone: "(51) 99999-9999",
         endereco: "Rua Ramiro Barcelos, Montenegro",
         tipoUsuario: "adm",
