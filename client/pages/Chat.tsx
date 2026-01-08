@@ -132,7 +132,7 @@ export default function Chat() {
           {/* Conversation List */}
           <div className="md:col-span-1">
             <ConversaList
-              usuarioId={currentUserId}
+              usuarioId={user?.id || 0}
               onSelectConversa={(conversa) => setSelectedConversa(conversa)}
               selectedConversaId={selectedConversa?.id}
             />
@@ -162,9 +162,12 @@ export default function Chat() {
                 <ChatBox
                   conversaId={selectedConversa.id}
                   messages={messages}
-                  currentUserId={currentUserId}
-                  tipoUsuario={userType}
+                  currentUserId={user?.id || 0}
+                  tipoUsuario="usuario"
                   onNewMessage={handleNewMessage}
+                  userCpf={user?.cpf}
+                  userTelefone={user?.telefone}
+                  onProfileIncomplete={() => setShowProfileGate(true)}
                 />
               </div>
             ) : (
