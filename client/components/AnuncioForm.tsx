@@ -71,6 +71,8 @@ export default function AnuncioForm({
     precoAnuncio: "",
     dataValidade: getDefaultValidityDate(),
     equipeDeVendaId: 0,
+    cidade: "",
+    estado: "",
     isDoacao: false,
     destaque: false,
     categoria: null as string | null,
