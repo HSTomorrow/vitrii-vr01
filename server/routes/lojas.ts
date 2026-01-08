@@ -145,14 +145,29 @@ export const createLoja: RequestHandler = async (req, res) => {
   }
 };
 
-// UPDATE store
+// Schema for updating store (whitelist safe fields)
+const LojaUpdateSchema = z.object({
+  nome: z.string().min(1, "Nome é obrigatório").optional(),
+  endereco: z.string().min(1, "Endereço é obrigatório").optional(),
+  descricao: z.string().min(1, "Descrição é obrigatória").optional(),
+  email: z.string().email("Email inválido").optional(),
+  site: z.string().optional(),
+  instagram: z.string().optional(),
+  facebook: z.string().optional(),
+  fotoUrl: z.string().optional(),
+});
+
+// UPDATE store (only safe fields allowed)
 export const updateLoja: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
+    // Validate input - only allow safe fields
+    const validatedData = LojaUpdateSchema.parse(req.body);
+
     const loja = await prisma.loja.update({
       where: { id: parseInt(id) },
-      data: req.body,
+      data: validatedData,
     });
 
     res.json({
@@ -161,6 +176,14 @@ export const updateLoja: RequestHandler = async (req, res) => {
       message: "Loja atualizada com sucesso",
     });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        success: false,
+        error: "Dados inválidos",
+        details: error.errors,
+      });
+    }
+
     console.error("Error updating store:", error);
     res.status(500).json({
       success: false,
