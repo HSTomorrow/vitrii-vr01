@@ -11,6 +11,8 @@ interface Anunciante {
   nome: string;
   cnpjOuCpf: string;
   endereco: string;
+  cidade: string;
+  estado: string;
   descricao: string;
   email: string;
   site?: string;
