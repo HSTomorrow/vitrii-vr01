@@ -89,10 +89,28 @@ export default function Index() {
     },
   });
 
+  const { data: eventosData, isLoading: eventosLoading } = useQuery({
+    queryKey: ["anuncios-eventos"],
+    queryFn: async () => {
+      const response = await fetch("/api/anuncios?status=pago");
+      if (!response.ok) throw new Error("Erro ao buscar eventos");
+      const data = await response.json();
+      // Filter for eventos by checking producto.tipo === "evento"
+      return {
+        ...data,
+        data: (data.data || []).filter((anuncio: any) =>
+          anuncio.producto?.tipo === "evento"
+        ),
+      };
+    },
+  });
+
   const anuncios = anunciosData?.data || [];
   const destacados = anuncios.slice(0, 20);
   const doacoes = doacoesData?.data || [];
   const destaqueDoacoes = doacoes.slice(0, 20);
+  const eventos = eventosData?.data || [];
+  const destaqueEventos = eventos.slice(0, 20);
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
