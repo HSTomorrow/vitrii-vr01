@@ -142,7 +142,7 @@ export default function AdCard({
           <div className="flex items-center gap-1 mb-3 text-xs text-walmart-text-secondary">
             <MapPin className="w-3 h-3" />
             <span className="truncate">
-              {extractMunicipality(anuncio.loja?.endereco || "")}
+              {extractMunicipality(anuncio.anunciante?.endereco || "")}
             </span>
           </div>
         </div>
