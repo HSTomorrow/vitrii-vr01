@@ -270,7 +270,7 @@ model Anuncio {
   precoAnuncio  Decimal?  @db.Decimal(10, 2)
   cidade        String?   @db.VarChar(100)
   estado        String?   @db.VarChar(2)
-  isDoacao      Boolean   @default(false)
+  isDoacao      Boolean   @default(false) // Deprecated: use gratuito logic instead
   destaque      Boolean   @default(false) // Featured ads
   isActive      Boolean   @default(true) // Logical deletion
   categoria     String?   @db.VarChar(50) // "roupas", "carros", "imoveis"
