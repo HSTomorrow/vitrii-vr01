@@ -835,7 +835,7 @@ export default function AnuncioForm({
       <CreateLojaModal
         isOpen={showCreateLoja}
         onClose={() => setShowCreateLoja(false)}
-        onSuccess={handleLojaCreated}
+        onSuccess={handleAnuncianteCreated}
       />
 
       {/* Create Producto Modal */}
