@@ -16,6 +16,7 @@ export default function CreateAnuncianteModal({
   onClose,
   onSuccess,
 }: CreateAnuncianteModalProps) {
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     nome: "",
@@ -35,7 +36,10 @@ export default function CreateAnuncianteModal({
       const response = await fetch("/api/anunciantes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          usuarioId: user?.id, // Include current user's ID to link them to the anunciante
+        }),
       });
 
       if (!response.ok) {
