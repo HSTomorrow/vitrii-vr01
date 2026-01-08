@@ -8,7 +8,7 @@ const ProductoCreateSchema = z.object({
   nome: z.string().min(1, "Nome é obrigatório"),
   descricao: z.string().optional(),
   sku: z.string().optional(),
-  tipo: z.enum(["produto", "servico"]).optional(),
+  tipo: z.enum(["produto", "servico", "doacao", "evento"]).optional(),
 });
 
 // GET all productos
