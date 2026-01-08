@@ -485,7 +485,7 @@ async function main() {
           },
         });
 
-        // Create announcement
+        // Create announcement - mark first product of each store as featured
         const anuncio = await prisma.anuncio.create({
           data: {
             anuncianteId: store.id,
@@ -499,6 +499,7 @@ async function main() {
             estado: store.estado,
             categoria: category.toLowerCase().replace(/\s+/g, "-"),
             status: "pago",
+            destaque: i === 0, // Mark first product as featured
             dataValidade: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30 days from now
           },
         });
@@ -506,7 +507,7 @@ async function main() {
         totalProducts++;
         totalAds++;
         console.log(
-          `  ✅ Produto criado: ${productName} - Anúncio ID: ${anuncio.id}`,
+          `  ✅ Produto criado: ${productName} - Anúncio ID: ${anuncio.id} ${i === 0 ? '(DESTAQUE)' : ''}`,
         );
       }
     }
