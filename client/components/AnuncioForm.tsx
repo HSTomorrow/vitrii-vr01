@@ -485,12 +485,18 @@ export default function AnuncioForm({
                     }
                   </p>
                 )}
+              {selectedProducto?.tipo && (
+                <p className="mt-2 text-sm text-walmart-text-secondary">
+                  Tipo: <span className="font-semibold capitalize">{selectedProducto.tipo === "agenda_recorrente" ? "Agenda Recorrente" : selectedProducto.tipo}</span>
+                </p>
+              )}
             </div>
 
-            {/* Tabela de Preço Selection */}
+            {/* Tabela de Preço Selection - Only for regular products/services */}
+            {selectedProducto?.tipo && !["evento", "agenda_recorrente", "doacao"].includes(selectedProducto.tipo) && (
             <div>
               <label className="block text-sm font-semibold text-walmart-text mb-2">
-                Variante (Tamanho/Cor) - Define o Preço
+                Variante (Tamanho/Cor) - Define o Preço *
               </label>
               {formData.productId > 0 ? (
                 <select
@@ -531,6 +537,14 @@ export default function AnuncioForm({
                 </p>
               )}
             </div>
+            )}
+            {selectedProducto?.tipo && ["evento", "agenda_recorrente", "doacao"].includes(selectedProducto.tipo) && (
+            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-800">
+                <strong>ℹ️ Dica:</strong> Este tipo de anúncio não requer variantes. O preço será definido diretamente no campo "Valor do Anúncio" abaixo.
+              </p>
+            </div>
+            )}
 
             {/* Preço do Anúncio - Sempre Visível */}
             <div>
