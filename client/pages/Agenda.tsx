@@ -14,7 +14,7 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import WaitlistModal from "../components/WaitlistModal";
 
-interface Loja {
+interface Anunciante {
   id: number;
   nome: string;
 }
