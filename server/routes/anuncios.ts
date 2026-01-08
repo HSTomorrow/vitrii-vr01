@@ -30,7 +30,11 @@ const AnuncioCreateSchema = z.object({
 // GET all ads
 export const getAnuncios: RequestHandler = async (req, res) => {
   try {
-    const { lojaId, status, includeInactive, isDoacao } = req.query;
+    const { lojaId, status, includeInactive, isDoacao, limit = "20", offset = "0" } = req.query;
+
+    // Validate pagination parameters
+    const pageLimit = Math.min(Math.max(parseInt(limit as string) || 20, 1), 100);
+    const pageOffset = Math.max(parseInt(offset as string) || 0, 0);
 
     const where: any = { isActive: true }; // Default: only active ads
     if (lojaId) where.lojaId = parseInt(lojaId as string);
@@ -41,39 +45,51 @@ export const getAnuncios: RequestHandler = async (req, res) => {
       where.isDoacao = isDoacao === "true";
     }
 
-    const anuncios = await prisma.anuncio.findMany({
-      where,
-      include: {
-        loja: {
-          select: {
-            id: true,
-            nome: true,
-            fotoUrl: true,
-            endereco: true,
+    // Get total count and paginated data in parallel
+    const [anuncios, total] = await Promise.all([
+      prisma.anuncio.findMany({
+        where,
+        include: {
+          loja: {
+            select: {
+              id: true,
+              nome: true,
+              fotoUrl: true,
+              endereco: true,
+            },
+          },
+          producto: {
+            select: {
+              id: true,
+              nome: true,
+              descricao: true,
+              tipo: true,
+            },
+          },
+          tabelaDePreco: {
+            select: {
+              id: true,
+              preco: true,
+            },
           },
         },
-        producto: {
-          select: {
-            id: true,
-            nome: true,
-            descricao: true,
-            tipo: true,
-          },
-        },
-        tabelaDePreco: {
-          select: {
-            id: true,
-            preco: true,
-          },
-        },
-      },
-      orderBy: [{ destaque: "desc" }, { dataCriacao: "desc" }], // Featured ads first
-    });
+        orderBy: [{ destaque: "desc" }, { dataCriacao: "desc" }],
+        take: pageLimit,
+        skip: pageOffset,
+      }),
+      prisma.anuncio.count({ where }),
+    ]);
 
     res.json({
       success: true,
       data: anuncios,
-      count: anuncios.length,
+      pagination: {
+        count: anuncios.length,
+        total,
+        limit: pageLimit,
+        offset: pageOffset,
+        hasMore: pageOffset + pageLimit < total,
+      },
     });
   } catch (error) {
     console.error("Error fetching ads:", error);
