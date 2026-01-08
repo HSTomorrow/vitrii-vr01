@@ -6,7 +6,7 @@ import { Send, Trash2 } from "lucide-react";
 interface Message {
   id: number;
   conteudo: string;
-  tipoRemetente: "usuario" | "loja";
+  tipoRemetente: "usuario" | "anunciante";
   dataCriacao: string;
   lido: boolean;
   remetente: {
@@ -19,7 +19,7 @@ interface ChatBoxProps {
   conversaId: number;
   messages: Message[];
   currentUserId: number;
-  tipoUsuario: "usuario" | "loja";
+  tipoUsuario: "usuario" | "anunciante";
   onNewMessage: (message: Message) => void;
 }
 
