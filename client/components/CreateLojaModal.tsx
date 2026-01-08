@@ -236,7 +236,7 @@ export default function CreateAnuncianteModal({
           {/* Descrição */}
           <div>
             <label className="block text-sm font-semibold text-walmart-text mb-2">
-              Descrição *
+              Descrição (Opcional)
             </label>
             <textarea
               value={formData.descricao}
