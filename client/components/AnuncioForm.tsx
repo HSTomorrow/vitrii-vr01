@@ -58,6 +58,7 @@ export default function AnuncioForm({
   anuncioId,
   onSuccess,
 }: AnuncioFormProps) {
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [selectedAnuncianteId, setSelectedAnuncianteId] = useState(
@@ -98,14 +99,22 @@ export default function AnuncioForm({
     setShowCreateProducto(false);
   };
 
-  // Fetch anunciantes
+  // Fetch anunciantes - filtered by user (ADM sees all, regular users see only theirs)
   const { data: anunciantesData } = useQuery({
-    queryKey: ["anunciantes"],
+    queryKey: ["anunciantes-do-usuario", user?.id],
     queryFn: async () => {
-      const response = await fetch("/api/anunciantes");
+      // If user is ADM, fetch all anunciantes without filter
+      if (user?.tipoUsuario === "adm") {
+        const response = await fetch("/api/anunciantes");
+        if (!response.ok) throw new Error("Erro ao buscar anunciantes");
+        return response.json();
+      }
+      // Otherwise, fetch only user's anunciantes
+      const response = await fetch("/api/anunciantes/do-usuario/listar");
       if (!response.ok) throw new Error("Erro ao buscar anunciantes");
       return response.json();
     },
+    enabled: !!user,
   });
 
   // Fetch anuncio if editing
