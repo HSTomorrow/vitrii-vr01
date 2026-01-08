@@ -3,17 +3,17 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { X } from "lucide-react";
 
-interface CreateLojaModalProps {
+interface CreateAnuncianteModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess?: (lojaId: number) => void;
 }
 
-export default function CreateLojaModal({
+export default function CreateAnuncianteModal({
   isOpen,
   onClose,
   onSuccess,
-}: CreateLojaModalProps) {
+}: CreateAnuncianteModalProps) {
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     nome: "",
@@ -28,7 +28,7 @@ export default function CreateLojaModal({
 
   const mutation = useMutation({
     mutationFn: async (data: any) => {
-      const response = await fetch("/api/lojas", {
+      const response = await fetch("/api/anunciantes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
@@ -42,8 +42,8 @@ export default function CreateLojaModal({
       return response.json();
     },
     onSuccess: (result) => {
-      queryClient.invalidateQueries({ queryKey: ["lojas"] });
-      toast.success("Loja criada com sucesso!");
+      queryClient.invalidateQueries({ queryKey: ["anunciantes"] });
+      toast.success("Anunciante criado com sucesso!");
       setFormData({
         nome: "",
         cnpjOuCpf: "",
@@ -59,7 +59,7 @@ export default function CreateLojaModal({
     },
     onError: (error) => {
       toast.error(
-        error instanceof Error ? error.message : "Erro ao criar loja",
+        error instanceof Error ? error.message : "Erro ao criar anunciante",
       );
     },
   });
@@ -94,7 +94,7 @@ export default function CreateLojaModal({
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
           <h2 className="text-xl font-bold text-walmart-text">
-            Criar Nova Loja
+            Novo Anunciante
           </h2>
           <button
             onClick={onClose}
@@ -109,13 +109,13 @@ export default function CreateLojaModal({
           {/* Nome */}
           <div>
             <label className="block text-sm font-semibold text-walmart-text mb-2">
-              Nome da Loja *
+              Nome do Anunciante *
             </label>
             <input
               type="text"
               value={formData.nome}
               onChange={(e) => handleInputChange("nome", e.target.value)}
-              placeholder="Ex: Loja Central"
+              placeholder="Ex: Anunciante Central"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
             />
           </div>
@@ -148,7 +148,7 @@ export default function CreateLojaModal({
               type="email"
               value={formData.email}
               onChange={(e) => handleInputChange("email", e.target.value)}
-              placeholder="Ex: contato@loja.com"
+              placeholder="Ex: contato@anunciante.com"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
             />
           </div>
@@ -190,7 +190,7 @@ export default function CreateLojaModal({
               type="text"
               value={formData.site}
               onChange={(e) => handleInputChange("site", e.target.value)}
-              placeholder="Ex: https://www.loja.com"
+              placeholder="Ex: https://www.anunciante.com"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
             />
           </div>
@@ -237,7 +237,7 @@ export default function CreateLojaModal({
               disabled={mutation.isPending}
               className="flex-1 px-4 py-2 bg-walmart-blue text-white rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors disabled:opacity-50"
             >
-              {mutation.isPending ? "Criando..." : "Criar Loja"}
+              {mutation.isPending ? "Criando..." : "Criar Anunciante"}
             </button>
           </div>
         </form>
