@@ -138,6 +138,14 @@ export default function ChatBox({
   const handleSendMessage = useCallback(
     (e: React.FormEvent) => {
       e.preventDefault();
+
+      // Check if user has completed their profile
+      if (!userCpf || !userTelefone) {
+        setShowProfileGate(true);
+        onProfileIncomplete?.();
+        return;
+      }
+
       const trimmed = messageText.trim();
 
       if (!trimmed) {
@@ -152,7 +160,7 @@ export default function ChatBox({
 
       sendMessageMutation.mutate(trimmed);
     },
-    [messageText, sendMessageMutation],
+    [messageText, sendMessageMutation, userCpf, userTelefone, onProfileIncomplete],
   );
 
   // Memoized key down handler
