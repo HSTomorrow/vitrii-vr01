@@ -194,7 +194,14 @@ export default function Chat() {
         isOpen={showCreateModal}
         onClose={() => setShowCreateModal(false)}
         onSuccess={handleConversaCreated}
-        currentUserId={currentUserId}
+        currentUserId={user?.id || 0}
+      />
+
+      {/* Profile Completion Gate */}
+      <ProfileCompletionGate
+        isOpen={showProfileGate}
+        onClose={() => setShowProfileGate(false)}
+        actionLabel="enviar mensagens ou iniciar uma conversa"
       />
     </div>
   );
