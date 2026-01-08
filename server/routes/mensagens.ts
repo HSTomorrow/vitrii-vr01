@@ -6,7 +6,7 @@ import { z } from "zod";
 const MensagemCreateSchema = z.object({
   conversaId: z.number().int().positive("Conversa é obrigatória"),
   remetentId: z.number().int().positive("Remetente é obrigatório"),
-  tipoRemetente: z.enum(["usuario", "loja"]),
+  tipoRemetente: z.enum(["usuario", "anunciante"]),
   conteudo: z
     .string()
     .min(1, "Mensagem não pode estar vazia")
