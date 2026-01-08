@@ -281,7 +281,7 @@ export default function AnuncioDetalhe() {
                 {/* Product Group */}
                 <div className="bg-white rounded-lg border border-gray-200 p-6">
                   <h3 className="font-bold text-walmart-text mb-3">Grupo de Produtos</h3>
-                  <p className="text-walmart-text">{anuncio.producto.grupoDeProductos.nome}</p>
+                  <p className="text-walmart-text">{anuncio.producto.grupo?.nome || "N/A"}</p>
                 </div>
               </div>
             </div>
