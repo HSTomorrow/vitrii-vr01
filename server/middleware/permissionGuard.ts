@@ -157,14 +157,17 @@ export const extractUserId: RequestHandler = (req, res, next) => {
     // 3. Request body
     // 4. Headers (for API key or custom header)
 
-    const userId =
+    const userIdSource =
       req.params.usuarioId ||
       req.query.usuarioId ||
       req.body.usuarioId ||
       req.headers["x-user-id"];
 
-    if (userId) {
-      req.userId = parseInt(userId as string);
+    if (userIdSource) {
+      const parsedId = parseInt(userIdSource as string, 10);
+      if (!isNaN(parsedId)) {
+        req.userId = parsedId;
+      }
     }
 
     next();
