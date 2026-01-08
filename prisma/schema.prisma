@@ -175,7 +175,7 @@ model Producto {
   nome          String    @db.VarChar(255)
   descricao     String?   @db.Text
   sku           String?   @db.VarChar(100)
-  tipo          String    @default("produto") // "produto" or "servico"
+  tipo          String    @default("produto") // "produto", "servico", "doacao", "evento"
   isActive      Boolean   @default(true)
   dataCriacao   DateTime  @default(now())
   dataAtualizacao DateTime @updatedAt
