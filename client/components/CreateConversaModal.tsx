@@ -48,9 +48,9 @@ export default function CreateConversaModal({
     enabled: isOpen,
   });
 
-  // Fetch anuncios for selected loja
+  // Fetch anuncios for selected anunciante
   const { data: anunciosData } = useQuery({
-    queryKey: ["anuncios-loja", formData.anuncianteId],
+    queryKey: ["anuncios-anunciante", formData.anuncianteId],
     queryFn: async () => {
       const response = await fetch(`/api/anuncios?anuncianteId=${formData.anuncianteId}`);
       if (!response.ok) throw new Error("Erro ao buscar anúncios");
