@@ -165,21 +165,31 @@ export function createServer() {
   app.put("/api/usuarios/:id", updateUsuario);
   app.delete("/api/usuarios/:id", deleteUsuario);
 
-  // Lojas routes
-  app.get("/api/lojas", getLojas);
-  app.get("/api/lojas/:id", getLojaById);
-  app.post("/api/lojas", createLoja);
-  app.put("/api/lojas/:id", updateLoja);
-  app.delete("/api/lojas/:id", deleteLoja);
-  app.get("/api/lojas/:lojaId/produtos-para-anuncio", getProdutosParaAnuncio);
+  // Anunciantes routes (formerly Lojas)
+  app.get("/api/anunciantes", getAnunciantes);
+  app.get("/api/anunciantes/:id", getAnuncianteById);
+  app.post("/api/anunciantes", createAnunciante);
+  app.put("/api/anunciantes/:id", updateAnunciante);
+  app.delete("/api/anunciantes/:id", deleteAnunciante);
+  app.post("/api/anunciantes/:id/usuarios", adicionarUsuarioAnunciante);
+  app.get("/api/anunciantes/:anuncianteId/usuarios", getEquipeAnunciante);
+  app.get("/api/anunciantes/:anuncianteId/produtos-para-anuncio", getProdutosParaAnuncio);
+
+  // Backward compatibility routes (still using /api/lojas)
+  app.get("/api/lojas", getAnunciantes);
+  app.get("/api/lojas/:id", getAnuncianteById);
+  app.post("/api/lojas", createAnunciante);
+  app.put("/api/lojas/:id", updateAnunciante);
+  app.delete("/api/lojas/:id", deleteAnunciante);
+  app.get("/api/lojas/:anuncianteId/produtos-para-anuncio", getProdutosParaAnuncio);
 
   // Grupos de Productos routes
   app.get("/api/grupos-productos", getGrupos);
   app.get("/api/grupos-productos/:id", getGrupoById);
   app.get("/api/grupos-productos/:id/productos", getProductosOfGrupo);
-  app.get("/api/lojas/:lojaId/grupos-productos", (req, res) => {
-    // Delegate to getGrupos with lojaId query param
-    req.query.lojaId = req.params.lojaId;
+  app.get("/api/lojas/:anuncianteId/grupos-productos", (req, res) => {
+    // Delegate to getGrupos with anuncianteId query param
+    req.query.anuncianteId = req.params.anuncianteId;
     return getGrupos(req, res);
   });
   app.post("/api/grupos-productos", createGrupo);
