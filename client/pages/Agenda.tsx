@@ -57,7 +57,7 @@ export default function Agenda() {
   const { anuncianteId } = useParams<{ anuncianteId?: string }>();
 
   const [agendas, setAgendas] = useState<AgendaSlot[]>([]);
-  const [lojas, setLojas] = useState<Loja[]>([]);
+  const [anunciantes, setAnunciantes] = useState<Anunciante[]>([]);
   const [productos, setProductos] = useState<Producto[]>([]);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [loading, setLoading] = useState(true);
