@@ -6,7 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Plus, Trash2, Edit2 } from "lucide-react";
 
-interface Loja {
+interface Anunciante {
   id: number;
   nome: string;
   cnpjOuCpf: string;
