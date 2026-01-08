@@ -164,7 +164,12 @@ export const createGrupo: RequestHandler = async (req, res) => {
     const grupo = await prisma.grupoDeProductos.create({
       data: validatedData,
       include: {
-        loja: true,
+        anunciante: {
+          select: {
+            id: true,
+            nome: true,
+          },
+        },
       },
     });
 
@@ -200,7 +205,12 @@ export const updateGrupo: RequestHandler = async (req, res) => {
       where: { id: parseInt(id) },
       data: updateData,
       include: {
-        loja: true,
+        anunciante: {
+          select: {
+            id: true,
+            nome: true,
+          },
+        },
       },
     });
 
