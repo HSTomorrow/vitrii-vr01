@@ -6,7 +6,7 @@ import { Trash2, MessageSquare, Search } from "lucide-react";
 interface Conversa {
   id: number;
   usuarioId: number;
-  lojaId: number;
+  anuncianteId: number;
   assunto: string;
   ultimaMensagem: string;
   dataUltimaMensagem: string;
@@ -15,7 +15,7 @@ interface Conversa {
     id: number;
     nome: string;
   };
-  loja: {
+  anunciante: {
     id: number;
     nome: string;
   };
@@ -27,14 +27,14 @@ interface Conversa {
 
 interface ConversaListProps {
   usuarioId: number;
-  lojaId?: number;
+  anuncianteId?: number;
   onSelectConversa: (conversa: Conversa) => void;
   selectedConversaId?: number;
 }
 
 export default function ConversaList({
   usuarioId,
-  lojaId,
+  anuncianteId,
   onSelectConversa,
   selectedConversaId,
 }: ConversaListProps) {
@@ -46,11 +46,11 @@ export default function ConversaList({
 
   // Fetch conversations
   const { data: conversasData, isLoading } = useQuery({
-    queryKey: ["conversas", usuarioId, lojaId],
+    queryKey: ["conversas", usuarioId, anuncianteId],
     queryFn: async () => {
       let url = "/api/conversas?";
       if (usuarioId) url += `usuarioId=${usuarioId}&`;
-      if (lojaId) url += `lojaId=${lojaId}&`;
+      if (anuncianteId) url += `anuncianteId=${anuncianteId}&`;
 
       const response = await fetch(url);
       if (!response.ok) throw new Error("Erro ao buscar conversas");
@@ -65,7 +65,7 @@ export default function ConversaList({
     const matchSearch =
       conv.assunto.toLowerCase().includes(searchTerm.toLowerCase()) ||
       conv.usuario.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      conv.loja.nome.toLowerCase().includes(searchTerm.toLowerCase());
+      conv.anunciante.nome.toLowerCase().includes(searchTerm.toLowerCase());
 
     const matchType = filterType === "todas" || conv.tipo === filterType;
 
@@ -84,7 +84,7 @@ export default function ConversaList({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["conversas", usuarioId, lojaId],
+        queryKey: ["conversas", usuarioId, anuncianteId],
       });
       toast.success("Conversa deletada");
     },
@@ -189,7 +189,7 @@ export default function ConversaList({
                       {conversa.assunto}
                     </p>
                     <p className="text-sm text-walmart-text-secondary">
-                      {conversa.loja.nome} • {conversa.usuario.nome}
+                      {conversa.anunciante.nome} • {conversa.usuario.nome}
                     </p>
                     {conversa.anuncio && (
                       <p className="text-xs text-gray-500 truncate">
