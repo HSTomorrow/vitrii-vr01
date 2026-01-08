@@ -20,6 +20,8 @@ const AnuncioCreateSchema = z.object({
     .nullable(),
   dataValidade: z.string().optional().nullable(),
   equipeDeVendaId: z.number().int().positive().optional().nullable(),
+  cidade: z.string().max(100, "Cidade não pode ter mais de 100 caracteres").optional().nullable(),
+  estado: z.string().length(2, "Estado deve ter 2 caracteres").optional().nullable(),
   isDoacao: z.boolean().optional().default(false),
   destaque: z.boolean().optional().default(false),
   isActive: z.boolean().optional().default(true),
