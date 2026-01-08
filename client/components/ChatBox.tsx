@@ -300,6 +300,13 @@ export default function ChatBox({
           </p>
         </form>
       </div>
+
+      {/* Profile Completion Gate */}
+      <ProfileCompletionGate
+        isOpen={showProfileGate}
+        onClose={() => setShowProfileGate(false)}
+        actionLabel="enviar mensagens"
+      />
     </div>
   );
 }
