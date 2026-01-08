@@ -73,11 +73,11 @@ export default function Index() {
     },
   });
 
-  // Fetch all paid ads without filtering by type - we'll filter on client side
+  // Fetch all active ads without status filter - we'll filter on client side
   const { data: allAnunciosData, isLoading: allAnunciosLoading } = useQuery({
-    queryKey: ["anuncios-all-paid"],
+    queryKey: ["anuncios-all"],
     queryFn: async () => {
-      const response = await fetch("/api/anuncios?status=pago");
+      const response = await fetch("/api/anuncios");
       if (!response.ok) throw new Error("Erro ao buscar anúncios");
       return response.json();
     },
