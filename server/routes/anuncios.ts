@@ -25,6 +25,7 @@ const AnuncioCreateSchema = z.object({
   isDoacao: z.boolean().optional().default(false),
   destaque: z.boolean().optional().default(false),
   isActive: z.boolean().optional().default(true),
+  status: z.enum(["em_edicao", "aguardando_pagamento", "pago", "historico"]).optional(),
   categoria: z.enum(["roupas", "carros", "imoveis"]).optional().nullable(),
   dadosCategoria: z.string().optional().nullable(), // JSON string
 });
