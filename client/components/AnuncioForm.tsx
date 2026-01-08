@@ -24,7 +24,7 @@ interface Producto {
   id: number;
   nome: string;
   descricao?: string;
-  tipo?: string; // "produto", "servico", "evento", "agenda_recorrente", "doacao"
+  tipo?: string; // "produto", "servico", "evento", "agenda_recorrente"
   grupo?: { id: number; nome: string };
   grupoDeProductos?: { id: number; nome: string };
   tabelasDePreco: Array<{
