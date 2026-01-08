@@ -735,16 +735,20 @@ export default function AnuncioForm({
                 <label className="block text-sm font-semibold text-walmart-text mb-2">
                   Estado (Opcional)
                 </label>
-                <input
-                  type="text"
+                <select
                   value={formData.estado}
                   onChange={(e) =>
-                    handleInputChange("estado", e.target.value.toUpperCase().slice(0, 2))
+                    handleInputChange("estado", e.target.value)
                   }
-                  placeholder="Ex: MG"
-                  maxLength={2}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
-                />
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent bg-white"
+                >
+                  <option value="">-- Selecione um estado --</option>
+                  {BRAZILIAN_STATES.map((state) => (
+                    <option key={state.code} value={state.code}>
+                      {state.code} - {state.name}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
 
