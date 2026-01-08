@@ -26,7 +26,7 @@ interface Producto {
 
 interface AgendaSlot {
   id: number;
-  lojaId: number;
+  anuncianteId: number;
   productId: number;
   dataHora: string;
   descricao?: string;
@@ -54,7 +54,7 @@ interface AgendaSlot {
 
 export default function Agenda() {
   const navigate = useNavigate();
-  const { lojaId } = useParams<{ lojaId?: string }>();
+  const { anuncianteId } = useParams<{ anuncianteId?: string }>();
 
   const [agendas, setAgendas] = useState<AgendaSlot[]>([]);
   const [lojas, setLojas] = useState<Loja[]>([]);
@@ -68,7 +68,7 @@ export default function Agenda() {
 
   // Form state
   const [formData, setFormData] = useState({
-    lojaId: lojaId ? parseInt(lojaId) : 0,
+    anuncianteId: anuncianteId ? parseInt(anuncianteId) : 0,
     productId: 0,
     dataHora: "",
     descricao: "",
@@ -107,7 +107,7 @@ export default function Agenda() {
   // Load agendas
   useEffect(() => {
     loadAgendas();
-  }, [selectedDate, lojaId]);
+  }, [selectedDate, anuncianteId]);
 
   const loadAgendas = async () => {
     try {
@@ -122,8 +122,8 @@ export default function Agenda() {
         dataFim: endOfDay.toISOString(),
       });
 
-      if (lojaId) {
-        params.append("lojaId", lojaId);
+      if (anuncianteId) {
+        params.append("anuncianteId", anuncianteId);
       }
 
       const response = await fetch(`/api/agendas?${params}`);
@@ -144,7 +144,7 @@ export default function Agenda() {
 
   const handleCreateSlot = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.lojaId || !formData.productId || !formData.dataHora) {
+    if (!formData.anuncianteId || !formData.productId || !formData.dataHora) {
       toast.error("Preencha todos os campos obrigatórios");
       return;
     }
@@ -162,7 +162,7 @@ export default function Agenda() {
         toast.success("Horário adicionado com sucesso");
         setShowNewSlotForm(false);
         setFormData({
-          lojaId: lojaId ? parseInt(lojaId) : 0,
+          anuncianteId: anuncianteId ? parseInt(anuncianteId) : 0,
           productId: 0,
           dataHora: "",
           descricao: "",
@@ -339,11 +339,11 @@ export default function Agenda() {
                       </div>
                     ) : (
                       <select
-                        value={formData.lojaId}
+                        value={formData.anuncianteId}
                         onChange={(e) =>
                           setFormData({
                             ...formData,
-                            lojaId: parseInt(e.target.value),
+                            anuncianteId: parseInt(e.target.value),
                           })
                         }
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
