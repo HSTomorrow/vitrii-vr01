@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import CategoryFields from "./CategoryFields";
-import CreateLojaModal from "./CreateLojaModal";
+import CreateAnuncianteModal from "./CreateLojaModal";
 import CreateProductoModal from "./CreateProductoModal";
 
 interface AnuncioFormProps {
