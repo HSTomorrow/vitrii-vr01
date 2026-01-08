@@ -56,6 +56,8 @@ import {
   forgotPassword,
   resetPassword,
   validateResetToken,
+  getUsuariosComSenha,
+  adminResetUserPassword,
 } from "./routes/usuarios";
 import {
   getEquipes,
