@@ -14,7 +14,7 @@ import CreateLojaModal from "./CreateLojaModal";
 import CreateProductoModal from "./CreateProductoModal";
 
 interface AnuncioFormProps {
-  lojaId?: number;
+  anuncianteId?: number;
   anuncioId?: number;
   onSuccess?: () => void;
 }
@@ -33,7 +33,7 @@ interface Producto {
   }>;
 }
 
-interface Loja {
+interface Anunciante {
   id: number;
   nome: string;
 }
@@ -51,13 +51,13 @@ const getDefaultValidityDate = () => {
 };
 
 export default function AnuncioForm({
-  lojaId,
+  anuncianteId,
   anuncioId,
   onSuccess,
 }: AnuncioFormProps) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const [selectedLojaId, setSelectedLojaId] = useState(lojaId || 0);
+  const [selectedAnuncianteId, setSelectedAnuncianteId] = useState(anuncianteId || 0);
   const [showCreateLoja, setShowCreateLoja] = useState(false);
   const [showCreateProducto, setShowCreateProducto] = useState(false);
   const [formData, setFormData] = useState({
@@ -76,8 +76,8 @@ export default function AnuncioForm({
   });
 
   // Handlers for inline creation
-  const handleLojaCreated = (newLojaId: number) => {
-    setSelectedLojaId(newLojaId);
+  const handleAnuncianteCreated = (newAnuncianteId: number) => {
+    setSelectedAnuncianteId(newAnuncianteId);
     setFormData((prev) => ({ ...prev, productId: 0, tabelaDePrecoId: 0 }));
     setShowCreateLoja(false);
   };
@@ -91,12 +91,12 @@ export default function AnuncioForm({
     setShowCreateProducto(false);
   };
 
-  // Fetch lojas
-  const { data: lojasData } = useQuery({
-    queryKey: ["lojas"],
+  // Fetch anunciantes
+  const { data: anunciantesData } = useQuery({
+    queryKey: ["anunciantes"],
     queryFn: async () => {
-      const response = await fetch("/api/lojas");
-      if (!response.ok) throw new Error("Erro ao buscar lojas");
+      const response = await fetch("/api/anunciantes");
+      if (!response.ok) throw new Error("Erro ao buscar anunciantes");
       return response.json();
     },
   });
