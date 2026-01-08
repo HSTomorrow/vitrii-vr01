@@ -22,7 +22,7 @@ interface Anuncio {
   id: number;
   titulo: string;
   descricao?: string;
-  lojaId: number;
+  anuncianteId: number;
   productId: number;
   fotoUrl?: string;
   precoAnuncio?: number;
@@ -31,7 +31,7 @@ interface Anuncio {
   isActive: boolean;
   status: string;
   dataCriacao: string;
-  loja?: { nome: string };
+  anunciante?: { nome: string };
   producto?: { nome: string };
 }
 
@@ -177,7 +177,7 @@ export default function AdminManageAds() {
   const filteredAnuncios = anuncios.filter((a: Anuncio) => {
     const matchesSearch =
       a.titulo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      a.loja?.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      a.anunciante?.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
       a.producto?.nome.toLowerCase().includes(searchTerm.toLowerCase());
 
     if (filterStatus === "todos") return matchesSearch;
@@ -282,7 +282,7 @@ export default function AdminManageAds() {
                         )}
                       </div>
                       <p className="text-sm text-walmart-text-secondary truncate">
-                        Loja: {anuncio.loja?.nome || "N/A"} • Produto:{" "}
+                        Anunciante: {anuncio.anunciante?.nome || "N/A"} • Produto:{" "}
                         {anuncio.producto?.nome || "N/A"}
                       </p>
                       <div className="flex items-center gap-2 mt-2">
