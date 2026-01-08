@@ -330,10 +330,10 @@ export default function Index() {
           <div className="flex justify-between items-center mb-8">
             <div>
               <h2 className="text-2xl md:text-3xl font-bold text-walmart-text mb-1">
-                Itens Gratuitos
+                Doações, Brindes e Serviços Gratuitos
               </h2>
               <p className="text-sm text-walmart-text-secondary">
-                Produtos, serviços e eventos disponíveis gratuitamente
+                Doações, Brindes, Produtos, Serviços e Eventos disponíveis para experimentação gratuitamente
               </p>
             </div>
             <Link
