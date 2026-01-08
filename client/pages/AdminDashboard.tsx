@@ -269,6 +269,57 @@ export default function AdminDashboard() {
           </p>
         </div>
 
+        {/* Quick Links */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+          <button
+            onClick={() => navigate("/admin/usuarios")}
+            className="bg-blue-50 border border-blue-200 rounded-lg p-6 hover:shadow-lg transition-shadow text-left group"
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                <Key className="w-6 h-6 text-blue-600" />
+              </div>
+              <h3 className="font-semibold text-walmart-text">
+                Gerenciar Senhas
+              </h3>
+            </div>
+            <p className="text-sm text-walmart-text-secondary">
+              Visualize e resete as senhas dos usuários
+            </p>
+          </button>
+
+          <button
+            onClick={() => navigate("/admin/anuncios")}
+            className="bg-green-50 border border-green-200 rounded-lg p-6 hover:shadow-lg transition-shadow text-left group"
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center group-hover:bg-green-200 transition-colors">
+                <AlertCircle className="w-6 h-6 text-green-600" />
+              </div>
+              <h3 className="font-semibold text-walmart-text">
+                Gerenciar Anúncios
+              </h3>
+            </div>
+            <p className="text-sm text-walmart-text-secondary">
+              Modere e controle anúncios do sistema
+            </p>
+          </button>
+
+          <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                <Users className="w-6 h-6 text-purple-600" />
+              </div>
+              <h3 className="font-semibold text-walmart-text">
+                Total de Usuários
+              </h3>
+            </div>
+            <p className="text-2xl font-bold text-walmart-blue">
+              {usuariosData?.count || 0}
+            </p>
+          </div>
+        </div>
+
         {/* Tabs */}
         <div className="flex gap-4 mb-6 border-b border-gray-200">
           <button
