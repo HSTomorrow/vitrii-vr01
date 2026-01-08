@@ -33,9 +33,13 @@ export default function ChatBox({
   currentUserId,
   tipoUsuario,
   onNewMessage,
+  userCpf,
+  userTelefone,
+  onProfileIncomplete,
 }: ChatBoxProps) {
   const queryClient = useQueryClient();
   const [messageText, setMessageText] = useState("");
+  const [showProfileGate, setShowProfileGate] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messageInputRef = useRef<HTMLTextAreaElement>(null);
 
