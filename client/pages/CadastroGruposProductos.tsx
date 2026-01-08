@@ -12,27 +12,27 @@ interface Loja {
 
 interface GrupoDeProductos {
   id: number;
-  lojaId: number;
+  anuncianteId: number;
   nome: string;
   descricao?: string;
-  loja?: Loja;
+  anunciante?: Loja;
 }
 
 export default function CadastroGruposProductos() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState({
-    lojaId: "",
+    anuncianteId: "",
     nome: "",
     descricao: "",
   });
 
-  // Fetch lojas
-  const { data: lojas = [] } = useQuery<Loja[]>({
-    queryKey: ["lojas"],
+  // Fetch anunciantes
+  const { data: anunciantes = [] } = useQuery<Loja[]>({
+    queryKey: ["anunciantes"],
     queryFn: async () => {
-      const response = await fetch("/api/lojas");
-      if (!response.ok) throw new Error("Erro ao buscar lojas");
+      const response = await fetch("/api/anunciantes");
+      if (!response.ok) throw new Error("Erro ao buscar anunciantes");
       const result = await response.json();
       return result.data || [];
     },
@@ -59,7 +59,7 @@ export default function CadastroGruposProductos() {
         method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          lojaId: parseInt(data.lojaId),
+          anuncianteId: parseInt(data.anuncianteId),
           nome: data.nome,
           descricao: data.descricao,
         }),
@@ -74,7 +74,7 @@ export default function CadastroGruposProductos() {
     },
     onSuccess: () => {
       toast.success(editingId ? "Grupo atualizado com sucesso!" : "Grupo criado com sucesso!");
-      setFormData({ lojaId: "", nome: "", descricao: "" });
+      setFormData({ anuncianteId: "", nome: "", descricao: "" });
       setEditingId(null);
       setIsFormOpen(false);
       refetch();
@@ -102,7 +102,7 @@ export default function CadastroGruposProductos() {
 
   const handleEdit = (grupo: GrupoDeProductos) => {
     setFormData({
-      lojaId: grupo.lojaId.toString(),
+      anuncianteId: grupo.anuncianteId.toString(),
       nome: grupo.nome,
       descricao: grupo.descricao || "",
     });
@@ -112,8 +112,8 @@ export default function CadastroGruposProductos() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.lojaId) {
-      toast.error("Selecione uma loja");
+    if (!formData.anuncianteId) {
+      toast.error("Selecione um anunciante");
       return;
     }
     saveGrupoMutation.mutate(formData);
@@ -130,7 +130,7 @@ export default function CadastroGruposProductos() {
             onClick={() => {
               setIsFormOpen(!isFormOpen);
               setEditingId(null);
-              setFormData({ lojaId: "", nome: "", descricao: "" });
+              setFormData({ anuncianteId: "", nome: "", descricao: "" });
             }}
             className="flex items-center gap-2 px-4 py-2 bg-walmart-yellow text-walmart-text rounded-lg hover:bg-walmart-yellow-dark transition-colors font-semibold"
           >
@@ -149,18 +149,18 @@ export default function CadastroGruposProductos() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-walmart-text mb-2">
-                    Loja *
+                    Anunciante *
                   </label>
                   <select
                     required
-                    value={formData.lojaId}
-                    onChange={(e) => setFormData({ ...formData, lojaId: e.target.value })}
+                    value={formData.anuncianteId}
+                    onChange={(e) => setFormData({ ...formData, anuncianteId: e.target.value })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
                   >
-                    <option value="">Selecione uma loja</option>
-                    {lojas.map((loja) => (
-                      <option key={loja.id} value={loja.id}>
-                        {loja.nome}
+                    <option value="">Selecione um anunciante</option>
+                    {anunciantes.map((anunciante) => (
+                      <option key={anunciante.id} value={anunciante.id}>
+                        {anunciante.nome}
                       </option>
                     ))}
                   </select>
@@ -221,7 +221,7 @@ export default function CadastroGruposProductos() {
             <table className="w-full">
               <thead className="bg-walmart-gray">
                 <tr>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">Loja</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">Anunciante</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">Nome</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">Descrição</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">Ações</th>
@@ -238,7 +238,7 @@ export default function CadastroGruposProductos() {
                   grupos.map((grupo) => (
                     <tr key={grupo.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 font-semibold text-walmart-text">
-                        {grupo.loja?.nome || "N/A"}
+                        {grupo.anunciante?.nome || "N/A"}
                       </td>
                       <td className="px-6 py-4 font-semibold text-walmart-text">{grupo.nome}</td>
                       <td className="px-6 py-4 text-walmart-text">{grupo.descricao || "-"}</td>
