@@ -36,7 +36,23 @@ export default function CreateAnuncianteModal({
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Erro ao criar loja");
+
+        // Format detailed validation errors if available
+        if (errorData.details && Array.isArray(errorData.details)) {
+          const formattedErrors = errorData.details
+            .map((err: any) => {
+              const field = err.path?.join('.') || 'campo desconhecido';
+              return `${field}: ${err.message}`;
+            })
+            .join('\n');
+
+          const error = new Error(formattedErrors);
+          (error as any).isValidationError = true;
+          (error as any).details = errorData.details;
+          throw error;
+        }
+
+        throw new Error(errorData.error || "Erro ao criar anunciante");
       }
 
       return response.json();
@@ -58,9 +74,17 @@ export default function CreateAnuncianteModal({
       onClose();
     },
     onError: (error) => {
-      toast.error(
-        error instanceof Error ? error.message : "Erro ao criar anunciante",
-      );
+      if (error instanceof Error) {
+        const isValidationError = (error as any).isValidationError;
+        if (isValidationError) {
+          // Show validation errors as a toast with detailed message
+          toast.error(error.message);
+        } else {
+          toast.error(error.message);
+        }
+      } else {
+        toast.error("Erro ao criar anunciante");
+      }
     },
   });
 
