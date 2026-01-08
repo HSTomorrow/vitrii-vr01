@@ -37,6 +37,8 @@ export const getAnunciantes: RequestHandler = async (req, res) => {
           nome: true,
           fotoUrl: true,
           endereco: true,
+          cidade: true,
+          estado: true,
           email: true,
           cnpjOuCpf: true,
           status: true,
