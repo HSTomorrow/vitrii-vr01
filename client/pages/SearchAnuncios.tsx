@@ -406,7 +406,7 @@ export default function SearchAnuncios() {
                               ).toFixed(2)}
                             </p>
                             <p className="text-sm text-walmart-text-secondary line-clamp-2 mb-3">
-                              {anuncio.loja.nome}
+                              {anuncio.anunciante?.nome}
                             </p>
                             <p className="text-xs text-walmart-text-secondary">
                               {new Date(anuncio.dataCriacao).toLocaleDateString(
