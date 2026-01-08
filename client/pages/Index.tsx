@@ -105,12 +105,30 @@ export default function Index() {
     },
   });
 
+  const { data: agendaRecorrenteData, isLoading: agendaLoading } = useQuery({
+    queryKey: ["anuncios-agenda-recorrente"],
+    queryFn: async () => {
+      const response = await fetch("/api/anuncios?status=pago");
+      if (!response.ok) throw new Error("Erro ao buscar agendas");
+      const data = await response.json();
+      // Filter for agenda_recorrente by checking producto.tipo === "agenda_recorrente"
+      return {
+        ...data,
+        data: (data.data || []).filter((anuncio: any) =>
+          anuncio.producto?.tipo === "agenda_recorrente"
+        ),
+      };
+    },
+  });
+
   const anuncios = anunciosData?.data || [];
   const destacados = anuncios.slice(0, 20);
   const doacoes = doacoesData?.data || [];
   const destaqueDoacoes = doacoes.slice(0, 20);
   const eventos = eventosData?.data || [];
   const destaqueEventos = eventos.slice(0, 20);
+  const agendas = agendaRecorrenteData?.data || [];
+  const destaqueAgendas = agendas.slice(0, 20);
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
