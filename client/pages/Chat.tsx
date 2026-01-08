@@ -3,9 +3,11 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ChevronLeft, Plus } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 import ConversaList from "../components/ConversaList";
 import ChatBox from "../components/ChatBox";
 import CreateConversaModal from "../components/CreateConversaModal";
+import ProfileCompletionGate from "../components/ProfileCompletionGate";
 
 interface Message {
   id: number;
