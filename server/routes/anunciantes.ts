@@ -137,6 +137,12 @@ export const createAnunciante: RequestHandler = async (req, res) => {
       return res.status(400).json({
         success: false,
         error: "Anunciante com este CNPJ/CPF já cadastrado",
+        details: [
+          {
+            path: ["cnpjOuCpf"],
+            message: "CNPJ/CPF já cadastrado no sistema",
+          },
+        ],
       });
     }
 
@@ -157,7 +163,10 @@ export const createAnunciante: RequestHandler = async (req, res) => {
       return res.status(400).json({
         success: false,
         error: "Dados inválidos",
-        details: error.errors,
+        details: error.errors.map((err) => ({
+          path: err.path,
+          message: err.message,
+        })),
       });
     }
 
