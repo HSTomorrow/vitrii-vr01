@@ -192,20 +192,30 @@ export const updateLoja: RequestHandler = async (req, res) => {
   }
 };
 
+// Schema for adding user to store
+const AdicionarUsuarioLojaSchema = z.object({
+  lojaId: z.number().int().positive("ID da loja é obrigatório"),
+  usuarioId: z.number().int().positive("ID do usuário é obrigatório"),
+  tipoUsuario: z.enum(["gerente", "vendedor", "operador"], {
+    errorMap: () => ({ message: "Tipo de usuário inválido" }),
+  }),
+});
+
 // Add user to store with role
 export const adicionarUsuarioLoja: RequestHandler = async (req, res) => {
   try {
-    const { lojaId, usuarioId, tipoUsuario } = req.body;
+    // Validate input
+    const validatedData = AdicionarUsuarioLojaSchema.parse(req.body);
 
     const usuarioLoja = await prisma.usuarioLoja.create({
-      data: {
-        lojaId,
-        usuarioId,
-        tipoUsuario,
-      },
+      data: validatedData,
       include: {
-        usuario: true,
-        loja: true,
+        usuario: {
+          select: { id: true, nome: true, email: true },
+        },
+        loja: {
+          select: { id: true, nome: true },
+        },
       },
     });
 
@@ -215,6 +225,14 @@ export const adicionarUsuarioLoja: RequestHandler = async (req, res) => {
       message: "Usuário adicionado à loja com sucesso",
     });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        success: false,
+        error: "Dados inválidos",
+        details: error.errors,
+      });
+    }
+
     console.error("Error adding user to store:", error);
     res.status(500).json({
       success: false,
