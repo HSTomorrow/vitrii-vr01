@@ -19,7 +19,7 @@ interface Anunciante {
   fotoUrl?: string;
 }
 
-export default function CadastroLojas() {
+export default function CadastroAnunciantes() {
   const navigate = useNavigate();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -35,7 +35,7 @@ export default function CadastroLojas() {
   });
 
   // Fetch anunciantes
-  const { data: anunciantes, refetch } = useQuery<Loja[]>({
+  const { data: anunciantes, refetch } = useQuery<Anunciante[]>({
     queryKey: ["anunciantes"],
     queryFn: async () => {
       const response = await fetch("/api/anunciantes");
@@ -46,7 +46,7 @@ export default function CadastroLojas() {
   });
 
   // Create/Update loja mutation
-  const saveLojaMutation = useMutation({
+  const saveAnuncianteMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
       const url = editingId ? `/api/anunciantes/${editingId}` : "/api/anunciantes";
       const method = editingId ? "PUT" : "POST";
@@ -65,7 +65,7 @@ export default function CadastroLojas() {
       return response.json();
     },
     onSuccess: () => {
-      toast.success(editingId ? "Loja atualizada com sucesso!" : "Loja criada com sucesso!");
+      toast.success(editingId ? "Anunciante atualizada com sucesso!" : "Anunciante criada com sucesso!");
       setFormData({
         nome: "",
         cnpjOuCpf: "",
@@ -86,14 +86,14 @@ export default function CadastroLojas() {
   });
 
   // Delete loja mutation
-  const deleteLojaMutation = useMutation({
+  const deleteAnuncianteMutation = useMutation({
     mutationFn: async (id: number) => {
       const response = await fetch(`/api/anunciantes/${id}`, { method: "DELETE" });
       if (!response.ok) throw new Error("Erro ao deletar loja");
       return response.json();
     },
     onSuccess: () => {
-      toast.success("Loja deletada com sucesso!");
+      toast.success("Anunciante deletada com sucesso!");
       refetch();
     },
     onError: (error) => {
@@ -101,7 +101,7 @@ export default function CadastroLojas() {
     },
   });
 
-  const handleEdit = (loja: Loja) => {
+  const handleEdit = (loja: Anunciante) => {
     setFormData({
       nome: loja.nome,
       cnpjOuCpf: loja.cnpjOuCpf,
@@ -118,7 +118,7 @@ export default function CadastroLojas() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    saveLojaMutation.mutate(formData);
+    saveAnuncianteMutation.mutate(formData);
   };
 
   return (
@@ -127,7 +127,7 @@ export default function CadastroLojas() {
       
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-walmart-text">Cadastro de Lojas</h1>
+          <h1 className="text-3xl font-bold text-walmart-text">Cadastro de Anunciantes</h1>
           <button
             onClick={() => {
               setIsFormOpen(!isFormOpen);
@@ -146,7 +146,7 @@ export default function CadastroLojas() {
             className="flex items-center gap-2 px-4 py-2 bg-walmart-yellow text-walmart-text rounded-lg hover:bg-walmart-yellow-dark transition-colors font-semibold"
           >
             <Plus className="w-5 h-5" />
-            Nova Loja
+            Nova Anunciante
           </button>
         </div>
 
@@ -154,13 +154,13 @@ export default function CadastroLojas() {
         {isFormOpen && (
           <div className="bg-white rounded-lg shadow-md p-6 mb-8">
             <h2 className="text-xl font-bold text-walmart-text mb-6">
-              {editingId ? "Editar Loja" : "Criar Nova Loja"}
+              {editingId ? "Editar Anunciante" : "Criar Nova Anunciante"}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-walmart-text mb-2">
-                    Nome da Loja *
+                    Nome da Anunciante *
                   </label>
                   <input
                     type="text"
@@ -267,10 +267,10 @@ export default function CadastroLojas() {
               <div className="flex gap-4">
                 <button
                   type="submit"
-                  disabled={saveLojaMutation.isPending}
+                  disabled={saveAnuncianteMutation.isPending}
                   className="px-6 py-2 bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors font-semibold disabled:opacity-50"
                 >
-                  {saveLojaMutation.isPending ? "Salvando..." : "Salvar"}
+                  {saveAnuncianteMutation.isPending ? "Salvando..." : "Salvar"}
                 </button>
                 <button
                   type="button"
@@ -287,7 +287,7 @@ export default function CadastroLojas() {
           </div>
         )}
 
-        {/* Lojas List */}
+        {/* Anunciantes List */}
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
@@ -324,7 +324,7 @@ export default function CadastroLojas() {
                         <button
                           onClick={() => {
                             if (confirm("Tem certeza que deseja deletar esta loja?")) {
-                              deleteLojaMutation.mutate(loja.id);
+                              deleteAnuncianteMutation.mutate(loja.id);
                             }
                           }}
                           className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
