@@ -5,7 +5,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Plus, Trash2, Edit2 } from "lucide-react";
 
-interface Loja {
+interface Anunciante {
   id: number;
   nome: string;
 }
@@ -18,47 +18,47 @@ interface Producto {
 interface TabelaDePreco {
   id: number;
   productId: number;
-  lojaId: number;
+  anuncianteId: number;
   preco: number;
   precoCusto?: number;
   produto?: Producto;
-  loja?: Loja;
+  anunciante?: Anunciante;
 }
 
 export default function CadastroTabelasPreco() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [selectedLojaId, setSelectedLojaId] = useState("");
+  const [selectedAnuncianteId, setSelectedAnuncianteId] = useState("");
   const [selectedGrupoId, setSelectedGrupoId] = useState("");
   const [formData, setFormData] = useState({
     productId: "",
-    lojaId: "",
+    anuncianteId: "",
     preco: "",
     precoCusto: "",
   });
 
-  // Fetch lojas
-  const { data: lojas = [] } = useQuery<Loja[]>({
-    queryKey: ["lojas"],
+  // Fetch anunciantes
+  const { data: anunciantes = [] } = useQuery<Anunciante[]>({
+    queryKey: ["anunciantes"],
     queryFn: async () => {
-      const response = await fetch("/api/lojas");
-      if (!response.ok) throw new Error("Erro ao buscar lojas");
+      const response = await fetch("/api/anunciantes");
+      if (!response.ok) throw new Error("Erro ao buscar anunciantes");
       const result = await response.json();
       return result.data || [];
     },
   });
 
-  // Fetch grupos for selected loja
+  // Fetch grupos for selected anunciante
   const { data: grupos = [] } = useQuery({
-    queryKey: ["grupos", selectedLojaId],
+    queryKey: ["grupos", selectedAnuncianteId],
     queryFn: async () => {
-      if (!selectedLojaId) return [];
-      const response = await fetch(`/api/lojas/${selectedLojaId}/grupos-productos`);
+      if (!selectedAnuncianteId) return [];
+      const response = await fetch(`/api/grupos-productos?anuncianteId=${selectedAnuncianteId}`);
       if (!response.ok) throw new Error("Erro ao buscar grupos");
       const result = await response.json();
       return result.data || [];
     },
-    enabled: !!selectedLojaId,
+    enabled: !!selectedAnuncianteId,
   });
 
   // Fetch productos for selected grupo
@@ -96,7 +96,7 @@ export default function CadastroTabelasPreco() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           productId: parseInt(data.productId),
-          lojaId: parseInt(data.lojaId),
+          anuncianteId: parseInt(data.anuncianteId),
           preco: parseFloat(data.preco),
           precoCusto: data.precoCusto ? parseFloat(data.precoCusto) : undefined,
         }),
@@ -111,7 +111,7 @@ export default function CadastroTabelasPreco() {
     },
     onSuccess: () => {
       toast.success(editingId ? "Tabela atualizada com sucesso!" : "Tabela criada com sucesso!");
-      setFormData({ productId: "", lojaId: "", preco: "", precoCusto: "" });
+      setFormData({ productId: "", anuncianteId: "", preco: "", precoCusto: "" });
       setEditingId(null);
       setIsFormOpen(false);
       refetch();
@@ -140,18 +140,18 @@ export default function CadastroTabelasPreco() {
   const handleEdit = (tabela: TabelaDePreco) => {
     setFormData({
       productId: tabela.productId.toString(),
-      lojaId: tabela.lojaId.toString(),
+      anuncianteId: tabela.anuncianteId.toString(),
       preco: tabela.preco.toString(),
       precoCusto: tabela.precoCusto?.toString() || "",
     });
-    setSelectedLojaId(tabela.lojaId.toString());
+    setSelectedAnuncianteId(tabela.anuncianteId.toString());
     setEditingId(tabela.id);
     setIsFormOpen(true);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.productId || !formData.lojaId || !formData.preco) {
+    if (!formData.productId || !formData.anuncianteId || !formData.preco) {
       toast.error("Preencha todos os campos obrigatórios");
       return;
     }
@@ -169,8 +169,8 @@ export default function CadastroTabelasPreco() {
             onClick={() => {
               setIsFormOpen(!isFormOpen);
               setEditingId(null);
-              setFormData({ productId: "", lojaId: "", preco: "", precoCusto: "" });
-              setSelectedLojaId("");
+              setFormData({ productId: "", anuncianteId: "", preco: "", precoCusto: "" });
+              setSelectedAnuncianteId("");
               setSelectedGrupoId("");
             }}
             className="flex items-center gap-2 px-4 py-2 bg-walmart-yellow text-walmart-text rounded-lg hover:bg-walmart-yellow-dark transition-colors font-semibold"
@@ -190,22 +190,22 @@ export default function CadastroTabelasPreco() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold text-walmart-text mb-2">
-                    Loja *
+                    Anunciante *
                   </label>
                   <select
                     required
-                    value={selectedLojaId}
+                    value={selectedAnuncianteId}
                     onChange={(e) => {
-                      setSelectedLojaId(e.target.value);
+                      setSelectedAnuncianteId(e.target.value);
                       setSelectedGrupoId("");
-                      setFormData({ ...formData, lojaId: e.target.value, productId: "" });
+                      setFormData({ ...formData, anuncianteId: e.target.value, productId: "" });
                     }}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
                   >
-                    <option value="">Selecione uma loja</option>
-                    {lojas.map((loja) => (
-                      <option key={loja.id} value={loja.id}>
-                        {loja.nome}
+                    <option value="">Selecione um anunciante</option>
+                    {anunciantes.map((anunciante) => (
+                      <option key={anunciante.id} value={anunciante.id}>
+                        {anunciante.nome}
                       </option>
                     ))}
                   </select>
@@ -223,7 +223,7 @@ export default function CadastroTabelasPreco() {
                       setFormData({ ...formData, productId: "" });
                     }}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
-                    disabled={!selectedLojaId}
+                    disabled={!selectedAnuncianteId}
                   >
                     <option value="">Selecione um grupo</option>
                     {grupos.map((grupo: any) => (
@@ -313,7 +313,7 @@ export default function CadastroTabelasPreco() {
             <table className="w-full">
               <thead className="bg-walmart-gray">
                 <tr>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">Loja</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">Anunciante</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">Produto</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">Preço</th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">Preço de Custo</th>
@@ -331,7 +331,7 @@ export default function CadastroTabelasPreco() {
                   tabelas.map((tabela) => (
                     <tr key={tabela.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 font-semibold text-walmart-text">
-                        {tabela.loja?.nome || "N/A"}
+                        {tabela.anunciante?.nome || "N/A"}
                       </td>
                       <td className="px-6 py-4 font-semibold text-walmart-text">
                         {tabela.produto?.nome || "N/A"}
