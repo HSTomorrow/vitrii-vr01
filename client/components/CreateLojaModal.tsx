@@ -201,6 +201,37 @@ export default function CreateAnuncianteModal({
             />
           </div>
 
+          {/* Cidade and Estado */}
+          <div className="grid grid-cols-3 gap-4">
+            <div className="col-span-2">
+              <label className="block text-sm font-semibold text-walmart-text mb-2">
+                Cidade *
+              </label>
+              <input
+                type="text"
+                value={formData.cidade}
+                onChange={(e) => handleInputChange("cidade", e.target.value)}
+                placeholder="Ex: Belo Horizonte"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-walmart-text mb-2">
+                Estado *
+              </label>
+              <input
+                type="text"
+                value={formData.estado}
+                onChange={(e) =>
+                  handleInputChange("estado", e.target.value.toUpperCase().slice(0, 2))
+                }
+                placeholder="Ex: MG"
+                maxLength={2}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+              />
+            </div>
+          </div>
+
           {/* Descrição */}
           <div>
             <label className="block text-sm font-semibold text-walmart-text mb-2">
