@@ -153,17 +153,17 @@ export default function CreateConversaModal({
 
             {searchAnunciantes && filteredAnunciantes.length > 0 && (
               <div className="mt-2 border border-gray-300 rounded-lg max-h-48 overflow-y-auto">
-                {filteredAnunciantes.map((loja: Anunciante) => (
+                {filteredAnunciantes.map((anunciante: Anunciante) => (
                   <button
-                    key={loja.id}
+                    key={anunciante.id}
                     type="button"
                     onClick={() => {
-                      setFormData((prev) => ({ ...prev, anuncianteId: loja.id }));
+                      setFormData((prev) => ({ ...prev, anuncianteId: anunciante.id }));
                       setSearchAnunciantes("");
                     }}
                     className="w-full text-left px-4 py-2 hover:bg-gray-100 border-b last:border-b-0"
                   >
-                    <p className="font-medium text-walmart-text">{loja.nome}</p>
+                    <p className="font-medium text-walmart-text">{anunciante.nome}</p>
                   </button>
                 ))}
               </div>
