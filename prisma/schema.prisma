@@ -42,9 +42,9 @@ model Usuario {
 }
 
 // ============================================================================
-// LOJAS (Stores)
+// ANUNCIANTES (Advertisers/Stores)
 // ============================================================================
-model Loja {
+model Anunciante {
   id            Int       @id @default(autoincrement())
   nome          String    @db.VarChar(255)
   cnpjOuCpf     String    @unique @db.VarChar(18)
@@ -54,14 +54,14 @@ model Loja {
   site          String?   @db.VarChar(255)
   instagram      String?   @db.VarChar(255)
   facebook      String?   @db.VarChar(255)
-  fotoUrl       String?   @db.Text // URL da foto da loja
+  fotoUrl       String?   @db.Text // URL da foto do anunciante
   status        String    @default("ativa") // "ativa" or "inativa"
   isActive      Boolean   @default(true)
   dataCriacao   DateTime  @default(now())
   dataAtualizacao DateTime @updatedAt
 
   // Relations
-  usuarioLojas  UsuarioLoja[]
+  usuarioAnunciantes UsuarioAnunciante[]
   gruposDeProductos GrupoDeProductos[]
   produtosEmEstoque ProdutoEmEstoque[]
   movimentoEstoque MovimentoEstoque[]
@@ -70,7 +70,7 @@ model Loja {
   agendas       Agenda[]
   conversas     Conversa[]
 
-  @@map("lojas")
+  @@map("anunciantes")
 }
 
 // ============================================================================
