@@ -37,12 +37,12 @@ export default function CreateConversaModal({
   const [searchLojas, setSearchLojas] = useState("");
   const [searchAnuncios, setSearchAnuncios] = useState("");
 
-  // Fetch lojas
-  const { data: lojasData } = useQuery({
-    queryKey: ["lojas"],
+  // Fetch anunciantes
+  const { data: anunciantesData } = useQuery({
+    queryKey: ["anunciantes"],
     queryFn: async () => {
       const response = await fetch("/api/anunciantes");
-      if (!response.ok) throw new Error("Erro ao buscar lojas");
+      if (!response.ok) throw new Error("Erro ao buscar anunciantes");
       return response.json();
     },
     enabled: isOpen,
@@ -59,12 +59,12 @@ export default function CreateConversaModal({
     enabled: formData.anuncianteId > 0,
   });
 
-  const lojas = lojasData?.data || [];
+  const anunciantes = anunciantesData?.data || [];
   const anuncios = (anunciosData?.data || []).filter((a: Anuncio) =>
     a.titulo.toLowerCase().includes(searchAnuncios.toLowerCase()),
   );
 
-  const filteredLojas = lojas.filter((loja: Loja) =>
+  const filteredLojas = anunciantes.filter((loja: Loja) =>
     loja.nome.toLowerCase().includes(searchLojas.toLowerCase()),
   );
 
@@ -172,7 +172,7 @@ export default function CreateConversaModal({
             {formData.anuncianteId > 0 && (
               <div className="mt-2 p-3 bg-blue-50 rounded-lg flex items-center justify-between">
                 <span className="text-sm text-walmart-text font-medium">
-                  {lojas.find((l: Loja) => l.id === formData.anuncianteId)?.nome}
+                  {anunciantes.find((l: Loja) => l.id === formData.anuncianteId)?.nome}
                 </span>
                 <button
                   type="button"
