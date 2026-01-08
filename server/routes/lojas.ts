@@ -64,16 +64,29 @@ export const getLojas: RequestHandler = async (req, res) => {
   }
 };
 
-// GET store by ID with full details
+// GET store by ID with full details (optimized)
 export const getLojaById: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
     const loja = await prisma.loja.findUnique({
       where: { id: parseInt(id) },
-      include: {
+      select: {
+        id: true,
+        nome: true,
+        fotoUrl: true,
+        endereco: true,
+        email: true,
+        cnpjOuCpf: true,
+        descricao: true,
+        site: true,
+        instagram: true,
+        facebook: true,
+        status: true,
+        dataCriacao: true,
         usuarioLojas: {
-          include: {
+          select: {
+            tipoUsuario: true,
             usuario: {
               select: {
                 id: true,
@@ -82,15 +95,7 @@ export const getLojaById: RequestHandler = async (req, res) => {
               },
             },
           },
-        },
-        gruposDeProductos: {
-          include: {
-            produtos: true,
-          },
-        },
-        produtosEmEstoque: true,
-        anuncios: {
-          where: { status: { not: "historico" } },
+          take: 10, // Limit to first 10 users
         },
       },
     });
