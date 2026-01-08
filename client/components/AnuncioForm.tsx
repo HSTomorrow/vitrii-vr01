@@ -526,7 +526,7 @@ export default function AnuncioForm({
               )}
             </div>
             )}
-            {selectedProducto?.tipo && ["evento", "agenda_recorrente", "doacao"].includes(selectedProducto.tipo) && (
+            {selectedProducto?.tipo && ["evento", "agenda_recorrente"].includes(selectedProducto.tipo) && (
             <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
               <p className="text-sm text-blue-800">
                 <strong>ℹ️ Dica:</strong> Este tipo de anúncio não requer variantes. O preço será definido diretamente no campo "Valor do Anúncio" abaixo.
