@@ -13,6 +13,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import CategoryFields from "./CategoryFields";
 import CreateAnuncianteModal from "./CreateLojaModal";
 import CreateProductoModal from "./CreateProductoModal";
+import ProfileCompletionGate from "./ProfileCompletionGate";
 import { BRAZILIAN_STATES } from "@shared/brazilianStates";
 
 interface AnuncioFormProps {
