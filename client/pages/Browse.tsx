@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Filter,
@@ -8,9 +8,7 @@ import {
   Package,
   Heart,
   X,
-  ChevronDown,
   MapPin,
-  Calendar,
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -21,70 +19,74 @@ export default function Browse() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  // Get filter from URL params
-  const filterFromUrl = searchParams.get("filter");
 
   // Local state
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 5000]);
+  const [priceRange, setPriceRange] = useState(5000);
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
   const [showFilters, setShowFilters] = useState(false);
   const [favoritos, setFavoritos] = useState<Set<number>>(new Set());
 
-  // Fetch all ads - different based on filter type
+  // Fetch all ads
   const { data: anunciosData, isLoading } = useQuery({
     queryKey: ["anuncios-browse"],
     queryFn: async () => {
-      const response = await fetch("/api/anuncios");
-      if (!response.ok) throw new Error("Erro ao buscar anúncios");
-      return response.json();
+      try {
+        const response = await fetch("/api/anuncios");
+        if (!response.ok) throw new Error("Erro ao buscar anúncios");
+        return response.json();
+      } catch (error) {
+        console.error("Error fetching ads:", error);
+        return { data: [] };
+      }
     },
   });
 
   const allAnuncios = anunciosData?.data || [];
 
-  // Apply filters
+  // Apply filters with safeguards
   const filtered = useMemo(() => {
-    let result = allAnuncios;
+    try {
+      let result = Array.isArray(allAnuncios) ? [...allAnuncios] : [];
 
-    // Filter by type based on URL param
-    if (filterFromUrl === "gratuito") {
-      result = result.filter((a: any) => a.isDoacao);
-    } else if (filterFromUrl === "evento") {
-      result = result.filter((a: any) => a.producto?.tipo === "evento");
-    } else if (filterFromUrl === "agenda_recorrente") {
-      result = result.filter((a: any) => a.producto?.tipo === "agenda_recorrente");
-    }
-
-    // Filter by search term
-    if (searchTerm) {
-      result = result.filter((a: any) => {
+      // Filter by search term
+      if (searchTerm && searchTerm.trim().length > 0) {
         const searchLower = searchTerm.toLowerCase();
-        return (
-          a.titulo.toLowerCase().includes(searchLower) ||
-          a.descricao?.toLowerCase().includes(searchLower) ||
-          a.anunciante?.nome.toLowerCase().includes(searchLower) ||
-          a.producto?.nome.toLowerCase().includes(searchLower)
-        );
+        result = result.filter((a: any) => {
+          try {
+            return (
+              (a.titulo && a.titulo.toLowerCase().includes(searchLower)) ||
+              (a.descricao && a.descricao.toLowerCase().includes(searchLower)) ||
+              (a.anunciante?.nome && a.anunciante.nome.toLowerCase().includes(searchLower)) ||
+              (a.producto?.nome && a.producto.nome.toLowerCase().includes(searchLower))
+            );
+          } catch (e) {
+            return true;
+          }
+        });
+      }
+
+      // Filter by price range
+      result = result.filter((a: any) => {
+        try {
+          const price = a.precoAnuncio || a.tabelaDePreco?.preco || 0;
+          return Number(price) <= Number(priceRange);
+        } catch (e) {
+          return true;
+        }
       });
+
+      // Filter by favorites
+      if (showFavoritesOnly && user) {
+        result = result.filter((a: any) => favoritos.has(a.id));
+      }
+
+      return result;
+    } catch (error) {
+      console.error("Error filtering ads:", error);
+      return allAnuncios;
     }
-
-    // Filter by price range
-    result = result.filter((a: any) => {
-      const price = a.precoAnuncio || a.tabelaDePreco?.preco || 0;
-      return price >= priceRange[0] && price <= priceRange[1];
-    });
-
-    // Filter by favorites
-    if (showFavoritesOnly && user) {
-      result = result.filter((a: any) => favoritos.has(a.id));
-    }
-
-    return result;
-  }, [allAnuncios, searchTerm, priceRange, showFavoritesOnly, favoritos, user, filterFromUrl]);
+  }, [allAnuncios, searchTerm, priceRange, showFavoritesOnly, favoritos, user]);
 
   // Toggle favorite mutation
   const toggleFavoritoMutation = useMutation({
@@ -122,27 +124,13 @@ export default function Browse() {
     },
   });
 
-  // Get filter title
-  const getFilterTitle = () => {
-    if (filterFromUrl === "gratuito") return "Doações e Serviços Gratuitos";
-    if (filterFromUrl === "evento") return "Eventos";
-    if (filterFromUrl === "agenda_recorrente") return "Aulas e Agendas Disponíveis";
-    return "Explorar Anúncios";
-  };
-
   const resetFilters = () => {
     setSearchTerm("");
-    setSelectedCategories([]);
-    setPriceRange([0, 5000]);
+    setPriceRange(5000);
     setShowFavoritesOnly(false);
   };
 
-  const hasActiveFilters =
-    searchTerm ||
-    selectedCategories.length > 0 ||
-    priceRange[0] !== 0 ||
-    priceRange[1] !== 5000 ||
-    showFavoritesOnly;
+  const hasActiveFilters = searchTerm || priceRange !== 5000 || showFavoritesOnly;
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
@@ -151,9 +139,9 @@ export default function Browse() {
       {/* Hero Section */}
       <section className="bg-gradient-to-r from-walmart-blue to-walmart-blue-dark text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-bold mb-2">{getFilterTitle()}</h1>
+          <h1 className="text-4xl font-bold mb-2">Explorar Anúncios</h1>
           <p className="text-blue-100 text-lg">
-            Descubra milhares de produtos, serviços e eventos de vendedores verificados
+            Descubra produtos, serviços e eventos de vendedores verificados
           </p>
         </div>
       </section>
@@ -202,53 +190,21 @@ export default function Browse() {
                 {/* Price Filter */}
                 <div>
                   <label className="block font-semibold text-walmart-text mb-3">
-                    Preço
+                    Preço Máximo
                   </label>
                   <div className="space-y-3">
                     <input
                       type="range"
                       min="0"
                       max="5000"
-                      value={priceRange[1]}
-                      onChange={(e) =>
-                        setPriceRange([priceRange[0], parseInt(e.target.value)])
-                      }
+                      value={priceRange}
+                      onChange={(e) => setPriceRange(parseInt(e.target.value))}
                       className="w-full"
                     />
                     <div className="flex justify-between text-sm text-walmart-text-secondary">
                       <span>R$ 0</span>
-                      <span>R$ {priceRange[1].toLocaleString("pt-BR")}</span>
+                      <span>R$ {priceRange.toLocaleString("pt-BR")}</span>
                     </div>
-                  </div>
-                </div>
-
-                {/* Category Filter */}
-                <div>
-                  <label className="block font-semibold text-walmart-text mb-3">
-                    Categoria
-                  </label>
-                  <div className="space-y-2">
-                    {["Produtos", "Serviços", "Eventos", "Aulas"].map((cat) => (
-                      <label key={cat} className="flex items-center space-x-2 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={selectedCategories.includes(cat)}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              setSelectedCategories([...selectedCategories, cat]);
-                            } else {
-                              setSelectedCategories(
-                                selectedCategories.filter((c) => c !== cat)
-                              );
-                            }
-                          }}
-                          className="rounded"
-                        />
-                        <span className="text-walmart-text-secondary text-sm">
-                          {cat}
-                        </span>
-                      </label>
-                    ))}
                   </div>
                 </div>
 
@@ -289,8 +245,7 @@ export default function Browse() {
             <div className="flex justify-between items-center mb-8">
               <div className="flex-1">
                 <p className="text-walmart-text-secondary">
-                  {filtered.length} anúncio{filtered.length !== 1 ? "s" : ""} encontrado
-                  {filtered.length !== 1 ? "s" : ""}
+                  {filtered.length} anúncio{filtered.length !== 1 ? "s" : ""} encontrado{filtered.length !== 1 ? "s" : ""}
                 </p>
               </div>
 
@@ -322,7 +277,7 @@ export default function Browse() {
                   </div>
                 ))}
               </div>
-            ) : filtered.length > 0 ? (
+            ) : filtered && filtered.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {filtered.map((anuncio: any) => (
                   <div
@@ -391,10 +346,12 @@ export default function Browse() {
                         </p>
 
                         {/* Location */}
-                        <div className="flex items-center gap-1 mb-3 text-xs text-walmart-text-secondary">
-                          <MapPin className="w-3 h-3" />
-                          <span className="truncate">{anuncio.anunciante?.endereco || "Localização desconhecida"}</span>
-                        </div>
+                        {anuncio.anunciante?.endereco && (
+                          <div className="flex items-center gap-1 mb-3 text-xs text-walmart-text-secondary">
+                            <MapPin className="w-3 h-3" />
+                            <span className="truncate">{anuncio.anunciante.endereco}</span>
+                          </div>
+                        )}
                       </div>
 
                       {/* Price and Rating */}
@@ -403,10 +360,13 @@ export default function Browse() {
                           R${" "}
                           {anuncio.isDoacao
                             ? "Grátis"
-                            : (anuncio.precoAnuncio || anuncio.tabelaDePreco?.preco || 0).toLocaleString(
-                                "pt-BR",
-                                { minimumFractionDigits: 2 }
-                              )}
+                            : (
+                                anuncio.precoAnuncio ||
+                                anuncio.tabelaDePreco?.preco ||
+                                0
+                              ).toLocaleString("pt-BR", {
+                                minimumFractionDigits: 2,
+                              })}
                         </span>
                         <div className="flex items-center space-x-1">
                           <Star className="w-4 h-4 fill-walmart-yellow text-walmart-yellow" />
@@ -415,11 +375,13 @@ export default function Browse() {
                       </div>
 
                       {/* Store Info */}
-                      <div className="mb-4 p-2 bg-gray-50 rounded text-xs">
-                        <p className="text-walmart-text-secondary truncate">
-                          <strong>{anuncio.anunciante?.nome || "Anunciante"}</strong>
-                        </p>
-                      </div>
+                      {anuncio.anunciante?.nome && (
+                        <div className="mb-4 p-2 bg-gray-50 rounded text-xs">
+                          <p className="text-walmart-text-secondary truncate">
+                            <strong>{anuncio.anunciante.nome}</strong>
+                          </p>
+                        </div>
+                      )}
 
                       {/* Button */}
                       <button
