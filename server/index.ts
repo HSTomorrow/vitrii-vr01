@@ -183,8 +183,9 @@ export function createServer() {
   );
 
   // Anunciantes routes (formerly Lojas)
-  app.get("/api/anunciantes", getAnunciantes);
+  // Note: More specific routes must come BEFORE parameterized routes
   app.get("/api/anunciantes/do-usuario/listar", extractUserId, getAnunciantesByUsuario);
+  app.get("/api/anunciantes", getAnunciantes);
   app.get("/api/anunciantes/:id", getAnuncianteById);
   app.post("/api/anunciantes", createAnunciante);
   app.put("/api/anunciantes/:id", updateAnunciante);
