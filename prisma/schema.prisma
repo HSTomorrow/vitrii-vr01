@@ -389,7 +389,7 @@ model ProdutoEmEstoque {
 // ============================================================================
 model MovimentoEstoque {
   id            Int       @id @default(autoincrement())
-  lojaId        Int
+  anuncianteId  Int
   productId     Int
   tipo          String    // "entrada", "saida", "ajuste"
   quantidade    Int
@@ -398,9 +398,9 @@ model MovimentoEstoque {
   dataCriacao   DateTime  @default(now())
 
   // Relations
-  loja          Loja      @relation(fields: [lojaId], references: [id], onDelete: Cascade)
+  anunciante    Anunciante @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
   producto      Producto  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  produtoEmEstoque ProdutoEmEstoque @relation(fields: [lojaId, productId], references: [lojaId, productId], onDelete: Cascade)
+  produtoEmEstoque ProdutoEmEstoque @relation(fields: [anuncianteId, productId], references: [anuncianteId, productId], onDelete: Cascade)
 
   @@map("movimentos_estoque")
 }
