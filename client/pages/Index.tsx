@@ -324,16 +324,16 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Donation Listings Section */}
+      {/* Free/Gratuito Listings Section */}
       <section className="py-8 md:py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-8">
             <div>
               <h2 className="text-2xl md:text-3xl font-bold text-walmart-text mb-1">
-                Anúncios de Doação
+                Itens Gratuitos
               </h2>
               <p className="text-sm text-walmart-text-secondary">
-                Encontre itens grátis disponíveis para retirada
+                Produtos, serviços e eventos disponíveis gratuitamente
               </p>
             </div>
             <Link
@@ -372,7 +372,7 @@ export default function Index() {
                   className="vitrii-card overflow-hidden hover:scale-105 transition-transform duration-200 cursor-pointer relative"
                 >
                   <div className="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold z-10">
-                    GRÁTIS
+                    GRATUITO
                   </div>
 
                   <div className="w-full h-48 bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center overflow-hidden">
@@ -431,7 +431,7 @@ export default function Index() {
                         {anuncio.titulo}
                       </h4>
                       <p className="text-sm text-walmart-text-secondary mb-3 line-clamp-2">
-                        {anuncio.descricao || "Item disponível para doação"}
+                        {anuncio.descricao || "Disponível gratuitamente"}
                       </p>
 
                       <div className="flex items-center gap-1 mb-3 text-xs text-walmart-text-secondary">
@@ -483,7 +483,7 @@ export default function Index() {
               <div className="col-span-full text-center py-12">
                 <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
                 <p className="text-walmart-text-secondary">
-                  Nenhuma doação publicada ainda
+                  Nenhum item gratuito publicado ainda
                 </p>
                 <Link
                   to="/anuncio/criar"
@@ -498,10 +498,10 @@ export default function Index() {
 
           <div className="text-center mt-12 lg:hidden">
             <Link
-              to="/browse?filter=doacao"
+              to="/browse?filter=gratuito"
               className="inline-flex items-center space-x-2 text-walmart-blue font-semibold hover:space-x-3 transition-all"
             >
-              <span>Ver Todas as Doações</span>
+              <span>Ver Todos os Itens Gratuitos</span>
               <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
