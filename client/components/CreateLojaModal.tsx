@@ -105,7 +105,6 @@ export default function CreateAnuncianteModal({
       !formData.endereco ||
       !formData.cidade ||
       !formData.estado ||
-      !formData.descricao ||
       !formData.email
     ) {
       toast.error("Preencha todos os campos obrigatórios");
