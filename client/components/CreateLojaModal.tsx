@@ -68,7 +68,7 @@ export default function CreateAnuncianteModal({
         cnpjOuCpf: "",
         endereco: "",
         cidade: "",
-        estado: "",
+        estado: "RS",
         descricao: "",
         email: "",
         site: "",
