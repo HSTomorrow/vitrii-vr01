@@ -208,9 +208,9 @@ export const createAnuncio: RequestHandler = async (req, res) => {
     }
 
     // Verify that the price table belongs to the product if provided
-    let tabelaDePreco = null;
+    let tabelaDePrecoId: number | null = null;
     if (validatedData.tabelaDePrecoId && validatedData.tabelaDePrecoId > 0) {
-      tabelaDePreco = await prisma.tabelaDePreco.findUnique({
+      const tabelaDePreco = await prisma.tabelaDePreco.findUnique({
         where: { id: validatedData.tabelaDePrecoId },
       });
 
@@ -223,29 +223,17 @@ export const createAnuncio: RequestHandler = async (req, res) => {
           error: "Tabela de preço não pertence ao produto selecionado",
         });
       }
-    } else {
-      // If no table selected, get the first available price table for the product
-      tabelaDePreco = await prisma.tabelaDePreco.findFirst({
-        where: { productId: validatedData.productId },
-      });
 
-      if (!tabelaDePreco) {
-        return res.status(400).json({
-          success: false,
-          error:
-            "Nenhuma tabela de preços disponível para este produto. Por favor, crie pelo menos uma variante.",
-        });
-      }
-
-      validatedData.tabelaDePrecoId = tabelaDePreco.id;
+      tabelaDePrecoId = validatedData.tabelaDePrecoId;
     }
+    // Note: tabelaDePrecoId can now be null for events, schedules, or when using manual price
 
     // Set validity: default to 7 days from now if not provided
     const dataValidade = validatedData.dataValidade
       ? new Date(validatedData.dataValidade)
       : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
-    // For donations: automatically set status to "pago" and zero out price
+    // For free items: automatically set status to "pago" and zero out price
     const isDoacao = validatedData.isDoacao || false;
     const precoAnuncio = isDoacao ? null : validatedData.precoAnuncio;
     const status = isDoacao ? "pago" : "em_edicao";
@@ -254,7 +242,7 @@ export const createAnuncio: RequestHandler = async (req, res) => {
       data: {
         anuncianteId: validatedData.anuncianteId,
         productId: validatedData.productId,
-        tabelaDePrecoId: validatedData.tabelaDePrecoId,
+        tabelaDePrecoId,
         titulo: validatedData.titulo,
         descricao: validatedData.descricao,
         fotoUrl: validatedData.fotoUrl,
