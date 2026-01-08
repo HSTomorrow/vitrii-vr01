@@ -320,7 +320,7 @@ model Pagamento {
 model Conversa {
   id            Int       @id @default(autoincrement())
   usuarioId     Int       // Buyer/Initiator
-  lojaId        Int       // Seller (store)
+  anuncianteId  Int       // Advertiser/Seller
   anuncioId     Int?      // Related ad (optional)
   tipo          String    @default("privada") // "publica", "privada"
   assunto       String    @db.VarChar(255) // Conversation subject
@@ -332,11 +332,11 @@ model Conversa {
 
   // Relations
   usuario       Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-  loja          Loja      @relation(fields: [lojaId], references: [id], onDelete: Cascade)
+  anunciante    Anunciante @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
   anuncio       Anuncio?  @relation(fields: [anuncioId], references: [id], onDelete: SetNull)
   mensagens     Mensagem[]
 
-  @@unique([usuarioId, lojaId, anuncioId])
+  @@unique([usuarioId, anuncianteId, anuncioId])
   @@map("conversas")
 }
 
