@@ -88,6 +88,8 @@ export default function AnuncioForm({
     setSelectedAnuncianteId(newAnuncianteId);
     setFormData((prev) => ({ ...prev, productId: 0, tabelaDePrecoId: 0 }));
     setShowCreateLoja(false);
+    // Refresh the anunciantes list
+    queryClient.invalidateQueries({ queryKey: ["anunciantes-do-usuario"] });
   };
 
   const handleProductoCreated = (newProductoId: number) => {
@@ -97,6 +99,8 @@ export default function AnuncioForm({
       tabelaDePrecoId: 0,
     }));
     setShowCreateProducto(false);
+    // Refresh the produtos list
+    queryClient.invalidateQueries({ queryKey: ["produtos-anuncio", selectedAnuncianteId] });
   };
 
   // Fetch anunciantes - filtered by user (ADM sees all, regular users see only theirs)
