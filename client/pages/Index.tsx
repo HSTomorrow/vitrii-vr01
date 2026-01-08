@@ -345,7 +345,7 @@ export default function Index() {
             </Link>
           </div>
 
-          {/* Donation Cards Grid */}
+          {/* Free/Gratuito Cards Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
             {doacoesLoading ? (
               <>
