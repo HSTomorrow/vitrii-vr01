@@ -167,6 +167,20 @@ export function createServer() {
   app.put("/api/usuarios/:id", updateUsuario);
   app.delete("/api/usuarios/:id", deleteUsuario);
 
+  // Admin routes for user password management
+  app.get(
+    "/api/admin/usuarios-com-senha",
+    extractUserId,
+    requireAdmin,
+    getUsuariosComSenha,
+  );
+  app.post(
+    "/api/admin/usuarios/:usuarioId/reset-password",
+    extractUserId,
+    requireAdmin,
+    adminResetUserPassword,
+  );
+
   // Anunciantes routes (formerly Lojas)
   app.get("/api/anunciantes", getAnunciantes);
   app.get("/api/anunciantes/:id", getAnuncianteById);
