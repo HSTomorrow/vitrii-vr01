@@ -33,6 +33,8 @@ export default function Index() {
   const { user } = useAuth();
   const [favoritos, setFavoritos] = useState<Set<number>>(new Set());
 
+  // All paid ads are fetched and filtered on client side
+
   const toggleFavoritoMutation = useMutation({
     mutationFn: async (anuncioId: number) => {
       if (!user) {
