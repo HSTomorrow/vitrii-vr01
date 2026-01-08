@@ -86,6 +86,11 @@ export default function Chat() {
   };
 
   const handleCreateConversa = () => {
+    // Check if user has completed their profile
+    if (!user?.cpf || !user?.telefone) {
+      setShowProfileGate(true);
+      return;
+    }
     setShowCreateModal(true);
   };
 
