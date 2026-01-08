@@ -15,12 +15,14 @@ import {
   getProdutosParaAnuncio,
 } from "./routes/anuncios";
 import {
-  getLojas,
-  getLojaById,
-  createLoja,
-  updateLoja,
-  deleteLoja,
-} from "./routes/lojas";
+  getAnunciantes,
+  getAnuncianteById,
+  createAnunciante,
+  updateAnunciante,
+  deleteAnunciante,
+  adicionarUsuarioAnunciante,
+  getEquipeAnunciante,
+} from "./routes/anunciantes";
 import {
   getGrupos,
   getGrupoById,
