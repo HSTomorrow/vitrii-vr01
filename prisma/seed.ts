@@ -1,5 +1,5 @@
 import prisma from "../server/lib/prisma";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 
 const stores = [
   {
