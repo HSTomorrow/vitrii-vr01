@@ -232,7 +232,7 @@ export default function Index() {
                       <div className="flex items-center gap-1 mb-3 text-xs text-walmart-text-secondary">
                         <MapPin className="w-3 h-3" />
                         <span className="truncate">
-                          {extractMunicipality(anuncio.loja?.endereco || "")}
+                          {extractMunicipality(anuncio.anunciante?.endereco || "")}
                         </span>
                       </div>
                     </div>
@@ -253,7 +253,7 @@ export default function Index() {
                     {anuncio.producto?.tipo === "servico" ? (
                       <div className="flex gap-2">
                         <Link
-                          to={`/agenda/loja/${anuncio.anuncianteId}`}
+                          to={`/agenda/anunciante/${anuncio.anuncianteId}`}
                           className="flex-1 bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
                         >
                           <Calendar className="w-4 h-4" />
