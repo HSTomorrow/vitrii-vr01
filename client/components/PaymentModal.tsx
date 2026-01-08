@@ -18,7 +18,8 @@ export default function PaymentModal({
 }: PaymentModalProps) {
   const queryClient = useQueryClient();
   const [copied, setCopied] = useState(false);
-  const [pollInterval, setPollInterval] = useState<NodeJS.Timeout | null>(null);
+  // Use useRef instead of useState to avoid unnecessary re-renders
+  const pollIntervalRef = useRef<number | null>(null);
 
   // Fetch payment data
   const { data: paymentData, refetch: refetchPayment } = useQuery({
@@ -75,19 +76,25 @@ export default function PaymentModal({
     }
   };
 
-  // Poll payment status
+  // Poll payment status with useRef for interval
   useEffect(() => {
     if (!isOpen || !payment || payment.status !== "pendente") {
-      if (pollInterval) clearInterval(pollInterval);
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+        pollIntervalRef.current = null;
+      }
       return;
     }
 
     // Start polling immediately and then every 3 seconds
     refetchPayment();
-    const interval = setInterval(() => {
+    pollIntervalRef.current = window.setInterval(() => {
       refetchPayment().then((result) => {
         if (result.data?.data?.status === "pago") {
-          if (pollInterval) clearInterval(pollInterval);
+          if (pollIntervalRef.current) {
+            clearInterval(pollIntervalRef.current);
+            pollIntervalRef.current = null;
+          }
           toast.success("Pagamento confirmado! ✅");
           setTimeout(() => {
             onPaymentConfirmed?.();
@@ -96,12 +103,13 @@ export default function PaymentModal({
       });
     }, 3000);
 
-    setPollInterval(interval);
-
     return () => {
-      if (interval) clearInterval(interval);
+      if (pollIntervalRef.current) {
+        clearInterval(pollIntervalRef.current);
+        pollIntervalRef.current = null;
+      }
     };
-  }, [isOpen, payment?.id, payment?.status]);
+  }, [isOpen, payment?.id, payment?.status, refetchPayment, onPaymentConfirmed]);
 
   if (!isOpen || !payment) return null;
 
