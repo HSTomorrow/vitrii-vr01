@@ -99,13 +99,13 @@ export default function AdCard({
       </button>
 
       {/* Store Logo Badge */}
-      {(loja?.fotoUrl || anuncio.loja?.fotoUrl) && (
+      {(anunciante?.fotoUrl || anuncio.anunciante?.fotoUrl) && (
         <div className="absolute bottom-3 left-3 z-10 w-10 h-10 rounded-full bg-white border-2 border-walmart-blue overflow-hidden flex items-center justify-center shadow-md">
           <img
-            src={loja?.fotoUrl || anuncio.loja?.fotoUrl}
-            alt={loja?.nome || anuncio.loja?.nome}
+            src={anunciante?.fotoUrl || anuncio.anunciante?.fotoUrl}
+            alt={anunciante?.nome || anuncio.anunciante?.nome}
             className="w-full h-full object-cover"
-            title={loja?.nome || anuncio.loja?.nome}
+            title={anunciante?.nome || anuncio.anunciante?.nome}
           />
         </div>
       )}
