@@ -49,6 +49,8 @@ model Anunciante {
   nome          String    @db.VarChar(255)
   cnpjOuCpf     String    @unique @db.VarChar(18)
   endereco      String    @db.Text
+  cidade        String    @db.VarChar(100)
+  estado        String    @db.VarChar(2)
   descricao     String    @db.Text
   email         String    @db.VarChar(255)
   site          String?   @db.VarChar(255)
