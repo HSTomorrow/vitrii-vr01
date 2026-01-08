@@ -164,7 +164,7 @@ export default function AdCard({
         {anuncio.producto?.tipo === "servico" ? (
           <div className="flex gap-2">
             <Link
-              to={`/agenda/loja/${anuncio.lojaId}`}
+              to={`/agenda/loja/${anuncio.anuncianteId}`}
               className={`flex-1 ${isDonation ? "bg-green-600 hover:bg-green-700" : "bg-green-600 hover:bg-green-700"} text-white py-2 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2`}
             >
               <Calendar className="w-4 h-4" />
