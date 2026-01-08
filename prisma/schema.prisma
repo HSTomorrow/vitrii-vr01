@@ -74,22 +74,22 @@ model Anunciante {
 }
 
 // ============================================================================
-// USUÁRIO x LOJA x TIPO DE USUÁRIO (User-Store-Role junction table)
+// USUÁRIO x ANUNCIANTE x TIPO DE USUÁRIO (User-Advertiser-Role junction table)
 // ============================================================================
-model UsuarioLoja {
+model UsuarioAnunciante {
   id            Int       @id @default(autoincrement())
   usuarioId     Int
-  lojaId        Int
+  anuncianteId  Int
   tipoUsuario   String    // "atendente", "gestor", "administrador"
   dataCriacao   DateTime  @default(now())
   dataAtualizacao DateTime @updatedAt
 
   // Relations
   usuario       Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-  loja          Loja      @relation(fields: [lojaId], references: [id], onDelete: Cascade)
+  anunciante    Anunciante @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
 
-  @@unique([usuarioId, lojaId])
-  @@map("usuarios_lojas")
+  @@unique([usuarioId, anuncianteId])
+  @@map("usuarios_anunciantes")
 }
 
 // ============================================================================
