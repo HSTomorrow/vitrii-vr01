@@ -452,7 +452,7 @@ export default function AnuncioForm({
                 </select>
               ) : (
                 <div className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500">
-                  Selecione uma loja primeiro
+                  Selecione um anunciante primeiro
                 </div>
               )}
               {selectedProducto &&
@@ -610,7 +610,7 @@ export default function AnuncioForm({
                 </select>
               ) : (
                 <div className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500">
-                  Selecione uma loja primeiro
+                  Selecione um anunciante primeiro
                 </div>
               )}
             </div>
