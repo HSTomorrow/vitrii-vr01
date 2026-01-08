@@ -524,57 +524,60 @@ export default function AnuncioForm({
               )}
             </div>
 
-            {/* Preço Anúncio (Promoção/Desconto) */}
-            {selectedPriceTable && (
-              <div>
-                <label className="block text-sm font-semibold text-walmart-text mb-2">
-                  Preço do Anúncio{" "}
-                  {formData.isDoacao
-                    ? "(Desabilitado - Doação)"
-                    : "(Promoção/Desconto)"}
-                </label>
-                <div className="flex items-center">
-                  <span className="text-walmart-text font-semibold mr-2">
-                    R$
-                  </span>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={formData.precoAnuncio}
-                    onChange={(e) =>
-                      handleInputChange("precoAnuncio", e.target.value)
-                    }
-                    disabled={formData.isDoacao}
-                    placeholder={
-                      formData.isDoacao
-                        ? "Grátis (doação)"
-                        : `Ex: ${Number(selectedPriceTable.preco).toFixed(2)}`
-                    }
-                    className={`flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent ${
-                      formData.isDoacao ? "bg-gray-100 cursor-not-allowed" : ""
-                    }`}
-                  />
-                </div>
-                <p className="mt-2 text-sm text-walmart-text-secondary">
-                  {formData.isDoacao
-                    ? "Este anúncio será publicado como doação, sem custo."
-                    : `Deixe em branco para usar o preço da variante: R$ ${Number(selectedPriceTable.preco).toFixed(2)}`}
-                </p>
-                {formData.precoAnuncio &&
-                  !formData.isDoacao &&
-                  Number(formData.precoAnuncio) <
-                    Number(selectedPriceTable.preco) && (
-                    <p className="mt-2 text-sm text-green-600 font-semibold">
-                      ✓ Desconto aplicado! Economia: R${" "}
-                      {(
-                        Number(selectedPriceTable.preco) -
-                        Number(formData.precoAnuncio)
-                      ).toFixed(2)}
-                    </p>
-                  )}
+            {/* Preço do Anúncio - Sempre Visível */}
+            <div>
+              <label className="block text-sm font-semibold text-walmart-text mb-2">
+                Valor do Anúncio *{" "}
+                {formData.isDoacao
+                  ? "(Desabilitado - Doação)"
+                  : ""}
+              </label>
+              <div className="flex items-center">
+                <span className="text-walmart-text font-semibold mr-2">
+                  R$
+                </span>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={formData.precoAnuncio}
+                  onChange={(e) =>
+                    handleInputChange("precoAnuncio", e.target.value)
+                  }
+                  disabled={formData.isDoacao}
+                  placeholder={
+                    formData.isDoacao
+                      ? "Grátis (doação)"
+                      : selectedPriceTable
+                        ? `Ex: ${Number(selectedPriceTable.preco).toFixed(2)}`
+                        : "Ex: 99.90"
+                  }
+                  className={`flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent ${
+                    formData.isDoacao ? "bg-gray-100 cursor-not-allowed" : ""
+                  }`}
+                />
               </div>
-            )}
+              <p className="mt-2 text-sm text-walmart-text-secondary">
+                {formData.isDoacao
+                  ? "Este anúncio será publicado como doação, sem custo."
+                  : selectedPriceTable
+                    ? `Deixe em branco para usar o preço da variante: R$ ${Number(selectedPriceTable.preco).toFixed(2)}`
+                    : "Digite o valor que deseja cobrar pelo anúncio"}
+              </p>
+              {formData.precoAnuncio &&
+                !formData.isDoacao &&
+                selectedPriceTable &&
+                Number(formData.precoAnuncio) <
+                  Number(selectedPriceTable.preco) && (
+                  <p className="mt-2 text-sm text-green-600 font-semibold">
+                    ✓ Desconto aplicado! Economia: R${" "}
+                    {(
+                      Number(selectedPriceTable.preco) -
+                      Number(formData.precoAnuncio)
+                    ).toFixed(2)}
+                  </p>
+                )}
+            </div>
 
             {/* Validade do Anúncio */}
             <div>
