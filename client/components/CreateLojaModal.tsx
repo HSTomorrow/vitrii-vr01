@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { X } from "lucide-react";
+import { X, AlertCircle } from "lucide-react";
 
 interface CreateAnuncianteModalProps {
   isOpen: boolean;
