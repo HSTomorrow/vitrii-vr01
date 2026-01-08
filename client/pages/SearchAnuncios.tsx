@@ -141,7 +141,7 @@ export default function SearchAnuncios() {
             <Search className="absolute left-4 top-3.5 w-5 h-5 text-gray-400" />
             <input
               type="text"
-              placeholder="Buscar por título, descrição ou loja..."
+              placeholder="Buscar por título, descrição ou anunciante..."
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
