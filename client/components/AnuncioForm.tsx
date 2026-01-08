@@ -547,14 +547,14 @@ export default function AnuncioForm({
                   type="number"
                   step="0.01"
                   min="0"
-                  value={formData.precoAnuncio}
+                  value={formData.isDoacao ? "0" : formData.precoAnuncio}
                   onChange={(e) =>
-                    handleInputChange("precoAnuncio", e.target.value)
+                    !formData.isDoacao && handleInputChange("precoAnuncio", e.target.value)
                   }
                   disabled={formData.isDoacao}
                   placeholder={
                     formData.isDoacao
-                      ? "0.00"
+                      ? "0.00 (Gratuito)"
                       : selectedPriceTable
                         ? `Ex: ${Number(selectedPriceTable.preco).toFixed(2)}`
                         : "Ex: 99.90"
