@@ -5,7 +5,7 @@ import { z } from "zod";
 // Schema validation
 const ConversaCreateSchema = z.object({
   usuarioId: z.number().int().positive("Usuário é obrigatório"),
-  lojaId: z.number().int().positive("Loja é obrigatória"),
+  anuncianteId: z.number().int().positive("Anunciante é obrigatório"),
   anuncioId: z.number().int().optional(),
   assunto: z.string().min(1, "Assunto é obrigatório"),
   tipo: z.enum(["publica", "privada"]).default("privada"),
@@ -19,14 +19,14 @@ const MensagemCreateSchema = z.object({
   tipoRemetente: z.enum(["usuario", "loja"]),
 });
 
-// GET all conversations for a user/store
+// GET all conversations for a user/anunciante
 export const getConversas: RequestHandler = async (req, res) => {
   try {
-    const { usuarioId, lojaId, tipo } = req.query;
+    const { usuarioId, anuncianteId, tipo } = req.query;
 
     const where: any = {};
     if (usuarioId) where.usuarioId = parseInt(usuarioId as string);
-    if (lojaId) where.lojaId = parseInt(lojaId as string);
+    if (anuncianteId) where.anuncianteId = parseInt(anuncianteId as string);
     if (tipo) where.tipo = tipo;
     where.isActive = true;
 
@@ -36,7 +36,7 @@ export const getConversas: RequestHandler = async (req, res) => {
         usuario: {
           select: { id: true, nome: true, email: true },
         },
-        loja: {
+        anunciante: {
           select: { id: true, nome: true },
         },
         anuncio: {
@@ -75,7 +75,7 @@ export const getConversaById: RequestHandler = async (req, res) => {
         usuario: {
           select: { id: true, nome: true, email: true, telefone: true },
         },
-        loja: {
+        anunciante: {
           select: { id: true, nome: true },
         },
         anuncio: {
@@ -120,9 +120,9 @@ export const createConversa: RequestHandler = async (req, res) => {
     // Check if conversation already exists
     const existingConversa = await prisma.conversa.findUnique({
       where: {
-        usuarioId_lojaId_anuncioId: {
+        usuarioId_anuncianteId_anuncioId: {
           usuarioId: validatedData.usuarioId,
-          lojaId: validatedData.lojaId,
+          anuncianteId: validatedData.anuncianteId,
           anuncioId: validatedData.anuncioId || null,
         },
       },
@@ -143,7 +143,7 @@ export const createConversa: RequestHandler = async (req, res) => {
         data: { isActive: true },
         include: {
           usuario: { select: { id: true, nome: true } },
-          loja: { select: { id: true, nome: true } },
+          anunciante: { select: { id: true, nome: true } },
           anuncio: { select: { id: true, titulo: true } },
         },
       });
@@ -159,7 +159,7 @@ export const createConversa: RequestHandler = async (req, res) => {
       data: validatedData,
       include: {
         usuario: { select: { id: true, nome: true } },
-        loja: { select: { id: true, nome: true } },
+        anunciante: { select: { id: true, nome: true } },
         anuncio: { select: { id: true, titulo: true } },
       },
     });
