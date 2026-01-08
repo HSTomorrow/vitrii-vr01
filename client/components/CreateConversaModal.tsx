@@ -108,7 +108,7 @@ export default function CreateConversaModal({
     e.preventDefault();
 
     if (!formData.anuncianteId || !formData.assunto) {
-      toast.error("Preencha loja e assunto");
+      toast.error("Preencha anunciante e assunto");
       return;
     }
 
