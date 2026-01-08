@@ -34,7 +34,7 @@ export default function CreateConversaModal({
     assunto: "",
     tipo: "privada" as "publica" | "privada",
   });
-  const [searchLojas, setSearchLojas] = useState("");
+  const [searchAnunciantes, setSearchAnunciantes] = useState("");
   const [searchAnuncios, setSearchAnuncios] = useState("");
 
   // Fetch anunciantes
@@ -94,7 +94,7 @@ export default function CreateConversaModal({
         assunto: "",
         tipo: "privada",
       });
-      setSearchLojas("");
+      setSearchAnunciantes("");
       setSearchAnuncios("");
     },
     onError: (error) => {
@@ -135,31 +135,31 @@ export default function CreateConversaModal({
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {/* Loja Selection */}
+          {/* Anunciante Selection */}
           <div>
             <label className="block text-sm font-semibold text-walmart-text mb-2">
-              Loja *
+              Anunciante *
             </label>
             <div className="relative">
               <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
               <input
                 type="text"
                 placeholder="Buscar loja..."
-                value={searchLojas}
-                onChange={(e) => setSearchLojas(e.target.value)}
+                value={searchAnunciantes}
+                onChange={(e) => setSearchAnunciantes(e.target.value)}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
               />
             </div>
 
-            {searchLojas && filteredLojas.length > 0 && (
+            {searchAnunciantes && filteredAnunciantes.length > 0 && (
               <div className="mt-2 border border-gray-300 rounded-lg max-h-48 overflow-y-auto">
-                {filteredLojas.map((loja: Loja) => (
+                {filteredAnunciantes.map((loja: Anunciante) => (
                   <button
                     key={loja.id}
                     type="button"
                     onClick={() => {
                       setFormData((prev) => ({ ...prev, anuncianteId: loja.id }));
-                      setSearchLojas("");
+                      setSearchAnunciantes("");
                     }}
                     className="w-full text-left px-4 py-2 hover:bg-gray-100 border-b last:border-b-0"
                   >
@@ -172,7 +172,7 @@ export default function CreateConversaModal({
             {formData.anuncianteId > 0 && (
               <div className="mt-2 p-3 bg-blue-50 rounded-lg flex items-center justify-between">
                 <span className="text-sm text-walmart-text font-medium">
-                  {anunciantes.find((l: Loja) => l.id === formData.anuncianteId)?.nome}
+                  {anunciantes.find((l: Anunciante) => l.id === formData.anuncianteId)?.nome}
                 </span>
                 <button
                   type="button"
