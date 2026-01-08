@@ -91,7 +91,7 @@ export default function Agenda() {
       const productosData = await productosRes.json();
 
       if (lojasData.success) {
-        setLojas(lojasData.data || []);
+        setAnunciantes(lojasData.data || []);
       }
       if (productosData.success) {
         setProductos(productosData.data || []);
