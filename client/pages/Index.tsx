@@ -168,6 +168,7 @@ export default function Index() {
               destacados.map((anuncio: any) => (
                 <div
                   key={anuncio.id}
+                  onClick={() => navigate(`/anuncio/${anuncio.id}`)}
                   className="vitrii-card overflow-hidden hover:scale-105 transition-transform duration-200 cursor-pointer relative"
                 >
                   <div className="w-full h-48 bg-gradient-to-br from-walmart-blue to-walmart-blue-dark flex items-center justify-center overflow-hidden">
