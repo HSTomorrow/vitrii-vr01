@@ -21,12 +21,12 @@ interface EquipeDeVenda {
   id: number;
   nome: string;
   descricao?: string;
-  lojaId: number;
-  loja: { id: number; nome: string };
+  anuncianteId: number;
+  anunciante: { id: number; nome: string };
   membros: MembroEquipe[];
 }
 
-interface Loja {
+interface Anunciante {
   id: number;
   nome: string;
 }
@@ -34,7 +34,7 @@ interface Loja {
 export default function CadastroEquipeDeVenda() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  const [selectedLojaId, setSelectedLojaId] = useState<number | null>(null);
+  const [selectedAnuncianteId, setSelectedAnuncianteId] = useState<number | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [expandedTeamId, setExpandedTeamId] = useState<number | null>(null);
@@ -44,12 +44,12 @@ export default function CadastroEquipeDeVenda() {
   });
   const [newMemberId, setNewMemberId] = useState(0);
 
-  // Fetch lojas
-  const { data: lojasData } = useQuery({
-    queryKey: ["lojas"],
+  // Fetch anunciantes
+  const { data: anunciantesData } = useQuery({
+    queryKey: ["anunciantes"],
     queryFn: async () => {
-      const response = await fetch("/api/lojas");
-      if (!response.ok) throw new Error("Erro ao buscar lojas");
+      const response = await fetch("/api/anunciantes");
+      if (!response.ok) throw new Error("Erro ao buscar anunciantes");
       return response.json();
     },
     enabled: !!user,
@@ -57,16 +57,16 @@ export default function CadastroEquipeDeVenda() {
 
   // Fetch equipes
   const { data: equipesData, refetch: refetchEquipes } = useQuery({
-    queryKey: ["equipes-venda", selectedLojaId],
+    queryKey: ["equipes-venda", selectedAnuncianteId],
     queryFn: async () => {
-      const url = selectedLojaId
-        ? `/api/equipes-venda?lojaId=${selectedLojaId}`
+      const url = selectedAnuncianteId
+        ? `/api/equipes-venda?anuncianteId=${selectedAnuncianteId}`
         : "/api/equipes-venda";
       const response = await fetch(url);
       if (!response.ok) throw new Error("Erro ao buscar equipes");
       return response.json();
     },
-    enabled: !!user && selectedLojaId !== null,
+    enabled: !!user && selectedAnuncianteId !== null,
   });
 
   // Fetch available users for a team
@@ -95,7 +95,7 @@ export default function CadastroEquipeDeVenda() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...data,
-          lojaId: selectedLojaId,
+          anuncianteId: selectedAnuncianteId,
         }),
       });
 
@@ -219,32 +219,32 @@ export default function CadastroEquipeDeVenda() {
     saveEquipeMutation.mutate(formData);
   };
 
-  const lojas = lojasData?.data || [];
+  const anunciantes = anunciantesData?.data || [];
   const equipes = equipesData?.data || [];
   const usuariosDisponiveis = usuariosDisponiveisData?.data || [];
 
-  // Set first loja as default
-  const defaultLojaId = useMemo(() => {
-    if (lojas.length > 0 && selectedLojaId === null) {
-      return lojas[0].id;
+  // Set first anunciante as default
+  const defaultAnuncianteId = useMemo(() => {
+    if (anunciantes.length > 0 && selectedAnuncianteId === null) {
+      return anunciantes[0].id;
     }
-    return selectedLojaId;
-  }, [lojas, selectedLojaId]);
+    return selectedAnuncianteId;
+  }, [anunciantes, selectedAnuncianteId]);
 
-  if (lojas.length === 0) {
+  if (anunciantes.length === 0) {
     return (
       <div className="min-h-screen flex flex-col bg-gray-50">
         <Header />
         <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
             <p className="text-yellow-800">
-              Você precisa cadastrar uma loja antes de criar equipes de venda.
+              Você precisa cadastrar um anunciante antes de criar equipes de venda.
             </p>
             <button
-              onClick={() => window.location.href = "/cadastros/lojas"}
+              onClick={() => window.location.href = "/cadastros/anunciantes"}
               className="mt-4 px-4 py-2 bg-walmart-yellow text-walmart-text rounded-lg hover:bg-walmart-yellow-dark transition-colors font-semibold"
             >
-              Ir para Cadastro de Lojas
+              Ir para Cadastro de Anunciantes
             </button>
           </div>
         </main>
@@ -271,24 +271,24 @@ export default function CadastroEquipeDeVenda() {
           </p>
         </div>
 
-        {/* Loja Selector */}
-        {lojas.length > 1 && (
+        {/* Anunciante Selector */}
+        {anunciantes.length > 1 && (
           <div className="mb-8">
             <label className="block text-sm font-semibold text-walmart-text mb-3">
-              Filtrar por Loja
+              Filtrar por Anunciante
             </label>
             <div className="flex flex-wrap gap-2">
-              {lojas.map((loja: Loja) => (
+              {anunciantes.map((anunciante: Anunciante) => (
                 <button
-                  key={loja.id}
-                  onClick={() => setSelectedLojaId(loja.id)}
+                  key={anunciante.id}
+                  onClick={() => setSelectedAnuncianteId(anunciante.id)}
                   className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
-                    (selectedLojaId || defaultLojaId) === loja.id
+                    (selectedAnuncianteId || defaultAnuncianteId) === anunciante.id
                       ? "bg-walmart-blue text-white"
                       : "bg-white text-walmart-text border border-gray-300 hover:border-walmart-blue"
                   }`}
                 >
-                  {loja.nome}
+                  {anunciante.nome}
                 </button>
               ))}
             </div>
@@ -398,7 +398,7 @@ export default function CadastroEquipeDeVenda() {
                         </p>
                       )}
                       <p className="text-xs text-gray-500 mt-2">
-                        Loja: {equipe.loja.nome} • {equipe.membros.length} membro(s)
+                        Anunciante: {equipe.anunciante.nome} • {equipe.membros.length} membro(s)
                       </p>
                     </div>
 
