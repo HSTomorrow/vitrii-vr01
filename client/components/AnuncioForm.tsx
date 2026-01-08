@@ -278,6 +278,12 @@ export default function AnuncioForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Check if user has completed their profile (CPF and phone)
+    if (!user?.cpf || !user?.telefone) {
+      setShowProfileGate(true);
+      return;
+    }
+
     // Basic required fields
     if (!selectedAnuncianteId || !formData.productId) {
       toast.error("Anunciante e Produto são obrigatórios");
