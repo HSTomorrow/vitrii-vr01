@@ -67,9 +67,9 @@ export const getUsuarioById: RequestHandler = async (req, res) => {
     const usuario = await prisma.usuario.findUnique({
       where: { id: parseInt(id) },
       include: {
-        usuarioLojas: {
+        usuarioAnunciantes: {
           include: {
-            loja: true,
+            anunciante: true,
           },
         },
       },
