@@ -114,7 +114,11 @@ export default function AnuncioForm({
         return response.json();
       }
       // Otherwise, fetch only user's anunciantes
-      const response = await fetch("/api/anunciantes/do-usuario/listar");
+      const response = await fetch("/api/anunciantes/do-usuario/listar", {
+        headers: {
+          "x-user-id": String(user?.id),
+        },
+      });
       if (!response.ok) throw new Error("Erro ao buscar anunciantes");
       return response.json();
     },
