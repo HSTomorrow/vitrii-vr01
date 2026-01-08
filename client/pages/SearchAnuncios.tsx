@@ -71,7 +71,7 @@ export default function SearchAnuncios() {
 
     // Filter by store
     if (selectedStore) {
-      ads = ads.filter((ad: any) => ad.lojaId === selectedStore);
+      ads = ads.filter((ad: any) => ad.anuncianteId === selectedStore);
     }
 
     // Filter by price range
