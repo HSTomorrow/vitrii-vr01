@@ -490,6 +490,177 @@ export default function Index() {
         </div>
       </section>
 
+      {/* Events Listings Section */}
+      <section className="py-8 md:py-12 bg-walmart-gray-light">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center mb-8">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-bold text-walmart-text mb-1">
+                Eventos
+              </h2>
+              <p className="text-sm text-walmart-text-secondary">
+                Descubra eventos, workshops e experiências próximas a você
+              </p>
+            </div>
+            <Link
+              to="/browse?filter=evento"
+              className="hidden md:inline-flex items-center space-x-2 text-walmart-blue font-semibold hover:space-x-3 transition-all"
+            >
+              <span>Ver Todos</span>
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+
+          {/* Events Cards Grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+            {eventosLoading ? (
+              <>
+                {[1, 2, 3, 4, 5].map((item) => (
+                  <div
+                    key={item}
+                    className="vitrii-card overflow-hidden animate-pulse"
+                  >
+                    <div className="w-full h-48 bg-gray-300" />
+                    <div className="p-4 space-y-3">
+                      <div className="h-4 bg-gray-300 rounded" />
+                      <div className="h-3 bg-gray-300 rounded w-3/4" />
+                      <div className="h-3 bg-gray-300 rounded w-1/2" />
+                      <div className="h-4 bg-gray-300 rounded" />
+                      <div className="h-10 bg-gray-300 rounded" />
+                    </div>
+                  </div>
+                ))}
+              </>
+            ) : destaqueEventos.length > 0 ? (
+              destaqueEventos.map((anuncio: any) => (
+                <div
+                  key={anuncio.id}
+                  className="vitrii-card overflow-hidden hover:scale-105 transition-transform duration-200 cursor-pointer relative"
+                >
+                  <div className="absolute top-3 right-3 bg-purple-500 text-white px-3 py-1 rounded-full text-xs font-bold z-10">
+                    EVENTO
+                  </div>
+
+                  <div className="w-full h-48 bg-gradient-to-br from-purple-400 to-purple-600 flex items-center justify-center overflow-hidden">
+                    {anuncio.fotoUrl ? (
+                      <img
+                        src={anuncio.fotoUrl}
+                        alt={anuncio.titulo}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <Calendar className="w-12 h-12 text-white opacity-50" />
+                    )}
+                  </div>
+
+                  {anuncio.anunciante?.fotoUrl && (
+                    <div className="absolute bottom-3 left-3 z-10 w-10 h-10 rounded-full bg-white border-2 border-purple-500 overflow-hidden flex items-center justify-center shadow-md">
+                      <img
+                        src={anuncio.anunciante.fotoUrl}
+                        alt={anuncio.anunciante.nome}
+                        className="w-full h-full object-cover"
+                        title={anuncio.anunciante.nome}
+                      />
+                    </div>
+                  )}
+
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (!user) {
+                        toast.error("Faça login para adicionar favoritos");
+                        navigate("/auth/signin");
+                      } else {
+                        toggleFavoritoMutation.mutate(anuncio.id);
+                      }
+                    }}
+                    disabled={toggleFavoritoMutation.isPending}
+                    className="absolute top-3 left-3 z-10 p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
+                    title={
+                      favoritos.has(anuncio.id)
+                        ? "Remover dos favoritos"
+                        : "Adicionar aos favoritos"
+                    }
+                  >
+                    <Heart
+                      className={`w-5 h-5 transition-colors ${
+                        favoritos.has(anuncio.id)
+                          ? "fill-red-500 text-red-500"
+                          : "text-gray-400"
+                      }`}
+                    />
+                  </button>
+
+                  <div className="p-4 flex flex-col h-full">
+                    <div>
+                      <h4 className="font-semibold text-walmart-text mb-2 line-clamp-2">
+                        {anuncio.titulo}
+                      </h4>
+                      <p className="text-sm text-walmart-text-secondary mb-3 line-clamp-2">
+                        {anuncio.descricao || "Confira este evento especial"}
+                      </p>
+
+                      <div className="flex items-center gap-1 mb-3 text-xs text-walmart-text-secondary">
+                        <MapPin className="w-3 h-3" />
+                        <span className="truncate">
+                          {extractMunicipality(anuncio.anunciante?.endereco || "")}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-center mb-4 mt-auto">
+                      <span className="text-2xl font-bold text-purple-600">
+                        R${" "}
+                        {anuncio.precoAnuncio
+                          ? Number(anuncio.precoAnuncio).toFixed(2)
+                          : anuncio.tabelaDePreco?.preco
+                            ? Number(anuncio.tabelaDePreco.preco).toFixed(2)
+                            : "0.00"}
+                      </span>
+                      <div className="flex items-center space-x-1">
+                        <Star className="w-4 h-4 fill-walmart-yellow text-walmart-yellow" />
+                        <span className="text-sm font-semibold">5.0</span>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => navigate(`/anuncio/${anuncio.id}`)}
+                      className="w-full bg-purple-600 text-white py-2 rounded-lg font-semibold hover:bg-purple-700 transition-colors"
+                    >
+                      Ver Detalhes
+                    </button>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="col-span-full text-center py-12">
+                <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-walmart-text-secondary">
+                  Nenhum evento publicado ainda
+                </p>
+                <Link
+                  to="/anuncio/criar"
+                  className="inline-flex items-center gap-2 text-walmart-blue font-semibold hover:underline mt-4"
+                >
+                  <Plus className="w-4 h-4" />
+                  Publique um Evento
+                </Link>
+              </div>
+            )}
+          </div>
+
+          <div className="text-center mt-12 lg:hidden">
+            <Link
+              to="/browse?filter=evento"
+              className="inline-flex items-center space-x-2 text-walmart-blue font-semibold hover:space-x-3 transition-all"
+            >
+              <span>Ver Todos os Eventos</span>
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Create Ad Section */}
       <section className="py-8 md:py-12 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
