@@ -481,10 +481,10 @@ export default function AnuncioForm({
             </div>
 
             {/* Tabela de Preço Selection - Only for regular products/services */}
-            {selectedProducto?.tipo && !["evento", "agenda_recorrente", "doacao"].includes(selectedProducto.tipo) && (
+            {selectedProducto?.tipo && ["produto", "servico"].includes(selectedProducto.tipo) && priceTables.length > 0 && (
             <div>
               <label className="block text-sm font-semibold text-walmart-text mb-2">
-                Variante (Tamanho/Cor) - Define o Preço *
+                Variante (Tamanho/Cor) - Opcional
               </label>
               {formData.productId > 0 ? (
                 <select
@@ -497,7 +497,7 @@ export default function AnuncioForm({
                   }
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
                 >
-                  <option value={0}>Selecione uma variante</option>
+                  <option value={0}>Selecione uma variante (opcional)</option>
                   {priceTables.map((pt) => (
                     <option key={pt.id} value={pt.id}>
                       {pt.tamanho && pt.cor
@@ -519,14 +519,9 @@ export default function AnuncioForm({
                   {Number(selectedPriceTable.preco).toFixed(2)}
                 </p>
               )}
-              {!selectedPriceTable && formData.productId > 0 && (
-                <p className="mt-2 text-sm text-red-600">
-                  Selecione uma variante para definir o preço do anúncio
-                </p>
-              )}
             </div>
             )}
-            {selectedProducto?.tipo && ["evento", "agenda_recorrente"].includes(selectedProducto.tipo) && (
+            {selectedProducto?.tipo && !["produto", "servico"].includes(selectedProducto.tipo) && (
             <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
               <p className="text-sm text-blue-800">
                 <strong>ℹ️ Dica:</strong> Este tipo de anúncio não requer variantes. O preço será definido diretamente no campo "Valor do Anúncio" abaixo.
