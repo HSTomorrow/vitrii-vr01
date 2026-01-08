@@ -41,10 +41,10 @@ export default function SearchAnuncios() {
 
   // Fetch stores for filter
   const { data: storesData } = useQuery({
-    queryKey: ["lojas"],
+    queryKey: ["anunciantes"],
     queryFn: async () => {
-      const response = await fetch("/api/lojas");
-      if (!response.ok) throw new Error("Erro ao buscar lojas");
+      const response = await fetch("/api/anunciantes");
+      if (!response.ok) throw new Error("Erro ao buscar anunciantes");
       return response.json();
     },
   });
@@ -233,7 +233,7 @@ export default function SearchAnuncios() {
                     }}
                     className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
                   >
-                    <option value="">Todas as lojas</option>
+                    <option value="">Todas as anunciantes</option>
                     {stores.map((store: any) => (
                       <option key={store.id} value={store.id}>
                         {store.nome}
