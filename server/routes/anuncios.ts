@@ -30,14 +30,14 @@ const AnuncioCreateSchema = z.object({
 // GET all ads
 export const getAnuncios: RequestHandler = async (req, res) => {
   try {
-    const { lojaId, status, includeInactive, isDoacao, limit = "20", offset = "0" } = req.query;
+    const { anuncianteId, status, includeInactive, isDoacao, limit = "20", offset = "0" } = req.query;
 
     // Validate pagination parameters
     const pageLimit = Math.min(Math.max(parseInt(limit as string) || 20, 1), 100);
     const pageOffset = Math.max(parseInt(offset as string) || 0, 0);
 
     const where: any = { isActive: true }; // Default: only active ads
-    if (lojaId) where.lojaId = parseInt(lojaId as string);
+    if (anuncianteId) where.anuncianteId = parseInt(anuncianteId as string);
     if (status) where.status = status;
     if (includeInactive === "true") delete where.isActive; // Override to include inactive
     // Handle isDoacao parameter
@@ -50,7 +50,7 @@ export const getAnuncios: RequestHandler = async (req, res) => {
       prisma.anuncio.findMany({
         where,
         include: {
-          loja: {
+          anunciante: {
             select: {
               id: true,
               nome: true,
@@ -119,10 +119,10 @@ export const getAnuncioById: RequestHandler = async (req, res) => {
         status: true,
         dataCriacao: true,
         dataValidade: true,
-        lojaId: true,
+        anuncianteId: true,
         productId: true,
         tabelaDePrecoId: true,
-        loja: {
+        anunciante: {
           select: {
             id: true,
             nome: true,
@@ -177,7 +177,7 @@ export const createAnuncio: RequestHandler = async (req, res) => {
   try {
     const validatedData = AnuncioCreateSchema.parse(req.body);
 
-    // Verify that the product belongs to the store
+    // Verify that the product belongs to the anunciante
     const producto = await prisma.producto.findUnique({
       where: { id: validatedData.productId },
       include: {
@@ -185,10 +185,10 @@ export const createAnuncio: RequestHandler = async (req, res) => {
       },
     });
 
-    if (!producto || producto.grupo.lojaId !== validatedData.lojaId) {
+    if (!producto || producto.grupo.anuncianteId !== validatedData.anuncianteId) {
       return res.status(400).json({
         success: false,
-        error: "Produto não pertence à loja selecionada",
+        error: "Produto não pertence ao anunciante selecionado",
       });
     }
 
@@ -237,7 +237,7 @@ export const createAnuncio: RequestHandler = async (req, res) => {
 
     const anuncio = await prisma.anuncio.create({
       data: {
-        lojaId: validatedData.lojaId,
+        anuncianteId: validatedData.anuncianteId,
         productId: validatedData.productId,
         tabelaDePrecoId: validatedData.tabelaDePrecoId,
         titulo: validatedData.titulo,
@@ -254,7 +254,7 @@ export const createAnuncio: RequestHandler = async (req, res) => {
         status,
       },
       include: {
-        loja: true,
+        anunciante: true,
         producto: true,
         tabelaDePreco: true,
       },
@@ -302,7 +302,7 @@ export const updateAnuncio: RequestHandler = async (req, res) => {
       where: { id: parseInt(id) },
       data: updateData,
       include: {
-        loja: true,
+        anunciante: true,
         producto: true,
         tabelaDePreco: true,
       },
@@ -357,7 +357,7 @@ export const updateAnuncioStatus: RequestHandler = async (req, res) => {
       where: { id: parseInt(id) },
       data: { status },
       include: {
-        loja: true,
+        anunciante: true,
         producto: true,
         tabelaDePreco: true,
       },
@@ -416,7 +416,7 @@ export const overrideAnuncioStatus: RequestHandler = async (req, res) => {
       where: { id: parseInt(id) },
       data: { status },
       include: {
-        loja: true,
+        anunciante: true,
         producto: true,
         tabelaDePreco: true,
       },
@@ -467,7 +467,7 @@ export const inactivateAnuncio: RequestHandler = async (req, res) => {
       where: { id: parseInt(id) },
       data: { isActive: false },
       include: {
-        loja: true,
+        anunciante: true,
         producto: true,
         tabelaDePreco: true,
       },
@@ -496,7 +496,7 @@ export const activateAnuncio: RequestHandler = async (req, res) => {
       where: { id: parseInt(id) },
       data: { isActive: true },
       include: {
-        loja: true,
+        anunciante: true,
         producto: true,
         tabelaDePreco: true,
       },
@@ -516,15 +516,15 @@ export const activateAnuncio: RequestHandler = async (req, res) => {
   }
 };
 
-// GET products and prices by store for ad creation
+// GET products and prices by anunciante for ad creation
 export const getProdutosParaAnuncio: RequestHandler = async (req, res) => {
   try {
-    const { lojaId } = req.params;
+    const { anuncianteId } = req.params;
 
     const productos = await prisma.producto.findMany({
       where: {
         grupo: {
-          lojaId: parseInt(lojaId),
+          anuncianteId: parseInt(anuncianteId),
         },
       },
       include: {
@@ -532,12 +532,12 @@ export const getProdutosParaAnuncio: RequestHandler = async (req, res) => {
           select: {
             id: true,
             nome: true,
-            lojaId: true,
+            anuncianteId: true,
           },
         },
         tabelasDePreco: {
           where: {
-            lojaId: parseInt(lojaId),
+            anuncianteId: parseInt(anuncianteId),
           },
         },
       },
