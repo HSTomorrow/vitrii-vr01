@@ -84,7 +84,7 @@ export default function Index() {
     queryKey: ["anuncios-doacoes"],
     queryFn: async () => {
       const response = await fetch("/api/anuncios?status=pago&isDoacao=true");
-      if (!response.ok) throw new Error("Erro ao buscar doações");
+      if (!response.ok) throw new Error("Erro ao buscar itens gratuitos");
       return response.json();
     },
   });
