@@ -249,7 +249,7 @@ export default function SearchAnuncios() {
 
                 {/* Store Filter */}
                 <div>
-                  <h3 className="font-semibold text-walmart-text mb-3">Loja</h3>
+                  <h3 className="font-semibold text-walmart-text mb-3">Anunciante</h3>
                   <select
                     value={selectedStore || ""}
                     onChange={(e) => {
