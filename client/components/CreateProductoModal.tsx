@@ -264,7 +264,15 @@ export default function CreateProductoModal({
               >
                 <option value="produto">Produto</option>
                 <option value="servico">Serviço</option>
+                <option value="evento">Evento</option>
+                <option value="agenda_recorrente">Agenda Recorrente</option>
+                <option value="doacao">Doação</option>
               </select>
+              <p className="mt-2 text-sm text-walmart-text-secondary">
+                {formData.tipo === "evento" && "Selecione este tipo para eventos e shows"}
+                {formData.tipo === "agenda_recorrente" && "Selecione este tipo para agendamentos recorrentes (aulas, consultas, etc)"}
+                {formData.tipo === "doacao" && "Selecione este tipo para itens que serão doados gratuitamente"}
+              </p>
             </div>
 
             {/* Variantes/Tabelas de Preço */}
