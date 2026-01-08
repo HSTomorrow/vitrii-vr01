@@ -22,6 +22,7 @@ import {
   deleteAnunciante,
   adicionarUsuarioAnunciante,
   getEquipeAnunciante,
+  getAnunciantesByUsuario,
 } from "./routes/anunciantes";
 import {
   getGrupos,
