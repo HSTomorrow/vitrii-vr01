@@ -682,7 +682,7 @@ export default function Index() {
 
           {/* Recurring Schedule Cards Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-            {agendaLoading ? (
+            {allAnunciosLoading ? (
               <>
                 {[1, 2, 3, 4, 5].map((item) => (
                   <div
