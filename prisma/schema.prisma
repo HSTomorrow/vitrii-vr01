@@ -347,7 +347,7 @@ model Mensagem {
   id            Int       @id @default(autoincrement())
   conversaId    Int
   remetentId    Int       // Sender
-  tipoRemetente String    // "usuario", "loja" (for easier querying)
+  tipoRemetente String    // "usuario", "anunciante" (for easier querying)
   conteudo      String    @db.Text
   lido          Boolean   @default(false)
   isActive      Boolean   @default(true) // Logical deletion
