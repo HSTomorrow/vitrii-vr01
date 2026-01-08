@@ -10,7 +10,7 @@ import CreateConversaModal from "../components/CreateConversaModal";
 interface Message {
   id: number;
   conteudo: string;
-  tipoRemetente: "usuario" | "loja";
+  tipoRemetente: "usuario" | "anunciante";
   dataCriacao: string;
   lido: boolean;
   remetente: {
@@ -22,7 +22,7 @@ interface Message {
 interface Conversa {
   id: number;
   usuarioId: number;
-  lojaId: number;
+  anuncianteId: number;
   assunto: string;
   ultimaMensagem: string;
   dataUltimaMensagem: string;
@@ -31,7 +31,7 @@ interface Conversa {
     id: number;
     nome: string;
   };
-  loja: {
+  anunciante: {
     id: number;
     nome: string;
   };
@@ -49,7 +49,7 @@ export default function Chat() {
   );
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [currentUserId] = useState(1); // In real app, get from auth context
-  const [userType] = useState<"usuario" | "loja">("usuario"); // In real app, get from auth context
+  const [userType] = useState<"usuario" | "anunciante">("usuario"); // In real app, get from auth context
 
   // Fetch selected conversation with messages
   const { data: conversaData, refetch: refetchConversa } = useQuery({
@@ -141,7 +141,7 @@ export default function Chat() {
                     {selectedConversa.assunto}
                   </h2>
                   <p className="text-sm text-walmart-text-secondary">
-                    com {selectedConversa.loja.nome} •{" "}
+                    com {selectedConversa.anunciante.nome} •{" "}
                     {selectedConversa.usuario.nome}
                   </p>
                   {selectedConversa.anuncio && (
