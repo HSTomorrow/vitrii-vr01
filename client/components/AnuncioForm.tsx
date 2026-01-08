@@ -652,29 +652,6 @@ export default function AnuncioForm({
               )}
             </div>
 
-            {/* Gratuito */}
-            <div className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg">
-              <input
-                type="checkbox"
-                id="isDoacao"
-                checked={formData.isDoacao}
-                onChange={(e) => {
-                  const isChecked = e.target.checked;
-                  handleInputChange("isDoacao", isChecked);
-                  // Zero out price when marking as free
-                  if (isChecked) {
-                    handleInputChange("precoAnuncio", "0");
-                  }
-                }}
-                className="w-5 h-5 text-green-600 cursor-pointer rounded"
-              />
-              <label htmlFor="isDoacao" className="flex-1 cursor-pointer">
-                <p className="font-semibold text-walmart-text">
-                  Este produto/serviço/evento é gratuito
-                </p>
-              </label>
-            </div>
-
             {/* Destaque (Featured) */}
             <div className="flex items-center gap-3 p-4 bg-yellow-50 border border-walmart-yellow rounded-lg">
               <input
