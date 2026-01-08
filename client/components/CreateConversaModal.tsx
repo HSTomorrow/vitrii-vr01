@@ -29,7 +29,7 @@ export default function CreateConversaModal({
 }: CreateConversaModalProps) {
   const [formData, setFormData] = useState({
     usuarioId: currentUserId,
-    lojaId: 0,
+    anuncianteId: 0,
     anuncioId: 0,
     assunto: "",
     tipo: "privada" as "publica" | "privada",
@@ -50,13 +50,13 @@ export default function CreateConversaModal({
 
   // Fetch anuncios for selected loja
   const { data: anunciosData } = useQuery({
-    queryKey: ["anuncios-loja", formData.lojaId],
+    queryKey: ["anuncios-loja", formData.anuncianteId],
     queryFn: async () => {
-      const response = await fetch(`/api/anuncios?lojaId=${formData.lojaId}`);
+      const response = await fetch(`/api/anuncios?anuncianteId=${formData.anuncianteId}`);
       if (!response.ok) throw new Error("Erro ao buscar anúncios");
       return response.json();
     },
-    enabled: formData.lojaId > 0,
+    enabled: formData.anuncianteId > 0,
   });
 
   const lojas = lojasData?.data || [];
@@ -89,7 +89,7 @@ export default function CreateConversaModal({
       onSuccess(result.data);
       setFormData({
         usuarioId: currentUserId,
-        lojaId: 0,
+        anuncianteId: 0,
         anuncioId: 0,
         assunto: "",
         tipo: "privada",
@@ -107,7 +107,7 @@ export default function CreateConversaModal({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.lojaId || !formData.assunto) {
+    if (!formData.anuncianteId || !formData.assunto) {
       toast.error("Preencha loja e assunto");
       return;
     }
@@ -158,7 +158,7 @@ export default function CreateConversaModal({
                     key={loja.id}
                     type="button"
                     onClick={() => {
-                      setFormData((prev) => ({ ...prev, lojaId: loja.id }));
+                      setFormData((prev) => ({ ...prev, anuncianteId: loja.id }));
                       setSearchLojas("");
                     }}
                     className="w-full text-left px-4 py-2 hover:bg-gray-100 border-b last:border-b-0"
@@ -169,15 +169,15 @@ export default function CreateConversaModal({
               </div>
             )}
 
-            {formData.lojaId > 0 && (
+            {formData.anuncianteId > 0 && (
               <div className="mt-2 p-3 bg-blue-50 rounded-lg flex items-center justify-between">
                 <span className="text-sm text-walmart-text font-medium">
-                  {lojas.find((l: Loja) => l.id === formData.lojaId)?.nome}
+                  {lojas.find((l: Loja) => l.id === formData.anuncianteId)?.nome}
                 </span>
                 <button
                   type="button"
                   onClick={() =>
-                    setFormData((prev) => ({ ...prev, lojaId: 0 }))
+                    setFormData((prev) => ({ ...prev, anuncianteId: 0 }))
                   }
                   className="text-red-600 hover:text-red-700 text-sm"
                 >
@@ -188,7 +188,7 @@ export default function CreateConversaModal({
           </div>
 
           {/* Anuncio Selection (Optional) */}
-          {formData.lojaId > 0 && (
+          {formData.anuncianteId > 0 && (
             <div>
               <label className="block text-sm font-semibold text-walmart-text mb-2">
                 Anúncio (Opcional)
