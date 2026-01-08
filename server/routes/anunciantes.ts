@@ -7,6 +7,8 @@ const AnuncianteCreateSchema = z.object({
   nome: z.string().min(1, "Nome é obrigatório"),
   cnpjOuCpf: z.string().regex(/^\d{11,18}$/, "CNPJ/CPF inválido"),
   endereco: z.string().min(1, "Endereço é obrigatório"),
+  cidade: z.string().min(1, "Cidade é obrigatória"),
+  estado: z.string().length(2, "Estado deve ter 2 caracteres (ex: MG, SP, RJ)"),
   descricao: z.string().min(1, "Descrição é obrigatória"),
   email: z.string().email("Email inválido"),
   site: z.string().optional(),
