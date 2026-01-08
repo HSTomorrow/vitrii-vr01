@@ -27,7 +27,7 @@ model Usuario {
   dataAtualizacao DateTime @updatedAt
 
   // Relations
-  usuarioLojas  UsuarioLoja[]
+  usuarioAnunciantes UsuarioAnunciante[]
   produtosVisualizados ProductoVisualizacao[]
   qrCodesVisitados QRCodeChamada[]
   membrosEquipe MembroEquipe[]
