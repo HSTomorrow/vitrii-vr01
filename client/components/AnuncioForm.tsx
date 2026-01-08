@@ -831,8 +831,8 @@ export default function AnuncioForm({
         </div>
       </div>
 
-      {/* Create Loja Modal */}
-      <CreateLojaModal
+      {/* Create Anunciante Modal */}
+      <CreateAnuncianteModal
         isOpen={showCreateLoja}
         onClose={() => setShowCreateLoja(false)}
         onSuccess={handleAnuncianteCreated}
