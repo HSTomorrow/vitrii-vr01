@@ -288,14 +288,38 @@ export const createUsuario: RequestHandler = async (req, res) => {
   }
 };
 
-// UPDATE user
+// Schema for updating user (whitelist safe fields)
+const UsuarioUpdateSchema = z.object({
+  nome: z.string().min(3, "Nome deve ter pelo menos 3 caracteres").max(255).optional(),
+  telefone: z.string().min(10, "Telefone inválido").optional(),
+  endereco: z.string().min(1, "Endereço é obrigatório").optional(),
+  cpf: z
+    .string()
+    .regex(/^\d{11}$/, "CPF deve ter 11 dígitos")
+    .optional(),
+});
+
+// UPDATE user (only safe fields allowed)
 export const updateUsuario: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
+    // Validate input - only allow safe fields
+    const validatedData = UsuarioUpdateSchema.parse(req.body);
+
     const usuario = await prisma.usuario.update({
       where: { id: parseInt(id) },
-      data: req.body,
+      data: validatedData,
+      select: {
+        id: true,
+        nome: true,
+        email: true,
+        cpf: true,
+        telefone: true,
+        endereco: true,
+        tipoUsuario: true,
+        dataCriacao: true,
+      },
     });
 
     res.json({
@@ -304,6 +328,14 @@ export const updateUsuario: RequestHandler = async (req, res) => {
       message: "Usuário atualizado com sucesso",
     });
   } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        success: false,
+        error: "Dados inválidos",
+        details: error.errors,
+      });
+    }
+
     console.error("Error updating user:", error);
     res.status(500).json({
       success: false,
