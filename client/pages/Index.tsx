@@ -685,7 +685,7 @@ export default function Index() {
           <div className="flex justify-between items-center mb-8">
             <div>
               <h2 className="text-2xl md:text-3xl font-bold text-walmart-text mb-1">
-                Agenda Recorrente
+                Aulas e Agendas Disponiveis 
               </h2>
               <p className="text-sm text-walmart-text-secondary">
                 Aulas, consultas e serviços agendáveis disponíveis
