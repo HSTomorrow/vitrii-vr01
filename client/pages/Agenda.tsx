@@ -35,7 +35,7 @@ interface AgendaSlot {
   isActive: boolean;
   dataCriacao: string;
   dataAtualizacao: string;
-  loja?: {
+  anunciante?: {
     id: number;
     nome: string;
     fotoUrl?: string;
