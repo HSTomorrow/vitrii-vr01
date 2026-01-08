@@ -100,41 +100,55 @@ export const getAnuncios: RequestHandler = async (req, res) => {
   }
 };
 
-// GET ad by ID with full details
+// GET ad by ID with full details (optimized query)
 export const getAnuncioById: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
     const anuncio = await prisma.anuncio.findUnique({
       where: { id: parseInt(id) },
-      include: {
+      select: {
+        id: true,
+        titulo: true,
+        descricao: true,
+        fotoUrl: true,
+        precoAnuncio: true,
+        isDoacao: true,
+        destaque: true,
+        isActive: true,
+        status: true,
+        dataCriacao: true,
+        dataValidade: true,
+        lojaId: true,
+        productId: true,
+        tabelaDePrecoId: true,
         loja: {
-          include: {
-            usuarioLojas: {
-              include: {
-                usuario: {
-                  select: {
-                    id: true,
-                    nome: true,
-                    email: true,
-                    telefone: true,
-                  },
-                },
-              },
-            },
+          select: {
+            id: true,
+            nome: true,
+            fotoUrl: true,
+            endereco: true,
+            email: true,
+            cnpjOuCpf: true,
           },
         },
         producto: {
-          include: {
-            grupo: {
-              select: {
-                id: true,
-                nome: true,
-              },
-            },
+          select: {
+            id: true,
+            nome: true,
+            descricao: true,
+            tipo: true,
+            grupoId: true,
           },
         },
-        tabelaDePreco: true,
+        tabelaDePreco: {
+          select: {
+            id: true,
+            preco: true,
+            tamanho: true,
+            cor: true,
+          },
+        },
       },
     });
 
