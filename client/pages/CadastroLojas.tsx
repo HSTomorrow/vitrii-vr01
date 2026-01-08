@@ -160,7 +160,7 @@ export default function CadastroAnunciantes() {
                 cnpjOuCpf: "",
                 endereco: "",
                 cidade: "",
-                estado: "",
+                estado: "RS",
                 descricao: "",
                 email: "",
                 site: "",
