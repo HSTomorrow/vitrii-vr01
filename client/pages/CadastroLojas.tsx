@@ -34,12 +34,12 @@ export default function CadastroLojas() {
     facebook: "",
   });
 
-  // Fetch lojas
-  const { data: lojas, refetch } = useQuery<Loja[]>({
-    queryKey: ["lojas"],
+  // Fetch anunciantes
+  const { data: anunciantes, refetch } = useQuery<Loja[]>({
+    queryKey: ["anunciantes"],
     queryFn: async () => {
-      const response = await fetch("/api/lojas");
-      if (!response.ok) throw new Error("Erro ao buscar lojas");
+      const response = await fetch("/api/anunciantes");
+      if (!response.ok) throw new Error("Erro ao buscar anunciantes");
       const result = await response.json();
       return result.data || [];
     },
@@ -48,7 +48,7 @@ export default function CadastroLojas() {
   // Create/Update loja mutation
   const saveLojaMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      const url = editingId ? `/api/lojas/${editingId}` : "/api/lojas";
+      const url = editingId ? `/api/anunciantes/${editingId}` : "/api/anunciantes";
       const method = editingId ? "PUT" : "POST";
 
       const response = await fetch(url, {
@@ -88,7 +88,7 @@ export default function CadastroLojas() {
   // Delete loja mutation
   const deleteLojaMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await fetch(`/api/lojas/${id}`, { method: "DELETE" });
+      const response = await fetch(`/api/anunciantes/${id}`, { method: "DELETE" });
       if (!response.ok) throw new Error("Erro ao deletar loja");
       return response.json();
     },
@@ -301,14 +301,14 @@ export default function CadastroLojas() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {!lojas || lojas.length === 0 ? (
+                {!anunciantes || anunciantes.length === 0 ? (
                   <tr>
                     <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
                       Nenhuma loja cadastrada
                     </td>
                   </tr>
                 ) : (
-                  lojas.map((loja) => (
+                  anunciantes.map((loja) => (
                     <tr key={loja.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 font-semibold text-walmart-text">{loja.nome}</td>
                       <td className="px-6 py-4 text-walmart-text">{loja.cnpjOuCpf}</td>
