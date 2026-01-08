@@ -289,7 +289,7 @@ export default function CreateConversaModal({
                   />
                   <span className="text-sm text-walmart-text">
                     {tipo === "privada"
-                      ? "Privada (apenas eu e a loja)"
+                      ? "Privada (apenas eu e o anunciante)"
                       : "Pública"}
                   </span>
                 </label>
