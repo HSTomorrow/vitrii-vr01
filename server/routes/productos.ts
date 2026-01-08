@@ -24,7 +24,7 @@ export const getProductos: RequestHandler = async (req, res) => {
       include: {
         grupo: {
           include: {
-            loja: {
+            anunciante: {
               select: {
                 id: true,
                 nome: true,
@@ -59,7 +59,7 @@ export const getProductoById: RequestHandler = async (req, res) => {
       include: {
         grupo: {
           include: {
-            loja: true,
+            anunciante: true,
           },
         },
         tabelasDePreco: true,
@@ -108,7 +108,7 @@ export const createProducto: RequestHandler = async (req, res) => {
       include: {
         grupo: {
           include: {
-            loja: true,
+            anunciante: true,
           },
         },
       },
@@ -148,7 +148,7 @@ export const updateProducto: RequestHandler = async (req, res) => {
       include: {
         grupo: {
           include: {
-            loja: true,
+            anunciante: true,
           },
         },
       },
