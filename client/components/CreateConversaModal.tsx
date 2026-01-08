@@ -10,7 +10,7 @@ interface CreateConversaModalProps {
   currentUserId: number;
 }
 
-interface Loja {
+interface Anunciante {
   id: number;
   nome: string;
 }
@@ -18,7 +18,7 @@ interface Loja {
 interface Anuncio {
   id: number;
   titulo: string;
-  lojaId: number;
+  anuncianteId: number;
 }
 
 export default function CreateConversaModal({
