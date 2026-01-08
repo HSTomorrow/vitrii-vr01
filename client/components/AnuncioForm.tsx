@@ -12,7 +12,7 @@ import { Link, useNavigate } from "react-router-dom";
 import CategoryFields from "./CategoryFields";
 import CreateAnuncianteModal from "./CreateLojaModal";
 import CreateProductoModal from "./CreateProductoModal";
-import { BRAZILIAN_STATES } from "@/shared/brazilianStates";
+import { BRAZILIAN_STATES } from "@shared/brazilianStates";
 
 interface AnuncioFormProps {
   anuncianteId?: number;
