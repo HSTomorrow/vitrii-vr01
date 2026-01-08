@@ -22,6 +22,9 @@ interface ChatBoxProps {
   currentUserId: number;
   tipoUsuario: "usuario" | "anunciante";
   onNewMessage: (message: Message) => void;
+  userCpf?: string;
+  userTelefone?: string;
+  onProfileIncomplete?: () => void;
 }
 
 export default function ChatBox({
