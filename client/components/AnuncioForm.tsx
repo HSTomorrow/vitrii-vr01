@@ -258,11 +258,18 @@ export default function AnuncioForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (
-      !selectedAnuncianteId ||
-      !formData.productId ||
-      !formData.tabelaDePrecoId
-    ) {
+    // Basic required fields
+    if (!selectedAnuncianteId || !formData.productId) {
+      toast.error("Anunciante e Produto são obrigatórios");
+      return;
+    }
+
+    // For regular products/services, variant is required
+    // For special types (evento, agenda_recorrente, doacao), price table is optional
+    const productType = selectedProducto?.tipo;
+    const isSpecialType = ["evento", "agenda_recorrente", "doacao"].includes(productType || "");
+
+    if (!isSpecialType && !formData.tabelaDePrecoId) {
       toast.error(
         "Anunciante, Produto e Variante são obrigatórios (a variante define o preço)",
       );
