@@ -4,7 +4,7 @@ import { z } from "zod";
 
 // Schema validation
 const GrupoCreateSchema = z.object({
-  lojaId: z.number().int().positive("Loja é obrigatória"),
+  anuncianteId: z.number().int().positive("Anunciante é obrigatório"),
   nome: z.string().min(1, "Nome é obrigatório"),
   descricao: z.string().optional(),
 });
@@ -12,14 +12,14 @@ const GrupoCreateSchema = z.object({
 // GET all grupos (with pagination)
 export const getGrupos: RequestHandler = async (req, res) => {
   try {
-    const { lojaId, limit = "20", offset = "0" } = req.query;
+    const { anuncianteId, limit = "20", offset = "0" } = req.query;
 
     // Validate pagination parameters
     const pageLimit = Math.min(Math.max(parseInt(limit as string) || 20, 1), 100);
     const pageOffset = Math.max(parseInt(offset as string) || 0, 0);
 
     const where: any = {};
-    if (lojaId) where.lojaId = parseInt(lojaId as string);
+    if (anuncianteId) where.anuncianteId = parseInt(anuncianteId as string);
 
     // Get total count and paginated data in parallel
     const [grupos, total] = await Promise.all([
@@ -29,7 +29,7 @@ export const getGrupos: RequestHandler = async (req, res) => {
           id: true,
           nome: true,
           descricao: true,
-          lojaId: true,
+          anuncianteId: true,
           dataCriacao: true,
         },
         orderBy: { dataCriacao: "desc" },
@@ -70,9 +70,9 @@ export const getGrupoById: RequestHandler = async (req, res) => {
         id: true,
         nome: true,
         descricao: true,
-        lojaId: true,
+        anuncianteId: true,
         dataCriacao: true,
-        loja: {
+        anunciante: {
           select: {
             id: true,
             nome: true,
