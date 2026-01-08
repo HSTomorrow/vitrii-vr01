@@ -64,8 +64,8 @@ export default function CreateConversaModal({
     a.titulo.toLowerCase().includes(searchAnuncios.toLowerCase()),
   );
 
-  const filteredLojas = anunciantes.filter((loja: Loja) =>
-    loja.nome.toLowerCase().includes(searchLojas.toLowerCase()),
+  const filteredAnunciantes = anunciantes.filter((anunciante: Anunciante) =>
+    anunciante.nome.toLowerCase().includes(searchAnunciantes.toLowerCase()),
   );
 
   // Create conversation mutation
