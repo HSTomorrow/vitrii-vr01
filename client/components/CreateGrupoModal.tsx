@@ -6,14 +6,14 @@ import { X } from "lucide-react";
 interface CreateGrupoModalProps {
   isOpen: boolean;
   onClose: () => void;
-  lojaId: number;
+  anuncianteId: number;
   onSuccess?: (grupoId: number) => void;
 }
 
 export default function CreateGrupoModal({
   isOpen,
   onClose,
-  lojaId,
+  anuncianteId,
   onSuccess,
 }: CreateGrupoModalProps) {
   const queryClient = useQueryClient();
@@ -29,7 +29,7 @@ export default function CreateGrupoModal({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ...data,
-          lojaId,
+          anuncianteId,
         }),
       });
 
@@ -41,7 +41,7 @@ export default function CreateGrupoModal({
       return response.json();
     },
     onSuccess: (result) => {
-      queryClient.invalidateQueries({ queryKey: ["grupos", lojaId] });
+      queryClient.invalidateQueries({ queryKey: ["grupos", anuncianteId] });
       toast.success("Grupo criado com sucesso!");
       setFormData({
         nome: "",
