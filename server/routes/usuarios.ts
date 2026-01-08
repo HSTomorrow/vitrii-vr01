@@ -603,3 +603,96 @@ export const validateResetToken: RequestHandler = async (req, res) => {
     });
   }
 };
+
+// ADMIN: Get all users with passwords (only for ADM users)
+export const getUsuariosComSenha: RequestHandler = async (req, res) => {
+  try {
+    // Check if user is admin (should be done via middleware in server/index.ts)
+    const usuarios = await prisma.usuario.findMany({
+      select: {
+        id: true,
+        nome: true,
+        email: true,
+        cpf: true,
+        telefone: true,
+        tipoUsuario: true,
+        dataCriacao: true,
+        senha: true, // Include hashed password for display purposes
+      },
+      orderBy: {
+        dataCriacao: "desc",
+      },
+    });
+
+    res.json({
+      success: true,
+      data: usuarios,
+      count: usuarios.length,
+    });
+  } catch (error) {
+    console.error("Error fetching users with passwords:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao buscar usuários",
+    });
+  }
+};
+
+// ADMIN: Reset user password and generate temporary password
+export const adminResetUserPassword: RequestHandler = async (req, res) => {
+  try {
+    const { usuarioId, novaSenha } = req.body;
+
+    if (!usuarioId || !novaSenha) {
+      return res.status(400).json({
+        success: false,
+        error: "ID do usuário e nova senha são obrigatórios",
+      });
+    }
+
+    if (novaSenha.length < 6) {
+      return res.status(400).json({
+        success: false,
+        error: "Senha deve ter no mínimo 6 caracteres",
+      });
+    }
+
+    // Find user
+    const usuario = await prisma.usuario.findUnique({
+      where: { id: parseInt(usuarioId) },
+      select: { id: true, email: true, nome: true },
+    });
+
+    if (!usuario) {
+      return res.status(404).json({
+        success: false,
+        error: "Usuário não encontrado",
+      });
+    }
+
+    // Hash new password
+    const senhaHash = await bcryptjs.hash(novaSenha, 10);
+
+    // Update user password
+    await prisma.usuario.update({
+      where: { id: usuario.id },
+      data: { senha: senhaHash },
+    });
+
+    res.status(200).json({
+      success: true,
+      message: `Senha do usuário ${usuario.nome} resetada com sucesso`,
+      data: {
+        usuarioId: usuario.id,
+        email: usuario.email,
+        nome: usuario.nome,
+      },
+    });
+  } catch (error) {
+    console.error("Error resetting user password:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao resetar senha do usuário",
+    });
+  }
+};
