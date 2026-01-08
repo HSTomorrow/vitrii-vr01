@@ -59,16 +59,26 @@ export const getGrupos: RequestHandler = async (req, res) => {
   }
 };
 
-// GET grupo by ID
+// GET grupo by ID (optimized)
 export const getGrupoById: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
     const grupo = await prisma.grupoDeProductos.findUnique({
       where: { id: parseInt(id) },
-      include: {
-        loja: true,
-        produtos: true,
+      select: {
+        id: true,
+        nome: true,
+        descricao: true,
+        lojaId: true,
+        dataCriacao: true,
+        loja: {
+          select: {
+            id: true,
+            nome: true,
+            fotoUrl: true,
+          },
+        },
       },
     });
 
