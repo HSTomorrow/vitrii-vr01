@@ -258,7 +258,7 @@ model QRCode {
 // ============================================================================
 model Anuncio {
   id            Int       @id @default(autoincrement())
-  lojaId        Int
+  anuncianteId  Int
   productId     Int
   tabelaDePrecoId Int?
   equipeDeVendaId Int?
@@ -277,7 +277,7 @@ model Anuncio {
   dataAtualizacao DateTime @updatedAt
 
   // Relations
-  loja          Loja      @relation(fields: [lojaId], references: [id], onDelete: Cascade)
+  anunciante    Anunciante @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
   producto      Producto  @relation(fields: [productId], references: [id], onDelete: Cascade)
   tabelaDePreco TabelaDePreco? @relation(fields: [tabelaDePrecoId], references: [id], onDelete: SetNull)
   equipeDeVenda EquipeDeVenda? @relation(fields: [equipeDeVendaId], references: [id], onDelete: SetNull)
