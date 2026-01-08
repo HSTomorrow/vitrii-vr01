@@ -57,7 +57,9 @@ export default function AnuncioForm({
 }: AnuncioFormProps) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const [selectedAnuncianteId, setSelectedAnuncianteId] = useState(anuncianteId || 0);
+  const [selectedAnuncianteId, setSelectedAnuncianteId] = useState(
+    anuncianteId || 0,
+  );
   const [showCreateLoja, setShowCreateLoja] = useState(false);
   const [showCreateProducto, setShowCreateProducto] = useState(false);
   const [formData, setFormData] = useState({
@@ -252,7 +254,11 @@ export default function AnuncioForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!selectedAnuncianteId || !formData.productId || !formData.tabelaDePrecoId) {
+    if (
+      !selectedAnuncianteId ||
+      !formData.productId ||
+      !formData.tabelaDePrecoId
+    ) {
       toast.error(
         "Anunciante, Produto e Variante são obrigatórios (a variante define o preço)",
       );

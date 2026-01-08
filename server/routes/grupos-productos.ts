@@ -15,7 +15,10 @@ export const getGrupos: RequestHandler = async (req, res) => {
     const { anuncianteId, limit = "20", offset = "0" } = req.query;
 
     // Validate pagination parameters
-    const pageLimit = Math.min(Math.max(parseInt(limit as string) || 20, 1), 100);
+    const pageLimit = Math.min(
+      Math.max(parseInt(limit as string) || 20, 1),
+      100,
+    );
     const pageOffset = Math.max(parseInt(offset as string) || 0, 0);
 
     const where: any = {};
@@ -109,7 +112,10 @@ export const getProductosOfGrupo: RequestHandler = async (req, res) => {
     const { limit = "20", offset = "0" } = req.query;
 
     // Validate pagination parameters
-    const pageLimit = Math.min(Math.max(parseInt(limit as string) || 20, 1), 100);
+    const pageLimit = Math.min(
+      Math.max(parseInt(limit as string) || 20, 1),
+      100,
+    );
     const pageOffset = Math.max(parseInt(offset as string) || 0, 0);
 
     // Get total count and paginated data in parallel

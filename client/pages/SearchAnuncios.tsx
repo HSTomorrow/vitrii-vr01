@@ -24,7 +24,9 @@ export default function SearchAnuncios() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [priceRange, setPriceRange] = useState({ min: "", max: "" });
   const [selectedStore, setSelectedStore] = useState<number | null>(null);
-  const [sortBy, setSortBy] = useState<"recent" | "price-asc" | "price-desc" | "featured">("recent");
+  const [sortBy, setSortBy] = useState<
+    "recent" | "price-asc" | "price-desc" | "featured"
+  >("recent");
   const [currentPage, setCurrentPage] = useState(1);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = useState(true);
@@ -60,7 +62,7 @@ export default function SearchAnuncios() {
         (ad: any) =>
           ad.titulo.toLowerCase().includes(term) ||
           ad.descricao?.toLowerCase().includes(term) ||
-          ad.loja.nome.toLowerCase().includes(term)
+          ad.loja.nome.toLowerCase().includes(term),
       );
     }
 
@@ -77,7 +79,7 @@ export default function SearchAnuncios() {
     // Filter by price range
     if (priceRange.min || priceRange.max) {
       ads = ads.filter((ad: any) => {
-        const price = ad.precoAnuncio || (ad.tabelaDePreco?.preco || 0);
+        const price = ad.precoAnuncio || ad.tabelaDePreco?.preco || 0;
         const min = priceRange.min ? parseFloat(priceRange.min) : 0;
         const max = priceRange.max ? parseFloat(priceRange.max) : Infinity;
         return price >= min && price <= max;
@@ -89,15 +91,19 @@ export default function SearchAnuncios() {
       if (sortBy === "featured") {
         // Featured ads first, then by creation date
         if (a.destaque !== b.destaque) return b.destaque ? 1 : -1;
-        return new Date(b.dataCriacao).getTime() - new Date(a.dataCriacao).getTime();
+        return (
+          new Date(b.dataCriacao).getTime() - new Date(a.dataCriacao).getTime()
+        );
       }
 
       if (sortBy === "recent") {
-        return new Date(b.dataCriacao).getTime() - new Date(a.dataCriacao).getTime();
+        return (
+          new Date(b.dataCriacao).getTime() - new Date(a.dataCriacao).getTime()
+        );
       }
 
-      const priceA = a.precoAnuncio || (a.tabelaDePreco?.preco || 0);
-      const priceB = b.precoAnuncio || (b.tabelaDePreco?.preco || 0);
+      const priceA = a.precoAnuncio || a.tabelaDePreco?.preco || 0;
+      const priceB = b.precoAnuncio || b.tabelaDePreco?.preco || 0;
 
       if (sortBy === "price-asc") return priceA - priceB;
       if (sortBy === "price-desc") return priceB - priceA;
@@ -106,7 +112,14 @@ export default function SearchAnuncios() {
     });
 
     return ads;
-  }, [anunciosData?.data, searchTerm, selectedCategory, selectedStore, priceRange, sortBy]);
+  }, [
+    anunciosData?.data,
+    searchTerm,
+    selectedCategory,
+    selectedStore,
+    priceRange,
+    sortBy,
+  ]);
 
   // Pagination
   const totalPages = Math.ceil(filteredAds.length / ITEMS_PER_PAGE);
@@ -147,20 +160,27 @@ export default function SearchAnuncios() {
             {/* Filters Sidebar */}
             <div
               className={`${
-                showFilters ? "w-full md:w-64 flex-shrink-0" : "hidden md:block md:w-64 flex-shrink-0"
+                showFilters
+                  ? "w-full md:w-64 flex-shrink-0"
+                  : "hidden md:block md:w-64 flex-shrink-0"
               }`}
             >
               <div className="bg-walmart-gray-light rounded-lg p-6 space-y-6">
                 <div className="flex items-center justify-between md:hidden">
                   <h2 className="font-bold text-walmart-text">Filtros</h2>
-                  <button onClick={() => setShowFilters(false)} className="text-sm text-walmart-blue">
+                  <button
+                    onClick={() => setShowFilters(false)}
+                    className="text-sm text-walmart-blue"
+                  >
                     Fechar
                   </button>
                 </div>
 
                 {/* Category Filter */}
                 <div>
-                  <h3 className="font-semibold text-walmart-text mb-3">Categoria</h3>
+                  <h3 className="font-semibold text-walmart-text mb-3">
+                    Categoria
+                  </h3>
                   <div className="space-y-2">
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
@@ -175,7 +195,10 @@ export default function SearchAnuncios() {
                       <span className="text-sm text-walmart-text">Todas</span>
                     </label>
                     {["roupas", "carros", "imoveis"].map((cat) => (
-                      <label key={cat} className="flex items-center gap-2 cursor-pointer">
+                      <label
+                        key={cat}
+                        className="flex items-center gap-2 cursor-pointer"
+                      >
                         <input
                           type="radio"
                           checked={selectedCategory === cat}
@@ -197,7 +220,9 @@ export default function SearchAnuncios() {
 
                 {/* Price Filter */}
                 <div>
-                  <h3 className="font-semibold text-walmart-text mb-3">Faixa de Preço</h3>
+                  <h3 className="font-semibold text-walmart-text mb-3">
+                    Faixa de Preço
+                  </h3>
                   <div className="space-y-2">
                     <input
                       type="number"
@@ -228,7 +253,9 @@ export default function SearchAnuncios() {
                   <select
                     value={selectedStore || ""}
                     onChange={(e) => {
-                      setSelectedStore(e.target.value ? parseInt(e.target.value) : null);
+                      setSelectedStore(
+                        e.target.value ? parseInt(e.target.value) : null,
+                      );
                       setCurrentPage(1);
                     }}
                     className="w-full px-3 py-2 border border-gray-300 rounded text-sm"
@@ -244,7 +271,9 @@ export default function SearchAnuncios() {
 
                 {/* Sort */}
                 <div>
-                  <h3 className="font-semibold text-walmart-text mb-3">Ordenar Por</h3>
+                  <h3 className="font-semibold text-walmart-text mb-3">
+                    Ordenar Por
+                  </h3>
                   <select
                     value={sortBy}
                     onChange={(e) => {
@@ -261,7 +290,11 @@ export default function SearchAnuncios() {
                 </div>
 
                 {/* Clear Filters */}
-                {(searchTerm || selectedCategory || selectedStore || priceRange.min || priceRange.max) && (
+                {(searchTerm ||
+                  selectedCategory ||
+                  selectedStore ||
+                  priceRange.min ||
+                  priceRange.max) && (
                   <button
                     onClick={() => {
                       setSearchTerm("");
@@ -284,7 +317,9 @@ export default function SearchAnuncios() {
               <div className="flex items-center justify-between mb-6">
                 <div>
                   <h2 className="text-lg font-bold text-walmart-text">
-                    {filteredAds.length} anúncio{filteredAds.length !== 1 ? "s" : ""} encontrado{filteredAds.length !== 1 ? "s" : ""}
+                    {filteredAds.length} anúncio
+                    {filteredAds.length !== 1 ? "s" : ""} encontrado
+                    {filteredAds.length !== 1 ? "s" : ""}
                   </h2>
                   <p className="text-sm text-walmart-text-secondary">
                     Página {currentPage} de {totalPages || 1}
@@ -324,8 +359,12 @@ export default function SearchAnuncios() {
               ) : currentAds.length === 0 ? (
                 <div className="text-center py-12">
                   <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-walmart-text text-lg">Nenhum anúncio encontrado</p>
-                  <p className="text-walmart-text-secondary">Tente ajustar seus filtros</p>
+                  <p className="text-walmart-text text-lg">
+                    Nenhum anúncio encontrado
+                  </p>
+                  <p className="text-walmart-text-secondary">
+                    Tente ajustar seus filtros
+                  </p>
                 </div>
               ) : (
                 <>
@@ -359,13 +398,20 @@ export default function SearchAnuncios() {
                               {anuncio.titulo}
                             </h3>
                             <p className="text-walmart-blue font-bold text-lg mb-2">
-                              R$ {(anuncio.precoAnuncio || anuncio.tabelaDePreco?.preco || 0).toFixed(2)}
+                              R${" "}
+                              {(
+                                anuncio.precoAnuncio ||
+                                anuncio.tabelaDePreco?.preco ||
+                                0
+                              ).toFixed(2)}
                             </p>
                             <p className="text-sm text-walmart-text-secondary line-clamp-2 mb-3">
                               {anuncio.loja.nome}
                             </p>
                             <p className="text-xs text-walmart-text-secondary">
-                              {new Date(anuncio.dataCriacao).toLocaleDateString("pt-BR")}
+                              {new Date(anuncio.dataCriacao).toLocaleDateString(
+                                "pt-BR",
+                              )}
                             </p>
                           </div>
                         </div>
@@ -400,7 +446,12 @@ export default function SearchAnuncios() {
                                 {anuncio.destaque && " ⭐"}
                               </h3>
                               <p className="text-walmart-blue font-bold text-lg">
-                                R$ {(anuncio.precoAnuncio || anuncio.tabelaDePreco?.preco || 0).toFixed(2)}
+                                R${" "}
+                                {(
+                                  anuncio.precoAnuncio ||
+                                  anuncio.tabelaDePreco?.preco ||
+                                  0
+                                ).toFixed(2)}
                               </p>
                             </div>
                             <p className="text-sm text-walmart-text-secondary line-clamp-2 mb-2">
@@ -412,7 +463,9 @@ export default function SearchAnuncios() {
                                 {anuncio.loja.nome}
                               </span>
                               <span>
-                                {new Date(anuncio.dataCriacao).toLocaleDateString("pt-BR")}
+                                {new Date(
+                                  anuncio.dataCriacao,
+                                ).toLocaleDateString("pt-BR")}
                               </span>
                             </div>
                           </div>
@@ -425,29 +478,35 @@ export default function SearchAnuncios() {
                   {totalPages > 1 && (
                     <div className="flex items-center justify-center gap-2 mt-12">
                       <button
-                        onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                        onClick={() =>
+                          setCurrentPage(Math.max(1, currentPage - 1))
+                        }
                         disabled={currentPage === 1}
                         className="p-2 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50"
                       >
                         <ChevronLeft className="w-5 h-5" />
                       </button>
 
-                      {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                        <button
-                          key={page}
-                          onClick={() => setCurrentPage(page)}
-                          className={`px-3 py-2 rounded ${
-                            currentPage === page
-                              ? "bg-walmart-blue text-white"
-                              : "border border-gray-300 hover:bg-gray-50"
-                          }`}
-                        >
-                          {page}
-                        </button>
-                      ))}
+                      {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                        (page) => (
+                          <button
+                            key={page}
+                            onClick={() => setCurrentPage(page)}
+                            className={`px-3 py-2 rounded ${
+                              currentPage === page
+                                ? "bg-walmart-blue text-white"
+                                : "border border-gray-300 hover:bg-gray-50"
+                            }`}
+                          >
+                            {page}
+                          </button>
+                        ),
+                      )}
 
                       <button
-                        onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                        onClick={() =>
+                          setCurrentPage(Math.min(totalPages, currentPage + 1))
+                        }
                         disabled={currentPage === totalPages}
                         className="p-2 border border-gray-300 rounded hover:bg-gray-50 disabled:opacity-50"
                       >

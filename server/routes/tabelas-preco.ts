@@ -124,7 +124,8 @@ export const createTabela: RequestHandler = async (req, res) => {
     if (existingTabela) {
       return res.status(400).json({
         success: false,
-        error: "Já existe uma tabela de preço para este produto neste anunciante",
+        error:
+          "Já existe uma tabela de preço para este produto neste anunciante",
       });
     }
 

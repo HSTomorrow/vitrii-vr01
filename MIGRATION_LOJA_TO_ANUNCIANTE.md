@@ -29,12 +29,14 @@
 ### Arquivos do Backend a Atualizar
 
 Todos os arquivos abaixo precisam de:
+
 - `lojaId` → `anuncianteId`
 - `"Loja"` → `"Anunciante"` (em mensagens de erro)
 - `.loja` → `.anunciante` (em relations)
 - `tipoRemetente: ["usuario", "loja"]` → `tipoRemetente: ["usuario", "anunciante"]`
 
 **Arquivos:**
+
 - `server/routes/anuncios.ts`
 - `server/routes/conversas.ts`
 - `server/routes/mensagens.ts`
@@ -54,6 +56,7 @@ Todos os arquivos abaixo precisam de:
 ## 🚀 Próximos Passos
 
 1. **Executar Migration no Banco:**
+
    ```bash
    npx prisma migrate resolve --applied rename_loja_to_anunciante
    npx prisma db push

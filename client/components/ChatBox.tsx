@@ -127,33 +127,39 @@ export default function ChatBox({
   }, []);
 
   // Memoized handler
-  const handleSendMessage = useCallback((e: React.FormEvent) => {
-    e.preventDefault();
-    const trimmed = messageText.trim();
-
-    if (!trimmed) {
-      toast.error("Mensagem não pode estar vazia");
-      return;
-    }
-
-    if (trimmed.length > 2000) {
-      toast.error("Mensagem muito longa (máx 2000 caracteres)");
-      return;
-    }
-
-    sendMessageMutation.mutate(trimmed);
-  }, [messageText, sendMessageMutation]);
-
-  // Memoized key down handler
-  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && e.ctrlKey) {
+  const handleSendMessage = useCallback(
+    (e: React.FormEvent) => {
       e.preventDefault();
       const trimmed = messageText.trim();
-      if (trimmed && trimmed.length <= 2000) {
-        sendMessageMutation.mutate(trimmed);
+
+      if (!trimmed) {
+        toast.error("Mensagem não pode estar vazia");
+        return;
       }
-    }
-  }, [messageText, sendMessageMutation]);
+
+      if (trimmed.length > 2000) {
+        toast.error("Mensagem muito longa (máx 2000 caracteres)");
+        return;
+      }
+
+      sendMessageMutation.mutate(trimmed);
+    },
+    [messageText, sendMessageMutation],
+  );
+
+  // Memoized key down handler
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (e.key === "Enter" && e.ctrlKey) {
+        e.preventDefault();
+        const trimmed = messageText.trim();
+        if (trimmed && trimmed.length <= 2000) {
+          sendMessageMutation.mutate(trimmed);
+        }
+      }
+    },
+    [messageText, sendMessageMutation],
+  );
 
   // Memoized grouped messages (recalculated only when messages or formatDate change)
   const groupedMessages = useMemo(() => {

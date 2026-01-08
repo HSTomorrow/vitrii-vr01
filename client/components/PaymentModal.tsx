@@ -109,7 +109,13 @@ export default function PaymentModal({
         pollIntervalRef.current = null;
       }
     };
-  }, [isOpen, payment?.id, payment?.status, refetchPayment, onPaymentConfirmed]);
+  }, [
+    isOpen,
+    payment?.id,
+    payment?.status,
+    refetchPayment,
+    onPaymentConfirmed,
+  ]);
 
   if (!isOpen || !payment) return null;
 

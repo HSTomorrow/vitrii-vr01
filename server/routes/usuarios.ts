@@ -290,7 +290,11 @@ export const createUsuario: RequestHandler = async (req, res) => {
 
 // Schema for updating user (whitelist safe fields)
 const UsuarioUpdateSchema = z.object({
-  nome: z.string().min(3, "Nome deve ter pelo menos 3 caracteres").max(255).optional(),
+  nome: z
+    .string()
+    .min(3, "Nome deve ter pelo menos 3 caracteres")
+    .max(255)
+    .optional(),
   telefone: z.string().min(10, "Telefone inválido").optional(),
   endereco: z.string().min(1, "Endereço é obrigatório").optional(),
   cpf: z

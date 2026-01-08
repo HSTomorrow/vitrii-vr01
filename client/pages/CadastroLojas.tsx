@@ -48,7 +48,9 @@ export default function CadastroAnunciantes() {
   // Create/Update loja mutation
   const saveAnuncianteMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      const url = editingId ? `/api/anunciantes/${editingId}` : "/api/anunciantes";
+      const url = editingId
+        ? `/api/anunciantes/${editingId}`
+        : "/api/anunciantes";
       const method = editingId ? "PUT" : "POST";
 
       const response = await fetch(url, {
@@ -65,7 +67,11 @@ export default function CadastroAnunciantes() {
       return response.json();
     },
     onSuccess: () => {
-      toast.success(editingId ? "Anunciante atualizada com sucesso!" : "Anunciante criada com sucesso!");
+      toast.success(
+        editingId
+          ? "Anunciante atualizada com sucesso!"
+          : "Anunciante criada com sucesso!",
+      );
       setFormData({
         nome: "",
         cnpjOuCpf: "",
@@ -81,14 +87,18 @@ export default function CadastroAnunciantes() {
       refetch();
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Erro ao salvar loja");
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao salvar loja",
+      );
     },
   });
 
   // Delete loja mutation
   const deleteAnuncianteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await fetch(`/api/anunciantes/${id}`, { method: "DELETE" });
+      const response = await fetch(`/api/anunciantes/${id}`, {
+        method: "DELETE",
+      });
       if (!response.ok) throw new Error("Erro ao deletar loja");
       return response.json();
     },
@@ -97,7 +107,9 @@ export default function CadastroAnunciantes() {
       refetch();
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Erro ao deletar loja");
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao deletar loja",
+      );
     },
   });
 
@@ -124,10 +136,12 @@ export default function CadastroAnunciantes() {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
-      
+
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-walmart-text">Cadastro de Anunciantes</h1>
+          <h1 className="text-3xl font-bold text-walmart-text">
+            Cadastro de Anunciantes
+          </h1>
           <button
             onClick={() => {
               setIsFormOpen(!isFormOpen);
@@ -166,7 +180,9 @@ export default function CadastroAnunciantes() {
                     type="text"
                     required
                     value={formData.nome}
-                    onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, nome: e.target.value })
+                    }
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
                   />
                 </div>
@@ -179,7 +195,9 @@ export default function CadastroAnunciantes() {
                     type="text"
                     required
                     value={formData.cnpjOuCpf}
-                    onChange={(e) => setFormData({ ...formData, cnpjOuCpf: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, cnpjOuCpf: e.target.value })
+                    }
                     placeholder="00000000000000"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
                   />
@@ -193,7 +211,9 @@ export default function CadastroAnunciantes() {
                     type="text"
                     required
                     value={formData.endereco}
-                    onChange={(e) => setFormData({ ...formData, endereco: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, endereco: e.target.value })
+                    }
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
                   />
                 </div>
@@ -206,7 +226,9 @@ export default function CadastroAnunciantes() {
                     type="email"
                     required
                     value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
                   />
                 </div>
@@ -218,7 +240,9 @@ export default function CadastroAnunciantes() {
                   <input
                     type="text"
                     value={formData.site}
-                    onChange={(e) => setFormData({ ...formData, site: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, site: e.target.value })
+                    }
                     placeholder="https://example.com"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
                   />
@@ -231,7 +255,9 @@ export default function CadastroAnunciantes() {
                   <input
                     type="text"
                     value={formData.instagram}
-                    onChange={(e) => setFormData({ ...formData, instagram: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, instagram: e.target.value })
+                    }
                     placeholder="@usuario"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
                   />
@@ -244,7 +270,9 @@ export default function CadastroAnunciantes() {
                   <input
                     type="text"
                     value={formData.facebook}
-                    onChange={(e) => setFormData({ ...formData, facebook: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, facebook: e.target.value })
+                    }
                     placeholder="nome-da-pagina"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
                   />
@@ -258,7 +286,9 @@ export default function CadastroAnunciantes() {
                 <textarea
                   required
                   value={formData.descricao}
-                  onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, descricao: e.target.value })
+                  }
                   rows={3}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
                 />
@@ -293,27 +323,48 @@ export default function CadastroAnunciantes() {
             <table className="w-full">
               <thead className="bg-walmart-gray">
                 <tr>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">Nome</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">CNPJ/CPF</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">Email</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">Endereço</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">Ações</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">
+                    Nome
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">
+                    CNPJ/CPF
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">
+                    Email
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">
+                    Endereço
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">
+                    Ações
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {!anunciantes || anunciantes.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                    <td
+                      colSpan={5}
+                      className="px-6 py-4 text-center text-gray-500"
+                    >
                       Nenhuma loja cadastrada
                     </td>
                   </tr>
                 ) : (
                   anunciantes.map((loja) => (
                     <tr key={loja.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 font-semibold text-walmart-text">{loja.nome}</td>
-                      <td className="px-6 py-4 text-walmart-text">{loja.cnpjOuCpf}</td>
-                      <td className="px-6 py-4 text-walmart-text">{loja.email}</td>
-                      <td className="px-6 py-4 text-walmart-text">{loja.endereco}</td>
+                      <td className="px-6 py-4 font-semibold text-walmart-text">
+                        {loja.nome}
+                      </td>
+                      <td className="px-6 py-4 text-walmart-text">
+                        {loja.cnpjOuCpf}
+                      </td>
+                      <td className="px-6 py-4 text-walmart-text">
+                        {loja.email}
+                      </td>
+                      <td className="px-6 py-4 text-walmart-text">
+                        {loja.endereco}
+                      </td>
                       <td className="px-6 py-4 flex gap-2">
                         <button
                           onClick={() => handleEdit(loja)}
@@ -323,7 +374,11 @@ export default function CadastroAnunciantes() {
                         </button>
                         <button
                           onClick={() => {
-                            if (confirm("Tem certeza que deseja deletar esta loja?")) {
+                            if (
+                              confirm(
+                                "Tem certeza que deseja deletar esta loja?",
+                              )
+                            ) {
                               deleteAnuncianteMutation.mutate(loja.id);
                             }
                           }}

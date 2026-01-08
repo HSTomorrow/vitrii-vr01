@@ -20,7 +20,9 @@ export const getEquipes: RequestHandler = async (req, res) => {
   try {
     const { anuncianteId } = req.query;
 
-    const where = anuncianteId ? { anuncianteId: parseInt(anuncianteId as string) } : {};
+    const where = anuncianteId
+      ? { anuncianteId: parseInt(anuncianteId as string) }
+      : {};
 
     const equipes = await prisma.equipeDeVenda.findMany({
       where,

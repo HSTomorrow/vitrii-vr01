@@ -30,10 +30,20 @@ const AnuncioCreateSchema = z.object({
 // GET all ads
 export const getAnuncios: RequestHandler = async (req, res) => {
   try {
-    const { anuncianteId, status, includeInactive, isDoacao, limit = "20", offset = "0" } = req.query;
+    const {
+      anuncianteId,
+      status,
+      includeInactive,
+      isDoacao,
+      limit = "20",
+      offset = "0",
+    } = req.query;
 
     // Validate pagination parameters
-    const pageLimit = Math.min(Math.max(parseInt(limit as string) || 20, 1), 100);
+    const pageLimit = Math.min(
+      Math.max(parseInt(limit as string) || 20, 1),
+      100,
+    );
     const pageOffset = Math.max(parseInt(offset as string) || 0, 0);
 
     const where: any = { isActive: true }; // Default: only active ads
@@ -185,7 +195,10 @@ export const createAnuncio: RequestHandler = async (req, res) => {
       },
     });
 
-    if (!producto || producto.grupo.anuncianteId !== validatedData.anuncianteId) {
+    if (
+      !producto ||
+      producto.grupo.anuncianteId !== validatedData.anuncianteId
+    ) {
       return res.status(400).json({
         success: false,
         error: "Produto não pertence ao anunciante selecionado",
