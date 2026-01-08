@@ -102,6 +102,8 @@ export default function CreateAnuncianteModal({
       !formData.nome ||
       !formData.cnpjOuCpf ||
       !formData.endereco ||
+      !formData.cidade ||
+      !formData.estado ||
       !formData.descricao ||
       !formData.email
     ) {
