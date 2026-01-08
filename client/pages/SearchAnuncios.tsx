@@ -460,7 +460,7 @@ export default function SearchAnuncios() {
                             <div className="flex gap-4 text-sm text-walmart-text-secondary">
                               <span className="flex items-center gap-1">
                                 <MapPin className="w-4 h-4" />
-                                {anuncio.loja.nome}
+                                {anuncio.anunciante?.nome}
                               </span>
                               <span>
                                 {new Date(
