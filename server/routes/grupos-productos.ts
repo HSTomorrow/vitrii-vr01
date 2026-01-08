@@ -9,30 +9,46 @@ const GrupoCreateSchema = z.object({
   descricao: z.string().optional(),
 });
 
-// GET all grupos
+// GET all grupos (with pagination)
 export const getGrupos: RequestHandler = async (req, res) => {
   try {
-    const { lojaId } = req.query;
+    const { lojaId, limit = "20", offset = "0" } = req.query;
+
+    // Validate pagination parameters
+    const pageLimit = Math.min(Math.max(parseInt(limit as string) || 20, 1), 100);
+    const pageOffset = Math.max(parseInt(offset as string) || 0, 0);
 
     const where: any = {};
     if (lojaId) where.lojaId = parseInt(lojaId as string);
 
-    const grupos = await prisma.grupoDeProductos.findMany({
-      where,
-      include: {
-        loja: {
-          select: {
-            id: true,
-            nome: true,
-          },
+    // Get total count and paginated data in parallel
+    const [grupos, total] = await Promise.all([
+      prisma.grupoDeProductos.findMany({
+        where,
+        select: {
+          id: true,
+          nome: true,
+          descricao: true,
+          lojaId: true,
+          dataCriacao: true,
         },
-      },
-    });
+        orderBy: { dataCriacao: "desc" },
+        take: pageLimit,
+        skip: pageOffset,
+      }),
+      prisma.grupoDeProductos.count({ where }),
+    ]);
 
     res.json({
       success: true,
       data: grupos,
-      count: grupos.length,
+      pagination: {
+        count: grupos.length,
+        total,
+        limit: pageLimit,
+        offset: pageOffset,
+        hasMore: pageOffset + pageLimit < total,
+      },
     });
   } catch (error) {
     console.error("Error fetching grupos:", error);
