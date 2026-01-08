@@ -119,25 +119,25 @@ export default function AnuncioForm({
     enabled: !!anuncioId,
   });
 
-  // Fetch productos for selected loja
+  // Fetch productos for selected anunciante
   const { data: productosData } = useQuery({
-    queryKey: ["produtos-anuncio", selectedLojaId],
+    queryKey: ["produtos-anuncio", selectedAnuncianteId],
     queryFn: async () => {
       const response = await fetch(
-        `/api/lojas/${selectedLojaId}/produtos-para-anuncio`,
+        `/api/anunciantes/${selectedAnuncianteId}/produtos-para-anuncio`,
       );
       if (!response.ok) throw new Error("Erro ao buscar produtos");
       return response.json();
     },
-    enabled: selectedLojaId > 0,
+    enabled: selectedAnuncianteId > 0,
   });
 
-  // Fetch equipes de venda for selected loja
+  // Fetch equipes de venda for selected anunciante
   const { data: equipesData } = useQuery({
-    queryKey: ["equipes-venda", selectedLojaId],
+    queryKey: ["equipes-venda", selectedAnuncianteId],
     queryFn: async () => {
       const response = await fetch(
-        `/api/equipes-venda?lojaId=${selectedLojaId}`,
+        `/api/equipes-venda?anuncianteId=${selectedAnuncianteId}`,
       );
       if (!response.ok) {
         const error = await response.json();
@@ -147,7 +147,7 @@ export default function AnuncioForm({
       }
       return response.json();
     },
-    enabled: selectedLojaId > 0,
+    enabled: selectedAnuncianteId > 0,
   });
 
   // Populate form with anuncio data when editing
@@ -156,7 +156,7 @@ export default function AnuncioForm({
       const ad = anuncioData.data;
       console.log("Loading anuncio data for editing:", ad);
 
-      setSelectedLojaId(ad.lojaId);
+      setSelectedAnuncianteId(ad.anuncianteId);
       setFormData({
         titulo: ad.titulo,
         descricao: ad.descricao || "",
@@ -194,7 +194,7 @@ export default function AnuncioForm({
           precoAnuncio: data.precoAnuncio
             ? parseFloat(data.precoAnuncio)
             : null,
-          lojaId: selectedLojaId,
+          anuncianteId: selectedAnuncianteId,
           productId: data.productId,
           tabelaDePrecoId:
             data.tabelaDePrecoId > 0 ? data.tabelaDePrecoId : null,
