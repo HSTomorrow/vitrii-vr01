@@ -252,9 +252,9 @@ export default function AnuncioForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!selectedLojaId || !formData.productId || !formData.tabelaDePrecoId) {
+    if (!selectedAnuncianteId || !formData.productId || !formData.tabelaDePrecoId) {
       toast.error(
-        "Loja, Produto e Variante são obrigatórios (a variante define o preço)",
+        "Anunciante, Produto e Variante são obrigatórios (a variante define o preço)",
       );
       return;
     }
@@ -293,7 +293,7 @@ export default function AnuncioForm({
     }));
   };
 
-  const lojas = lojasData?.data || [];
+  const anunciantes = anunciantesData?.data || [];
   const productos = productosData?.data || [];
   const equipes = equipesData?.data || [];
 
@@ -380,7 +380,7 @@ export default function AnuncioForm({
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label className="block text-sm font-semibold text-walmart-text">
-                  Loja *
+                  Anunciante *
                 </label>
                 <button
                   type="button"
@@ -388,13 +388,13 @@ export default function AnuncioForm({
                   className="inline-flex items-center gap-1 px-3 py-1 text-sm bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors"
                 >
                   <Plus className="w-4 h-4" />
-                  Nova Loja
+                  Novo Anunciante
                 </button>
               </div>
               <select
-                value={selectedLojaId}
+                value={selectedAnuncianteId}
                 onChange={(e) => {
-                  setSelectedLojaId(parseInt(e.target.value));
+                  setSelectedAnuncianteId(parseInt(e.target.value));
                   setFormData((prev) => ({
                     ...prev,
                     productId: 0,
