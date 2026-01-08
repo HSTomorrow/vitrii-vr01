@@ -167,7 +167,12 @@ export const extractUserId: RequestHandler = (req, res, next) => {
       const parsedId = parseInt(userIdSource as string, 10);
       if (!isNaN(parsedId)) {
         req.userId = parsedId;
+        console.log(`[extractUserId] Successfully extracted user ID: ${parsedId}`);
+      } else {
+        console.warn(`[extractUserId] Invalid user ID format: ${userIdSource}`);
       }
+    } else {
+      console.log("[extractUserId] No user ID found in request");
     }
 
     next();
