@@ -152,6 +152,12 @@ export const getAnuncioById: RequestHandler = async (req, res) => {
             descricao: true,
             tipo: true,
             grupoId: true,
+            grupo: {
+              select: {
+                id: true,
+                nome: true,
+              },
+            },
           },
         },
         tabelaDePreco: {
