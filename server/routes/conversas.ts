@@ -16,7 +16,7 @@ const MensagemCreateSchema = z.object({
     .string()
     .min(1, "Mensagem não pode estar vazia")
     .max(2000, "Mensagem muito longa"),
-  tipoRemetente: z.enum(["usuario", "loja"]),
+  tipoRemetente: z.enum(["usuario", "anunciante"]),
 });
 
 // GET all conversations for a user/anunciante
