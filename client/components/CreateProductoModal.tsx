@@ -7,7 +7,7 @@ import CreateGrupoModal from "./CreateGrupoModal";
 interface CreateProductoModalProps {
   isOpen: boolean;
   onClose: () => void;
-  lojaId: number;
+  anuncianteId: number;
   onSuccess?: (productoId: number) => void;
 }
 
@@ -20,7 +20,7 @@ interface TabelaDePreco {
 export default function CreateProductoModal({
   isOpen,
   onClose,
-  lojaId,
+  anuncianteId,
   onSuccess,
 }: CreateProductoModalProps) {
   const queryClient = useQueryClient();
@@ -38,13 +38,13 @@ export default function CreateProductoModal({
 
   // Fetch grupos for this store
   const { data: gruposData } = useQuery({
-    queryKey: ["grupos-store", lojaId],
+    queryKey: ["grupos-store", anuncianteId],
     queryFn: async () => {
-      const response = await fetch(`/api/grupos-productos?lojaId=${lojaId}`);
+      const response = await fetch(`/api/grupos-productos?anuncianteId=${anuncianteId}`);
       if (!response.ok) throw new Error("Erro ao buscar grupos");
       return response.json();
     },
-    enabled: isOpen && lojaId > 0,
+    enabled: isOpen && anuncianteId > 0,
   });
 
   const grupos = gruposData?.data || [];
@@ -96,7 +96,7 @@ export default function CreateProductoModal({
         }
       }
 
-      queryClient.invalidateQueries({ queryKey: ["produtos-anuncio", lojaId] });
+      queryClient.invalidateQueries({ queryKey: ["produtos-anuncio", anuncianteId] });
       toast.success("Produto criado com sucesso!");
       resetForm();
       onSuccess?.(productId);
@@ -365,7 +365,7 @@ export default function CreateProductoModal({
       <CreateGrupoModal
         isOpen={showCreateGrupo}
         onClose={() => setShowCreateGrupo(false)}
-        lojaId={lojaId}
+        anuncianteId={anuncianteId}
         onSuccess={handleGrupoCreated}
       />
     </>
