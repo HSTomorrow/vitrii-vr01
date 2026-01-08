@@ -283,11 +283,12 @@ export default function CreateProductoModal({
               </p>
             </div>
 
-            {/* Variantes/Tabelas de Preço */}
+            {/* Variantes/Tabelas de Preço - Only for produtos and servicos */}
+            {["produto", "servico"].includes(formData.tipo) && (
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label className="block text-sm font-semibold text-walmart-text">
-                  Variantes (Tamanho/Cor e Preço)
+                  Variantes (Tamanho/Cor e Preço) *
                 </label>
                 <button
                   type="button"
@@ -355,6 +356,7 @@ export default function CreateProductoModal({
                 Adicione pelo menos um preço para este produto
               </p>
             </div>
+            )}
 
             {/* Buttons */}
             <div className="flex gap-4 pt-6 border-t">
