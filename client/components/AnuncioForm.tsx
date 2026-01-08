@@ -880,7 +880,7 @@ export default function AnuncioForm({
       <CreateProductoModal
         isOpen={showCreateProducto}
         onClose={() => setShowCreateProducto(false)}
-        lojaId={selectedAnuncianteId}
+        anuncianteId={selectedAnuncianteId}
         onSuccess={handleProductoCreated}
       />
     </div>
