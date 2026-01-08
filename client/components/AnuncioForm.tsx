@@ -73,7 +73,7 @@ export default function AnuncioForm({
     dataValidade: getDefaultValidityDate(),
     equipeDeVendaId: 0,
     cidade: "",
-    estado: "",
+    estado: "RS",
     isDoacao: false,
     destaque: false,
     categoria: null as string | null,
