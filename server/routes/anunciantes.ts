@@ -265,7 +265,10 @@ export const adicionarUsuarioAnunciante: RequestHandler = async (req, res) => {
       return res.status(400).json({
         success: false,
         error: "Dados inválidos",
-        details: error.errors,
+        details: error.errors.map((err) => ({
+          path: err.path,
+          message: err.message,
+        })),
       });
     }
 
