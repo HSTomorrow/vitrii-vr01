@@ -83,7 +83,7 @@ export default function Agenda() {
     try {
       setLoadingSelects(true);
       const [lojasRes, productosRes] = await Promise.all([
-        fetch("/api/lojas"),
+        fetch("/api/anunciantes"),
         fetch("/api/productos"),
       ]);
 
