@@ -337,10 +337,10 @@ export default function Index() {
               </p>
             </div>
             <Link
-              to="/browse?filter=doacao"
+              to="/browse?filter=gratuito"
               className="hidden md:inline-flex items-center space-x-2 text-walmart-blue font-semibold hover:space-x-3 transition-all"
             >
-              <span>Ver Todas</span>
+              <span>Ver Todos</span>
               <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
