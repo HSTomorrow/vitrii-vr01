@@ -78,7 +78,7 @@ export const getMensagensConversa: RequestHandler = async (req, res) => {
   }
 };
 
-// CREATE new message
+// CREATE new message (with atomic transaction)
 export const createMensagem: RequestHandler = async (req, res) => {
   try {
     const validatedData = MensagemCreateSchema.parse(req.body);
@@ -95,26 +95,29 @@ export const createMensagem: RequestHandler = async (req, res) => {
       });
     }
 
-    // Create message
-    const mensagem = await prisma.mensagem.create({
-      data: {
-        ...validatedData,
-      },
-      include: {
-        remetente: {
-          select: { id: true, nome: true },
+    // Use transaction to ensure atomicity (both operations succeed or both fail)
+    // This prevents race conditions where multiple messages arrive simultaneously
+    const [mensagem] = await prisma.$transaction([
+      // Step 1: Create message
+      prisma.mensagem.create({
+        data: {
+          ...validatedData,
         },
-      },
-    });
-
-    // Update conversation's last message
-    await prisma.conversa.update({
-      where: { id: validatedData.conversaId },
-      data: {
-        ultimaMensagem: validatedData.conteudo.substring(0, 100),
-        dataUltimaMensagem: new Date(),
-      },
-    });
+        include: {
+          remetente: {
+            select: { id: true, nome: true },
+          },
+        },
+      }),
+      // Step 2: Update conversation's last message metadata
+      prisma.conversa.update({
+        where: { id: validatedData.conversaId },
+        data: {
+          ultimaMensagem: validatedData.conteudo.substring(0, 100),
+          dataUltimaMensagem: new Date(),
+        },
+      }),
+    ]);
 
     res.status(201).json({
       success: true,
