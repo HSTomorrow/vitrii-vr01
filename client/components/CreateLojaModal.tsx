@@ -75,10 +75,14 @@ export default function CreateAnuncianteModal({
     },
     onError: (error) => {
       if (error instanceof Error) {
-        const isValidationError = (error as any).isValidationError;
-        if (isValidationError) {
-          // Show validation errors as a toast with detailed message
-          toast.error(error.message);
+        const details = (error as any).details;
+        if (details && Array.isArray(details)) {
+          // Show multiple validation errors
+          const errorMessages = details
+            .map((err: any) => err.message)
+            .join(" • ");
+
+          toast.error(`Erro de validação: ${errorMessages}`);
         } else {
           toast.error(error.message);
         }
