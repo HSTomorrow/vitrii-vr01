@@ -80,6 +80,8 @@ export default function CadastroAnunciantes() {
         nome: "",
         cnpjOuCpf: "",
         endereco: "",
+        cidade: "",
+        estado: "",
         descricao: "",
         email: "",
         site: "",
