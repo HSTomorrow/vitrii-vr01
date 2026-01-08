@@ -41,7 +41,7 @@ export default function CreateConversaModal({
   const { data: lojasData } = useQuery({
     queryKey: ["lojas"],
     queryFn: async () => {
-      const response = await fetch("/api/lojas");
+      const response = await fetch("/api/anunciantes");
       if (!response.ok) throw new Error("Erro ao buscar lojas");
       return response.json();
     },
