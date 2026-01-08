@@ -133,6 +133,7 @@ export const getAnuncianteById: RequestHandler = async (req, res) => {
 export const createAnunciante: RequestHandler = async (req, res) => {
   try {
     const validatedData = AnuncianteCreateSchema.parse(req.body);
+    const { usuarioId } = req.body; // Optional userId to link the creator
 
     // Check if anunciante already exists
     const existingAnunciante = await prisma.anunciante.findUnique({
@@ -152,12 +153,29 @@ export const createAnunciante: RequestHandler = async (req, res) => {
       });
     }
 
+    // Create anunciante and link to user if provided
     const anunciante = await prisma.anunciante.create({
       data: {
         ...validatedData,
         status: "ativa",
       },
     });
+
+    // Link the creating user to this anunciante as admin/owner
+    if (usuarioId) {
+      try {
+        await prisma.usuarioAnunciante.create({
+          data: {
+            usuarioId: usuarioId,
+            anuncianteId: anunciante.id,
+            tipoUsuario: "gerente", // Creator is a manager/admin of their own anunciante
+          },
+        });
+      } catch (err) {
+        // If linking fails, still return success with the anunciante
+        console.error("Error linking user to anunciante:", err);
+      }
+    }
 
     res.status(201).json({
       success: true,
