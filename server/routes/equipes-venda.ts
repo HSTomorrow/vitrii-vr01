@@ -4,7 +4,7 @@ import { z } from "zod";
 
 // Schema validation
 const EquipeCreateSchema = z.object({
-  lojaId: z.number().int().positive("Loja inválida"),
+  anuncianteId: z.number().int().positive("Anunciante inválido"),
   nome: z.string().min(1, "Nome da equipe é obrigatório"),
   descricao: z.string().optional(),
 });
@@ -15,12 +15,12 @@ const AdicionarMembroSchema = z.object({
   usuarioId: z.number().int().positive("Usuário inválido"),
 });
 
-// GET all sales teams (filtered by store if provided)
+// GET all sales teams (filtered by anunciante if provided)
 export const getEquipes: RequestHandler = async (req, res) => {
   try {
-    const { lojaId } = req.query;
+    const { anuncianteId } = req.query;
 
-    const where = lojaId ? { lojaId: parseInt(lojaId as string) } : {};
+    const where = anuncianteId ? { anuncianteId: parseInt(anuncianteId as string) } : {};
 
     const equipes = await prisma.equipeDeVenda.findMany({
       where,
@@ -122,21 +122,21 @@ export const createEquipe: RequestHandler = async (req, res) => {
   try {
     const body = EquipeCreateSchema.parse(req.body);
 
-    // Verify store exists
-    const loja = await prisma.loja.findUnique({
-      where: { id: body.lojaId },
+    // Verify anunciante exists
+    const anunciante = await prisma.anunciante.findUnique({
+      where: { id: body.anuncianteId },
     });
 
-    if (!loja) {
+    if (!anunciante) {
       return res.status(404).json({
         success: false,
-        error: "Loja não encontrada",
+        error: "Anunciante não encontrado",
       });
     }
 
     const equipe = await prisma.equipeDeVenda.create({
       data: {
-        lojaId: body.lojaId,
+        anuncianteId: body.anuncianteId,
         nome: body.nome,
         descricao: body.descricao,
       },
@@ -405,12 +405,12 @@ export const getUsuariosDisponiveis: RequestHandler = async (req, res) => {
       });
     }
 
-    // Get users who have access to this store but are not members of this team
+    // Get users who have access to this anunciante but are not members of this team
     const usuariosDisponiveis = await prisma.usuario.findMany({
       where: {
-        usuarioLojas: {
+        usuarioAnunciantes: {
           some: {
-            lojaId: equipe.lojaId,
+            anuncianteId: equipe.anuncianteId,
           },
         },
         membrosEquipe: {
