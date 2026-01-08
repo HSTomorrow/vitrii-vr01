@@ -45,13 +45,13 @@ interface Conversa {
 }
 
 export default function Chat() {
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const [selectedConversa, setSelectedConversa] = useState<Conversa | null>(
     null,
   );
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [currentUserId] = useState(1); // In real app, get from auth context
-  const [userType] = useState<"usuario" | "anunciante">("usuario"); // In real app, get from auth context
+  const [showProfileGate, setShowProfileGate] = useState(false);
 
   // Fetch selected conversation with messages
   const { data: conversaData, refetch: refetchConversa } = useQuery({
