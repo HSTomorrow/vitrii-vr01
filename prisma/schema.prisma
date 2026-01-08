@@ -367,7 +367,7 @@ model Mensagem {
 // ============================================================================
 model ProdutoEmEstoque {
   id            Int       @id @default(autoincrement())
-  lojaId        Int
+  anuncianteId  Int
   productId     Int
   quantidade    Int       @default(0)
   quantidadeMinima Int?   @default(0)
@@ -376,11 +376,11 @@ model ProdutoEmEstoque {
   dataAtualizacao DateTime @updatedAt
 
   // Relations
-  loja          Loja      @relation(fields: [lojaId], references: [id], onDelete: Cascade)
+  anunciante    Anunciante @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
   producto      Producto  @relation(fields: [productId], references: [id], onDelete: Cascade)
   movimentos    MovimentoEstoque[]
 
-  @@unique([lojaId, productId])
+  @@unique([anuncianteId, productId])
   @@map("produtos_em_estoque")
 }
 
