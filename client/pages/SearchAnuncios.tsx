@@ -62,7 +62,7 @@ export default function SearchAnuncios() {
         (ad: any) =>
           ad.titulo.toLowerCase().includes(term) ||
           ad.descricao?.toLowerCase().includes(term) ||
-          ad.loja.nome.toLowerCase().includes(term),
+          ad.anunciante?.nome?.toLowerCase().includes(term),
       );
     }
 
