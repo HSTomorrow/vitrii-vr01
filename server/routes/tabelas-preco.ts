@@ -6,7 +6,7 @@ import { Decimal } from "@prisma/client/runtime/library";
 // Schema validation
 const TabelaPrecoCreateSchema = z.object({
   productId: z.number().int().positive("Produto é obrigatório"),
-  lojaId: z.number().int().positive("Loja é obrigatória"),
+  anuncianteId: z.number().int().positive("Anunciante é obrigatório"),
   preco: z.number().positive("Preço deve ser maior que zero"),
   precoCusto: z.number().optional(),
   tamanho: z.string().optional(),
@@ -16,10 +16,10 @@ const TabelaPrecoCreateSchema = z.object({
 // GET all tabelas
 export const getTabelas: RequestHandler = async (req, res) => {
   try {
-    const { lojaId, productId } = req.query;
+    const { anuncianteId, productId } = req.query;
 
     const where: any = {};
-    if (lojaId) where.lojaId = parseInt(lojaId as string);
+    if (anuncianteId) where.anuncianteId = parseInt(anuncianteId as string);
     if (productId) where.productId = parseInt(productId as string);
 
     const tabelas = await prisma.tabelaDePreco.findMany({
@@ -91,7 +91,7 @@ export const createTabela: RequestHandler = async (req, res) => {
   try {
     const validatedData = TabelaPrecoCreateSchema.parse(req.body);
 
-    // Verify that the product exists and belongs to a grupo in the specified store
+    // Verify that the product exists and belongs to a grupo in the specified anunciante
     const producto = await prisma.producto.findUnique({
       where: { id: validatedData.productId },
       include: {
@@ -106,32 +106,32 @@ export const createTabela: RequestHandler = async (req, res) => {
       });
     }
 
-    if (producto.grupo.lojaId !== validatedData.lojaId) {
+    if (producto.grupo.anuncianteId !== validatedData.anuncianteId) {
       return res.status(400).json({
         success: false,
-        error: "Produto não pertence à loja selecionada",
+        error: "Produto não pertence ao anunciante selecionado",
       });
     }
 
-    // Check if price table already exists for this product in this store
+    // Check if price table already exists for this product in this anunciante
     const existingTabela = await prisma.tabelaDePreco.findFirst({
       where: {
         productId: validatedData.productId,
-        lojaId: validatedData.lojaId,
+        anuncianteId: validatedData.anuncianteId,
       },
     });
 
     if (existingTabela) {
       return res.status(400).json({
         success: false,
-        error: "Já existe uma tabela de preço para este produto nesta loja",
+        error: "Já existe uma tabela de preço para este produto neste anunciante",
       });
     }
 
     const tabela = await prisma.tabelaDePreco.create({
       data: {
         productId: validatedData.productId,
-        lojaId: validatedData.lojaId,
+        anuncianteId: validatedData.anuncianteId,
         tamanho: validatedData.tamanho || null,
         cor: validatedData.cor || null,
         preco: new Decimal(validatedData.preco.toString()),
@@ -188,8 +188,8 @@ export const updateTabela: RequestHandler = async (req, res) => {
     if (validatedData.productId !== undefined) {
       updatePayload.productId = validatedData.productId;
     }
-    if (validatedData.lojaId !== undefined) {
-      updatePayload.lojaId = validatedData.lojaId;
+    if (validatedData.anuncianteId !== undefined) {
+      updatePayload.anuncianteId = validatedData.anuncianteId;
     }
 
     const tabela = await prisma.tabelaDePreco.update({
