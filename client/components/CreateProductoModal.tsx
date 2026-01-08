@@ -274,7 +274,6 @@ export default function CreateProductoModal({
                 <option value="servico">Serviço</option>
                 <option value="evento">Evento</option>
                 <option value="agenda_recorrente">Agenda Recorrente</option>
-                <option value="doacao">Doação</option>
               </select>
               <p className="mt-2 text-sm text-walmart-text-secondary">
                 {formData.tipo === "evento" && "Selecione este tipo para eventos e shows"}
