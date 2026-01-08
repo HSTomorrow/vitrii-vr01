@@ -382,7 +382,7 @@ export default function AnuncioForm({
         {/* Form */}
         <div className="bg-white rounded-lg shadow-md p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Loja Selection */}
+            {/* Anunciante Selection */}
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label className="block text-sm font-semibold text-walmart-text">
