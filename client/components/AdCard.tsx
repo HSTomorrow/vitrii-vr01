@@ -10,7 +10,7 @@ interface AdCardProps {
   isFavorited?: boolean;
   onFavoritoToggle?: (anuncioId: number, isFavorited: boolean) => void;
   variant?: "featured" | "donation";
-  loja?: any;
+  anunciante?: any;
 }
 
 export default function AdCard({
@@ -18,7 +18,7 @@ export default function AdCard({
   isFavorited = false,
   onFavoritoToggle,
   variant = "featured",
-  loja,
+  anunciante,
 }: AdCardProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
