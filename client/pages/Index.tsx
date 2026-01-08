@@ -709,6 +709,7 @@ export default function Index() {
               destaqueAgendas.map((anuncio: any) => (
                 <div
                   key={anuncio.id}
+                  onClick={() => navigate(`/anuncio/${anuncio.id}`)}
                   className="vitrii-card overflow-hidden hover:scale-105 transition-transform duration-200 cursor-pointer relative"
                 >
                   <div className="absolute top-3 right-3 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold z-10">
