@@ -126,6 +126,14 @@ export default function CreateProductoModal({
       toast.error("Grupo e Nome do produto são obrigatórios");
       return;
     }
+
+    // Variants are required for regular products and services, but optional for special types
+    const requiresVariants = ["produto", "servico"].includes(formData.tipo);
+    if (requiresVariants && !tabelas.some((t) => t.preco)) {
+      toast.error("Adicione pelo menos um preço para este produto");
+      return;
+    }
+
     mutation.mutate(formData);
   };
 
