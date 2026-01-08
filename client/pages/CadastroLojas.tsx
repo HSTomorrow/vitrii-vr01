@@ -230,6 +230,39 @@ export default function CadastroAnunciantes() {
 
                 <div>
                   <label className="block text-sm font-semibold text-walmart-text mb-2">
+                    Cidade *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={formData.cidade}
+                    onChange={(e) =>
+                      setFormData({ ...formData, cidade: e.target.value })
+                    }
+                    placeholder="Ex: Belo Horizonte"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                    Estado (UF) *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    maxLength={2}
+                    value={formData.estado}
+                    onChange={(e) =>
+                      setFormData({ ...formData, estado: e.target.value.toUpperCase().slice(0, 2) })
+                    }
+                    placeholder="Ex: MG"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-walmart-text mb-2">
                     Email *
                   </label>
                   <input
