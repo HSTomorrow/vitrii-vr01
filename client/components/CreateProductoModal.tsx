@@ -83,7 +83,7 @@ export default function CreateProductoModal({
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                   productId,
-                  lojaId,
+                  anuncianteId,
                   tamanho: tabela.tamanho || null,
                   cor: tabela.cor || null,
                   preco: parseFloat(tabela.preco),
