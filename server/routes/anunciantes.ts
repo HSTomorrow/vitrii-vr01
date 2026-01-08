@@ -343,6 +343,90 @@ export const deleteAnunciante: RequestHandler = async (req, res) => {
   }
 };
 
+// GET anunciantes filtered by user (ADM sees all, regular users see only theirs)
+export const getAnunciantesByUsuario: RequestHandler = async (req, res) => {
+  try {
+    const usuarioId = req.userId;
+
+    if (!usuarioId) {
+      return res.status(401).json({
+        success: false,
+        error: "Usuário não autenticado",
+      });
+    }
+
+    // Fetch user to check if is admin
+    const usuario = await prisma.usuario.findUnique({
+      where: { id: usuarioId },
+      select: { tipoUsuario: true },
+    });
+
+    if (!usuario) {
+      return res.status(404).json({
+        success: false,
+        error: "Usuário não encontrado",
+      });
+    }
+
+    let anunciantes;
+
+    // If user is ADM, return all anunciantes
+    if (usuario.tipoUsuario === "adm") {
+      anunciantes = await prisma.anunciante.findMany({
+        select: {
+          id: true,
+          nome: true,
+          fotoUrl: true,
+          endereco: true,
+          cidade: true,
+          estado: true,
+          email: true,
+          cnpjOuCpf: true,
+          status: true,
+          dataCriacao: true,
+        },
+        orderBy: { dataCriacao: "desc" },
+      });
+    } else {
+      // For regular users, return only anunciantes where they are linked
+      anunciantes = await prisma.anunciante.findMany({
+        where: {
+          usuarioAnunciantes: {
+            some: {
+              usuarioId: usuarioId,
+            },
+          },
+        },
+        select: {
+          id: true,
+          nome: true,
+          fotoUrl: true,
+          endereco: true,
+          cidade: true,
+          estado: true,
+          email: true,
+          cnpjOuCpf: true,
+          status: true,
+          dataCriacao: true,
+        },
+        orderBy: { dataCriacao: "desc" },
+      });
+    }
+
+    res.json({
+      success: true,
+      data: anunciantes,
+      count: anunciantes.length,
+    });
+  } catch (error) {
+    console.error("Error fetching anunciantes by user:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao buscar anunciantes",
+    });
+  }
+};
+
 // Backward compatibility: export old function names that call new ones
 export const getLojas = getAnunciantes;
 export const getLojaById = getAnuncianteById;
