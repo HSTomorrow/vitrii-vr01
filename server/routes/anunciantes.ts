@@ -184,6 +184,8 @@ export const createAnunciante: RequestHandler = async (req, res) => {
 const AnuncianteUpdateSchema = z.object({
   nome: z.string().min(1, "Nome é obrigatório").optional(),
   endereco: z.string().min(1, "Endereço é obrigatório").optional(),
+  cidade: z.string().min(1, "Cidade é obrigatória").optional(),
+  estado: z.string().length(2, "Estado deve ter 2 caracteres").optional(),
   descricao: z.string().min(1, "Descrição é obrigatória").optional(),
   email: z.string().email("Email inválido").optional(),
   site: z.string().optional(),
