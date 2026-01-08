@@ -101,37 +101,15 @@ export default function ChatBox({
     },
   });
 
-  const handleSendMessage = (e: React.FormEvent) => {
-    e.preventDefault();
-    const trimmed = messageText.trim();
-
-    if (!trimmed) {
-      toast.error("Mensagem não pode estar vazia");
-      return;
-    }
-
-    if (trimmed.length > 2000) {
-      toast.error("Mensagem muito longa (máx 2000 caracteres)");
-      return;
-    }
-
-    sendMessageMutation.mutate(trimmed);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && e.ctrlKey) {
-      handleSendMessage(e as any);
-    }
-  };
-
-  const formatTime = (date: string) => {
+  // Memoized format functions
+  const formatTime = useCallback((date: string): string => {
     return new Date(date).toLocaleTimeString("pt-BR", {
       hour: "2-digit",
       minute: "2-digit",
     });
-  };
+  }, []);
 
-  const formatDate = (date: string) => {
+  const formatDate = useCallback((date: string): string => {
     const today = new Date();
     const msgDate = new Date(date);
 
@@ -146,18 +124,49 @@ export default function ChatBox({
     }
 
     return msgDate.toLocaleDateString("pt-BR");
-  };
+  }, []);
 
-  // Group messages by date
-  const groupedMessages = messages.reduce(
-    (acc, msg) => {
-      const date = formatDate(msg.dataCriacao);
-      if (!acc[date]) acc[date] = [];
-      acc[date].push(msg);
-      return acc;
-    },
-    {} as Record<string, Message[]>,
-  );
+  // Memoized handler
+  const handleSendMessage = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = messageText.trim();
+
+    if (!trimmed) {
+      toast.error("Mensagem não pode estar vazia");
+      return;
+    }
+
+    if (trimmed.length > 2000) {
+      toast.error("Mensagem muito longa (máx 2000 caracteres)");
+      return;
+    }
+
+    sendMessageMutation.mutate(trimmed);
+  }, [messageText, sendMessageMutation]);
+
+  // Memoized key down handler
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && e.ctrlKey) {
+      e.preventDefault();
+      const trimmed = messageText.trim();
+      if (trimmed && trimmed.length <= 2000) {
+        sendMessageMutation.mutate(trimmed);
+      }
+    }
+  }, [messageText, sendMessageMutation]);
+
+  // Memoized grouped messages (recalculated only when messages or formatDate change)
+  const groupedMessages = useMemo(() => {
+    return messages.reduce(
+      (acc, msg) => {
+        const date = formatDate(msg.dataCriacao);
+        if (!acc[date]) acc[date] = [];
+        acc[date].push(msg);
+        return acc;
+      },
+      {} as Record<string, Message[]>,
+    );
+  }, [messages, formatDate]);
 
   return (
     <div className="flex flex-col h-full bg-white rounded-lg shadow-md">
