@@ -38,7 +38,7 @@ export const getEquipes: RequestHandler = async (req, res) => {
             },
           },
         },
-        loja: {
+        anunciante: {
           select: {
             id: true,
             nome: true,
@@ -82,7 +82,7 @@ export const getEquipeById: RequestHandler = async (req, res) => {
             },
           },
         },
-        loja: {
+        anunciante: {
           select: {
             id: true,
             nome: true,
@@ -154,7 +154,7 @@ export const createEquipe: RequestHandler = async (req, res) => {
             },
           },
         },
-        loja: {
+        anunciante: {
           select: {
             id: true,
             nome: true,
@@ -215,7 +215,7 @@ export const updateEquipe: RequestHandler = async (req, res) => {
             },
           },
         },
-        loja: {
+        anunciante: {
           select: {
             id: true,
             nome: true,
