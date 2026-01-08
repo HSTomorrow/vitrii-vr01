@@ -91,7 +91,7 @@ export default function App() {
                   element={<CadastroEquipeDeVenda />}
                 />
                 <Route path="/agenda" element={<Agenda />} />
-                <Route path="/agenda/:lojaId" element={<Agenda />} />
+                <Route path="/agenda/:anuncianteId" element={<Agenda />} />
                 <Route path="/checkout/:anuncioId" element={<Checkout />} />
                 <Route path="/chat" element={<Chat />} />
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
