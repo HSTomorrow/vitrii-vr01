@@ -542,7 +542,7 @@ export default function AnuncioForm({
             {/* Preço do Anúncio - Sempre Visível */}
             <div>
               <label className="block text-sm font-semibold text-walmart-text mb-2">
-                Valor do Anúncio {formData.isDoacao ? "(Gratuito)" : ""}
+                Valor {formData.isDoacao ? "(Gratuito)" : ""}
               </label>
               <div className="flex items-center">
                 <span className="text-walmart-text font-semibold mr-2">
@@ -569,13 +569,6 @@ export default function AnuncioForm({
                   }`}
                 />
               </div>
-              <p className="mt-2 text-sm text-walmart-text-secondary">
-                {formData.isDoacao
-                  ? "Este anúncio será publicado como gratuito."
-                  : selectedPriceTable
-                    ? `Deixe em branco para usar o preço da variante: R$ ${Number(selectedPriceTable.preco).toFixed(2)}`
-                    : "Digite o valor que deseja cobrar pelo anúncio. Deixe vazio para usar o preço da variante."}
-              </p>
               {formData.precoAnuncio &&
                 !formData.isDoacao &&
                 selectedPriceTable &&
@@ -589,6 +582,26 @@ export default function AnuncioForm({
                     ).toFixed(2)}
                   </p>
                 )}
+            </div>
+
+            {/* Gratuito - Moved after Valor field */}
+            <div className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <input
+                type="checkbox"
+                id="isDoacao"
+                checked={formData.isDoacao}
+                onChange={(e) => {
+                  const isChecked = e.target.checked;
+                  handleInputChange("isDoacao", isChecked);
+                  if (isChecked) {
+                    handleInputChange("precoAnuncio", "");
+                  }
+                }}
+                className="w-4 h-4 text-green-600 bg-white border-gray-300 rounded focus:ring-2 focus:ring-green-500"
+              />
+              <label htmlFor="isDoacao" className="text-sm font-semibold text-walmart-text cursor-pointer">
+                Este produto/serviço/evento é gratuito
+              </label>
             </div>
 
             {/* Validade do Anúncio */}
