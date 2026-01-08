@@ -235,7 +235,7 @@ export default function Index() {
                     {anuncio.producto?.tipo === "servico" ? (
                       <div className="flex gap-2">
                         <Link
-                          to={`/agenda/loja/${anuncio.lojaId}`}
+                          to={`/agenda/loja/${anuncio.anuncianteId}`}
                           className="flex-1 bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
                         >
                           <Calendar className="w-4 h-4" />
@@ -419,7 +419,7 @@ export default function Index() {
                     {anuncio.producto?.tipo === "servico" ? (
                       <div className="flex gap-2">
                         <Link
-                          to={`/agenda/loja/${anuncio.lojaId}`}
+                          to={`/agenda/loja/${anuncio.anuncianteId}`}
                           className="flex-1 bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
                         >
                           <Calendar className="w-4 h-4" />
