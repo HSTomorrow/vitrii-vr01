@@ -135,7 +135,7 @@ model MembroEquipe {
 // ============================================================================
 model GrupoDeProductos {
   id            Int       @id @default(autoincrement())
-  lojaId        Int
+  anuncianteId  Int
   nome          String    @db.VarChar(255)
   descricao     String?   @db.Text
   isActive      Boolean   @default(true)
@@ -143,7 +143,7 @@ model GrupoDeProductos {
   dataAtualizacao DateTime @updatedAt
 
   // Relations
-  loja          Loja      @relation(fields: [lojaId], references: [id], onDelete: Cascade)
+  anunciante    Anunciante @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
   fotos         FotoGrupo[]
   produtos      Producto[]
 
