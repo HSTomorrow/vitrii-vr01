@@ -4,7 +4,7 @@ import { z } from "zod";
 
 // Schema validation for creating/updating ad
 const AnuncioCreateSchema = z.object({
-  lojaId: z.number().int().positive("Loja é obrigatória"),
+  anuncianteId: z.number().int().positive("Anunciante é obrigatório"),
   productId: z.number().int().positive("Produto é obrigatório"),
   tabelaDePrecoId: z.number().int().optional().nullable(),
   titulo: z
