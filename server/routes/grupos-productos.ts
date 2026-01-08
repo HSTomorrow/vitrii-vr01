@@ -102,19 +102,44 @@ export const getGrupoById: RequestHandler = async (req, res) => {
   }
 };
 
-// GET productos of a grupo
+// GET productos of a grupo (with pagination)
 export const getProductosOfGrupo: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
+    const { limit = "20", offset = "0" } = req.query;
 
-    const productos = await prisma.producto.findMany({
-      where: { grupoId: parseInt(id) },
-    });
+    // Validate pagination parameters
+    const pageLimit = Math.min(Math.max(parseInt(limit as string) || 20, 1), 100);
+    const pageOffset = Math.max(parseInt(offset as string) || 0, 0);
+
+    // Get total count and paginated data in parallel
+    const [productos, total] = await Promise.all([
+      prisma.producto.findMany({
+        where: { grupoId: parseInt(id) },
+        select: {
+          id: true,
+          nome: true,
+          descricao: true,
+          tipo: true,
+          grupoId: true,
+        },
+        orderBy: { dataCriacao: "desc" },
+        take: pageLimit,
+        skip: pageOffset,
+      }),
+      prisma.producto.count({ where: { grupoId: parseInt(id) } }),
+    ]);
 
     res.json({
       success: true,
       data: productos,
-      count: productos.length,
+      pagination: {
+        count: productos.length,
+        total,
+        limit: pageLimit,
+        offset: pageOffset,
+        hasMore: pageOffset + pageLimit < total,
+      },
     });
   } catch (error) {
     console.error("Error fetching productos:", error);
