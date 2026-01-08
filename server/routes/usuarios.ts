@@ -241,11 +241,28 @@ export const createUsuario: RequestHandler = async (req, res) => {
       });
     }
 
-    // In production, hash the password with bcrypt
+    // Hash password with bcrypt (same as signup)
+    const senhaHash = await bcryptjs.hash(validatedData.senha, 10);
+
     const usuario = await prisma.usuario.create({
       data: {
-        ...validatedData,
+        nome: validatedData.nome,
+        email: validatedData.email,
+        senha: senhaHash,
+        cpf: validatedData.cpf || "",
+        telefone: validatedData.telefone || "",
+        endereco: validatedData.endereco || "",
         tipoUsuario: "comum",
+      },
+      select: {
+        id: true,
+        nome: true,
+        email: true,
+        cpf: true,
+        telefone: true,
+        endereco: true,
+        tipoUsuario: true,
+        dataCriacao: true,
       },
     });
 
