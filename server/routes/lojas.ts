@@ -15,29 +15,45 @@ const LojaCreateSchema = z.object({
   fotoUrl: z.string().optional(),
 });
 
-// GET all stores
+// GET all stores (with pagination)
 export const getLojas: RequestHandler = async (req, res) => {
   try {
-    const lojas = await prisma.loja.findMany({
-      include: {
-        usuarioLojas: {
-          include: {
-            usuario: {
-              select: {
-                id: true,
-                nome: true,
-                email: true,
-              },
-            },
-          },
+    const { limit = "20", offset = "0" } = req.query;
+
+    // Validate pagination parameters
+    const pageLimit = Math.min(Math.max(parseInt(limit as string) || 20, 1), 100);
+    const pageOffset = Math.max(parseInt(offset as string) || 0, 0);
+
+    // Get total count and paginated data in parallel
+    const [lojas, total] = await Promise.all([
+      prisma.loja.findMany({
+        select: {
+          id: true,
+          nome: true,
+          fotoUrl: true,
+          endereco: true,
+          email: true,
+          cnpjOuCpf: true,
+          status: true,
+          dataCriacao: true,
         },
-      },
-    });
+        orderBy: { dataCriacao: "desc" },
+        take: pageLimit,
+        skip: pageOffset,
+      }),
+      prisma.loja.count(),
+    ]);
 
     res.json({
       success: true,
       data: lojas,
-      count: lojas.length,
+      pagination: {
+        count: lojas.length,
+        total,
+        limit: pageLimit,
+        offset: pageOffset,
+        hasMore: pageOffset + pageLimit < total,
+      },
     });
   } catch (error) {
     console.error("Error fetching stores:", error);
