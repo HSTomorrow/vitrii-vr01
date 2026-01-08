@@ -62,6 +62,7 @@ export default function CreateAnuncianteModal({
     },
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ["anunciantes"] });
+      queryClient.invalidateQueries({ queryKey: ["anunciantes-do-usuario"] });
       toast.success("Anunciante criado com sucesso!");
       setFormData({
         nome: "",
