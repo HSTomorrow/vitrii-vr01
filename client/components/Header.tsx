@@ -182,6 +182,11 @@ export default function Header() {
             <input
               type="text"
               placeholder="Buscar..."
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && (e.target as HTMLInputElement).value.trim()) {
+                  navigate(`/buscar?q=${encodeURIComponent((e.target as HTMLInputElement).value)}`);
+                }
+              }}
               className="w-full px-4 py-2 pl-10 bg-walmart-gray border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-walmart-blue"
             />
             <Search className="absolute left-3 top-2.5 text-gray-400 w-5 h-5" />
