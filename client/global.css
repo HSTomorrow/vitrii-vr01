@@ -1,6 +1,11 @@
 /** @import must precede all other statements */
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 
+@font-face {
+  font-family: "Segoe Fuente Icons";
+  src: local("Segoe UI"), local("Segoe UI Symbol"), local("Segoe MDL2 Assets"), local("Arial");
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
