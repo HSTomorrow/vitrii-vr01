@@ -7,8 +7,8 @@ async function resetAdminPassword() {
   try {
     console.log("🔐 Resetting admin password...\n");
 
-    // The correct admin email (with "eii")
-    const adminEmail = "admin@vitreii.com";
+    // The correct admin email (with "ii" not "eii")
+    const adminEmail = "admin@vitrii.com";
     const newPassword = "Admin@2025";
 
     // Hash the password with bcrypt (matching signup flow)
