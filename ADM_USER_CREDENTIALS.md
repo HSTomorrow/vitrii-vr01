@@ -153,16 +153,16 @@ O usuário ADM foi criado com as seguintes informações:
 
 ```
 Tabela: usuarios
-ID:              2
-nome:            Administrador Vitrii
-email:           admin@vitreii.com
-senha:           Admin@2025
+ID:              45
+nome:            Administrador
+email:           admin@vitrii.com
+senha:           [bcryptjs hash - Admin@2025]
 cpf:             00000000000
 telefone:        0000000000
 endereco:        Sistema Administrativo
 tipoUsuario:     adm
 isActive:        true
-dataCriacao:     [Data de criação]
+dataCriacao:     2026-01-08
 ```
 
 Todas as 14 funcionalidades foram automaticamente concedidas na tabela `usuarios_x_funcionalidades`.
