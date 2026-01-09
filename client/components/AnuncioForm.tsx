@@ -753,11 +753,11 @@ export default function AnuncioForm({
               </p>
             </div>
 
-            {/* Localização (Cidade e Estado) */}
+            {/* Localização (Município e Estado) */}
             <div className="grid grid-cols-3 gap-4">
               <div className="col-span-2">
                 <label className="block text-sm font-semibold text-walmart-text mb-2">
-                  Cidade (Opcional)
+                  Município (Opcional)
                 </label>
                 <input
                   type="text"
