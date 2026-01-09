@@ -314,8 +314,12 @@ const UsuarioUpdateSchema = z.object({
     .min(3, "Nome deve ter pelo menos 3 caracteres")
     .max(255)
     .optional(),
-  telefone: z.string().min(10, "Telefone inválido").optional(),
-  endereco: z.string().min(1, "Endereço é obrigatório").optional(),
+  telefone: z
+    .string()
+    .min(10, "Telefone deve ter no mínimo 10 dígitos")
+    .optional()
+    .or(z.literal("")), // Allow empty string
+  endereco: z.string().optional().or(z.literal("")), // Allow empty string
 });
 
 // UPDATE user (only safe fields allowed)
