@@ -129,7 +129,7 @@ Para cada anúncio, você pode ver:
 
 ### Cenário: Desativar um anúncio problemático
 
-1. Login com: **admin@vitrii.com.br** / **Admin@2025**
+1. Login com: **admin@vitrii.com** / **Admin@2025**
 2. Clique no botão laranja **"Anúncios"** no header
 3. Use a barra de busca para encontrar o anúncio
 4. Clique para expandir o anúncio
