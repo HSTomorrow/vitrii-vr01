@@ -189,6 +189,30 @@ export default function PerfilUsuario() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Email */}
+            <div>
+              <label className="block text-sm font-semibold text-walmart-text mb-2">
+                Email *
+              </label>
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => handleInputChange("email", e.target.value)}
+                placeholder="seu.email@exemplo.com"
+                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-1 transition-colors ${
+                  errors.email
+                    ? "border-red-500 focus:border-red-500 focus:ring-red-500 bg-red-50"
+                    : "border-gray-300 focus:border-walmart-blue focus:ring-walmart-blue"
+                }`}
+              />
+              {errors.email && (
+                <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-4 h-4" />
+                  {errors.email}
+                </p>
+              )}
+            </div>
+
             {/* CPF / CNPJ */}
             <div>
               <label className="block text-sm font-semibold text-walmart-text mb-2">
