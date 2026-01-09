@@ -75,17 +75,18 @@ export default function PerfilUsuario() {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (formData.cpf && !/^\d{11}$/.test(formData.cpf.replace(/\D/g, ""))) {
+    // CPF validation - only if provided
+    if (formData.cpf.trim() && !/^\d{11}$/.test(formData.cpf.replace(/\D/g, ""))) {
       newErrors.cpf = "CPF deve ter 11 dígitos";
     }
 
-    if (formData.telefone && formData.telefone.replace(/\D/g, "").length < 10) {
+    // Phone validation - only if provided
+    if (formData.telefone.trim() && formData.telefone.replace(/\D/g, "").length < 10) {
       newErrors.telefone = "Telefone deve ter no mínimo 10 dígitos";
     }
 
-    if (!formData.endereco.trim()) {
-      newErrors.endereco = "Endereço é obrigatório";
-    }
+    // Address is optional now, but if provided should be valid
+    // Remove required validation for address
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
