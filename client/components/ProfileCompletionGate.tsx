@@ -44,7 +44,7 @@ export default function ProfileCompletionGate({
             Continuar Navegando
           </button>
           <Link
-            to="/profile"
+            to="/perfil"
             onClick={onClose}
             className="flex-1 px-4 py-2 bg-walmart-blue text-white rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors text-center"
           >
