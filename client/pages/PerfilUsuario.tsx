@@ -66,30 +66,23 @@ export default function PerfilUsuario() {
       }, 1500);
     },
     onError: (error: any) => {
-      // Try to parse detailed error response from server
-      if (error instanceof Error && error.message) {
-        const errorMsg = error.message;
-        // Check if it's a JSON error response from server
-        try {
-          const parsed = JSON.parse(errorMsg);
-          if (parsed.details && Array.isArray(parsed.details)) {
-            // Extract field-specific errors from Zod validation
-            const fieldErrors: Record<string, string> = {};
-            parsed.details.forEach((detail: any) => {
-              const fieldPath = Array.isArray(detail.path)
-                ? detail.path.join(".")
-                : detail.path;
-              fieldErrors[fieldPath] = detail.message;
-            });
-            setErrors(fieldErrors);
-            // Show a summary message
-            toast.error("Por favor, corrija os dados inválidos indicados abaixo");
-            return;
-          }
-        } catch (e) {
-          // Not a JSON response, continue with generic error
-        }
+      // Check if error has response with details (from our custom error handling)
+      if (error?.response?.details && Array.isArray(error.response.details)) {
+        // Extract field-specific errors from Zod validation
+        const fieldErrors: Record<string, string> = {};
+        error.response.details.forEach((detail: any) => {
+          const fieldPath = Array.isArray(detail.path)
+            ? detail.path.join(".")
+            : detail.path;
+          fieldErrors[fieldPath] = detail.message;
+        });
+        setErrors(fieldErrors);
+        // Show a summary message
+        toast.error("Por favor, corrija os dados inválidos indicados abaixo");
+        return;
       }
+
+      // Fallback to generic error message
       toast.error(
         error instanceof Error ? error.message : "Erro ao atualizar perfil",
       );
