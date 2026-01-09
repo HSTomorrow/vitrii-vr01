@@ -230,6 +230,9 @@ export default function AnuncioForm({
             : null,
           equipeDeVendaId:
             data.equipeDeVendaId > 0 ? data.equipeDeVendaId : null,
+          endereco: data.endereco || null,
+          cidade: data.cidade || null,
+          estado: data.estado || null,
           isDoacao: data.isDoacao,
           destaque: data.destaque,
           categoria: data.categoria,
