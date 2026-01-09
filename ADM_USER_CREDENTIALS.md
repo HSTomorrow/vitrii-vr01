@@ -155,7 +155,7 @@ O usuário ADM foi criado com as seguintes informações:
 Tabela: usuarios
 ID:              2
 nome:            Administrador Vitrii
-email:           admin@vitrii.com.br
+email:           admin@vitreii.com
 senha:           Admin@2025
 cpf:             00000000000
 telefone:        0000000000
