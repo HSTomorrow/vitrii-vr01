@@ -156,24 +156,39 @@ export default function PerfilUsuario() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* CPF */}
+            {/* CPF / CNPJ */}
             <div>
               <label className="block text-sm font-semibold text-walmart-text mb-2">
-                CPF (opcional)
+                CPF \ CNPJ (opcional)
               </label>
               <input
                 type="text"
                 value={formData.cpf}
                 onChange={(e) => {
-                  const cpf = e.target.value.replace(/\D/g, "").slice(0, 11);
-                  // Format: XXX.XXX.XXX-XX
-                  const formatted = cpf
-                    .replace(/(\d{3})(\d)/, "$1.$2")
-                    .replace(/(\d{3})(\d)/, "$1.$2")
-                    .replace(/(\d{3})(\d{2})$/, "$1-$2");
+                  const input = e.target.value.replace(/\D/g, "");
+                  let formatted = "";
+
+                  // Format based on length: CPF (11) or CNPJ (14)
+                  if (input.length <= 11) {
+                    // CPF format: XXX.XXX.XXX-XX
+                    const cpf = input.slice(0, 11);
+                    formatted = cpf
+                      .replace(/(\d{3})(\d)/, "$1.$2")
+                      .replace(/(\d{3})(\d)/, "$1.$2")
+                      .replace(/(\d{3})(\d{2})$/, "$1-$2");
+                  } else {
+                    // CNPJ format: XX.XXX.XXX/XXXX-XX
+                    const cnpj = input.slice(0, 14);
+                    formatted = cnpj
+                      .replace(/(\d{2})(\d)/, "$1.$2")
+                      .replace(/(\d{3})(\d)/, "$1.$2")
+                      .replace(/(\d{3})(\d)/, "$1/$2")
+                      .replace(/(\d{4})(\d{2})$/, "$1-$2");
+                  }
+
                   handleInputChange("cpf", formatted);
                 }}
-                placeholder="000.000.000-00"
+                placeholder="000.000.000-00 ou 00.000.000/0000-00"
                 className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-1 transition-colors ${
                   errors.cpf
                     ? "border-red-500 focus:border-red-500 focus:ring-red-500 bg-red-50"
