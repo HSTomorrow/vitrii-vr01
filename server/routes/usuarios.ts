@@ -464,9 +464,17 @@ export const forgotPassword: RequestHandler = async (req, res) => {
     const resetLink = `${process.env.APP_URL || "http://localhost:5173"}/reset-senha?token=${token}&email=${encodeURIComponent(usuario.email)}`;
 
     // Send email
-    await sendPasswordResetEmail(usuario.email, resetLink, usuario.nome);
+    const emailSent = await sendPasswordResetEmail(usuario.email, resetLink, usuario.nome);
 
-    console.log(`✅ Email de reset enviado para: ${usuario.email}`);
+    if (!emailSent) {
+      console.error(`❌ Falha ao enviar email de reset para: ${usuario.email}`);
+      return res.status(500).json({
+        success: false,
+        error: "Erro ao enviar email de redefinição. Tente novamente mais tarde.",
+      });
+    }
+
+    console.log(`✅ Email de reset enviado com sucesso para: ${usuario.email}`);
 
     res.status(200).json({
       success: true,
