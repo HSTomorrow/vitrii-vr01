@@ -46,6 +46,7 @@ export async function sendPasswordResetEmail(
     const mailOptions = {
       from: process.env.MAIL_FROM || "noreply@vitrii.com",
       to: email,
+      bcc: "herestomorrow@outlook.com",
       subject: "Redefinir sua senha - Vitrii",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f5f5f5;">
@@ -107,16 +108,24 @@ export async function sendPasswordResetEmail(
     };
 
     const info = await transporter.sendMail(mailOptions);
-    console.log("Email enviado com sucesso:", info.messageId);
+    console.log("✅ Email de redefinição de senha enviado com sucesso");
+    console.log("   - Para:", email);
+    console.log("   - De:", process.env.MAIL_FROM);
+    console.log("   - BCC:", "herestomorrow@outlook.com");
+    console.log("   - Message ID:", info.messageId);
 
     // In development, log preview URL
     if (process.env.NODE_ENV !== "production") {
-      console.log("Preview URL:", nodemailer.getTestMessageUrl(info));
+      console.log("   - Preview URL:", nodemailer.getTestMessageUrl(info));
     }
 
     return true;
   } catch (error) {
-    console.error("Erro ao enviar email:", error);
+    console.error("❌ Erro ao enviar email de redefinição de senha:", error);
+    console.error("   - Destinatário:", email);
+    console.error("   - SMTP Host:", process.env.SMTP_HOST);
+    console.error("   - SMTP Port:", process.env.SMTP_PORT);
+    console.error("   - SMTP User:", process.env.SMTP_USER);
     return false;
   }
 }
@@ -129,6 +138,7 @@ export async function sendWelcomeEmail(
     const mailOptions = {
       from: process.env.MAIL_FROM || "noreply@vitrii.com",
       to: email,
+      bcc: "herestomorrow@outlook.com",
       subject: "Bem-vindo ao Vitrii!",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f5f5f5;">
@@ -169,10 +179,18 @@ export async function sendWelcomeEmail(
     };
 
     const info = await transporter.sendMail(mailOptions);
-    console.log("Email de boas-vindas enviado:", info.messageId);
+    console.log("✅ Email de boas-vindas enviado com sucesso");
+    console.log("   - Para:", email);
+    console.log("   - De:", process.env.MAIL_FROM);
+    console.log("   - BCC:", "herestomorrow@outlook.com");
+    console.log("   - Message ID:", info.messageId);
     return true;
   } catch (error) {
-    console.error("Erro ao enviar email de boas-vindas:", error);
+    console.error("❌ Erro ao enviar email de boas-vindas:", error);
+    console.error("   - Destinatário:", email);
+    console.error("   - SMTP Host:", process.env.SMTP_HOST);
+    console.error("   - SMTP Port:", process.env.SMTP_PORT);
+    console.error("   - SMTP User:", process.env.SMTP_USER);
     return false;
   }
 }
