@@ -121,10 +121,6 @@ export default function CadastroVariantes() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.preco) {
-      toast.error("Preço é obrigatório");
-      return;
-    }
     saveVarianteMutation.mutate(formData);
   };
 
