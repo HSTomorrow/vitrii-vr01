@@ -2,10 +2,10 @@
 
 /**
  * Email Configuration Diagnostic Script
- * 
+ *
  * This script tests if the SMTP configuration is working correctly
  * by attempting to send a test email and validating the setup.
- * 
+ *
  * Usage: node test-email-config.mjs
  */
 
@@ -18,14 +18,25 @@ console.log("📋 ENVIRONMENT VARIABLES:");
 console.log("   SMTP_HOST:", process.env.SMTP_HOST || "NOT SET ❌");
 console.log("   SMTP_PORT:", process.env.SMTP_PORT || "NOT SET ❌");
 console.log("   SMTP_USER:", process.env.SMTP_USER || "NOT SET ❌");
-console.log("   SMTP_PASS:", process.env.SMTP_PASS ? "SET ✅ (hidden)" : "NOT SET ❌");
+console.log(
+  "   SMTP_PASS:",
+  process.env.SMTP_PASS ? "SET ✅ (hidden)" : "NOT SET ❌",
+);
 console.log("   MAIL_FROM:", process.env.MAIL_FROM || "NOT SET ❌");
-console.log("   SMTP_SECURE:", process.env.SMTP_SECURE || "NOT SET (defaults to false)");
+console.log(
+  "   SMTP_SECURE:",
+  process.env.SMTP_SECURE || "NOT SET (defaults to false)",
+);
 console.log("");
 
 // Validate configuration
 let isConfigValid = true;
-if (!process.env.SMTP_HOST || !process.env.SMTP_PORT || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+if (
+  !process.env.SMTP_HOST ||
+  !process.env.SMTP_PORT ||
+  !process.env.SMTP_USER ||
+  !process.env.SMTP_PASS
+) {
   console.log("⚠️  WARNING: SMTP configuration is incomplete!");
   console.log("   Set the following environment variables:");
   console.log("   - SMTP_HOST");
@@ -60,10 +71,18 @@ transporter.verify(function (error, success) {
     console.log("❌ SMTP CONNECTION FAILED");
     console.log("   Error:", error.message);
     console.log("\n🔧 TROUBLESHOOTING:");
-    console.log("   1. Verify SMTP_HOST is correct (check with email provider)");
-    console.log("   2. Verify SMTP_PORT is correct (usually 587 for TLS, 465 for SSL)");
-    console.log("   3. Verify SMTP_USER is correct (usually full email address)");
-    console.log("   4. Verify SMTP_PASS is correct (may need app-specific password for Gmail)");
+    console.log(
+      "   1. Verify SMTP_HOST is correct (check with email provider)",
+    );
+    console.log(
+      "   2. Verify SMTP_PORT is correct (usually 587 for TLS, 465 for SSL)",
+    );
+    console.log(
+      "   3. Verify SMTP_USER is correct (usually full email address)",
+    );
+    console.log(
+      "   4. Verify SMTP_PASS is correct (may need app-specific password for Gmail)",
+    );
     console.log("   5. Check firewall/network connectivity to SMTP server");
     process.exit(1);
   } else {
@@ -133,9 +152,13 @@ transporter.verify(function (error, success) {
         console.log("📬 NEXT STEPS:");
         console.log("   1. Check your inbox for the test email");
         console.log("   2. Check herestomorrow@outlook.com for the BCC copy");
-        console.log("   3. If emails arrive, your configuration is working! ✅");
+        console.log(
+          "   3. If emails arrive, your configuration is working! ✅",
+        );
         console.log("");
-        console.log("ℹ️  Note: It may take a few minutes for emails to arrive.");
+        console.log(
+          "ℹ️  Note: It may take a few minutes for emails to arrive.",
+        );
         process.exit(0);
       }
     });

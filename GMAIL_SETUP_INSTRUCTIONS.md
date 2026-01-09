@@ -3,6 +3,7 @@
 ## Problem
 
 Gmail is rejecting the login with this error:
+
 ```
 Invalid login: 535-5.7.8 Username and Password not accepted
 ```
@@ -39,10 +40,12 @@ This happens because **Gmail requires an App-Specific Password** for third-party
 The app-specific password should look like: `xxxx xxxx xxxx xxxx` (16 characters with spaces)
 
 When setting the environment variable, **remove the spaces**:
+
 - With spaces: `abcd efgh ijkl mnop`
 - Environment variable: `abcdefghijklmnop`
 
 Use DevServerControl to set:
+
 ```
 SMTP_PASS: [your 16-character app password without spaces]
 ```
@@ -52,6 +55,7 @@ SMTP_PASS: [your 16-character app password without spaces]
 ## 🔍 Current Configuration Status
 
 **Current Settings:**
+
 ```
 SMTP_HOST: smtp.gmail.com
 SMTP_PORT: 587
@@ -62,6 +66,7 @@ SMTP_SECURE: false (TLS on port 587)
 ```
 
 **What needs to change:**
+
 - ❌ SMTP_PASS: Currently set to account password (vItrII2025)
 - ✅ SMTP_PASS: Should be set to app-specific password (16 characters)
 

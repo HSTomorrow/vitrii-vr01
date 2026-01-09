@@ -25,14 +25,11 @@ const UsuarioCreateSchema = z.object({
   senha: z.string().min(6, "Senha deve ter no mínimo 6 caracteres"),
   cpf: z
     .string()
-    .refine(
-      (value) => {
-        const digitsOnly = value.replace(/\D/g, "");
-        // Accept either 11 digits (CPF) or 14 digits (CNPJ)
-        return /^\d{11}$|^\d{14}$/.test(digitsOnly);
-      },
-      "CPF \ CNPJ deve ter 11 ou 14 dígitos",
-    )
+    .refine((value) => {
+      const digitsOnly = value.replace(/\D/g, "");
+      // Accept either 11 digits (CPF) or 14 digits (CNPJ)
+      return /^\d{11}$|^\d{14}$/.test(digitsOnly);
+    }, "CPF \ CNPJ deve ter 11 ou 14 dígitos")
     .optional(),
   telefone: z.string().min(10, "Telefone inválido").optional(),
   endereco: z.string().min(1, "Endereço é obrigatório").optional(),
@@ -302,14 +299,11 @@ const UsuarioUpdateSchema = z.object({
   cpf: z
     .string()
     .min(1, "CPF \ CNPJ é obrigatório")
-    .refine(
-      (value) => {
-        const digitsOnly = value.replace(/\D/g, "");
-        // Accept either 11 digits (CPF) or 14 digits (CNPJ)
-        return /^\d{11}$|^\d{14}$/.test(digitsOnly);
-      },
-      "CPF \ CNPJ deve ter 11 ou 14 dígitos",
-    ),
+    .refine((value) => {
+      const digitsOnly = value.replace(/\D/g, "");
+      // Accept either 11 digits (CPF) or 14 digits (CNPJ)
+      return /^\d{11}$|^\d{14}$/.test(digitsOnly);
+    }, "CPF \ CNPJ deve ter 11 ou 14 dígitos"),
   nome: z
     .string()
     .min(3, "Nome deve ter pelo menos 3 caracteres")
@@ -439,7 +433,9 @@ export const forgotPassword: RequestHandler = async (req, res) => {
 
     if (!usuario) {
       // Email not found in database
-      console.log(`❌ Tentativa de reset de senha para email não cadastrado: ${email}`);
+      console.log(
+        `❌ Tentativa de reset de senha para email não cadastrado: ${email}`,
+      );
       return res.status(200).json({
         success: true,
         emailFound: false,
@@ -464,13 +460,18 @@ export const forgotPassword: RequestHandler = async (req, res) => {
     const resetLink = `${process.env.APP_URL || "http://localhost:5173"}/reset-senha?token=${token}&email=${encodeURIComponent(usuario.email)}`;
 
     // Send email
-    const emailSent = await sendPasswordResetEmail(usuario.email, resetLink, usuario.nome);
+    const emailSent = await sendPasswordResetEmail(
+      usuario.email,
+      resetLink,
+      usuario.nome,
+    );
 
     if (!emailSent) {
       console.error(`❌ Falha ao enviar email de reset para: ${usuario.email}`);
       return res.status(500).json({
         success: false,
-        error: "Erro ao enviar email de redefinição. Tente novamente mais tarde.",
+        error:
+          "Erro ao enviar email de redefinição. Tente novamente mais tarde.",
       });
     }
 

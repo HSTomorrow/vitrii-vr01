@@ -106,7 +106,8 @@ export default function ForgotPassword() {
                     Email não encontrado
                   </h3>
                   <p className="text-sm text-red-800 mt-1">
-                    O email <strong>{email}</strong> não está cadastrado em nossa base de dados.
+                    O email <strong>{email}</strong> não está cadastrado em
+                    nossa base de dados.
                   </p>
                 </div>
               </div>

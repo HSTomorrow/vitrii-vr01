@@ -11,6 +11,7 @@
 ## ✅ Email Configuration Status
 
 All emails sent by the system (Password Reset, Welcome) now include:
+
 - **From**: vitriimarketplace@gmail.com
 - **BCC**: herestomorrow@outlook.com (automatic copy to monitoring account)
 
@@ -32,6 +33,7 @@ When an email is sent, you'll see detailed logs in the dev server console:
 ```
 
 **What Each Line Means:**
+
 - ✅ = Email was sent successfully
 - Para = Recipient email address
 - De = Sender email (must be vitriimarketplace@gmail.com)
@@ -42,6 +44,7 @@ When an email is sent, you'll see detailed logs in the dev server console:
 ### 2. **Monitor the BCC Account**
 
 Check **herestomorrow@outlook.com** for incoming emails:
+
 - Log in to herestomorrow@outlook.com
 - Look in the Inbox folder
 - Search for emails from vitriimarketplace@gmail.com
@@ -61,6 +64,7 @@ If emails fail to send, the logs will show:
 ```
 
 **Common Issues:**
+
 - ❌ "SMTP authentication failed" → Check SMTP_PASS (password)
 - ❌ "Connection timeout" → Check internet connection or firewall
 - ❌ "Invalid credentials" → Check SMTP_USER and SMTP_PASS
@@ -87,15 +91,15 @@ If emails fail to send, the logs will show:
 
 The following must be set in DevServerControl:
 
-| Variable | Value | Status |
-|----------|-------|--------|
-| SMTP_HOST | smtp.gmail.com | ✅ Set |
-| SMTP_PORT | 587 | ✅ Set |
-| SMTP_USER | vitriimarketplace@gmail.com | ✅ Set |
-| SMTP_PASS | vItrII2025 | ✅ Set (secure) |
-| SMTP_SECURE | false | ✅ Set (TLS) |
-| MAIL_FROM | vitriimarketplace@gmail.com | ✅ Set |
-| APP_URL | http://localhost:5173 | ✅ Set |
+| Variable    | Value                       | Status          |
+| ----------- | --------------------------- | --------------- |
+| SMTP_HOST   | smtp.gmail.com              | ✅ Set          |
+| SMTP_PORT   | 587                         | ✅ Set          |
+| SMTP_USER   | vitriimarketplace@gmail.com | ✅ Set          |
+| SMTP_PASS   | vItrII2025                  | ✅ Set (secure) |
+| SMTP_SECURE | false                       | ✅ Set (TLS)    |
+| MAIL_FROM   | vitriimarketplace@gmail.com | ✅ Set          |
+| APP_URL     | http://localhost:5173       | ✅ Set          |
 
 ---
 
@@ -104,12 +108,14 @@ The following must be set in DevServerControl:
 ### **Scenario 1: Email Shows "Sent" in Logs but Not Received**
 
 **Possible Causes:**
+
 1. Email in Spam folder (common with new email accounts)
 2. Gmail account security settings
 3. Recipient email address typo
 4. Email provider blocking the sender
 
 **Solutions:**
+
 1. Check spam/junk folders in recipient email
 2. Add vitriimarketplace@gmail.com to contacts/safe senders
 3. Verify the email address in the form was correct
@@ -118,6 +124,7 @@ The following must be set in DevServerControl:
 ### **Scenario 2: Email Shows Error in Logs**
 
 **Check the specific error message:**
+
 - Look for "❌ Erro ao enviar email"
 - Note the error details
 - Verify SMTP credentials are correct
@@ -126,11 +133,13 @@ The following must be set in DevServerControl:
 ### **Scenario 3: No Logs Appear**
 
 **Possible Causes:**
+
 1. Server didn't process the request
 2. Form validation failed
 3. API endpoint not responding
 
 **Solutions:**
+
 1. Check browser console for JavaScript errors
 2. Check network tab to see if the API call was made
 3. Verify the email address in the form is valid
@@ -141,12 +150,14 @@ The following must be set in DevServerControl:
 ## 📋 Email Function Reference
 
 ### Password Reset Email
+
 - **Sent by**: `/api/auth/forgot-password` endpoint
 - **Function**: `sendPasswordResetEmail()`
 - **Contents**: Reset link valid for 1 hour
 - **Recipients**: User email + BCC to herestomorrow@outlook.com
 
 ### Welcome Email
+
 - **Sent by**: `/api/auth/signup` endpoint
 - **Function**: `sendWelcomeEmail()`
 - **Contents**: Account creation confirmation
@@ -174,6 +185,7 @@ When testing email functionality:
 ### Critical Issue: Gmail Authentication Failed
 
 If diagnostic shows:
+
 ```
 ❌ SMTP CONNECTION FAILED
 Invalid login: 535-5.7.8 Username and Password not accepted
@@ -182,6 +194,7 @@ Invalid login: 535-5.7.8 Username and Password not accepted
 **This is a GMAIL SECURITY ISSUE** - Gmail requires an App-Specific Password!
 
 **Solution**: Follow **GMAIL_SETUP_INSTRUCTIONS.md**
+
 1. Enable 2-Step Verification
 2. Generate App-Specific Password at https://myaccount.google.com/apppasswords
 3. Update SMTP_PASS with the 16-character password
@@ -215,6 +228,7 @@ Invalid login: 535-5.7.8 Username and Password not accepted
 ## 📝 Logs to Save for Support
 
 If you need help, gather these logs:
+
 1. Full server console output from email send attempt
 2. Browser console errors (F12 → Console tab)
 3. Network request details (F12 → Network tab)

@@ -13,6 +13,7 @@ The "Esqueci minha senha" (Forgot Password) functionality now validates whether 
 **Endpoint**: `POST /api/auth/forgot-password`
 
 The backend now:
+
 1. ✅ Validates that email is provided
 2. ✅ Checks if email exists in user database
 3. ✅ Returns `emailFound` flag in response:
@@ -40,6 +41,7 @@ or
 ```
 
 **Server Logging:**
+
 - ✅ Email found → `✅ Email de reset enviado para: user@example.com`
 - ❌ Email not found → `❌ Tentativa de reset de senha para email não cadastrado: user@example.com`
 
@@ -50,6 +52,7 @@ or
 The UI now has 3 states:
 
 #### **State 1: Email Not Found** (NEW)
+
 - Shows error message with email not found icon
 - Displays the email that wasn't found
 - Offers 3 options:
@@ -58,11 +61,13 @@ The UI now has 3 states:
   3. **"Voltar para login"** - Return to sign in
 
 #### **State 2: Email Sent Successfully** (EXISTING, IMPROVED)
+
 - Shows success message
 - Displays the email that reset link was sent to
 - Options to request another email or return to login
 
 #### **State 3: Form Input** (EXISTING)
+
 - User enters their email address
 - Validates email format
 - Shows instructions on how password reset works
@@ -130,12 +135,14 @@ When testing email validation:
 ## 🔍 Server Logs Reference
 
 ### Email Found (Success Case)
+
 ```
 ✅ Email de reset enviado para: user@example.com
 Preview URL: https://ethereal.email/message/...
 ```
 
 ### Email Not Found (Failed Case)
+
 ```
 ❌ Tentativa de reset de senha para email não cadastrado: invalid@example.com
 ```
@@ -149,7 +156,7 @@ Preview URL: https://ethereal.email/message/...
 ✅ **Security**: Logs attempts to reset non-existent accounts  
 ✅ **User Experience**: Options to create account or try different email  
 ✅ **Monitoring**: BCC copy to herestomorrow@outlook.com for all emails  
-✅ **Logging**: Detailed server logs for debugging  
+✅ **Logging**: Detailed server logs for debugging
 
 ---
 
