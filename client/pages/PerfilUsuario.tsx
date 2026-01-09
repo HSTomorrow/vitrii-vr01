@@ -110,8 +110,17 @@ export default function PerfilUsuario() {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    // CPF/CNPJ validation - only if provided
-    if (formData.cpf.trim()) {
+    // Email validation - required
+    if (!formData.email.trim()) {
+      newErrors.email = "Email é obrigatório";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Email inválido";
+    }
+
+    // CPF/CNPJ validation - required
+    if (!formData.cpf.trim()) {
+      newErrors.cpf = "CPF \ CNPJ é obrigatório";
+    } else {
       const digitsOnly = formData.cpf.replace(/\D/g, "");
       // Accept either 11 digits (CPF) or 14 digits (CNPJ)
       if (!/^\d{11}$|^\d{14}$/.test(digitsOnly)) {
@@ -127,8 +136,7 @@ export default function PerfilUsuario() {
       newErrors.telefone = "Telefone deve ter no mínimo 10 dígitos";
     }
 
-    // Address is optional now, but if provided should be valid
-    // Remove required validation for address
+    // Address is optional
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
