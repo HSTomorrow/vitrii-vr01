@@ -173,16 +173,20 @@ export default function AnuncioDetalhe() {
             <div>
               <div className="flex items-center gap-4 mb-2 flex-wrap">
                 <h1 className="text-4xl font-bold text-walmart-text">{anuncio.titulo}</h1>
-                <span className={`px-3 py-1 rounded-full text-sm font-semibold ${statusColors[anuncio.status] || statusColors.em_edicao}`}>
-                  {statusLabels[anuncio.status] || anuncio.status}
-                </span>
-                {isInactive && (
-                  <span className="px-3 py-1 rounded-full text-sm font-semibold bg-gray-400 text-white">
-                    Inativo
-                  </span>
+                {canEdit && (
+                  <>
+                    <span className={`px-3 py-1 rounded-full text-sm font-semibold ${statusColors[anuncio.status] || statusColors.em_edicao}`}>
+                      {statusLabels[anuncio.status] || anuncio.status}
+                    </span>
+                    {isInactive && (
+                      <span className="px-3 py-1 rounded-full text-sm font-semibold bg-gray-400 text-white">
+                        Inativo
+                      </span>
+                    )}
+                  </>
                 )}
               </div>
-              <div className="flex items-center gap-4 text-walmart-text-secondary mt-2">
+              <div className="flex items-center gap-4 text-walmart-text-secondary mt-2 mb-2">
                 <div className="flex items-center gap-1">
                   <Eye className="w-4 h-4" />
                   <span>Visualizações: 0</span>
@@ -192,6 +196,9 @@ export default function AnuncioDetalhe() {
                   <span>Mensagens: 0</span>
                 </div>
               </div>
+              <p className="text-sm text-walmart-text-secondary">
+                Publicado por: <span className="font-semibold text-walmart-text">{anuncio.anunciante.nome}</span>
+              </p>
             </div>
 
             {/* Action Buttons - Only show if user can edit */}
