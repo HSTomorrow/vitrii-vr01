@@ -567,3 +567,63 @@ export const getProdutosParaAnuncio: RequestHandler = async (req, res) => {
     });
   }
 };
+
+// CHECK if user can edit/delete an ad
+export const canEditAnuncio: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const usuarioId = req.userId;
+
+    // Get current user and ad
+    const [usuario, anuncio] = await Promise.all([
+      prisma.usuario.findUnique({
+        where: { id: usuarioId },
+        select: { tipoUsuario: true },
+      }),
+      prisma.anuncio.findUnique({
+        where: { id: parseInt(id) },
+        select: { anuncianteId: true },
+      }),
+    ]);
+
+    if (!usuario || !anuncio) {
+      return res.status(404).json({
+        success: false,
+        canEdit: false,
+        error: "Usuário ou anúncio não encontrado",
+      });
+    }
+
+    // ADM can edit any ad
+    if (usuario.tipoUsuario === "adm") {
+      return res.json({
+        success: true,
+        canEdit: true,
+      });
+    }
+
+    // Check if user is associated with the advertiser (anunciante)
+    const usuarioAnunciante = await prisma.usuarioAnunciante.findUnique({
+      where: {
+        usuarioId_anuncianteId: {
+          usuarioId: usuarioId,
+          anuncianteId: anuncio.anuncianteId,
+        },
+      },
+    });
+
+    const canEdit = !!usuarioAnunciante;
+
+    res.json({
+      success: true,
+      canEdit,
+    });
+  } catch (error) {
+    console.error("Error checking ad edit permissions:", error);
+    res.status(500).json({
+      success: false,
+      canEdit: false,
+      error: "Erro ao verificar permissões",
+    });
+  }
+};
