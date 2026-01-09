@@ -572,7 +572,24 @@ export const getProdutosParaAnuncio: RequestHandler = async (req, res) => {
 export const canEditAnuncio: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
-    const usuarioId = req.userId;
+    // Try to get userId from different sources
+    let usuarioId = req.userId;
+
+    if (!usuarioId) {
+      // Try to get from query parameter or header
+      usuarioId = parseInt(
+        (req.query.usuarioId as string) || (req.headers["x-user-id"] as string) || "0",
+        10
+      );
+    }
+
+    // If still no userId, return not authenticated
+    if (!usuarioId || usuarioId === 0) {
+      return res.json({
+        success: true,
+        canEdit: false,
+      });
+    }
 
     // Get current user and ad
     const [usuario, anuncio] = await Promise.all([
@@ -587,10 +604,9 @@ export const canEditAnuncio: RequestHandler = async (req, res) => {
     ]);
 
     if (!usuario || !anuncio) {
-      return res.status(404).json({
-        success: false,
+      return res.json({
+        success: true,
         canEdit: false,
-        error: "Usuário ou anúncio não encontrado",
       });
     }
 
@@ -620,7 +636,7 @@ export const canEditAnuncio: RequestHandler = async (req, res) => {
     });
   } catch (error) {
     console.error("Error checking ad edit permissions:", error);
-    res.status(500).json({
+    res.json({
       success: false,
       canEdit: false,
       error: "Erro ao verificar permissões",
