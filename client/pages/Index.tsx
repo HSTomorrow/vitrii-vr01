@@ -227,7 +227,7 @@ export default function Index() {
 
                   <div className="p-4 flex flex-col h-full">
                     <div>
-                      <h4 className="font-semibold text-walmart-text mb-2 line-clamp-2">
+                      <h4 style={{ color: "#025CBA" }} className="font-semibold mb-2 line-clamp-2">
                         {anuncio.titulo}
                       </h4>
                       <p className="text-sm text-walmart-text-secondary mb-3 line-clamp-2">
@@ -415,7 +415,7 @@ export default function Index() {
 
                   <div className="p-4 flex flex-col h-full">
                     <div>
-                      <h4 className="font-semibold text-walmart-text mb-2 line-clamp-2">
+                      <h4 style={{ color: "#025CBA" }} className="font-semibold mb-2 line-clamp-2">
                         {anuncio.titulo}
                       </h4>
                       <p className="text-sm text-walmart-text-secondary mb-3 line-clamp-2">
@@ -600,7 +600,7 @@ export default function Index() {
 
                   <div className="p-4 flex flex-col h-full">
                     <div>
-                      <h4 className="font-semibold text-walmart-text mb-2 line-clamp-2">
+                      <h4 style={{ color: "#025CBA" }} className="font-semibold mb-2 line-clamp-2">
                         {anuncio.titulo}
                       </h4>
                       <p className="text-sm text-walmart-text-secondary mb-3 line-clamp-2">
@@ -772,7 +772,7 @@ export default function Index() {
 
                   <div className="p-4 flex flex-col h-full">
                     <div>
-                      <h4 className="font-semibold text-walmart-text mb-2 line-clamp-2">
+                      <h4 style={{ color: "#025CBA" }} className="font-semibold mb-2 line-clamp-2">
                         {anuncio.titulo}
                       </h4>
                       <p className="text-sm text-walmart-text-secondary mb-3 line-clamp-2">
