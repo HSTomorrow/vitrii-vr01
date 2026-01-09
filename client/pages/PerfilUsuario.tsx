@@ -85,12 +85,13 @@ export default function PerfilUsuario() {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    // CPF validation - only if provided
-    if (
-      formData.cpf.trim() &&
-      !/^\d{11}$/.test(formData.cpf.replace(/\D/g, ""))
-    ) {
-      newErrors.cpf = "CPF deve ter 11 dígitos";
+    // CPF/CNPJ validation - only if provided
+    if (formData.cpf.trim()) {
+      const digitsOnly = formData.cpf.replace(/\D/g, "");
+      // Accept either 11 digits (CPF) or 14 digits (CNPJ)
+      if (!/^\d{11}$|^\d{14}$/.test(digitsOnly)) {
+        newErrors.cpf = "CPF \ CNPJ deve ter 11 ou 14 dígitos";
+      }
     }
 
     // Phone validation - only if provided
