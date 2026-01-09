@@ -117,9 +117,13 @@ export default function Index() {
       <Header />
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-walmart-blue to-walmart-blue-dark text-white py-2 md:py-3">
+      <section style={{ backgroundColor: "#78BDF6" }} className="text-white py-2 md:py-3">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-lg md:text-xl font-bold">Bem-vindo ao Vitrii</h1>
+          <div className="flex justify-center">
+            <h1 style={{ fontFamily: "Segoe Fuente Icons, sans-serif" }} className="text-lg md:text-xl font-bold">
+              Bem-vindo ao Vitrii
+            </h1>
+          </div>
         </div>
       </section>
 
