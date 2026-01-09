@@ -735,6 +735,24 @@ export default function AnuncioForm({
               />
             </div>
 
+            {/* Endereço */}
+            <div>
+              <label className="block text-sm font-semibold text-walmart-text mb-2">
+                Endereço (Opcional)
+              </label>
+              <input
+                type="text"
+                value={formData.endereco}
+                onChange={(e) => handleInputChange("endereco", e.target.value)}
+                placeholder="Ex: Rua das Flores, 123"
+                maxLength={100}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+              />
+              <p className="mt-1 text-sm text-walmart-text-secondary">
+                {formData.endereco.length}/100 caracteres
+              </p>
+            </div>
+
             {/* Localização (Cidade e Estado) */}
             <div className="grid grid-cols-3 gap-4">
               <div className="col-span-2">
