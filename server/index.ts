@@ -13,6 +13,7 @@ import {
   inactivateAnuncio,
   activateAnuncio,
   getProdutosParaAnuncio,
+  canEditAnuncio,
 } from "./routes/anuncios";
 import {
   getAnunciantes,
