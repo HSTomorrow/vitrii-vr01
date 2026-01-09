@@ -171,25 +171,44 @@ When testing email functionality:
 
 ## 📞 Troubleshooting Steps
 
+### Critical Issue: Gmail Authentication Failed
+
+If diagnostic shows:
+```
+❌ SMTP CONNECTION FAILED
+Invalid login: 535-5.7.8 Username and Password not accepted
+```
+
+**This is a GMAIL SECURITY ISSUE** - Gmail requires an App-Specific Password!
+
+**Solution**: Follow **GMAIL_SETUP_INSTRUCTIONS.md**
+1. Enable 2-Step Verification
+2. Generate App-Specific Password at https://myaccount.google.com/apppasswords
+3. Update SMTP_PASS with the 16-character password
+4. Restart dev server
+5. Run: `node test-email-config.mjs` to verify
+
+### Other Troubleshooting
+
 1. **Check if email was sent:**
    - Look at server logs for "✅ Email enviado"
-   
+
 2. **Verify BCC is working:**
    - Check herestomorrow@outlook.com inbox
    - If BCC copy is there, the email system is working
-   
+
 3. **Verify SMTP credentials:**
    - Use the values from DevServerControl settings
    - Ensure no typos in email or password
-   
+
 4. **Test network connection:**
    - Ensure stable internet connection
-   - Test other SMTP connections if available
-   
+   - Run: `node test-email-config.mjs` to test SMTP connection
+
 5. **Check Gmail security:**
-   - Gmail may block "less secure apps"
-   - May require app-specific password instead of account password
-   - Check Gmail account security settings
+   - Use app-specific password, not account password
+   - Ensure 2-Step Verification is enabled
+   - Check https://myaccount.google.com/notifications for blocked attempts
 
 ---
 
