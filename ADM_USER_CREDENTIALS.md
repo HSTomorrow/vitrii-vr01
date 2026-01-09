@@ -5,7 +5,7 @@
 > **IMPORTANTE**: Guarde estas credenciais com segurança!
 
 ```
-Email:    admin@vitrii.com.br
+Email:    admin@vitreii.com
 Senha:    Admin@2025
 Tipo:     ADM (Administrador)
 ID:       2
@@ -15,7 +15,7 @@ Status:   Ativo
 ## Como Fazer Login
 
 1. Acesse a página de login: `/auth/signin`
-2. Digite o email: **admin@vitrii.com.br**
+2. Digite o email: **admin@vitreii.com**
 3. Digite a senha: **Admin@2025**
 4. Clique em "Entrar"
 
