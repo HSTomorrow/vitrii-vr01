@@ -41,6 +41,8 @@ export default function CreateGrupoModal({
       return response.json();
     },
     onSuccess: (result) => {
+      // Invalidate both query patterns to ensure refresh
+      queryClient.invalidateQueries({ queryKey: ["grupos-productos"] });
       queryClient.invalidateQueries({ queryKey: ["grupos", anuncianteId] });
       toast.success("Grupo criado com sucesso!");
       setFormData({
