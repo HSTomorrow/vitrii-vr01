@@ -344,7 +344,7 @@ export default function CadastroProdutos() {
                     Grupo
                   </th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">
-                    SKU
+                    Codigo Identificacao \ QRCode (SKU)
                   </th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">
                     Descrição
