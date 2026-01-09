@@ -458,8 +458,8 @@ export default function SearchAnuncios() {
                               <p className="text-walmart-blue font-bold text-lg">
                                 R${" "}
                                 {(
-                                  anuncio.precoAnuncio ||
-                                  anuncio.tabelaDePreco?.preco ||
+                                  parseFloat(anuncio.precoAnuncio) ||
+                                  parseFloat(anuncio.tabelaDePreco?.preco) ||
                                   0
                                 ).toFixed(2)}
                               </p>
