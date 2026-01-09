@@ -363,15 +363,17 @@ export default function AnuncioDetalhe() {
                     </p>
                   </div>
                 </div>
-                <div className="flex gap-2">
-                  <DollarSign className="w-5 h-5 text-walmart-blue flex-shrink-0 mt-0.5" />
-                  <div className="text-sm">
-                    <p className="text-walmart-text-secondary">Status de Pagamento</p>
-                    <p className="font-semibold text-walmart-text">
-                      {anuncio.status === "pago" ? "Pago" : "Pendente"}
-                    </p>
+                {canEdit && (
+                  <div className="flex gap-2">
+                    <DollarSign className="w-5 h-5 text-walmart-blue flex-shrink-0 mt-0.5" />
+                    <div className="text-sm">
+                      <p className="text-walmart-text-secondary">Status de Pagamento</p>
+                      <p className="font-semibold text-walmart-text">
+                        {anuncio.status === "pago" ? "Pago" : "Pendente"}
+                      </p>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           </div>
