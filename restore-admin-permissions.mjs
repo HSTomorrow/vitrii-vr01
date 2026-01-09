@@ -23,7 +23,9 @@ async function restoreAdminPermissions() {
       where: { isActive: true },
     });
 
-    console.log(`📋 Found ${funcionalidades.length} funcionalidades to assign\n`);
+    console.log(
+      `📋 Found ${funcionalidades.length} funcionalidades to assign\n`,
+    );
 
     // Clear existing permissions
     const deletedCount = await prisma.usuarioXFuncionalidade.deleteMany({
@@ -45,7 +47,9 @@ async function restoreAdminPermissions() {
       console.log(`   ✅ ${func.nome}`);
     }
 
-    console.log(`\n✨ Successfully assigned ${createdCount} permissions to admin!\n`);
+    console.log(
+      `\n✨ Successfully assigned ${createdCount} permissions to admin!\n`,
+    );
 
     // Verify permissions were assigned
     const updated = await prisma.usuario.findUnique({
@@ -59,7 +63,9 @@ async function restoreAdminPermissions() {
       },
     });
 
-    console.log(`🎉 Verification - Admin now has ${updated.usuarioXFuncionalidades.length} permissions:`);
+    console.log(
+      `🎉 Verification - Admin now has ${updated.usuarioXFuncionalidades.length} permissions:`,
+    );
     updated.usuarioXFuncionalidades.forEach((uxf) => {
       console.log(`   ✅ ${uxf.funcionalidade.nome}`);
     });

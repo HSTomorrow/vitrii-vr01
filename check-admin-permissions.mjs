@@ -31,8 +31,10 @@ async function checkAdminPermissions() {
     console.log(`   isActive: ${admin.isActive}`);
     console.log(`   Data Criação: ${admin.dataCriacao}`);
 
-    console.log(`\n📋 Permissions (${admin.usuarioXFuncionalidades.length} funcionalidades):`);
-    
+    console.log(
+      `\n📋 Permissions (${admin.usuarioXFuncionalidades.length} funcionalidades):`,
+    );
+
     if (admin.usuarioXFuncionalidades.length === 0) {
       console.log("   ❌ NO PERMISSIONS ASSIGNED!");
     } else {
@@ -43,10 +45,10 @@ async function checkAdminPermissions() {
 
     // Check if MANAGE_ADS and VIEW_ALL_ADS are assigned
     const manageAds = admin.usuarioXFuncionalidades.find(
-      (uxf) => uxf.funcionalidade.slug === "MANAGE_ADS"
+      (uxf) => uxf.funcionalidade.slug === "MANAGE_ADS",
     );
     const viewAllAds = admin.usuarioXFuncionalidades.find(
-      (uxf) => uxf.funcionalidade.slug === "VIEW_ALL_ADS"
+      (uxf) => uxf.funcionalidade.slug === "VIEW_ALL_ADS",
     );
 
     console.log("\n🎯 Key Permissions for Admin Panel:");
@@ -58,7 +60,7 @@ async function checkAdminPermissions() {
     const allFuncs = await prisma.funcionalidade.findMany({
       where: { isActive: true },
     });
-    
+
     allFuncs.forEach((func) => {
       console.log(`   - ${func.slug}: ${func.nome}`);
     });

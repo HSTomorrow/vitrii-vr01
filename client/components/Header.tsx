@@ -62,8 +62,13 @@ export default function Header() {
                 type="text"
                 placeholder="Buscar produtos e serviços..."
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" && (e.target as HTMLInputElement).value.trim()) {
-                    navigate(`/buscar?q=${encodeURIComponent((e.target as HTMLInputElement).value)}`);
+                  if (
+                    e.key === "Enter" &&
+                    (e.target as HTMLInputElement).value.trim()
+                  ) {
+                    navigate(
+                      `/buscar?q=${encodeURIComponent((e.target as HTMLInputElement).value)}`,
+                    );
                   }
                 }}
                 className="w-full px-4 py-2 pl-10 bg-walmart-gray border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-walmart-blue focus:ring-1 focus:ring-walmart-blue"
@@ -197,8 +202,13 @@ export default function Header() {
               type="text"
               placeholder="Buscar..."
               onKeyDown={(e) => {
-                if (e.key === "Enter" && (e.target as HTMLInputElement).value.trim()) {
-                  navigate(`/buscar?q=${encodeURIComponent((e.target as HTMLInputElement).value)}`);
+                if (
+                  e.key === "Enter" &&
+                  (e.target as HTMLInputElement).value.trim()
+                ) {
+                  navigate(
+                    `/buscar?q=${encodeURIComponent((e.target as HTMLInputElement).value)}`,
+                  );
                 }
               }}
               className="w-full px-4 py-2 pl-10 bg-walmart-gray border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-walmart-blue"

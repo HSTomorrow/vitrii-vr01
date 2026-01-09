@@ -52,7 +52,9 @@ async function checkAdminUsers() {
     if (adminEmailUsers.length === 0) {
       console.log("❌ No users with 'admin' in email found!");
     } else {
-      console.log(`✅ Found ${adminEmailUsers.length} user(s) with 'admin' in email:\n`);
+      console.log(
+        `✅ Found ${adminEmailUsers.length} user(s) with 'admin' in email:\n`,
+      );
       adminEmailUsers.forEach((user) => {
         console.log(`   ID: ${user.id}`);
         console.log(`   Nome: ${user.nome}`);

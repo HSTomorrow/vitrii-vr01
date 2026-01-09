@@ -87,10 +87,11 @@ export default function Index() {
 
   // Filter anuncios by type and gratuito status
   const destacados = allAnuncios
-    .filter((anuncio: any) =>
-      !anuncio.isDoacao &&
-      anuncio.destaque &&
-      ["produto", "servico"].includes(anuncio.producto?.tipo)
+    .filter(
+      (anuncio: any) =>
+        !anuncio.isDoacao &&
+        anuncio.destaque &&
+        ["produto", "servico"].includes(anuncio.producto?.tipo),
     )
     .slice(0, 20);
 
@@ -99,16 +100,16 @@ export default function Index() {
     .slice(0, 20);
 
   const destaqueEventos = allAnuncios
-    .filter((anuncio: any) =>
-      !anuncio.isDoacao &&
-      anuncio.producto?.tipo === "evento"
+    .filter(
+      (anuncio: any) =>
+        !anuncio.isDoacao && anuncio.producto?.tipo === "evento",
     )
     .slice(0, 20);
 
   const destaqueAgendas = allAnuncios
-    .filter((anuncio: any) =>
-      !anuncio.isDoacao &&
-      anuncio.producto?.tipo === "agenda_recorrente"
+    .filter(
+      (anuncio: any) =>
+        !anuncio.isDoacao && anuncio.producto?.tipo === "agenda_recorrente",
     )
     .slice(0, 20);
 
@@ -117,10 +118,16 @@ export default function Index() {
       <Header />
 
       {/* Hero Section */}
-      <section style={{ backgroundColor: "#78BDF6" }} className="text-white py-2 md:py-3">
+      <section
+        style={{ backgroundColor: "#78BDF6" }}
+        className="text-white py-2 md:py-3"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-center">
-            <h1 style={{ fontFamily: "Segoe Fuente Icons, sans-serif" }} className="text-lg md:text-xl font-bold">
+            <h1
+              style={{ fontFamily: "Segoe Fuente Icons, sans-serif" }}
+              className="text-lg md:text-xl font-bold"
+            >
               Bem-vindo ao Vitrii
             </h1>
           </div>
@@ -132,7 +139,10 @@ export default function Index() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-8">
             <div>
-              <h2 style={{ color: "#025CBA" }} className="text-2xl md:text-3xl font-bold mb-1">
+              <h2
+                style={{ color: "#025CBA" }}
+                className="text-2xl md:text-3xl font-bold mb-1"
+              >
                 Anúncios em Destaque
               </h2>
               <p className="text-sm text-walmart-text-secondary">
@@ -227,7 +237,10 @@ export default function Index() {
 
                   <div className="p-4 flex flex-col h-full">
                     <div>
-                      <h4 style={{ color: "#025CBA" }} className="font-semibold mb-2 line-clamp-2">
+                      <h4
+                        style={{ color: "#025CBA" }}
+                        className="font-semibold mb-2 line-clamp-2"
+                      >
                         {anuncio.titulo}
                       </h4>
                       <p className="text-sm text-walmart-text-secondary mb-3 line-clamp-2">
@@ -237,7 +250,9 @@ export default function Index() {
                       <div className="flex items-center gap-1 mb-3 text-xs text-walmart-text-secondary">
                         <MapPin className="w-3 h-3" />
                         <span className="truncate">
-                          {extractMunicipality(anuncio.anunciante?.endereco || "")}
+                          {extractMunicipality(
+                            anuncio.anunciante?.endereco || "",
+                          )}
                         </span>
                       </div>
                     </div>
@@ -320,7 +335,8 @@ export default function Index() {
                 Doações, Brindes e Serviços Gratuitos
               </h2>
               <p className="text-sm text-walmart-text-secondary">
-                Doações, Brindes, Produtos, Serviços e Eventos disponíveis para experimentação gratuitamente
+                Doações, Brindes, Produtos, Serviços e Eventos disponíveis para
+                experimentação gratuitamente
               </p>
             </div>
             <Link
@@ -415,7 +431,10 @@ export default function Index() {
 
                   <div className="p-4 flex flex-col h-full">
                     <div>
-                      <h4 style={{ color: "#025CBA" }} className="font-semibold mb-2 line-clamp-2">
+                      <h4
+                        style={{ color: "#025CBA" }}
+                        className="font-semibold mb-2 line-clamp-2"
+                      >
                         {anuncio.titulo}
                       </h4>
                       <p className="text-sm text-walmart-text-secondary mb-3 line-clamp-2">
@@ -425,7 +444,9 @@ export default function Index() {
                       <div className="flex items-center gap-1 mb-3 text-xs text-walmart-text-secondary">
                         <MapPin className="w-3 h-3" />
                         <span className="truncate">
-                          {extractMunicipality(anuncio.anunciante?.endereco || "")}
+                          {extractMunicipality(
+                            anuncio.anunciante?.endereco || "",
+                          )}
                         </span>
                       </div>
                     </div>
@@ -600,7 +621,10 @@ export default function Index() {
 
                   <div className="p-4 flex flex-col h-full">
                     <div>
-                      <h4 style={{ color: "#025CBA" }} className="font-semibold mb-2 line-clamp-2">
+                      <h4
+                        style={{ color: "#025CBA" }}
+                        className="font-semibold mb-2 line-clamp-2"
+                      >
                         {anuncio.titulo}
                       </h4>
                       <p className="text-sm text-walmart-text-secondary mb-3 line-clamp-2">
@@ -610,7 +634,9 @@ export default function Index() {
                       <div className="flex items-center gap-1 mb-3 text-xs text-walmart-text-secondary">
                         <MapPin className="w-3 h-3" />
                         <span className="truncate">
-                          {extractMunicipality(anuncio.anunciante?.endereco || "")}
+                          {extractMunicipality(
+                            anuncio.anunciante?.endereco || "",
+                          )}
                         </span>
                       </div>
                     </div>
@@ -674,7 +700,7 @@ export default function Index() {
           <div className="flex justify-between items-center mb-8">
             <div>
               <h2 className="text-2xl md:text-3xl font-bold text-walmart-text mb-1">
-                Aulas e Agendas Disponiveis 
+                Aulas e Agendas Disponiveis
               </h2>
               <p className="text-sm text-walmart-text-secondary">
                 Aulas, consultas e serviços agendáveis disponíveis
@@ -772,7 +798,10 @@ export default function Index() {
 
                   <div className="p-4 flex flex-col h-full">
                     <div>
-                      <h4 style={{ color: "#025CBA" }} className="font-semibold mb-2 line-clamp-2">
+                      <h4
+                        style={{ color: "#025CBA" }}
+                        className="font-semibold mb-2 line-clamp-2"
+                      >
                         {anuncio.titulo}
                       </h4>
                       <p className="text-sm text-walmart-text-secondary mb-3 line-clamp-2">
@@ -782,7 +811,9 @@ export default function Index() {
                       <div className="flex items-center gap-1 mb-3 text-xs text-walmart-text-secondary">
                         <MapPin className="w-3 h-3" />
                         <span className="truncate">
-                          {extractMunicipality(anuncio.anunciante?.endereco || "")}
+                          {extractMunicipality(
+                            anuncio.anunciante?.endereco || "",
+                          )}
                         </span>
                       </div>
                     </div>
