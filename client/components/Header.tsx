@@ -84,7 +84,7 @@ export default function Header() {
           </nav>
 
           {/* Right side - Auth and actions */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4">
             <Link
               to="/chat"
               className="p-2 hover:bg-walmart-gray rounded-lg transition-colors"
