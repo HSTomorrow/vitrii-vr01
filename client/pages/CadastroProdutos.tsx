@@ -265,7 +265,7 @@ export default function CadastroProdutos() {
 
                 <div>
                   <label className="block text-sm font-semibold text-walmart-text mb-2">
-                    SKU (Opcional)
+                    Codigo Identificacao \ QRCode (SKU) (Opcional)
                   </label>
                   <input
                     type="text"
