@@ -40,7 +40,9 @@ export default function CreateProductoModal({
   const { data: gruposData } = useQuery({
     queryKey: ["grupos-store", anuncianteId],
     queryFn: async () => {
-      const response = await fetch(`/api/grupos-productos?anuncianteId=${anuncianteId}`);
+      const response = await fetch(
+        `/api/grupos-productos?anuncianteId=${anuncianteId}`,
+      );
       if (!response.ok) throw new Error("Erro ao buscar grupos");
       return response.json();
     },
@@ -96,7 +98,9 @@ export default function CreateProductoModal({
         }
       }
 
-      queryClient.invalidateQueries({ queryKey: ["produtos-anuncio", anuncianteId] });
+      queryClient.invalidateQueries({
+        queryKey: ["produtos-anuncio", anuncianteId],
+      });
       toast.success("Produto criado com sucesso!");
       resetForm();
       onSuccess?.(productId);
@@ -270,85 +274,88 @@ export default function CreateProductoModal({
                 <option value="agenda_recorrente">Agenda Recorrente</option>
               </select>
               <p className="mt-2 text-sm text-walmart-text-secondary">
-                {formData.tipo === "evento" && "Selecione este tipo para eventos e shows"}
-                {formData.tipo === "agenda_recorrente" && "Selecione este tipo para agendamentos recorrentes (aulas, consultas, etc)"}
-                {formData.tipo === "doacao" && "Selecione este tipo para itens que serão doados gratuitamente"}
+                {formData.tipo === "evento" &&
+                  "Selecione este tipo para eventos e shows"}
+                {formData.tipo === "agenda_recorrente" &&
+                  "Selecione este tipo para agendamentos recorrentes (aulas, consultas, etc)"}
+                {formData.tipo === "doacao" &&
+                  "Selecione este tipo para itens que serão doados gratuitamente"}
               </p>
             </div>
 
             {/* Variantes/Tabelas de Preço - Only for produtos and servicos */}
             {["produto", "servico"].includes(formData.tipo) && (
-            <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-semibold text-walmart-text">
-                  Variantes (Tamanho/Cor e Preço) *
-                </label>
-                <button
-                  type="button"
-                  onClick={addTabelaRow}
-                  className="inline-flex items-center gap-1 px-3 py-1 text-sm border border-walmart-blue text-walmart-blue rounded-lg hover:bg-blue-50 transition-colors"
-                >
-                  <Plus className="w-4 h-4" />
-                  Adicionar
-                </button>
-              </div>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-semibold text-walmart-text">
+                    Variantes (Tamanho/Cor e Preço) *
+                  </label>
+                  <button
+                    type="button"
+                    onClick={addTabelaRow}
+                    className="inline-flex items-center gap-1 px-3 py-1 text-sm border border-walmart-blue text-walmart-blue rounded-lg hover:bg-blue-50 transition-colors"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Adicionar
+                  </button>
+                </div>
 
-              <div className="space-y-3">
-                {tabelas.map((tabela, index) => (
-                  <div key={index} className="flex gap-3 items-end">
-                    <div className="flex-1">
-                      <input
-                        type="text"
-                        placeholder="Tamanho (ex: P, M, G)"
-                        value={tabela.tamanho || ""}
-                        onChange={(e) =>
-                          handleTabelaChange(index, "tamanho", e.target.value)
-                        }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <input
-                        type="text"
-                        placeholder="Cor (ex: Azul, Vermelho)"
-                        value={tabela.cor || ""}
-                        onChange={(e) =>
-                          handleTabelaChange(index, "cor", e.target.value)
-                        }
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <div className="flex gap-2 items-center">
-                        <span className="text-sm text-walmart-text">R$</span>
+                <div className="space-y-3">
+                  {tabelas.map((tabela, index) => (
+                    <div key={index} className="flex gap-3 items-end">
+                      <div className="flex-1">
                         <input
-                          type="number"
-                          step="0.01"
-                          placeholder="Preço"
-                          value={tabela.preco}
+                          type="text"
+                          placeholder="Tamanho (ex: P, M, G)"
+                          value={tabela.tamanho || ""}
                           onChange={(e) =>
-                            handleTabelaChange(index, "preco", e.target.value)
+                            handleTabelaChange(index, "tamanho", e.target.value)
                           }
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
                         />
                       </div>
+                      <div className="flex-1">
+                        <input
+                          type="text"
+                          placeholder="Cor (ex: Azul, Vermelho)"
+                          value={tabela.cor || ""}
+                          onChange={(e) =>
+                            handleTabelaChange(index, "cor", e.target.value)
+                          }
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex gap-2 items-center">
+                          <span className="text-sm text-walmart-text">R$</span>
+                          <input
+                            type="number"
+                            step="0.01"
+                            placeholder="Preço"
+                            value={tabela.preco}
+                            onChange={(e) =>
+                              handleTabelaChange(index, "preco", e.target.value)
+                            }
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                          />
+                        </div>
+                      </div>
+                      {tabelas.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeTabelaRow(index)}
+                          className="px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        >
+                          ✕
+                        </button>
+                      )}
                     </div>
-                    {tabelas.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => removeTabelaRow(index)}
-                        className="px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                      >
-                        ✕
-                      </button>
-                    )}
-                  </div>
-                ))}
+                  ))}
+                </div>
+                <p className="mt-2 text-sm text-walmart-text-secondary">
+                  Adicione pelo menos um preço para este produto
+                </p>
               </div>
-              <p className="mt-2 text-sm text-walmart-text-secondary">
-                Adicione pelo menos um preço para este produto
-              </p>
-            </div>
             )}
 
             {/* Buttons */}

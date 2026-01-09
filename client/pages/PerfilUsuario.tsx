@@ -4,7 +4,15 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { ChevronLeft, AlertCircle, CheckCircle, User, Mail, Phone, MapPin } from "lucide-react";
+import {
+  ChevronLeft,
+  AlertCircle,
+  CheckCircle,
+  User,
+  Mail,
+  Phone,
+  MapPin,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -54,7 +62,9 @@ export default function PerfilUsuario() {
       }, 1500);
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Erro ao atualizar perfil");
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao atualizar perfil",
+      );
     },
   });
 
@@ -76,12 +86,18 @@ export default function PerfilUsuario() {
     const newErrors: Record<string, string> = {};
 
     // CPF validation - only if provided
-    if (formData.cpf.trim() && !/^\d{11}$/.test(formData.cpf.replace(/\D/g, ""))) {
+    if (
+      formData.cpf.trim() &&
+      !/^\d{11}$/.test(formData.cpf.replace(/\D/g, ""))
+    ) {
       newErrors.cpf = "CPF deve ter 11 dígitos";
     }
 
     // Phone validation - only if provided
-    if (formData.telefone.trim() && formData.telefone.replace(/\D/g, "").length < 10) {
+    if (
+      formData.telefone.trim() &&
+      formData.telefone.replace(/\D/g, "").length < 10
+    ) {
       newErrors.telefone = "Telefone deve ter no mínimo 10 dígitos";
     }
 
@@ -132,7 +148,8 @@ export default function PerfilUsuario() {
             <div>
               <h3 className="font-semibold text-walmart-text">Parabéns!</h3>
               <p className="text-sm text-walmart-text-secondary mt-1">
-                Sua conta foi criada com sucesso. Complete seu perfil para começar a vender.
+                Sua conta foi criada com sucesso. Complete seu perfil para
+                começar a vender.
               </p>
             </div>
           </div>
@@ -228,7 +245,8 @@ export default function PerfilUsuario() {
             {/* Info Box */}
             <div className="bg-yellow-50 border-l-4 border-walmart-yellow rounded p-4">
               <p className="text-sm text-walmart-text">
-                💡 Essas informações ajudam seus clientes a te localizarem e facilitam a entrega de pedidos.
+                💡 Essas informações ajudam seus clientes a te localizarem e
+                facilitam a entrega de pedidos.
               </p>
             </div>
 

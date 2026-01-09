@@ -57,7 +57,9 @@ export default function CadastroVariantes() {
   // Save variante mutation
   const saveVarianteMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      const url = editingId ? `/api/tabelas-preco/${editingId}` : "/api/tabelas-preco";
+      const url = editingId
+        ? `/api/tabelas-preco/${editingId}`
+        : "/api/tabelas-preco";
       const method = editingId ? "PUT" : "POST";
 
       const response = await fetch(url, {
@@ -81,21 +83,29 @@ export default function CadastroVariantes() {
       return response.json();
     },
     onSuccess: () => {
-      toast.success(editingId ? "Variante atualizada com sucesso!" : "Variante criada com sucesso!");
+      toast.success(
+        editingId
+          ? "Variante atualizada com sucesso!"
+          : "Variante criada com sucesso!",
+      );
       setFormData({ tamanho: "", cor: "", preco: "", precoCusto: "" });
       setEditingId(null);
       setIsFormOpen(false);
       refetch();
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Erro ao salvar variante");
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao salvar variante",
+      );
     },
   });
 
   // Delete variante mutation
   const deleteVarianteMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await fetch(`/api/tabelas-preco/${id}`, { method: "DELETE" });
+      const response = await fetch(`/api/tabelas-preco/${id}`, {
+        method: "DELETE",
+      });
       if (!response.ok) throw new Error("Erro ao deletar variante");
       return response.json();
     },
@@ -104,7 +114,9 @@ export default function CadastroVariantes() {
       refetch();
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Erro ao deletar variante");
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao deletar variante",
+      );
     },
   });
 
@@ -144,7 +156,9 @@ export default function CadastroVariantes() {
 
           {producto && (
             <div>
-              <h1 className="text-3xl font-bold text-walmart-text">{producto.nome}</h1>
+              <h1 className="text-3xl font-bold text-walmart-text">
+                {producto.nome}
+              </h1>
               <p className="text-walmart-text-secondary mt-2">
                 Gerenciar Variantes (Tamanho, Cor, Preço)
               </p>
@@ -187,7 +201,9 @@ export default function CadastroVariantes() {
                   <input
                     type="text"
                     value={formData.tamanho}
-                    onChange={(e) => setFormData({ ...formData, tamanho: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, tamanho: e.target.value })
+                    }
                     placeholder="Ex: P, M, G, GG"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
                   />
@@ -200,7 +216,9 @@ export default function CadastroVariantes() {
                   <input
                     type="text"
                     value={formData.cor}
-                    onChange={(e) => setFormData({ ...formData, cor: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, cor: e.target.value })
+                    }
                     placeholder="Ex: Azul, Vermelho"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
                   />
@@ -215,7 +233,9 @@ export default function CadastroVariantes() {
                     step="0.01"
                     required
                     value={formData.preco}
-                    onChange={(e) => setFormData({ ...formData, preco: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, preco: e.target.value })
+                    }
                     placeholder="0.00"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
                   />
@@ -229,7 +249,9 @@ export default function CadastroVariantes() {
                     type="number"
                     step="0.01"
                     value={formData.precoCusto}
-                    onChange={(e) => setFormData({ ...formData, precoCusto: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, precoCusto: e.target.value })
+                    }
                     placeholder="0.00"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
                   />
@@ -285,7 +307,10 @@ export default function CadastroVariantes() {
               <tbody className="divide-y divide-gray-200">
                 {variantes.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                    <td
+                      colSpan={5}
+                      className="px-6 py-4 text-center text-gray-500"
+                    >
                       Nenhuma variante cadastrada
                     </td>
                   </tr>
@@ -316,7 +341,9 @@ export default function CadastroVariantes() {
                         <button
                           onClick={() => {
                             if (
-                              confirm("Tem certeza que deseja deletar esta variante?")
+                              confirm(
+                                "Tem certeza que deseja deletar esta variante?",
+                              )
                             ) {
                               deleteVarianteMutation.mutate(variante.id);
                             }
