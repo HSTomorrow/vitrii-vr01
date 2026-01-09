@@ -296,8 +296,9 @@ export const createUsuario: RequestHandler = async (req, res) => {
 };
 
 // Schema for updating user (whitelist safe fields)
+// NOTE: Email cannot be edited through this endpoint - it's the primary key
+// Email can only be changed by an admin through a separate admin endpoint
 const UsuarioUpdateSchema = z.object({
-  email: z.string().email("Email inválido"),
   cpf: z
     .string()
     .min(1, "CPF \ CNPJ é obrigatório")
