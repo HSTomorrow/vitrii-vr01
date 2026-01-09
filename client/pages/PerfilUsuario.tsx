@@ -40,9 +40,17 @@ export default function PerfilUsuario() {
       return response.json();
     },
     onSuccess: () => {
+      // Invalidate user cache to refresh user data
+      queryClient.invalidateQueries({ queryKey: ["user"] });
       toast.success("Perfil atualizado com sucesso!");
       setTimeout(() => {
-        navigate("/sell");
+        // Go back to previous page or to /anuncio/criar if no previous page
+        const previousPath = window.history.length > 1 ? -1 : "/anuncio/criar";
+        if (previousPath === -1) {
+          navigate(-1);
+        } else {
+          navigate(previousPath as string);
+        }
       }, 1500);
     },
     onError: (error) => {
