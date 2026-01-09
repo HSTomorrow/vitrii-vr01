@@ -132,7 +132,7 @@ export default function Index() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-8">
             <div>
-              <h2 className="text-2xl md:text-3xl font-bold text-walmart-text mb-1">
+              <h2 style={{ color: "#025CBA" }} className="text-2xl md:text-3xl font-bold mb-1">
                 Anúncios em Destaque
               </h2>
               <p className="text-sm text-walmart-text-secondary">
