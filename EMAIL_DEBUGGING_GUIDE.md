@@ -96,7 +96,7 @@ The following must be set in DevServerControl:
 | SMTP_HOST   | smtp.gmail.com              | ✅ Set          |
 | SMTP_PORT   | 587                         | ✅ Set          |
 | SMTP_USER   | vitriimarketplace@gmail.com | ✅ Set          |
-| SMTP_PASS   | vItrII2025                  | ✅ Set (secure) |
+| SMTP_PASS   | [App Password]              | ✅ Set (secure) |
 | SMTP_SECURE | false                       | ✅ Set (TLS)    |
 | MAIL_FROM   | vitriimarketplace@gmail.com | ✅ Set          |
 | APP_URL     | http://localhost:5173       | ✅ Set          |
