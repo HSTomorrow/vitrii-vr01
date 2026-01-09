@@ -109,6 +109,10 @@
   }
 
   body {
+    font-family: "Segoe Fuente Icons", "Segoe UI", system-ui, -apple-system, sans-serif;
+  }
+
+  body {
     @apply bg-background text-foreground font-sans;
   }
 
