@@ -330,8 +330,33 @@ export const updateUsuario: RequestHandler = async (req, res) => {
     // Validate input - only allow safe fields
     const validatedData = UsuarioUpdateSchema.parse(req.body);
 
+    const userId = parseInt(id);
+
+    // Check if CPF already exists for a different user
+    if (validatedData.cpf && validatedData.cpf.trim()) {
+      const existingCpf = await prisma.usuario.findFirst({
+        where: {
+          cpf: validatedData.cpf,
+          id: { not: userId }, // Exclude current user
+        },
+      });
+
+      if (existingCpf) {
+        return res.status(400).json({
+          success: false,
+          error: "Dados inválidos",
+          details: [
+            {
+              path: ["cpf"],
+              message: "CPF \ CNPJ já cadastrado",
+            },
+          ],
+        });
+      }
+    }
+
     const usuario = await prisma.usuario.update({
-      where: { id: parseInt(id) },
+      where: { id: userId },
       data: validatedData,
       select: {
         id: true,
