@@ -36,6 +36,20 @@ export default function AnuncioDetalhe() {
     },
   });
 
+  // Check if user can edit ad
+  const { data: canEditData } = useQuery({
+    queryKey: ["canEditAnuncio", id, user?.id],
+    queryFn: async () => {
+      const url = `/api/anuncios/${id}/can-edit${user?.id ? `?usuarioId=${user.id}` : ""}`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error("Erro ao verificar permissões");
+      return response.json();
+    },
+    enabled: !!id,
+  });
+
+  const canEdit = canEditData?.canEdit ?? false;
+
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async () => {
