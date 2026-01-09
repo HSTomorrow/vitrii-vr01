@@ -297,15 +297,10 @@ export const createUsuario: RequestHandler = async (req, res) => {
 
 // Schema for updating user (whitelist safe fields)
 const UsuarioUpdateSchema = z.object({
-  nome: z
-    .string()
-    .min(3, "Nome deve ter pelo menos 3 caracteres")
-    .max(255)
-    .optional(),
-  telefone: z.string().min(10, "Telefone inválido").optional(),
-  endereco: z.string().min(1, "Endereço é obrigatório").optional(),
+  email: z.string().email("Email inválido"),
   cpf: z
     .string()
+    .min(1, "CPF \ CNPJ é obrigatório")
     .refine(
       (value) => {
         const digitsOnly = value.replace(/\D/g, "");
@@ -313,8 +308,14 @@ const UsuarioUpdateSchema = z.object({
         return /^\d{11}$|^\d{14}$/.test(digitsOnly);
       },
       "CPF \ CNPJ deve ter 11 ou 14 dígitos",
-    )
+    ),
+  nome: z
+    .string()
+    .min(3, "Nome deve ter pelo menos 3 caracteres")
+    .max(255)
     .optional(),
+  telefone: z.string().min(10, "Telefone inválido").optional(),
+  endereco: z.string().min(1, "Endereço é obrigatório").optional(),
 });
 
 // UPDATE user (only safe fields allowed)
