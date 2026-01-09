@@ -11,6 +11,7 @@ export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [emailSent, setEmailSent] = useState(false);
+  const [emailNotFound, setEmailNotFound] = useState(false);
 
   // Forgot password mutation
   const forgotPasswordMutation = useMutation({
@@ -28,11 +29,16 @@ export default function ForgotPassword() {
 
       return response.json();
     },
-    onSuccess: () => {
-      setEmailSent(true);
-      toast.success(
-        "Email enviado com sucesso! Verifique sua caixa de entrada.",
-      );
+    onSuccess: (data: any) => {
+      if (data.emailFound === false) {
+        setEmailNotFound(true);
+        toast.error(data.message || "Este email não está cadastrado");
+      } else {
+        setEmailSent(true);
+        toast.success(
+          "Email enviado com sucesso! Verifique sua caixa de entrada.",
+        );
+      }
     },
     onError: (error) => {
       toast.error(
@@ -71,6 +77,7 @@ export default function ForgotPassword() {
     e.preventDefault();
 
     if (validateForm()) {
+      setEmailNotFound(false);
       forgotPasswordMutation.mutate(email);
     }
   };
