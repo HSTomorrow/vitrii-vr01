@@ -43,7 +43,10 @@ export default function PerfilUsuario() {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Erro ao atualizar perfil");
+        // Create error with full response attached for detailed error handling
+        const customError = new Error(error.error || "Erro ao atualizar perfil");
+        (customError as any).response = error;
+        throw customError;
       }
 
       return response.json();
