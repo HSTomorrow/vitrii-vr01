@@ -251,6 +251,7 @@ export function createServer() {
   app.patch("/api/anuncios/:id/inactivate", inactivateAnuncio);
   app.patch("/api/anuncios/:id/activate", activateAnuncio);
   app.delete("/api/anuncios/:id", deleteAnuncio);
+  app.get("/api/anuncios/:id/can-edit", extractUserId, canEditAnuncio);
 
   // Equipes de Venda routes
   app.get("/api/equipes-venda", getEquipes);
