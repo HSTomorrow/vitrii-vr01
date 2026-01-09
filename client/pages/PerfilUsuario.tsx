@@ -177,28 +177,18 @@ export default function PerfilUsuario() {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Email */}
+            {/* Email (Read-only) */}
             <div>
               <label className="block text-sm font-semibold text-walmart-text mb-2">
-                Email *
+                Email
               </label>
-              <input
-                type="email"
-                value={formData.email}
-                onChange={(e) => handleInputChange("email", e.target.value)}
-                placeholder="seu.email@exemplo.com"
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-1 transition-colors ${
-                  errors.email
-                    ? "border-red-500 focus:border-red-500 focus:ring-red-500 bg-red-50"
-                    : "border-gray-300 focus:border-walmart-blue focus:ring-walmart-blue"
-                }`}
-              />
-              {errors.email && (
-                <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
-                  <AlertCircle className="w-4 h-4" />
-                  {errors.email}
-                </p>
-              )}
+              <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-walmart-text flex items-center gap-2">
+                <Mail className="w-5 h-5 text-walmart-text-secondary flex-shrink-0" />
+                <span>{user?.email}</span>
+              </div>
+              <p className="text-xs text-walmart-text-secondary mt-2">
+                Para alterar o email, entre em contato com o administrador.
+              </p>
             </div>
 
             {/* CPF / CNPJ */}
