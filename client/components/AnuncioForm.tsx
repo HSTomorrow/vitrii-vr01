@@ -77,6 +77,7 @@ export default function AnuncioForm({
     precoAnuncio: "",
     dataValidade: getDefaultValidityDate(),
     equipeDeVendaId: 0,
+    endereco: "",
     cidade: "",
     estado: "RS",
     isDoacao: false,
