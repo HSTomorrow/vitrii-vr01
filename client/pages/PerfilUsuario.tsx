@@ -204,7 +204,7 @@ export default function PerfilUsuario() {
             {/* Endereço */}
             <div>
               <label className="block text-sm font-semibold text-walmart-text mb-2">
-                Endereço *
+                Endereço (opcional)
               </label>
               <input
                 type="text"
