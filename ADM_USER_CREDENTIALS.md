@@ -224,6 +224,12 @@ _Nota: Esta funcionalidade pode ser implementada em atualizações futuras_
 - `client/App.tsx` - Adicionada rota `/admin/anuncios`
 - `client/components/Header.tsx` - Adicionado botão "Anúncios" para ADM
 
+## 📝 Notas Importantes
+
+- O email correto é **admin@vitrii.com** (com "ii" não "eii")
+- A senha foi resetada e agora está com hash bcrypt (compatível com o sistema de signin)
+- O ID do usuário admin é **45** (não 2)
+
 ## Próximas Etapas
 
 Após fazer login como ADM, você pode:
