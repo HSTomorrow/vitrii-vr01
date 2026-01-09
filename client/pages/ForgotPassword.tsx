@@ -82,6 +82,83 @@ export default function ForgotPassword() {
     }
   };
 
+  if (emailNotFound) {
+    return (
+      <div className="min-h-screen flex flex-col bg-white">
+        <Header />
+
+        <div className="flex-1 max-w-lg mx-auto w-full px-4 sm:px-6 lg:px-8 py-12">
+          <div className="bg-walmart-gray-light rounded-lg p-8 text-center">
+            <div className="mb-8">
+              <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <AlertCircle className="w-8 h-8 text-red-600" />
+              </div>
+              <h1 className="text-3xl font-bold text-walmart-text">
+                Email não cadastrado
+              </h1>
+            </div>
+
+            <div className="bg-red-50 border-l-4 border-red-500 rounded p-4 mb-6 text-left">
+              <div className="flex gap-3">
+                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                <div>
+                  <h3 className="font-semibold text-red-900">
+                    Email não encontrado
+                  </h3>
+                  <p className="text-sm text-red-800 mt-1">
+                    O email <strong>{email}</strong> não está cadastrado em nossa base de dados.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <p className="text-walmart-text-secondary mb-6">
+              Verifique se digitou o email corretamente ou crie uma nova conta.
+            </p>
+
+            <div className="space-y-3">
+              <button
+                onClick={() => {
+                  setEmailNotFound(false);
+                  setEmail("");
+                }}
+                className="w-full bg-walmart-blue text-white py-3 rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors"
+              >
+                Tentar outro email
+              </button>
+
+              <Link
+                to="/auth/signup"
+                className="block w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
+              >
+                Criar uma nova conta
+              </Link>
+
+              <Link
+                to="/auth/signin"
+                className="block w-full bg-white border-2 border-walmart-blue text-walmart-blue py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+              >
+                Voltar para login
+              </Link>
+            </div>
+
+            <div className="mt-8 pt-8 border-t border-gray-300">
+              <Link
+                to="/"
+                className="inline-flex items-center space-x-2 text-walmart-blue font-semibold hover:space-x-3 transition-all"
+              >
+                <span>Voltar para Home</span>
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        <Footer />
+      </div>
+    );
+  }
+
   if (emailSent) {
     return (
       <div className="min-h-screen flex flex-col bg-white">
