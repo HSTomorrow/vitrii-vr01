@@ -87,7 +87,7 @@ export default function Header() {
           <div className="flex items-center space-x-2 sm:space-x-4">
             <Link
               to="/chat"
-              className="p-2 hover:bg-walmart-gray rounded-lg transition-colors"
+              className="flex-shrink-0 p-2 hover:bg-walmart-gray rounded-lg transition-colors"
               title="Minhas mensagens"
             >
               <MessageSquare className="w-5 h-5 text-walmart-text" />
@@ -96,7 +96,7 @@ export default function Header() {
             {user && (
               <Link
                 to="/favoritos"
-                className="p-2 hover:bg-walmart-gray rounded-lg transition-colors"
+                className="flex-shrink-0 p-2 hover:bg-walmart-gray rounded-lg transition-colors"
                 title="Meus favoritos"
               >
                 <Heart className="w-5 h-5 text-walmart-text" />
