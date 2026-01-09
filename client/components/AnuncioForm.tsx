@@ -195,6 +195,9 @@ export default function AnuncioForm({
           ? new Date(ad.dataValidade).toISOString().split("T")[0]
           : getDefaultValidityDate(),
         equipeDeVendaId: ad.equipeDeVendaId || 0,
+        endereco: ad.endereco || "",
+        cidade: ad.cidade || "",
+        estado: ad.estado || "RS",
         isDoacao: ad.isDoacao || false,
         destaque: ad.destaque || false,
         categoria: ad.categoria || null,
