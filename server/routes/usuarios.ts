@@ -438,11 +438,12 @@ export const forgotPassword: RequestHandler = async (req, res) => {
     });
 
     if (!usuario) {
-      // Return success even if user not found (security best practice)
+      // Email not found in database
+      console.log(`❌ Tentativa de reset de senha para email não cadastrado: ${email}`);
       return res.status(200).json({
         success: true,
-        message:
-          "Se este email estiver cadastrado, você receberá um link para redefinir sua senha",
+        emailFound: false,
+        message: `Este email não está cadastrado em nossa base de dados. Verifique o email ou crie uma nova conta.`,
       });
     }
 
@@ -465,8 +466,11 @@ export const forgotPassword: RequestHandler = async (req, res) => {
     // Send email
     await sendPasswordResetEmail(usuario.email, resetLink, usuario.nome);
 
+    console.log(`✅ Email de reset enviado para: ${usuario.email}`);
+
     res.status(200).json({
       success: true,
+      emailFound: true,
       message: "Email para redefinição de senha enviado com sucesso",
     });
   } catch (error) {
