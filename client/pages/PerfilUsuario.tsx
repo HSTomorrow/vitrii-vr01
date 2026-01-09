@@ -1,14 +1,17 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { ChevronLeft, AlertCircle, CheckCircle, User, Mail, Phone, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function PerfilUsuario() {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     telefone: "",
     endereco: "",
@@ -19,9 +22,11 @@ export default function PerfilUsuario() {
   // Update mutation
   const updateMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      // For now, just mock the update
-      // In a real app, you'd send userId in the request
-      const response = await fetch("/api/usuarios/1", {
+      if (!user?.id) {
+        throw new Error("Usuário não autenticado");
+      }
+
+      const response = await fetch(`/api/usuarios/${user.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
