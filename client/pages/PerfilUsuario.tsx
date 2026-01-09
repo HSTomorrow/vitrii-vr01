@@ -105,13 +105,6 @@ export default function PerfilUsuario() {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    // Email validation - required
-    if (!formData.email.trim()) {
-      newErrors.email = "Email é obrigatório";
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Email inválido";
-    }
-
     // CPF/CNPJ validation - required
     if (!formData.cpf.trim()) {
       newErrors.cpf = "CPF \ CNPJ é obrigatório";
