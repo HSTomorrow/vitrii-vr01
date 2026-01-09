@@ -216,7 +216,7 @@ export default function PerfilUsuario() {
             {/* CPF / CNPJ */}
             <div>
               <label className="block text-sm font-semibold text-walmart-text mb-2">
-                CPF \ CNPJ (opcional)
+                CPF \ CNPJ *
               </label>
               <input
                 type="text"
