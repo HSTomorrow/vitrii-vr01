@@ -20,6 +20,7 @@ const ITEMS_PER_PAGE = 12;
 
 export default function SearchAnuncios() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [priceRange, setPriceRange] = useState({ min: "", max: "" });
@@ -30,6 +31,15 @@ export default function SearchAnuncios() {
   const [currentPage, setCurrentPage] = useState(1);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = useState(true);
+
+  // Read search query parameter on mount
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const q = params.get("q");
+    if (q) {
+      setSearchTerm(decodeURIComponent(q));
+    }
+  }, [location.search]);
 
   // Fetch all ads
   const { data: anunciosData, isLoading } = useQuery({
