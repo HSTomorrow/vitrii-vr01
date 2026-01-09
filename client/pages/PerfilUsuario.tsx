@@ -21,9 +21,10 @@ export default function PerfilUsuario() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
+    email: user?.email || "",
+    cpf: "",
     telefone: "",
     endereco: "",
-    cpf: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
