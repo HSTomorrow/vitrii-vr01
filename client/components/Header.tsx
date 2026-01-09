@@ -48,12 +48,11 @@ export default function Header() {
             to="/"
             className="flex-shrink-0 flex items-center space-x-2 group"
           >
-            <div className="w-10 h-10 bg-gradient-to-br from-walmart-blue to-walmart-blue-dark rounded-lg flex items-center justify-center text-white font-bold text-lg">
-              V
-            </div>
-            <span className="text-xl font-bold text-walmart-blue hidden sm:inline">
-              Vitrii
-            </span>
+            <img
+              src="https://cdn.builder.io/api/v1/image/assets%2Ff2e9e91d4cc44d4bae5b9dac3bb6abe8%2F9b0468b30c2f492b9eac618e9410fecf?format=webp&width=800"
+              alt="Vitrii Logo"
+              className="h-12 w-auto"
+            />
           </Link>
 
           {/* Search Bar - Hidden on mobile */}
