@@ -306,7 +306,14 @@ const UsuarioUpdateSchema = z.object({
   endereco: z.string().min(1, "Endereço é obrigatório").optional(),
   cpf: z
     .string()
-    .regex(/^\d{11}$/, "CPF deve ter 11 dígitos")
+    .refine(
+      (value) => {
+        const digitsOnly = value.replace(/\D/g, "");
+        // Accept either 11 digits (CPF) or 14 digits (CNPJ)
+        return /^\d{11}$|^\d{14}$/.test(digitsOnly);
+      },
+      "CPF \ CNPJ deve ter 11 ou 14 dígitos",
+    )
     .optional(),
 });
 
