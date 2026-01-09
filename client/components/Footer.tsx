@@ -89,7 +89,7 @@ export default function Footer() {
                 </a>
               </li>
               <li>
-                <a href="#" className="hover:text-walmart-yellow transition-colors">
+                <a href="mailto:vitriimarketplace@gmail.com" className="hover:text-walmart-yellow transition-colors">
                   Contato
                 </a>
               </li>
@@ -120,7 +120,7 @@ export default function Footer() {
             <a href="#" className="text-gray-400 hover:text-walmart-yellow transition-colors">
               <Twitter className="w-5 h-5" />
             </a>
-            <a href="#" className="text-gray-400 hover:text-walmart-yellow transition-colors">
+            <a href="mailto:vitriimarketplace@gmail.com" className="text-gray-400 hover:text-walmart-yellow transition-colors">
               <Mail className="w-5 h-5" />
             </a>
           </div>
