@@ -90,6 +90,7 @@ export default function CadastroAnunciantes() {
         site: "",
         instagram: "",
         facebook: "",
+        whatsapp: "",
       });
       setEditingId(null);
       setIsFormOpen(false);
@@ -168,6 +169,7 @@ export default function CadastroAnunciantes() {
                 site: "",
                 instagram: "",
                 facebook: "",
+                whatsapp: "",
               });
             }}
             className="flex items-center gap-2 px-4 py-2 bg-walmart-yellow text-walmart-text rounded-lg hover:bg-walmart-yellow-dark transition-colors font-semibold"
