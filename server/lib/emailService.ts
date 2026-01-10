@@ -4,12 +4,22 @@ import nodemailer from "nodemailer";
 // For development, we'll use ethereal (testing service)
 // For production, configure with your SMTP provider
 
-let transporter: nodemailer.Transporter;
+let transporter: nodemailer.Transporter | null = null;
+let lastSmtpConfig: string = "";
 
-// Initialize transporter based on environment
-async function initializeTransporter() {
+// Create or get transporter based on current environment
+async function getTransporter() {
+  // Check if SMTP configuration exists
+  const currentConfig = `${process.env.SMTP_HOST}:${process.env.SMTP_PORT}`;
+
+  // If SMTP is configured and hasn't changed, return cached transporter
+  if (process.env.SMTP_HOST && process.env.SMTP_PORT && lastSmtpConfig === currentConfig && transporter) {
+    return transporter;
+  }
+
   if (process.env.SMTP_HOST && process.env.SMTP_PORT) {
     // Production: Use configured SMTP
+    console.log("🔄 Inicializando transporter com configuração SMTP real");
     transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: parseInt(process.env.SMTP_PORT || "587"),
@@ -19,8 +29,10 @@ async function initializeTransporter() {
         pass: process.env.SMTP_PASS,
       },
     });
+    lastSmtpConfig = currentConfig;
   } else {
     // Development: Use Ethereal (fake SMTP service for testing)
+    console.log("🔄 Inicializando transporter com Ethereal (teste)");
     const testAccount = await nodemailer.createTestAccount();
     transporter = nodemailer.createTransport({
       host: "smtp.ethereal.email",
@@ -31,11 +43,11 @@ async function initializeTransporter() {
         pass: testAccount.pass,
       },
     });
+    lastSmtpConfig = "";
   }
-}
 
-// Initialize on module load
-initializeTransporter().catch(console.error);
+  return transporter;
+}
 
 export async function sendPasswordResetEmail(
   email: string,
