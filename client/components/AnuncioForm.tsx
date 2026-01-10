@@ -299,8 +299,8 @@ export default function AnuncioForm({
     }
 
     // Basic required fields
-    if (!selectedAnuncianteId || !formData.productId) {
-      toast.error("Anunciante e Produto são obrigatórios");
+    if (!selectedAnuncianteId || !formData.titulo) {
+      toast.error("Anunciante e Título são obrigatórios");
       return;
     }
 
