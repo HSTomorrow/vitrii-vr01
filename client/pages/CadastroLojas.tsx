@@ -4,7 +4,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Plus, Trash2, Edit2 } from "lucide-react";
+import { Plus, Trash2, Edit2, MessageCircle } from "lucide-react";
 import { BRAZILIAN_STATES } from "@shared/brazilianStates";
 
 interface Anunciante {
