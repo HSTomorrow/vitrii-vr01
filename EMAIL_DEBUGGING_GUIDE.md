@@ -2,8 +2,8 @@
 
 ## Current Configuration
 
-**Email Service**: vitriimarketplace@gmail.com
-**BCC (Cópia Oculta)**: vitriimarketplace@gmail.com
+**Email Service**: noreply@vitrii.com
+**BCC (Cópia Oculta)**: herestomorrow@outlook.com + vitriimarketplace@gmail.com
 **SMTP Provider**: Gmail (smtp.gmail.com:587) - **REQUIRES CONFIGURATION**
 
 ---
