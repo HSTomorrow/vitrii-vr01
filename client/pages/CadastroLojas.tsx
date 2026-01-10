@@ -42,7 +42,7 @@ export default function CadastroAnunciantes() {
   });
 
   // Fetch anunciantes
-  const { data: anunciantes, refetch } = useQuery<Anunciante[]>({
+  const { data: anunciantesData, refetch } = useQuery({
     queryKey: ["anunciantes"],
     queryFn: async () => {
       const response = await fetch("/api/anunciantes");
@@ -51,6 +51,9 @@ export default function CadastroAnunciantes() {
       return result.data || [];
     },
   });
+
+  // Ensure anunciantes is always an array
+  const anunciantes = Array.isArray(anunciantesData) ? anunciantesData : [];
 
   // Create/Update loja mutation
   const saveAnuncianteMutation = useMutation({
