@@ -148,6 +148,7 @@ export async function sendWelcomeEmail(
   userName: string,
 ): Promise<boolean> {
   try {
+    const transporter = await getTransporter();
     const mailOptions = {
       from: process.env.MAIL_FROM || "noreply@vitrii.com",
       to: email,
