@@ -20,10 +20,12 @@ export default function PerfilUsuario() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const queryClient = useQueryClient();
+
+  // Initialize form with cached user data first
   const [formData, setFormData] = useState({
-    cpf: "",
-    telefone: "",
-    endereco: "",
+    cpf: user?.cpf || "",
+    telefone: user?.telefone || "",
+    endereco: user?.endereco || "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -32,15 +34,22 @@ export default function PerfilUsuario() {
     queryKey: ["user", user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
-      const response = await fetch(`/api/usuarios/${user.id}`);
-      if (!response.ok) return null;
-      const result = await response.json();
-      return result.data;
+      try {
+        const response = await fetch(`/api/usuarios/${user.id}`);
+        if (!response.ok) return null;
+        const result = await response.json();
+        return result.data;
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        return null;
+      }
     },
     enabled: !!user?.id,
+    staleTime: 0,
+    gcTime: 0,
   });
 
-  // Initialize form with fresh user data when available
+  // Update form with fresh user data when available
   useEffect(() => {
     if (freshUserData) {
       setFormData({
