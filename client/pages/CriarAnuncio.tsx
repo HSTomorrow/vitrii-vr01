@@ -70,7 +70,9 @@ export default function CriarAnuncio() {
   }
 
   // Validate that user has completed their profile (has CPF)
-  if (!user?.cpf || !user.cpf.trim()) {
+  // Use fresh data from server to avoid stale cached data
+  const userCpf = freshUserData?.cpf || user?.cpf;
+  if (!userCpf || !userCpf.trim()) {
     return (
       <div className="min-h-screen flex flex-col bg-white">
         <Header />
