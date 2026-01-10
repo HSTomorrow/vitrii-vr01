@@ -11,16 +11,23 @@ export default function CriarAnuncio() {
   const { user, isLoggedIn, isLoading } = useAuth();
 
   // Fetch fresh user data to ensure CPF is up-to-date
-  const { data: freshUserData } = useQuery({
+  const { data: freshUserData, isLoading: isLoadingUserData } = useQuery({
     queryKey: ["user", user?.id],
     queryFn: async () => {
       if (!user?.id) return null;
-      const response = await fetch(`/api/usuarios/${user.id}`);
-      if (!response.ok) return null;
-      const result = await response.json();
-      return result.data;
+      try {
+        const response = await fetch(`/api/usuarios/${user.id}`);
+        if (!response.ok) return null;
+        const result = await response.json();
+        return result.data;
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        return null;
+      }
     },
     enabled: !!user?.id && isLoggedIn,
+    staleTime: 0, // Always fetch fresh data
+    gcTime: 0, // Don't cache
   });
 
   // Show loading state while checking authentication or fetching user data
