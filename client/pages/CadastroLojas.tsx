@@ -38,6 +38,7 @@ export default function CadastroAnunciantes() {
     site: "",
     instagram: "",
     facebook: "",
+    whatsapp: "",
   });
 
   // Fetch anunciantes
