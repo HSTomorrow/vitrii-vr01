@@ -71,6 +71,9 @@ SMTP_SECURE: false (TLS on port 587)
 
 - ❌ SMTP_PASS: Currently set to account password (vItrII2025)
 - ✅ SMTP_PASS: Should be set to app-specific password (16 characters)
+- ✅ BCC Setup: Both accounts will receive automatic copies:
+  - herestomorrow@outlook.com
+  - vitriimarketplace@gmail.com
 
 ---
 
