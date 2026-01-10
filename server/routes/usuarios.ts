@@ -327,6 +327,11 @@ export const updateUsuario: RequestHandler = async (req, res) => {
 
     const userId = parseInt(id);
 
+    // Normalize CPF/CNPJ to digits-only format
+    if (validatedData.cpf && validatedData.cpf.trim()) {
+      validatedData.cpf = validatedData.cpf.replace(/\D/g, "");
+    }
+
     // Check if CPF already exists for a different user
     if (validatedData.cpf && validatedData.cpf.trim()) {
       const existingCpf = await prisma.usuario.findFirst({
