@@ -45,7 +45,7 @@ export default function CriarAnuncio() {
                 Entrar
               </button>
               <button
-                onClick={() => navigate("/cadastro")}
+                onClick={() => navigate("/auth/signup")}
                 className="flex-1 px-4 py-3 border-2 border-walmart-blue text-walmart-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors"
               >
                 Cadastrar
