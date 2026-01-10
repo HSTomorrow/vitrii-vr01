@@ -248,12 +248,18 @@ export const createUsuario: RequestHandler = async (req, res) => {
     // Hash password with bcrypt (same as signup)
     const senhaHash = await bcryptjs.hash(validatedData.senha, 10);
 
+    // Normalize CPF/CNPJ to digits-only format
+    let normalizedCpf = "";
+    if (validatedData.cpf && validatedData.cpf.trim()) {
+      normalizedCpf = validatedData.cpf.replace(/\D/g, "");
+    }
+
     const usuario = await prisma.usuario.create({
       data: {
         nome: validatedData.nome,
         email: validatedData.email,
         senha: senhaHash,
-        cpf: validatedData.cpf || "",
+        cpf: normalizedCpf,
         telefone: validatedData.telefone || "",
         endereco: validatedData.endereco || "",
         tipoUsuario: "comum",
