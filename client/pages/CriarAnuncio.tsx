@@ -23,8 +23,21 @@ export default function CriarAnuncio() {
     enabled: !!user?.id && isLoggedIn,
   });
 
-  // Show loading state while checking authentication
+  // Show loading state while checking authentication or fetching user data
   if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-white">
+        <Header />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-walmart-blue" />
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  // Show loading state while fetching fresh user data (for CPF validation)
+  if (isLoggedIn && !freshUserData && user?.id) {
     return (
       <div className="min-h-screen flex flex-col bg-white">
         <Header />
