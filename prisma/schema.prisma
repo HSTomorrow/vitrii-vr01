@@ -283,7 +283,7 @@ model Anuncio {
 
   // Relations
   anunciante    Anunciante @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
-  producto      Producto  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  producto      Producto? @relation(fields: [productId], references: [id], onDelete: SetNull)
   tabelaDePreco TabelaDePreco? @relation(fields: [tabelaDePrecoId], references: [id], onDelete: SetNull)
   equipeDeVenda EquipeDeVenda? @relation(fields: [equipeDeVendaId], references: [id], onDelete: SetNull)
   pagamento     Pagamento?
