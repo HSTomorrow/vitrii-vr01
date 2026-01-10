@@ -111,6 +111,8 @@ export const getAnuncios: RequestHandler = async (req, res) => {
       prisma.anuncio.count({ where }),
     ]);
 
+    console.log("[getAnuncios] Success! Fetched", anuncios.length, "ads out of", total);
+
     res.json({
       success: true,
       data: anuncios,
@@ -123,10 +125,15 @@ export const getAnuncios: RequestHandler = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error fetching ads:", error);
+    console.error("[getAnuncios] Error fetching ads:", error);
+    console.error("[getAnuncios] Error details:", {
+      message: error instanceof Error ? error.message : "Unknown error",
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     res.status(500).json({
       success: false,
       error: "Erro ao buscar anúncios",
+      details: error instanceof Error ? error.message : "Erro desconhecido",
     });
   }
 };
