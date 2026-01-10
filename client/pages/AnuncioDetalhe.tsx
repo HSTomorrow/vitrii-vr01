@@ -347,6 +347,17 @@ export default function AnuncioDetalhe() {
                   <MessageSquare className="w-4 h-4" />
                   Enviar Mensagem
                 </button>
+                {anuncio.anunciante.whatsapp && (
+                  <a
+                    href={`https://wa.me/${anuncio.anunciante.whatsapp.replace(/\D/g, "")}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full px-4 py-3 bg-green-500 text-white rounded-lg font-semibold hover:bg-green-600 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    WhatsApp
+                  </a>
+                )}
                 <button className="w-full px-4 py-3 border-2 border-gray-300 text-walmart-text rounded-lg font-semibold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
                   <Share2 className="w-4 h-4" />
                   Compartilhar
