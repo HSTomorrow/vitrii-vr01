@@ -201,6 +201,33 @@ export default function AdminManageAds() {
     return matchesSearch;
   });
 
+  // Check authorization
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-walmart-bg flex flex-col">
+        <Header />
+        <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-8 flex items-center justify-center">
+          <div className="text-center">
+            <Lock className="w-16 h-16 text-red-500 mx-auto mb-4" />
+            <h1 className="text-3xl font-bold text-walmart-text mb-2">
+              Acesso Restrito
+            </h1>
+            <p className="text-walmart-text-secondary mb-6">
+              Apenas administradores podem acessar esta página.
+            </p>
+            <button
+              onClick={() => navigate("/")}
+              className="px-6 py-2 bg-walmart-blue text-white rounded-lg hover:bg-blue-700 transition"
+            >
+              Voltar para Home
+            </button>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-walmart-bg flex flex-col">
       <Header />
