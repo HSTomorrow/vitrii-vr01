@@ -19,6 +19,7 @@ interface Anunciante {
   site?: string;
   instagram?: string;
   facebook?: string;
+  whatsapp?: string;
   fotoUrl?: string;
 }
 
