@@ -135,6 +135,7 @@ export default function CadastroAnunciantes() {
       site: loja.site || "",
       instagram: loja.instagram || "",
       facebook: loja.facebook || "",
+      whatsapp: loja.whatsapp || "",
     });
     setEditingId(loja.id);
     setIsFormOpen(true);
