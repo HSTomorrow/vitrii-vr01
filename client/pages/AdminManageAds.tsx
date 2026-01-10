@@ -276,13 +276,26 @@ export default function AdminManageAds() {
         </div>
 
         {/* Ads List */}
+        {error && (
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+            <div className="flex items-center gap-3">
+              <AlertCircle className="w-5 h-5 text-red-600" />
+              <div>
+                <h3 className="font-semibold text-red-800">Erro ao carregar anúncios</h3>
+                <p className="text-sm text-red-700">
+                  {error instanceof Error ? error.message : "Erro desconhecido"}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
         {isLoading ? (
           <div className="text-center py-12">
             <p className="text-walmart-text-secondary">
               Carregando anúncios...
             </p>
           </div>
-        ) : filteredAnuncios.length === 0 ? (
+        ) : error || filteredAnuncios.length === 0 ? (
           <div className="text-center py-12">
             <AlertCircle className="w-12 h-12 text-walmart-text-secondary mx-auto mb-2" />
             <p className="text-walmart-text-secondary">
