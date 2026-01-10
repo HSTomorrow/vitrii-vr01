@@ -168,14 +168,20 @@ The following must be set in DevServerControl:
 - **Sent by**: `/api/auth/forgot-password` endpoint
 - **Function**: `sendPasswordResetEmail()`
 - **Contents**: Reset link valid for 1 hour
-- **Recipients**: User email + BCC to herestomorrow@outlook.com
+- **Recipients**:
+  - User email (TO)
+  - herestomorrow@outlook.com (BCC)
+  - vitriimarketplace@gmail.com (BCC)
 
 ### Welcome Email
 
 - **Sent by**: `/api/auth/signup` endpoint
 - **Function**: `sendWelcomeEmail()`
 - **Contents**: Account creation confirmation
-- **Recipients**: User email + BCC to herestomorrow@outlook.com
+- **Recipients**:
+  - User email (TO)
+  - herestomorrow@outlook.com (BCC)
+  - vitriimarketplace@gmail.com (BCC)
 
 ---
 
