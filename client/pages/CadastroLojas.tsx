@@ -329,6 +329,21 @@ export default function CadastroAnunciantes() {
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
                   />
                 </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                    WhatsApp (Opcional)
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.whatsapp}
+                    onChange={(e) =>
+                      setFormData({ ...formData, whatsapp: e.target.value })
+                    }
+                    placeholder="+55 (11) 98765-4321"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+                  />
+                </div>
               </div>
 
               <div>
