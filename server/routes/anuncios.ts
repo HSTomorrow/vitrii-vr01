@@ -45,6 +45,8 @@ const AnuncioCreateSchema = z.object({
 // GET all ads
 export const getAnuncios: RequestHandler = async (req, res) => {
   try {
+    console.log("[getAnuncios] Starting request...");
+
     const {
       anuncianteId,
       status,
@@ -61,6 +63,8 @@ export const getAnuncios: RequestHandler = async (req, res) => {
     );
     const pageOffset = Math.max(parseInt(offset as string) || 0, 0);
 
+    console.log("[getAnuncios] Query parameters:", { anuncianteId, status, includeInactive, pageLimit, pageOffset });
+
     const where: any = { isActive: true }; // Default: only active ads
     if (anuncianteId) where.anuncianteId = parseInt(anuncianteId as string);
     if (status) where.status = status;
@@ -69,6 +73,8 @@ export const getAnuncios: RequestHandler = async (req, res) => {
     if (isDoacao !== undefined) {
       where.isDoacao = isDoacao === "true";
     }
+
+    console.log("[getAnuncios] Where clause:", where);
 
     // Get total count and paginated data in parallel
     const [anuncios, total] = await Promise.all([
