@@ -338,20 +338,6 @@ export default function AnuncioForm({
     }));
   };
 
-  const anunciantes = anunciantesData?.data || [];
-  const productos = productosData?.data || [];
-  const equipes = equipesData?.data || [];
-
-  // Get selected product details
-  const selectedProducto = productos.find(
-    (p: Producto) => p.id === formData.productId,
-  );
-  const priceTables = selectedProducto?.tabelasDePreco || [];
-
-  const selectedPriceTable = priceTables.find(
-    (pt) => pt.id === formData.tabelaDePrecoId,
-  );
-
   // Show loading state while fetching anuncio for editing
   if (anuncioId && isLoadingAnuncio) {
     return (
