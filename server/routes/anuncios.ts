@@ -5,7 +5,7 @@ import { z } from "zod";
 // Schema validation for creating/updating ad
 const AnuncioCreateSchema = z.object({
   anuncianteId: z.number().int().positive("Anunciante é obrigatório"),
-  productId: z.number().int().positive().optional().nullable(),
+  productId: z.number().int().nonnegative().optional().nullable(), // Allow 0 since product is optional
   tabelaDePrecoId: z.number().int().optional().nullable(),
   titulo: z
     .string()
@@ -29,7 +29,18 @@ const AnuncioCreateSchema = z.object({
   status: z.enum(["em_edicao", "aguardando_pagamento", "pago", "historico"]).optional(),
   categoria: z.enum(["roupas", "carros", "imoveis"]).optional().nullable(),
   dadosCategoria: z.string().optional().nullable(), // JSON string
-});
+}).refine(
+  (data) => {
+    // Either precoAnuncio must be provided OR isDoacao must be true
+    const hasPrice = data.precoAnuncio && data.precoAnuncio > 0;
+    const isFree = data.isDoacao === true;
+    return hasPrice || isFree;
+  },
+  {
+    message: "Você deve preencher o Valor do anúncio ou marcar como gratuito/doação",
+    path: ["precoAnuncio"], // Point to the field with the error
+  }
+);
 
 // GET all ads
 export const getAnuncios: RequestHandler = async (req, res) => {
