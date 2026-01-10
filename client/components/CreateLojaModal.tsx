@@ -81,6 +81,7 @@ export default function CreateAnuncianteModal({
         site: "",
         instagram: "",
         facebook: "",
+        whatsapp: "",
       });
       onSuccess?.(result.data.id);
       onClose();
