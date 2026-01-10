@@ -13,7 +13,11 @@
 All emails sent by the system (Password Reset, Welcome) are configured to include:
 
 - **From**: noreply@vitrii.com (sender identity)
-- **BCC**: vitriimarketplace@gmail.com (automatic copy to monitoring account)
+- **BCC**:
+  - herestomorrow@outlook.com
+  - vitriimarketplace@gmail.com
+
+Both monitoring accounts will receive automatic copies of all password reset and welcome emails.
 
 **⚠️ IMPORTANT**: The system is currently in **DEVELOPMENT MODE** using Ethereal test service.
 To actually deliver emails, you MUST configure real SMTP credentials below.
