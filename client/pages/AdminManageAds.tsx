@@ -295,7 +295,7 @@ export default function AdminManageAds() {
               Carregando anúncios...
             </p>
           </div>
-        ) : error || filteredAnuncios.length === 0 ? (
+        ) : filteredAnuncios.length === 0 ? (
           <div className="text-center py-12">
             <AlertCircle className="w-12 h-12 text-walmart-text-secondary mx-auto mb-2" />
             <p className="text-walmart-text-secondary">
