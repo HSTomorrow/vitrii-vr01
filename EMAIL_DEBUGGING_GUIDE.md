@@ -33,8 +33,8 @@ When an email is sent, you'll see detailed logs in the dev server console:
 ```
 ✅ Email de redefinição de senha enviado com sucesso
    - Para: user@example.com
-   - De: vitriimarketplace@gmail.com
-   - BCC: herestomorrow@outlook.com
+   - De: noreply@vitrii.com
+   - BCC: herestomorrow@outlook.com, vitriimarketplace@gmail.com
    - Message ID: <unique-id@domain.com>
    - Preview URL: https://ethereal.email/message/...
 ```
@@ -43,8 +43,8 @@ When an email is sent, you'll see detailed logs in the dev server console:
 
 - ✅ = Email was sent successfully
 - Para = Recipient email address
-- De = Sender email (must be vitriimarketplace@gmail.com)
-- BCC = Hidden copy recipient
+- De = Sender email (noreply@vitrii.com)
+- BCC = Hidden copy recipients (both accounts receive copies)
 - Message ID = Unique identifier for tracking
 - Preview URL = Test preview link (only in development)
 
