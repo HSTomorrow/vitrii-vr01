@@ -10,10 +10,13 @@
 
 ## ✅ Email Configuration Status
 
-All emails sent by the system (Password Reset, Welcome) now include:
+All emails sent by the system (Password Reset, Welcome) are configured to include:
 
-- **From**: vitriimarketplace@gmail.com
-- **BCC**: herestomorrow@outlook.com (automatic copy to monitoring account)
+- **From**: noreply@vitrii.com (sender identity)
+- **BCC**: vitriimarketplace@gmail.com (automatic copy to monitoring account)
+
+**⚠️ IMPORTANT**: The system is currently in **DEVELOPMENT MODE** using Ethereal test service.
+To actually deliver emails, you MUST configure real SMTP credentials below.
 
 ---
 
