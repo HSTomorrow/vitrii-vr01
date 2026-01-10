@@ -57,7 +57,9 @@ export default function App() {
                 <Route path="/sell" element={<Sell />} />
                 <Route path="/qrcode" element={<QRCodePage />} />
                 <Route path="/auth/signin" element={<SignIn />} />
+                <Route path="/entrar" element={<SignIn />} />
                 <Route path="/auth/signup" element={<SignUp />} />
+                <Route path="/cadastrar" element={<SignUp />} />
                 <Route path="/esqueci-senha" element={<ForgotPassword />} />
                 <Route path="/reset-senha" element={<ResetPassword />} />
                 <Route path="/favoritos" element={<Favoritos />} />
