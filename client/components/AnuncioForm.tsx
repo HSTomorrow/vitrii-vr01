@@ -716,38 +716,6 @@ export default function AnuncioForm({
               }
             />
 
-            {/* Título */}
-            <div>
-              <label className="block text-sm font-semibold text-walmart-text mb-2">
-                Título do Anúncio *
-              </label>
-              <input
-                type="text"
-                value={formData.titulo}
-                onChange={(e) => handleInputChange("titulo", e.target.value)}
-                placeholder="Ex: Camiseta Azul"
-                maxLength={50}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
-              />
-              <p className="mt-1 text-sm text-walmart-text-secondary">
-                {formData.titulo.length}/50 caracteres
-              </p>
-            </div>
-
-            {/* Descrição */}
-            <div>
-              <label className="block text-sm font-semibold text-walmart-text mb-2">
-                Descrição (Opcional)
-              </label>
-              <textarea
-                value={formData.descricao}
-                onChange={(e) => handleInputChange("descricao", e.target.value)}
-                placeholder="Descreva o produto em detalhes..."
-                rows={5}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
-              />
-            </div>
-
             {/* Endereço */}
             <div>
               <label className="block text-sm font-semibold text-walmart-text mb-2">
