@@ -39,7 +39,7 @@ export default function CriarAnuncio() {
             </p>
             <div className="flex gap-3">
               <button
-                onClick={() => navigate("/entrar")}
+                onClick={() => navigate("/auth/signin")}
                 className="flex-1 px-4 py-3 bg-walmart-blue text-white rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors"
               >
                 Entrar
