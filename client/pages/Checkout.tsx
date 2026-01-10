@@ -241,7 +241,7 @@ export default function Checkout() {
                   </div>
 
                   <button
-                    onClick={() => navigate(`/anuncios/${parsedAnuncioId}`)}
+                    onClick={() => navigate(`/anuncio/${parsedAnuncioId}`)}
                     className="w-full mt-4 px-4 py-2 border-2 border-walmart-blue text-walmart-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors"
                   >
                     Ver Anúncio Completo
