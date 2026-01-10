@@ -92,10 +92,7 @@ export default function CriarAnuncio() {
   // Validate that user has completed their profile (has CPF)
   // Prefer fresh data from server, fall back to cached auth data if fetch failed
   const userCpf = freshUserData?.cpf || user?.cpf || "";
-  const userPhoneNumber = freshUserData?.telefone || user?.telefone || "";
-
-  // Check if profile is truly incomplete (no CPF and no phone)
-  const hasValidProfile = (userCpf && userCpf.trim()) || (userPhoneNumber && userPhoneNumber.trim());
+  const hasValidProfile = userCpf && userCpf.trim().length > 0;
 
   if (!hasValidProfile) {
     return (
