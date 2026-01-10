@@ -108,6 +108,7 @@ After updating the SMTP_PASS:
 - [ ] test-email-config.mjs ran successfully
 - [ ] Test email received in inbox
 - [ ] BCC copy received in herestomorrow@outlook.com
+- [ ] BCC copy received in vitriimarketplace@gmail.com
 
 ---
 
