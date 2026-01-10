@@ -61,7 +61,9 @@ SMTP_HOST: smtp.gmail.com
 SMTP_PORT: 587
 SMTP_USER: vitriimarketplace@gmail.com
 SMTP_PASS: [currently using account password - NEEDS UPDATE]
-MAIL_FROM: vitriimarketplace@gmail.com
+MAIL_FROM: noreply@vitrii.com
+BCC_1: herestomorrow@outlook.com
+BCC_2: vitriimarketplace@gmail.com
 SMTP_SECURE: false (TLS on port 587)
 ```
 
