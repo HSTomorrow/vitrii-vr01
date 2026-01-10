@@ -304,6 +304,20 @@ export default function CreateAnuncianteModal({
             />
           </div>
 
+          {/* WhatsApp */}
+          <div>
+            <label className="block text-sm font-semibold text-walmart-text mb-2">
+              WhatsApp (Opcional)
+            </label>
+            <input
+              type="text"
+              value={formData.whatsapp}
+              onChange={(e) => handleInputChange("whatsapp", e.target.value)}
+              placeholder="Ex: +55 (11) 98765-4321"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+            />
+          </div>
+
           {/* Buttons */}
           <div className="flex gap-4 pt-6 border-t">
             <button
