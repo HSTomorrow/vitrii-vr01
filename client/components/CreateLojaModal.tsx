@@ -105,6 +105,13 @@ export default function CreateAnuncianteModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Check if user is logged in
+    if (!user || !user.id) {
+      toast.error("Você precisa estar logado para criar um anunciante");
+      return;
+    }
+
     if (
       !formData.nome ||
       !formData.cnpjOuCpf ||
