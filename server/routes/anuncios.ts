@@ -264,7 +264,7 @@ export const createAnuncio: RequestHandler = async (req, res) => {
     const anuncio = await prisma.anuncio.create({
       data: {
         anuncianteId: validatedData.anuncianteId,
-        productId: validatedData.productId,
+        productId: validatedData.productId && validatedData.productId > 0 ? validatedData.productId : null,
         tabelaDePrecoId,
         titulo: validatedData.titulo,
         descricao: validatedData.descricao,
