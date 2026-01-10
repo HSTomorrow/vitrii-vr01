@@ -334,15 +334,25 @@ export default function CadastroAnunciantes() {
                   <label className="block text-sm font-semibold text-walmart-text mb-2">
                     WhatsApp (Opcional)
                   </label>
-                  <input
-                    type="text"
-                    value={formData.whatsapp}
-                    onChange={(e) =>
-                      setFormData({ ...formData, whatsapp: e.target.value })
-                    }
-                    placeholder="+55 (11) 98765-4321"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
-                  />
+                  <div className="flex items-center gap-0">
+                    <span className="px-4 py-2 border border-r-0 border-gray-300 rounded-l-lg bg-gray-100 text-walmart-text font-semibold">
+                      +55
+                    </span>
+                    <input
+                      type="text"
+                      value={formData.whatsapp.startsWith("+55") ? formData.whatsapp.substring(3) : formData.whatsapp}
+                      onChange={(e) => {
+                        // Only allow digits, spaces, parentheses, and hyphens
+                        const cleanValue = e.target.value.replace(/[^\d\s()()-]/g, "");
+                        setFormData({ ...formData, whatsapp: "+55" + cleanValue });
+                      }}
+                      placeholder="(11) 98765-4321"
+                      className="flex-1 px-4 py-2 border border-gray-300 rounded-r-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+                    />
+                  </div>
+                  <p className="text-xs text-walmart-text-secondary mt-1">
+                    Digite apenas DDD e número (ex: 11 98765-4321)
+                  </p>
                 </div>
               </div>
 
