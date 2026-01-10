@@ -245,7 +245,7 @@ export default function AnuncioForm({
             ? parseFloat(data.precoAnuncio)
             : null,
           anuncianteId: selectedAnuncianteId,
-          productId: data.productId,
+          productId: data.productId > 0 ? data.productId : null,
           tabelaDePrecoId:
             data.tabelaDePrecoId > 0 ? data.tabelaDePrecoId : null,
           dataValidade: data.dataValidade
