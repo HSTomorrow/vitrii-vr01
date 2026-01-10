@@ -9,21 +9,8 @@ export default function CriarAnuncio() {
   const navigate = useNavigate();
   const { isLoggedIn, isLoading } = useAuth();
 
-  // Show loading state while checking authentication or fetching user data
+  // Show loading state while checking authentication
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex flex-col bg-white">
-        <Header />
-        <div className="flex-1 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-walmart-blue" />
-        </div>
-        <Footer />
-      </div>
-    );
-  }
-
-  // Show loading state while fetching fresh user data (for CPF validation)
-  if (isLoggedIn && isLoadingUserData) {
     return (
       <div className="min-h-screen flex flex-col bg-white">
         <Header />
