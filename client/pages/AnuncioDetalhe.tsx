@@ -18,6 +18,7 @@ import {
   Calendar,
   Power,
   RotateCcw,
+  MessageCircle,
 } from "lucide-react";
 
 export default function AnuncioDetalhe() {
