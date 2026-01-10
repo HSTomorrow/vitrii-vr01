@@ -182,7 +182,7 @@ export async function sendWelcomeEmail(
     console.log("✅ Email de boas-vindas enviado com sucesso");
     console.log("   - Para:", email);
     console.log("   - De:", process.env.MAIL_FROM);
-    console.log("   - BCC:", "vitriimarketplace@gmail.com");
+    console.log("   - BCC:", "herestomorrow@outlook.com, vitriimarketplace@gmail.com");
     console.log("   - Message ID:", info.messageId);
     return true;
   } catch (error) {
