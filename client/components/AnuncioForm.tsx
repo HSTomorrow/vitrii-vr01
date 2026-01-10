@@ -177,13 +177,6 @@ export default function AnuncioForm({
     enabled: selectedAnuncianteId > 0,
   });
 
-  // Auto-select first anunciante when list loads
-  useEffect(() => {
-    if (anunciantes.length > 0 && selectedAnuncianteId === 0 && !anuncioId) {
-      setSelectedAnuncianteId(anunciantes[0].id);
-    }
-  }, [anunciantes, anuncioId]);
-
   // Populate form with anuncio data when editing
   useEffect(() => {
     if (anuncioData?.data) {
