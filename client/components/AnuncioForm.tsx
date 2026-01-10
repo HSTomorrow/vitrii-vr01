@@ -353,28 +353,6 @@ export default function AnuncioForm({
     }));
   };
 
-  // Get data from queries
-  const anunciantes = anunciantesData?.data || [];
-  const productos = productosData?.data || [];
-  const equipes = equipesData?.data || [];
-
-  // Get selected product details
-  const selectedProducto = productos.find(
-    (p: Producto) => p.id === formData.productId,
-  );
-  const priceTables = selectedProducto?.tabelasDePreco || [];
-
-  const selectedPriceTable = priceTables.find(
-    (pt) => pt.id === formData.tabelaDePrecoId,
-  );
-
-  // Auto-select first anunciante when list loads
-  useEffect(() => {
-    if (anunciantes.length > 0 && selectedAnuncianteId === 0 && !anuncioId) {
-      setSelectedAnuncianteId(anunciantes[0].id);
-    }
-  }, [anunciantes, anuncioId]);
-
   // Show loading state while fetching anuncio for editing
   if (anuncioId && isLoadingAnuncio) {
     return (
