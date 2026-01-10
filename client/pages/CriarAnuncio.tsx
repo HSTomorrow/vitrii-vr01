@@ -44,7 +44,7 @@ export default function CriarAnuncio() {
   }
 
   // Show loading state while fetching fresh user data (for CPF validation)
-  if (isLoggedIn && !freshUserData && user?.id) {
+  if (isLoggedIn && isLoadingUserData) {
     return (
       <div className="min-h-screen flex flex-col bg-white">
         <Header />
