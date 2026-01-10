@@ -14,9 +14,10 @@ import {
   ChevronDown,
   ChevronUp,
   FileText,
+  Lock,
 } from "lucide-react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 interface Anuncio {
   id: number;
@@ -38,16 +39,29 @@ interface Anuncio {
 export default function AdminManageAds() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [expandedAd, setExpandedAd] = useState<number | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>("todos");
 
+  // Check if user is admin
+  const isAdmin = user?.tipoUsuario === "adm";
+
   // Fetch all ads
-  const { data: anunciosData, isLoading } = useQuery({
+  const { data: anunciosData, isLoading, error } = useQuery({
     queryKey: ["admin-anuncios"],
+    enabled: isAdmin,
     queryFn: async () => {
-      const response = await fetch("/api/anuncios");
-      if (!response.ok) throw new Error("Erro ao buscar anúncios");
+      const response = await fetch("/api/anuncios", {
+        headers: {
+          "x-user-id": user?.id ? String(user.id) : "",
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: "Erro desconhecido" }));
+        throw new Error(errorData.error || `HTTP ${response.status}`);
+      }
       return response.json();
     },
   });
