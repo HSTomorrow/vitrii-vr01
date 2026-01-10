@@ -19,6 +19,9 @@ import {
   Power,
   RotateCcw,
   MessageCircle,
+  Globe,
+  Instagram,
+  Facebook,
 } from "lucide-react";
 
 export default function AnuncioDetalhe() {
