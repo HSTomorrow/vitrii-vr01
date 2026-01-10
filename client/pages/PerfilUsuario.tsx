@@ -27,6 +27,30 @@ export default function PerfilUsuario() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // Fetch fresh user data to show current profile info
+  const { data: freshUserData } = useQuery({
+    queryKey: ["user", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const response = await fetch(`/api/usuarios/${user.id}`);
+      if (!response.ok) return null;
+      const result = await response.json();
+      return result.data;
+    },
+    enabled: !!user?.id,
+  });
+
+  // Initialize form with fresh user data when available
+  useEffect(() => {
+    if (freshUserData) {
+      setFormData({
+        cpf: freshUserData.cpf || "",
+        telefone: freshUserData.telefone || "",
+        endereco: freshUserData.endereco || "",
+      });
+    }
+  }, [freshUserData]);
+
   // Update mutation
   const updateMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
