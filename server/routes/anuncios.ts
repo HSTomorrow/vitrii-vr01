@@ -263,16 +263,12 @@ export const createAnuncio: RequestHandler = async (req, res) => {
 
     const anuncio = await prisma.anuncio.create({
       data: {
-        anunciante: {
-          connect: {
-            id: validatedData.anuncianteId,
-          },
-        },
+        anuncianteId: validatedData.anuncianteId,
         productId: validatedData.productId && validatedData.productId > 0 ? validatedData.productId : null,
         tabelaDePrecoId,
         titulo: validatedData.titulo,
         descricao: validatedData.descricao,
-        fotoUrl: validatedData.fotoUrl,
+        fotoUrl: validatedData.fotoUrl || null,
         precoAnuncio,
         dataValidade,
         equipeDeVendaId: validatedData.equipeDeVendaId,
@@ -280,7 +276,7 @@ export const createAnuncio: RequestHandler = async (req, res) => {
         destaque: validatedData.destaque || false,
         isActive: validatedData.isActive !== false,
         categoria: validatedData.categoria,
-        dadosCategoria: validatedData.dadosCategoria,
+        dadosCategoria: validatedData.dadosCategoria || null,
         status,
       },
       include: {
