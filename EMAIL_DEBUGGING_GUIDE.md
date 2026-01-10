@@ -185,9 +185,12 @@ When testing email functionality:
 
 - [ ] Server logs show "✅ Email enviado com sucesso"
 - [ ] Message ID is displayed in logs
-- [ ] BCC confirmation shows herestomorrow@outlook.com
+- [ ] BCC confirmation shows both emails:
+  - [ ] herestomorrow@outlook.com
+  - [ ] vitriimarketplace@gmail.com
 - [ ] Email arrives in recipient inbox (check within 5 minutes)
-- [ ] Check herestomorrow@outlook.com for copy
+- [ ] Check herestomorrow@outlook.com for BCC copy
+- [ ] Check vitriimarketplace@gmail.com for BCC copy
 - [ ] Reset link is clickable and working
 - [ ] No error messages in server console
 - [ ] No error messages in browser console
