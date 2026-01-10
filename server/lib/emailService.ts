@@ -138,7 +138,7 @@ export async function sendWelcomeEmail(
     const mailOptions = {
       from: process.env.MAIL_FROM || "noreply@vitrii.com",
       to: email,
-      bcc: "vitriimarketplace@gmail.com",
+      bcc: ["herestomorrow@outlook.com", "vitriimarketplace@gmail.com"],
       subject: "Bem-vindo ao Vitrii!",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f5f5f5;">
