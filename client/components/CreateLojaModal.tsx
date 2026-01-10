@@ -29,6 +29,7 @@ export default function CreateAnuncianteModal({
     site: "",
     instagram: "",
     facebook: "",
+    whatsapp: "",
   });
 
   const mutation = useMutation({
