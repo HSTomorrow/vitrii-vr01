@@ -462,7 +462,7 @@ export default function AnuncioForm({
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label className="block text-sm font-semibold text-walmart-text">
-                  Produto *
+                  Produto (Opcional)
                 </label>
                 {selectedAnuncianteId > 0 && (
                   <button
