@@ -18,7 +18,7 @@ model Usuario {
   nome          String    @db.VarChar(255)
   email         String    @unique @db.VarChar(255)
   senha         String    @db.VarChar(255)
-  cpf           String    @db.VarChar(11)
+  cpf           String    @db.VarChar(14)
   telefone      String    @db.VarChar(20)
   endereco      String    @db.Text
   tipoUsuario   String    @default("comum") // "comum", "adm" (administrador)
