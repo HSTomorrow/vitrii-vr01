@@ -48,14 +48,21 @@ When an email is sent, you'll see detailed logs in the dev server console:
 - Message ID = Unique identifier for tracking
 - Preview URL = Test preview link (only in development)
 
-### 2. **Monitor the BCC Account**
+### 2. **Monitor the BCC Accounts**
 
-Check **herestomorrow@outlook.com** for incoming emails:
+Both monitoring accounts receive automatic copies:
 
+**Account 1: herestomorrow@outlook.com**
 - Log in to herestomorrow@outlook.com
 - Look in the Inbox folder
-- Search for emails from vitriimarketplace@gmail.com
-- Every password reset or welcome email will appear here automatically
+- Every password reset and welcome email will appear here automatically
+
+**Account 2: vitriimarketplace@gmail.com**
+- Log in to vitriimarketplace@gmail.com
+- Look in the Inbox folder
+- Every password reset and welcome email will appear here automatically
+
+**Note:** Both accounts receive the same emails simultaneously as BCC copies.
 
 ### 3. **Check for Errors**
 
