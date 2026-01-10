@@ -55,13 +55,8 @@ export default function PerfilUsuario() {
       queryClient.invalidateQueries({ queryKey: ["user"] });
       toast.success("Perfil atualizado com sucesso!");
       setTimeout(() => {
-        // Go back to previous page or to /anuncio/criar if no previous page
-        const previousPath = window.history.length > 1 ? -1 : "/anuncio/criar";
-        if (previousPath === -1) {
-          navigate(-1);
-        } else {
-          navigate(previousPath as string);
-        }
+        // Navigate to ad editing page after profile update
+        navigate("/anuncio/criar");
       }, 1500);
     },
     onError: (error: any) => {
