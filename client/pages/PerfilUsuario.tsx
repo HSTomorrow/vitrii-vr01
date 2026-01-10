@@ -75,8 +75,12 @@ export default function PerfilUsuario() {
       return response.json();
     },
     onSuccess: () => {
-      // Invalidate user cache to refresh user data
+      // Invalidate user cache to refresh user data everywhere
+      // This will affect both ["user"] and ["user", userId] query keys
       queryClient.invalidateQueries({ queryKey: ["user"] });
+      if (user?.id) {
+        queryClient.invalidateQueries({ queryKey: ["user", user.id] });
+      }
       toast.success("Perfil atualizado com sucesso!");
       setTimeout(() => {
         // Navigate to ad editing page after profile update
