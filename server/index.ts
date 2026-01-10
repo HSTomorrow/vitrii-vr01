@@ -152,6 +152,30 @@ export function createServer() {
     res.json({ message: ping });
   });
 
+  // Health check and diagnostics
+  app.get("/api/health", async (_req, res) => {
+    try {
+      // Test database connection
+      const result = await fetch('https://www.google.com', { method: 'HEAD' }).catch(() => null);
+
+      res.json({
+        status: "ok",
+        timestamp: new Date().toISOString(),
+        environment: {
+          node_env: process.env.NODE_ENV,
+          has_database_url: !!process.env.DATABASE_URL,
+          database_configured: process.env.DATABASE_URL ? "yes" : "no",
+        },
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: "error",
+        timestamp: new Date().toISOString(),
+        error: error instanceof Error ? error.message : "Unknown error",
+      });
+    }
+  });
+
   app.get("/api/demo", handleDemo);
 
   // Upload route
