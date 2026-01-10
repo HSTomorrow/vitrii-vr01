@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
+import { useQuery } from "@tanstack/react-query";
 import { AlertCircle } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -8,6 +9,19 @@ import AnuncioForm from "@/components/AnuncioForm";
 export default function CriarAnuncio() {
   const navigate = useNavigate();
   const { user, isLoggedIn, isLoading } = useAuth();
+
+  // Fetch fresh user data to ensure CPF is up-to-date
+  const { data: freshUserData } = useQuery({
+    queryKey: ["user", user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const response = await fetch(`/api/usuarios/${user.id}`);
+      if (!response.ok) return null;
+      const result = await response.json();
+      return result.data;
+    },
+    enabled: !!user?.id && isLoggedIn,
+  });
 
   // Show loading state while checking authentication
   if (isLoading) {
