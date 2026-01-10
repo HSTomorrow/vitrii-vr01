@@ -926,13 +926,6 @@ export default function AnuncioForm({
         anuncianteId={selectedAnuncianteId}
         onSuccess={handleProductoCreated}
       />
-
-      {/* Profile Completion Gate */}
-      <ProfileCompletionGate
-        isOpen={showProfileGate}
-        onClose={() => setShowProfileGate(false)}
-        actionLabel="publicar anúncio"
-      />
     </div>
   );
 }
