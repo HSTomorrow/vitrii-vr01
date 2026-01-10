@@ -67,7 +67,6 @@ export default function AnuncioForm({
   );
   const [showCreateLoja, setShowCreateLoja] = useState(false);
   const [showCreateProducto, setShowCreateProducto] = useState(false);
-  const [showProfileGate, setShowProfileGate] = useState(false);
   const [formData, setFormData] = useState({
     titulo: "",
     descricao: "",
