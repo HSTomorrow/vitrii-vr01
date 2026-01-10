@@ -343,11 +343,21 @@ export default function CadastroAnunciantes() {
                     </span>
                     <input
                       type="text"
-                      value={formData.whatsapp.startsWith("+55") ? formData.whatsapp.substring(3) : formData.whatsapp}
+                      value={
+                        formData.whatsapp.startsWith("+55")
+                          ? formData.whatsapp.substring(3)
+                          : formData.whatsapp
+                      }
                       onChange={(e) => {
                         // Only allow digits, spaces, parentheses, and hyphens
-                        const cleanValue = e.target.value.replace(/[^\d\s()()-]/g, "");
-                        setFormData({ ...formData, whatsapp: "+55" + cleanValue });
+                        const cleanValue = e.target.value.replace(
+                          /[^\d\s()()-]/g,
+                          "",
+                        );
+                        setFormData({
+                          ...formData,
+                          whatsapp: "+55" + cleanValue,
+                        });
                       }}
                       placeholder="(11) 98765-4321"
                       className="flex-1 px-4 py-2 border border-gray-300 rounded-r-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
@@ -448,7 +458,9 @@ export default function CadastroAnunciantes() {
                         {loja.endereco}
                       </td>
                       <td className="px-6 py-4 text-walmart-text">
-                        {loja.cidade && loja.estado ? `${loja.cidade}, ${loja.estado}` : '—'}
+                        {loja.cidade && loja.estado
+                          ? `${loja.cidade}, ${loja.estado}`
+                          : "—"}
                       </td>
                       <td className="px-6 py-4 flex gap-2">
                         <button

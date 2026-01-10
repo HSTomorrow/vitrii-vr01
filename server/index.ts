@@ -156,7 +156,9 @@ export function createServer() {
   app.get("/api/health", async (_req, res) => {
     try {
       // Test database connection
-      const result = await fetch('https://www.google.com', { method: 'HEAD' }).catch(() => null);
+      const result = await fetch("https://www.google.com", {
+        method: "HEAD",
+      }).catch(() => null);
 
       res.json({
         status: "ok",
@@ -209,7 +211,11 @@ export function createServer() {
 
   // Anunciantes routes (formerly Lojas)
   // Note: More specific routes must come BEFORE parameterized routes
-  app.get("/api/anunciantes/do-usuario/listar", extractUserId, getAnunciantesByUsuario);
+  app.get(
+    "/api/anunciantes/do-usuario/listar",
+    extractUserId,
+    getAnunciantesByUsuario,
+  );
   app.get("/api/anunciantes", getAnunciantes);
   app.get("/api/anunciantes/:id", getAnuncianteById);
   app.post("/api/anunciantes", createAnunciante);

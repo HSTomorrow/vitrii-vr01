@@ -101,7 +101,9 @@ export default function AnuncioForm({
     }));
     setShowCreateProducto(false);
     // Refresh the produtos list
-    queryClient.invalidateQueries({ queryKey: ["produtos-anuncio", selectedAnuncianteId] });
+    queryClient.invalidateQueries({
+      queryKey: ["produtos-anuncio", selectedAnuncianteId],
+    });
   };
 
   // Fetch anunciantes - filtered by user (ADM sees all, regular users see only theirs)
@@ -312,11 +314,14 @@ export default function AnuncioForm({
     }
 
     // Validate price: either precoAnuncio must be filled OR isDoacao must be true
-    const hasPrice = formData.precoAnuncio && parseFloat(formData.precoAnuncio) > 0;
+    const hasPrice =
+      formData.precoAnuncio && parseFloat(formData.precoAnuncio) > 0;
     const isFreeAd = formData.isDoacao;
 
     if (!hasPrice && !isFreeAd) {
-      toast.error("Você deve preencher o Valor do anúncio ou marcar como gratuito/doação");
+      toast.error(
+        "Você deve preencher o Valor do anúncio ou marcar como gratuito/doação",
+      );
       return;
     }
 
@@ -347,7 +352,10 @@ export default function AnuncioForm({
     }
   };
 
-  const handleInputChange = (field: string, value: string | number | boolean) => {
+  const handleInputChange = (
+    field: string,
+    value: string | number | boolean,
+  ) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -549,59 +557,71 @@ export default function AnuncioForm({
                 )}
               {selectedProducto?.tipo && (
                 <p className="mt-2 text-sm text-walmart-text-secondary">
-                  Tipo: <span className="font-semibold capitalize">{selectedProducto.tipo === "agenda_recorrente" ? "Agenda Recorrente" : selectedProducto.tipo}</span>
+                  Tipo:{" "}
+                  <span className="font-semibold capitalize">
+                    {selectedProducto.tipo === "agenda_recorrente"
+                      ? "Agenda Recorrente"
+                      : selectedProducto.tipo}
+                  </span>
                 </p>
               )}
             </div>
 
             {/* Tabela de Preço Selection - Only for regular products/services */}
-            {selectedProducto?.tipo && ["produto", "servico"].includes(selectedProducto.tipo) && priceTables.length > 0 && (
-            <div>
-              <label className="block text-sm font-semibold text-walmart-text mb-2">
-                Variante (Tamanho/Cor) - Opcional
-              </label>
-              {formData.productId > 0 ? (
-                <select
-                  value={formData.tabelaDePrecoId}
-                  onChange={(e) =>
-                    handleInputChange(
-                      "tabelaDePrecoId",
-                      parseInt(e.target.value),
-                    )
-                  }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
-                >
-                  <option value={0}>Selecione uma variante (opcional)</option>
-                  {priceTables.map((pt) => (
-                    <option key={pt.id} value={pt.id}>
-                      {pt.tamanho && pt.cor
-                        ? `${pt.tamanho} - ${pt.cor}`
-                        : pt.tamanho ||
-                          pt.cor ||
-                          `R$ ${Number(pt.preco).toFixed(2)}`}
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <div className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500">
-                  Selecione um produto primeiro
+            {selectedProducto?.tipo &&
+              ["produto", "servico"].includes(selectedProducto.tipo) &&
+              priceTables.length > 0 && (
+                <div>
+                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                    Variante (Tamanho/Cor) - Opcional
+                  </label>
+                  {formData.productId > 0 ? (
+                    <select
+                      value={formData.tabelaDePrecoId}
+                      onChange={(e) =>
+                        handleInputChange(
+                          "tabelaDePrecoId",
+                          parseInt(e.target.value),
+                        )
+                      }
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                    >
+                      <option value={0}>
+                        Selecione uma variante (opcional)
+                      </option>
+                      {priceTables.map((pt) => (
+                        <option key={pt.id} value={pt.id}>
+                          {pt.tamanho && pt.cor
+                            ? `${pt.tamanho} - ${pt.cor}`
+                            : pt.tamanho ||
+                              pt.cor ||
+                              `R$ ${Number(pt.preco).toFixed(2)}`}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <div className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500">
+                      Selecione um produto primeiro
+                    </div>
+                  )}
+                  {selectedPriceTable && (
+                    <p className="mt-2 text-sm text-walmart-blue font-semibold">
+                      Preço da Variante: R${" "}
+                      {Number(selectedPriceTable.preco).toFixed(2)}
+                    </p>
+                  )}
                 </div>
               )}
-              {selectedPriceTable && (
-                <p className="mt-2 text-sm text-walmart-blue font-semibold">
-                  Preço da Variante: R${" "}
-                  {Number(selectedPriceTable.preco).toFixed(2)}
-                </p>
+            {selectedProducto?.tipo &&
+              !["produto", "servico"].includes(selectedProducto.tipo) && (
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm text-blue-800">
+                    <strong>ℹ️ Dica:</strong> Este tipo de anúncio não requer
+                    variantes. O preço será definido diretamente no campo "Valor
+                    do Anúncio" abaixo.
+                  </p>
+                </div>
               )}
-            </div>
-            )}
-            {selectedProducto?.tipo && !["produto", "servico"].includes(selectedProducto.tipo) && (
-            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <p className="text-sm text-blue-800">
-                <strong>ℹ️ Dica:</strong> Este tipo de anúncio não requer variantes. O preço será definido diretamente no campo "Valor do Anúncio" abaixo.
-              </p>
-            </div>
-            )}
 
             {/* Preço do Anúncio - Sempre Visível */}
             <div>
@@ -609,16 +629,15 @@ export default function AnuncioForm({
                 Valor {formData.isDoacao ? "(Gratuito)" : ""}
               </label>
               <div className="flex items-center">
-                <span className="text-walmart-text font-semibold mr-2">
-                  R$
-                </span>
+                <span className="text-walmart-text font-semibold mr-2">R$</span>
                 <input
                   type="number"
                   step="0.01"
                   min="0"
                   value={formData.isDoacao ? "0" : formData.precoAnuncio}
                   onChange={(e) =>
-                    !formData.isDoacao && handleInputChange("precoAnuncio", e.target.value)
+                    !formData.isDoacao &&
+                    handleInputChange("precoAnuncio", e.target.value)
                   }
                   disabled={formData.isDoacao}
                   placeholder={
@@ -663,7 +682,10 @@ export default function AnuncioForm({
                 }}
                 className="w-4 h-4 text-green-600 bg-white border-gray-300 rounded focus:ring-2 focus:ring-green-500"
               />
-              <label htmlFor="isDoacao" className="text-sm font-semibold text-walmart-text cursor-pointer">
+              <label
+                htmlFor="isDoacao"
+                className="text-sm font-semibold text-walmart-text cursor-pointer"
+              >
                 Este produto/serviço/evento é gratuito
               </label>
             </div>
@@ -788,9 +810,7 @@ export default function AnuncioForm({
                 </label>
                 <select
                   value={formData.estado}
-                  onChange={(e) =>
-                    handleInputChange("estado", e.target.value)
-                  }
+                  onChange={(e) => handleInputChange("estado", e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent bg-white"
                 >
                   <option value="">-- Selecione um estado --</option>

@@ -129,7 +129,10 @@ export default function AnuncioDetalhe() {
           <div className="text-center">
             <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
             <p className="text-walmart-text text-lg">Anúncio não encontrado</p>
-            <Link to="/sell" className="text-walmart-blue hover:underline mt-4 inline-block">
+            <Link
+              to="/sell"
+              className="text-walmart-blue hover:underline mt-4 inline-block"
+            >
               Voltar para anúncios
             </Link>
           </div>
@@ -176,10 +179,14 @@ export default function AnuncioDetalhe() {
           <div className="flex items-start justify-between mb-8">
             <div>
               <div className="flex items-center gap-4 mb-2 flex-wrap">
-                <h1 className="text-4xl font-bold text-walmart-text">{anuncio.titulo}</h1>
+                <h1 className="text-4xl font-bold text-walmart-text">
+                  {anuncio.titulo}
+                </h1>
                 {canEdit && (
                   <>
-                    <span className={`px-3 py-1 rounded-full text-sm font-semibold ${statusColors[anuncio.status] || statusColors.em_edicao}`}>
+                    <span
+                      className={`px-3 py-1 rounded-full text-sm font-semibold ${statusColors[anuncio.status] || statusColors.em_edicao}`}
+                    >
                       {statusLabels[anuncio.status] || anuncio.status}
                     </span>
                     {isInactive && (
@@ -201,7 +208,10 @@ export default function AnuncioDetalhe() {
                 </div>
               </div>
               <p className="text-sm text-walmart-text-secondary">
-                Publicado por: <span className="font-semibold text-walmart-text">{anuncio.anunciante.nome}</span>
+                Publicado por:{" "}
+                <span className="font-semibold text-walmart-text">
+                  {anuncio.anunciante.nome}
+                </span>
               </p>
             </div>
 
@@ -224,14 +234,16 @@ export default function AnuncioDetalhe() {
                     } else {
                       if (
                         confirm(
-                          "Tem certeza que deseja inativar este anúncio? Ele deixará de aparecer na busca."
+                          "Tem certeza que deseja inativar este anúncio? Ele deixará de aparecer na busca.",
                         )
                       ) {
                         inactivateMutation.mutate();
                       }
                     }
                   }}
-                  disabled={inactivateMutation.isPending || activateMutation.isPending}
+                  disabled={
+                    inactivateMutation.isPending || activateMutation.isPending
+                  }
                   className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors disabled:opacity-50 ${
                     isInactive
                       ? "bg-green-500 text-white hover:bg-green-600"
@@ -252,7 +264,11 @@ export default function AnuncioDetalhe() {
                 </button>
                 <button
                   onClick={() => {
-                    if (confirm("Tem certeza que deseja deletar este anúncio? Isso não pode ser desfeito.")) {
+                    if (
+                      confirm(
+                        "Tem certeza que deseja deletar este anúncio? Isso não pode ser desfeito.",
+                      )
+                    ) {
                       deleteMutation.mutate();
                     }
                   }}
@@ -287,7 +303,9 @@ export default function AnuncioDetalhe() {
 
               {/* Description */}
               <div className="bg-white rounded-lg border border-gray-200 p-6 mb-8">
-                <h2 className="text-2xl font-bold text-walmart-text mb-4">Descrição</h2>
+                <h2 className="text-2xl font-bold text-walmart-text mb-4">
+                  Descrição
+                </h2>
                 <p className="text-walmart-text-secondary whitespace-pre-wrap leading-relaxed">
                   {anuncio.descricao || "Sem descrição adicional"}
                 </p>
@@ -297,18 +315,29 @@ export default function AnuncioDetalhe() {
               <div className="grid grid-cols-2 gap-4">
                 {/* Store Info */}
                 <div className="bg-white rounded-lg border border-gray-200 p-6">
-                  <h3 className="font-bold text-walmart-text mb-3">Anunciante</h3>
+                  <h3 className="font-bold text-walmart-text mb-3">
+                    Anunciante
+                  </h3>
                   <div className="space-y-3">
-                    <p className="text-walmart-text font-semibold">{anuncio.anunciante.nome}</p>
+                    <p className="text-walmart-text font-semibold">
+                      {anuncio.anunciante.nome}
+                    </p>
                     <div className="flex items-center gap-2 text-walmart-text-secondary text-sm">
                       <MapPin className="w-4 h-4" />
-                      <span>{anuncio.anunciante.endereco || "Endereço não informado"}</span>
+                      <span>
+                        {anuncio.anunciante.endereco ||
+                          "Endereço não informado"}
+                      </span>
                     </div>
                     {/* Social Media Links */}
                     <div className="flex gap-3 pt-2">
                       {anuncio.anunciante.site && (
                         <a
-                          href={anuncio.anunciante.site.startsWith("http") ? anuncio.anunciante.site : `https://${anuncio.anunciante.site}`}
+                          href={
+                            anuncio.anunciante.site.startsWith("http")
+                              ? anuncio.anunciante.site
+                              : `https://${anuncio.anunciante.site}`
+                          }
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-flex items-center gap-1 text-walmart-blue hover:text-walmart-blue-dark transition-colors"
@@ -345,8 +374,12 @@ export default function AnuncioDetalhe() {
 
                 {/* Product Group */}
                 <div className="bg-white rounded-lg border border-gray-200 p-6">
-                  <h3 className="font-bold text-walmart-text mb-3">Grupo de Produtos</h3>
-                  <p className="text-walmart-text">{anuncio.producto.grupo?.nome || "N/A"}</p>
+                  <h3 className="font-bold text-walmart-text mb-3">
+                    Grupo de Produtos
+                  </h3>
+                  <p className="text-walmart-text">
+                    {anuncio.producto.grupo?.nome || "N/A"}
+                  </p>
                 </div>
               </div>
             </div>
@@ -358,23 +391,30 @@ export default function AnuncioDetalhe() {
                 <p className="text-sm opacity-90 mb-1">Preço</p>
                 <div className="flex items-baseline">
                   <span className="text-4xl font-bold">
-                    R$ {Number(anuncio.precoAnuncio || anuncio.tabelaDePreco?.preco || 0).toFixed(2)}
+                    R${" "}
+                    {Number(
+                      anuncio.precoAnuncio || anuncio.tabelaDePreco?.preco || 0,
+                    ).toFixed(2)}
                   </span>
                 </div>
-                {anuncio.tabelaDePreco && (anuncio.tabelaDePreco.tamanho || anuncio.tabelaDePreco.cor) && (
-                  <div className="mt-4 pt-4 border-t border-blue-400">
-                    {anuncio.tabelaDePreco.tamanho && (
-                      <p className="text-sm">
-                        <span className="opacity-75">Tamanho:</span> {anuncio.tabelaDePreco.tamanho}
-                      </p>
-                    )}
-                    {anuncio.tabelaDePreco.cor && (
-                      <p className="text-sm">
-                        <span className="opacity-75">Cor:</span> {anuncio.tabelaDePreco.cor}
-                      </p>
-                    )}
-                  </div>
-                )}
+                {anuncio.tabelaDePreco &&
+                  (anuncio.tabelaDePreco.tamanho ||
+                    anuncio.tabelaDePreco.cor) && (
+                    <div className="mt-4 pt-4 border-t border-blue-400">
+                      {anuncio.tabelaDePreco.tamanho && (
+                        <p className="text-sm">
+                          <span className="opacity-75">Tamanho:</span>{" "}
+                          {anuncio.tabelaDePreco.tamanho}
+                        </p>
+                      )}
+                      {anuncio.tabelaDePreco.cor && (
+                        <p className="text-sm">
+                          <span className="opacity-75">Cor:</span>{" "}
+                          {anuncio.tabelaDePreco.cor}
+                        </p>
+                      )}
+                    </div>
+                  )}
               </div>
 
               {/* Contact Actions */}
@@ -410,7 +450,9 @@ export default function AnuncioDetalhe() {
                   <div className="text-sm">
                     <p className="text-walmart-text-secondary">Publicado em</p>
                     <p className="font-semibold text-walmart-text">
-                      {new Date(anuncio.dataCriacao).toLocaleDateString("pt-BR")}
+                      {new Date(anuncio.dataCriacao).toLocaleDateString(
+                        "pt-BR",
+                      )}
                     </p>
                   </div>
                 </div>
@@ -418,7 +460,9 @@ export default function AnuncioDetalhe() {
                   <div className="flex gap-2">
                     <DollarSign className="w-5 h-5 text-walmart-blue flex-shrink-0 mt-0.5" />
                     <div className="text-sm">
-                      <p className="text-walmart-text-secondary">Status de Pagamento</p>
+                      <p className="text-walmart-text-secondary">
+                        Status de Pagamento
+                      </p>
                       <p className="font-semibold text-walmart-text">
                         {anuncio.status === "pago" ? "Pago" : "Pendente"}
                       </p>

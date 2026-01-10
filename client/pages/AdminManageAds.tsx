@@ -48,7 +48,11 @@ export default function AdminManageAds() {
   const isAdmin = user?.tipoUsuario === "adm";
 
   // Fetch all ads
-  const { data: anunciosData, isLoading, error } = useQuery({
+  const {
+    data: anunciosData,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["admin-anuncios"],
     enabled: isAdmin,
     queryFn: async () => {
@@ -59,7 +63,9 @@ export default function AdminManageAds() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: "Erro desconhecido" }));
+        const errorData = await response
+          .json()
+          .catch(() => ({ error: "Erro desconhecido" }));
         throw new Error(errorData.error || `HTTP ${response.status}`);
       }
       return response.json();
@@ -281,7 +287,9 @@ export default function AdminManageAds() {
             <div className="flex items-center gap-3">
               <AlertCircle className="w-5 h-5 text-red-600" />
               <div>
-                <h3 className="font-semibold text-red-800">Erro ao carregar anúncios</h3>
+                <h3 className="font-semibold text-red-800">
+                  Erro ao carregar anúncios
+                </h3>
                 <p className="text-sm text-red-700">
                   {error instanceof Error ? error.message : "Erro desconhecido"}
                 </p>
@@ -336,8 +344,8 @@ export default function AdminManageAds() {
                         )}
                       </div>
                       <p className="text-sm text-walmart-text-secondary truncate">
-                        Anunciante: {anuncio.anunciante?.nome || "N/A"} • Produto:{" "}
-                        {anuncio.producto?.nome || "N/A"}
+                        Anunciante: {anuncio.anunciante?.nome || "N/A"} •
+                        Produto: {anuncio.producto?.nome || "N/A"}
                       </p>
                       <div className="flex items-center gap-2 mt-2">
                         <span
@@ -361,13 +369,14 @@ export default function AdminManageAds() {
                     </div>
 
                     {/* Price */}
-                    {anuncio.precoAnuncio && typeof anuncio.precoAnuncio === 'number' && (
-                      <div className="text-right">
-                        <p className="text-lg font-bold text-walmart-blue">
-                          R$ {Number(anuncio.precoAnuncio).toFixed(2)}
-                        </p>
-                      </div>
-                    )}
+                    {anuncio.precoAnuncio &&
+                      typeof anuncio.precoAnuncio === "number" && (
+                        <div className="text-right">
+                          <p className="text-lg font-bold text-walmart-blue">
+                            R$ {Number(anuncio.precoAnuncio).toFixed(2)}
+                          </p>
+                        </div>
+                      )}
 
                     {/* Expand button */}
                     {expandedAd === anuncio.id ? (

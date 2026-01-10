@@ -30,9 +30,12 @@ export default function CriarAnuncio() {
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center max-w-md">
             <AlertCircle className="w-12 h-12 text-blue-600 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-walmart-text mb-2">Acesso Restrito</h2>
+            <h2 className="text-2xl font-bold text-walmart-text mb-2">
+              Acesso Restrito
+            </h2>
             <p className="text-walmart-text-secondary mb-6">
-              Para criar anúncios, você precisa estar logado com uma conta válida.
+              Para criar anúncios, você precisa estar logado com uma conta
+              válida.
             </p>
             <div className="flex gap-3">
               <button
@@ -59,9 +62,7 @@ export default function CriarAnuncio() {
     <div className="min-h-screen flex flex-col bg-walmart-gray-light">
       <Header />
       <main className="flex-1">
-        <AnuncioForm
-          onSuccess={() => navigate("/sell")}
-        />
+        <AnuncioForm onSuccess={() => navigate("/sell")} />
       </main>
       <Footer />
     </div>

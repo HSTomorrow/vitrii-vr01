@@ -50,10 +50,10 @@ export default function CreateAnuncianteModal({
         if (errorData.details && Array.isArray(errorData.details)) {
           const formattedErrors = errorData.details
             .map((err: any) => {
-              const field = err.path?.join('.') || 'campo desconhecido';
+              const field = err.path?.join(".") || "campo desconhecido";
               return `${field}: ${err.message}`;
             })
-            .join('\n');
+            .join("\n");
 
           const error = new Error(formattedErrors);
           (error as any).isValidationError = true;
@@ -315,10 +315,17 @@ export default function CreateAnuncianteModal({
               </span>
               <input
                 type="text"
-                value={formData.whatsapp.startsWith("+55") ? formData.whatsapp.substring(3) : formData.whatsapp}
+                value={
+                  formData.whatsapp.startsWith("+55")
+                    ? formData.whatsapp.substring(3)
+                    : formData.whatsapp
+                }
                 onChange={(e) => {
                   // Only allow digits, spaces, parentheses, and hyphens
-                  const cleanValue = e.target.value.replace(/[^\d\s()()-]/g, "");
+                  const cleanValue = e.target.value.replace(
+                    /[^\d\s()()-]/g,
+                    "",
+                  );
                   handleInputChange("whatsapp", "+55" + cleanValue);
                 }}
                 placeholder="(11) 98765-4321"

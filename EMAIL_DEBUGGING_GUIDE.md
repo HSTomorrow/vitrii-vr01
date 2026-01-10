@@ -53,11 +53,13 @@ When an email is sent, you'll see detailed logs in the dev server console:
 Both monitoring accounts receive automatic copies:
 
 **Account 1: herestomorrow@outlook.com**
+
 - Log in to herestomorrow@outlook.com
 - Look in the Inbox folder
 - Every password reset and welcome email will appear here automatically
 
 **Account 2: vitriimarketplace@gmail.com**
+
 - Log in to vitriimarketplace@gmail.com
 - Look in the Inbox folder
 - Every password reset and welcome email will appear here automatically

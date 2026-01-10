@@ -3,44 +3,61 @@ import prisma from "../lib/prisma";
 import { z } from "zod";
 
 // Schema validation for creating/updating ad
-const AnuncioCreateSchema = z.object({
-  anuncianteId: z.number().int().positive("Anunciante é obrigatório"),
-  productId: z.number().int().nonnegative().optional().nullable(), // Allow 0 since product is optional
-  tabelaDePrecoId: z.number().int().optional().nullable(),
-  titulo: z
-    .string()
-    .min(5, "Título deve ter pelo menos 5 caracteres")
-    .max(50, "Título não pode ter mais de 50 caracteres"),
-  descricao: z.string().optional().nullable(),
-  fotoUrl: z.string().optional().nullable(),
-  precoAnuncio: z
-    .number()
-    .positive("Preço do anúncio deve ser maior que 0")
-    .optional()
-    .nullable(),
-  dataValidade: z.string().optional().nullable(),
-  equipeDeVendaId: z.number().int().positive().optional().nullable(),
-  endereco: z.string().max(100, "Endereço não pode ter mais de 100 caracteres").optional().nullable(),
-  cidade: z.string().max(100, "Cidade não pode ter mais de 100 caracteres").optional().nullable(),
-  estado: z.string().length(2, "Estado deve ter 2 caracteres").optional().nullable(),
-  isDoacao: z.boolean().optional().default(false),
-  destaque: z.boolean().optional().default(false),
-  isActive: z.boolean().optional().default(true),
-  status: z.enum(["em_edicao", "aguardando_pagamento", "pago", "historico"]).optional(),
-  categoria: z.enum(["roupas", "carros", "imoveis"]).optional().nullable(),
-  dadosCategoria: z.string().optional().nullable(), // JSON string
-}).refine(
-  (data) => {
-    // Either precoAnuncio must be provided OR isDoacao must be true
-    const hasPrice = data.precoAnuncio && data.precoAnuncio > 0;
-    const isFree = data.isDoacao === true;
-    return hasPrice || isFree;
-  },
-  {
-    message: "Você deve preencher o Valor do anúncio ou marcar como gratuito/doação",
-    path: ["precoAnuncio"], // Point to the field with the error
-  }
-);
+const AnuncioCreateSchema = z
+  .object({
+    anuncianteId: z.number().int().positive("Anunciante é obrigatório"),
+    productId: z.number().int().nonnegative().optional().nullable(), // Allow 0 since product is optional
+    tabelaDePrecoId: z.number().int().optional().nullable(),
+    titulo: z
+      .string()
+      .min(5, "Título deve ter pelo menos 5 caracteres")
+      .max(50, "Título não pode ter mais de 50 caracteres"),
+    descricao: z.string().optional().nullable(),
+    fotoUrl: z.string().optional().nullable(),
+    precoAnuncio: z
+      .number()
+      .positive("Preço do anúncio deve ser maior que 0")
+      .optional()
+      .nullable(),
+    dataValidade: z.string().optional().nullable(),
+    equipeDeVendaId: z.number().int().positive().optional().nullable(),
+    endereco: z
+      .string()
+      .max(100, "Endereço não pode ter mais de 100 caracteres")
+      .optional()
+      .nullable(),
+    cidade: z
+      .string()
+      .max(100, "Cidade não pode ter mais de 100 caracteres")
+      .optional()
+      .nullable(),
+    estado: z
+      .string()
+      .length(2, "Estado deve ter 2 caracteres")
+      .optional()
+      .nullable(),
+    isDoacao: z.boolean().optional().default(false),
+    destaque: z.boolean().optional().default(false),
+    isActive: z.boolean().optional().default(true),
+    status: z
+      .enum(["em_edicao", "aguardando_pagamento", "pago", "historico"])
+      .optional(),
+    categoria: z.enum(["roupas", "carros", "imoveis"]).optional().nullable(),
+    dadosCategoria: z.string().optional().nullable(), // JSON string
+  })
+  .refine(
+    (data) => {
+      // Either precoAnuncio must be provided OR isDoacao must be true
+      const hasPrice = data.precoAnuncio && data.precoAnuncio > 0;
+      const isFree = data.isDoacao === true;
+      return hasPrice || isFree;
+    },
+    {
+      message:
+        "Você deve preencher o Valor do anúncio ou marcar como gratuito/doação",
+      path: ["precoAnuncio"], // Point to the field with the error
+    },
+  );
 
 // GET all ads
 export const getAnuncios: RequestHandler = async (req, res) => {
@@ -63,7 +80,13 @@ export const getAnuncios: RequestHandler = async (req, res) => {
     );
     const pageOffset = Math.max(parseInt(offset as string) || 0, 0);
 
-    console.log("[getAnuncios] Query parameters:", { anuncianteId, status, includeInactive, pageLimit, pageOffset });
+    console.log("[getAnuncios] Query parameters:", {
+      anuncianteId,
+      status,
+      includeInactive,
+      pageLimit,
+      pageOffset,
+    });
 
     const where: any = { isActive: true }; // Default: only active ads
     if (anuncianteId) where.anuncianteId = parseInt(anuncianteId as string);
@@ -111,7 +134,12 @@ export const getAnuncios: RequestHandler = async (req, res) => {
       prisma.anuncio.count({ where }),
     ]);
 
-    console.log("[getAnuncios] Success! Fetched", anuncios.length, "ads out of", total);
+    console.log(
+      "[getAnuncios] Success! Fetched",
+      anuncios.length,
+      "ads out of",
+      total,
+    );
 
     res.json({
       success: true,
@@ -277,7 +305,10 @@ export const createAnuncio: RequestHandler = async (req, res) => {
     const anuncio = await prisma.anuncio.create({
       data: {
         anuncianteId: validatedData.anuncianteId,
-        productId: validatedData.productId && validatedData.productId > 0 ? validatedData.productId : null,
+        productId:
+          validatedData.productId && validatedData.productId > 0
+            ? validatedData.productId
+            : null,
         tabelaDePrecoId,
         titulo: validatedData.titulo,
         descricao: validatedData.descricao,
@@ -606,8 +637,10 @@ export const canEditAnuncio: RequestHandler = async (req, res) => {
     if (!usuarioId) {
       // Try to get from query parameter or header
       usuarioId = parseInt(
-        (req.query.usuarioId as string) || (req.headers["x-user-id"] as string) || "0",
-        10
+        (req.query.usuarioId as string) ||
+          (req.headers["x-user-id"] as string) ||
+          "0",
+        10,
       );
     }
 

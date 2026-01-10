@@ -13,7 +13,12 @@ async function getTransporter() {
   const currentConfig = `${process.env.SMTP_HOST}:${process.env.SMTP_PORT}`;
 
   // If SMTP is configured and hasn't changed, return cached transporter
-  if (process.env.SMTP_HOST && process.env.SMTP_PORT && lastSmtpConfig === currentConfig && transporter) {
+  if (
+    process.env.SMTP_HOST &&
+    process.env.SMTP_PORT &&
+    lastSmtpConfig === currentConfig &&
+    transporter
+  ) {
     return transporter;
   }
 
@@ -124,7 +129,10 @@ export async function sendPasswordResetEmail(
     console.log("✅ Email de redefinição de senha enviado com sucesso");
     console.log("   - Para:", email);
     console.log("   - De:", process.env.MAIL_FROM);
-    console.log("   - BCC:", "herestomorrow@outlook.com, vitriimarketplace@gmail.com");
+    console.log(
+      "   - BCC:",
+      "herestomorrow@outlook.com, vitriimarketplace@gmail.com",
+    );
     console.log("   - Message ID:", info.messageId);
 
     // In development, log preview URL
@@ -196,7 +204,10 @@ export async function sendWelcomeEmail(
     console.log("✅ Email de boas-vindas enviado com sucesso");
     console.log("   - Para:", email);
     console.log("   - De:", process.env.MAIL_FROM);
-    console.log("   - BCC:", "herestomorrow@outlook.com, vitriimarketplace@gmail.com");
+    console.log(
+      "   - BCC:",
+      "herestomorrow@outlook.com, vitriimarketplace@gmail.com",
+    );
     console.log("   - Message ID:", info.messageId);
     return true;
   } catch (error) {
