@@ -261,7 +261,7 @@ model QRCode {
 model Anuncio {
   id            Int       @id @default(autoincrement())
   anuncianteId  Int
-  productId     Int
+  productId     Int?
   tabelaDePrecoId Int?
   equipeDeVendaId Int?
   titulo        String    @db.VarChar(50)
