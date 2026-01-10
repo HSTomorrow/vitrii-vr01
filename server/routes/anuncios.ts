@@ -208,42 +208,46 @@ export const createAnuncio: RequestHandler = async (req, res) => {
   try {
     const validatedData = AnuncioCreateSchema.parse(req.body);
 
-    // Verify that the product belongs to the anunciante
-    const producto = await prisma.producto.findUnique({
-      where: { id: validatedData.productId },
-      include: {
-        grupo: true,
-      },
-    });
-
-    if (
-      !producto ||
-      producto.grupo.anuncianteId !== validatedData.anuncianteId
-    ) {
-      return res.status(400).json({
-        success: false,
-        error: "Produto não pertence ao anunciante selecionado",
-      });
-    }
-
-    // Verify that the price table belongs to the product if provided
     let tabelaDePrecoId: number | null = null;
-    if (validatedData.tabelaDePrecoId && validatedData.tabelaDePrecoId > 0) {
-      const tabelaDePreco = await prisma.tabelaDePreco.findUnique({
-        where: { id: validatedData.tabelaDePrecoId },
+
+    // Only validate product if one is provided (product is optional)
+    if (validatedData.productId && validatedData.productId > 0) {
+      // Verify that the product belongs to the anunciante
+      const producto = await prisma.producto.findUnique({
+        where: { id: validatedData.productId },
+        include: {
+          grupo: true,
+        },
       });
 
       if (
-        !tabelaDePreco ||
-        tabelaDePreco.productId !== validatedData.productId
+        !producto ||
+        producto.grupo.anuncianteId !== validatedData.anuncianteId
       ) {
         return res.status(400).json({
           success: false,
-          error: "Tabela de preço não pertence ao produto selecionado",
+          error: "Produto não pertence ao anunciante selecionado",
         });
       }
 
-      tabelaDePrecoId = validatedData.tabelaDePrecoId;
+      // Verify that the price table belongs to the product if provided
+      if (validatedData.tabelaDePrecoId && validatedData.tabelaDePrecoId > 0) {
+        const tabelaDePreco = await prisma.tabelaDePreco.findUnique({
+          where: { id: validatedData.tabelaDePrecoId },
+        });
+
+        if (
+          !tabelaDePreco ||
+          tabelaDePreco.productId !== validatedData.productId
+        ) {
+          return res.status(400).json({
+            success: false,
+            error: "Tabela de preço não pertence ao produto selecionado",
+          });
+        }
+
+        tabelaDePrecoId = validatedData.tabelaDePrecoId;
+      }
     }
     // Note: tabelaDePrecoId can now be null for events, schedules, or when using manual price
 
