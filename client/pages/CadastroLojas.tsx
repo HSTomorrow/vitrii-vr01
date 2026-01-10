@@ -361,10 +361,9 @@ export default function CadastroAnunciantes() {
 
               <div>
                 <label className="block text-sm font-semibold text-walmart-text mb-2">
-                  Descrição *
+                  Descrição (Opcional)
                 </label>
                 <textarea
-                  required
                   value={formData.descricao}
                   onChange={(e) =>
                     setFormData({ ...formData, descricao: e.target.value })
