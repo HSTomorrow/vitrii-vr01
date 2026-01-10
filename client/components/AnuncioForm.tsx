@@ -311,6 +311,15 @@ export default function AnuncioForm({
       return;
     }
 
+    // Validate price: either precoAnuncio must be filled OR isDoacao must be true
+    const hasPrice = formData.precoAnuncio && parseFloat(formData.precoAnuncio) > 0;
+    const isFreeAd = formData.isDoacao;
+
+    if (!hasPrice && !isFreeAd) {
+      toast.error("Você deve preencher o Valor do anúncio ou marcar como gratuito/doação");
+      return;
+    }
+
     mutation.mutate(formData);
   };
 
