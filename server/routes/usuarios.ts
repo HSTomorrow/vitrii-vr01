@@ -406,7 +406,7 @@ export const deleteUsuario: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
-    await prisma.usracesso.delete({
+    await prisma.usracessos.delete({
       where: { id: parseInt(id) },
     });
 
