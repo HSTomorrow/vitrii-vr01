@@ -45,10 +45,9 @@ async function main() {
     // Update existing records with contract date (30 days from now)
     console.log("\n📝 Preenchendo contratos existentes com data + 30 dias...");
     const result = await prisma.$executeRawUnsafe(
-      `UPDATE "usracessos" 
-       SET "dataVigenciaContrato" = $1 
-       WHERE "dataVigenciaContrato" IS NULL OR "dataVigenciaContrato" = CURRENT_TIMESTAMP`,
-      futureDateISO
+      `UPDATE "usracessos"
+       SET "dataVigenciaContrato" = NOW() + INTERVAL '30 days'
+       WHERE "dataVigenciaContrato" IS NULL OR "dataVigenciaContrato" = CURRENT_TIMESTAMP`
     );
     console.log(`✅ ${result} usuários atualizados\n`);
 
