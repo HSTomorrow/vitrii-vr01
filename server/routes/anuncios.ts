@@ -298,6 +298,7 @@ export const createAnuncio: RequestHandler = async (req, res) => {
 
     const anuncio = await prisma.anuncios.create({
       data: {
+        usuarioId: validatedData.usuarioId,
         anuncianteId: validatedData.anuncianteId,
         productId:
           validatedData.productId && validatedData.productId > 0
@@ -316,6 +317,7 @@ export const createAnuncio: RequestHandler = async (req, res) => {
         categoria: validatedData.categoria,
         dadosCategoria: validatedData.dadosCategoria || null,
         status,
+        dataAtualizacao: new Date(),
       },
       include: {
         anunciante: true,
