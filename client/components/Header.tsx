@@ -166,18 +166,13 @@ export default function Header() {
             )}
 
             {/* Mobile menu button */}
-            <button
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
+            <Link
+              to="/menu"
               className="flex-shrink-0 p-2 hover:bg-walmart-gray rounded-lg mobile-menu-button"
               aria-label="Menu de navegação"
-              aria-expanded={isMenuOpen}
             >
-              {isMenuOpen ? (
-                <X className="w-5 h-5" />
-              ) : (
-                <Menu className="w-5 h-5" />
-              )}
-            </button>
+              <Menu className="w-5 h-5" />
+            </Link>
           </div>
         </div>
 
