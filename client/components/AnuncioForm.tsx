@@ -318,7 +318,9 @@ export default function AnuncioForm({
     onError: (error) => {
       const errorMsg =
         error instanceof Error ? error.message : "Erro ao salvar";
-      toast.error(errorMsg);
+      console.error("[AnuncioForm] Mutation error:", error);
+      console.error("[AnuncioForm] Error details:", errorMsg);
+      toast.error(`Erro ao salvar anúncio: ${errorMsg}`);
     },
   });
 
