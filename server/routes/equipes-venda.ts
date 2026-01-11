@@ -169,7 +169,7 @@ export const createEquipe: RequestHandler = async (req, res) => {
     const usuarioId = req.userId;
 
     // Verify anunciante exists
-    const anunciante = await prisma.anunciante.findUnique({
+    const anunciante = await prisma.anunciantes.findUnique({
       where: { id: body.anuncianteId },
     });
 
