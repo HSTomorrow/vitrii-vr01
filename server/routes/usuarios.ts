@@ -41,7 +41,7 @@ const UsuarioCreateSchema = z.object({
 // GET all users
 export const getUsuarios: RequestHandler = async (req, res) => {
   try {
-    const usuarios = await prisma.usracesso.findMany({
+    const usuarios = await prisma.usracessos.findMany({
       select: {
         id: true,
         nome: true,
@@ -680,7 +680,7 @@ export const validateResetToken: RequestHandler = async (req, res) => {
 export const getUsuariosComSenha: RequestHandler = async (req, res) => {
   try {
     // Check if user is admin (should be done via middleware in server/index.ts)
-    const usuarios = await prisma.usracesso.findMany({
+    const usuarios = await prisma.usracessos.findMany({
       select: {
         id: true,
         nome: true,
