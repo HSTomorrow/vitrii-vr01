@@ -122,6 +122,10 @@ model MembroEquipe {
   id            Int       @id @default(autoincrement())
   equipeId      Int
   usuarioId     Int
+  nome          String    @db.VarChar(255)           // Nome do membro da equipe
+  email         String    @db.VarChar(255)           // Email do membro
+  whatsapp      String?   @db.VarChar(20)            // WhatsApp do membro
+  status        String    @default("disponivel")     // "disponivel", "nao_disponivel", "cancelado"
   dataCriacao   DateTime  @default(now())
   dataAtualizacao DateTime @updatedAt
 
