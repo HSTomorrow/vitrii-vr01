@@ -41,7 +41,7 @@ const UsuarioCreateSchema = z.object({
 // GET all users
 export const getUsuarios: RequestHandler = async (req, res) => {
   try {
-    const usuarios = await prisma.usuario.findMany({
+    const usuarios = await prisma.usracesso.findMany({
       select: {
         id: true,
         nome: true,
@@ -71,7 +71,7 @@ export const getUsuarios: RequestHandler = async (req, res) => {
 export const getUsuarioById: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
-    const usuario = await prisma.usuario.findUnique({
+    const usuario = await prisma.usracesso.findUnique({
       where: { id: parseInt(id) },
       include: {
         usuarioAnunciantes: {
@@ -116,7 +116,7 @@ export const signInUsuario: RequestHandler = async (req, res) => {
     }
 
     // Find user by email
-    const usuario = await prisma.usuario.findUnique({
+    const usuario = await prisma.usracesso.findUnique({
       where: { email },
       select: {
         id: true,
@@ -170,7 +170,7 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
     const validatedData = UsuarioSignUpSchema.parse(req.body);
 
     // Check if user already exists by email
-    const existingUser = await prisma.usuario.findUnique({
+    const existingUser = await prisma.usracesso.findUnique({
       where: { email: validatedData.email },
     });
 
@@ -184,7 +184,7 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
     // Hash password with bcrypt
     const senhaHash = await bcryptjs.hash(validatedData.senha, 10);
 
-    const usuario = await prisma.usuario.create({
+    const usuario = await prisma.usracesso.create({
       data: {
         nome: validatedData.nome,
         email: validatedData.email,
@@ -237,7 +237,7 @@ export const createUsuario: RequestHandler = async (req, res) => {
     const validatedData = UsuarioCreateSchema.parse(req.body);
 
     // Check if user already exists
-    const existingUser = await prisma.usuario.findUnique({
+    const existingUser = await prisma.usracesso.findUnique({
       where: { email: validatedData.email },
     });
 
@@ -257,7 +257,7 @@ export const createUsuario: RequestHandler = async (req, res) => {
       normalizedCpf = validatedData.cpf.replace(/\D/g, "");
     }
 
-    const usuario = await prisma.usuario.create({
+    const usuario = await prisma.usracesso.create({
       data: {
         nome: validatedData.nome,
         email: validatedData.email,
@@ -343,7 +343,7 @@ export const updateUsuario: RequestHandler = async (req, res) => {
 
     // Check if CPF already exists for a different user
     if (validatedData.cpf && validatedData.cpf.trim()) {
-      const existingCpf = await prisma.usuario.findFirst({
+      const existingCpf = await prisma.usracesso.findFirst({
         where: {
           cpf: validatedData.cpf,
           id: { not: userId }, // Exclude current user
@@ -364,7 +364,7 @@ export const updateUsuario: RequestHandler = async (req, res) => {
       }
     }
 
-    const usuario = await prisma.usuario.update({
+    const usuario = await prisma.usracesso.update({
       where: { id: userId },
       data: validatedData,
       select: {
@@ -406,7 +406,7 @@ export const deleteUsuario: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
-    await prisma.usuario.delete({
+    await prisma.usracesso.delete({
       where: { id: parseInt(id) },
     });
 
@@ -436,7 +436,7 @@ export const forgotPassword: RequestHandler = async (req, res) => {
     }
 
     // Find user by email
-    const usuario = await prisma.usuario.findUnique({
+    const usuario = await prisma.usracesso.findUnique({
       where: { email },
       select: {
         id: true,
@@ -532,7 +532,7 @@ export const resetPassword: RequestHandler = async (req, res) => {
     }
 
     // Find user by email
-    const usuario = await prisma.usuario.findUnique({
+    const usuario = await prisma.usracesso.findUnique({
       where: { email },
       select: { id: true },
     });
@@ -582,7 +582,7 @@ export const resetPassword: RequestHandler = async (req, res) => {
 
     // Update user password and mark token as used
     await Promise.all([
-      prisma.usuario.update({
+      prisma.usracesso.update({
         where: { id: usuario.id },
         data: { senha: senhaHash },
       }),
@@ -618,7 +618,7 @@ export const validateResetToken: RequestHandler = async (req, res) => {
     }
 
     // Find user by email
-    const usuario = await prisma.usuario.findUnique({
+    const usuario = await prisma.usracesso.findUnique({
       where: { email: email as string },
       select: { id: true },
     });
@@ -680,7 +680,7 @@ export const validateResetToken: RequestHandler = async (req, res) => {
 export const getUsuariosComSenha: RequestHandler = async (req, res) => {
   try {
     // Check if user is admin (should be done via middleware in server/index.ts)
-    const usuarios = await prisma.usuario.findMany({
+    const usuarios = await prisma.usracesso.findMany({
       select: {
         id: true,
         nome: true,
@@ -730,7 +730,7 @@ export const adminResetUserPassword: RequestHandler = async (req, res) => {
     }
 
     // Find user
-    const usuario = await prisma.usuario.findUnique({
+    const usuario = await prisma.usracesso.findUnique({
       where: { id: parseInt(usuarioId) },
       select: { id: true, email: true, nome: true },
     });
@@ -746,7 +746,7 @@ export const adminResetUserPassword: RequestHandler = async (req, res) => {
     const senhaHash = await bcryptjs.hash(novaSenha, 10);
 
     // Update user password
-    await prisma.usuario.update({
+    await prisma.usracesso.update({
       where: { id: usuario.id },
       data: { senha: senhaHash },
     });
