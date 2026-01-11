@@ -105,7 +105,7 @@ async function main() {
     const adminPassword = await bcrypt.hash("admin123", 10);
     const adminUser = await prisma.usracessos.create({
       data: {
-        nome: "Administrador",
+        nome: "Admin",
         email: "admin@vitrii.com",
         senha: adminPassword,
         cpf: "00000000000",
