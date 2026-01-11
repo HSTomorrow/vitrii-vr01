@@ -125,7 +125,7 @@ async function main() {
       const anunciante = await prisma.anunciantes.create({
         data: {
           nome: storeData.nome,
-          cnpj: storeData.cnpjOuCpf,
+          cnpj: storeData.cnpjOuCpf.replace(/[^0-9]/g, "").substring(0, 14), // Remove formatting, keep only 14 digits
           endereco: storeData.endereco,
           cidade: storeData.cidade,
           estado: storeData.estado,
