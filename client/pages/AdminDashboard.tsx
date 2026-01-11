@@ -20,6 +20,7 @@ import {
   Key,
 } from "lucide-react";
 import { useState } from "react";
+import AdminEditUserModal from "@/components/AdminEditUserModal";
 
 interface Usuario {
   id: number;
@@ -27,8 +28,14 @@ interface Usuario {
   email: string;
   cpf?: string;
   telefone?: string;
+  whatsapp?: string;
+  linkedin?: string;
+  facebook?: string;
   tipoUsuario: string;
   dataCriacao: string;
+  dataVigenciaContrato: string;
+  numeroAnunciosAtivos: number;
+  endereco?: string;
 }
 
 interface Funcionalidade {
