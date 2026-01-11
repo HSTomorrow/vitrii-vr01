@@ -901,6 +901,47 @@ export const canEditAnuncio: RequestHandler = async (req, res) => {
   }
 };
 
+// TOGGLE featured status of an ad (destaque)
+export const toggleDestaqueAnuncio: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Get current destaque status
+    const anuncio = await prisma.anuncios.findUnique({
+      where: { id: parseInt(id) },
+      select: { destaque: true },
+    });
+
+    if (!anuncio) {
+      return res.status(404).json({
+        success: false,
+        error: "Anúncio não encontrado",
+      });
+    }
+
+    // Toggle the destaque value
+    const updated = await prisma.anuncios.update({
+      where: { id: parseInt(id) },
+      data: { destaque: !anuncio.destaque },
+      include: {
+        anunciantes: true,
+      },
+    });
+
+    res.json({
+      success: true,
+      message: `Anúncio ${updated.destaque ? "adicionado ao" : "removido do"} destaque com sucesso`,
+      data: updated,
+    });
+  } catch (error) {
+    console.error("Error toggling featured status:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao alternar status de destaque",
+    });
+  }
+};
+
 // GET user's ads (my ads)
 export const getAnunciosDUsuario: RequestHandler = async (req, res) => {
   try {
