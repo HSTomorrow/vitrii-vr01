@@ -151,19 +151,19 @@ export const requireAdmin: RequestHandler = async (req, res, next) => {
  */
 export const extractUserId: RequestHandler = (req, res, next) => {
   try {
-    // Try to get userId from:
-    // 1. URL parameter (for nested routes like /api/usuarios/:usuarioId/...)
-    // 2. Query parameter (?userId=123)
-    // 3. Request body ({userId: 123})
-    // 4. Headers (x-user-id header)
+    // Try to get userId from (in order of priority):
+    // 1. Headers (x-user-id) - for authenticated API requests
+    // 2. URL parameter usuarioId (for nested routes like /api/usuarios/:usuarioId/...)
+    // Note: We avoid using generic :id param to prevent confusion between resource ID and user ID
+    // 3. Query parameter (?userId=123)
+    // 4. Request body ({userId: 123} or {usuarioId: 123})
 
     const userIdSource =
+      req.headers["x-user-id"] ||
       req.params?.usuarioId ||
-      req.params?.id ||
       req.query?.userId ||
       req.body?.usuarioId ||
-      req.body?.userId ||
-      req.headers["x-user-id"];
+      req.body?.userId;
 
     if (userIdSource) {
       const parsedId = parseInt(userIdSource as string, 10);
