@@ -170,7 +170,7 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
     const validatedData = UsuarioSignUpSchema.parse(req.body);
 
     // Check if user already exists by email
-    const existingUser = await prisma.usracesso.findUnique({
+    const existingUser = await prisma.usracessos.findUnique({
       where: { email: validatedData.email },
     });
 
@@ -237,7 +237,7 @@ export const createUsuario: RequestHandler = async (req, res) => {
     const validatedData = UsuarioCreateSchema.parse(req.body);
 
     // Check if user already exists
-    const existingUser = await prisma.usracesso.findUnique({
+    const existingUser = await prisma.usracessos.findUnique({
       where: { email: validatedData.email },
     });
 
