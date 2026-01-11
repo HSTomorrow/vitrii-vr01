@@ -219,7 +219,7 @@ export function createServer() {
   app.get("/api/anunciantes", getAnunciantes);
   app.get("/api/anunciantes/:id", getAnuncianteById);
   app.post("/api/anunciantes", createAnunciante);
-  app.put("/api/anunciantes/:id", updateAnunciante);
+  app.put("/api/anunciantes/:id", extractUserId, updateAnunciante);
   app.delete("/api/anunciantes/:id", deleteAnunciante);
   app.post("/api/anunciantes/:id/usuarios", adicionarUsuarioAnunciante);
   app.get("/api/anunciantes/:anuncianteId/usuarios", getEquipeAnunciante);
