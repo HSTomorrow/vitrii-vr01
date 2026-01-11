@@ -192,12 +192,14 @@
   /* Mobile menu button - show on screens < 1024px (lg breakpoint) */
   .mobile-menu-button {
     display: flex;
+    visibility: visible;
+    z-index: 50;
   }
 
   /* Hide mobile menu button on large screens only */
   @media (min-width: 1024px) {
     .mobile-menu-button {
-      display: none;
+      display: none !important;
     }
   }
 
@@ -208,17 +210,31 @@
     }
   }
 
-  /* Extra fallback for zoom scenarios */
-  @media (min-width: 0px) {
-    .mobile-menu-button {
-      display: flex;
-      visibility: visible;
+  /* Mobile menu navigation styles */
+  .mobile-menu-nav {
+    display: block !important;
+    visibility: visible !important;
+    position: fixed;
+    top: 64px;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 40;
+    background-color: white;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Ensure mobile menu is visible and properly positioned */
+  @media (max-width: 1023px) {
+    .mobile-menu-nav {
+      display: block !important;
     }
   }
 
   @media (min-width: 1024px) {
-    .mobile-menu-button {
-      display: none;
+    .mobile-menu-nav {
+      display: none !important;
     }
   }
 }
