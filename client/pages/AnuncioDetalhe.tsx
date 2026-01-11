@@ -332,6 +332,15 @@ export default function AnuncioDetalhe() {
                     </div>
                     {/* Social Media Links */}
                     <div className="flex gap-3 pt-2">
+                      {anuncio.anunciante.email && (
+                        <a
+                          href={`mailto:${anuncio.anunciante.email}`}
+                          className="inline-flex items-center gap-1 text-red-600 hover:text-red-700 transition-colors"
+                          title="Enviar email"
+                        >
+                          <Mail className="w-4 h-4" />
+                        </a>
+                      )}
                       {anuncio.anunciante.site && (
                         <a
                           href={
