@@ -447,13 +447,16 @@ export default function AnuncioDetalhe() {
                   </div>
                 </div>
 
-                {/* Product Group */}
+                {/* Category */}
                 <div className="bg-white rounded-lg border border-gray-200 p-6">
                   <h3 className="font-bold text-walmart-text mb-3">
-                    Grupo de Produtos
+                    Categoria
                   </h3>
                   <p className="text-walmart-text">
-                    {anuncio.producto?.grupo?.nome || "N/A"}
+                    {anuncio.categoria || "Sem categoria"}
+                  </p>
+                  <p className="text-sm text-walmart-text-secondary mt-2">
+                    Tipo: {anuncio.tipo}
                   </p>
                 </div>
               </div>
