@@ -118,7 +118,7 @@ export const getEquipeById: RequestHandler = async (req, res) => {
     let membrosFilter: any = {};
 
     if (usuarioId) {
-      const usuario = await prisma.usracesso.findUnique({
+      const usuario = await prisma.usracessos.findUnique({
         where: { id: usuarioId },
         select: { tipoUsuario: true },
       });
