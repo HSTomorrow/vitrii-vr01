@@ -46,6 +46,7 @@ export default function AdminManageUsers() {
     usuarioId: number;
     nome: string;
   } | null>(null);
+  const [editingUser, setEditingUser] = useState<Usuario | null>(null);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const itemsPerPage = 20;
