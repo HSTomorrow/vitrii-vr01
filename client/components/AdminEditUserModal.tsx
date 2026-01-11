@@ -181,7 +181,7 @@ export default function AdminEditUserModal({
 
               <div>
                 <label className="block text-sm font-medium text-walmart-text mb-2">
-                  CPF
+                  CPF \ CNPJ
                 </label>
                 <input
                   type="text"
