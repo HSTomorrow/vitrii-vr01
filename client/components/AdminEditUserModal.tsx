@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { X } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Usuario {
   id: number;
