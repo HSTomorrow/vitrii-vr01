@@ -64,22 +64,18 @@ async function createTestData() {
 
     // 4. Create test Tabela de Preço (Price Table)
     console.log("4️⃣ Creating test Tabela de Preço...");
-    const tabela = await prisma.tabelas_preco.upsert({
-      where: { id: 999 },
-      update: {},
-      create: {
-        id: 999,
+    const tabela = await prisma.tabelas_preco.create({
+      data: {
         productId: producto.id,
-        anuncianteId: anunciante.id,
-        preco: 99.90,
-        precoCusto: 50.00,
+        lojaId: anunciante.id,
+        preco: new Prisma.Decimal("99.90"),
         tamanho: "Único",
         cor: "Padrão",
         dataCriacao: new Date(),
         dataAtualizacao: new Date(),
       },
     });
-    console.log(`✅ Tabela de Preço criada/atualizada: R$ ${tabela.preco}\n`);
+    console.log(`✅ Tabela de Preço criada: R$ ${tabela.preco}\n`);
 
     // 5. Create test Variante via Price Table (P+G variation)
     console.log("5️⃣ Creating test Variante (via Tabela de Preço variation)...");
