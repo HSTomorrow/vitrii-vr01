@@ -185,27 +185,27 @@ export function createServer() {
   // Upload route
   app.post("/api/upload", uploadMiddleware, handleUpload);
 
-  // Usuários routes
-  app.get("/api/usuarios", getUsuarios);
-  app.get("/api/usuarios/:id", getUsuarioById);
+  // Usracessos routes (User Access)
+  app.get("/api/usracessos", getUsuarios);
+  app.get("/api/usracessos/:id", getUsuarioById);
   app.post("/api/auth/signin", signInUsuario);
   app.post("/api/auth/signup", signUpUsuario);
   app.post("/api/auth/forgot-password", forgotPassword);
   app.post("/api/auth/reset-password", resetPassword);
   app.get("/api/auth/validate-reset-token", validateResetToken);
-  app.post("/api/usuarios", createUsuario);
-  app.put("/api/usuarios/:id", updateUsuario);
-  app.delete("/api/usuarios/:id", deleteUsuario);
+  app.post("/api/usracessos", createUsuario);
+  app.put("/api/usracessos/:id", updateUsuario);
+  app.delete("/api/usracessos/:id", deleteUsuario);
 
   // Admin routes for user password management
   app.get(
-    "/api/admin/usuarios-com-senha",
+    "/api/admin/usracessos-com-senha",
     extractUserId,
     requireAdmin,
     getUsuariosComSenha,
   );
   app.post(
-    "/api/admin/usuarios/:usuarioId/reset-password",
+    "/api/admin/usracessos/:usuarioId/reset-password",
     extractUserId,
     requireAdmin,
     adminResetUserPassword,
