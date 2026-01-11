@@ -457,14 +457,47 @@ export const forgotPassword: RequestHandler = async (req, res) => {
       });
     }
 
-    // TODO: Implement password reset token functionality after adding passwordResetToken model to schema
-    // For now, just return success to avoid breaking the forgot password flow
-    console.log(`📧 Solicitação de reset de senha para: ${usuario.email}`);
+    // Generate a random reset token
+    const resetToken = crypto.randomBytes(32).toString("hex");
+
+    // Set token expiration to 1 hour from now
+    const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
+
+    // Store the token in the database
+    await prisma.passwordResetToken.create({
+      data: {
+        usuarioId: usuario.id,
+        token: resetToken,
+        expiresAt,
+      },
+    });
+
+    // Build the reset link with token and email as query parameters
+    const resetLink = `${process.env.APP_URL}/reset-senha?token=${resetToken}&email=${encodeURIComponent(email)}`;
+
+    // Send the password reset email
+    const emailSent = await sendPasswordResetEmail(
+      usuario.email,
+      resetLink,
+      usuario.nome,
+    );
+
+    if (!emailSent) {
+      console.error(
+        `❌ Falha ao enviar email de reset de senha para: ${usuario.email}`,
+      );
+      return res.status(500).json({
+        success: false,
+        error: "Erro ao enviar email. Tente novamente mais tarde.",
+      });
+    }
+
+    console.log(`✅ Email de reset de senha enviado com sucesso para: ${usuario.email}`);
 
     res.status(200).json({
       success: true,
       emailFound: true,
-      message: "Email para redefinição de senha seria enviado com sucesso (feature em desenvolvimento)",
+      message: "Email para redefinição de senha enviado com sucesso! Verifique seu email.",
     });
   } catch (error) {
     console.error("Error in forgot password:", error);
