@@ -160,7 +160,7 @@ model usracessos {
   dataCriacao           DateTime               @default(now())
   dataAtualizacao       DateTime
   endereco              String?
-  dataVigenciaContrato  DateTime
+  dataVigenciaContrato  DateTime               @default(now())
   numeroAnunciosAtivos  Int                    @default(0)
   usuarios_anunciantes  usuarios_anunciantes[]
   membros_equipe        membros_equipe[]
