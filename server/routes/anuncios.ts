@@ -699,7 +699,7 @@ export const canEditAnuncio: RequestHandler = async (req, res) => {
 
     // Get current user and ad
     const [usuario, anuncio] = await Promise.all([
-      prisma.usracesso.findUnique({
+      prisma.usracessos.findUnique({
         where: { id: usuarioId },
         select: { tipoUsuario: true },
       }),
