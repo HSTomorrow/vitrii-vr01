@@ -253,7 +253,7 @@ export default function Header() {
               {user && (
                 <Link
                   to="/favoritos"
-                  className="py-2 text-walmart-text hover:bg-walmart-gray rounded-lg flex items-center gap-2"
+                  className="block px-4 py-2 text-walmart-text hover:bg-walmart-gray rounded-lg flex items-center gap-2"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <Heart className="w-4 h-4" />
