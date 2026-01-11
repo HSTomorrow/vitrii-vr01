@@ -42,7 +42,7 @@ export const getAnunciantes: RequestHandler = async (req, res) => {
           estado: true,
           email: true,
           cnpj: true,
-          status: true,
+
           dataCriacao: true,
         },
         orderBy: { dataCriacao: "desc" },
@@ -441,7 +441,7 @@ export const getAnunciantesByUsuario: RequestHandler = async (req, res) => {
           estado: true,
           email: true,
           cnpj: true,
-          status: true,
+
           dataCriacao: true,
         },
         orderBy: { dataCriacao: "desc" },
@@ -465,7 +465,7 @@ export const getAnunciantesByUsuario: RequestHandler = async (req, res) => {
           estado: true,
           email: true,
           cnpj: true,
-          status: true,
+
           dataCriacao: true,
         },
         orderBy: { dataCriacao: "desc" },
