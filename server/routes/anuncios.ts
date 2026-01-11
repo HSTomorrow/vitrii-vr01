@@ -614,21 +614,12 @@ export const getProdutosParaAnuncio: RequestHandler = async (req, res) => {
 
     const productos = await prisma.productos.findMany({
       where: {
-        grupo: {
-          anuncianteId: parseInt(anuncianteId),
-        },
+        lojaId: parseInt(anuncianteId),
       },
       include: {
-        grupo: {
-          select: {
-            id: true,
-            nome: true,
-            anuncianteId: true,
-          },
-        },
         tabelasDePreco: {
           where: {
-            anuncianteId: parseInt(anuncianteId),
+            lojaId: parseInt(anuncianteId),
           },
         },
       },
