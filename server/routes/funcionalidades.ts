@@ -101,7 +101,7 @@ export const getFuncionalidadesByUsuario: RequestHandler = async (req, res) => {
   try {
     const { usuarioId } = req.params;
 
-    const usuario = await prisma.usracesso.findUnique({
+    const usuario = await prisma.usracessos.findUnique({
       where: { id: parseInt(usuarioId) },
       include: {
         usuarioXFuncionalidades: {
