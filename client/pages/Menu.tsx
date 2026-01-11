@@ -66,7 +66,9 @@ export default function Menu() {
                 className="flex items-center gap-4 px-6 py-4 bg-walmart-gray hover:bg-gray-200 rounded-lg transition-colors"
               >
                 <Home className="w-6 h-6 text-walmart-blue" />
-                <span className="text-walmart-text font-medium">Página Inicial</span>
+                <span className="text-walmart-text font-medium">
+                  Página Inicial
+                </span>
               </Link>
 
               <Link
@@ -74,7 +76,9 @@ export default function Menu() {
                 className="flex items-center gap-4 px-6 py-4 bg-walmart-gray hover:bg-gray-200 rounded-lg transition-colors"
               >
                 <ShoppingBag className="w-6 h-6 text-walmart-blue" />
-                <span className="text-walmart-text font-medium">Ver Anúncios</span>
+                <span className="text-walmart-text font-medium">
+                  Ver Anúncios
+                </span>
               </Link>
 
               {user && (
@@ -83,7 +87,9 @@ export default function Menu() {
                   className="flex items-center gap-4 px-6 py-4 bg-walmart-yellow hover:bg-walmart-yellow-dark rounded-lg transition-colors"
                 >
                   <Plus className="w-6 h-6 text-walmart-text" />
-                  <span className="text-walmart-text font-bold">Publicar Anúncio</span>
+                  <span className="text-walmart-text font-bold">
+                    Publicar Anúncio
+                  </span>
                 </Link>
               )}
 
@@ -128,7 +134,9 @@ export default function Menu() {
                     className="flex items-center gap-4 px-6 py-4 bg-walmart-gray hover:bg-gray-200 rounded-lg transition-colors"
                   >
                     <Heart className="w-6 h-6 text-red-500" />
-                    <span className="text-walmart-text font-medium">Meus Favoritos</span>
+                    <span className="text-walmart-text font-medium">
+                      Meus Favoritos
+                    </span>
                   </Link>
 
                   <Link
@@ -136,7 +144,9 @@ export default function Menu() {
                     className="flex items-center gap-4 px-6 py-4 bg-walmart-gray hover:bg-gray-200 rounded-lg transition-colors"
                   >
                     <FileText className="w-6 h-6 text-walmart-blue" />
-                    <span className="text-walmart-text font-medium">Minhas Mensagens</span>
+                    <span className="text-walmart-text font-medium">
+                      Minhas Mensagens
+                    </span>
                   </Link>
                 </div>
               </section>
@@ -152,7 +162,9 @@ export default function Menu() {
                     className="flex items-center gap-4 px-6 py-4 bg-walmart-gray hover:bg-gray-200 rounded-lg transition-colors"
                   >
                     <Store className="w-6 h-6 text-walmart-blue" />
-                    <span className="text-walmart-text font-medium">Cadastro de Lojas</span>
+                    <span className="text-walmart-text font-medium">
+                      Cadastro de Lojas
+                    </span>
                   </Link>
 
                   <Link
@@ -160,7 +172,9 @@ export default function Menu() {
                     className="flex items-center gap-4 px-6 py-4 bg-walmart-gray hover:bg-gray-200 rounded-lg transition-colors"
                   >
                     <Grid className="w-6 h-6 text-walmart-blue" />
-                    <span className="text-walmart-text font-medium">Grupos de Produtos</span>
+                    <span className="text-walmart-text font-medium">
+                      Grupos de Produtos
+                    </span>
                   </Link>
 
                   <Link
@@ -168,7 +182,9 @@ export default function Menu() {
                     className="flex items-center gap-4 px-6 py-4 bg-walmart-gray hover:bg-gray-200 rounded-lg transition-colors"
                   >
                     <ShoppingBag className="w-6 h-6 text-walmart-blue" />
-                    <span className="text-walmart-text font-medium">Cadastro de Produtos</span>
+                    <span className="text-walmart-text font-medium">
+                      Cadastro de Produtos
+                    </span>
                   </Link>
 
                   <Link
@@ -176,7 +192,9 @@ export default function Menu() {
                     className="flex items-center gap-4 px-6 py-4 bg-walmart-gray hover:bg-gray-200 rounded-lg transition-colors"
                   >
                     <Tag className="w-6 h-6 text-walmart-blue" />
-                    <span className="text-walmart-text font-medium">Tabelas de Preço</span>
+                    <span className="text-walmart-text font-medium">
+                      Tabelas de Preço
+                    </span>
                   </Link>
 
                   <Link
@@ -184,7 +202,9 @@ export default function Menu() {
                     className="flex items-center gap-4 px-6 py-4 bg-walmart-gray hover:bg-gray-200 rounded-lg transition-colors"
                   >
                     <Layers className="w-6 h-6 text-walmart-blue" />
-                    <span className="text-walmart-text font-medium">Variantes</span>
+                    <span className="text-walmart-text font-medium">
+                      Variantes
+                    </span>
                   </Link>
 
                   <Link
@@ -192,7 +212,9 @@ export default function Menu() {
                     className="flex items-center gap-4 px-6 py-4 bg-walmart-gray hover:bg-gray-200 rounded-lg transition-colors"
                   >
                     <Users className="w-6 h-6 text-walmart-blue" />
-                    <span className="text-walmart-text font-medium">Equipes de Venda</span>
+                    <span className="text-walmart-text font-medium">
+                      Equipes de Venda
+                    </span>
                   </Link>
                 </div>
               </section>
@@ -209,7 +231,9 @@ export default function Menu() {
                       className="flex items-center gap-4 px-6 py-4 bg-yellow-100 hover:bg-yellow-200 rounded-lg transition-colors border border-yellow-300"
                     >
                       <Shield className="w-6 h-6 text-yellow-700" />
-                      <span className="text-yellow-900 font-medium">Painel de Controle</span>
+                      <span className="text-yellow-900 font-medium">
+                        Painel de Controle
+                      </span>
                     </Link>
 
                     <Link
@@ -217,7 +241,9 @@ export default function Menu() {
                       className="flex items-center gap-4 px-6 py-4 bg-orange-100 hover:bg-orange-200 rounded-lg transition-colors border border-orange-300"
                     >
                       <FileText className="w-6 h-6 text-orange-700" />
-                      <span className="text-orange-900 font-medium">Gerenciar Anúncios</span>
+                      <span className="text-orange-900 font-medium">
+                        Gerenciar Anúncios
+                      </span>
                     </Link>
                   </div>
                 </section>
@@ -240,7 +266,9 @@ export default function Menu() {
                       </span>
                     </div>
                     <div className="flex-1">
-                      <p className="text-green-900 font-semibold">{user.nome}</p>
+                      <p className="text-green-900 font-semibold">
+                        {user.nome}
+                      </p>
                       <p className="text-green-700 text-sm">{user.email}</p>
                     </div>
                   </div>
@@ -250,7 +278,9 @@ export default function Menu() {
                     className="w-full flex items-center gap-4 px-6 py-4 bg-red-50 hover:bg-red-100 rounded-lg transition-colors border border-red-200 text-left"
                   >
                     <LogOut className="w-6 h-6 text-red-600" />
-                    <span className="text-red-900 font-medium">Sair da Conta</span>
+                    <span className="text-red-900 font-medium">
+                      Sair da Conta
+                    </span>
                   </button>
                 </>
               ) : (

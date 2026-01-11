@@ -507,8 +507,7 @@ export const adicionarMembro: RequestHandler = async (req, res) => {
     res.status(500).json({
       success: false,
       error: "Erro inesperado ao adicionar membro à equipe",
-      details:
-        error instanceof Error ? error.message : "Erro desconhecido",
+      details: error instanceof Error ? error.message : "Erro desconhecido",
     });
   }
 };

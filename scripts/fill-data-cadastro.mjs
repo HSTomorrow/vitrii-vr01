@@ -11,7 +11,7 @@ async function main() {
     const usuariosResult = await prisma.$executeRawUnsafe(
       `UPDATE "usracessos" 
        SET "dataAtualizacao" = NOW() 
-       WHERE "dataAtualizacao" IS NULL`
+       WHERE "dataAtualizacao" IS NULL`,
     );
     console.log(`✅ ${usuariosResult} usuários atualizados\n`);
 
@@ -20,7 +20,7 @@ async function main() {
     const anunciantesResult = await prisma.$executeRawUnsafe(
       `UPDATE "anunciantes" 
        SET "dataAtualizacao" = NOW() 
-       WHERE "dataAtualizacao" IS NULL`
+       WHERE "dataAtualizacao" IS NULL`,
     );
     console.log(`✅ ${anunciantesResult} anunciantes atualizados\n`);
 
@@ -28,23 +28,23 @@ async function main() {
     console.log("📊 Verificando resultados:\n");
 
     const usuariosWithDate = await prisma.$queryRawUnsafe(
-      `SELECT COUNT(*) as count FROM "usracessos" WHERE "dataAtualizacao" IS NOT NULL`
+      `SELECT COUNT(*) as count FROM "usracessos" WHERE "dataAtualizacao" IS NOT NULL`,
     );
     const usuariosTotal = await prisma.$queryRawUnsafe(
-      `SELECT COUNT(*) as count FROM "usracessos"`
+      `SELECT COUNT(*) as count FROM "usracessos"`,
     );
     console.log(
-      `Usuários: ${usuariosWithDate[0].count}/${usuariosTotal[0].count} com data de atualização`
+      `Usuários: ${usuariosWithDate[0].count}/${usuariosTotal[0].count} com data de atualização`,
     );
 
     const anunciantesWithDate = await prisma.$queryRawUnsafe(
-      `SELECT COUNT(*) as count FROM "anunciantes" WHERE "dataAtualizacao" IS NOT NULL`
+      `SELECT COUNT(*) as count FROM "anunciantes" WHERE "dataAtualizacao" IS NOT NULL`,
     );
     const anunciantesTotal = await prisma.$queryRawUnsafe(
-      `SELECT COUNT(*) as count FROM "anunciantes"`
+      `SELECT COUNT(*) as count FROM "anunciantes"`,
     );
     console.log(
-      `Anunciantes: ${anunciantesWithDate[0].count}/${anunciantesTotal[0].count} com data de atualização\n`
+      `Anunciantes: ${anunciantesWithDate[0].count}/${anunciantesTotal[0].count} com data de atualização\n`,
     );
 
     console.log("✨ Preenchimento concluído com sucesso!");

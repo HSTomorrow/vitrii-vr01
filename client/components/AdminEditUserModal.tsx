@@ -67,7 +67,7 @@ export default function AdminEditUserModal({
             "x-user-id": user?.id?.toString() || "",
           },
           body: JSON.stringify(data),
-        }
+        },
       );
 
       if (!response.ok) {
@@ -78,11 +78,15 @@ export default function AdminEditUserModal({
           const fieldErrors = errorData.details
             .map((err: any) => `${err.field}: ${err.message}`)
             .join("\n");
-          throw new Error(fieldErrors || errorData.error || "Erro ao atualizar perfil do usuário");
+          throw new Error(
+            fieldErrors ||
+              errorData.error ||
+              "Erro ao atualizar perfil do usuário",
+          );
         }
 
         throw new Error(
-          errorData.error || "Erro ao atualizar perfil do usuário"
+          errorData.error || "Erro ao atualizar perfil do usuário",
         );
       }
 
@@ -99,7 +103,7 @@ export default function AdminEditUserModal({
   });
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({

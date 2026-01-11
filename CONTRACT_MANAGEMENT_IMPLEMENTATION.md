@@ -25,6 +25,7 @@ ALTER TABLE "usracessos" ADD COLUMN "numeroAnunciosAtivos" INTEGER DEFAULT 0;
 ```
 
 ### Status Atual
+
 - ✅ Coluna `dataVigenciaContrato` criada e preenchida
 - ✅ Coluna `numeroAnunciosAtivos` criada com valor padrão 0
 - ✅ 7/7 usuários com data de vigência preenchida (hoje + 30 dias)
@@ -34,6 +35,7 @@ ALTER TABLE "usracessos" ADD COLUMN "numeroAnunciosAtivos" INTEGER DEFAULT 0;
 ## 2. **Validações Implementadas**
 
 ### 2.1 Validação de CPF Único em Usuários
+
 **Arquivo**: `server/routes/usuarios.ts` (linhas 268-280)
 
 ```typescript
@@ -53,11 +55,13 @@ if (normalizedCpf) {
 ```
 
 **Comportamento**:
+
 - ✅ Usuários NÃO podem ter CPF/CNPJ repetido
 - ✅ Um CPF/CNPJ só pode estar associado a um usuário
 - ✅ Múltiplos usuários podem ter CPF/CNPJ NULL
 
 ### 2.2 Validação Cruzada: CPF/CNPJ entre Usuários e Anunciantes
+
 **Arquivo**: `server/routes/anunciantes.ts` (linhas 137-160)
 
 ```typescript
@@ -85,6 +89,7 @@ if (validatedData.cnpj && usuarioId) {
 ```
 
 **Comportamento**:
+
 - ✅ Anunciantes podem ter CNPJ/CPF repetido (múltiplos anunciantes com mesmo CNPJ)
 - ✅ Se um CPF/CNPJ está cadastrado como USUÁRIO, usuários regulares NÃO podem criar anunciante com esse CPF/CNPJ
 - ✅ ADMINISTRADORES podem criar exceção (ignorar essa regra) - ideal para franquias/filiais
@@ -95,6 +100,7 @@ if (validatedData.cnpj && usuarioId) {
 ## 3. **Lógica de Limite de Anúncios Ativos**
 
 ### 3.1 Restrições de Criação de Anúncios
+
 **Arquivo**: `server/routes/anuncios.ts` (linhas 252-282)
 
 Antes de criar um anúncio, o sistema valida:
@@ -128,10 +134,12 @@ if ((usuario.numeroAnunciosAtivos || 0) >= 3) {
 ```
 
 **Validações**:
+
 1. ✅ **Data de Vigência**: Usuário só pode criar anúncios se a data atual < `dataVigenciaContrato`
 2. ✅ **Limite de Anúncios**: Usuário só pode ter no máximo 3 anúncios com status "pago"
 
 ### 3.2 Incrementar Contador ao Criar Anúncio
+
 **Arquivo**: `server/routes/anuncios.ts` (linhas 364-374)
 
 ```typescript
@@ -150,6 +158,7 @@ if (status === "pago") {
 ```
 
 ### 3.3 Decrementar Contador ao Deletar Anúncio
+
 **Arquivo**: `server/routes/anuncios.ts` (linhas 622-655)
 
 ```typescript
@@ -167,6 +176,7 @@ if (anuncio.status === "pago") {
 ```
 
 ### 3.4 Atualizar Contador ao Mudar Status
+
 **Arquivo**: `server/routes/anuncios.ts` (linhas 520-541)
 
 ```typescript
@@ -198,6 +208,7 @@ if (wasActive && !isNowActive) {
 ```
 
 **Lógica de Transições**:
+
 - ✅ Ao publicar (em_edicao → pago): incrementa
 - ✅ Ao cancelar (pago → historico): decrementa
 - ✅ Ao inativar (pago → inativo): decrementa
@@ -208,6 +219,7 @@ if (wasActive && !isNowActive) {
 ## 4. **Preenchimento de Dados Existentes**
 
 ### Script Executado
+
 - **Arquivo**: `scripts/add-contract-fields.mjs`
 - **Data de Execução**: 11/01/2026
 - **Resultado**:
@@ -216,6 +228,7 @@ if (wasActive && !isNowActive) {
   - ✅ Campo `numeroAnunciosAtivos` iniciado com 0
 
 ### Exemplo de Dados Preenchidos
+
 ```
 ID: 22, Nome: Total Mais
   Vigência: 11/02/2026 (hoje + 30 dias)
@@ -280,17 +293,17 @@ ID: 24, Nome: Malibu Conceito
 
 ## 6. **Validações e Regras de Negócio**
 
-| Regra | Implementação | Status |
-|-------|---------------|--------|
-| CPF único por usuário | Validação em `createUsuario` | ✅ |
-| CNPJ pode se repetir em anunciantes | Sem restrição entre anunciantes | ✅ |
-| CPF de usuário não pode ser CNPJ de anunciante | Validação cruzada em `createAnunciante` | ✅ |
-| Admin pode excepcionar CPF/CNPJ | Bypass se `tipoUsuario === "adm"` | ✅ |
-| Máximo 3 anúncios ativos | Validação em `createAnuncio` | ✅ |
-| Contrato deve estar válido | Validação em `createAnuncio` | ✅ |
-| Contrato válido por 30 dias | Preenchimento automático na criação | ✅ |
-| Contador decrementado ao deletar | Lógica em `deleteAnuncio` | ✅ |
-| Contador atualizado ao mudar status | Lógica em `updateAnuncioStatus` | ✅ |
+| Regra                                          | Implementação                           | Status |
+| ---------------------------------------------- | --------------------------------------- | ------ |
+| CPF único por usuário                          | Validação em `createUsuario`            | ✅     |
+| CNPJ pode se repetir em anunciantes            | Sem restrição entre anunciantes         | ✅     |
+| CPF de usuário não pode ser CNPJ de anunciante | Validação cruzada em `createAnunciante` | ✅     |
+| Admin pode excepcionar CPF/CNPJ                | Bypass se `tipoUsuario === "adm"`       | ✅     |
+| Máximo 3 anúncios ativos                       | Validação em `createAnuncio`            | ✅     |
+| Contrato deve estar válido                     | Validação em `createAnuncio`            | ✅     |
+| Contrato válido por 30 dias                    | Preenchimento automático na criação     | ✅     |
+| Contador decrementado ao deletar               | Lógica em `deleteAnuncio`               | ✅     |
+| Contador atualizado ao mudar status            | Lógica em `updateAnuncioStatus`         | ✅     |
 
 ---
 
@@ -299,19 +312,23 @@ ID: 24, Nome: Malibu Conceito
 ### Endpoints Modificados
 
 #### Usuários
+
 - `POST /api/auth/signup` - Agora preenche `dataVigenciaContrato`
 - `POST /api/usracessos` - Valida CPF único e preenche contrato
 
 #### Anúncios
+
 - `POST /api/anuncios` - Valida contrato e limite de anúncios
 - `PATCH /api/anuncios/:id/status` - Atualiza contador ao mudar status
 - `DELETE /api/anuncios/:id` - Decrementa contador ao deletar
 - `PATCH /api/anuncios/:id/inactivate` - Decrementa contador ao inativar
 
 #### Anunciantes
+
 - `POST /api/anunciantes` - Valida cruzada de CPF/CNPJ com usuários
 
 #### Equipes (Bugfix)
+
 - `GET /api/equipes-venda` - Corrigido referência `membroEquipe` → `membros_equipe`
 - Todos endpoints que usavam `membroEquipe` foram corrigidos
 
@@ -381,13 +398,13 @@ POST /api/anuncios
 ### Ver dados de usuários com contratos
 
 ```sql
-SELECT 
-  id, 
-  nome, 
-  email, 
+SELECT
+  id,
+  nome,
+  email,
   "dataVigenciaContrato",
   "numeroAnunciosAtivos",
-  (CASE 
+  (CASE
     WHEN "dataVigenciaContrato" < NOW() THEN 'VENCIDO'
     ELSE 'ATIVO'
   END) as status_contrato
@@ -398,10 +415,10 @@ ORDER BY id;
 ### Ver usuários no limite de anúncios
 
 ```sql
-SELECT 
-  id, 
-  nome, 
-  email, 
+SELECT
+  id,
+  nome,
+  email,
   "numeroAnunciosAtivos"
 FROM "usracessos"
 WHERE "numeroAnunciosAtivos" >= 3
@@ -411,10 +428,10 @@ ORDER BY "numeroAnunciosAtivos" DESC;
 ### Ver contratos vencidos
 
 ```sql
-SELECT 
-  id, 
-  nome, 
-  email, 
+SELECT
+  id,
+  nome,
+  email,
   "dataVigenciaContrato",
   AGE(NOW(), "dataVigenciaContrato") as dias_vencido
 FROM "usracessos"
@@ -426,22 +443,23 @@ ORDER BY "dataVigenciaContrato" DESC;
 
 ## 10. **Status de Implementação**
 
-| Componente | Status | Data | Notas |
-|-----------|--------|------|-------|
-| Schema de banco | ✅ | 11/01/2026 | Campos criados e preenchidos |
-| Validação de CPF único | ✅ | 11/01/2026 | Implementado em código |
-| Validação cruzada CPF/CNPJ | ✅ | 11/01/2026 | Com bypass para admin |
-| Limite de anúncios | ✅ | 11/01/2026 | Máximo 3 anúncios ativos |
-| Preenchimento de contratos | ✅ | 11/01/2026 | 7/7 usuários preenchidos |
-| Endpoints de anúncios | ✅ | 11/01/2026 | Create, delete, status update |
-| Bugfix equipes-venda | ✅ | 11/01/2026 | membroEquipe → membros_equipe |
-| Documentação | ✅ | 11/01/2026 | Este documento |
+| Componente                 | Status | Data       | Notas                         |
+| -------------------------- | ------ | ---------- | ----------------------------- |
+| Schema de banco            | ✅     | 11/01/2026 | Campos criados e preenchidos  |
+| Validação de CPF único     | ✅     | 11/01/2026 | Implementado em código        |
+| Validação cruzada CPF/CNPJ | ✅     | 11/01/2026 | Com bypass para admin         |
+| Limite de anúncios         | ✅     | 11/01/2026 | Máximo 3 anúncios ativos      |
+| Preenchimento de contratos | ✅     | 11/01/2026 | 7/7 usuários preenchidos      |
+| Endpoints de anúncios      | ✅     | 11/01/2026 | Create, delete, status update |
+| Bugfix equipes-venda       | ✅     | 11/01/2026 | membroEquipe → membros_equipe |
+| Documentação               | ✅     | 11/01/2026 | Este documento                |
 
 ---
 
 ## 11. **Considerações de Segurança**
 
 ✅ **Implementado**:
+
 - Validação de CPF no servidor (não apenas cliente)
 - Validação de contrato antes de criar anúncio
 - Cross-validation de CPF entre usuários e anunciantes
@@ -449,6 +467,7 @@ ORDER BY "dataVigenciaContrato" DESC;
 - Contador atualizado atomicamente com criação de anúncio
 
 ⚠️ **Recomendações Futuras**:
+
 - Adicionar índices em `dataVigenciaContrato` para queries rápidas
 - Implementar job agendado para notificar contratos vencendo em 7 dias
 - Adicionar auditoria de mudanças no campo `numeroAnunciosAtivos`
@@ -466,6 +485,6 @@ O sistema de gestão de contratos e limite de anúncios foi **completamente impl
 ✅ Limite de 3 anúncios ativos por usuário  
 ✅ Contratos com vigência de 30 dias  
 ✅ Contador automático sincronizado com operações de anúncios  
-✅ Bugfix em referências de modelos Prisma  
+✅ Bugfix em referências de modelos Prisma
 
 **Status Final: 🎉 PRONTO PARA PRODUÇÃO**

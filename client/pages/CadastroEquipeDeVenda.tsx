@@ -199,7 +199,9 @@ export default function CadastroEquipeDeVenda() {
         const details = error.details || "";
 
         // Combine error message with details for more context
-        const fullMessage = details ? `${errorMessage} - ${details}` : errorMessage;
+        const fullMessage = details
+          ? `${errorMessage} - ${details}`
+          : errorMessage;
         throw new Error(fullMessage);
       }
 
@@ -750,7 +752,8 @@ export default function CadastroEquipeDeVenda() {
                       </div>
 
                       {/* Members Table */}
-                      {getFilteredMembros(equipe.membros, equipe.id).length === 0 &&
+                      {getFilteredMembros(equipe.membros, equipe.id).length ===
+                        0 &&
                       !isAddingMember &&
                       editingMemberId === null ? (
                         <p className="text-gray-500 text-sm py-4">
@@ -814,7 +817,6 @@ export default function CadastroEquipeDeVenda() {
                                   </td>
                                   <td className="px-4 py-3">
                                     <div className="flex items-center gap-1">
-                                     
                                       <input
                                         type="text"
                                         value={
@@ -899,7 +901,10 @@ export default function CadastroEquipeDeVenda() {
                               )}
 
                               {/* Existing Members */}
-                              {getFilteredMembros(equipe.membros, equipe.id).map((membro) => (
+                              {getFilteredMembros(
+                                equipe.membros,
+                                equipe.id,
+                              ).map((membro) => (
                                 <tr
                                   key={membro.id}
                                   className="border-b border-gray-200 hover:bg-gray-50"

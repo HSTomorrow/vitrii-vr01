@@ -84,7 +84,7 @@ export const googleCallback: RequestHandler = async (req, res) => {
       "https://www.googleapis.com/oauth2/v2/userinfo",
       {
         headers: { Authorization: `Bearer ${tokenData.access_token}` },
-      }
+      },
     );
 
     if (!userInfoResponse.ok) {

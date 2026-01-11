@@ -278,7 +278,8 @@ export const createAnuncio: RequestHandler = async (req, res) => {
     if ((usuario.numeroAnunciosAtivos || 0) >= 3) {
       return res.status(403).json({
         success: false,
-        error: "Limite de 3 anúncios ativos atingido. Aguarde a expiração de anúncios antigos.",
+        error:
+          "Limite de 3 anúncios ativos atingido. Aguarde a expiração de anúncios antigos.",
       });
     }
 
@@ -289,10 +290,7 @@ export const createAnuncio: RequestHandler = async (req, res) => {
         where: { id: validatedData.productId },
       });
 
-      if (
-        !producto ||
-        producto.lojaId !== validatedData.anuncianteId
-      ) {
+      if (!producto || producto.lojaId !== validatedData.anuncianteId) {
         return res.status(400).json({
           success: false,
           error: "Produto não pertence ao anunciante selecionado",
@@ -422,10 +420,14 @@ export const updateAnuncio: RequestHandler = async (req, res) => {
     // Map field names to schema
     const mappedData: any = {};
     if (updateData.titulo !== undefined) mappedData.titulo = updateData.titulo;
-    if (updateData.descricao !== undefined) mappedData.descricao = updateData.descricao;
-    if (updateData.fotoUrl !== undefined) mappedData.imagem = updateData.fotoUrl;
-    if (updateData.precoAnuncio !== undefined) mappedData.preco = updateData.precoAnuncio;
-    if (updateData.categoria !== undefined) mappedData.categoria = updateData.categoria;
+    if (updateData.descricao !== undefined)
+      mappedData.descricao = updateData.descricao;
+    if (updateData.fotoUrl !== undefined)
+      mappedData.imagem = updateData.fotoUrl;
+    if (updateData.precoAnuncio !== undefined)
+      mappedData.preco = updateData.precoAnuncio;
+    if (updateData.categoria !== undefined)
+      mappedData.categoria = updateData.categoria;
     if (updateData.cidade !== undefined) mappedData.cidade = updateData.cidade;
     if (updateData.estado !== undefined) mappedData.estado = updateData.estado;
     if (updateData.status !== undefined) mappedData.status = updateData.status;
@@ -608,8 +610,7 @@ export const overrideAnuncioStatus: RequestHandler = async (req, res) => {
 
     // Update active ads counter if status is changing
     const wasActive = anuncio.status === "pago" || anuncio.status === "ativo";
-    const isNowActive =
-      status === "pago" || status === "ativo";
+    const isNowActive = status === "pago" || status === "ativo";
 
     if (wasActive && !isNowActive) {
       // Transitioning from active to inactive

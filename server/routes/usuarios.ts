@@ -392,14 +392,11 @@ const UsuarioAdminUpdateSchema = z.object({
   tipoUsuario: z.enum(["adm", "comum"]).optional(),
   dataVigenciaContrato: z
     .string()
-    .refine(
-      (value) => {
-        if (!value) return true; // Allow empty
-        // Accept both date (YYYY-MM-DD) and datetime (ISO 8601) formats
-        return /^\d{4}-\d{2}-\d{2}(T|$)/.test(value);
-      },
-      "Data de vigência deve estar no formato YYYY-MM-DD ou ISO 8601"
-    )
+    .refine((value) => {
+      if (!value) return true; // Allow empty
+      // Accept both date (YYYY-MM-DD) and datetime (ISO 8601) formats
+      return /^\d{4}-\d{2}-\d{2}(T|$)/.test(value);
+    }, "Data de vigência deve estar no formato YYYY-MM-DD ou ISO 8601")
     .optional(),
 });
 
@@ -569,12 +566,15 @@ export const forgotPassword: RequestHandler = async (req, res) => {
       });
     }
 
-    console.log(`✅ Email de reset de senha enviado com sucesso para: ${usuario.email}`);
+    console.log(
+      `✅ Email de reset de senha enviado com sucesso para: ${usuario.email}`,
+    );
 
     res.status(200).json({
       success: true,
       emailFound: true,
-      message: "Email para redefinição de senha enviado com sucesso! Verifique seu email.",
+      message:
+        "Email para redefinição de senha enviado com sucesso! Verifique seu email.",
     });
   } catch (error) {
     console.error("Error in forgot password:", error);
@@ -922,8 +922,8 @@ export const adminUpdateUserProfile: RequestHandler = async (req, res) => {
     // Remove empty strings for optional fields
     const cleanedData = Object.fromEntries(
       Object.entries(validatedData).filter(
-        ([_, value]) => value !== "" && value !== undefined
-      )
+        ([_, value]) => value !== "" && value !== undefined,
+      ),
     );
 
     // Update user profile

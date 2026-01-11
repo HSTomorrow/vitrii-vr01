@@ -8,7 +8,7 @@ async function createVitriiAdmin() {
   try {
     const adminEmail = "vitriimarketplace@gmail.com";
     const adminPassword = "AavItrII2025Zzç";
-    
+
     // Check if admin already exists
     const existingAdmin = await prisma.usracessos.findUnique({
       where: { email: adminEmail },
@@ -44,7 +44,7 @@ async function createVitriiAdmin() {
     console.log(`   Email: ${admUser.email}`);
     console.log(`   Tipo: ${admUser.tipoUsuario}`);
     console.log(`   Data Criação: ${admUser.dataCriacao}`);
-    
+
     console.log("\n🔓 Login Credentials:");
     console.log(`   Email: ${adminEmail}`);
     console.log(`   Password: ${adminPassword}`);
@@ -55,7 +55,6 @@ async function createVitriiAdmin() {
     console.log("🎉 Admin setup complete! You can now login with:");
     console.log(`   Email: ${adminEmail}`);
     console.log(`   Password: ${adminPassword}`);
-
   } catch (error) {
     console.error("❌ Error creating admin user:", error);
   } finally {

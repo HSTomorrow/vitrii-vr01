@@ -3,14 +3,16 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("🔄 Adicionando campos de perfil de usuário e rastreamento de anúncios...\n");
+  console.log(
+    "🔄 Adicionando campos de perfil de usuário e rastreamento de anúncios...\n",
+  );
 
   try {
     // Add whatsapp column to usracessos
     console.log("📝 Verificando coluna whatsapp em usracessos...");
     try {
       await prisma.$executeRawUnsafe(
-        `ALTER TABLE "usracessos" ADD COLUMN "whatsapp" VARCHAR(20);`
+        `ALTER TABLE "usracessos" ADD COLUMN "whatsapp" VARCHAR(20);`,
       );
       console.log("✅ Coluna whatsapp adicionada");
     } catch (err) {
@@ -25,7 +27,7 @@ async function main() {
     console.log("📝 Verificando coluna linkedin em usracessos...");
     try {
       await prisma.$executeRawUnsafe(
-        `ALTER TABLE "usracessos" ADD COLUMN "linkedin" VARCHAR(255);`
+        `ALTER TABLE "usracessos" ADD COLUMN "linkedin" VARCHAR(255);`,
       );
       console.log("✅ Coluna linkedin adicionada");
     } catch (err) {
@@ -40,7 +42,7 @@ async function main() {
     console.log("📝 Verificando coluna facebook em usracessos...");
     try {
       await prisma.$executeRawUnsafe(
-        `ALTER TABLE "usracessos" ADD COLUMN "facebook" VARCHAR(255);`
+        `ALTER TABLE "usracessos" ADD COLUMN "facebook" VARCHAR(255);`,
       );
       console.log("✅ Coluna facebook adicionada");
     } catch (err) {
@@ -55,7 +57,7 @@ async function main() {
     console.log("📝 Verificando coluna visualizacoes em anuncios...");
     try {
       await prisma.$executeRawUnsafe(
-        `ALTER TABLE "anuncios" ADD COLUMN "visualizacoes" INTEGER DEFAULT 0;`
+        `ALTER TABLE "anuncios" ADD COLUMN "visualizacoes" INTEGER DEFAULT 0;`,
       );
       console.log("✅ Coluna visualizacoes adicionada");
     } catch (err) {
@@ -75,14 +77,14 @@ async function main() {
           "anuncioId" INTEGER NOT NULL REFERENCES "anuncios"("id") ON DELETE CASCADE,
           "usuarioId" INTEGER REFERENCES "usracessos"("id") ON DELETE SET NULL,
           "dataCriacao" TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-        );`
+        );`,
       );
       console.log("✅ Tabela anuncioVisualizados criada");
 
       // Create indices for better performance
       try {
         await prisma.$executeRawUnsafe(
-          `CREATE INDEX IF NOT EXISTS "anuncioVisualizados_anuncioId_idx" ON "anuncioVisualizados"("anuncioId");`
+          `CREATE INDEX IF NOT EXISTS "anuncioVisualizados_anuncioId_idx" ON "anuncioVisualizados"("anuncioId");`,
         );
         console.log("✅ Índice anuncioId criado");
       } catch (err) {
@@ -91,7 +93,7 @@ async function main() {
 
       try {
         await prisma.$executeRawUnsafe(
-          `CREATE INDEX IF NOT EXISTS "anuncioVisualizados_usuarioId_idx" ON "anuncioVisualizados"("usuarioId");`
+          `CREATE INDEX IF NOT EXISTS "anuncioVisualizados_usuarioId_idx" ON "anuncioVisualizados"("usuarioId");`,
         );
         console.log("✅ Índice usuarioId criado");
       } catch (err) {
@@ -100,7 +102,7 @@ async function main() {
 
       try {
         await prisma.$executeRawUnsafe(
-          `CREATE INDEX IF NOT EXISTS "anuncioVisualizados_dataCriacao_idx" ON "anuncioVisualizados"("dataCriacao");`
+          `CREATE INDEX IF NOT EXISTS "anuncioVisualizados_dataCriacao_idx" ON "anuncioVisualizados"("dataCriacao");`,
         );
         console.log("✅ Índice dataCriacao criado");
       } catch (err) {
@@ -122,7 +124,7 @@ async function main() {
     const usuariosSchema = await prisma.$queryRawUnsafe(
       `SELECT column_name, data_type FROM information_schema.columns 
        WHERE table_name = 'usracessos' 
-       ORDER BY ordinal_position`
+       ORDER BY ordinal_position`,
     );
 
     console.log("Colunas em usracessos:");
@@ -133,7 +135,7 @@ async function main() {
     const anunciosSchema = await prisma.$queryRawUnsafe(
       `SELECT column_name, data_type FROM information_schema.columns 
        WHERE table_name = 'anuncios' 
-       ORDER BY ordinal_position`
+       ORDER BY ordinal_position`,
     );
 
     console.log("\nColunas em anuncios:");
@@ -142,7 +144,7 @@ async function main() {
     });
 
     const vizualizacoesExists = await prisma.$queryRawUnsafe(
-      `SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'anuncioVisualizados');`
+      `SELECT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'anuncioVisualizados');`,
     );
 
     if (vizualizacoesExists[0].exists) {

@@ -17,7 +17,7 @@ async function main() {
   futureDate.setDate(futureDate.getDate() + 30);
 
   console.log(
-    `Atualizando contratos para: ${futureDate.toLocaleDateString("pt-BR")} ${futureDate.toLocaleTimeString("pt-BR")}\n`
+    `Atualizando contratos para: ${futureDate.toLocaleDateString("pt-BR")} ${futureDate.toLocaleTimeString("pt-BR")}\n`,
   );
 
   // Update all users' contract dates
@@ -25,7 +25,7 @@ async function main() {
     `UPDATE "usracessos"
      SET "dataVigenciaContrato" = $1
      WHERE id > 0`,
-    futureDate
+    futureDate,
   );
 
   console.log(`✅ ${result} usuários atualizados\n`);
@@ -43,14 +43,16 @@ async function main() {
 
   const today = new Date();
   const validUsers = updatedUsers.filter(
-    (u) => new Date(u.dataVigenciaContrato) > today
+    (u) => new Date(u.dataVigenciaContrato) > today,
   );
 
   if (validUsers.length === updatedUsers.length) {
-    console.log(`\n✨ Todos os ${validUsers.length} usuários agora têm contratos válidos!`);
+    console.log(
+      `\n✨ Todos os ${validUsers.length} usuários agora têm contratos válidos!`,
+    );
   } else {
     console.log(
-      `\n⚠️ Apenas ${validUsers.length}/${updatedUsers.length} usuários têm contratos válidos`
+      `\n⚠️ Apenas ${validUsers.length}/${updatedUsers.length} usuários têm contratos válidos`,
     );
   }
 

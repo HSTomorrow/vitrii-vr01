@@ -58,16 +58,19 @@ GOOGLE_OAUTH_CALLBACK_URL=https://seu-dominio.com/api/oauth/google/callback
 ## 🔗 Passo 5: Endpoints Disponíveis
 
 ### Autorizar via Google
+
 ```
 GET /api/oauth/google/authorize
 ```
 
 ### Callback do Google (automático)
+
 ```
 GET /api/oauth/google/callback?code=...&state=...
 ```
 
 ### Vincular Google a conta existente
+
 ```
 POST /api/oauth/google/link
 Body: {
@@ -92,7 +95,7 @@ Body: {
 
 ```javascript
 const googleLogin = async () => {
-  window.location.href = '/api/oauth/google/authorize';
+  window.location.href = "/api/oauth/google/authorize";
 };
 ```
 
@@ -128,12 +131,15 @@ const googleLogin = async () => {
 ## 🐛 Troubleshooting
 
 ### Erro: "Invalid redirect URI"
+
 - Verifique se a URI no .env matches com a configurada no Google Console
 
 ### Erro: "Client ID inválido"
+
 - Confirme se GOOGLE_OAUTH_CLIENT_ID está correto no .env
 
 ### Erro: "Usuário não encontrado"
+
 - O usuário será criado automaticamente na primeira autenticação
 
 ---
@@ -141,5 +147,6 @@ const googleLogin = async () => {
 ## 📞 Suporte
 
 Para dúvidas ou problemas, consulte:
+
 - [Google OAuth Documentation](https://developers.google.com/identity/protocols/oauth2)
 - [Google Cloud Console](https://console.cloud.google.com)

@@ -1,6 +1,7 @@
 # Data de Cadastro - Configuração Concluída ✅
 
 ## Resumo
+
 O sistema agora possui registro completo de "Data de Cadastro" (`dataCriacao`) para todos os usuários e anunciantes, com preenchimento automático de datas de atualização (`dataAtualizacao`).
 
 ---
@@ -8,6 +9,7 @@ O sistema agora possui registro completo de "Data de Cadastro" (`dataCriacao`) p
 ## 1. **Schema do Banco de Dados**
 
 ### Modelo `usracessos` (Usuários)
+
 ```prisma
 model usracessos {
   id                   Int      @id @default(autoincrement())
@@ -25,6 +27,7 @@ model usracessos {
 ```
 
 ### Modelo `anunciantes` (Anunciantes)
+
 ```prisma
 model anunciantes {
   id                   Int      @id(map: "lojas_pkey") @default(autoincrement())
@@ -48,12 +51,14 @@ model anunciantes {
 ## 2. **Preenchimento de Registros Existentes**
 
 ### Script Executado
+
 - **Arquivo**: `scripts/fill-data-cadastro.mjs`
 - **Resultado**:
   - ✅ 7/7 usuários com `dataAtualizacao` preenchida
   - ✅ 7/7 anunciantes com `dataAtualizacao` preenchida
 
 ### Comando para Reexecutar
+
 ```bash
 node scripts/fill-data-cadastro.mjs
 ```
@@ -63,6 +68,7 @@ node scripts/fill-data-cadastro.mjs
 ## 3. **Implementação nos Endpoints de Criação**
 
 ### Usuários - Signup (`signUpUsuario`)
+
 **Arquivo**: `server/routes/usuarios.ts` (linha 187-197)
 
 ```typescript
@@ -75,7 +81,7 @@ const usuario = await prisma.usracessos.create({
     telefone: "",
     endereco: "",
     tipoUsuario: "comum",
-    dataAtualizacao: new Date(),  // ✅ Preenchido aqui
+    dataAtualizacao: new Date(), // ✅ Preenchido aqui
     // dataCriacao é preenchido automaticamente por @default(now())
   },
   select: {
@@ -83,12 +89,13 @@ const usuario = await prisma.usracessos.create({
     nome: true,
     email: true,
     tipoUsuario: true,
-    dataCriacao: true,            // ✅ Retornado na resposta
+    dataCriacao: true, // ✅ Retornado na resposta
   },
 });
 ```
 
 ### Usuários - Create (`createUsuario`)
+
 **Arquivo**: `server/routes/usuarios.ts` (linha 261-271)
 
 ```typescript
@@ -101,13 +108,14 @@ const usuario = await prisma.usracessos.create({
     telefone: validatedData.telefone || "",
     endereco: validatedData.endereco || "",
     tipoUsuario: "comum",
-    dataAtualizacao: new Date(),  // ✅ Preenchido aqui
+    dataAtualizacao: new Date(), // ✅ Preenchido aqui
     // dataCriacao é preenchido automaticamente por @default(now())
   },
 });
 ```
 
 ### Anunciantes - Create (`createAnunciante`)
+
 **Arquivo**: `server/routes/anunciantes.ts` (linha 158-172)
 
 ```typescript
@@ -122,8 +130,8 @@ const anunciante = await prisma.anunciantes.create({
     telefone: validatedData.telefone,
     cep: validatedData.cep,
     descricao: validatedData.descricao,
-    dataCriacao: new Date(),      // ✅ Explicitamente preenchido
-    dataAtualizacao: new Date(),  // ✅ Preenchido aqui
+    dataCriacao: new Date(), // ✅ Explicitamente preenchido
+    dataAtualizacao: new Date(), // ✅ Preenchido aqui
   },
 });
 ```
@@ -133,6 +141,7 @@ const anunciante = await prisma.anunciantes.create({
 ## 4. **Consultas de Verificação**
 
 ### Verificar usuários com data de cadastro
+
 ```sql
 SELECT id, nome, email, dataCriacao, dataAtualizacao
 FROM "usracessos"
@@ -140,6 +149,7 @@ ORDER BY dataCriacao DESC;
 ```
 
 ### Verificar anunciantes com data de cadastro
+
 ```sql
 SELECT id, nome, email, dataCriacao, dataAtualizacao
 FROM "anunciantes"
@@ -147,16 +157,17 @@ ORDER BY dataCriacao DESC;
 ```
 
 ### Contar registros com datas preenchidas
+
 ```sql
 -- Usuários
-SELECT 
+SELECT
   COUNT(*) as total,
   COUNT(CASE WHEN dataCriacao IS NOT NULL THEN 1 END) as com_dataCriacao,
   COUNT(CASE WHEN dataAtualizacao IS NOT NULL THEN 1 END) as com_dataAtualizacao
 FROM "usracessos";
 
 -- Anunciantes
-SELECT 
+SELECT
   COUNT(*) as total,
   COUNT(CASE WHEN dataCriacao IS NOT NULL THEN 1 END) as com_dataCriacao,
   COUNT(CASE WHEN dataAtualizacao IS NOT NULL THEN 1 END) as com_dataAtualizacao

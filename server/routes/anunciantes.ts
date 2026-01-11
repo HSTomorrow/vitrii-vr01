@@ -5,7 +5,10 @@ import { z } from "zod";
 // Schema validation
 const AnuncianteCreateSchema = z.object({
   nome: z.string().min(1, "Nome é obrigatório"),
-  cnpj: z.string().regex(/^\d{11,14}$/, "CNPJ/CPF inválido").optional(),
+  cnpj: z
+    .string()
+    .regex(/^\d{11,14}$/, "CNPJ/CPF inválido")
+    .optional(),
   endereco: z.string().min(1, "Endereço é obrigatório").optional(),
   cidade: z.string().min(1, "Cidade é obrigatória"),
   estado: z.string().length(2, "Estado deve ter 2 caracteres (ex: MG, SP, RJ)"),
@@ -33,7 +36,7 @@ export const getAnunciantes: RequestHandler = async (req, res) => {
         select: {
           id: true,
           nome: true,
-          
+
           endereco: true,
           cidade: true,
           estado: true,
@@ -79,7 +82,7 @@ export const getAnuncianteById: RequestHandler = async (req, res) => {
       select: {
         id: true,
         nome: true,
-        
+
         endereco: true,
         cidade: true,
         estado: true,
@@ -456,7 +459,7 @@ export const getAnunciantesByUsuario: RequestHandler = async (req, res) => {
         select: {
           id: true,
           nome: true,
-          
+
           endereco: true,
           cidade: true,
           estado: true,
@@ -480,7 +483,7 @@ export const getAnunciantesByUsuario: RequestHandler = async (req, res) => {
         select: {
           id: true,
           nome: true,
-          
+
           endereco: true,
           cidade: true,
           estado: true,

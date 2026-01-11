@@ -91,7 +91,9 @@ async function createTestData() {
         dataAtualizacao: new Date(),
       },
     });
-    console.log(`✅ Variante criada: ${variante.tamanho}/${variante.cor} - R$ ${variante.preco}\n`);
+    console.log(
+      `✅ Variante criada: ${variante.tamanho}/${variante.cor} - R$ ${variante.preco}\n`,
+    );
 
     // 6. Create test Equipe de Venda (Sales Team)
     console.log("6️⃣ Creating test Equipe de Venda...");
@@ -109,13 +111,17 @@ async function createTestData() {
     });
     console.log(`✅ Equipe de Venda criada/atualizada: ${equipe.nome}\n`);
 
-    console.log("🎉 Todos os dados de teste foram criados/atualizados com sucesso!");
+    console.log(
+      "🎉 Todos os dados de teste foram criados/atualizados com sucesso!",
+    );
     console.log("\n📋 Resumo dos dados criados:");
     console.log(`  1️⃣ Anunciante (Loja): ${anunciante.nome}`);
     console.log(`  2️⃣ Grupo de Productos: ${grupo.nome}`);
     console.log(`  3️⃣ Producto: ${producto.nome}`);
     console.log(`  4️⃣ Tabela de Preço: R$ ${tabela.preco}`);
-    console.log(`  5️⃣ Variante: ${variante.tamanho}/${variante.cor} - R$ ${variante.preco}`);
+    console.log(
+      `  5️⃣ Variante: ${variante.tamanho}/${variante.cor} - R$ ${variante.preco}`,
+    );
     console.log(`  6️⃣ Equipe de Venda: ${equipe.nome}`);
   } catch (error) {
     console.error("❌ Erro ao criar dados de teste:", error);

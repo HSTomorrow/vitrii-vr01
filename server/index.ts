@@ -140,7 +140,11 @@ import {
 } from "./routes/usuario-funcionalidades";
 import { uploadMiddleware, handleUpload } from "./routes/upload";
 import { extractUserId, requireAdmin } from "./middleware/permissionGuard";
-import { googleAuthorize, googleCallback, googleLinkAccount } from "./routes/oauth";
+import {
+  googleAuthorize,
+  googleCallback,
+  googleLinkAccount,
+} from "./routes/oauth";
 
 export function createServer() {
   const app = express();
@@ -308,8 +312,16 @@ export function createServer() {
   app.put("/api/equipes-venda/:id", extractUserId, updateEquipe);
   app.delete("/api/equipes-venda/:id", deleteEquipe);
   app.post("/api/equipes-venda/:id/membros", extractUserId, adicionarMembro);
-  app.put("/api/equipes-venda/:id/membros/:membroId", extractUserId, atualizarMembro);
-  app.delete("/api/equipes-venda/:id/membros/:membroId", extractUserId, removerMembro);
+  app.put(
+    "/api/equipes-venda/:id/membros/:membroId",
+    extractUserId,
+    atualizarMembro,
+  );
+  app.delete(
+    "/api/equipes-venda/:id/membros/:membroId",
+    extractUserId,
+    removerMembro,
+  );
   app.get(
     "/api/equipes-venda/:id/usuarios-disponiveis",
     getUsuariosDisponiveis,

@@ -111,7 +111,7 @@ export default function AdminDashboard() {
             "Content-Type": "application/json",
             "x-user-id": user?.id?.toString() || "",
           },
-        }
+        },
       );
       if (!response.ok)
         throw new Error("Erro ao buscar funcionalidades do usuário");

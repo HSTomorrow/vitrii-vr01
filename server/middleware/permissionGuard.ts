@@ -57,10 +57,11 @@ export const checkPermission = (
         : [requiredPermissions];
 
       // Fetch user's funcionalidades
-      const userFuncionalidades = await prisma.usracessosXFuncionalidade.findMany({
-        where: { usuarioId: userId },
-        include: { funcionalidade: true },
-      });
+      const userFuncionalidades =
+        await prisma.usracessosXFuncionalidade.findMany({
+          where: { usuarioId: userId },
+          include: { funcionalidade: true },
+        });
 
       const userPermissionChaves = userFuncionalidades.map(
         (uf) => uf.funcionalidade.chave,
@@ -169,7 +170,9 @@ export const extractUserId: RequestHandler = (req, res, next) => {
       const parsedId = parseInt(userIdSource as string, 10);
       if (!isNaN(parsedId)) {
         req.userId = parsedId;
-        console.log(`[extractUserId] Successfully extracted user ID: ${parsedId}`);
+        console.log(
+          `[extractUserId] Successfully extracted user ID: ${parsedId}`,
+        );
       } else {
         console.warn(`[extractUserId] Invalid user ID format: ${userIdSource}`);
       }

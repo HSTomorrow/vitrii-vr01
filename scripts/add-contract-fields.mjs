@@ -16,7 +16,7 @@ async function main() {
     console.log("📝 Verificando coluna dataVigenciaContrato...");
     try {
       await prisma.$executeRawUnsafe(
-        `ALTER TABLE "usracessos" ADD COLUMN "dataVigenciaContrato" TIMESTAMP DEFAULT NOW();`
+        `ALTER TABLE "usracessos" ADD COLUMN "dataVigenciaContrato" TIMESTAMP DEFAULT NOW();`,
       );
       console.log("✅ Coluna dataVigenciaContrato adicionada");
     } catch (err) {
@@ -31,7 +31,7 @@ async function main() {
     console.log("📝 Verificando coluna numeroAnunciosAtivos...");
     try {
       await prisma.$executeRawUnsafe(
-        `ALTER TABLE "usracessos" ADD COLUMN "numeroAnunciosAtivos" INTEGER DEFAULT 0;`
+        `ALTER TABLE "usracessos" ADD COLUMN "numeroAnunciosAtivos" INTEGER DEFAULT 0;`,
       );
       console.log("✅ Coluna numeroAnunciosAtivos adicionada");
     } catch (err) {
@@ -47,7 +47,7 @@ async function main() {
     const result = await prisma.$executeRawUnsafe(
       `UPDATE "usracessos"
        SET "dataVigenciaContrato" = NOW() + INTERVAL '30 days'
-       WHERE "dataVigenciaContrato" IS NULL OR "dataVigenciaContrato" = CURRENT_TIMESTAMP`
+       WHERE "dataVigenciaContrato" IS NULL OR "dataVigenciaContrato" = CURRENT_TIMESTAMP`,
     );
     console.log(`✅ ${result} usuários atualizados\n`);
 
@@ -55,33 +55,43 @@ async function main() {
     console.log("📊 Verificando resultados:\n");
 
     const usuariosWithContract = await prisma.$queryRawUnsafe(
-      `SELECT COUNT(*) as count FROM "usracessos" WHERE "dataVigenciaContrato" IS NOT NULL`
+      `SELECT COUNT(*) as count FROM "usracessos" WHERE "dataVigenciaContrato" IS NOT NULL`,
     );
     const usuariosTotal = await prisma.$queryRawUnsafe(
-      `SELECT COUNT(*) as count FROM "usracessos"`
+      `SELECT COUNT(*) as count FROM "usracessos"`,
     );
     console.log(
-      `Usuários: ${usuariosWithContract[0].count}/${usuariosTotal[0].count} com data de vigência de contrato`
+      `Usuários: ${usuariosWithContract[0].count}/${usuariosTotal[0].count} com data de vigência de contrato`,
     );
 
     // Show sample data
     const sample = await prisma.$queryRawUnsafe(
-      `SELECT id, nome, email, "dataVigenciaContrato", "numeroAnunciosAtivos" FROM "usracessos" LIMIT 3`
+      `SELECT id, nome, email, "dataVigenciaContrato", "numeroAnunciosAtivos" FROM "usracessos" LIMIT 3`,
     );
     console.log("\n📋 Amostra de dados:\n");
     sample.forEach((user) => {
       console.log(`  ID: ${user.id}`);
       console.log(`  Nome: ${user.nome}`);
       console.log(`  Email: ${user.email}`);
-      console.log(`  Vigência: ${new Date(user.dataVigenciaContrato).toLocaleDateString("pt-BR")}`);
+      console.log(
+        `  Vigência: ${new Date(user.dataVigenciaContrato).toLocaleDateString("pt-BR")}`,
+      );
       console.log(`  Anúncios Ativos: ${user.numeroAnunciosAtivos}\n`);
     });
 
     console.log("✨ Campos adicionados e preenchidos com sucesso!");
-    console.log("\n📌 IMPORTANTE: As validações de CPF único e cross-validation de CPF/CNPJ");
-    console.log("   entre usuários e anunciantes foram implementadas no código de aplicação.");
-    console.log("   Não é necessária uma constraint UNIQUE em banco de dados pois");
-    console.log("   o campo CPF pode ser NULL e a validação é feita em lógica de negócio.");
+    console.log(
+      "\n📌 IMPORTANTE: As validações de CPF único e cross-validation de CPF/CNPJ",
+    );
+    console.log(
+      "   entre usuários e anunciantes foram implementadas no código de aplicação.",
+    );
+    console.log(
+      "   Não é necessária uma constraint UNIQUE em banco de dados pois",
+    );
+    console.log(
+      "   o campo CPF pode ser NULL e a validação é feita em lógica de negócio.",
+    );
   } catch (error) {
     console.error("❌ Erro ao adicionar campos:", error);
     process.exit(1);

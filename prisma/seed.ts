@@ -56,25 +56,15 @@ const stores = [
 ];
 
 const productsByCategory = {
-  "Roupa": [
+  Roupa: [
     "Camiseta Básica",
     "Calça Jeans",
     "Vestido Social",
     "Blusa Feminina",
     "Jaqueta de Couro",
   ],
-  "Bazar": [
-    "Jogo de Toalhas",
-    "Cortinas",
-    "Almofadas",
-    "Tapete",
-  ],
-  "Utilidades Domésticas": [
-    "Vassoura",
-    "Pá de Lixo",
-    "Rodo",
-    "Pano de Prato",
-  ],
+  Bazar: ["Jogo de Toalhas", "Cortinas", "Almofadas", "Tapete"],
+  "Utilidades Domésticas": ["Vassoura", "Pá de Lixo", "Rodo", "Pano de Prato"],
 };
 
 async function main() {
@@ -214,7 +204,9 @@ async function main() {
       );
 
       if (!category) {
-        category = store.descricao?.includes("Roupa") ? "Roupa" : "Utilidades Domésticas";
+        category = store.descricao?.includes("Roupa")
+          ? "Roupa"
+          : "Utilidades Domésticas";
       }
 
       // Create product group
@@ -228,7 +220,8 @@ async function main() {
       });
 
       // Get products for this category
-      const categoryProducts = productsByCategory[category as keyof typeof productsByCategory] || [];
+      const categoryProducts =
+        productsByCategory[category as keyof typeof productsByCategory] || [];
 
       // Create products and announcements
       for (let i = 0; i < 3; i++) {
@@ -251,7 +244,8 @@ async function main() {
           data: {
             productId: producto.id,
             lojaId: store.id,
-            tamanho: ["P", "M", "G", "GG"][Math.floor(Math.random() * 4)] || undefined,
+            tamanho:
+              ["P", "M", "G", "GG"][Math.floor(Math.random() * 4)] || undefined,
             preco: new Decimal(preco.toString()),
             dataAtualizacao: new Date(),
           },

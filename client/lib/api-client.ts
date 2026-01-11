@@ -10,16 +10,16 @@ interface FetchOptions extends RequestInit {
 /**
  * Make an authenticated API request
  * Automatically includes x-user-id header for permission checks
- * 
+ *
  * Usage:
- * const data = await fetchApi('/api/admin/users', { 
+ * const data = await fetchApi('/api/admin/users', {
  *   userId: currentUser.id,
- *   method: 'GET' 
+ *   method: 'GET'
  * });
  */
 export async function fetchApi(
   url: string,
-  options: FetchOptions = {}
+  options: FetchOptions = {},
 ): Promise<Response> {
   const { userId, ...fetchOptions } = options;
 
@@ -43,23 +43,23 @@ export async function fetchApi(
 
 /**
  * Make an authenticated API request and parse JSON response
- * 
+ *
  * Usage:
- * const data = await fetchApiJson('/api/admin/users', { 
+ * const data = await fetchApiJson('/api/admin/users', {
  *   userId: currentUser.id,
- *   method: 'GET' 
+ *   method: 'GET'
  * });
  */
 export async function fetchApiJson<T = unknown>(
   url: string,
-  options: FetchOptions = {}
+  options: FetchOptions = {},
 ): Promise<T> {
   const response = await fetchApi(url, options);
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
     throw new Error(
-      errorData.error || `API Error: ${response.status} ${response.statusText}`
+      errorData.error || `API Error: ${response.status} ${response.statusText}`,
     );
   }
 

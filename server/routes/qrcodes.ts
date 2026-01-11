@@ -28,7 +28,7 @@ export const generateQRCode: RequestHandler = async (req, res) => {
 
     // Generate unique code
     const codigo = `ad-${anuncioId}-${Date.now()}`;
-    
+
     // Create direct link to ad
     const adLink = `${process.env.BASE_URL || "http://localhost:5173"}/anuncio/${anuncioId}`;
 
@@ -130,7 +130,8 @@ export const getQRCodesForAd: RequestHandler = async (req, res) => {
     res.json({
       success: true,
       data: alternativeQRCodes.length > 0 ? alternativeQRCodes : qrCodes,
-      count: (alternativeQRCodes.length > 0 ? alternativeQRCodes : qrCodes).length,
+      count: (alternativeQRCodes.length > 0 ? alternativeQRCodes : qrCodes)
+        .length,
     });
   } catch (error) {
     console.error("Error fetching QR codes:", error);
@@ -214,10 +215,12 @@ export const getQRCodeStats: RequestHandler = async (req, res) => {
     const stats = {
       totalScans: qrCode.chamadas.length,
       uniqueUsers: new Set(qrCode.chamadas.map((c) => c.usuarioId)).size,
-      firstScan: qrCode.chamadas.length > 0 ? qrCode.chamadas[0].dataChamada : null,
-      lastScan: qrCode.chamadas.length > 0 
-        ? qrCode.chamadas[qrCode.chamadas.length - 1].dataChamada 
-        : null,
+      firstScan:
+        qrCode.chamadas.length > 0 ? qrCode.chamadas[0].dataChamada : null,
+      lastScan:
+        qrCode.chamadas.length > 0
+          ? qrCode.chamadas[qrCode.chamadas.length - 1].dataChamada
+          : null,
     };
 
     res.json({
