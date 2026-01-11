@@ -162,6 +162,18 @@ model usracessos {
   endereco             String?
   usuarios_anunciantes usuarios_anunciantes[]
   membros_equipe       membros_equipe[]
+  passwordResetTokens  passwordResetToken[]
+}
+
+model passwordResetToken {
+  id        Int       @id @default(autoincrement())
+  usuarioId Int
+  token     String    @unique @db.VarChar(500)
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  usuario   usracessos @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId])
 }
 
 model usuarios_anunciantes {
