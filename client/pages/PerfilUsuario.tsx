@@ -35,7 +35,7 @@ export default function PerfilUsuario() {
     queryFn: async () => {
       if (!user?.id) return null;
       try {
-        const response = await fetch(`/api/usuarios/${user.id}`);
+        const response = await fetch(`/api/usracessos/${user.id}`);
         if (!response.ok) return null;
         const result = await response.json();
         return result.data;
@@ -67,7 +67,7 @@ export default function PerfilUsuario() {
         throw new Error("Usuário não autenticado");
       }
 
-      const response = await fetch(`/api/usuarios/${user.id}`, {
+      const response = await fetch(`/api/usracessos/${user.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
