@@ -54,7 +54,7 @@ export const createPagamento: RequestHandler = async (req, res) => {
     const validatedData = PagamentoCreateSchema.parse(req.body);
 
     // Verify that the anuncio exists
-    const anuncio = await prisma.anuncio.findUnique({
+    const anuncio = await prisma.anuncios.findUnique({
       where: { id: validatedData.anuncioId },
     });
 
@@ -101,7 +101,7 @@ export const createPagamento: RequestHandler = async (req, res) => {
     });
 
     // Update anuncio status to waiting for payment
-    await prisma.anuncio.update({
+    await prisma.anuncios.update({
       where: { id: validatedData.anuncioId },
       data: { status: "aguardando_pagamento" },
     });
@@ -151,7 +151,7 @@ export const updatePagamentoStatus: RequestHandler = async (req, res) => {
 
     // If payment is confirmed, update anuncio status to "pago"
     if (validatedData.status === "pago") {
-      await prisma.anuncio.update({
+      await prisma.anuncios.update({
         where: { id: pagamento.anuncioId },
         data: { status: "pago" },
       });
@@ -162,7 +162,7 @@ export const updatePagamentoStatus: RequestHandler = async (req, res) => {
       validatedData.status === "cancelado" ||
       validatedData.status === "expirado"
     ) {
-      await prisma.anuncio.update({
+      await prisma.anuncios.update({
         where: { id: pagamento.anuncioId },
         data: { status: "em_edicao" },
       });
@@ -303,7 +303,7 @@ export const cancelPagamento: RequestHandler = async (req, res) => {
     });
 
     // Update anuncio status back to "em_edicao"
-    await prisma.anuncio.update({
+    await prisma.anuncios.update({
       where: { id: pagamento.anuncioId },
       data: { status: "em_edicao" },
     });
