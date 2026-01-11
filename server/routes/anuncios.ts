@@ -107,31 +107,10 @@ export const getAnuncios: RequestHandler = async (req, res) => {
       prisma.anuncios.findMany({
         where,
         include: {
-          anunciante: {
+          anunciantes: {
             select: {
               id: true,
               nome: true,
-              fotoUrl: true,
-              endereco: true,
-              email: true,
-              site: true,
-              instagram: true,
-              facebook: true,
-              whatsapp: true,
-            },
-          },
-          producto: {
-            select: {
-              id: true,
-              nome: true,
-              descricao: true,
-              tipo: true,
-            },
-          },
-          tabelaDePreco: {
-            select: {
-              id: true,
-              preco: true,
             },
           },
         },
