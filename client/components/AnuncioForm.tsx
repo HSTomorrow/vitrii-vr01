@@ -240,18 +240,14 @@ export default function AnuncioForm({
         titulo: data.titulo,
         descricao: data.descricao,
         fotoUrl: data.fotoUrl,
-        precoAnuncio: data.precoAnuncio
-          ? parseFloat(data.precoAnuncio)
-          : null,
+        precoAnuncio: data.precoAnuncio ? parseFloat(data.precoAnuncio) : null,
         anuncianteId: selectedAnuncianteId,
         productId: data.productId > 0 ? data.productId : null,
-        tabelaDePrecoId:
-          data.tabelaDePrecoId > 0 ? data.tabelaDePrecoId : null,
+        tabelaDePrecoId: data.tabelaDePrecoId > 0 ? data.tabelaDePrecoId : null,
         dataValidade: data.dataValidade
           ? new Date(data.dataValidade).toISOString()
           : null,
-        equipeDeVendaId:
-          data.equipeDeVendaId > 0 ? data.equipeDeVendaId : null,
+        equipeDeVendaId: data.equipeDeVendaId > 0 ? data.equipeDeVendaId : null,
         endereco: data.endereco || null,
         cidade: data.cidade || null,
         estado: data.estado || null,
@@ -333,7 +329,9 @@ export default function AnuncioForm({
 
     // Basic required fields
     if (!selectedAnuncianteId || !formData.titulo) {
-      console.warn("[AnuncioForm] Validation failed: missing anunciante or titulo");
+      console.warn(
+        "[AnuncioForm] Validation failed: missing anunciante or titulo",
+      );
       toast.error("Anunciante e Título são obrigatórios");
       return;
     }
@@ -741,8 +739,8 @@ export default function AnuncioForm({
                   <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-6">
                     <p className="text-sm text-blue-800">
                       <strong>ℹ️ Dica:</strong> Este tipo de anúncio não requer
-                      variantes. O preço será definido diretamente no campo "Valor
-                      do Anúncio" acima.
+                      variantes. O preço será definido diretamente no campo
+                      "Valor do Anúncio" acima.
                     </p>
                   </div>
                 )}
@@ -929,7 +927,7 @@ export default function AnuncioForm({
               />
               <label htmlFor="destaque" className="flex-1 cursor-pointer">
                 <p className="font-semibold text-walmart-text">
-                  ⭐ Anuncio em Destaque 
+                  ⭐ Anuncio em Destaque
                 </p>
                 <p className="text-sm text-walmart-text-secondary">
                   Marque esta opção para colocar o anúncio em destaque na página

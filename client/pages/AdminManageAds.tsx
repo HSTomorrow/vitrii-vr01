@@ -61,11 +61,14 @@ export default function AdminManageAds() {
     queryFn: async () => {
       // Fetch with limit=500 to get all ads for admin view
       // includeInactive=true to show inactive ads in admin view
-      const response = await fetch("/api/anuncios?includeInactive=true&limit=500", {
-        headers: {
-          "x-user-id": user?.id ? String(user.id) : "",
+      const response = await fetch(
+        "/api/anuncios?includeInactive=true&limit=500",
+        {
+          headers: {
+            "x-user-id": user?.id ? String(user.id) : "",
+          },
         },
-      });
+      );
 
       if (!response.ok) {
         const errorData = await response
@@ -213,7 +216,10 @@ export default function AdminManageAds() {
   });
 
   // Reset to page 1 when search or filter changes
-  if (currentPage > 1 && filteredAnuncios.length < (currentPage - 1) * itemsPerPage) {
+  if (
+    currentPage > 1 &&
+    filteredAnuncios.length < (currentPage - 1) * itemsPerPage
+  ) {
     setCurrentPage(1);
   }
 
@@ -303,9 +309,15 @@ export default function AdminManageAds() {
             <p className="text-sm text-blue-900">
               <span className="font-semibold">
                 {startIndex + 1}-{Math.min(endIndex, filteredAnuncios.length)}
-              </span> de <span className="font-semibold">{filteredAnuncios.length}</span> anúncio(s)
+              </span>{" "}
+              de{" "}
+              <span className="font-semibold">{filteredAnuncios.length}</span>{" "}
+              anúncio(s)
               {anunciosData.pagination?.total && (
-                <span className="text-blue-700"> (Total na plataforma: {anunciosData.pagination.total})</span>
+                <span className="text-blue-700">
+                  {" "}
+                  (Total na plataforma: {anunciosData.pagination.total})
+                </span>
               )}
             </p>
           </div>

@@ -1,11 +1,13 @@
 # Pagination Implementation (20 items per page)
 
 ## Overview
+
 Implemented a reusable pagination component and integrated it into admin pages for better UX when managing large lists.
 
 ## Changes Made
 
 ### 1. New Component: `client/components/Pagination.tsx`
+
 - **Purpose**: Reusable pagination component for all list pages
 - **Features**:
   - Shows current page and total pages
@@ -15,6 +17,7 @@ Implemented a reusable pagination component and integrated it into admin pages f
   - Responsive design
 
 ### 2. Updated: `client/pages/AdminManageAds.tsx`
+
 - **Import**: Added `Pagination` component import
 - **State**: Added `currentPage` and `itemsPerPage = 20`
 - **Logic**:
@@ -27,6 +30,7 @@ Implemented a reusable pagination component and integrated it into admin pages f
   - Pagination controls below the ad list
 
 ### 3. Updated: `client/pages/AdminManageUsers.tsx`
+
 - **Import**: Added `Pagination` component import
 - **State**: Added `currentPage` and `itemsPerPage = 20`
 - **Logic**:
@@ -73,6 +77,7 @@ const paginatedItems = filteredItems.slice(startIndex, endIndex);
 ## Pages That Could Benefit from Pagination
 
 The following cadastro pages currently don't have pagination:
+
 - `CadastroEquipeDeVenda.tsx`
 - `CadastroGruposProductos.tsx`
 - `CadastroLojas.tsx`

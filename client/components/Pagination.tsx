@@ -14,7 +14,7 @@ export default function Pagination({
   onPageChange,
 }: PaginationProps) {
   const totalPages = Math.ceil(totalItems / itemsPerPage);
-  
+
   if (totalPages <= 1) {
     return null;
   }
@@ -67,7 +67,10 @@ export default function Pagination({
         {pageNumbers.map((page, idx) => {
           if (page === "...") {
             return (
-              <span key={`ellipsis-${idx}`} className="px-2 py-2 text-walmart-text-secondary">
+              <span
+                key={`ellipsis-${idx}`}
+                className="px-2 py-2 text-walmart-text-secondary"
+              >
                 {page}
               </span>
             );

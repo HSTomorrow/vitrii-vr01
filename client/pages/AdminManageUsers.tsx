@@ -70,7 +70,9 @@ export default function AdminManageUsers() {
       const response = await fetch("/api/admin/usuarios-com-senha");
       if (!response.ok) {
         if (response.status === 403) {
-          throw new Error("Acesso negado. Apenas administradores podem acessar.");
+          throw new Error(
+            "Acesso negado. Apenas administradores podem acessar.",
+          );
         }
         throw new Error("Erro ao buscar usuários");
       }
@@ -124,7 +126,10 @@ export default function AdminManageUsers() {
   );
 
   // Reset to page 1 when search changes
-  if (currentPage > 1 && filteredUsuarios.length < (currentPage - 1) * itemsPerPage) {
+  if (
+    currentPage > 1 &&
+    filteredUsuarios.length < (currentPage - 1) * itemsPerPage
+  ) {
     setCurrentPage(1);
   }
 
@@ -218,7 +223,10 @@ export default function AdminManageUsers() {
               <p className="text-sm text-blue-900">
                 <span className="font-semibold">
                   {startIndex + 1}-{Math.min(endIndex, filteredUsuarios.length)}
-                </span> de <span className="font-semibold">{filteredUsuarios.length}</span> usuário(s)
+                </span>{" "}
+                de{" "}
+                <span className="font-semibold">{filteredUsuarios.length}</span>{" "}
+                usuário(s)
               </p>
             </div>
           )}
@@ -275,9 +283,7 @@ export default function AdminManageUsers() {
                               : "••••••••"}
                           </code>
                           <button
-                            onClick={() =>
-                              togglePasswordVisibility(usuario.id)
-                            }
+                            onClick={() => togglePasswordVisibility(usuario.id)}
                             className="p-1 hover:bg-gray-200 rounded transition-colors"
                             title={
                               showPasswords.has(usuario.id)
@@ -364,7 +370,9 @@ export default function AdminManageUsers() {
             </h2>
             <p className="text-walmart-text-secondary mb-6">
               Resetar senha para{" "}
-              <strong className="text-walmart-text">{resetPasswordModal.nome}</strong>
+              <strong className="text-walmart-text">
+                {resetPasswordModal.nome}
+              </strong>
             </p>
 
             <div className="space-y-4 mb-6">

@@ -35,7 +35,9 @@ export default function Browse() {
       <section className="bg-gradient-to-r from-walmart-blue to-walmart-blue-dark text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl font-bold mb-2">Explorar Anúncios</h1>
-          <p className="text-blue-100">Encontre os melhores produtos e serviços</p>
+          <p className="text-blue-100">
+            Encontre os melhores produtos e serviços
+          </p>
         </div>
       </section>
 
@@ -75,7 +77,9 @@ export default function Browse() {
                     {anuncio.anunciante?.endereco && (
                       <div className="flex items-center gap-1 mb-3 text-xs text-walmart-text-secondary">
                         <MapPin className="w-3 h-3" />
-                        <span className="truncate">{anuncio.anunciante.endereco}</span>
+                        <span className="truncate">
+                          {anuncio.anunciante.endereco}
+                        </span>
                       </div>
                     )}
 
