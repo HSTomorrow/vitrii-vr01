@@ -284,25 +284,34 @@ export default function AnuncioForm({
       return result;
     },
     onSuccess: (result) => {
+      console.log("[AnuncioForm] Mutation successful, invalidating queries");
       queryClient.invalidateQueries({ queryKey: ["anuncios"] });
-      toast.success(
-        anuncioId
-          ? "Anúncio atualizado com sucesso!"
-          : "Anúncio criado com sucesso!",
-      );
+
+      const successMessage = anuncioId
+        ? "Anúncio atualizado com sucesso!"
+        : "Anúncio criado com sucesso!";
+
+      console.log("[AnuncioForm] Showing toast:", successMessage);
+      toast.success(successMessage);
 
       // If creating a new ad (not editing)
       if (!anuncioId && result.data?.id) {
+        console.log("[AnuncioForm] New ad created, ID:", result.data.id);
+        console.log("[AnuncioForm] isDoacao:", result.data.isDoacao);
+
         setTimeout(() => {
           // Donations go directly to ad detail (no payment needed)
           // Regular ads go to checkout
           if (result.data.isDoacao) {
+            console.log("[AnuncioForm] Navigating to ad detail (donation)");
             navigate(`/anuncio/${result.data.id}`);
           } else {
+            console.log("[AnuncioForm] Navigating to checkout");
             navigate(`/checkout/${result.data.id}`);
           }
         }, 500);
-      } else if (onSuccess) {
+      } else if (anuncioId && onSuccess) {
+        console.log("[AnuncioForm] Editing mode, calling onSuccess callback");
         onSuccess();
       }
     },
