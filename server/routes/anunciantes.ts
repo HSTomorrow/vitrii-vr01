@@ -214,6 +214,7 @@ const AnuncianteUpdateSchema = z.object({
   site: z.string().optional(),
   instagram: z.string().optional(),
   facebook: z.string().optional(),
+  whatsapp: z.string().optional(),
   fotoUrl: z.string().optional(),
 });
 
