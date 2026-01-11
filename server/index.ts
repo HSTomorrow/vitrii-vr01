@@ -69,7 +69,9 @@ import {
   deleteEquipe,
   adicionarMembro,
   removerMembro,
+  atualizarMembro,
   getUsuariosDisponiveis,
+  getMembrosDisponiveis,
 } from "./routes/equipes-venda";
 import {
   getFavoritos,
