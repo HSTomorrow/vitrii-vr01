@@ -138,16 +138,16 @@ export default function AnunciosCarousel({
       {/* Navigation Buttons */}
       <button
         onClick={() => scroll("left")}
-        className="absolute left-0 top-1/2 -translate-y-1/2 z-10 p-2 bg-white/80 hover:bg-white rounded-full shadow-md transition-all opacity-0 group-hover:opacity-100 -translate-x-4"
+        className="absolute left-2 sm:left-0 top-1/2 -translate-y-1/2 z-10 p-2 bg-white/90 hover:bg-white rounded-full shadow-md transition-all"
       >
-        <ChevronLeft className="w-6 h-6 text-walmart-blue" />
+        <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-walmart-blue" />
       </button>
 
       <button
         onClick={() => scroll("right")}
-        className="absolute right-0 top-1/2 -translate-y-1/2 z-10 p-2 bg-white/80 hover:bg-white rounded-full shadow-md transition-all opacity-0 group-hover:opacity-100 translate-x-4"
+        className="absolute right-2 sm:right-0 top-1/2 -translate-y-1/2 z-10 p-2 bg-white/90 hover:bg-white rounded-full shadow-md transition-all"
       >
-        <ChevronRight className="w-6 h-6 text-walmart-blue" />
+        <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-walmart-blue" />
       </button>
 
       {/* Carousel Container */}
