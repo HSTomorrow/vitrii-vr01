@@ -64,7 +64,7 @@ export default function Header() {
             <nav className="hidden lg:flex items-center space-x-6">
               <Link
                 to="/browse"
-                className="text-walmart-text-secondary hover:text-walmart-blue transition-colors"
+                className="text-walmart-text-secondary hover:text-walmart-blue transition-colors text-[0.85rem]"
               >
                 Ver Anúncios
               </Link>
