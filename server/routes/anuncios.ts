@@ -211,6 +211,10 @@ export const getAnuncioById: RequestHandler = async (req, res) => {
             endereco: true,
             email: true,
             cnpjOuCpf: true,
+            site: true,
+            instagram: true,
+            facebook: true,
+            whatsapp: true,
           },
         },
         producto: {
