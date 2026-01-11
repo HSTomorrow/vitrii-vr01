@@ -121,7 +121,7 @@ model EquipeDeVenda {
 model MembroEquipe {
   id            Int       @id @default(autoincrement())
   equipeId      Int
-  usuarioId     Int
+  usuarioId     Int?
   nome          String    @db.VarChar(255)           // Nome do membro da equipe
   email         String    @db.VarChar(255)           // Email do membro
   whatsapp      String?   @db.VarChar(20)            // WhatsApp do membro
@@ -131,7 +131,7 @@ model MembroEquipe {
 
   // Relations
   equipe        EquipeDeVenda @relation(fields: [equipeId], references: [id], onDelete: Cascade)
-  usuario       Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  usuario       Usuario?  @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
 
   @@unique([equipeId, usuarioId])
   @@map("membros_equipe")
