@@ -28,23 +28,25 @@ model anunciantes {
 }
 
 model anuncios {
-  id              Int         @id @default(autoincrement())
-  usuarioId       Int
-  anuncianteId    Int
-  titulo          String      @db.VarChar(255)
-  descricao       String
-  preco           Decimal?    @db.Decimal(10, 2)
-  categoria       String?     @db.VarChar(100)
-  imagem          String?     @db.VarChar(500)
-  status          String      @default("ativo") @db.VarChar(50)
-  tipo            String      @default("produto") @db.VarChar(50)
-  diasRestantes   Int?
-  statusPagamento String?     @default("pendente") @db.VarChar(50)
-  dataCriacao     DateTime    @default(now())
-  dataAtualizacao DateTime
-  cidade          String?     @db.VarChar(100)
-  estado          String?     @db.VarChar(2)
-  anunciantes     anunciantes @relation(fields: [anuncianteId], references: [id], onDelete: Cascade, map: "anuncios_lojaId_fkey")
+  id                  Int                     @id @default(autoincrement())
+  usuarioId           Int
+  anuncianteId        Int
+  titulo              String                  @db.VarChar(255)
+  descricao           String
+  preco               Decimal?                @db.Decimal(10, 2)
+  categoria           String?                 @db.VarChar(100)
+  imagem              String?                 @db.VarChar(500)
+  status              String                  @default("ativo") @db.VarChar(50)
+  tipo                String                  @default("produto") @db.VarChar(50)
+  diasRestantes       Int?
+  statusPagamento     String?                 @default("pendente") @db.VarChar(50)
+  dataCriacao         DateTime                @default(now())
+  dataAtualizacao     DateTime
+  cidade              String?                 @db.VarChar(100)
+  estado              String?                 @db.VarChar(2)
+  visualizacoes       Int                     @default(0)
+  anunciantes         anunciantes             @relation(fields: [anuncianteId], references: [id], onDelete: Cascade, map: "anuncios_lojaId_fkey")
+  anuncioVisualizados anuncioVisualizados[]
 }
 
 model fotos_grupos {
