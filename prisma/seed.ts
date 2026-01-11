@@ -218,7 +218,7 @@ async function main() {
       }
 
       // Create product group
-      const grupoDeProductos = await prisma.grupos_productos.create({
+      const grupoDeProductos = await prisma.grupos_produtos.create({
         data: {
           lojaId: store.id,
           nome: category,
