@@ -170,7 +170,6 @@ export const getAnuncioById: RequestHandler = async (req, res) => {
           select: {
             id: true,
             nome: true,
-            tipo: true,
             endereco: true,
             email: true,
             cnpj: true,
