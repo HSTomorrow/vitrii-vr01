@@ -25,16 +25,14 @@ interface Anuncio {
   titulo: string;
   descricao?: string;
   anuncianteId: number;
-  productId: number;
-  fotoUrl?: string;
-  precoAnuncio?: number;
-  isDoacao: boolean;
+  imagem?: string;
+  preco?: number;
   destaque: boolean;
   isActive: boolean;
   status: string;
   dataCriacao: string;
-  anunciante?: { nome: string };
-  producto?: { nome: string };
+  tipo: string;
+  anunciantes?: { nome: string };
 }
 
 export default function AdminManageAds() {
