@@ -29,6 +29,7 @@ export default function AdminEditUserModal({
   usuario,
   onClose,
 }: AdminEditUserModalProps) {
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     nome: usuario.nome,
