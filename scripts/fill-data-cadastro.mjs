@@ -7,54 +7,51 @@ async function main() {
 
   const today = new Date();
   today.setHours(0, 0, 0, 0);
+  const todayISO = today.toISOString();
 
   try {
-    // Update usracessos (usuarios)
+    // Update usracessos (usuarios) com dataAtualizacao NULL
     console.log("📝 Atualizando usuários sem dataAtualizacao...");
-    const usuariosUpdated = await prisma.usracessos.updateMany({
-      where: {
-        dataAtualizacao: null,
-      },
-      data: {
-        dataAtualizacao: today,
-      },
-    });
-    console.log(`✅ ${usuariosUpdated.count} usuários atualizados\n`);
+    const usuariosResult = await prisma.$executeRawUnsafe(
+      `UPDATE "usracessos" 
+       SET "dataAtualizacao" = $1 
+       WHERE "dataAtualizacao" IS NULL`,
+      todayISO
+    );
+    console.log(`✅ ${usuariosResult} usuários atualizados\n`);
 
-    // Update anunciantes
+    // Update anunciantes com dataAtualizacao NULL
     console.log("📝 Atualizando anunciantes sem dataAtualizacao...");
-    const anunciantesUpdated = await prisma.anunciantes.updateMany({
-      where: {
-        dataAtualizacao: null,
-      },
-      data: {
-        dataAtualizacao: today,
-      },
-    });
-    console.log(`✅ ${anunciantesUpdated.count} anunciantes atualizados\n`);
+    const anunciantesResult = await prisma.$executeRawUnsafe(
+      `UPDATE "anunciantes" 
+       SET "dataAtualizacao" = $1 
+       WHERE "dataAtualizacao" IS NULL`,
+      todayISO
+    );
+    console.log(`✅ ${anunciantesResult} anunciantes atualizados\n`);
 
     // Verify results
     console.log("📊 Verificando resultados:\n");
 
-    const usuariosTotal = await prisma.usracessos.count();
-    const usuariosComData = await prisma.usracessos.count({
-      where: {
-        dataAtualizacao: {
-          not: null,
-        },
-      },
-    });
-    console.log(`Usuários: ${usuariosComData}/${usuariosTotal} com data de atualização`);
+    const usuariosWithDate = await prisma.$queryRawUnsafe(
+      `SELECT COUNT(*) as count FROM "usracessos" WHERE "dataAtualizacao" IS NOT NULL`
+    );
+    const usuariosTotal = await prisma.$queryRawUnsafe(
+      `SELECT COUNT(*) as count FROM "usracessos"`
+    );
+    console.log(
+      `Usuários: ${usuariosWithDate[0].count}/${usuariosTotal[0].count} com data de atualização`
+    );
 
-    const anunciantesTotal = await prisma.anunciantes.count();
-    const anunciantesComData = await prisma.anunciantes.count({
-      where: {
-        dataAtualizacao: {
-          not: null,
-        },
-      },
-    });
-    console.log(`Anunciantes: ${anunciantesComData}/${anunciantesTotal} com data de atualização\n`);
+    const anunciantesWithDate = await prisma.$queryRawUnsafe(
+      `SELECT COUNT(*) as count FROM "anunciantes" WHERE "dataAtualizacao" IS NOT NULL`
+    );
+    const anunciantesTotal = await prisma.$queryRawUnsafe(
+      `SELECT COUNT(*) as count FROM "anunciantes"`
+    );
+    console.log(
+      `Anunciantes: ${anunciantesWithDate[0].count}/${anunciantesTotal[0].count} com data de atualização\n`
+    );
 
     console.log("✨ Preenchimento concluído com sucesso!");
   } catch (error) {
