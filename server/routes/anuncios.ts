@@ -275,7 +275,7 @@ export const createAnuncio: RequestHandler = async (req, res) => {
     // Only validate product if one is provided (product is optional)
     if (validatedData.productId && validatedData.productId > 0) {
       // Verify that the product belongs to the anunciante
-      const producto = await prisma.producto.findUnique({
+      const producto = await prisma.productos.findUnique({
         where: { id: validatedData.productId },
         include: {
           grupo: true,
@@ -636,7 +636,7 @@ export const getProdutosParaAnuncio: RequestHandler = async (req, res) => {
   try {
     const { anuncianteId } = req.params;
 
-    const productos = await prisma.producto.findMany({
+    const productos = await prisma.productos.findMany({
       where: {
         grupo: {
           anuncianteId: parseInt(anuncianteId),
