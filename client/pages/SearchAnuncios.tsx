@@ -45,7 +45,7 @@ export default function SearchAnuncios() {
   const { data: anunciosData, isLoading } = useQuery({
     queryKey: ["anuncios", "search"],
     queryFn: async () => {
-      const response = await fetch("/api/anuncios");
+      const response = await fetch("/api/anuncios?status=pago&limit=500");
       if (!response.ok) throw new Error("Erro ao buscar anúncios");
       return response.json();
     },
