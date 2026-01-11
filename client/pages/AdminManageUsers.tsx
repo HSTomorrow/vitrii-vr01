@@ -203,11 +203,25 @@ export default function AdminManageUsers() {
                 type="text"
                 placeholder="Buscar por nome ou email..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1); // Reset to page 1 when searching
+                }}
                 className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-walmart-blue"
               />
             </div>
           </div>
+
+          {/* Pagination Info */}
+          {!usuariosLoading && filteredUsuarios.length > 0 && (
+            <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <p className="text-sm text-blue-900">
+                <span className="font-semibold">
+                  {startIndex + 1}-{Math.min(endIndex, filteredUsuarios.length)}
+                </span> de <span className="font-semibold">{filteredUsuarios.length}</span> usuário(s)
+              </p>
+            </div>
+          )}
 
           {/* Users Table */}
           {usuariosLoading ? (
