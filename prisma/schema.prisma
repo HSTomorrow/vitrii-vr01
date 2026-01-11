@@ -10,6 +10,7 @@ datasource db {
 model anunciantes {
   id                   Int                    @id(map: "lojas_pkey") @default(autoincrement())
   nome                 String                 @db.VarChar(255)
+  tipo                 String                 @default("Comum") @db.VarChar(50)
   descricao            String?
   cnpj                 String?                @db.VarChar(14)
   telefone             String?                @db.VarChar(20)
