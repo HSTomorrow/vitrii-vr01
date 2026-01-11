@@ -14,6 +14,7 @@ import {
   activateAnuncio,
   getProdutosParaAnuncio,
   canEditAnuncio,
+  recordAnuncioView,
 } from "./routes/anuncios";
 import {
   getAnunciantes,
