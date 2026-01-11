@@ -129,7 +129,7 @@ export const getEquipeById: RequestHandler = async (req, res) => {
       }
     }
 
-    const membros = await prisma.membroEquipe.findMany({
+    const membros = await prisma.membros_equipe.findMany({
       where: {
         equipeId: parseInt(id),
         ...membrosFilter,
@@ -422,7 +422,7 @@ export const adicionarMembro: RequestHandler = async (req, res) => {
     }
 
     // Check if email already exists in this equipe
-    const existingMember = await prisma.membroEquipe.findFirst({
+    const existingMember = await prisma.membros_equipe.findFirst({
       where: {
         equipeId: parseInt(id),
         email: body.email,
@@ -436,7 +436,7 @@ export const adicionarMembro: RequestHandler = async (req, res) => {
       });
     }
 
-    const membro = await prisma.membroEquipe.create({
+    const membro = await prisma.membros_equipe.create({
       data: {
         equipeId: parseInt(id),
         usuarioId: usuarioId, // Preenchido automaticamente com o usuário autenticado
@@ -519,7 +519,7 @@ export const removerMembro: RequestHandler = async (req, res) => {
     const { id, membroId } = req.params;
     const usuarioId = req.userId;
 
-    const membro = await prisma.membroEquipe.findUnique({
+    const membro = await prisma.membros_equipe.findUnique({
       where: { id: parseInt(membroId) },
     });
 
@@ -546,7 +546,7 @@ export const removerMembro: RequestHandler = async (req, res) => {
       }
     }
 
-    await prisma.membroEquipe.delete({
+    await prisma.membros_equipe.delete({
       where: { id: parseInt(membroId) },
     });
 
@@ -570,7 +570,7 @@ export const atualizarMembro: RequestHandler = async (req, res) => {
     const usuarioId = req.userId;
     const body = AtualizarMembroSchema.parse(req.body);
 
-    const membro = await prisma.membroEquipe.findUnique({
+    const membro = await prisma.membros_equipe.findUnique({
       where: { id: parseInt(membroId) },
     });
 
@@ -597,7 +597,7 @@ export const atualizarMembro: RequestHandler = async (req, res) => {
       }
     }
 
-    const updated = await prisma.membroEquipe.update({
+    const updated = await prisma.membros_equipe.update({
       where: { id: parseInt(membroId) },
       data: body,
       include: {
@@ -708,7 +708,7 @@ export const getMembrosDisponiveis: RequestHandler = async (req, res) => {
     }
 
     // Get members with status = "disponivel"
-    const membros = await prisma.membroEquipe.findMany({
+    const membros = await prisma.membros_equipe.findMany({
       where: {
         equipeId: parseInt(equipeId),
         status: "disponivel",
