@@ -223,18 +223,56 @@ const AnuncianteUpdateSchema = z.object({
 export const updateAnunciante: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
+    const usuarioId = req.userId;
 
     // Validate input - only allow safe fields
     const validatedData = AnuncianteUpdateSchema.parse(req.body);
 
-    const anunciante = await prisma.anunciante.update({
+    // Check if anunciante exists
+    const anunciante = await prisma.anunciante.findUnique({
+      where: { id: parseInt(id) },
+    });
+
+    if (!anunciante) {
+      return res.status(404).json({
+        success: false,
+        error: "Anunciante não encontrado",
+      });
+    }
+
+    // Check permissions - allow if user is admin or owner of the anunciante
+    if (usuarioId) {
+      const usuario = await prisma.usuario.findUnique({
+        where: { id: usuarioId },
+        select: { tipoUsuario: true },
+      });
+
+      // If not admin, check if user is associated with this anunciante
+      if (usuario?.tipoUsuario !== "adm") {
+        const hasAccess = await prisma.usuarioAnunciante.findFirst({
+          where: {
+            usuarioId: usuarioId,
+            anuncianteId: parseInt(id),
+          },
+        });
+
+        if (!hasAccess) {
+          return res.status(403).json({
+            success: false,
+            error: "Você não tem permissão para atualizar este anunciante",
+          });
+        }
+      }
+    }
+
+    const updatedAnunciante = await prisma.anunciante.update({
       where: { id: parseInt(id) },
       data: validatedData,
     });
 
     res.json({
       success: true,
-      data: anunciante,
+      data: updatedAnunciante,
       message: "Anunciante atualizado com sucesso",
     });
   } catch (error) {
