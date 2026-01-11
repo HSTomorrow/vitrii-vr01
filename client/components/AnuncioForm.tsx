@@ -327,8 +327,13 @@ export default function AnuncioForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    console.log("[AnuncioForm] Form submission started");
+    console.log("[AnuncioForm] Form data:", formData);
+    console.log("[AnuncioForm] Selected anunciante ID:", selectedAnuncianteId);
+
     // Basic required fields
     if (!selectedAnuncianteId || !formData.titulo) {
+      console.warn("[AnuncioForm] Validation failed: missing anunciante or titulo");
       toast.error("Anunciante e Título são obrigatórios");
       return;
     }
@@ -338,13 +343,21 @@ export default function AnuncioForm({
       formData.precoAnuncio && parseFloat(formData.precoAnuncio) > 0;
     const isFreeAd = formData.isDoacao;
 
+    console.log("[AnuncioForm] Price validation:", {
+      hasPrice,
+      isFreeAd,
+      precoAnuncio: formData.precoAnuncio,
+    });
+
     if (!hasPrice && !isFreeAd) {
+      console.warn("[AnuncioForm] Validation failed: no price or free ad");
       toast.error(
         "Você deve preencher o Valor do anúncio ou marcar como gratuito/doação",
       );
       return;
     }
 
+    console.log("[AnuncioForm] All validations passed, submitting mutation");
     mutation.mutate(formData);
   };
 
