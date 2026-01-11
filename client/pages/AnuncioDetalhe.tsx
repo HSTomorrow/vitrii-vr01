@@ -409,61 +409,38 @@ export default function AnuncioDetalhe() {
                   </h3>
                   <div className="space-y-3">
                     <p className="text-walmart-text font-semibold">
-                      {anuncio.anunciante.nome}
+                      {anuncio.anunciantes?.nome || "Anunciante desconhecido"}
                     </p>
                     <div className="flex items-center gap-2 text-walmart-text-secondary text-sm">
                       <MapPin className="w-4 h-4" />
                       <span>
-                        {anuncio.anunciante.endereco ||
+                        {anuncio.anunciantes?.endereco ||
                           "Endereço não informado"}
                       </span>
                     </div>
                     {/* Social Media Links */}
                     <div className="flex gap-3 pt-2">
-                      {anuncio.anunciante.email && (
+                      {anuncio.anunciantes?.email && (
                         <a
-                          href={`mailto:${anuncio.anunciante.email}`}
+                          href={`mailto:${anuncio.anunciantes.email}`}
                           className="inline-flex items-center gap-1 text-red-600 hover:text-red-700 transition-colors"
                           title="Enviar email"
                         >
                           <Mail className="w-4 h-4" />
                         </a>
                       )}
-                      {anuncio.anunciante.site && (
+                      {anuncio.anunciantes?.cnpj && (
+                        <div className="text-sm text-walmart-text-secondary">
+                          CNPJ: {anuncio.anunciantes.cnpj}
+                        </div>
+                      )}
+                      {anuncio.anunciantes?.telefone && (
                         <a
-                          href={
-                            anuncio.anunciante.site.startsWith("http")
-                              ? anuncio.anunciante.site
-                              : `https://${anuncio.anunciante.site}`
-                          }
-                          target="_blank"
-                          rel="noopener noreferrer"
+                          href={`tel:${anuncio.anunciantes.telefone.replace(/\D/g, "")}`}
                           className="inline-flex items-center gap-1 text-walmart-blue hover:text-walmart-blue-dark transition-colors"
-                          title="Visitar site"
+                          title="Ligar"
                         >
-                          <Globe className="w-4 h-4" />
-                        </a>
-                      )}
-                      {anuncio.anunciante.instagram && (
-                        <a
-                          href={`https://instagram.com/${anuncio.anunciante.instagram.replace(/^@/, "")}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-pink-600 hover:text-pink-700 transition-colors"
-                          title="Visitar Instagram"
-                        >
-                          <Instagram className="w-4 h-4" />
-                        </a>
-                      )}
-                      {anuncio.anunciante.facebook && (
-                        <a
-                          href={`https://facebook.com/${anuncio.anunciante.facebook.replace(/^\//, "")}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-blue-700 hover:text-blue-800 transition-colors"
-                          title="Visitar Facebook"
-                        >
-                          <Facebook className="w-4 h-4" />
+                          <Phone className="w-4 h-4" />
                         </a>
                       )}
                     </div>
