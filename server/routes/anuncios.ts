@@ -408,6 +408,7 @@ export const updateAnuncio: RequestHandler = async (req, res) => {
       },
     });
 
+    console.log("[updateAnuncio] Ad updated successfully:", anuncio.id);
     res.json({
       success: true,
       data: anuncio,
@@ -418,6 +419,7 @@ export const updateAnuncio: RequestHandler = async (req, res) => {
       const errorMessages = error.errors
         .map((err) => `${err.path.join(".")}: ${err.message}`)
         .join("; ");
+      console.error("[updateAnuncio] Validation error:", errorMessages);
       return res.status(400).json({
         success: false,
         error: "Dados inválidos",
@@ -425,7 +427,11 @@ export const updateAnuncio: RequestHandler = async (req, res) => {
       });
     }
 
-    console.error("Error updating ad:", error);
+    console.error("[updateAnuncio] Unexpected error:", error);
+    console.error("[updateAnuncio] Error details:", {
+      message: error instanceof Error ? error.message : "Unknown error",
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     res.status(500).json({
       success: false,
       error: "Erro ao atualizar anúncio",
