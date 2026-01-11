@@ -37,6 +37,7 @@ import Chat from "./pages/Chat";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminManageAds from "./pages/AdminManageAds";
 import AdminManageUsers from "./pages/AdminManageUsers";
+import AdminBanners from "./pages/AdminBanners";
 import Menu from "./pages/Menu";
 import MeusAnuncios from "./pages/MeusAnuncios";
 import NotFound from "./pages/NotFound";
