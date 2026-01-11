@@ -74,6 +74,16 @@ export default function Index() {
     },
   });
 
+  // Fetch all banners
+  const { data: bannersData } = useQuery({
+    queryKey: ["banners"],
+    queryFn: async () => {
+      const response = await fetch("/api/banners");
+      if (!response.ok) throw new Error("Erro ao buscar banners");
+      return response.json();
+    },
+  });
+
   // Fetch all active ads without status filter - we'll filter on client side
   const { data: allAnunciosData, isLoading: allAnunciosLoading } = useQuery({
     queryKey: ["anuncios-all"],
