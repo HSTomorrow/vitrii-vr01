@@ -415,7 +415,7 @@ export const getAnunciantesByUsuario: RequestHandler = async (req, res) => {
     }
 
     // Fetch user to check if is admin
-    const usuario = await prisma.usracesso.findUnique({
+    const usuario = await prisma.usracessos.findUnique({
       where: { id: usuarioId },
       select: { tipoUsuario: true },
     });
