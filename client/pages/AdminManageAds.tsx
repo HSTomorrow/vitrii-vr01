@@ -47,7 +47,7 @@ export default function AdminManageAds() {
   // Check if user is admin
   const isAdmin = user?.tipoUsuario === "adm";
 
-  // Fetch all ads
+  // Fetch all ads (including inactive ones for admin view)
   const {
     data: anunciosData,
     isLoading,
@@ -56,7 +56,7 @@ export default function AdminManageAds() {
     queryKey: ["admin-anuncios"],
     enabled: isAdmin,
     queryFn: async () => {
-      const response = await fetch("/api/anuncios", {
+      const response = await fetch("/api/anuncios?includeInactive=true", {
         headers: {
           "x-user-id": user?.id ? String(user.id) : "",
         },
