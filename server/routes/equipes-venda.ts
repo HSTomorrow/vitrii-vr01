@@ -118,7 +118,7 @@ export const getEquipeById: RequestHandler = async (req, res) => {
     let membrosFilter: any = {};
 
     if (usuarioId) {
-      const usuario = await prisma.usuario.findUnique({
+      const usuario = await prisma.usracesso.findUnique({
         where: { id: usuarioId },
         select: { tipoUsuario: true },
       });
@@ -182,14 +182,14 @@ export const createEquipe: RequestHandler = async (req, res) => {
 
     // Check permissions - allow if user is admin or owner of the anunciante
     if (usuarioId) {
-      const usuario = await prisma.usuario.findUnique({
+      const usuario = await prisma.usracesso.findUnique({
         where: { id: usuarioId },
         select: { tipoUsuario: true },
       });
 
       // If not admin, check if user is associated with this anunciante
       if (usuario?.tipoUsuario !== "adm") {
-        const hasAccess = await prisma.usuarioAnunciante.findFirst({
+        const hasAccess = await prisma.usracessoAnunciante.findFirst({
           where: {
             usuarioId: usuarioId,
             anuncianteId: body.anuncianteId,
@@ -272,14 +272,14 @@ export const updateEquipe: RequestHandler = async (req, res) => {
 
     // Check permissions - allow if user is admin or owner of the anunciante
     if (usuarioId) {
-      const usuario = await prisma.usuario.findUnique({
+      const usuario = await prisma.usracesso.findUnique({
         where: { id: usuarioId },
         select: { tipoUsuario: true },
       });
 
       // If not admin, check if user is associated with this anunciante
       if (usuario?.tipoUsuario !== "adm") {
-        const hasAccess = await prisma.usuarioAnunciante.findFirst({
+        const hasAccess = await prisma.usracessoAnunciante.findFirst({
           where: {
             usuarioId: usuarioId,
             anuncianteId: equipe.anuncianteId,
@@ -399,14 +399,14 @@ export const adicionarMembro: RequestHandler = async (req, res) => {
     }
 
     // Check permissions - allow if user is admin or owner of the anunciante
-    const usuario = await prisma.usuario.findUnique({
+    const usuario = await prisma.usracesso.findUnique({
       where: { id: usuarioId },
       select: { tipoUsuario: true },
     });
 
     // If not admin, check if user is associated with this anunciante
     if (usuario?.tipoUsuario !== "adm") {
-      const hasAccess = await prisma.usuarioAnunciante.findFirst({
+      const hasAccess = await prisma.usracessoAnunciante.findFirst({
         where: {
           usuarioId: usuarioId,
           anuncianteId: equipe.anuncianteId,
@@ -532,7 +532,7 @@ export const removerMembro: RequestHandler = async (req, res) => {
 
     // Check permissions - allow if user is admin or creator of this member
     if (usuarioId) {
-      const usuario = await prisma.usuario.findUnique({
+      const usuario = await prisma.usracesso.findUnique({
         where: { id: usuarioId },
         select: { tipoUsuario: true },
       });
@@ -583,7 +583,7 @@ export const atualizarMembro: RequestHandler = async (req, res) => {
 
     // Check permissions - allow if user is admin or creator of this member
     if (usuarioId) {
-      const usuario = await prisma.usuario.findUnique({
+      const usuario = await prisma.usracesso.findUnique({
         where: { id: usuarioId },
         select: { tipoUsuario: true },
       });
@@ -649,7 +649,7 @@ export const getUsuariosDisponiveis: RequestHandler = async (req, res) => {
     }
 
     // Get users who have access to this anunciante but are not members of this team
-    const usuariosDisponiveis = await prisma.usuario.findMany({
+    const usuariosDisponiveis = await prisma.usracesso.findMany({
       where: {
         usuarioAnunciantes: {
           some: {
