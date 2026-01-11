@@ -389,6 +389,10 @@ export const adicionarMembro: RequestHandler = async (req, res) => {
       data: {
         equipeId: parseInt(id),
         usuarioId: body.usuarioId,
+        nome: body.nome,
+        email: body.email,
+        whatsapp: body.whatsapp || null,
+        status: body.status || "disponivel",
       },
       include: {
         usuario: {
