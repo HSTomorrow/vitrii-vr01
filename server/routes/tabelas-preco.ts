@@ -22,7 +22,7 @@ export const getTabelas: RequestHandler = async (req, res) => {
     if (anuncianteId) where.anuncianteId = parseInt(anuncianteId as string);
     if (productId) where.productId = parseInt(productId as string);
 
-    const tabelas = await prisma.tabelaDePreco.findMany({
+    const tabelas = await prisma.tabelasPreco.findMany({
       where,
       include: {
         produto: {
@@ -53,7 +53,7 @@ export const getTabelaById: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const tabela = await prisma.tabelaDePreco.findUnique({
+    const tabela = await prisma.tabelasPreco.findUnique({
       where: { id: parseInt(id) },
       include: {
         produto: {
@@ -114,7 +114,7 @@ export const createTabela: RequestHandler = async (req, res) => {
     }
 
     // Check if price table already exists for this product in this anunciante
-    const existingTabela = await prisma.tabelaDePreco.findFirst({
+    const existingTabela = await prisma.tabelasPreco.findFirst({
       where: {
         productId: validatedData.productId,
         anuncianteId: validatedData.anuncianteId,
@@ -129,7 +129,7 @@ export const createTabela: RequestHandler = async (req, res) => {
       });
     }
 
-    const tabela = await prisma.tabelaDePreco.create({
+    const tabela = await prisma.tabelasPreco.create({
       data: {
         productId: validatedData.productId,
         anuncianteId: validatedData.anuncianteId,
@@ -193,7 +193,7 @@ export const updateTabela: RequestHandler = async (req, res) => {
       updatePayload.anuncianteId = validatedData.anuncianteId;
     }
 
-    const tabela = await prisma.tabelaDePreco.update({
+    const tabela = await prisma.tabelasPreco.update({
       where: { id: parseInt(id) },
       data: updatePayload,
       include: {
@@ -232,7 +232,7 @@ export const deleteTabela: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
-    await prisma.tabelaDePreco.delete({
+    await prisma.tabelasPreco.delete({
       where: { id: parseInt(id) },
     });
 
