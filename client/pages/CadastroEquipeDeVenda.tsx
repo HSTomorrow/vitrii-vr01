@@ -788,9 +788,7 @@ export default function CadastroEquipeDeVenda() {
                                   </td>
                                   <td className="px-4 py-3">
                                     <div className="flex items-center gap-1">
-                                      <span className="text-gray-600 text-xs">
-                                        +55
-                                      </span>
+                                     
                                       <input
                                         type="text"
                                         value={
