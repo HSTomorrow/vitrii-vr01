@@ -114,6 +114,7 @@ export default function App() {
                 <Route path="/agenda/:anuncianteId" element={<Agenda />} />
                 <Route path="/checkout/:anuncioId" element={<Checkout />} />
                 <Route path="/chat" element={<Chat />} />
+                <Route path="/menu" element={<Menu />} />
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
                 <Route path="/admin/anuncios" element={<AdminManageAds />} />
                 <Route path="/admin/usuarios" element={<AdminManageUsers />} />
