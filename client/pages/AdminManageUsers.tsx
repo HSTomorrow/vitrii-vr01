@@ -123,6 +123,16 @@ export default function AdminManageUsers() {
       u.email.toLowerCase().includes(searchTerm.toLowerCase()),
   );
 
+  // Reset to page 1 when search changes
+  if (currentPage > 1 && filteredUsuarios.length < (currentPage - 1) * itemsPerPage) {
+    setCurrentPage(1);
+  }
+
+  // Calculate pagination
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedUsuarios = filteredUsuarios.slice(startIndex, endIndex);
+
   const togglePasswordVisibility = (usuarioId: number) => {
     setShowPasswords((prev) => {
       const newSet = new Set(prev);
