@@ -286,7 +286,7 @@ export function createServer() {
   app.get("/api/anuncios/:id/can-edit", canEditAnuncio);
 
   // Equipes de Venda routes
-  app.get("/api/equipes-venda", getEquipes);
+  app.get("/api/equipes-venda", extractUserId, getEquipes);
   app.get("/api/equipes-venda/:id", extractUserId, getEquipeById);
   app.post("/api/equipes-venda", extractUserId, createEquipe);
   app.put("/api/equipes-venda/:id", extractUserId, updateEquipe);
