@@ -560,3 +560,62 @@ export const getUsuariosDisponiveis: RequestHandler = async (req, res) => {
     });
   }
 };
+
+// GET available members for contacting (status = "disponivel")
+export const getMembrosDisponiveis: RequestHandler = async (req, res) => {
+  try {
+    const { equipeId } = req.params;
+
+    const equipe = await prisma.equipeDeVenda.findUnique({
+      where: { id: parseInt(equipeId) },
+      include: {
+        anunciante: {
+          select: {
+            id: true,
+            nome: true,
+          },
+        },
+      },
+    });
+
+    if (!equipe) {
+      return res.status(404).json({
+        success: false,
+        error: "Equipe de venda não encontrada",
+      });
+    }
+
+    // Get members with status = "disponivel"
+    const membros = await prisma.membroEquipe.findMany({
+      where: {
+        equipeId: parseInt(equipeId),
+        status: "disponivel",
+      },
+      select: {
+        id: true,
+        nome: true,
+        email: true,
+        whatsapp: true,
+        status: true,
+      },
+      orderBy: { dataCriacao: "asc" },
+    });
+
+    res.json({
+      success: true,
+      data: membros,
+      equipe: {
+        id: equipe.id,
+        nome: equipe.nome,
+        anunciante: equipe.anunciante,
+      },
+      count: membros.length,
+    });
+  } catch (error) {
+    console.error("Error fetching available members:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao buscar membros disponíveis",
+    });
+  }
+};
