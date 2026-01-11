@@ -212,6 +212,10 @@ export default function AdminDashboard() {
         `/api/usracessos/${usuarioId}/funcionalidades/grant-all`,
         {
           method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-user-id": user?.id?.toString() || "",
+          },
         },
       );
       if (!response.ok) {
