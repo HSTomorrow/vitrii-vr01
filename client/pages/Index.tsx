@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
+import BannerCarousel from "@/components/BannerCarousel";
 import {
   Star,
   ArrowRight,
