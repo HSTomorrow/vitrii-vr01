@@ -175,10 +175,7 @@ export default function CadastroEquipeDeVenda() {
       const response = await fetch(`/api/equipes-venda/${teamId}/membros`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          usuarioId: 0,
-          ...memberFormData,
-        }),
+        body: JSON.stringify(memberFormData),
       });
 
       if (!response.ok) {
