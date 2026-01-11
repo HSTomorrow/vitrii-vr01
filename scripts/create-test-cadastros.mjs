@@ -114,13 +114,13 @@ async function createTestData() {
     console.log(`✅ Equipe de Venda criada/atualizada: ${equipe.nome}\n`);
 
     console.log("🎉 Todos os dados de teste foram criados/atualizados com sucesso!");
-    console.log("\n📋 Resumo:");
-    console.log(`  - Anunciante: ${anunciante.nome} (ID: ${anunciante.id})`);
-    console.log(`  - Grupo de Productos: ${grupo.nome} (ID: ${grupo.id})`);
-    console.log(`  - Producto: ${producto.nome} (ID: ${producto.id})`);
-    console.log(`  - Tabela de Preço: R$ ${tabela.preco} (ID: ${tabela.id})`);
-    console.log(`  - Variante: ${variante.nome} (ID: ${variante.id})`);
-    console.log(`  - Equipe de Venda: ${equipe.nome} (ID: ${equipe.id})`);
+    console.log("\n📋 Resumo dos dados criados:");
+    console.log(`  1️⃣ Anunciante (Loja): ${anunciante.nome}`);
+    console.log(`  2️⃣ Grupo de Productos: ${grupo.nome}`);
+    console.log(`  3️⃣ Producto: ${producto.nome}`);
+    console.log(`  4️⃣ Tabela de Preço: R$ ${tabela.preco}`);
+    console.log(`  5️⃣ Variante: ${variante.tamanho}/${variante.cor} - R$ ${variante.preco}`);
+    console.log(`  6️⃣ Equipe de Venda: ${equipe.nome}`);
   } catch (error) {
     console.error("❌ Erro ao criar dados de teste:", error);
     process.exit(1);
