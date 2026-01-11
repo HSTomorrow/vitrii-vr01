@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,509 +7,169 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ============================================================================
-// USUÁRIOS (Users)
-// ============================================================================
-model Usuario {
-  id            Int       @id @default(autoincrement())
-  nome          String    @db.VarChar(255)
-  email         String    @unique @db.VarChar(255)
-  senha         String    @db.VarChar(255)
-  cpf           String    @db.VarChar(14)
-  telefone      String    @db.VarChar(20)
-  endereco      String    @db.Text
-  tipoUsuario   String    @default("comum") // "comum", "adm" (administrador)
-  isActive      Boolean   @default(true)
-  dataCriacao   DateTime  @default(now())
-  dataAtualizacao DateTime @updatedAt
-
-  // Relations
-  usuarioAnunciantes UsuarioAnunciante[]
-  produtosVisualizados ProductoVisualizacao[]
-  qrCodesVisitados QRCodeChamada[]
-  membrosEquipe MembroEquipe[]
-  agendas       Agenda[]
-  conversas     Conversa[]
-  mensagens     Mensagem[]
-  usuarioXFuncionalidades UsuarioXFuncionalidade[]
-  passwordResetTokens PasswordResetToken[]
-  favoritos     Favorito[]
-
-  @@map("usuarios")
+model anunciantes {
+  id                   Int                    @id(map: "lojas_pkey") @default(autoincrement())
+  nome                 String                 @db.VarChar(255)
+  descricao            String?
+  cnpj                 String?                @db.VarChar(14)
+  telefone             String?                @db.VarChar(20)
+  email                String?                @db.VarChar(255)
+  endereco             String?                @db.VarChar(255)
+  cidade               String                 @db.VarChar(100)
+  estado               String                 @db.VarChar(2)
+  cep                  String?                @db.VarChar(8)
+  dataCriacao          DateTime               @default(now())
+  dataAtualizacao      DateTime
+  anuncios             anuncios[]
+  movimentos_estoque   movimentos_estoque[]
+  produtos_em_estoque  produtos_em_estoque[]
+  usuarios_anunciantes usuarios_anunciantes[]
 }
 
-// ============================================================================
-// ANUNCIANTES (Advertisers/Stores)
-// ============================================================================
-model Anunciante {
-  id            Int       @id @default(autoincrement())
-  nome          String    @db.VarChar(255)
-  cnpjOuCpf     String    @unique @db.VarChar(18)
-  endereco      String    @db.Text
-  cidade        String    @db.VarChar(100)
-  estado        String    @db.VarChar(2)
-  descricao     String    @db.Text
-  email         String    @db.VarChar(255)
-  site          String?   @db.VarChar(255)
-  instagram      String?   @db.VarChar(255)
-  facebook      String?   @db.VarChar(255)
-  whatsapp      String?   @db.VarChar(20)
-  fotoUrl       String?   @db.Text // URL da foto do anunciante
-  status        String    @default("ativa") // "ativa" or "inativa"
-  isActive      Boolean   @default(true)
-  dataCriacao   DateTime  @default(now())
-  dataAtualizacao DateTime @updatedAt
-
-  // Relations
-  usuarioAnunciantes UsuarioAnunciante[]
-  gruposDeProductos GrupoDeProductos[]
-  produtosEmEstoque ProdutoEmEstoque[]
-  movimentoEstoque MovimentoEstoque[]
-  anuncios      Anuncio[]
-  equipesDeVenda EquipeDeVenda[]
-  agendas       Agenda[]
-  conversas     Conversa[]
-
-  @@map("anunciantes")
+model anuncios {
+  id              Int         @id @default(autoincrement())
+  usuarioId       Int
+  anuncianteId    Int
+  titulo          String      @db.VarChar(255)
+  descricao       String
+  preco           Decimal?    @db.Decimal(10, 2)
+  categoria       String?     @db.VarChar(100)
+  imagem          String?     @db.VarChar(500)
+  status          String      @default("ativo") @db.VarChar(50)
+  tipo            String      @default("produto") @db.VarChar(50)
+  diasRestantes   Int?
+  statusPagamento String?     @default("pendente") @db.VarChar(50)
+  dataCriacao     DateTime    @default(now())
+  dataAtualizacao DateTime
+  cidade          String?     @db.VarChar(100)
+  estado          String?     @db.VarChar(2)
+  anunciantes     anunciantes @relation(fields: [anuncianteId], references: [id], onDelete: Cascade, map: "anuncios_lojaId_fkey")
 }
 
-// ============================================================================
-// USUÁRIO x ANUNCIANTE x TIPO DE USUÁRIO (User-Advertiser-Role junction table)
-// ============================================================================
-model UsuarioAnunciante {
-  id            Int       @id @default(autoincrement())
-  usuarioId     Int
-  anuncianteId  Int
-  tipoUsuario   String    // "atendente", "gestor", "administrador"
-  dataCriacao   DateTime  @default(now())
-  dataAtualizacao DateTime @updatedAt
-
-  // Relations
-  usuario       Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-  anunciante    Anunciante @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
-
-  @@unique([usuarioId, anuncianteId])
-  @@map("usuarios_anunciantes")
+model fotos_grupos {
+  id          Int      @id @default(autoincrement())
+  grupoId     Int
+  url         String   @db.VarChar(500)
+  ordem       Int?     @default(1)
+  dataCriacao DateTime @default(now())
 }
 
-// ============================================================================
-// EQUIPE DE VENDA (Sales Team)
-// ============================================================================
-model EquipeDeVenda {
-  id            Int       @id @default(autoincrement())
-  anuncianteId  Int
-  nome          String    @db.VarChar(255)
-  descricao     String?   @db.Text
-  isActive      Boolean   @default(true)
-  dataCriacao   DateTime  @default(now())
-  dataAtualizacao DateTime @updatedAt
+model grupos_produtos {
+  id              Int      @id @default(autoincrement())
+  lojaId          Int
+  nome            String   @db.VarChar(255)
+  descricao       String?
+  icone           String?  @db.VarChar(50)
+  dataCriacao     DateTime @default(now())
+  dataAtualizacao DateTime
 
-  // Relations
-  anunciante    Anunciante @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
-  membros       MembroEquipe[]
-  anuncios      Anuncio[]
-
-  @@map("equipes_de_venda")
+  @@unique([lojaId, nome])
 }
 
-// ============================================================================
-// MEMBRO DA EQUIPE DE VENDA (Sales Team Member)
-// ============================================================================
-model MembroEquipe {
-  id            Int       @id @default(autoincrement())
-  equipeId      Int
-  usuarioId     Int       // Usuário que cadastrou este membro
-  nomeMembro    String    @db.VarChar(255)           // Nome do membro da equipe
-  email         String    @db.VarChar(255)           // Email do membro
-  whatsapp      String?   @db.VarChar(20)            // WhatsApp do membro
-  status        String    @default("disponivel")     // "disponivel", "nao_disponivel", "cancelado"
-  dataCriacao   DateTime  @default(now())
-  dataAtualizacao DateTime @updatedAt
-
-  // Relations
-  equipe        EquipeDeVenda @relation(fields: [equipeId], references: [id], onDelete: Cascade)
-  usuario       Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-
-  @@unique([equipeId, email])
-  @@map("membros_equipe")
+model movimentos_estoque {
+  id                  Int                 @id @default(autoincrement())
+  anuncianteId        Int
+  productId           Int
+  tipo                String              @db.VarChar(255)
+  quantidade          Int
+  motivoSaida         String?             @db.VarChar(255)
+  observacoes         String?
+  dataCriacao         DateTime            @default(now())
+  anunciantes         anunciantes         @relation(fields: [anuncianteId], references: [id], onDelete: Cascade, map: "movimentos_estoque_lojaId_fkey")
+  produtos_em_estoque produtos_em_estoque @relation(fields: [anuncianteId, productId], references: [anuncianteId, productId], onDelete: Cascade, map: "movimentos_estoque_lojaId_productId_fkey")
+  productos           productos           @relation(fields: [productId], references: [id], onDelete: Cascade)
 }
 
-// ============================================================================
-// GRUPOS DE PRODUTOS E SERVIÇOS
-// ============================================================================
-model GrupoDeProductos {
-  id            Int       @id @default(autoincrement())
-  anuncianteId  Int
-  nome          String    @db.VarChar(255)
-  descricao     String?   @db.Text
-  isActive      Boolean   @default(true)
-  dataCriacao   DateTime  @default(now())
-  dataAtualizacao DateTime @updatedAt
-
-  // Relations
-  anunciante    Anunciante @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
-  fotos         FotoGrupo[]
-  produtos      Producto[]
-
-  @@map("grupos_de_productos")
+model productos {
+  id                  Int                   @id @default(autoincrement())
+  lojaId              Int
+  grupoId             Int
+  nome                String                @db.VarChar(255)
+  descricao           String?
+  sku                 String?               @db.VarChar(100)
+  dataCriacao         DateTime              @default(now())
+  dataAtualizacao     DateTime
+  movimentos_estoque  movimentos_estoque[]
+  produtos_em_estoque produtos_em_estoque[]
 }
 
-// Fotos do Grupo de Produtos (até 5 fotos)
-model FotoGrupo {
-  id            Int       @id @default(autoincrement())
-  grupoId       Int
-  fotoUrl       String    @db.Text
-  ordem         Int       @default(1)
-  dataCriacao   DateTime  @default(now())
-
-  // Relations
-  grupo         GrupoDeProductos @relation(fields: [grupoId], references: [id], onDelete: Cascade)
-
-  @@map("fotos_grupo")
-}
-
-// ============================================================================
-// PRODUTOS E SERVIÇOS
-// ============================================================================
-model Producto {
-  id            Int       @id @default(autoincrement())
-  grupoId       Int
-  nome          String    @db.VarChar(255)
-  descricao     String?   @db.Text
-  sku           String?   @db.VarChar(100)
-  tipo          String    @default("produto") // "produto", "servico", "evento", "agenda_recorrente"
-  isActive      Boolean   @default(true)
-  dataCriacao   DateTime  @default(now())
-  dataAtualizacao DateTime @updatedAt
-
-  // Relations
-  grupo         GrupoDeProductos @relation(fields: [grupoId], references: [id], onDelete: Cascade)
-  tabelasDePreco TabelaDePreco[]
-  estoques      ProdutoEmEstoque[]
-  movimentoEstoque MovimentoEstoque[]
-  anuncios      Anuncio[]
-  agendas       Agenda[]
-
-  @@map("productos")
-}
-
-// ============================================================================
-// TABELA DE PREÇOS
-// ============================================================================
-model TabelaDePreco {
-  id            Int       @id @default(autoincrement())
-  productId     Int
-  anuncianteId  Int
-  tamanho       String?   @db.VarChar(100)
-  cor           String?   @db.VarChar(100)
-  preco         Decimal   @db.Decimal(10, 2)
-  precoCusto    Decimal?  @db.Decimal(10, 2)
-  isActive      Boolean   @default(true)
-  dataCriacao   DateTime  @default(now())
-  dataAtualizacao DateTime @updatedAt
-
-  // Relations
-  produto       Producto  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  qrCodes       QRCode[]
-  anuncios      Anuncio[]
-
-  @@map("tabelas_de_preco")
-}
-
-// ============================================================================
-// AGENDA DE SERVIÇOS (Service Schedule)
-// ============================================================================
-model Agenda {
-  id            Int       @id @default(autoincrement())
-  anuncianteId  Int
-  productId     Int
-  usuarioId     Int?      // Service provider
-  dataHora      DateTime
-  descricao     String?   @db.Text
-  status        String    @default("disponivel") // "disponivel", "ocupado", "cancelado"
-  isActive      Boolean   @default(true)
-  dataCriacao   DateTime  @default(now())
-  dataAtualizacao DateTime @updatedAt
-
-  // Relations
-  anunciante    Anunciante @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
-  producto      Producto  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  usuario       Usuario?  @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
-
-  @@map("agendas")
-}
-
-// ============================================================================
-// QR CODES
-// ============================================================================
-model QRCode {
-  id            Int       @id @default(autoincrement())
-  tabelaDePrecoId Int
-  codigo        String    @unique @db.VarChar(500)
-  descricao     String?   @db.Text
-  dataCriacao   DateTime  @default(now())
-  dataAtualizacao DateTime @updatedAt
-
-  // Relations
-  tabelaDePreco TabelaDePreco @relation(fields: [tabelaDePrecoId], references: [id], onDelete: Cascade)
-  chamadas      QRCodeChamada[]
-
-  @@map("qr_codes")
-}
-
-// ============================================================================
-// ANÚNCIOS (Listings)
-// ============================================================================
-model Anuncio {
-  id            Int       @id @default(autoincrement())
-  anuncianteId  Int
-  productId     Int?
-  tabelaDePrecoId Int?
-  equipeDeVendaId Int?
-  titulo        String    @db.VarChar(50)
-  descricao     String?   @db.Text
-  fotoUrl       String?   @db.Text
-  precoAnuncio  Decimal?  @db.Decimal(10, 2)
-  endereco      String?   @db.VarChar(100) // Address for the ad (optional)
-  cidade        String?   @db.VarChar(100)
-  estado        String?   @db.VarChar(2)
-  isDoacao      Boolean   @default(false) // Deprecated: use gratuito logic instead
-  destaque      Boolean   @default(false) // Featured ads
-  isActive      Boolean   @default(true) // Logical deletion
-  categoria     String?   @db.VarChar(50) // "roupas", "carros", "imoveis"
-  dadosCategoria String?   @db.Text // JSON string for category-specific data
-  status        String    @default("em_edicao") // "em_edicao", "aguardando_pagamento", "pago", "historico"
-  dataValidade  DateTime?
-  dataCriacao   DateTime  @default(now())
-  dataAtualizacao DateTime @updatedAt
-
-  // Relations
-  anunciante    Anunciante @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
-  producto      Producto? @relation(fields: [productId], references: [id], onDelete: SetNull)
-  tabelaDePreco TabelaDePreco? @relation(fields: [tabelaDePrecoId], references: [id], onDelete: SetNull)
-  equipeDeVenda EquipeDeVenda? @relation(fields: [equipeDeVendaId], references: [id], onDelete: SetNull)
-  pagamento     Pagamento?
-  conversas     Conversa[]
-  favoritos     Favorito[]
-
-  @@map("anuncios")
-}
-
-// ============================================================================
-// PAGAMENTOS (Payments - Pix/Payments)
-// ============================================================================
-model Pagamento {
-  id            Int       @id @default(autoincrement())
-  anuncioId     Int       @unique
-  valor         Decimal   @db.Decimal(10, 2)
-  status        String    @default("pendente") // "pendente", "processando", "pago", "cancelado", "expirado"
-  tipo          String    @default("pix") // "pix", "credito", "debito"
-  provedor      String    @default("mercado-pago") // Payment provider: "mercado-pago", "stripe", etc.
-  idExterno     String?   @db.VarChar(255) // External payment ID from provider
-  qrCode        String?   @db.Text // Pix QR Code string
-  urlCopiaECola String?   @db.Text // Pix Copy-and-paste URL
-  pixId         String?   @db.VarChar(255) // Pix transaction ID
-  erroMsg       String?   @db.Text // Error message if payment failed
-  dataExpiracao DateTime? // Expiration date for Pix QR code
-  dataPagamento DateTime? // Actual payment date
-  dataCriacao   DateTime  @default(now())
-  dataAtualizacao DateTime @updatedAt
-
-  // Relations
-  anuncio       Anuncio   @relation(fields: [anuncioId], references: [id], onDelete: Cascade)
-
-  @@map("pagamentos")
-}
-
-// ============================================================================
-// CONVERSAS (Chat Conversations)
-// ============================================================================
-model Conversa {
-  id            Int       @id @default(autoincrement())
-  usuarioId     Int       // Buyer/Initiator
-  anuncianteId  Int       // Advertiser/Seller
-  anuncioId     Int?      // Related ad (optional)
-  tipo          String    @default("privada") // "publica", "privada"
-  assunto       String    @db.VarChar(255) // Conversation subject
-  ultimaMensagem String?  @db.Text // Last message preview
-  dataUltimaMensagem DateTime? // Last message date for sorting
-  isActive      Boolean   @default(true) // Logical deletion
-  dataCriacao   DateTime  @default(now())
-  dataAtualizacao DateTime @updatedAt
-
-  // Relations
-  usuario       Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-  anunciante    Anunciante @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
-  anuncio       Anuncio?  @relation(fields: [anuncioId], references: [id], onDelete: SetNull)
-  mensagens     Mensagem[]
-
-  @@unique([usuarioId, anuncianteId, anuncioId])
-  @@map("conversas")
-}
-
-// ============================================================================
-// MENSAGENS (Chat Messages)
-// ============================================================================
-model Mensagem {
-  id            Int       @id @default(autoincrement())
-  conversaId    Int
-  remetentId    Int       // Sender
-  tipoRemetente String    // "usuario", "anunciante" (for easier querying)
-  conteudo      String    @db.Text
-  lido          Boolean   @default(false)
-  isActive      Boolean   @default(true) // Logical deletion
-  dataCriacao   DateTime  @default(now())
-  dataAtualizacao DateTime @updatedAt
-
-  // Relations
-  conversa      Conversa  @relation(fields: [conversaId], references: [id], onDelete: Cascade)
-  remetente     Usuario   @relation(fields: [remetentId], references: [id], onDelete: Cascade)
-
-  @@index([conversaId, dataCriacao]) // For efficient message fetching
-  @@map("mensagens")
-}
-
-// ============================================================================
-// CONTROLE DE ESTOQUE
-// ============================================================================
-model ProdutoEmEstoque {
-  id            Int       @id @default(autoincrement())
-  anuncianteId  Int
-  productId     Int
-  quantidade    Int       @default(0)
-  quantidadeMinima Int?   @default(0)
-  quantidadeMaxima Int?
-  dataCriacao   DateTime  @default(now())
-  dataAtualizacao DateTime @updatedAt
-
-  // Relations
-  anunciante    Anunciante @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
-  producto      Producto  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  movimentos    MovimentoEstoque[]
-
-  @@unique([anuncianteId, productId])
-  @@map("produtos_em_estoque")
-}
-
-// ============================================================================
-// MOVIMENTO DE ESTOQUE (Inventory movements/history)
-// ============================================================================
-model MovimentoEstoque {
-  id            Int       @id @default(autoincrement())
-  anuncianteId  Int
-  productId     Int
-  tipo          String    // "entrada", "saida", "ajuste"
-  quantidade    Int
-  motivoSaida   String?   @db.VarChar(255) // "venda", "devolucao", "perda", etc
-  observacoes   String?   @db.Text
-  dataCriacao   DateTime  @default(now())
-
-  // Relations
-  anunciante    Anunciante @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
-  producto      Producto  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  produtoEmEstoque ProdutoEmEstoque @relation(fields: [anuncianteId, productId], references: [anuncianteId, productId], onDelete: Cascade)
-
-  @@map("movimentos_estoque")
-}
-
-// ============================================================================
-// CONTAGEM DE VISUALIZAÇÕES DE PRODUTOS
-// ============================================================================
-model ProductoVisualizacao {
-  id            Int       @id @default(autoincrement())
-  usuarioId     Int?      // Pode ser nulo se for visitante
-  productId     Int
+model productos_visualizacoes {
+  id               Int      @id @default(autoincrement())
+  usuarioId        Int?
+  productId        Int
   dataVisualizacao DateTime @default(now())
-
-  // Relations
-  usuario       Usuario?  @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
-
-  @@map("producto_visualizacoes")
 }
 
-// ============================================================================
-// CONTAGEM DE CHAMADAS DE QR CODE
-// ============================================================================
-model QRCodeChamada {
-  id            Int       @id @default(autoincrement())
-  usuarioId     Int?      // Pode ser nulo se for visitante
-  qrCodeId      Int
-  dataChamada   DateTime  @default(now())
+model produtos_em_estoque {
+  id                 Int                  @id @default(autoincrement())
+  anuncianteId       Int
+  productId          Int
+  quantidade         Int                  @default(0)
+  quantidadeMinima   Int?                 @default(0)
+  quantidadeMaxima   Int?
+  dataCriacao        DateTime             @default(now())
+  dataAtualizacao    DateTime
+  movimentos_estoque movimentos_estoque[]
+  anunciantes        anunciantes          @relation(fields: [anuncianteId], references: [id], onDelete: Cascade, map: "produtos_em_estoque_lojaId_fkey")
+  productos          productos            @relation(fields: [productId], references: [id], onDelete: Cascade)
 
-  // Relations
-  usuario       Usuario?  @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
-  qrCode        QRCode    @relation(fields: [qrCodeId], references: [id], onDelete: Cascade)
-
-  @@map("qr_code_chamadas")
+  @@unique([anuncianteId, productId], map: "produtos_em_estoque_lojaId_productId_key")
 }
 
-// ============================================================================
-// FUNCIONALIDADES (Features/Permissions)
-// ============================================================================
-model Funcionalidade {
-  id            Int       @id @default(autoincrement())
-  chave         String    @unique @db.VarChar(100) // e.g., "MANAGE_USERS", "MANAGE_ADS"
-  nome          String    @db.VarChar(255) // Display name
-  descricao     String?   @db.Text // Description
-  categoria     String    @db.VarChar(50) // Category: "users", "ads", "chat", "payments", "reports"
-  isActive      Boolean   @default(true)
-  dataCriacao   DateTime  @default(now())
-  dataAtualizacao DateTime @updatedAt
+model qrcodes {
+  id              Int      @id @default(autoincrement())
+  lojaId          Int
+  productId       Int
+  codigo          String   @unique @db.VarChar(255)
+  localizacao     String?  @db.VarChar(255)
+  ativo           Boolean  @default(true)
+  dataCriacao     DateTime @default(now())
+  dataAtualizacao DateTime
 
-  // Relations
-  usuarioXFuncionalidades UsuarioXFuncionalidade[]
-
-  @@map("funcionalidades")
+  @@unique([lojaId, productId])
 }
 
-// ============================================================================
-// USUÁRIO x FUNCIONALIDADE (User-Functionality Junction Table)
-// ============================================================================
-model UsuarioXFuncionalidade {
-  id            Int       @id @default(autoincrement())
-  usuarioId     Int
-  funcionalidadeId Int
-  dataCriacao   DateTime  @default(now())
-  dataAtualizacao DateTime @updatedAt
-
-  // Relations
-  usuario       Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-  funcionalidade Funcionalidade @relation(fields: [funcionalidadeId], references: [id], onDelete: Cascade)
-
-  @@unique([usuarioId, funcionalidadeId])
-  @@map("usuarios_x_funcionalidades")
+model qrcodes_chamadas {
+  id          Int      @id @default(autoincrement())
+  qrcodeId    Int
+  dataChamada DateTime @default(now())
 }
 
-// ============================================================================
-// FAVORITOS (User Favorites - Bookmarked Ads)
-// ============================================================================
-model Favorito {
-  id            Int       @id @default(autoincrement())
-  usuarioId     Int
-  anuncioId     Int
-  dataCriacao   DateTime  @default(now())
+model tabelas_preco {
+  id              Int      @id @default(autoincrement())
+  productId       Int
+  lojaId          Int
+  tamanho         String?  @db.VarChar(50)
+  cor             String?  @db.VarChar(50)
+  preco           Decimal  @db.Decimal(10, 2)
+  dataCriacao     DateTime @default(now())
+  dataAtualizacao DateTime
 
-  // Relations
-  usuario       Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-  anuncio       Anuncio   @relation(fields: [anuncioId], references: [id], onDelete: Cascade)
-
-  @@unique([usuarioId, anuncioId])
-  @@map("favoritos")
+  @@unique([productId, lojaId, tamanho, cor])
 }
 
-// ============================================================================
-// PASSWORD RESET TOKENS (Password Recovery)
-// ============================================================================
-model PasswordResetToken {
-  id            Int       @id @default(autoincrement())
-  usuarioId     Int
-  token         String    @unique @db.VarChar(255)
-  expiresAt     DateTime  // Expiration time for token
-  isUsed        Boolean   @default(false)
-  dataCriacao   DateTime  @default(now())
+model usuarios {
+  id                   Int                    @id @default(autoincrement())
+  nome                 String                 @db.VarChar(255)
+  email                String                 @unique @db.VarChar(255)
+  senha                String                 @db.VarChar(255)
+  cpf                  String?                @db.VarChar(14)
+  telefone             String?                @db.VarChar(20)
+  tipoUsuario          String                 @default("common") @db.VarChar(20)
+  dataCriacao          DateTime               @default(now())
+  dataAtualizacao      DateTime
+  endereco             String?
+  usuarios_anunciantes usuarios_anunciantes[]
+}
 
-  // Relations
-  usuario       Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+model usuarios_anunciantes {
+  id           Int         @id(map: "usuarios_lojas_pkey") @default(autoincrement())
+  usuarioId    Int
+  anuncianteId Int
+  papel        String      @default("attendant") @db.VarChar(50)
+  dataCriacao  DateTime    @default(now())
+  anunciantes  anunciantes @relation(fields: [anuncianteId], references: [id], onDelete: Cascade, map: "usuarios_lojas_lojaId_fkey")
+  usuarios     usuarios    @relation(fields: [usuarioId], references: [id], onDelete: Cascade, map: "usuarios_lojas_usuarioId_fkey")
 
-  @@map("password_reset_tokens")
+  @@unique([usuarioId, anuncianteId], map: "usuarios_lojas_usuarioId_lojaId_key")
 }
