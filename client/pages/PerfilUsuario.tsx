@@ -288,7 +288,7 @@ export default function PerfilUsuario() {
                     .replace(/(\d{5})(\d)/, "$1-$2");
                   handleInputChange("telefone", formatted);
                 }}
-                placeholder="(11) 99999-9999"
+                placeholder="(51) 99999-9999"
                 className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-1 transition-colors ${
                   errors.telefone
                     ? "border-red-500 focus:border-red-500 focus:ring-red-500 bg-red-50"
