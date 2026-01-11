@@ -186,7 +186,7 @@ export const getAnuncioById: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const anuncio = await prisma.anuncio.findUnique({
+    const anuncio = await prisma.anuncios.findUnique({
       where: { id: parseInt(id) },
       select: {
         id: true,
@@ -323,7 +323,7 @@ export const createAnuncio: RequestHandler = async (req, res) => {
     const precoAnuncio = isDoacao ? null : validatedData.precoAnuncio;
     const status = isDoacao ? "pago" : "em_edicao";
 
-    const anuncio = await prisma.anuncio.create({
+    const anuncio = await prisma.anuncios.create({
       data: {
         anuncianteId: validatedData.anuncianteId,
         productId:
@@ -407,7 +407,7 @@ export const updateAnuncio: RequestHandler = async (req, res) => {
       updateData.precoAnuncio = null;
     }
 
-    const anuncio = await prisma.anuncio.update({
+    const anuncio = await prisma.anuncios.update({
       where: { id: parseInt(id) },
       data: updateData,
       include: {
@@ -468,7 +468,7 @@ export const updateAnuncioStatus: RequestHandler = async (req, res) => {
       });
     }
 
-    const anuncio = await prisma.anuncio.update({
+    const anuncio = await prisma.anuncios.update({
       where: { id: parseInt(id) },
       data: { status },
       include: {
@@ -515,7 +515,7 @@ export const overrideAnuncioStatus: RequestHandler = async (req, res) => {
     }
 
     // Check if ad exists
-    const anuncio = await prisma.anuncio.findUnique({
+    const anuncio = await prisma.anuncios.findUnique({
       where: { id: parseInt(id) },
     });
 
@@ -527,7 +527,7 @@ export const overrideAnuncioStatus: RequestHandler = async (req, res) => {
     }
 
     // Update status
-    const updatedAnuncio = await prisma.anuncio.update({
+    const updatedAnuncio = await prisma.anuncios.update({
       where: { id: parseInt(id) },
       data: { status },
       include: {
@@ -556,7 +556,7 @@ export const deleteAnuncio: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
-    await prisma.anuncio.delete({
+    await prisma.anuncios.delete({
       where: { id: parseInt(id) },
     });
 
@@ -578,7 +578,7 @@ export const inactivateAnuncio: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const anuncio = await prisma.anuncio.update({
+    const anuncio = await prisma.anuncios.update({
       where: { id: parseInt(id) },
       data: { isActive: false },
       include: {
@@ -607,7 +607,7 @@ export const activateAnuncio: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const anuncio = await prisma.anuncio.update({
+    const anuncio = await prisma.anuncios.update({
       where: { id: parseInt(id) },
       data: { isActive: true },
       include: {
