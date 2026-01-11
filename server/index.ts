@@ -218,6 +218,12 @@ export function createServer() {
     requireAdmin,
     adminResetUserPassword,
   );
+  app.put(
+    "/api/admin/usracessos/:id/profile",
+    extractUserId,
+    requireAdmin,
+    adminUpdateUserProfile,
+  );
 
   // Anunciantes routes (formerly Lojas)
   // Note: More specific routes must come BEFORE parameterized routes
