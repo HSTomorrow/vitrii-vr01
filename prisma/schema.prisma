@@ -203,7 +203,7 @@ model membros_equipe {
   dataCriacao     DateTime           @default(now())
   dataAtualizacao DateTime           @updatedAt
   equipe          equipes_de_venda   @relation(fields: [equipeId], references: [id], onDelete: Cascade)
-  usuario         usuarios           @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  usuario         usracessos         @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
   @@unique([equipeId, email])
   @@map("membros_equipe")
