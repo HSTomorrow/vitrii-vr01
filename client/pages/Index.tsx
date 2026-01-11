@@ -135,20 +135,24 @@ export default function Index() {
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
 
-      {/* Hero Section */}
-      <section
-        style={{ backgroundColor: "#78BDF6" }}
-        className="text-white py-2 md:py-3"
-      >
+      {/* Banner Carousel Section */}
+      <section className="py-4 md:py-6 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-center">
-            <h1
-              style={{ fontFamily: "Segoe Fuente Icons, sans-serif" }}
-              className="text-lg md:text-xl font-bold"
+          {bannersData?.data && bannersData.data.length > 0 ? (
+            <BannerCarousel banners={bannersData.data} autoPlay={true} />
+          ) : (
+            <div
+              style={{ backgroundColor: "#78BDF6" }}
+              className="text-white py-8 md:py-12 rounded-lg flex items-center justify-center"
             >
-              Bem-vindo ao Vitrii
-            </h1>
-          </div>
+              <h1
+                style={{ fontFamily: "Segoe Fuente Icons, sans-serif" }}
+                className="text-lg md:text-xl font-bold"
+              >
+                Bem-vindo ao Vitrii
+              </h1>
+            </div>
+          )}
         </div>
       </section>
 
