@@ -583,9 +583,38 @@ export const deleteAnuncio: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
+    // Get ad details before deletion to check status
+    const anuncio = await prisma.anuncios.findUnique({
+      where: { id: parseInt(id) },
+      select: {
+        status: true,
+        usuarioId: true,
+      },
+    });
+
+    if (!anuncio) {
+      return res.status(404).json({
+        success: false,
+        error: "Anúncio não encontrado",
+      });
+    }
+
+    // Delete the ad
     await prisma.anuncios.delete({
       where: { id: parseInt(id) },
     });
+
+    // Decrement active ads counter if ad was active
+    if (anuncio.status === "pago") {
+      await prisma.usracessos.update({
+        where: { id: anuncio.usuarioId },
+        data: {
+          numeroAnunciosAtivos: {
+            decrement: 1,
+          },
+        },
+      });
+    }
 
     res.json({
       success: true,
