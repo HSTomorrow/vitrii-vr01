@@ -257,7 +257,7 @@ export const updateAnunciante: RequestHandler = async (req, res) => {
 
       // If not admin, check if user is associated with this anunciante
       if (usuario?.tipoUsuario !== "adm") {
-        const hasAccess = await prisma.usracessoAnunciante.findFirst({
+        const hasAccess = await prisma.usuarios_anunciantes.findFirst({
           where: {
             usuarioId: usuarioId,
             anuncianteId: parseInt(id),
@@ -307,7 +307,7 @@ export const updateAnunciante: RequestHandler = async (req, res) => {
 const AdicionarUsuarioAnuncianteSchema = z.object({
   anuncianteId: z.number().int().positive("ID do anunciante é obrigatório"),
   usuarioId: z.number().int().positive("ID do usuário é obrigatório"),
-  tipoUsuario: z.enum(["gerente", "vendedor", "operador"], {
+  papel: z.enum(["gerente", "vendedor", "operador"], {
     errorMap: () => ({ message: "Tipo de usuário inválido" }),
   }),
 });
@@ -318,7 +318,7 @@ export const adicionarUsuarioAnunciante: RequestHandler = async (req, res) => {
     // Validate input
     const validatedData = AdicionarUsuarioAnuncianteSchema.parse(req.body);
 
-    const usuarioAnunciante = await prisma.usracessoAnunciante.create({
+    const usuarioAnunciante = await prisma.usuarios_anunciantes.create({
       data: validatedData,
       include: {
         usuario: {
@@ -360,7 +360,7 @@ export const getEquipeAnunciante: RequestHandler = async (req, res) => {
   try {
     const { anuncianteId } = req.params;
 
-    const equipe = await prisma.usracessoAnunciante.findMany({
+    const equipe = await prisma.usuarios_anunciantes.findMany({
       where: { anuncianteId: parseInt(anuncianteId) },
       include: {
         usuario: {
