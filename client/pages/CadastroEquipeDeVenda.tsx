@@ -870,7 +870,7 @@ export default function CadastroEquipeDeVenda() {
                               )}
 
                               {/* Existing Members */}
-                              {equipe.membros.map((membro) => (
+                              {getFilteredMembros(equipe.membros, equipe.id).map((membro) => (
                                 <tr
                                   key={membro.id}
                                   className="border-b border-gray-200 hover:bg-gray-50"
