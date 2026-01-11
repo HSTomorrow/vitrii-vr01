@@ -60,7 +60,7 @@ export default function AdminDashboard() {
   const { data: usuariosData, isLoading: usuariosLoading } = useQuery({
     queryKey: ["usuarios"],
     queryFn: async () => {
-      const response = await fetch("/api/usuarios");
+      const response = await fetch("/api/usracessos");
       if (!response.ok) throw new Error("Erro ao buscar usuários");
       return response.json();
     },
@@ -82,7 +82,7 @@ export default function AdminDashboard() {
     queryFn: async () => {
       if (!selectedUsuario) return null;
       const response = await fetch(
-        `/api/usuarios/${selectedUsuario}/funcionalidades`,
+        `/api/usracessos/${selectedUsuario}/funcionalidades`,
       );
       if (!response.ok)
         throw new Error("Erro ao buscar funcionalidades do usuário");
@@ -101,7 +101,7 @@ export default function AdminDashboard() {
       funcionalidadeId: number;
     }) => {
       const response = await fetch(
-        `/api/usuarios/${usuarioId}/funcionalidades/grant`,
+        `/api/usracessos/${usuarioId}/funcionalidades/grant`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -141,7 +141,7 @@ export default function AdminDashboard() {
       funcionalidadeId: number;
     }) => {
       const response = await fetch(
-        `/api/usuarios/${usuarioId}/funcionalidades/${funcionalidadeId}`,
+        `/api/usracessos/${usuarioId}/funcionalidades/${funcionalidadeId}`,
         {
           method: "DELETE",
         },
@@ -173,7 +173,7 @@ export default function AdminDashboard() {
   const grantAllFuncionalidadesMutation = useMutation({
     mutationFn: async (usuarioId: number) => {
       const response = await fetch(
-        `/api/usuarios/${usuarioId}/funcionalidades/grant-all`,
+        `/api/usracessos/${usuarioId}/funcionalidades/grant-all`,
         {
           method: "POST",
         },
@@ -205,7 +205,7 @@ export default function AdminDashboard() {
   const revokeAllFuncionalidadesMutation = useMutation({
     mutationFn: async (usuarioId: number) => {
       const response = await fetch(
-        `/api/usuarios/${usuarioId}/funcionalidades/revoke-all`,
+        `/api/usracessos/${usuarioId}/funcionalidades/revoke-all`,
         {
           method: "POST",
         },
