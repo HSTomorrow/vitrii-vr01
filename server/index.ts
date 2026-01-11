@@ -232,7 +232,7 @@ export function createServer() {
   app.get("/api/lojas", getAnunciantes);
   app.get("/api/lojas/:id", getAnuncianteById);
   app.post("/api/lojas", createAnunciante);
-  app.put("/api/lojas/:id", updateAnunciante);
+  app.put("/api/lojas/:id", extractUserId, updateAnunciante);
   app.delete("/api/lojas/:id", deleteAnunciante);
   app.get(
     "/api/lojas/:anuncianteId/produtos-para-anuncio",
