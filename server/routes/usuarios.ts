@@ -48,8 +48,17 @@ export const getUsuarios: RequestHandler = async (req, res) => {
         email: true,
         cpf: true,
         telefone: true,
+        whatsapp: true,
+        linkedin: true,
+        facebook: true,
         tipoUsuario: true,
         dataCriacao: true,
+        dataVigenciaContrato: true,
+        numeroAnunciosAtivos: true,
+        endereco: true,
+      },
+      orderBy: {
+        dataCriacao: "desc",
       },
     });
 
