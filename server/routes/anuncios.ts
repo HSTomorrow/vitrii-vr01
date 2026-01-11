@@ -703,7 +703,7 @@ export const canEditAnuncio: RequestHandler = async (req, res) => {
         where: { id: usuarioId },
         select: { tipoUsuario: true },
       }),
-      prisma.anuncio.findUnique({
+      prisma.anuncios.findUnique({
         where: { id: parseInt(id) },
         select: { anuncianteId: true },
       }),
