@@ -752,8 +752,14 @@ export const getUsuariosComSenha: RequestHandler = async (req, res) => {
         email: true,
         cpf: true,
         telefone: true,
+        whatsapp: true,
+        linkedin: true,
+        facebook: true,
         tipoUsuario: true,
         dataCriacao: true,
+        dataVigenciaContrato: true,
+        numeroAnunciosAtivos: true,
+        endereco: true,
         senha: true, // Include hashed password for display purposes
       },
       orderBy: {
