@@ -24,7 +24,7 @@ export const grantFuncionalidade: RequestHandler = async (req, res) => {
     const validatedData = UsuarioXFuncionalidadeSchema.parse(req.body);
 
     // Check if user exists
-    const usuario = await prisma.usuario.findUnique({
+    const usuario = await prisma.usracesso.findUnique({
       where: { id: validatedData.usuarioId },
     });
 
@@ -56,7 +56,7 @@ export const grantFuncionalidade: RequestHandler = async (req, res) => {
     }
 
     // Check if relationship already exists
-    const existing = await prisma.usuarioXFuncionalidade.findUnique({
+    const existing = await prisma.usracessoXFuncionalidade.findUnique({
       where: {
         usuarioId_funcionalidadeId: {
           usuarioId: validatedData.usuarioId,
@@ -72,7 +72,7 @@ export const grantFuncionalidade: RequestHandler = async (req, res) => {
       });
     }
 
-    const relationship = await prisma.usuarioXFuncionalidade.create({
+    const relationship = await prisma.usracessoXFuncionalidade.create({
       data: validatedData,
       include: {
         usuario: {
@@ -119,7 +119,7 @@ export const grantFuncionalidades: RequestHandler = async (req, res) => {
     const validatedData = GrantFuncionalidadesSchema.parse(req.body);
 
     // Check if user exists
-    const usuario = await prisma.usuario.findUnique({
+    const usuario = await prisma.usracesso.findUnique({
       where: { id: validatedData.usuarioId },
     });
 
@@ -151,7 +151,7 @@ export const grantFuncionalidades: RequestHandler = async (req, res) => {
     }
 
     // Get existing relationships
-    const existing = await prisma.usuarioXFuncionalidade.findMany({
+    const existing = await prisma.usracessoXFuncionalidade.findMany({
       where: {
         usuarioId: validatedData.usuarioId,
         funcionalidadeId: { in: validatedData.funcionalidadeIds },
@@ -171,7 +171,7 @@ export const grantFuncionalidades: RequestHandler = async (req, res) => {
     }
 
     // Grant funcionalidades
-    const created = await prisma.usuarioXFuncionalidade.createMany({
+    const created = await prisma.usracessoXFuncionalidade.createMany({
       data: toGrant.map((funcionalidadeId) => ({
         usuarioId: validatedData.usuarioId,
         funcionalidadeId,
@@ -208,7 +208,7 @@ export const revokeFuncionalidade: RequestHandler = async (req, res) => {
     const { usuarioId, funcionalidadeId } = req.params;
 
     // Check if user exists
-    const usuario = await prisma.usuario.findUnique({
+    const usuario = await prisma.usracesso.findUnique({
       where: { id: parseInt(usuarioId) },
     });
 
@@ -228,7 +228,7 @@ export const revokeFuncionalidade: RequestHandler = async (req, res) => {
     }
 
     // Find and delete relationship
-    const relationship = await prisma.usuarioXFuncionalidade.findUnique({
+    const relationship = await prisma.usracessoXFuncionalidade.findUnique({
       where: {
         usuarioId_funcionalidadeId: {
           usuarioId: parseInt(usuarioId),
@@ -244,7 +244,7 @@ export const revokeFuncionalidade: RequestHandler = async (req, res) => {
       });
     }
 
-    await prisma.usuarioXFuncionalidade.delete({
+    await prisma.usracessoXFuncionalidade.delete({
       where: {
         usuarioId_funcionalidadeId: {
           usuarioId: parseInt(usuarioId),
@@ -272,7 +272,7 @@ export const revokeFuncionalidades: RequestHandler = async (req, res) => {
     const validatedData = RevokeFuncionalidadesSchema.parse(req.body);
 
     // Check if user exists
-    const usuario = await prisma.usuario.findUnique({
+    const usuario = await prisma.usracesso.findUnique({
       where: { id: validatedData.usuarioId },
     });
 
@@ -291,7 +291,7 @@ export const revokeFuncionalidades: RequestHandler = async (req, res) => {
       });
     }
 
-    const deleted = await prisma.usuarioXFuncionalidade.deleteMany({
+    const deleted = await prisma.usracessoXFuncionalidade.deleteMany({
       where: {
         usuarioId: validatedData.usuarioId,
         funcionalidadeId: { in: validatedData.funcionalidadeIds },
@@ -337,7 +337,7 @@ export const listUserFuncionalidades: RequestHandler = async (req, res) => {
       where.funcionalidadeId = parseInt(funcionalidadeId as string);
     }
 
-    const relationships = await prisma.usuarioXFuncionalidade.findMany({
+    const relationships = await prisma.usracessoXFuncionalidade.findMany({
       where,
       include: {
         usuario: {
@@ -383,7 +383,7 @@ export const grantAllFuncionalidades: RequestHandler = async (req, res) => {
     const { usuarioId } = req.params;
 
     // Check if user exists
-    const usuario = await prisma.usuario.findUnique({
+    const usuario = await prisma.usracesso.findUnique({
       where: { id: parseInt(usuarioId) },
     });
 
@@ -408,7 +408,7 @@ export const grantAllFuncionalidades: RequestHandler = async (req, res) => {
     });
 
     // Get existing relationships
-    const existing = await prisma.usuarioXFuncionalidade.findMany({
+    const existing = await prisma.usracessoXFuncionalidade.findMany({
       where: {
         usuarioId: parseInt(usuarioId),
       },
@@ -426,7 +426,7 @@ export const grantAllFuncionalidades: RequestHandler = async (req, res) => {
       });
     }
 
-    const created = await prisma.usuarioXFuncionalidade.createMany({
+    const created = await prisma.usracessoXFuncionalidade.createMany({
       data: toGrant.map((func) => ({
         usuarioId: parseInt(usuarioId),
         funcionalidadeId: func.id,
@@ -456,7 +456,7 @@ export const revokeAllFuncionalidades: RequestHandler = async (req, res) => {
     const { usuarioId } = req.params;
 
     // Check if user exists
-    const usuario = await prisma.usuario.findUnique({
+    const usuario = await prisma.usracesso.findUnique({
       where: { id: parseInt(usuarioId) },
     });
 
@@ -475,7 +475,7 @@ export const revokeAllFuncionalidades: RequestHandler = async (req, res) => {
       });
     }
 
-    const deleted = await prisma.usuarioXFuncionalidade.deleteMany({
+    const deleted = await prisma.usracessoXFuncionalidade.deleteMany({
       where: {
         usuarioId: parseInt(usuarioId),
       },
