@@ -7,7 +7,7 @@ async function main() {
 
   try {
     // Check if admin already exists
-    const existingAdmin = await prisma.usuario.findUnique({
+    const existingAdmin = await prisma.usracesso.findUnique({
       where: { email: "admin@vitrii.com.br" },
     });
 
@@ -23,7 +23,7 @@ async function main() {
     }
 
     // Create ADM user (password stored as-is, matching current system)
-    const admUser = await prisma.usuario.create({
+    const admUser = await prisma.usracesso.create({
       data: {
         nome: "Administrador Vitrii",
         email: "admin@vitrii.com.br",
@@ -55,7 +55,7 @@ async function main() {
     );
 
     for (const func of allFuncionalidades) {
-      const existing = await prisma.usuarioXFuncionalidade.findUnique({
+      const existing = await prisma.usracessoXFuncionalidade.findUnique({
         where: {
           usuarioId_funcionalidadeId: {
             usuarioId: admUser.id,
@@ -65,7 +65,7 @@ async function main() {
       });
 
       if (!existing) {
-        await prisma.usuarioXFuncionalidade.create({
+        await prisma.usracessoXFuncionalidade.create({
           data: {
             usuarioId: admUser.id,
             funcionalidadeId: func.id,
