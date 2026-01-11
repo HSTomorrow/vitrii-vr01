@@ -227,164 +227,19 @@ export default function Index() {
             </Link>
           </div>
 
-          {/* Free/Gratuito Cards Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-            {allAnunciosLoading ? (
-              <>
-                {[1, 2, 3, 4, 5].map((item) => (
-                  <div
-                    key={item}
-                    className="vitrii-card overflow-hidden animate-pulse"
-                  >
-                    <div className="w-full h-48 bg-gray-300" />
-                    <div className="p-4 space-y-3">
-                      <div className="h-4 bg-gray-300 rounded" />
-                      <div className="h-3 bg-gray-300 rounded w-3/4" />
-                      <div className="h-3 bg-gray-300 rounded w-1/2" />
-                      <div className="h-4 bg-gray-300 rounded" />
-                      <div className="h-10 bg-gray-300 rounded" />
-                    </div>
-                  </div>
-                ))}
-              </>
-            ) : destaqueDoacoes.length > 0 ? (
-              destaqueDoacoes.map((anuncio: any) => (
-                <div
-                  key={anuncio.id}
-                  onClick={() => navigate(`/anuncio/${anuncio.id}`)}
-                  className="vitrii-card overflow-hidden hover:scale-105 transition-transform duration-200 cursor-pointer relative"
-                >
-                  <div className="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold z-10">
-                    GRATUITO
-                  </div>
+          {/* Free/Gratuito Cards Carousel */}
+          <AnunciosCarousel
+            anuncios={destaqueDoacoes}
+            isLoading={allAnunciosLoading}
+            isFavorited={(id) => favoritos.has(id)}
+            onToggleFavorito={(id) =>
+              toggleFavoritoMutation.mutate(id)
+            }
+            emptyMessage="Nenhum item gratuito publicado ainda"
+            color="green"
+          />
 
-                  <div className="w-full h-48 bg-gradient-to-br from-green-400 to-green-600 flex items-center justify-center overflow-hidden">
-                    {anuncio.fotoUrl ? (
-                      <img
-                        src={anuncio.fotoUrl}
-                        alt={anuncio.titulo}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <Package className="w-12 h-12 text-white opacity-50" />
-                    )}
-                  </div>
-
-                  {anuncio.anunciante?.fotoUrl && (
-                    <div className="absolute bottom-3 left-3 z-10 w-10 h-10 rounded-full bg-white border-2 border-green-500 overflow-hidden flex items-center justify-center shadow-md">
-                      <img
-                        src={anuncio.anunciante.fotoUrl}
-                        alt={anuncio.anunciante.nome}
-                        className="w-full h-full object-cover"
-                        title={anuncio.anunciante.nome}
-                      />
-                    </div>
-                  )}
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (!user) {
-                        toast.error("Faça login para adicionar favoritos");
-                        navigate("/auth/signin");
-                      } else {
-                        toggleFavoritoMutation.mutate(anuncio.id);
-                      }
-                    }}
-                    disabled={toggleFavoritoMutation.isPending}
-                    className="absolute top-3 left-3 z-10 p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
-                    title={
-                      favoritos.has(anuncio.id)
-                        ? "Remover dos favoritos"
-                        : "Adicionar aos favoritos"
-                    }
-                  >
-                    <Heart
-                      className={`w-5 h-5 transition-colors ${
-                        favoritos.has(anuncio.id)
-                          ? "fill-red-500 text-red-500"
-                          : "text-gray-400"
-                      }`}
-                    />
-                  </button>
-
-                  <div className="p-4 flex flex-col h-full">
-                    <div>
-                      <h4
-                        style={{ color: "#025CBA" }}
-                        className="font-semibold mb-2 line-clamp-2"
-                      >
-                        {anuncio.titulo}
-                      </h4>
-                      <p className="text-sm text-walmart-text-secondary mb-3 line-clamp-2">
-                        {anuncio.descricao || "Disponível gratuitamente"}
-                      </p>
-
-                      <div className="flex items-center gap-1 mb-3 text-xs text-walmart-text-secondary">
-                        <MapPin className="w-3 h-3" />
-                        <span className="truncate">
-                          {extractMunicipality(
-                            anuncio.anunciante?.endereco || "",
-                          )}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex justify-between items-center mb-4 mt-auto">
-                      <span className="text-lg font-bold text-green-600">
-                        Grátis
-                      </span>
-                      <div className="flex items-center space-x-1">
-                        <Star className="w-4 h-4 fill-walmart-yellow text-walmart-yellow" />
-                        <span className="text-sm font-semibold">5.0</span>
-                      </div>
-                    </div>
-
-                    {anuncio.tipo === "servico" ? (
-                      <div className="flex gap-2">
-                        <Link
-                          to={`/agenda/anunciante/${anuncio.anuncianteId}`}
-                          className="flex-1 bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
-                        >
-                          <Calendar className="w-4 h-4" />
-                          Agendar
-                        </Link>
-                        <button
-                          onClick={() => navigate(`/anuncio/${anuncio.id}`)}
-                          className="flex-1 bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors"
-                        >
-                          Detalhes
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => navigate(`/anuncio/${anuncio.id}`)}
-                        className="w-full bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors"
-                      >
-                        Ver Detalhes
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="col-span-full text-center py-12">
-                <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-walmart-text-secondary">
-                  Nenhum item gratuito publicado ainda
-                </p>
-                <Link
-                  to="/anuncio/criar?tipo=doacao"
-                  className="inline-flex items-center gap-2 text-walmart-blue font-semibold hover:underline mt-4"
-                >
-                  <Plus className="w-4 h-4" />
-                  Publique uma Doação
-                </Link>
-              </div>
-            )}
-          </div>
-
-          <div className="text-center mt-12 lg:hidden">
+          <div className="text-center mt-8">
             <Link
               to="/browse?filter=gratuito"
               className="inline-flex items-center space-x-2 text-walmart-blue font-semibold hover:space-x-3 transition-all"
