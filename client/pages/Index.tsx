@@ -317,158 +317,19 @@ export default function Index() {
             </Link>
           </div>
 
-          {/* Recurring Schedule Cards Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-            {allAnunciosLoading ? (
-              <>
-                {[1, 2, 3, 4, 5].map((item) => (
-                  <div
-                    key={item}
-                    className="vitrii-card overflow-hidden animate-pulse"
-                  >
-                    <div className="w-full h-48 bg-gray-300" />
-                    <div className="p-4 space-y-3">
-                      <div className="h-4 bg-gray-300 rounded" />
-                      <div className="h-3 bg-gray-300 rounded w-3/4" />
-                      <div className="h-3 bg-gray-300 rounded w-1/2" />
-                      <div className="h-4 bg-gray-300 rounded" />
-                      <div className="h-10 bg-gray-300 rounded" />
-                    </div>
-                  </div>
-                ))}
-              </>
-            ) : destaqueAgendas.length > 0 ? (
-              destaqueAgendas.map((anuncio: any) => (
-                <div
-                  key={anuncio.id}
-                  onClick={() => navigate(`/anuncio/${anuncio.id}`)}
-                  className="vitrii-card overflow-hidden hover:scale-105 transition-transform duration-200 cursor-pointer relative"
-                >
-                  <div className="absolute top-3 right-3 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold z-10">
-                    AGENDA
-                  </div>
+          {/* Recurring Schedule Cards Carousel */}
+          <AnunciosCarousel
+            anuncios={destaqueAgendas}
+            isLoading={allAnunciosLoading}
+            isFavorited={(id) => favoritos.has(id)}
+            onToggleFavorito={(id) =>
+              toggleFavoritoMutation.mutate(id)
+            }
+            emptyMessage="Nenhuma agenda recorrente publicada ainda"
+            color="orange"
+          />
 
-                  <div className="w-full h-48 bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center overflow-hidden">
-                    {anuncio.fotoUrl ? (
-                      <img
-                        src={anuncio.fotoUrl}
-                        alt={anuncio.titulo}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <Calendar className="w-12 h-12 text-white opacity-50" />
-                    )}
-                  </div>
-
-                  {anuncio.anunciante?.fotoUrl && (
-                    <div className="absolute bottom-3 left-3 z-10 w-10 h-10 rounded-full bg-white border-2 border-orange-500 overflow-hidden flex items-center justify-center shadow-md">
-                      <img
-                        src={anuncio.anunciante.fotoUrl}
-                        alt={anuncio.anunciante.nome}
-                        className="w-full h-full object-cover"
-                        title={anuncio.anunciante.nome}
-                      />
-                    </div>
-                  )}
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (!user) {
-                        toast.error("Faça login para adicionar favoritos");
-                        navigate("/auth/signin");
-                      } else {
-                        toggleFavoritoMutation.mutate(anuncio.id);
-                      }
-                    }}
-                    disabled={toggleFavoritoMutation.isPending}
-                    className="absolute top-3 left-3 z-10 p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
-                    title={
-                      favoritos.has(anuncio.id)
-                        ? "Remover dos favoritos"
-                        : "Adicionar aos favoritos"
-                    }
-                  >
-                    <Heart
-                      className={`w-5 h-5 transition-colors ${
-                        favoritos.has(anuncio.id)
-                          ? "fill-red-500 text-red-500"
-                          : "text-gray-400"
-                      }`}
-                    />
-                  </button>
-
-                  <div className="p-4 flex flex-col h-full">
-                    <div>
-                      <h4
-                        style={{ color: "#025CBA" }}
-                        className="font-semibold mb-2 line-clamp-2"
-                      >
-                        {anuncio.titulo}
-                      </h4>
-                      <p className="text-sm text-walmart-text-secondary mb-3 line-clamp-2">
-                        {anuncio.descricao || "Serviço agendável disponível"}
-                      </p>
-
-                      <div className="flex items-center gap-1 mb-3 text-xs text-walmart-text-secondary">
-                        <MapPin className="w-3 h-3" />
-                        <span className="truncate">
-                          {extractMunicipality(
-                            anuncio.anunciante?.endereco || "",
-                          )}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="flex justify-between items-center mb-4 mt-auto">
-                      <span className="text-2xl font-bold text-orange-600">
-                        R${" "}
-                        {anuncio.preco
-                          ? Number(anuncio.preco).toFixed(2)
-                          : "0.00"}
-                      </span>
-                      <div className="flex items-center space-x-1">
-                        <Star className="w-4 h-4 fill-walmart-yellow text-walmart-yellow" />
-                        <span className="text-sm font-semibold">5.0</span>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-2">
-                      <Link
-                        to={`/agenda/anunciante/${anuncio.anuncianteId}`}
-                        className="flex-1 bg-orange-600 text-white py-2 rounded-lg font-semibold hover:bg-orange-700 transition-colors flex items-center justify-center gap-2 text-sm"
-                      >
-                        <Calendar className="w-4 h-4" />
-                        Agendar
-                      </Link>
-                      <button
-                        onClick={() => navigate(`/anuncio/${anuncio.id}`)}
-                        className="flex-1 bg-orange-600 text-white py-2 rounded-lg font-semibold hover:bg-orange-700 transition-colors text-sm"
-                      >
-                        Detalhes
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))
-            ) : (
-              <div className="col-span-full text-center py-12">
-                <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-walmart-text-secondary">
-                  Nenhuma agenda recorrente publicada ainda
-                </p>
-                <Link
-                  to="/anuncio/criar"
-                  className="inline-flex items-center gap-2 text-walmart-blue font-semibold hover:underline mt-4"
-                >
-                  <Plus className="w-4 h-4" />
-                  Publique uma Agenda
-                </Link>
-              </div>
-            )}
-          </div>
-
-          <div className="text-center mt-12 lg:hidden">
+          <div className="text-center mt-8">
             <Link
               to="/browse?filter=agenda_recorrente"
               className="inline-flex items-center space-x-2 text-walmart-blue font-semibold hover:space-x-3 transition-all"
