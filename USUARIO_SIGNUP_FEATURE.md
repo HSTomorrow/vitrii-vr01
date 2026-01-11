@@ -73,7 +73,7 @@ Request:
 ```json
 {
   "cpf": "12345678901",
-  "telefone": "(11) 99999-9999",
+  "telefone": "(51) 99999-9999",
   "endereco": "Rua das Flores, 123, São Paulo, SP"
 }
 ```
