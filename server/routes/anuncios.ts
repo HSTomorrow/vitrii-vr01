@@ -294,7 +294,7 @@ export const createAnuncio: RequestHandler = async (req, res) => {
 
       // Verify that the price table belongs to the product if provided
       if (validatedData.tabelaDePrecoId && validatedData.tabelaDePrecoId > 0) {
-        const tabelaDePreco = await prisma.tabelaDePreco.findUnique({
+        const tabelaDePreco = await prisma.tabelasPreco.findUnique({
           where: { id: validatedData.tabelaDePrecoId },
         });
 
