@@ -156,6 +156,9 @@ model usracessos {
   senha                 String                 @db.VarChar(255)
   cpf                   String?                @db.VarChar(14) @unique
   telefone              String?                @db.VarChar(20)
+  whatsapp              String?                @db.VarChar(20)
+  linkedin              String?                @db.VarChar(255)
+  facebook              String?                @db.VarChar(255)
   tipoUsuario           String                 @default("common") @db.VarChar(20)
   dataCriacao           DateTime               @default(now())
   dataAtualizacao       DateTime
@@ -165,6 +168,7 @@ model usracessos {
   usuarios_anunciantes  usuarios_anunciantes[]
   membros_equipe        membros_equipe[]
   passwordResetTokens   passwordResetToken[]
+  anuncioVisualizados   anuncioVisualizados[]
 }
 
 model passwordResetToken {
