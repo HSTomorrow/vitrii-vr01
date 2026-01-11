@@ -219,8 +219,8 @@ export default function Header() {
 
         {/* Mobile Navigation Menu */}
         {isMenuOpen && (
-          <nav className="lg:hidden border-t border-gray-200 fixed left-0 right-0 top-16 bottom-0 bg-white overflow-y-auto z-40">
-            <div className="flex flex-col space-y-2 pt-4 pb-20 px-4">
+          <nav className="lg:hidden border-t border-gray-200 fixed left-0 right-0 top-16 bottom-0 bg-white overflow-y-auto z-40 max-h-screen">
+            <div className="flex flex-col space-y-2 pt-4 pb-32 px-4 min-h-full">
               <Link
                 to="/browse"
                 className="py-2 text-walmart-text hover:bg-walmart-gray rounded-lg"
