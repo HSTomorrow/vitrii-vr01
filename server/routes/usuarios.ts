@@ -352,7 +352,36 @@ const UsuarioUpdateSchema = z.object({
     .min(10, "Telefone deve ter no mínimo 10 dígitos")
     .optional()
     .or(z.literal("")), // Allow empty string
+  whatsapp: z.string().optional().or(z.literal("")), // Allow empty string
+  linkedin: z.string().optional().or(z.literal("")), // Allow empty string
+  facebook: z.string().optional().or(z.literal("")), // Allow empty string
   endereco: z.string().optional().or(z.literal("")), // Allow empty string
+});
+
+// Admin schema for updating user profile (includes all fields)
+const UsuarioAdminUpdateSchema = z.object({
+  nome: z
+    .string()
+    .min(3, "Nome deve ter pelo menos 3 caracteres")
+    .max(255)
+    .optional(),
+  email: z.string().email("Email inválido").optional(),
+  cpf: z
+    .string()
+    .refine((value) => {
+      if (!value) return true; // Allow empty
+      const digitsOnly = value.replace(/\D/g, "");
+      return /^\d{11}$|^\d{14}$/.test(digitsOnly);
+    }, "CPF \ CNPJ deve ter 11 ou 14 dígitos")
+    .optional()
+    .or(z.literal("")),
+  telefone: z.string().optional().or(z.literal("")),
+  whatsapp: z.string().optional().or(z.literal("")),
+  linkedin: z.string().optional().or(z.literal("")),
+  facebook: z.string().optional().or(z.literal("")),
+  endereco: z.string().optional().or(z.literal("")),
+  tipoUsuario: z.enum(["adm", "comum"]).optional(),
+  dataVigenciaContrato: z.string().datetime().optional(),
 });
 
 // UPDATE user (only safe fields allowed)
