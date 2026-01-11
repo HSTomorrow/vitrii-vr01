@@ -5,17 +5,14 @@ import { z } from "zod";
 // Schema validation
 const AnuncianteCreateSchema = z.object({
   nome: z.string().min(1, "Nome é obrigatório"),
-  cnpjOuCpf: z.string().regex(/^\d{11,18}$/, "CNPJ/CPF inválido"),
-  endereco: z.string().min(1, "Endereço é obrigatório"),
+  cnpj: z.string().regex(/^\d{11,14}$/, "CNPJ/CPF inválido").optional(),
+  endereco: z.string().min(1, "Endereço é obrigatório").optional(),
   cidade: z.string().min(1, "Cidade é obrigatória"),
   estado: z.string().length(2, "Estado deve ter 2 caracteres (ex: MG, SP, RJ)"),
   descricao: z.string().optional(),
-  email: z.string().email("Email inválido"),
-  site: z.string().optional(),
-  instagram: z.string().optional(),
-  facebook: z.string().optional(),
-  whatsapp: z.string().optional(),
-  fotoUrl: z.string().optional(),
+  email: z.string().email("Email inválido").optional(),
+  telefone: z.string().optional(),
+  cep: z.string().optional(),
 });
 
 // GET all anunciantes (with pagination)
