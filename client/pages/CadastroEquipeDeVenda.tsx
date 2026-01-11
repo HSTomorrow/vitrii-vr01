@@ -317,6 +317,7 @@ export default function CadastroEquipeDeVenda() {
     },
     onSuccess: () => {
       toast.success("Membro removido com sucesso!");
+      setSearchMembro({});
       refetchEquipes();
     },
     onError: (error) => {
