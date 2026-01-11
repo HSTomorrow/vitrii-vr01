@@ -903,6 +903,103 @@ export const canEditAnuncio: RequestHandler = async (req, res) => {
   }
 };
 
+// GET user's ads (my ads)
+export const getAnunciosDUsuario: RequestHandler = async (req, res) => {
+  try {
+    const usuarioId = (req as any).userId;
+
+    if (!usuarioId) {
+      return res.status(401).json({
+        success: false,
+        error: "Usuário não autenticado",
+      });
+    }
+
+    const {
+      status,
+      limit = "20",
+      offset = "0",
+    } = req.query;
+
+    const pageLimit = Math.min(
+      Math.max(parseInt(limit as string) || 20, 1),
+      100,
+    );
+    const pageOffset = Math.max(parseInt(offset as string) || 0, 0);
+
+    // Get all ads created by this user's advertisers
+    const usuarioAnunciantes = await prisma.usuarios_anunciantes.findMany({
+      where: { usuarioId },
+      select: { anuncianteId: true },
+    });
+
+    const anuncianteIds = usuarioAnunciantes.map((ua) => ua.anuncianteId);
+
+    // If user has no advertisers, return empty list
+    if (anuncianteIds.length === 0) {
+      return res.json({
+        success: true,
+        data: [],
+        pagination: {
+          count: 0,
+          total: 0,
+          limit: pageLimit,
+          offset: pageOffset,
+          hasMore: false,
+        },
+      });
+    }
+
+    const where: any = {
+      anuncianteId: {
+        in: anuncianteIds,
+      },
+    };
+
+    if (status) {
+      where.status = status;
+    }
+
+    // Get total count and paginated data in parallel
+    const [anuncios, total] = await Promise.all([
+      prisma.anuncios.findMany({
+        where,
+        include: {
+          anunciantes: {
+            select: {
+              id: true,
+              nome: true,
+            },
+          },
+        },
+        orderBy: { dataCriacao: "desc" },
+        take: pageLimit,
+        skip: pageOffset,
+      }),
+      prisma.anuncios.count({ where }),
+    ]);
+
+    res.json({
+      success: true,
+      data: anuncios,
+      pagination: {
+        count: anuncios.length,
+        total,
+        limit: pageLimit,
+        offset: pageOffset,
+        hasMore: pageOffset + pageLimit < total,
+      },
+    });
+  } catch (error) {
+    console.error("[getAnunciosDUsuario] Error fetching user ads:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao buscar seus anúncios",
+      details: error instanceof Error ? error.message : "Erro desconhecido",
+    });
+  }
+};
+
 // RECORD ad view
 export const recordAnuncioView: RequestHandler = async (req, res) => {
   try {
