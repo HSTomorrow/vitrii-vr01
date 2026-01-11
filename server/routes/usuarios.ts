@@ -582,7 +582,7 @@ export const resetPassword: RequestHandler = async (req, res) => {
 
     // Update user password and mark token as used
     await Promise.all([
-      prisma.usracesso.update({
+      prisma.usracessos.update({
         where: { id: usuario.id },
         data: { senha: senhaHash },
       }),
