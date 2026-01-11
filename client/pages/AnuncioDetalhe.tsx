@@ -378,7 +378,7 @@ export default function AnuncioDetalhe() {
                     Grupo de Produtos
                   </h3>
                   <p className="text-walmart-text">
-                    {anuncio.producto.grupo?.nome || "N/A"}
+                    {anuncio.producto?.grupo?.nome || "N/A"}
                   </p>
                 </div>
               </div>
