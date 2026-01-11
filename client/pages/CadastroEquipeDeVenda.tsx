@@ -261,11 +261,12 @@ export default function CadastroEquipeDeVenda() {
       toast.success("Membro atualizado com sucesso!");
       setEditingMemberId(null);
       setMemberFormData({
-        nome: "",
+        nomeMembro: "",
         email: "",
         whatsapp: "",
         status: "disponivel",
       });
+      setSearchMembro({});
       refetchEquipes();
     },
     onError: (error) => {
