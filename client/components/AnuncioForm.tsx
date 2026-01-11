@@ -929,7 +929,7 @@ export default function AnuncioForm({
               />
               <label htmlFor="destaque" className="flex-1 cursor-pointer">
                 <p className="font-semibold text-walmart-text">
-                  ⭐ Destaque S
+                  ⭐ Anuncio em Destaque 
                 </p>
                 <p className="text-sm text-walmart-text-secondary">
                   Marque esta opção para colocar o anúncio em destaque na página
