@@ -701,7 +701,7 @@ export const canEditAnuncio: RequestHandler = async (req, res) => {
     }
 
     // Check if user is associated with the advertiser (anunciante)
-    const usuarioAnunciante = await prisma.usracessoAnunciante.findUnique({
+    const usuarioAnunciante = await prisma.usuarios_anunciantes.findUnique({
       where: {
         usuarioId_anuncianteId: {
           usuarioId: usuarioId,
