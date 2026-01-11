@@ -67,7 +67,7 @@ export default function AdminManageUsers() {
   const { data: usuariosData, isLoading: usuariosLoading } = useQuery({
     queryKey: ["usuarios-com-senha"],
     queryFn: async () => {
-      const response = await fetch("/api/admin/usuarios-com-senha");
+      const response = await fetch("/api/admin/usracessos-com-senha");
       if (!response.ok) {
         if (response.status === 403) {
           throw new Error(
@@ -90,7 +90,7 @@ export default function AdminManageUsers() {
       novaSenha: string;
     }) => {
       const response = await fetch(
-        `/api/admin/usuarios/${usuarioId}/reset-password`,
+        `/api/admin/usracessos/${usuarioId}/reset-password`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
