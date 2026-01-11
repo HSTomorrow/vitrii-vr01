@@ -174,9 +174,16 @@ export default function CadastroEquipeDeVenda() {
   // Add member mutation
   const addMemberMutation = useMutation({
     mutationFn: async ({ teamId }: { teamId: number }) => {
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (user?.id) {
+        headers["X-User-Id"] = user.id.toString();
+      }
+
       const response = await fetch(`/api/equipes-venda/${teamId}/membros`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify(memberFormData),
       });
 
