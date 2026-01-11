@@ -182,7 +182,7 @@ export const createEquipe: RequestHandler = async (req, res) => {
 
     // Check permissions - allow if user is admin or owner of the anunciante
     if (usuarioId) {
-      const usuario = await prisma.usracesso.findUnique({
+      const usuario = await prisma.usracessos.findUnique({
         where: { id: usuarioId },
         select: { tipoUsuario: true },
       });
