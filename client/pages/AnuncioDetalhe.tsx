@@ -160,6 +160,29 @@ export default function AnuncioDetalhe() {
     },
   });
 
+  // Toggle destaque mutation (admin only)
+  const destacueMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch(`/api/anuncios/${id}/destaque`, {
+        method: "PATCH",
+      });
+      if (!response.ok) throw new Error("Erro ao alterar status de destaque");
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast.success(data.data?.message || "Status de destaque alterado com sucesso");
+      queryClient.invalidateQueries({ queryKey: ["anuncio", id] });
+      queryClient.invalidateQueries({ queryKey: ["anuncios"] });
+    },
+    onError: (error) => {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Erro ao alterar status de destaque",
+      );
+    },
+  });
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col bg-white">
