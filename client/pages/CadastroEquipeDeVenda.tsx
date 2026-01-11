@@ -721,11 +721,13 @@ export default function CadastroEquipeDeVenda() {
                       </div>
 
                       {/* Members Table */}
-                      {equipe.membros.length === 0 &&
+                      {getFilteredMembros(equipe.membros, equipe.id).length === 0 &&
                       !isAddingMember &&
                       editingMemberId === null ? (
                         <p className="text-gray-500 text-sm py-4">
-                          Nenhum membro adicionado
+                          {equipe.membros.length === 0
+                            ? "Nenhum membro adicionado"
+                            : "Nenhum membro encontrado com os critérios de busca"}
                         </p>
                       ) : (
                         <div className="overflow-x-auto">
