@@ -93,7 +93,13 @@ export default function CadastroEquipeDeVenda() {
       const url = selectedAnuncianteId
         ? `/api/equipes-venda?anuncianteId=${selectedAnuncianteId}`
         : "/api/equipes-venda";
-      const response = await fetch(url);
+
+      const headers: Record<string, string> = {};
+      if (user?.id) {
+        headers["X-User-Id"] = user.id.toString();
+      }
+
+      const response = await fetch(url, { headers });
       if (!response.ok) throw new Error("Erro ao buscar equipes");
       return response.json();
     },
