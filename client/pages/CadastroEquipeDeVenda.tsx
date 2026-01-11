@@ -316,9 +316,20 @@ export default function CadastroEquipeDeVenda() {
       refetchEquipes();
     },
     onError: (error) => {
-      toast.error(
-        error instanceof Error ? error.message : "Erro ao remover membro",
-      );
+      let errorMessage = "Erro ao remover membro";
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+
+        // Try to extract more detailed error info if available
+        if (errorMessage.includes("não encontrado")) {
+          toast.error("Membro não encontrado");
+        } else {
+          toast.error(errorMessage);
+        }
+      } else {
+        toast.error(errorMessage);
+      }
     },
   });
 
