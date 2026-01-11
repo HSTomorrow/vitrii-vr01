@@ -94,7 +94,7 @@ export default function Header() {
                 <>
                   <Link
                     to="/anuncio/criar"
-                    className="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-walmart-yellow text-walmart-text rounded-lg hover:bg-walmart-yellow-dark transition-colors font-semibold"
+                    className="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-walmart-yellow text-walmart-text rounded-lg hover:bg-walmart-yellow-dark transition-colors font-semibold text-[0.85rem]"
                   >
                     <Plus className="w-4 h-4" />
                     <span className="hidden md:inline">Publicar</span>
@@ -104,7 +104,7 @@ export default function Header() {
                     <div className="hidden sm:flex gap-2">
                       <Link
                         to="/admin/dashboard"
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200 transition-colors font-semibold"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200 transition-colors font-semibold text-[0.85rem]"
                         title="Painel de Administrador"
                       >
                         <Shield className="w-4 h-4" />
@@ -112,7 +112,7 @@ export default function Header() {
                       </Link>
                       <Link
                         to="/admin/anuncios"
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors font-semibold"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors font-semibold text-[0.85rem]"
                         title="Gerenciar Anúncios"
                       >
                         <FileText className="w-4 h-4" />
@@ -120,7 +120,7 @@ export default function Header() {
                       </Link>
                       <Link
                         to="/admin/banners"
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors font-semibold"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors font-semibold text-[0.85rem]"
                         title="Gerenciar Banners"
                       >
                         <Plus className="w-4 h-4" />
@@ -131,14 +131,14 @@ export default function Header() {
 
                   <div className="hidden sm:flex items-center space-x-2 px-4 py-2 bg-green-50 rounded-lg border border-green-200">
                     <User className="w-4 h-4 text-green-600" />
-                    <span className="text-sm font-semibold text-green-800 hidden md:inline">
+                    <span className="text-[0.74rem] font-semibold text-green-800 hidden md:inline">
                       {user.nome.split(" ")[0]}
                     </span>
                   </div>
 
                   <button
                     onClick={handleLogout}
-                    className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors hidden sm:flex items-center gap-2 font-semibold"
+                    className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors hidden sm:flex items-center gap-2 font-semibold text-[0.85rem]"
                   >
                     <LogOut className="w-4 h-4" />
                     <span className="hidden md:inline">Sair</span>
@@ -148,7 +148,7 @@ export default function Header() {
                 <>
                   <Link
                     to="/anuncio/criar"
-                    className="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-walmart-yellow text-walmart-text rounded-lg hover:bg-walmart-yellow-dark transition-colors font-semibold"
+                    className="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-walmart-yellow text-walmart-text rounded-lg hover:bg-walmart-yellow-dark transition-colors font-semibold text-[0.85rem]"
                   >
                     <Plus className="w-4 h-4" />
                     <span className="hidden md:inline">Publicar</span>
@@ -156,14 +156,14 @@ export default function Header() {
 
                   <Link
                     to="/auth/signin"
-                    className="px-4 py-2 text-walmart-blue hover:bg-blue-50 rounded-lg transition-colors hidden sm:block"
+                    className="px-4 py-2 text-walmart-blue hover:bg-blue-50 rounded-lg transition-colors hidden sm:block text-[0.85rem]"
                   >
                     Entrar
                   </Link>
 
                   <Link
                     to="/auth/signup"
-                    className="px-4 py-2 bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors hidden sm:block"
+                    className="px-4 py-2 bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors hidden sm:block text-[0.85rem]"
                   >
                     Cadastrar
                   </Link>
