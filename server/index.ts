@@ -439,5 +439,18 @@ export function createServer() {
     revokeAllFuncionalidades,
   );
 
+  // Banners routes
+  app.get("/api/banners", getBanners);
+  app.get("/api/banners/:id", getBannerById);
+  app.post("/api/banners", extractUserId, requireAdmin, createBanner);
+  app.put("/api/banners/:id", extractUserId, requireAdmin, updateBanner);
+  app.delete("/api/banners/:id", extractUserId, requireAdmin, deleteBanner);
+  app.post(
+    "/api/banners/reorder",
+    extractUserId,
+    requireAdmin,
+    reorderBanners,
+  );
+
   return app;
 }
