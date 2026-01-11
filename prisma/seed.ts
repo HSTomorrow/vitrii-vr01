@@ -223,6 +223,7 @@ async function main() {
           lojaId: store.id,
           nome: category,
           descricao: `Produtos de ${category} da ${store.nome}`,
+          dataAtualizacao: new Date(),
         },
       });
 
