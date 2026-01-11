@@ -547,17 +547,57 @@ export const resetPassword: RequestHandler = async (req, res) => {
       });
     }
 
-    // TODO: Implement token validation once passwordResetToken model is added to schema
-    // For now, just reset the password directly if email matches
+    // Validate the reset token
+    const resetTokenRecord = await prisma.passwordResetToken.findUnique({
+      where: { token },
+    });
+
+    if (!resetTokenRecord) {
+      console.error(`❌ Token de reset inválido ou expirado`);
+      return res.status(400).json({
+        success: false,
+        error: "Link de reset expirado ou inválido. Solicite um novo link.",
+      });
+    }
+
+    // Check if token is expired
+    if (new Date() > resetTokenRecord.expiresAt) {
+      // Delete the expired token
+      await prisma.passwordResetToken.delete({
+        where: { id: resetTokenRecord.id },
+      });
+
+      console.error(`❌ Token de reset expirado`);
+      return res.status(400).json({
+        success: false,
+        error: "Link de reset expirou. Solicite um novo link.",
+      });
+    }
+
+    // Verify token belongs to the user
+    if (resetTokenRecord.usuarioId !== usuario.id) {
+      console.error(`❌ Token de reset não corresponde ao usuário`);
+      return res.status(400).json({
+        success: false,
+        error: "Link de reset inválido.",
+      });
+    }
 
     // Hash new password
     const senhaHash = await bcryptjs.hash(novaSenha, 10);
 
-    // Update user password
+    // Update user password and delete the token
     await prisma.usracessos.update({
       where: { id: usuario.id },
       data: { senha: senhaHash },
     });
+
+    // Delete the used token
+    await prisma.passwordResetToken.delete({
+      where: { id: resetTokenRecord.id },
+    });
+
+    console.log(`✅ Senha redefinida com sucesso para: ${email}`);
 
     res.status(200).json({
       success: true,
