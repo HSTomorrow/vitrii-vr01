@@ -456,7 +456,7 @@ export const revokeAllFuncionalidades: RequestHandler = async (req, res) => {
     const { usuarioId } = req.params;
 
     // Check if user exists
-    const usuario = await prisma.usracesso.findUnique({
+    const usuario = await prisma.usracessos.findUnique({
       where: { id: parseInt(usuarioId) },
     });
 
