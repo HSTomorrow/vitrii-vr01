@@ -138,6 +138,7 @@ import {
 } from "./routes/usuario-funcionalidades";
 import { uploadMiddleware, handleUpload } from "./routes/upload";
 import { extractUserId, requireAdmin } from "./middleware/permissionGuard";
+import { googleAuthorize, googleCallback, googleLinkAccount } from "./routes/oauth";
 
 export function createServer() {
   const app = express();
