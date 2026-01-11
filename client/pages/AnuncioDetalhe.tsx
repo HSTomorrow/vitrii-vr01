@@ -274,11 +274,11 @@ export default function AnuncioDetalhe() {
               <div className="flex items-center gap-4 text-walmart-text-secondary mt-2 mb-2">
                 <div className="flex items-center gap-1">
                   <Eye className="w-4 h-4" />
-                  <span>Visualizações: 0</span>
+                  <span>Visualizações: {anuncio.visualizacoes || 0}</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <MessageSquare className="w-4 h-4" />
-                  <span>Mensagens: 0</span>
+                  <span>ID: #{anuncio.id}</span>
                 </div>
               </div>
               <p className="text-sm text-walmart-text-secondary">
