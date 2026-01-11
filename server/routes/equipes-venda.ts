@@ -357,38 +357,41 @@ export const adicionarMembro: RequestHandler = async (req, res) => {
       });
     }
 
-    const usuario = await prisma.usuario.findUnique({
-      where: { id: body.usuarioId },
-    });
-
-    if (!usuario) {
-      return res.status(404).json({
-        success: false,
-        error: "Usuário não encontrado",
+    // If usuarioId is provided, verify the user exists
+    if (body.usuarioId) {
+      const usuario = await prisma.usuario.findUnique({
+        where: { id: body.usuarioId },
       });
-    }
 
-    // Check if already a member
-    const existingMember = await prisma.membroEquipe.findUnique({
-      where: {
-        equipeId_usuarioId: {
-          equipeId: parseInt(id),
-          usuarioId: body.usuarioId,
+      if (!usuario) {
+        return res.status(404).json({
+          success: false,
+          error: "Usuário não encontrado",
+        });
+      }
+
+      // Check if already a member
+      const existingMember = await prisma.membroEquipe.findUnique({
+        where: {
+          equipeId_usuarioId: {
+            equipeId: parseInt(id),
+            usuarioId: body.usuarioId,
+          },
         },
-      },
-    });
-
-    if (existingMember) {
-      return res.status(400).json({
-        success: false,
-        error: "Usuário já é membro desta equipe",
       });
+
+      if (existingMember) {
+        return res.status(400).json({
+          success: false,
+          error: "Usuário já é membro desta equipe",
+        });
+      }
     }
 
     const membro = await prisma.membroEquipe.create({
       data: {
         equipeId: parseInt(id),
-        usuarioId: body.usuarioId,
+        usuarioId: body.usuarioId || null,
         nome: body.nome,
         email: body.email,
         whatsapp: body.whatsapp || null,
