@@ -363,15 +363,15 @@ async function main() {
     await prisma.tabelaDePreco.deleteMany({});
     await prisma.producto.deleteMany({});
     await prisma.grupoDeProductos.deleteMany({});
-    await prisma.usuarioAnunciante.deleteMany({});
-    await prisma.usuario.deleteMany({});
+    await prisma.usracessoAnunciante.deleteMany({});
+    await prisma.usracesso.deleteMany({});
     await prisma.anunciante.deleteMany({});
 
     console.log("✅ Dados anterior removidos");
 
     // Create admin user
     const adminPassword = await bcrypt.hash("admin123", 10);
-    const adminUser = await prisma.usuario.create({
+    const adminUser = await prisma.usracesso.create({
       data: {
         nome: "Administrador",
         email: "admin@vitrii.com",
@@ -405,7 +405,7 @@ async function main() {
 
       // Create a user for each store
       const userPassword = await bcrypt.hash("loja123", 10);
-      const user = await prisma.usuario.create({
+      const user = await prisma.usracesso.create({
         data: {
           nome: storeData.nome,
           email: storeData.email,
@@ -418,7 +418,7 @@ async function main() {
       });
 
       // Associate user with store
-      await prisma.usuarioAnunciante.create({
+      await prisma.usracessoAnunciante.create({
         data: {
           usuarioId: user.id,
           anuncianteId: anunciante.id,
