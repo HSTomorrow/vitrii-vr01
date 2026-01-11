@@ -197,9 +197,24 @@ export default function CadastroEquipeDeVenda() {
       refetchEquipes();
     },
     onError: (error) => {
-      toast.error(
-        error instanceof Error ? error.message : "Erro ao adicionar membro",
-      );
+      let errorMessage = "Erro ao adicionar membro";
+
+      if (error instanceof Error) {
+        errorMessage = error.message;
+
+        // Try to extract more detailed error info if available
+        if (errorMessage.includes("Erro no campo")) {
+          toast.error(errorMessage);
+        } else if (errorMessage.includes("já é membro")) {
+          toast.error("Este membro já faz parte da equipe");
+        } else if (errorMessage.includes("não encontrado")) {
+          toast.error("Equipe ou dados inválidos");
+        } else {
+          toast.error(errorMessage);
+        }
+      } else {
+        toast.error(errorMessage);
+      }
     },
   });
 
