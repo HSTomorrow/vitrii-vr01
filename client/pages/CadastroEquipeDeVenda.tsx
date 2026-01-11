@@ -44,11 +44,18 @@ export default function CadastroEquipeDeVenda() {
   });
   const [newMemberId, setNewMemberId] = useState(0);
 
-  // Fetch anunciantes
+  // Fetch anunciantes (filtered by current user, or all if admin)
   const { data: anunciantesData } = useQuery({
-    queryKey: ["anunciantes"],
+    queryKey: ["anunciantes", user?.id],
     queryFn: async () => {
-      const response = await fetch("/api/anunciantes");
+      const headers: Record<string, string> = {};
+      if (user?.id) {
+        headers["X-User-Id"] = user.id.toString();
+      }
+
+      const response = await fetch("/api/anunciantes/do-usuario/listar", {
+        headers,
+      });
       if (!response.ok) throw new Error("Erro ao buscar anunciantes");
       return response.json();
     },
