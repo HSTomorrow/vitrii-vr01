@@ -107,7 +107,7 @@ export const getAnuncios: RequestHandler = async (req, res) => {
 
     // Get total count and paginated data in parallel
     const [anuncios, total] = await Promise.all([
-      prisma.anuncio.findMany({
+      prisma.anuncios.findMany({
         where,
         include: {
           anunciante: {
