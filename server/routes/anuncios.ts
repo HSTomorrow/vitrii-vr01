@@ -4,6 +4,7 @@ import { z } from "zod";
 
 // Base schema for ads (without refinement)
 const AnuncioBaseSchema = z.object({
+  usuarioId: z.number().int().positive("Usuário é obrigatório"),
   anuncianteId: z.number().int().positive("Anunciante é obrigatório"),
   productId: z.number().int().nonnegative().optional().nullable(), // Allow 0 since product is optional
   tabelaDePrecoId: z.number().int().optional().nullable(),
