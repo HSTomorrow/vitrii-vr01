@@ -299,6 +299,7 @@ export function createServer() {
   app.patch("/api/anuncios/:id/activate", activateAnuncio);
   app.delete("/api/anuncios/:id", deleteAnuncio);
   app.get("/api/anuncios/:id/can-edit", canEditAnuncio);
+  app.post("/api/anuncios/:id/view", extractUserId, recordAnuncioView);
 
   // Equipes de Venda routes
   app.get("/api/equipes-venda", extractUserId, getEquipes);
