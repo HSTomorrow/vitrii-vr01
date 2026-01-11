@@ -284,7 +284,7 @@ export default function AnuncioDetalhe() {
               <p className="text-sm text-walmart-text-secondary">
                 Publicado por:{" "}
                 <span className="font-semibold text-walmart-text">
-                  {anuncio.anunciante.nome}
+                  {anuncio.anunciantes?.nome || "Anunciante desconhecido"}
                 </span>
               </p>
             </div>
