@@ -34,7 +34,7 @@ export const checkPermission = (
       }
 
       // Fetch user
-      const usuario = await prisma.usracessos.findUnique({
+      const usuario = await prisma.usracessoss.findUnique({
         where: { id: userId },
       });
 
@@ -57,7 +57,7 @@ export const checkPermission = (
         : [requiredPermissions];
 
       // Fetch user's funcionalidades
-      const userFuncionalidades = await prisma.usracessoXFuncionalidade.findMany({
+      const userFuncionalidades = await prisma.usracessosXFuncionalidade.findMany({
         where: { usuarioId: userId },
         include: { funcionalidade: true },
       });
@@ -122,7 +122,7 @@ export const requireAdmin: RequestHandler = async (req, res, next) => {
       });
     }
 
-    const usuario = await prisma.usracesso.findUnique({
+    const usuario = await prisma.usracessos.findUnique({
       where: { id: userId },
     });
 
@@ -193,7 +193,7 @@ export const userHasPermission = async (
   permissionChave: string,
 ): Promise<boolean> => {
   try {
-    const usuario = await prisma.usracesso.findUnique({
+    const usuario = await prisma.usracessos.findUnique({
       where: { id: userId },
     });
 
@@ -206,7 +206,7 @@ export const userHasPermission = async (
       return true;
     }
 
-    const permission = await prisma.usracessoXFuncionalidade.findFirst({
+    const permission = await prisma.usracessosXFuncionalidade.findFirst({
       where: {
         usuarioId,
         funcionalidade: { chave: permissionChave },
