@@ -286,8 +286,8 @@ export function createServer() {
   // Equipes de Venda routes
   app.get("/api/equipes-venda", getEquipes);
   app.get("/api/equipes-venda/:id", getEquipeById);
-  app.post("/api/equipes-venda", createEquipe);
-  app.put("/api/equipes-venda/:id", updateEquipe);
+  app.post("/api/equipes-venda", extractUserId, createEquipe);
+  app.put("/api/equipes-venda/:id", extractUserId, updateEquipe);
   app.delete("/api/equipes-venda/:id", deleteEquipe);
   app.post("/api/equipes-venda/:id/membros", adicionarMembro);
   app.delete("/api/equipes-venda/:id/membros/:membroId", removerMembro);
