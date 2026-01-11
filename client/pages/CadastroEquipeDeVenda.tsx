@@ -300,7 +300,15 @@ export default function CadastroEquipeDeVenda() {
           method: "DELETE",
         },
       );
-      if (!response.ok) throw new Error("Erro ao remover membro");
+      if (!response.ok) {
+        const error = await response.json();
+        const errorMessage = error.error || "Erro ao remover membro";
+        const details = error.details || "";
+        const fullMessage = details
+          ? `${errorMessage} - ${details}`
+          : errorMessage;
+        throw new Error(fullMessage);
+      }
       return response.json();
     },
     onSuccess: () => {
