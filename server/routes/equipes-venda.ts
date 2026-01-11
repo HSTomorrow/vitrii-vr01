@@ -86,21 +86,11 @@ export const getEquipes: RequestHandler = async (req, res) => {
 export const getEquipeById: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
+    const usuarioId = req.userId;
 
     const equipe = await prisma.equipeDeVenda.findUnique({
       where: { id: parseInt(id) },
       include: {
-        membros: {
-          include: {
-            usuario: {
-              select: {
-                id: true,
-                nome: true,
-                email: true,
-              },
-            },
-          },
-        },
         anunciante: {
           select: {
             id: true,
@@ -124,9 +114,43 @@ export const getEquipeById: RequestHandler = async (req, res) => {
       });
     }
 
+    // Fetch members with permission check
+    let membrosFilter: any = {};
+
+    if (usuarioId) {
+      const usuario = await prisma.usuario.findUnique({
+        where: { id: usuarioId },
+        select: { tipoUsuario: true },
+      });
+
+      // If not admin, only show members created by this user
+      if (usuario?.tipoUsuario !== "adm") {
+        membrosFilter = { usuarioId };
+      }
+    }
+
+    const membros = await prisma.membroEquipe.findMany({
+      where: {
+        equipeId: parseInt(id),
+        ...membrosFilter,
+      },
+      include: {
+        usuario: {
+          select: {
+            id: true,
+            nome: true,
+            email: true,
+          },
+        },
+      },
+    });
+
     res.json({
       success: true,
-      data: equipe,
+      data: {
+        ...equipe,
+        membros,
+      },
     });
   } catch (error) {
     console.error("Error fetching sales team:", error);
