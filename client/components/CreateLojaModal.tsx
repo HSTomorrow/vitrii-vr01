@@ -333,7 +333,7 @@ export default function CreateAnuncianteModal({
               />
             </div>
             <p className="text-xs text-walmart-text-secondary mt-1">
-              Digite apenas DDD e número (ex: 11 98765-4321)
+              Digite apenas DDD e número (ex: 51 98765-4321)
             </p>
           </div>
 
