@@ -32,7 +32,7 @@ export const getAnunciantes: RequestHandler = async (req, res) => {
 
     // Get total count and paginated data in parallel
     const [anunciantes, total] = await Promise.all([
-      prisma.anunciante.findMany({
+      prisma.anunciantes.findMany({
         select: {
           id: true,
           nome: true,
@@ -49,7 +49,7 @@ export const getAnunciantes: RequestHandler = async (req, res) => {
         take: pageLimit,
         skip: pageOffset,
       }),
-      prisma.anunciante.count(),
+      prisma.anunciantes.count(),
     ]);
 
     res.json({
@@ -77,7 +77,7 @@ export const getAnuncianteById: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const anunciante = await prisma.anunciante.findUnique({
+    const anunciante = await prisma.anunciantes.findUnique({
       where: { id: parseInt(id) },
       select: {
         id: true,
@@ -138,7 +138,7 @@ export const createAnunciante: RequestHandler = async (req, res) => {
     const { usuarioId } = req.body; // Optional userId to link the creator
 
     // Check if anunciante already exists
-    const existingAnunciante = await prisma.anunciante.findUnique({
+    const existingAnunciante = await prisma.anunciantes.findUnique({
       where: { cnpjOuCpf: validatedData.cnpjOuCpf },
     });
 
@@ -156,7 +156,7 @@ export const createAnunciante: RequestHandler = async (req, res) => {
     }
 
     // Create anunciante and link to user if provided
-    const anunciante = await prisma.anunciante.create({
+    const anunciante = await prisma.anunciantes.create({
       data: {
         ...validatedData,
         status: "ativa",
@@ -229,7 +229,7 @@ export const updateAnunciante: RequestHandler = async (req, res) => {
     const validatedData = AnuncianteUpdateSchema.parse(req.body);
 
     // Check if anunciante exists
-    const anunciante = await prisma.anunciante.findUnique({
+    const anunciante = await prisma.anunciantes.findUnique({
       where: { id: parseInt(id) },
     });
 
@@ -265,7 +265,7 @@ export const updateAnunciante: RequestHandler = async (req, res) => {
       }
     }
 
-    const updatedAnunciante = await prisma.anunciante.update({
+    const updatedAnunciante = await prisma.anunciantes.update({
       where: { id: parseInt(id) },
       data: validatedData,
     });
@@ -385,7 +385,7 @@ export const deleteAnunciante: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
-    await prisma.anunciante.delete({
+    await prisma.anunciantes.delete({
       where: { id: parseInt(id) },
     });
 
@@ -431,7 +431,7 @@ export const getAnunciantesByUsuario: RequestHandler = async (req, res) => {
 
     // If user is ADM, return all anunciantes
     if (usuario.tipoUsuario === "adm") {
-      anunciantes = await prisma.anunciante.findMany({
+      anunciantes = await prisma.anunciantes.findMany({
         select: {
           id: true,
           nome: true,
@@ -448,7 +448,7 @@ export const getAnunciantesByUsuario: RequestHandler = async (req, res) => {
       });
     } else {
       // For regular users, return only anunciantes where they are linked
-      anunciantes = await prisma.anunciante.findMany({
+      anunciantes = await prisma.anunciantes.findMany({
         where: {
           usuarioAnunciantes: {
             some: {
