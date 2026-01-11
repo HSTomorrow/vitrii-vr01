@@ -64,7 +64,7 @@ export default function CriarAnuncio() {
     <div className="min-h-screen flex flex-col bg-walmart-gray-light">
       <Header />
       <main className="flex-1">
-        <AnuncioForm onSuccess={() => navigate("/sell")} />
+        <AnuncioForm onSuccess={() => navigate("/sell")} isDonation={isDonation} />
       </main>
       <Footer />
     </div>
