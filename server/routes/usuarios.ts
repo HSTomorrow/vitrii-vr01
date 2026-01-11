@@ -746,7 +746,7 @@ export const adminResetUserPassword: RequestHandler = async (req, res) => {
     const senhaHash = await bcryptjs.hash(novaSenha, 10);
 
     // Update user password
-    await prisma.usracesso.update({
+    await prisma.usracessos.update({
       where: { id: usuario.id },
       data: { senha: senhaHash },
     });
