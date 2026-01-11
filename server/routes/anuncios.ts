@@ -141,6 +141,10 @@ export const getAnuncios: RequestHandler = async (req, res) => {
       anuncios.length,
       "ads out of",
       total,
+      "with limit:",
+      pageLimit,
+      "offset:",
+      pageOffset,
     );
 
     res.json({
