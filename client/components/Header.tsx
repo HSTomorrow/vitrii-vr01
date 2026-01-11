@@ -262,10 +262,10 @@ export default function Header() {
               )}
 
               {user && (
-                <div className="border-t border-gray-300 pt-4 mt-2">
+                <div className="border-t border-gray-300 pt-2 mt-2">
                   <button
                     onClick={() => setIsCadastrosOpen(!isCadastrosOpen)}
-                    className="w-full text-left py-2 text-walmart-text hover:bg-walmart-gray rounded-lg font-semibold flex items-center gap-2"
+                    className="w-full text-left px-4 py-2 text-walmart-text hover:bg-walmart-gray rounded-lg font-semibold flex items-center gap-2"
                   >
                     <Settings className="w-4 h-4" />
                     Cadastros
