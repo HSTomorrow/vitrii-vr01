@@ -37,6 +37,7 @@ import Chat from "./pages/Chat";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminManageAds from "./pages/AdminManageAds";
 import AdminManageUsers from "./pages/AdminManageUsers";
+import Menu from "./pages/Menu";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
