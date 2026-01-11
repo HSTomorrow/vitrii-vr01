@@ -133,7 +133,10 @@ export default function AdminDashboard() {
         `/api/usracessos/${usuarioId}/funcionalidades/grant`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "x-user-id": user?.id?.toString() || "",
+          },
           body: JSON.stringify({ usuarioId, funcionalidadeId }),
         },
       );
