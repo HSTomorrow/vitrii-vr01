@@ -833,3 +833,116 @@ export const adminResetUserPassword: RequestHandler = async (req, res) => {
     });
   }
 };
+
+// ADMIN: Update user profile with all fields
+export const adminUpdateUserProfile: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Validate input
+    const validatedData = UsuarioAdminUpdateSchema.parse(req.body);
+
+    const userId = parseInt(id);
+
+    // Find user
+    const usuario = await prisma.usracessos.findUnique({
+      where: { id: userId },
+      select: { id: true, email: true, cpf: true },
+    });
+
+    if (!usuario) {
+      return res.status(404).json({
+        success: false,
+        error: "Usuário não encontrado",
+      });
+    }
+
+    // Check if email already exists for a different user
+    if (validatedData.email) {
+      const existingEmail = await prisma.usracessos.findFirst({
+        where: {
+          email: validatedData.email,
+          id: { not: userId },
+        },
+      });
+
+      if (existingEmail) {
+        return res.status(400).json({
+          success: false,
+          error: "Email já cadastrado para outro usuário",
+        });
+      }
+    }
+
+    // Check if CPF already exists for a different user
+    if (validatedData.cpf && validatedData.cpf.trim()) {
+      const digitsOnly = validatedData.cpf.replace(/\D/g, "");
+      const existingCpf = await prisma.usracessos.findFirst({
+        where: {
+          cpf: digitsOnly,
+          id: { not: userId },
+        },
+      });
+
+      if (existingCpf) {
+        return res.status(400).json({
+          success: false,
+          error: "CPF \ CNPJ já cadastrado para outro usuário",
+        });
+      }
+
+      validatedData.cpf = digitsOnly;
+    }
+
+    // Remove empty strings for optional fields
+    const cleanedData = Object.fromEntries(
+      Object.entries(validatedData).filter(
+        ([_, value]) => value !== "" && value !== undefined
+      )
+    );
+
+    // Update user profile
+    const updatedUsuario = await prisma.usracessos.update({
+      where: { id: userId },
+      data: cleanedData,
+      select: {
+        id: true,
+        nome: true,
+        email: true,
+        cpf: true,
+        telefone: true,
+        whatsapp: true,
+        linkedin: true,
+        facebook: true,
+        tipoUsuario: true,
+        dataCriacao: true,
+        dataVigenciaContrato: true,
+        numeroAnunciosAtivos: true,
+        endereco: true,
+      },
+    });
+
+    res.json({
+      success: true,
+      data: updatedUsuario,
+      message: "Perfil do usuário atualizado com sucesso",
+    });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        success: false,
+        error: "Dados inválidos",
+        details: error.errors.map((e) => ({
+          field: e.path.join("."),
+          message: e.message,
+        })),
+      });
+    }
+
+    console.error("Error updating user profile:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao atualizar perfil do usuário",
+    });
+  }
+};
