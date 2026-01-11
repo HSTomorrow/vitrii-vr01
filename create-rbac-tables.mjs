@@ -129,7 +129,7 @@ async function main() {
     }
 
     // Grant all permissions to any existing ADM users
-    const admUsers = await prisma.usuario.findMany({
+    const admUsers = await prisma.usracesso.findMany({
       where: { tipoUsuario: "adm" },
     });
 
@@ -144,7 +144,7 @@ async function main() {
 
         // Grant each funcionalidade to the ADM user if not already granted
         for (const func of allFuncionalidades) {
-          const existing = await prisma.usuarioXFuncionalidade.findUnique({
+          const existing = await prisma.usracessoXFuncionalidade.findUnique({
             where: {
               usuarioId_funcionalidadeId: {
                 usuarioId: user.id,
@@ -154,7 +154,7 @@ async function main() {
           });
 
           if (!existing) {
-            await prisma.usuarioXFuncionalidade.create({
+            await prisma.usracessoXFuncionalidade.create({
               data: {
                 usuarioId: user.id,
                 funcionalidadeId: func.id,

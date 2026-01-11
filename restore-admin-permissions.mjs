@@ -7,7 +7,7 @@ async function restoreAdminPermissions() {
     console.log("🔐 Restoring admin permissions...\n");
 
     // Find the admin user
-    const admin = await prisma.usuario.findUnique({
+    const admin = await prisma.usracesso.findUnique({
       where: { email: "admin@vitrii.com" },
     });
 
@@ -28,7 +28,7 @@ async function restoreAdminPermissions() {
     );
 
     // Clear existing permissions
-    const deletedCount = await prisma.usuarioXFuncionalidade.deleteMany({
+    const deletedCount = await prisma.usracessoXFuncionalidade.deleteMany({
       where: { usuarioId: admin.id },
     });
 
@@ -37,7 +37,7 @@ async function restoreAdminPermissions() {
     // Assign all funcionalidades to admin
     let createdCount = 0;
     for (const func of funcionalidades) {
-      const created = await prisma.usuarioXFuncionalidade.create({
+      const created = await prisma.usracessoXFuncionalidade.create({
         data: {
           usuarioId: admin.id,
           funcionalidadeId: func.id,
@@ -52,7 +52,7 @@ async function restoreAdminPermissions() {
     );
 
     // Verify permissions were assigned
-    const updated = await prisma.usuario.findUnique({
+    const updated = await prisma.usracesso.findUnique({
       where: { id: admin.id },
       include: {
         usuarioXFuncionalidades: {
