@@ -337,16 +337,16 @@ export default function Header() {
                 </div>
               )}
 
-              <div className="border-t border-gray-300 pt-4 mt-2">
+              <div className="border-t border-gray-300 pt-2 mt-2">
                 <Link
                   to="/auth/signin"
-                  className="block py-2 text-walmart-blue"
+                  className="block px-4 py-2 text-walmart-blue"
                 >
                   Entrar
                 </Link>
                 <Link
                   to="/auth/signup"
-                  className="block py-2 bg-walmart-blue text-white rounded-lg text-center"
+                  className="block px-4 py-2 bg-walmart-blue text-white rounded-lg text-center"
                 >
                   Cadastrar
                 </Link>
