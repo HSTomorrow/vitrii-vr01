@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
 import BannerCarousel from "@/components/BannerCarousel";
+import AnunciosCarousel from "@/components/AnunciosCarousel";
 import {
   Star,
   ArrowRight,
