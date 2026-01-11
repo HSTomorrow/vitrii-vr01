@@ -149,6 +149,7 @@ export default function CadastroAnunciantes() {
   const handleEdit = (loja: Anunciante) => {
     setFormData({
       nome: loja.nome,
+      tipo: loja.tipo || "Comum",
       cnpjOuCpf: loja.cnpjOuCpf,
       endereco: loja.endereco,
       cidade: loja.cidade,
