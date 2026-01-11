@@ -458,6 +458,58 @@ export const removerMembro: RequestHandler = async (req, res) => {
   }
 };
 
+// UPDATE member details
+export const atualizarMembro: RequestHandler = async (req, res) => {
+  try {
+    const { id, membroId } = req.params;
+    const body = AtualizarMembroSchema.parse(req.body);
+
+    const membro = await prisma.membroEquipe.findUnique({
+      where: { id: parseInt(membroId) },
+    });
+
+    if (!membro || membro.equipeId !== parseInt(id)) {
+      return res.status(404).json({
+        success: false,
+        error: "Membro não encontrado",
+      });
+    }
+
+    const updated = await prisma.membroEquipe.update({
+      where: { id: parseInt(membroId) },
+      data: body,
+      include: {
+        usuario: {
+          select: {
+            id: true,
+            nome: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    res.json({
+      success: true,
+      data: updated,
+      message: "Membro atualizado com sucesso",
+    });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        success: false,
+        error: error.errors[0].message,
+      });
+    }
+
+    console.error("Error updating team member:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao atualizar membro da equipe",
+    });
+  }
+};
+
 // GET available users for a team (users with access to the store)
 export const getUsuariosDisponiveis: RequestHandler = async (req, res) => {
   try {
