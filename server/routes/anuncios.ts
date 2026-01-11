@@ -116,6 +116,11 @@ export const getAnuncios: RequestHandler = async (req, res) => {
               nome: true,
               fotoUrl: true,
               endereco: true,
+              email: true,
+              site: true,
+              instagram: true,
+              facebook: true,
+              whatsapp: true,
             },
           },
           producto: {
