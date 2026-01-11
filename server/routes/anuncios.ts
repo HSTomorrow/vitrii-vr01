@@ -449,7 +449,10 @@ export const updateAnuncioStatus: RequestHandler = async (req, res) => {
 
     const anuncio = await prisma.anuncios.update({
       where: { id: parseInt(id) },
-      data: { status },
+      data: {
+        status,
+        dataAtualizacao: new Date(),
+      },
       include: {
         anunciante: true,
         producto: true,
