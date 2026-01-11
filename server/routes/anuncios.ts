@@ -763,9 +763,7 @@ export const activateAnuncio: RequestHandler = async (req, res) => {
       where: { id: parseInt(id) },
       data: { isActive: true },
       include: {
-        anunciante: true,
-        producto: true,
-        tabelaDePreco: true,
+        anunciantes: true,
       },
     });
 
