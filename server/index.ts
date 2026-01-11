@@ -289,6 +289,12 @@ export function createServer() {
   app.delete("/api/tabelas-preco/:id", deleteTabela);
 
   // Anúncios routes
+  // Note: More specific routes must come BEFORE parameterized routes
+  app.get(
+    "/api/anuncios/do-usuario/listar",
+    extractUserId,
+    getAnunciosDUsuario,
+  );
   app.get("/api/anuncios", getAnuncios);
   app.get("/api/anuncios/:id", getAnuncioById);
   app.post("/api/anuncios", createAnuncio);
