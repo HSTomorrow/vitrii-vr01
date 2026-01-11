@@ -45,9 +45,16 @@ export default function CadastroAnunciantes() {
 
   // Fetch anunciantes (filtered by current user, or all if admin)
   const { data: anunciantesData, refetch } = useQuery({
-    queryKey: ["anunciantes"],
+    queryKey: ["anunciantes", user?.id],
     queryFn: async () => {
-      const response = await fetch("/api/anunciantes/do-usuario/listar");
+      const headers: Record<string, string> = {};
+      if (user?.id) {
+        headers["X-User-Id"] = user.id.toString();
+      }
+
+      const response = await fetch("/api/anunciantes/do-usuario/listar", {
+        headers,
+      });
       if (!response.ok) throw new Error("Erro ao buscar anunciantes");
       const result = await response.json();
       return result.data || [];
