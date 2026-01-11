@@ -817,7 +817,7 @@ export default function CadastroEquipeDeVenda() {
                                   className="border-b border-gray-200 hover:bg-gray-50"
                                 >
                                   <td className="px-4 py-3 text-walmart-text">
-                                    {membro.nome}
+                                    {membro.nomeMembro}
                                   </td>
                                   <td className="px-4 py-3 text-walmart-text text-xs">
                                     {membro.email}
