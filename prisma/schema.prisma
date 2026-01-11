@@ -171,7 +171,7 @@ model usuarios_anunciantes {
   papel        String      @default("attendant") @db.VarChar(50)
   dataCriacao  DateTime    @default(now())
   anunciantes  anunciantes @relation(fields: [anuncianteId], references: [id], onDelete: Cascade, map: "usuarios_lojas_lojaId_fkey")
-  usuarios     usuarios    @relation(fields: [usuarioId], references: [id], onDelete: Cascade, map: "usuarios_lojas_usuarioId_fkey")
+  usuario      usracessos  @relation(fields: [usuarioId], references: [id], onDelete: Cascade, map: "usuarios_lojas_usuarioId_fkey")
 
   @@unique([usuarioId, anuncianteId], map: "usuarios_lojas_usuarioId_lojaId_key")
 }
