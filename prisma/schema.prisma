@@ -149,7 +149,7 @@ model tabelas_preco {
   @@unique([productId, lojaId, tamanho, cor])
 }
 
-model usuarios {
+model usracessos {
   id                   Int                    @id @default(autoincrement())
   nome                 String                 @db.VarChar(255)
   email                String                 @unique @db.VarChar(255)
@@ -162,6 +162,8 @@ model usuarios {
   endereco             String?
   usuarios_anunciantes usuarios_anunciantes[]
   membros_equipe       membros_equipe[]
+
+  @@map("usuarios")
 }
 
 model usuarios_anunciantes {
