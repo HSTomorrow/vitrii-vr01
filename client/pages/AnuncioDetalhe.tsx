@@ -377,9 +377,9 @@ export default function AnuncioDetalhe() {
             <div className="lg:col-span-2">
               {/* Product Image */}
               <div className="bg-walmart-gray-light rounded-lg overflow-hidden mb-8">
-                {anuncio.fotoUrl ? (
+                {anuncio.imagem ? (
                   <img
-                    src={anuncio.fotoUrl}
+                    src={anuncio.imagem}
                     alt={anuncio.titulo}
                     className="w-full h-96 object-cover"
                   />
