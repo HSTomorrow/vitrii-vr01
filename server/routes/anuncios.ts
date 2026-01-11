@@ -901,3 +901,55 @@ export const canEditAnuncio: RequestHandler = async (req, res) => {
     });
   }
 };
+
+// RECORD ad view
+export const recordAnuncioView: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const usuarioId = (req as any).userId; // From extractUserId middleware, optional for non-logged-in users
+
+    const anuncioId = parseInt(id);
+
+    // Verify ad exists
+    const anuncio = await prisma.anuncios.findUnique({
+      where: { id: anuncioId },
+      select: { id: true },
+    });
+
+    if (!anuncio) {
+      return res.status(404).json({
+        success: false,
+        error: "Anúncio não encontrado",
+      });
+    }
+
+    // Record the view in anuncioVisualizados
+    await prisma.anuncioVisualizados.create({
+      data: {
+        anuncioId,
+        usuarioId: usuarioId || null, // null if not logged in
+      },
+    });
+
+    // Increment visualizacoes counter
+    await prisma.anuncios.update({
+      where: { id: anuncioId },
+      data: {
+        visualizacoes: {
+          increment: 1,
+        },
+      },
+    });
+
+    res.json({
+      success: true,
+      message: "Visualização registrada com sucesso",
+    });
+  } catch (error) {
+    console.error("Error recording ad view:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao registrar visualização",
+    });
+  }
+};
