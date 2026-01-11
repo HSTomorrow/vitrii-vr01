@@ -49,43 +49,8 @@ async function createVitriiAdmin() {
     console.log(`   Email: ${adminEmail}`);
     console.log(`   Password: ${adminPassword}`);
 
-    // Now grant all permissions to this admin
-    console.log("\n🔑 Granting permissions...");
-    
-    const funcionalidades = await prisma.funcionalidade.findMany({
-      where: { isActive: true },
-    });
-
-    console.log(`   Found ${funcionalidades.length} funcionalidades\n`);
-
-    let grantedCount = 0;
-    for (const func of funcionalidades) {
-      try {
-        // Check if already granted
-        const existing = await prisma.usuarioXFuncionalidade.findUnique({
-          where: {
-            usuarioId_funcionalidadeId: {
-              usuarioId: admUser.id,
-              funcionalidadeId: func.id,
-            },
-          },
-        });
-
-        if (!existing) {
-          await prisma.usuarioXFuncionalidade.create({
-            data: {
-              usuarioId: admUser.id,
-              funcionalidadeId: func.id,
-            },
-          });
-          grantedCount++;
-        }
-      } catch (error) {
-        console.error(`   Error granting ${func.chave}:`, error.message);
-      }
-    }
-
-    console.log(`✅ Granted ${grantedCount} permissions\n`);
+    // Note: Admin users have access to all permissions by default
+    console.log("\n✅ Admin user has full system access by default!");
 
     console.log("🎉 Admin setup complete! You can now login with:");
     console.log(`   Email: ${adminEmail}`);
