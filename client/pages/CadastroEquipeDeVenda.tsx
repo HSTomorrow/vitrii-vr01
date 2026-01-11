@@ -813,7 +813,7 @@ export default function CadastroEquipeDeVenda() {
                                             whatsapp: "+55" + cleanValue,
                                           });
                                         }}
-                                        placeholder="(11) 98765-4321"
+                                        placeholder="(51) 98765-4321"
                                         className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-walmart-blue"
                                       />
                                     </div>
