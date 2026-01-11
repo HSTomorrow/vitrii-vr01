@@ -67,6 +67,33 @@ export default function AnuncioDetalhe() {
 
   const canEdit = canEditData?.canEdit ?? false;
 
+  // Fetch equipes do anunciante
+  const { data: equipesData } = useQuery({
+    queryKey: ["equipes-anunciante", data?.data?.anuncianteId],
+    queryFn: async () => {
+      const anuncianteId = data?.data?.anuncianteId;
+      if (!anuncianteId) throw new Error("Anunciante não encontrado");
+      const response = await fetch(`/api/equipes-venda?anuncianteId=${anuncianteId}`);
+      if (!response.ok) throw new Error("Erro ao buscar equipes");
+      return response.json();
+    },
+    enabled: !!data?.data?.anuncianteId,
+  });
+
+  // Fetch membros disponíveis de uma equipe
+  const { data: membrosData } = useQuery({
+    queryKey: ["membros-disponiveis", selectedEquipeId],
+    queryFn: async () => {
+      const response = await fetch(`/api/equipes-venda/${selectedEquipeId}/membros-disponiveis`);
+      if (!response.ok) throw new Error("Erro ao buscar membros");
+      return response.json();
+    },
+    enabled: !!selectedEquipeId,
+  });
+
+  const equipes = equipesData?.data || [];
+  const membros = membrosData?.data || [];
+
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async () => {
