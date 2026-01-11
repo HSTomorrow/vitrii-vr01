@@ -549,7 +549,7 @@ export default function AdminManageAds() {
                         }`}
                       >
                         <Star className="w-4 h-4" />
-                        {anuncio.destaque ? "Remover" : "Destacar"}
+                        {anuncio.destaque ? "Retirar Destaque" : "Destacar"}
                       </button>
 
                       {/* Delete Button */}
