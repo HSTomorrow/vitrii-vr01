@@ -408,6 +408,28 @@ export default function CadastroEquipeDeVenda() {
   const anunciantes = anunciantesData?.data || [];
   const equipes = equipesData?.data || [];
 
+  // Filter equipes based on search
+  const equipesFiltered = useMemo(() => {
+    return equipes.filter((equipe: EquipeDeVenda) =>
+      equipe.nome.toLowerCase().includes(searchEquipe.toLowerCase()),
+    );
+  }, [equipes, searchEquipe]);
+
+  // Filter membros based on search - memoized to avoid re-filtering on every render
+  const getFilteredMembros = (membros: MembroEquipe[], equipeId: number) => {
+    const search = (searchMembro as any)[equipeId];
+    if (!search) return membros;
+
+    return membros.filter((membro) => {
+      const lowerSearch = search.toLowerCase();
+      return (
+        membro.nomeMembro.toLowerCase().includes(lowerSearch) ||
+        membro.email.toLowerCase().includes(lowerSearch) ||
+        (membro.status || "").toLowerCase().includes(lowerSearch)
+      );
+    });
+  };
+
   // Set first anunciante as default
   const defaultAnuncianteId = useMemo(() => {
     if (anunciantes.length > 0 && selectedAnuncianteId === null) {
