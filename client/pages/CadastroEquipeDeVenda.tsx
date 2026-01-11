@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Plus, Trash2, Edit2, Users, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, Trash2, Edit2, Users, ChevronDown, ChevronUp, Save, X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface Usuario {
@@ -14,7 +14,11 @@ interface Usuario {
 
 interface MembroEquipe {
   id: number;
-  usuario: Usuario;
+  nome: string;
+  email: string;
+  whatsapp?: string;
+  status: "disponivel" | "nao_disponivel" | "cancelado";
+  usuario?: Usuario;
 }
 
 interface EquipeDeVenda {
@@ -38,11 +42,18 @@ export default function CadastroEquipeDeVenda() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [expandedTeamId, setExpandedTeamId] = useState<number | null>(null);
+  const [editingMemberId, setEditingMemberId] = useState<number | null>(null);
+  const [isAddingMember, setIsAddingMember] = useState(false);
   const [formData, setFormData] = useState({
     nome: "",
     descricao: "",
   });
-  const [newMemberId, setNewMemberId] = useState(0);
+  const [memberFormData, setMemberFormData] = useState({
+    nome: "",
+    email: "",
+    whatsapp: "",
+    status: "disponivel" as const,
+  });
 
   // Fetch anunciantes (filtered by current user, or all if admin)
   const { data: anunciantesData } = useQuery({
@@ -76,19 +87,6 @@ export default function CadastroEquipeDeVenda() {
     enabled: !!user && selectedAnuncianteId !== null,
   });
 
-  // Fetch available users for a team
-  const { data: usuariosDisponiveisData } = useQuery({
-    queryKey: ["usuarios-disponiveis", expandedTeamId],
-    queryFn: async () => {
-      const response = await fetch(
-        `/api/equipes-venda/${expandedTeamId}/usuarios-disponiveis`
-      );
-      if (!response.ok) throw new Error("Erro ao buscar usuários");
-      return response.json();
-    },
-    enabled: !!expandedTeamId,
-  });
-
   // Create/update equipe mutation
   const saveEquipeMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
@@ -101,7 +99,6 @@ export default function CadastroEquipeDeVenda() {
         "Content-Type": "application/json",
       };
 
-      // Add user ID to header for authentication
       if (user?.id) {
         headers["X-User-Id"] = user.id.toString();
       }
@@ -157,17 +154,14 @@ export default function CadastroEquipeDeVenda() {
 
   // Add member mutation
   const addMemberMutation = useMutation({
-    mutationFn: async ({
-      teamId,
-      userId,
-    }: {
-      teamId: number;
-      userId: number;
-    }) => {
+    mutationFn: async ({ teamId }: { teamId: number }) => {
       const response = await fetch(`/api/equipes-venda/${teamId}/membros`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ usuarioId: userId }),
+        body: JSON.stringify({
+          usuarioId: 0,
+          ...memberFormData,
+        }),
       });
 
       if (!response.ok) {
@@ -179,14 +173,43 @@ export default function CadastroEquipeDeVenda() {
     },
     onSuccess: () => {
       toast.success("Membro adicionado com sucesso!");
-      setNewMemberId(0);
+      setMemberFormData({ nome: "", email: "", whatsapp: "", status: "disponivel" });
+      setIsAddingMember(false);
       refetchEquipes();
-      queryClient.invalidateQueries({
-        queryKey: ["usuarios-disponiveis"],
-      });
     },
     onError: (error) => {
       toast.error(error instanceof Error ? error.message : "Erro ao adicionar membro");
+    },
+  });
+
+  // Update member mutation
+  const updateMemberMutation = useMutation({
+    mutationFn: async ({
+      teamId,
+      memberId,
+      data,
+    }: {
+      teamId: number;
+      memberId: number;
+      data: typeof memberFormData;
+    }) => {
+      const response = await fetch(`/api/equipes-venda/${teamId}/membros/${memberId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) throw new Error("Erro ao atualizar membro");
+      return response.json();
+    },
+    onSuccess: () => {
+      toast.success("Membro atualizado com sucesso!");
+      setEditingMemberId(null);
+      setMemberFormData({ nome: "", email: "", whatsapp: "", status: "disponivel" });
+      refetchEquipes();
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : "Erro ao atualizar membro");
     },
   });
 
@@ -208,9 +231,6 @@ export default function CadastroEquipeDeVenda() {
     onSuccess: () => {
       toast.success("Membro removido com sucesso!");
       refetchEquipes();
-      queryClient.invalidateQueries({
-        queryKey: ["usuarios-disponiveis"],
-      });
     },
     onError: (error) => {
       toast.error(error instanceof Error ? error.message : "Erro ao remover membro");
@@ -226,6 +246,16 @@ export default function CadastroEquipeDeVenda() {
     setIsFormOpen(true);
   };
 
+  const handleEditMember = (membro: MembroEquipe) => {
+    setMemberFormData({
+      nome: membro.nome,
+      email: membro.email,
+      whatsapp: membro.whatsapp || "",
+      status: membro.status,
+    });
+    setEditingMemberId(membro.id);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.nome) {
@@ -235,9 +265,26 @@ export default function CadastroEquipeDeVenda() {
     saveEquipeMutation.mutate(formData);
   };
 
+  const handleSubmitMember = (e: React.FormEvent, teamId: number) => {
+    e.preventDefault();
+    if (!memberFormData.nome || !memberFormData.email) {
+      toast.error("Nome e email são obrigatórios");
+      return;
+    }
+
+    if (editingMemberId) {
+      updateMemberMutation.mutate({
+        teamId,
+        memberId: editingMemberId,
+        data: memberFormData,
+      });
+    } else {
+      addMemberMutation.mutate({ teamId });
+    }
+  };
+
   const anunciantes = anunciantesData?.data || [];
   const equipes = equipesData?.data || [];
-  const usuariosDisponiveis = usuariosDisponiveisData?.data || [];
 
   // Set first anunciante as default
   const defaultAnuncianteId = useMemo(() => {
@@ -246,6 +293,13 @@ export default function CadastroEquipeDeVenda() {
     }
     return selectedAnuncianteId;
   }, [anunciantes, selectedAnuncianteId]);
+
+  // Set default anunciante when mounted
+  useMemo(() => {
+    if (!selectedAnuncianteId && defaultAnuncianteId) {
+      setSelectedAnuncianteId(defaultAnuncianteId);
+    }
+  }, [defaultAnuncianteId]);
 
   if (anunciantes.length === 0) {
     return (
@@ -273,7 +327,7 @@ export default function CadastroEquipeDeVenda() {
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
 
-      <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
@@ -457,92 +511,229 @@ export default function CadastroEquipeDeVenda() {
                   {/* Expanded Members Section */}
                   {expandedTeamId === equipe.id && (
                     <div className="mt-6 pt-6 border-t border-gray-200">
-                      <h4 className="font-semibold text-walmart-text mb-4">
-                        Membros da Equipe
-                      </h4>
+                      <div className="flex items-center justify-between mb-4">
+                        <h4 className="font-semibold text-walmart-text">
+                          Membros da Equipe
+                        </h4>
+                        {!isAddingMember && editingMemberId === null && (
+                          <button
+                            onClick={() => {
+                              setIsAddingMember(true);
+                              setMemberFormData({
+                                nome: "",
+                                email: "",
+                                whatsapp: "",
+                                status: "disponivel",
+                              });
+                            }}
+                            className="flex items-center gap-1 px-3 py-1 text-sm bg-walmart-yellow text-walmart-text rounded hover:bg-walmart-yellow-dark transition-colors font-semibold"
+                          >
+                            <Plus className="w-4 h-4" />
+                            Adicionar Membro
+                          </button>
+                        )}
+                      </div>
 
-                      {/* Members List */}
-                      {equipe.membros.length === 0 ? (
-                        <p className="text-gray-500 text-sm mb-4">
+                      {/* Members Table */}
+                      {equipe.membros.length === 0 && !isAddingMember && editingMemberId === null ? (
+                        <p className="text-gray-500 text-sm py-4">
                           Nenhum membro adicionado
                         </p>
                       ) : (
-                        <div className="space-y-2 mb-6">
-                          {equipe.membros.map((membro) => (
-                            <div
-                              key={membro.id}
-                              className="flex items-center justify-between bg-gray-50 p-3 rounded-lg"
-                            >
-                              <div>
-                                <p className="font-semibold text-sm text-walmart-text">
-                                  {membro.usuario.nome}
-                                </p>
-                                <p className="text-xs text-walmart-text-secondary">
-                                  {membro.usuario.email}
-                                </p>
-                              </div>
-                              <button
-                                onClick={() => {
-                                  if (
-                                    confirm(
-                                      "Remover este membro da equipe?"
-                                    )
-                                  ) {
-                                    removeMemberMutation.mutate({
-                                      teamId: equipe.id,
-                                      memberId: membro.id,
-                                    });
-                                  }
-                                }}
-                                className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-                      )}
+                        <div className="overflow-x-auto">
+                          <table className="w-full text-sm">
+                            <thead className="bg-gray-100 border-b border-gray-200">
+                              <tr>
+                                <th className="px-4 py-2 text-left font-semibold text-walmart-text">
+                                  Nome
+                                </th>
+                                <th className="px-4 py-2 text-left font-semibold text-walmart-text">
+                                  Email
+                                </th>
+                                <th className="px-4 py-2 text-left font-semibold text-walmart-text">
+                                  WhatsApp
+                                </th>
+                                <th className="px-4 py-2 text-left font-semibold text-walmart-text">
+                                  Status
+                                </th>
+                                <th className="px-4 py-2 text-center font-semibold text-walmart-text">
+                                  Ações
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {/* Adding/Editing Form Row */}
+                              {(isAddingMember || editingMemberId !== null) && (
+                                <tr className="bg-blue-50 border-b border-gray-200">
+                                  <td className="px-4 py-3">
+                                    <input
+                                      type="text"
+                                      value={memberFormData.nome}
+                                      onChange={(e) =>
+                                        setMemberFormData({
+                                          ...memberFormData,
+                                          nome: e.target.value,
+                                        })
+                                      }
+                                      placeholder="Nome do membro"
+                                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-walmart-blue"
+                                    />
+                                  </td>
+                                  <td className="px-4 py-3">
+                                    <input
+                                      type="email"
+                                      value={memberFormData.email}
+                                      onChange={(e) =>
+                                        setMemberFormData({
+                                          ...memberFormData,
+                                          email: e.target.value,
+                                        })
+                                      }
+                                      placeholder="Email"
+                                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-walmart-blue"
+                                    />
+                                  </td>
+                                  <td className="px-4 py-3">
+                                    <div className="flex items-center gap-1">
+                                      <span className="text-gray-600 text-xs">+55</span>
+                                      <input
+                                        type="text"
+                                        value={
+                                          memberFormData.whatsapp.startsWith("+55")
+                                            ? memberFormData.whatsapp.substring(3)
+                                            : memberFormData.whatsapp
+                                        }
+                                        onChange={(e) => {
+                                          const cleanValue = e.target.value.replace(
+                                            /[^\d\s()()-]/g,
+                                            ""
+                                          );
+                                          setMemberFormData({
+                                            ...memberFormData,
+                                            whatsapp: "+55" + cleanValue,
+                                          });
+                                        }}
+                                        placeholder="(11) 98765-4321"
+                                        className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-walmart-blue"
+                                      />
+                                    </div>
+                                  </td>
+                                  <td className="px-4 py-3">
+                                    <select
+                                      value={memberFormData.status}
+                                      onChange={(e) =>
+                                        setMemberFormData({
+                                          ...memberFormData,
+                                          status: e.target.value as any,
+                                        })
+                                      }
+                                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-walmart-blue bg-white"
+                                    >
+                                      <option value="disponivel">Disponível</option>
+                                      <option value="nao_disponivel">
+                                        Não Disponível
+                                      </option>
+                                      <option value="cancelado">Cancelado</option>
+                                    </select>
+                                  </td>
+                                  <td className="px-4 py-3">
+                                    <div className="flex items-center justify-center gap-1">
+                                      <button
+                                        onClick={(e) => handleSubmitMember(e, equipe.id)}
+                                        disabled={addMemberMutation.isPending || updateMemberMutation.isPending}
+                                        className="p-1 bg-walmart-blue text-white rounded hover:bg-walmart-blue-dark transition-colors disabled:opacity-50"
+                                      >
+                                        <Save className="w-4 h-4" />
+                                      </button>
+                                      <button
+                                        onClick={() => {
+                                          setIsAddingMember(false);
+                                          setEditingMemberId(null);
+                                          setMemberFormData({
+                                            nome: "",
+                                            email: "",
+                                            whatsapp: "",
+                                            status: "disponivel",
+                                          });
+                                        }}
+                                        className="p-1 bg-gray-300 text-walmart-text rounded hover:bg-gray-400 transition-colors"
+                                      >
+                                        <X className="w-4 h-4" />
+                                      </button>
+                                    </div>
+                                  </td>
+                                </tr>
+                              )}
 
-                      {/* Add Member Section */}
-                      {usuariosDisponiveis.length > 0 && (
-                        <div className="bg-blue-50 p-4 rounded-lg">
-                          <label className="block text-sm font-semibold text-walmart-text mb-2">
-                            Adicionar Membro
-                          </label>
-                          <div className="flex gap-2">
-                            <select
-                              value={newMemberId}
-                              onChange={(e) =>
-                                setNewMemberId(parseInt(e.target.value))
-                              }
-                              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
-                            >
-                              <option value={0}>
-                                Selecione um usuário
-                              </option>
-                              {usuariosDisponiveis.map((usuario: Usuario) => (
-                                <option key={usuario.id} value={usuario.id}>
-                                  {usuario.nome} ({usuario.email})
-                                </option>
+                              {/* Existing Members */}
+                              {equipe.membros.map((membro) => (
+                                <tr key={membro.id} className="border-b border-gray-200 hover:bg-gray-50">
+                                  <td className="px-4 py-3 text-walmart-text">{membro.nome}</td>
+                                  <td className="px-4 py-3 text-walmart-text text-xs">
+                                    {membro.email}
+                                  </td>
+                                  <td className="px-4 py-3 text-walmart-text text-xs">
+                                    {membro.whatsapp ? (
+                                      <a
+                                        href={`https://wa.me/${membro.whatsapp.replace(/\D/g, "")}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-green-600 hover:underline"
+                                      >
+                                        {membro.whatsapp}
+                                      </a>
+                                    ) : (
+                                      "—"
+                                    )}
+                                  </td>
+                                  <td className="px-4 py-3">
+                                    <span
+                                      className={`inline-block px-2 py-1 rounded text-xs font-semibold ${
+                                        membro.status === "disponivel"
+                                          ? "bg-green-100 text-green-800"
+                                          : membro.status === "nao_disponivel"
+                                          ? "bg-yellow-100 text-yellow-800"
+                                          : "bg-red-100 text-red-800"
+                                      }`}
+                                    >
+                                      {membro.status === "disponivel"
+                                        ? "Disponível"
+                                        : membro.status === "nao_disponivel"
+                                        ? "Não Disponível"
+                                        : "Cancelado"}
+                                    </span>
+                                  </td>
+                                  <td className="px-4 py-3">
+                                    <div className="flex items-center justify-center gap-2">
+                                      <button
+                                        onClick={() => handleEditMember(membro)}
+                                        className="p-1 text-walmart-blue hover:bg-blue-50 rounded transition-colors"
+                                      >
+                                        <Edit2 className="w-4 h-4" />
+                                      </button>
+                                      <button
+                                        onClick={() => {
+                                          if (
+                                            confirm(
+                                              "Remover este membro da equipe?"
+                                            )
+                                          ) {
+                                            removeMemberMutation.mutate({
+                                              teamId: equipe.id,
+                                              memberId: membro.id,
+                                            });
+                                          }
+                                        }}
+                                        className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors"
+                                      >
+                                        <Trash2 className="w-4 h-4" />
+                                      </button>
+                                    </div>
+                                  </td>
+                                </tr>
                               ))}
-                            </select>
-                            <button
-                              onClick={() => {
-                                if (newMemberId > 0) {
-                                  addMemberMutation.mutate({
-                                    teamId: equipe.id,
-                                    userId: newMemberId,
-                                  });
-                                }
-                              }}
-                              disabled={
-                                newMemberId === 0 || addMemberMutation.isPending
-                              }
-                              className="px-4 py-2 bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors font-semibold disabled:opacity-50"
-                            >
-                              Adicionar
-                            </button>
-                          </div>
+                            </tbody>
+                          </table>
                         </div>
                       )}
                     </div>
