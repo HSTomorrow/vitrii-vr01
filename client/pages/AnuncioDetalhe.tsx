@@ -536,6 +536,114 @@ export default function AnuncioDetalhe() {
         </div>
       </main>
 
+      {/* Modal: Chamar Vendedor */}
+      {showMembrosModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full max-h-96 flex flex-col">
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h3 className="text-xl font-bold text-walmart-text">
+                Chamar Vendedor
+              </h3>
+              <button
+                onClick={() => {
+                  setShowMembrosModal(false);
+                  setSelectedEquipeId(null);
+                }}
+                className="p-1 hover:bg-gray-100 rounded transition-colors"
+              >
+                <X className="w-6 h-6 text-gray-600" />
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="flex-1 overflow-y-auto p-6">
+              {equipes.length > 1 && !selectedEquipeId && (
+                <div className="space-y-3">
+                  <p className="text-sm text-walmart-text-secondary mb-4">
+                    Selecione uma equipe de vendas:
+                  </p>
+                  {equipes.map((equipe) => (
+                    <button
+                      key={equipe.id}
+                      onClick={() => setSelectedEquipeId(equipe.id)}
+                      className="w-full p-4 border border-gray-300 rounded-lg hover:border-walmart-blue hover:bg-blue-50 transition-colors text-left"
+                    >
+                      <p className="font-semibold text-walmart-text">{equipe.nome}</p>
+                      <p className="text-sm text-walmart-text-secondary">
+                        {equipe.membros.length} membro(s)
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              {selectedEquipeId && (
+                <div className="space-y-4">
+                  <p className="text-sm text-walmart-text-secondary mb-4">
+                    Membros disponíveis para contato:
+                  </p>
+
+                  {membros.length === 0 ? (
+                    <div className="text-center py-8">
+                      <p className="text-gray-500">
+                        Nenhum membro disponível no momento
+                      </p>
+                    </div>
+                  ) : (
+                    membros.map((membro: MembroEquipe) => (
+                      <div
+                        key={membro.id}
+                        className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                      >
+                        <p className="font-semibold text-walmart-text mb-2">
+                          {membro.nome}
+                        </p>
+
+                        <div className="space-y-2 text-sm">
+                          <div className="flex items-center gap-2 text-walmart-text-secondary">
+                            <Mail className="w-4 h-4" />
+                            <a
+                              href={`mailto:${membro.email}`}
+                              className="text-walmart-blue hover:underline"
+                            >
+                              {membro.email}
+                            </a>
+                          </div>
+
+                          {membro.whatsapp && (
+                            <div className="flex items-center gap-2">
+                              <a
+                                href={`https://wa.me/${membro.whatsapp.replace(/\D/g, "")}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-2 text-green-600 hover:text-green-700 font-semibold"
+                              >
+                                <MessageCircle className="w-4 h-4" />
+                                {membro.whatsapp}
+                              </a>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))
+                  )}
+
+                  {equipes.length > 1 && (
+                    <button
+                      onClick={() => setSelectedEquipeId(null)}
+                      className="w-full mt-4 px-4 py-2 border border-gray-300 text-walmart-text rounded-lg hover:bg-gray-50 transition-colors font-semibold text-sm"
+                    >
+                      Voltar para Equipes
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       <Footer />
     </div>
   );
