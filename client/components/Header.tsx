@@ -118,6 +118,14 @@ export default function Header() {
                         <FileText className="w-4 h-4" />
                         <span className="hidden md:inline">Anúncios</span>
                       </Link>
+                      <Link
+                        to="/admin/banners"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors font-semibold"
+                        title="Gerenciar Banners"
+                      >
+                        <Plus className="w-4 h-4" />
+                        <span className="hidden md:inline">Banners</span>
+                      </Link>
                     </div>
                   )}
 
