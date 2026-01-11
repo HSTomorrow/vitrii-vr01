@@ -150,19 +150,21 @@ model tabelas_preco {
 }
 
 model usracessos {
-  id                   Int                    @id @default(autoincrement())
-  nome                 String                 @db.VarChar(255)
-  email                String                 @unique @db.VarChar(255)
-  senha                String                 @db.VarChar(255)
-  cpf                  String?                @db.VarChar(14)
-  telefone             String?                @db.VarChar(20)
-  tipoUsuario          String                 @default("common") @db.VarChar(20)
-  dataCriacao          DateTime               @default(now())
-  dataAtualizacao      DateTime
-  endereco             String?
-  usuarios_anunciantes usuarios_anunciantes[]
-  membros_equipe       membros_equipe[]
-  passwordResetTokens  passwordResetToken[]
+  id                    Int                    @id @default(autoincrement())
+  nome                  String                 @db.VarChar(255)
+  email                 String                 @unique @db.VarChar(255)
+  senha                 String                 @db.VarChar(255)
+  cpf                   String?                @db.VarChar(14) @unique
+  telefone              String?                @db.VarChar(20)
+  tipoUsuario           String                 @default("common") @db.VarChar(20)
+  dataCriacao           DateTime               @default(now())
+  dataAtualizacao       DateTime
+  endereco              String?
+  dataVigenciaContrato  DateTime
+  numeroAnunciosAtivos  Int                    @default(0)
+  usuarios_anunciantes  usuarios_anunciantes[]
+  membros_equipe        membros_equipe[]
+  passwordResetTokens   passwordResetToken[]
 }
 
 model passwordResetToken {
