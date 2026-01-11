@@ -239,6 +239,7 @@ export default function AnuncioForm({
       const method = anuncioId ? "PUT" : "POST";
 
       const payload = {
+        usuarioId: user?.id,
         titulo: data.titulo,
         descricao: data.descricao,
         fotoUrl: data.fotoUrl,
