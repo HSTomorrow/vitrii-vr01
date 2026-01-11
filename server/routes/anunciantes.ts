@@ -134,40 +134,51 @@ export const createAnunciante: RequestHandler = async (req, res) => {
     const validatedData = AnuncianteCreateSchema.parse(req.body);
     const { usuarioId } = req.body; // Optional userId to link the creator
 
-    // Check if anunciante already exists
-    const existingAnunciante = await prisma.anunciantes.findUnique({
-      where: { cnpjOuCpf: validatedData.cnpjOuCpf },
-    });
-
-    if (existingAnunciante) {
-      return res.status(400).json({
-        success: false,
-        error: "Anunciante com este CNPJ/CPF já cadastrado",
-        details: [
-          {
-            path: ["cnpjOuCpf"],
-            message: "CNPJ/CPF já cadastrado no sistema",
-          },
-        ],
+    // Check if anunciante already exists (only if cnpj is provided)
+    if (validatedData.cnpj) {
+      const existingAnunciante = await prisma.anunciantes.findFirst({
+        where: { cnpj: validatedData.cnpj },
       });
+
+      if (existingAnunciante) {
+        return res.status(400).json({
+          success: false,
+          error: "Anunciante com este CNPJ/CPF já cadastrado",
+          details: [
+            {
+              path: ["cnpj"],
+              message: "CNPJ/CPF já cadastrado no sistema",
+            },
+          ],
+        });
+      }
     }
 
-    // Create anunciante and link to user if provided
+    // Create anunciante with required and optional fields
     const anunciante = await prisma.anunciantes.create({
       data: {
-        ...validatedData,
-        status: "ativa",
+        nome: validatedData.nome,
+        cidade: validatedData.cidade,
+        estado: validatedData.estado,
+        cnpj: validatedData.cnpj,
+        endereco: validatedData.endereco,
+        email: validatedData.email,
+        telefone: validatedData.telefone,
+        cep: validatedData.cep,
+        descricao: validatedData.descricao,
+        dataCriacao: new Date(),
+        dataAtualizacao: new Date(),
       },
     });
 
     // Link the creating user to this anunciante as admin/owner
     if (usuarioId) {
       try {
-        await prisma.usracessoAnunciante.create({
+        await prisma.usuarios_anunciantes.create({
           data: {
             usuarioId: usuarioId,
             anuncianteId: anunciante.id,
-            tipoUsuario: "gerente", // Creator is a manager/admin of their own anunciante
+            papel: "gerente",
           },
         });
       } catch (err) {
