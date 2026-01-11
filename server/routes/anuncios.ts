@@ -637,8 +637,8 @@ export const getProdutosParaAnuncio: RequestHandler = async (req, res) => {
 
     res.json({
       success: true,
-      data: productos,
-      count: productos.length,
+      data: productosComPrecos,
+      count: productosComPrecos.length,
     });
   } catch (error) {
     console.error("Error fetching products:", error);
