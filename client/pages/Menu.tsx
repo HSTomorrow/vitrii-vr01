@@ -131,6 +131,16 @@ export default function Menu() {
                 </h2>
                 <div className="space-y-2">
                   <Link
+                    to="/meus-anuncios"
+                    className="flex items-center gap-4 px-6 py-4 bg-walmart-gray hover:bg-gray-200 rounded-lg transition-colors"
+                  >
+                    <Package className="w-6 h-6 text-walmart-blue" />
+                    <span className="text-walmart-text font-medium">
+                      Meus Anúncios
+                    </span>
+                  </Link>
+
+                  <Link
                     to="/favoritos"
                     className="flex items-center gap-4 px-6 py-4 bg-walmart-gray hover:bg-gray-200 rounded-lg transition-colors"
                   >
