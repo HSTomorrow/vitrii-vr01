@@ -94,6 +94,11 @@ export default function AnuncioDetalhe() {
   const equipes = equipesData?.data || [];
   const membros = membrosData?.data || [];
 
+  // Check if there are any available members in any team
+  const temMembrosDisponiveis = equipes.some((equipe) =>
+    equipe.membros?.some((membro) => membro.status === "disponivel")
+  );
+
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async () => {
