@@ -500,9 +500,9 @@ export default function AnuncioDetalhe() {
                   <MessageSquare className="w-4 h-4" />
                   Enviar Mensagem
                 </button>
-                {anuncio.anunciante.whatsapp && (
+                {anuncio.anunciantes?.telefone && (
                   <a
-                    href={`https://wa.me/${anuncio.anunciante.whatsapp.replace(/\D/g, "")}`}
+                    href={`https://wa.me/${anuncio.anunciantes.telefone.replace(/\D/g, "")}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full px-4 py-3 bg-green-500 text-white rounded-lg font-semibold hover:bg-green-600 transition-colors flex items-center justify-center gap-2"
