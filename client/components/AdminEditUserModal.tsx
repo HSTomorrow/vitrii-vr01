@@ -117,7 +117,16 @@ export default function AdminEditUserModal({
       return;
     }
 
-    updateMutation.mutate(formData);
+    // Prepare data for submission
+    const submitData = {
+      ...formData,
+      // Convert date to datetime if provided
+      dataVigenciaContrato: formData.dataVigenciaContrato
+        ? dateToDateTime(formData.dataVigenciaContrato)
+        : undefined,
+    };
+
+    updateMutation.mutate(submitData);
   };
 
   return (
