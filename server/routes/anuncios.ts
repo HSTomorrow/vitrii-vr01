@@ -247,7 +247,9 @@ export const getAnuncioById: RequestHandler = async (req, res) => {
 // CREATE new ad
 export const createAnuncio: RequestHandler = async (req, res) => {
   try {
+    console.log("[createAnuncio] Starting ad creation with payload:", req.body);
     const validatedData = AnuncioCreateSchema.parse(req.body);
+    console.log("[createAnuncio] Data validated successfully:", validatedData);
 
     let tabelaDePrecoId: number | null = null;
 
