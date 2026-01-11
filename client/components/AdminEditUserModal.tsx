@@ -63,6 +63,15 @@ export default function AdminEditUserModal({
 
       if (!response.ok) {
         const errorData = await response.json();
+
+        // If there are field-level errors, show them
+        if (errorData.details && Array.isArray(errorData.details)) {
+          const fieldErrors = errorData.details
+            .map((err: any) => `${err.field}: ${err.message}`)
+            .join("\n");
+          throw new Error(fieldErrors || errorData.error || "Erro ao atualizar perfil do usuário");
+        }
+
         throw new Error(
           errorData.error || "Erro ao atualizar perfil do usuário"
         );
