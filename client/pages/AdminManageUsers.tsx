@@ -242,7 +242,7 @@ export default function AdminManageUsers() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredUsuarios.map((usuario: Usuario) => (
+                  {paginatedUsuarios.map((usuario: Usuario) => (
                     <tr
                       key={usuario.id}
                       className="border-b border-gray-200 hover:bg-gray-50 transition-colors"
@@ -323,6 +323,12 @@ export default function AdminManageUsers() {
                   ))}
                 </tbody>
               </table>
+              <Pagination
+                currentPage={currentPage}
+                totalItems={filteredUsuarios.length}
+                itemsPerPage={itemsPerPage}
+                onPageChange={setCurrentPage}
+              />
             </div>
           ) : (
             <div className="text-center py-12">
