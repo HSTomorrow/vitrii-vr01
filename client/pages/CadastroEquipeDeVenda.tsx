@@ -346,7 +346,7 @@ export default function CadastroEquipeDeVenda() {
 
   const handleEditMember = (membro: MembroEquipe) => {
     setMemberFormData({
-      nome: membro.nome,
+      nomeMembro: membro.nomeMembro,
       email: membro.email,
       whatsapp: membro.whatsapp || "",
       status: membro.status,
