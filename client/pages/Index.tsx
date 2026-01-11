@@ -495,7 +495,7 @@ export default function Index() {
                   Nenhum item gratuito publicado ainda
                 </p>
                 <Link
-                  to="/anuncio/criar"
+                  to="/anuncio/criar?tipo=doacao"
                   className="inline-flex items-center gap-2 text-walmart-blue font-semibold hover:underline mt-4"
                 >
                   <Plus className="w-4 h-4" />
