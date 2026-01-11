@@ -162,8 +162,6 @@ model usracessos {
   endereco             String?
   usuarios_anunciantes usuarios_anunciantes[]
   membros_equipe       membros_equipe[]
-
-  @@map("usuarios")
 }
 
 model usuarios_anunciantes {
