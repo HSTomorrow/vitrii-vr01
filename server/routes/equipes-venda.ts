@@ -13,10 +13,19 @@ const EquipeUpdateSchema = EquipeCreateSchema.partial();
 
 const AdicionarMembroSchema = z.object({
   usuarioId: z.number().int().optional(),
-  nome: z.string().min(1, "Nome do membro é obrigatório"),
-  email: z.string().email("Email inválido"),
+  nome: z
+    .string()
+    .min(1, "Nome do membro é obrigatório")
+    .max(255, "Nome não pode ter mais de 255 caracteres"),
+  email: z
+    .string()
+    .email("Email deve ser um endereço de email válido")
+    .max(255, "Email não pode ter mais de 255 caracteres"),
   whatsapp: z.string().optional(),
-  status: z.enum(["disponivel", "nao_disponivel", "cancelado"]).optional(),
+  status: z
+    .enum(["disponivel", "nao_disponivel", "cancelado"])
+    .optional()
+    .default("disponivel"),
 });
 
 const AtualizarMembroSchema = z.object({
