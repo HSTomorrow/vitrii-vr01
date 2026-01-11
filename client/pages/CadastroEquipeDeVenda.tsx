@@ -243,7 +243,15 @@ export default function CadastroEquipeDeVenda() {
         },
       );
 
-      if (!response.ok) throw new Error("Erro ao atualizar membro");
+      if (!response.ok) {
+        const error = await response.json();
+        const errorMessage = error.error || "Erro ao atualizar membro";
+        const details = error.details || "";
+        const fullMessage = details
+          ? `${errorMessage} - ${details}`
+          : errorMessage;
+        throw new Error(fullMessage);
+      }
       return response.json();
     },
     onSuccess: () => {
