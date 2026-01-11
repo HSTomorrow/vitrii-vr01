@@ -14,6 +14,7 @@ import {
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
+import Pagination from "@/components/Pagination";
 
 interface Usuario {
   id: number;
