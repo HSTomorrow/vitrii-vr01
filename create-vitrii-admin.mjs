@@ -33,6 +33,7 @@ async function createVitriiAdmin() {
         telefone: "0000000000",
         endereco: "Sistema Administrativo",
         tipoUsuario: "adm",
+        dataAtualizacao: new Date(),
       },
     });
 
