@@ -163,4 +163,29 @@
   .vitrii-card {
     @apply bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-200;
   }
+
+  /* Mobile menu scroll fix - ensures scrollbar appears and works properly */
+  nav[class*="overflow-y-auto"] {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+    scrollbar-width: auto;
+  }
+
+  /* Custom scrollbar styling for better visibility */
+  nav[class*="overflow-y-auto"]::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  nav[class*="overflow-y-auto"]::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  nav[class*="overflow-y-auto"]::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 4px;
+  }
+
+  nav[class*="overflow-y-auto"]::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+  }
 }
