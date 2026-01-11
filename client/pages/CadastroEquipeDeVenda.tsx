@@ -647,7 +647,7 @@ export default function CadastroEquipeDeVenda() {
                             onClick={() => {
                               setIsAddingMember(true);
                               setMemberFormData({
-                                nome: "",
+                                nomeMembro: "",
                                 email: "",
                                 whatsapp: "",
                                 status: "disponivel",
