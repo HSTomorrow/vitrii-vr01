@@ -121,6 +121,7 @@ export default function App() {
                 <Route path="/admin/dashboard" element={<AdminDashboard />} />
                 <Route path="/admin/anuncios" element={<AdminManageAds />} />
                 <Route path="/admin/usuarios" element={<AdminManageUsers />} />
+                <Route path="/admin/banners" element={<AdminBanners />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
