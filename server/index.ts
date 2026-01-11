@@ -147,6 +147,14 @@ import {
   googleCallback,
   googleLinkAccount,
 } from "./routes/oauth";
+import {
+  getBanners,
+  getBannerById,
+  createBanner,
+  updateBanner,
+  deleteBanner,
+  reorderBanners,
+} from "./routes/banners";
 
 export function createServer() {
   const app = express();
