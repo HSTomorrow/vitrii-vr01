@@ -22,6 +22,7 @@ import {
   Globe,
   Instagram,
   Facebook,
+  Mail,
 } from "lucide-react";
 
 export default function AnuncioDetalhe() {
