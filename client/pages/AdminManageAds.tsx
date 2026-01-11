@@ -409,11 +409,11 @@ export default function AdminManageAds() {
                     </div>
 
                     {/* Price */}
-                    {anuncio.precoAnuncio &&
-                      typeof anuncio.precoAnuncio === "number" && (
+                    {anuncio.preco &&
+                      typeof anuncio.preco === "number" && (
                         <div className="text-right">
                           <p className="text-lg font-bold text-walmart-blue">
-                            R$ {Number(anuncio.precoAnuncio).toFixed(2)}
+                            R$ {Number(anuncio.preco).toFixed(2)}
                           </p>
                         </div>
                       )}
