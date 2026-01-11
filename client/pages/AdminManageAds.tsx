@@ -3,6 +3,7 @@ import Footer from "@/components/Footer";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import Pagination from "@/components/Pagination";
 import {
   Search,
   Edit2,
