@@ -147,27 +147,29 @@ export const requireAdmin: RequestHandler = async (req, res, next) => {
 /**
  * Middleware to extract user ID from request
  * This should be used before permission guard middleware
- * In a real application, this would verify JWT or session
+ * Gets userId from multiple sources (params, query, body, headers)
  */
 export const extractUserId: RequestHandler = (req, res, next) => {
   try {
     // Try to get userId from:
     // 1. URL parameter (for nested routes like /api/usuarios/:usuarioId/...)
-    // 2. Query parameter
-    // 3. Request body
-    // 4. Headers (for API key or custom header)
+    // 2. Query parameter (?userId=123)
+    // 3. Request body ({userId: 123})
+    // 4. Headers (x-user-id header)
 
     const userIdSource =
       req.params?.usuarioId ||
-      req.query?.usuarioId ||
+      req.params?.id ||
+      req.query?.userId ||
       req.body?.usuarioId ||
+      req.body?.userId ||
       req.headers["x-user-id"];
 
     if (userIdSource) {
       const parsedId = parseInt(userIdSource as string, 10);
       if (!isNaN(parsedId)) {
         req.userId = parsedId;
-        console.log(`[extractUserId] Successfully extracted user ID: ${parsedId} from source: ${userIdSource}`);
+        console.log(`[extractUserId] Successfully extracted user ID: ${parsedId}`);
       } else {
         console.warn(`[extractUserId] Invalid user ID format: ${userIdSource}`);
       }
