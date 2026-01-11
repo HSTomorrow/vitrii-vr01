@@ -26,6 +26,7 @@ import {
   Mail,
   X,
   Phone,
+  Star,
 } from "lucide-react";
 
 interface MembroEquipe {
