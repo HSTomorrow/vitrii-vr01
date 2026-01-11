@@ -1,5 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import bcryptjs from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -24,15 +23,12 @@ async function createVitriiAdmin() {
       return;
     }
 
-    // Hash password with bcrypt
-    const senhaHash = await bcryptjs.hash(adminPassword, 10);
-
     // Create admin user
     const admUser = await prisma.usracesso.create({
       data: {
         nome: "Administrador Vitrii",
         email: adminEmail,
-        senha: senhaHash,
+        senha: adminPassword,
         cpf: "00000000000",
         telefone: "0000000000",
         endereco: "Sistema Administrativo",
