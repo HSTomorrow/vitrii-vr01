@@ -105,6 +105,13 @@ export default function AdminDashboard() {
       if (!selectedUsuario) return null;
       const response = await fetch(
         `/api/usracessos/${selectedUsuario}/funcionalidades`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "x-user-id": user?.id?.toString() || "",
+          },
+        }
       );
       if (!response.ok)
         throw new Error("Erro ao buscar funcionalidades do usuário");
