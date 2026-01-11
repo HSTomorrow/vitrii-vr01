@@ -33,12 +33,14 @@ export default function AdminManageUsers() {
   const [searchTerm, setSearchTerm] = useState("");
   const [showPasswords, setShowPasswords] = useState<Set<number>>(new Set());
   const [copiedId, setCopiedId] = useState<number | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
   const [resetPasswordModal, setResetPasswordModal] = useState<{
     usuarioId: number;
     nome: string;
   } | null>(null);
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const itemsPerPage = 20;
 
   // Check if user is admin
   if (!user || user.tipoUsuario !== "adm") {
