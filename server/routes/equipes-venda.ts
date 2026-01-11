@@ -550,6 +550,7 @@ export const removerMembro: RequestHandler = async (req, res) => {
 export const atualizarMembro: RequestHandler = async (req, res) => {
   try {
     const { id, membroId } = req.params;
+    const usuarioId = req.userId;
     const body = AtualizarMembroSchema.parse(req.body);
 
     const membro = await prisma.membroEquipe.findUnique({
@@ -561,6 +562,22 @@ export const atualizarMembro: RequestHandler = async (req, res) => {
         success: false,
         error: "Membro não encontrado",
       });
+    }
+
+    // Check permissions - allow if user is admin or creator of this member
+    if (usuarioId) {
+      const usuario = await prisma.usuario.findUnique({
+        where: { id: usuarioId },
+        select: { tipoUsuario: true },
+      });
+
+      // If not admin and not the creator, deny access
+      if (usuario?.tipoUsuario !== "adm" && membro.usuarioId !== usuarioId) {
+        return res.status(403).json({
+          success: false,
+          error: "Você não tem permissão para atualizar este membro",
+        });
+      }
     }
 
     const updated = await prisma.membroEquipe.update({
