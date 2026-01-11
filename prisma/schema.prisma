@@ -49,6 +49,20 @@ model anuncios {
   anuncioVisualizados anuncioVisualizados[]
 }
 
+// Anuncio Visualizacoes - Log table to track ad views
+model anuncioVisualizados {
+  id              Int       @id @default(autoincrement())
+  anuncioId       Int
+  usuarioId       Int?      // Nullable for anonymous/non-logged-in visitors
+  dataCriacao     DateTime  @default(now())
+  anuncio         anuncios  @relation(fields: [anuncioId], references: [id], onDelete: Cascade)
+  usuario         usracessos? @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+
+  @@index([anuncioId])
+  @@index([usuarioId])
+  @@index([dataCriacao])
+}
+
 model fotos_grupos {
   id          Int      @id @default(autoincrement())
   grupoId     Int
