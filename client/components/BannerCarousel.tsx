@@ -1,0 +1,149 @@
+import { useEffect, useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
+interface Banner {
+  id: number;
+  titulo: string;
+  descricao?: string;
+  imagemUrl: string;
+  link?: string;
+  ordem: number;
+  ativo: boolean;
+}
+
+interface BannerCarouselProps {
+  banners: Banner[];
+  autoPlay?: boolean;
+  autoPlayInterval?: number;
+}
+
+export default function BannerCarousel({
+  banners,
+  autoPlay = true,
+  autoPlayInterval = 5000,
+}: BannerCarouselProps) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const activeBanners = banners.filter((b) => b.ativo);
+
+  useEffect(() => {
+    if (!autoPlay || activeBanners.length === 0) return;
+
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % activeBanners.length);
+    }, autoPlayInterval);
+
+    return () => clearInterval(interval);
+  }, [autoPlay, autoPlayInterval, activeBanners.length]);
+
+  if (activeBanners.length === 0) {
+    return null;
+  }
+
+  const currentBanner = activeBanners[currentIndex];
+
+  const handlePrevious = () => {
+    setCurrentIndex(
+      (prev) => (prev - 1 + activeBanners.length) % activeBanners.length
+    );
+  };
+
+  const handleNext = () => {
+    setCurrentIndex((prev) => (prev + 1) % activeBanners.length);
+  };
+
+  const handleDotClick = (index: number) => {
+    setCurrentIndex(index);
+  };
+
+  const BannerContent = () => (
+    <div className="w-full h-full relative overflow-hidden rounded-lg">
+      {/* Background Image */}
+      <img
+        src={currentBanner.imagemUrl}
+        alt={currentBanner.titulo}
+        className="w-full h-full object-cover"
+      />
+
+      {/* Overlay */}
+      <div className="absolute inset-0 bg-black/30 flex flex-col items-center justify-center">
+        {/* Content */}
+        <div className="text-center text-white max-w-3xl px-4">
+          <h2 className="text-3xl md:text-4xl font-bold mb-2">
+            {currentBanner.titulo}
+          </h2>
+          {currentBanner.descricao && (
+            <p className="text-lg md:text-xl text-gray-100 mb-6">
+              {currentBanner.descricao}
+            </p>
+          )}
+
+          {currentBanner.link && (
+            <a
+              href={currentBanner.link}
+              className="inline-block px-8 py-3 bg-walmart-blue text-white rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors"
+            >
+              Saiba Mais
+            </a>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="w-full">
+      {/* Main Carousel */}
+      <div className="relative bg-walmart-gray-light overflow-hidden rounded-lg">
+        {/* Banner Container */}
+        <div className="relative w-full h-64 sm:h-80 md:h-96">
+          <BannerContent />
+
+          {/* Navigation Buttons */}
+          {activeBanners.length > 1 && (
+            <>
+              <button
+                onClick={handlePrevious}
+                className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2 bg-white/80 hover:bg-white rounded-full transition-colors"
+                aria-label="Banner anterior"
+              >
+                <ChevronLeft className="w-6 h-6 text-walmart-blue" />
+              </button>
+
+              <button
+                onClick={handleNext}
+                className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-2 bg-white/80 hover:bg-white rounded-full transition-colors"
+                aria-label="Próximo banner"
+              >
+                <ChevronRight className="w-6 h-6 text-walmart-blue" />
+              </button>
+            </>
+          )}
+        </div>
+
+        {/* Dot Indicators */}
+        {activeBanners.length > 1 && (
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+            {activeBanners.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => handleDotClick(index)}
+                className={`w-3 h-3 rounded-full transition-colors ${
+                  index === currentIndex ? "bg-walmart-blue" : "bg-white/50"
+                }`}
+                aria-label={`Ir para banner ${index + 1}`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Banner Counter */}
+      {activeBanners.length > 1 && (
+        <div className="text-center py-2 text-sm text-walmart-text-secondary">
+          {currentIndex + 1} de {activeBanners.length}
+        </div>
+      )}
+    </div>
+  );
+}
