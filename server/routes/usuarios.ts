@@ -267,6 +267,7 @@ export const createUsuario: RequestHandler = async (req, res) => {
         telefone: validatedData.telefone || "",
         endereco: validatedData.endereco || "",
         tipoUsuario: "comum",
+        dataAtualizacao: new Date(),
       },
       select: {
         id: true,
