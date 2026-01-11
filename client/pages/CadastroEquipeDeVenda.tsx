@@ -180,7 +180,12 @@ export default function CadastroEquipeDeVenda() {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Erro ao adicionar membro");
+        const errorMessage = error.error || "Erro ao adicionar membro";
+        const details = error.details || "";
+
+        // Combine error message with details for more context
+        const fullMessage = details ? `${errorMessage} - ${details}` : errorMessage;
+        throw new Error(fullMessage);
       }
 
       return response.json();
