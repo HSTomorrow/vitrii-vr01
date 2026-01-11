@@ -637,11 +637,42 @@ export const validateResetToken: RequestHandler = async (req, res) => {
       });
     }
 
-    // TODO: Validate token once passwordResetToken model is added to schema
-    // For now, assume token is valid if user exists
+    // Find the reset token
+    const resetTokenRecord = await prisma.passwordResetToken.findUnique({
+      where: { token: token as string },
+    });
+
+    if (!resetTokenRecord) {
+      return res.status(400).json({
+        success: false,
+        error: "Link de reset expirado ou inválido",
+      });
+    }
+
+    // Check if token is expired
+    if (new Date() > resetTokenRecord.expiresAt) {
+      // Delete the expired token
+      await prisma.passwordResetToken.delete({
+        where: { id: resetTokenRecord.id },
+      });
+
+      return res.status(400).json({
+        success: false,
+        error: "Link de reset expirou. Solicite um novo link.",
+      });
+    }
+
+    // Verify token belongs to the user
+    if (resetTokenRecord.usuarioId !== usuario.id) {
+      return res.status(400).json({
+        success: false,
+        error: "Link de reset inválido",
+      });
+    }
+
     res.status(200).json({
       success: true,
-      message: "Token validation pending implementation",
+      message: "Token válido",
     });
   } catch (error) {
     console.error("Error validating token:", error);
