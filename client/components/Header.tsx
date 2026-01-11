@@ -219,8 +219,15 @@ export default function Header() {
 
         {/* Mobile Navigation Menu */}
         {isMenuOpen && (
-          <nav className="border-t border-gray-200 fixed left-0 right-0 top-16 bottom-0 bg-white overflow-y-auto z-40 max-h-screen mobile-menu-nav">
-            <div className="flex flex-col space-y-1 pt-2 pb-32 px-2 min-h-full">
+          <>
+            {/* Backdrop overlay */}
+            <div
+              className="fixed inset-0 bg-black/20 z-30 mobile-menu-backdrop"
+              onClick={() => setIsMenuOpen(false)}
+            />
+            {/* Mobile menu */}
+            <nav className="fixed left-0 right-0 top-16 bottom-0 bg-white z-40 overflow-y-auto mobile-menu-nav">
+              <div className="flex flex-col space-y-1 pt-2 pb-32 px-2">
               <Link
                 to="/browse"
                 className="block px-4 py-2 text-walmart-text hover:bg-walmart-gray rounded-lg"
@@ -351,8 +358,9 @@ export default function Header() {
                   Cadastrar
                 </Link>
               </div>
-            </div>
-          </nav>
+              </div>
+            </nav>
+          </>
         )}
       </div>
     </header>
