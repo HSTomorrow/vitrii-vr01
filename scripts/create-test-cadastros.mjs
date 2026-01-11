@@ -83,9 +83,8 @@ async function createTestData() {
     const variante = await prisma.tabelas_preco.create({
       data: {
         productId: producto.id,
-        anuncianteId: anunciante.id,
-        preco: 109.90,
-        precoCusto: 60.00,
+        lojaId: anunciante.id,
+        preco: new Prisma.Decimal("109.90"),
         tamanho: "M",
         cor: "Azul",
         dataCriacao: new Date(),
