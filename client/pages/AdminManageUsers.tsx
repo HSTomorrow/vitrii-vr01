@@ -10,11 +10,13 @@ import {
   Copy,
   Check,
   AlertCircle,
+  Edit2,
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
 import Pagination from "@/components/Pagination";
+import AdminEditUserModal from "@/components/AdminEditUserModal";
 
 interface Usuario {
   id: number;
@@ -22,8 +24,14 @@ interface Usuario {
   email: string;
   cpf?: string;
   telefone?: string;
+  whatsapp?: string;
+  linkedin?: string;
+  facebook?: string;
   tipoUsuario: string;
   dataCriacao: string;
+  dataVigenciaContrato: string;
+  numeroAnunciosAtivos: number;
+  endereco?: string;
   senha: string; // Hashed password (for display)
 }
 
