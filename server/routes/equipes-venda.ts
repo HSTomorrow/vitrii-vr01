@@ -213,6 +213,7 @@ export const createEquipe: RequestHandler = async (req, res) => {
 export const updateEquipe: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
+    const usuarioId = req.userId;
     const body = EquipeUpdateSchema.parse(req.body);
 
     const equipe = await prisma.equipeDeVenda.findUnique({
@@ -224,6 +225,31 @@ export const updateEquipe: RequestHandler = async (req, res) => {
         success: false,
         error: "Equipe de venda não encontrada",
       });
+    }
+
+    // Check permissions - allow if user is admin or owner of the anunciante
+    if (usuarioId) {
+      const usuario = await prisma.usuario.findUnique({
+        where: { id: usuarioId },
+        select: { tipoUsuario: true },
+      });
+
+      // If not admin, check if user is associated with this anunciante
+      if (usuario?.tipoUsuario !== "adm") {
+        const hasAccess = await prisma.usuarioAnunciante.findFirst({
+          where: {
+            usuarioId: usuarioId,
+            anuncianteId: equipe.anuncianteId,
+          },
+        });
+
+        if (!hasAccess) {
+          return res.status(403).json({
+            success: false,
+            error: "Você não tem permissão para atualizar esta equipe",
+          });
+        }
+      }
     }
 
     const updated = await prisma.equipeDeVenda.update({
