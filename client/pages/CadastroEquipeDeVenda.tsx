@@ -604,13 +604,19 @@ export default function CadastroEquipeDeVenda() {
           {equipesFiltered.length === 0 ? (
             <div className="bg-white rounded-lg shadow-md p-12 text-center">
               <Users className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500 text-lg">Nenhuma equipe cadastrada</p>
+              <p className="text-gray-500 text-lg">
+                {equipes.length === 0
+                  ? "Nenhuma equipe cadastrada"
+                  : "Nenhuma equipe encontrada com os critérios de busca"}
+              </p>
               <p className="text-gray-400 mt-2">
-                Clique em "Nova Equipe" para criar sua primeira equipe
+                {equipes.length === 0
+                  ? 'Clique em "Nova Equipe" para criar sua primeira equipe'
+                  : "Tente alterar os termos de busca"}
               </p>
             </div>
           ) : (
-            equipes.map((equipe: EquipeDeVenda) => (
+            equipesFiltered.map((equipe: EquipeDeVenda) => (
               <div
                 key={equipe.id}
                 className="bg-white rounded-lg shadow-md overflow-hidden"
