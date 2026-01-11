@@ -89,27 +89,34 @@ export default function Index() {
   const destacados = allAnuncios
     .filter(
       (anuncio: any) =>
-        !anuncio.isDoacao &&
         anuncio.destaque &&
-        ["produto", "servico"].includes(anuncio.producto?.tipo),
+        anuncio.isActive &&
+        !anuncio.isDoacao &&
+        ["produto", "servico"].includes(anuncio.tipo),
     )
     .slice(0, 20);
 
   const destaqueDoacoes = allAnuncios
-    .filter((anuncio: any) => anuncio.isDoacao)
+    .filter((anuncio: any) => anuncio.destaque && anuncio.isActive && anuncio.isDoacao)
     .slice(0, 20);
 
   const destaqueEventos = allAnuncios
     .filter(
       (anuncio: any) =>
-        !anuncio.isDoacao && anuncio.producto?.tipo === "evento",
+        anuncio.destaque &&
+        anuncio.isActive &&
+        !anuncio.isDoacao &&
+        anuncio.tipo === "evento",
     )
     .slice(0, 20);
 
   const destaqueAgendas = allAnuncios
     .filter(
       (anuncio: any) =>
-        !anuncio.isDoacao && anuncio.producto?.tipo === "agenda_recorrente",
+        anuncio.destaque &&
+        anuncio.isActive &&
+        !anuncio.isDoacao &&
+        anuncio.tipo === "agenda_recorrente",
     )
     .slice(0, 20);
 
