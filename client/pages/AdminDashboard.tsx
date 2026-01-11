@@ -176,6 +176,10 @@ export default function AdminDashboard() {
         `/api/usracessos/${usuarioId}/funcionalidades/${funcionalidadeId}`,
         {
           method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            "x-user-id": user?.id?.toString() || "",
+          },
         },
       );
       if (!response.ok) {
