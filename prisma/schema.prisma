@@ -45,6 +45,8 @@ model anuncios {
   cidade              String?                 @db.VarChar(100)
   estado              String?                 @db.VarChar(2)
   visualizacoes       Int                     @default(0)
+  destaque            Boolean                 @default(false)
+  isActive            Boolean                 @default(true)
   anunciantes         anunciantes             @relation(fields: [anuncianteId], references: [id], onDelete: Cascade, map: "anuncios_lojaId_fkey")
   anuncioVisualizados anuncioVisualizados[]
 }
