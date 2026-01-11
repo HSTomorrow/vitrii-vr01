@@ -51,11 +51,11 @@ async function createTestData() {
       update: {},
       create: {
         id: 999,
+        lojaId: anunciante.id,
         grupoId: grupo.id,
         nome: "Produto Teste - Menu",
         descricao: "Produto de teste para o menu de cadastros",
         sku: "SKU-TEST-999",
-        tipo: "produto",
         dataCriacao: new Date(),
         dataAtualizacao: new Date(),
       },
