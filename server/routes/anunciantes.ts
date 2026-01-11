@@ -166,7 +166,7 @@ export const createAnunciante: RequestHandler = async (req, res) => {
     // Link the creating user to this anunciante as admin/owner
     if (usuarioId) {
       try {
-        await prisma.usuarioAnunciante.create({
+        await prisma.usracessoAnunciante.create({
           data: {
             usuarioId: usuarioId,
             anuncianteId: anunciante.id,
@@ -242,14 +242,14 @@ export const updateAnunciante: RequestHandler = async (req, res) => {
 
     // Check permissions - allow if user is admin or owner of the anunciante
     if (usuarioId) {
-      const usuario = await prisma.usuario.findUnique({
+      const usuario = await prisma.usracesso.findUnique({
         where: { id: usuarioId },
         select: { tipoUsuario: true },
       });
 
       // If not admin, check if user is associated with this anunciante
       if (usuario?.tipoUsuario !== "adm") {
-        const hasAccess = await prisma.usuarioAnunciante.findFirst({
+        const hasAccess = await prisma.usracessoAnunciante.findFirst({
           where: {
             usuarioId: usuarioId,
             anuncianteId: parseInt(id),
@@ -310,7 +310,7 @@ export const adicionarUsuarioAnunciante: RequestHandler = async (req, res) => {
     // Validate input
     const validatedData = AdicionarUsuarioAnuncianteSchema.parse(req.body);
 
-    const usuarioAnunciante = await prisma.usuarioAnunciante.create({
+    const usuarioAnunciante = await prisma.usracessoAnunciante.create({
       data: validatedData,
       include: {
         usuario: {
@@ -352,7 +352,7 @@ export const getEquipeAnunciante: RequestHandler = async (req, res) => {
   try {
     const { anuncianteId } = req.params;
 
-    const equipe = await prisma.usuarioAnunciante.findMany({
+    const equipe = await prisma.usracessoAnunciante.findMany({
       where: { anuncianteId: parseInt(anuncianteId) },
       include: {
         usuario: {
@@ -415,7 +415,7 @@ export const getAnunciantesByUsuario: RequestHandler = async (req, res) => {
     }
 
     // Fetch user to check if is admin
-    const usuario = await prisma.usuario.findUnique({
+    const usuario = await prisma.usracesso.findUnique({
       where: { id: usuarioId },
       select: { tipoUsuario: true },
     });
