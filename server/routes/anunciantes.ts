@@ -92,9 +92,9 @@ export const getAnuncianteById: RequestHandler = async (req, res) => {
         whatsapp: true,
         status: true,
         dataCriacao: true,
-        usuarioAnunciantes: {
+        usuarios_anunciantes: {
           select: {
-            tipoUsuario: true,
+            papel: true,
             usuario: {
               select: {
                 id: true,
