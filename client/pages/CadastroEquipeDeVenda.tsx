@@ -586,9 +586,22 @@ export default function CadastroEquipeDeVenda() {
           </div>
         )}
 
+        {/* Search and Filter */}
+        {equipes.length > 0 && (
+          <div className="mb-6">
+            <input
+              type="text"
+              placeholder="🔍 Buscar equipe por nome..."
+              value={searchEquipe}
+              onChange={(e) => setSearchEquipe(e.target.value)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+            />
+          </div>
+        )}
+
         {/* Equipes List */}
         <div className="space-y-4">
-          {equipes.length === 0 ? (
+          {equipesFiltered.length === 0 ? (
             <div className="bg-white rounded-lg shadow-md p-12 text-center">
               <Users className="w-12 h-12 text-gray-300 mx-auto mb-4" />
               <p className="text-gray-500 text-lg">Nenhuma equipe cadastrada</p>
