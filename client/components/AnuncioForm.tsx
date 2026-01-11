@@ -222,7 +222,7 @@ export default function AnuncioForm({
         estado: ad.estado || "RS",
         isDoacao: ad.isDoacao || false,
         destaque: ad.destaque || false,
-        categoria: ad.categoria || null,
+        categoria: ad.categoria || "",
         dadosCategoria: ad.dadosCategoria || "",
       });
 
