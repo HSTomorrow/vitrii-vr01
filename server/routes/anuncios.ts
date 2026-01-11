@@ -388,7 +388,9 @@ export const createAnuncio: RequestHandler = async (req, res) => {
 export const updateAnuncio: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
-    let updateData = AnuncioCreateSchema.partial().parse(req.body);
+    console.log("[updateAnuncio] Updating ad:", id, "with data:", req.body);
+    let updateData = AnuncioUpdateSchema.parse(req.body);
+    console.log("[updateAnuncio] Validated data:", updateData);
 
     // If updating to donation, automatically set status to "pago" and zero price
     if (updateData.isDoacao === true) {
