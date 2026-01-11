@@ -212,6 +212,17 @@ export default function AdminManageAds() {
     return matchesSearch;
   });
 
+  // Reset to page 1 when search or filter changes
+  if (currentPage > 1 && filteredAnuncios.length < (currentPage - 1) * itemsPerPage) {
+    setCurrentPage(1);
+  }
+
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredAnuncios.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedAnuncios = filteredAnuncios.slice(startIndex, endIndex);
+
   // Check authorization
   if (!isAdmin) {
     return (
