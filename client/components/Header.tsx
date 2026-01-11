@@ -53,7 +53,8 @@ export default function Header() {
   }, [isMenuOpen]);
 
   return (
-    <header className="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-200">
+    <>
+      <header className="sticky top-0 z-40 bg-white shadow-sm border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -230,16 +231,19 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Mobile Navigation Menu */}
-        {isMenuOpen && (
-          <>
-            {/* Backdrop overlay */}
-            <div
-              className="fixed inset-0 bg-black/20 z-40 mobile-menu-backdrop"
-              onClick={() => setIsMenuOpen(false)}
-            />
-            {/* Mobile menu */}
-            <nav className="fixed left-0 right-0 top-16 bottom-0 bg-white z-50 overflow-y-auto mobile-menu-nav">
+      </div>
+    </header>
+
+    {/* Mobile Navigation Menu - Rendered outside header */}
+    {isMenuOpen && (
+      <>
+        {/* Backdrop overlay */}
+        <div
+          className="fixed inset-0 bg-black/20 z-40 mobile-menu-backdrop"
+          onClick={() => setIsMenuOpen(false)}
+        />
+        {/* Mobile menu */}
+        <nav className="fixed left-0 right-0 top-16 bottom-0 bg-white z-50 overflow-y-auto mobile-menu-nav">
               <div className="flex flex-col space-y-1 pt-2 pb-32 px-2">
               <Link
                 to="/browse"
@@ -372,10 +376,9 @@ export default function Header() {
                 </Link>
               </div>
               </div>
-            </nav>
-          </>
-        )}
-      </div>
-    </header>
+        </nav>
+      </>
+    )}
+    </>
   );
 }
