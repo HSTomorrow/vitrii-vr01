@@ -66,14 +66,14 @@ export default function BannerCarousel({
       />
 
       {/* Overlay */}
-      <div className="absolute inset-0 bg-black/30 flex flex-col items-center justify-center">
+      <div className="absolute inset-0 bg-black/30 flex flex-col items-center justify-center p-2">
         {/* Content */}
-        <div className="text-center text-white max-w-3xl px-4">
-          <h2 className="text-3xl md:text-4xl font-bold mb-2">
+        <div className="text-center text-white max-w-3xl px-2 sm:px-4">
+          <h2 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2 line-clamp-2">
             {currentBanner.titulo}
           </h2>
           {currentBanner.descricao && (
-            <p className="text-lg md:text-xl text-gray-100 mb-6">
+            <p className="text-xs sm:text-sm md:text-lg lg:text-xl text-gray-100 mb-3 sm:mb-6 line-clamp-2">
               {currentBanner.descricao}
             </p>
           )}
@@ -81,7 +81,7 @@ export default function BannerCarousel({
           {currentBanner.link && (
             <a
               href={currentBanner.link}
-              className="inline-block px-8 py-3 bg-walmart-blue text-white rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors"
+              className="inline-block px-3 py-1.5 sm:px-6 sm:py-2 md:px-8 md:py-3 bg-walmart-blue text-white rounded-lg font-semibold text-xs sm:text-sm md:text-base hover:bg-walmart-blue-dark transition-colors whitespace-nowrap"
             >
               Saiba Mais
             </a>
