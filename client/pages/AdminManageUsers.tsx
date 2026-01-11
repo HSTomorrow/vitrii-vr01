@@ -201,11 +201,11 @@ export default function AdminManageUsers() {
             <div className="flex items-center gap-3 mb-2">
               <Lock className="w-8 h-8 text-walmart-blue" />
               <h1 className="text-3xl font-bold text-walmart-text">
-                Gerenciar Senhas de Usuários
+                Gerenciar Usuários
               </h1>
             </div>
             <p className="text-walmart-text-secondary">
-              Visualize e resete as senhas dos usuários do sistema
+              Visualize, edite e resete as senhas dos usuários do sistema
             </p>
           </div>
 
@@ -335,18 +335,29 @@ export default function AdminManageUsers() {
                         </span>
                       </td>
                       <td className="py-4 px-4">
-                        <button
-                          onClick={() =>
-                            setResetPasswordModal({
-                              usuarioId: usuario.id,
-                              nome: usuario.nome,
-                            })
-                          }
-                          className="inline-flex items-center gap-2 px-3 py-1 bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors text-sm font-medium"
-                        >
-                          <RefreshCw className="w-4 h-4" />
-                          Resetar
-                        </button>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => setEditingUser(usuario)}
+                            className="inline-flex items-center gap-2 px-3 py-1 bg-walmart-green text-white rounded-lg hover:bg-walmart-green-dark transition-colors text-sm font-medium"
+                            title="Editar"
+                          >
+                            <Edit2 className="w-4 h-4" />
+                            Editar
+                          </button>
+                          <button
+                            onClick={() =>
+                              setResetPasswordModal({
+                                usuarioId: usuario.id,
+                                nome: usuario.nome,
+                              })
+                            }
+                            className="inline-flex items-center gap-2 px-3 py-1 bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors text-sm font-medium"
+                            title="Resetar Senha"
+                          >
+                            <RefreshCw className="w-4 h-4" />
+                            Resetar
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -433,6 +444,14 @@ export default function AdminManageUsers() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Edit User Modal */}
+      {editingUser && (
+        <AdminEditUserModal
+          usuario={editingUser}
+          onClose={() => setEditingUser(null)}
+        />
       )}
 
       <Footer />
