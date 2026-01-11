@@ -301,29 +301,19 @@ export const createAnuncio: RequestHandler = async (req, res) => {
       data: {
         usuarioId: validatedData.usuarioId,
         anuncianteId: validatedData.anuncianteId,
-        productId:
-          validatedData.productId && validatedData.productId > 0
-            ? validatedData.productId
-            : null,
-        tabelaDePrecoId,
         titulo: validatedData.titulo,
         descricao: validatedData.descricao,
-        fotoUrl: validatedData.fotoUrl || null,
-        precoAnuncio,
-        dataValidade,
-        equipeDeVendaId: validatedData.equipeDeVendaId,
-        isDoacao,
-        destaque: validatedData.destaque || false,
-        isActive: validatedData.isActive !== false,
+        imagem: validatedData.fotoUrl || null,
+        preco: precoAnuncio,
         categoria: validatedData.categoria,
-        dadosCategoria: validatedData.dadosCategoria || null,
+        cidade: validatedData.cidade,
+        estado: validatedData.estado,
         status,
+        tipo: "produto",
         dataAtualizacao: new Date(),
       },
       include: {
-        anunciante: true,
-        producto: true,
-        tabelaDePreco: true,
+        anunciantes: true,
       },
     });
 
