@@ -336,6 +336,21 @@ export default function AnuncioDetalhe() {
                     </>
                   )}
                 </button>
+                {/* Admin-only: Toggle Featured status */}
+                {user?.tipoUsuario === "adm" && (
+                  <button
+                    onClick={() => destacueMutation.mutate()}
+                    disabled={destacueMutation.isPending}
+                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors disabled:opacity-50 ${
+                      anuncio.destaque
+                        ? "bg-yellow-500 text-white hover:bg-yellow-600"
+                        : "bg-gray-400 text-white hover:bg-gray-500"
+                    }`}
+                  >
+                    <Star className="w-4 h-4" />
+                    {anuncio.destaque ? "Remover do Destaque" : "Adicionar ao Destaque"}
+                  </button>
+                )}
                 <button
                   onClick={() => {
                     if (
