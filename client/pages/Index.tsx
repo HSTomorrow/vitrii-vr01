@@ -468,7 +468,7 @@ export default function Index() {
                       </div>
                     </div>
 
-                    {anuncio.producto?.tipo === "servico" ? (
+                    {anuncio.tipo === "servico" ? (
                       <div className="flex gap-2">
                         <Link
                           to={`/agenda/anunciante/${anuncio.anuncianteId}`}
