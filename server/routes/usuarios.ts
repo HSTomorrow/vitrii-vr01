@@ -71,7 +71,7 @@ export const getUsuarios: RequestHandler = async (req, res) => {
 export const getUsuarioById: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
-    const usuario = await prisma.usracesso.findUnique({
+    const usuario = await prisma.usracessos.findUnique({
       where: { id: parseInt(id) },
       include: {
         usuarioAnunciantes: {
@@ -116,7 +116,7 @@ export const signInUsuario: RequestHandler = async (req, res) => {
     }
 
     // Find user by email
-    const usuario = await prisma.usracesso.findUnique({
+    const usuario = await prisma.usracessos.findUnique({
       where: { email },
       select: {
         id: true,
@@ -436,7 +436,7 @@ export const forgotPassword: RequestHandler = async (req, res) => {
     }
 
     // Find user by email
-    const usuario = await prisma.usracesso.findUnique({
+    const usuario = await prisma.usracessos.findUnique({
       where: { email },
       select: {
         id: true,
@@ -532,7 +532,7 @@ export const resetPassword: RequestHandler = async (req, res) => {
     }
 
     // Find user by email
-    const usuario = await prisma.usracesso.findUnique({
+    const usuario = await prisma.usracessos.findUnique({
       where: { email },
       select: { id: true },
     });
@@ -618,7 +618,7 @@ export const validateResetToken: RequestHandler = async (req, res) => {
     }
 
     // Find user by email
-    const usuario = await prisma.usracesso.findUnique({
+    const usuario = await prisma.usracessos.findUnique({
       where: { email: email as string },
       select: { id: true },
     });
@@ -730,7 +730,7 @@ export const adminResetUserPassword: RequestHandler = async (req, res) => {
     }
 
     // Find user
-    const usuario = await prisma.usracesso.findUnique({
+    const usuario = await prisma.usracessos.findUnique({
       where: { id: parseInt(usuarioId) },
       select: { id: true, email: true, nome: true },
     });
