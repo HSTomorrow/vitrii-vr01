@@ -288,7 +288,7 @@ export default function Header() {
                           setIsMenuOpen(false);
                           setIsCadastrosOpen(false);
                         }}
-                        className="block py-2 text-sm text-walmart-text hover:bg-walmart-gray rounded-lg pl-4"
+                        className="block px-6 py-2 text-sm text-walmart-text hover:bg-walmart-gray rounded-lg"
                       >
                         Grupos de Produtos
                       </Link>
@@ -298,7 +298,7 @@ export default function Header() {
                           setIsMenuOpen(false);
                           setIsCadastrosOpen(false);
                         }}
-                        className="block py-2 text-sm text-walmart-text hover:bg-walmart-gray rounded-lg pl-4"
+                        className="block px-6 py-2 text-sm text-walmart-text hover:bg-walmart-gray rounded-lg"
                       >
                         Cadastro de Produtos
                       </Link>
@@ -308,7 +308,7 @@ export default function Header() {
                           setIsMenuOpen(false);
                           setIsCadastrosOpen(false);
                         }}
-                        className="block py-2 text-sm text-walmart-text hover:bg-walmart-gray rounded-lg pl-4"
+                        className="block px-6 py-2 text-sm text-walmart-text hover:bg-walmart-gray rounded-lg"
                       >
                         Tabelas de Preço
                       </Link>
@@ -318,7 +318,7 @@ export default function Header() {
                           setIsMenuOpen(false);
                           setIsCadastrosOpen(false);
                         }}
-                        className="block py-2 text-sm text-walmart-text hover:bg-walmart-gray rounded-lg pl-4"
+                        className="block px-6 py-2 text-sm text-walmart-text hover:bg-walmart-gray rounded-lg"
                       >
                         Variantes
                       </Link>
@@ -328,7 +328,7 @@ export default function Header() {
                           setIsMenuOpen(false);
                           setIsCadastrosOpen(false);
                         }}
-                        className="block py-2 text-sm text-walmart-text hover:bg-walmart-gray rounded-lg pl-4"
+                        className="block px-6 py-2 text-sm text-walmart-text hover:bg-walmart-gray rounded-lg"
                       >
                         Equipes de Venda
                       </Link>
