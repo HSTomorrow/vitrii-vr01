@@ -697,11 +697,11 @@ export default function CadastroEquipeDeVenda() {
                                   <td className="px-4 py-3">
                                     <input
                                       type="text"
-                                      value={memberFormData.nome}
+                                      value={memberFormData.nomeMembro}
                                       onChange={(e) =>
                                         setMemberFormData({
                                           ...memberFormData,
-                                          nome: e.target.value,
+                                          nomeMembro: e.target.value,
                                         })
                                       }
                                       placeholder="Nome do membro"
