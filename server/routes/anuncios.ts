@@ -253,14 +253,11 @@ export const createAnuncio: RequestHandler = async (req, res) => {
       // Verify that the product belongs to the anunciante
       const producto = await prisma.productos.findUnique({
         where: { id: validatedData.productId },
-        include: {
-          grupo: true,
-        },
       });
 
       if (
         !producto ||
-        producto.grupo.anuncianteId !== validatedData.anuncianteId
+        producto.lojaId !== validatedData.anuncianteId
       ) {
         return res.status(400).json({
           success: false,
@@ -270,7 +267,7 @@ export const createAnuncio: RequestHandler = async (req, res) => {
 
       // Verify that the price table belongs to the product if provided
       if (validatedData.tabelaDePrecoId && validatedData.tabelaDePrecoId > 0) {
-        const tabelaDePreco = await prisma.tabelasPreco.findUnique({
+        const tabelaDePreco = await prisma.tabelas_preco.findUnique({
           where: { id: validatedData.tabelaDePrecoId },
         });
 
