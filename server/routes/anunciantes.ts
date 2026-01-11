@@ -36,7 +36,7 @@ export const getAnunciantes: RequestHandler = async (req, res) => {
         select: {
           id: true,
           nome: true,
-          fotoUrl: true,
+          
           endereco: true,
           cidade: true,
           estado: true,
@@ -82,7 +82,7 @@ export const getAnuncianteById: RequestHandler = async (req, res) => {
       select: {
         id: true,
         nome: true,
-        fotoUrl: true,
+        
         endereco: true,
         cidade: true,
         estado: true,
@@ -435,7 +435,7 @@ export const getAnunciantesByUsuario: RequestHandler = async (req, res) => {
         select: {
           id: true,
           nome: true,
-          fotoUrl: true,
+          
           endereco: true,
           cidade: true,
           estado: true,
@@ -459,7 +459,7 @@ export const getAnunciantesByUsuario: RequestHandler = async (req, res) => {
         select: {
           id: true,
           nome: true,
-          fotoUrl: true,
+          
           endereco: true,
           cidade: true,
           estado: true,
