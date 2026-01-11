@@ -249,6 +249,39 @@ export const createAnuncio: RequestHandler = async (req, res) => {
 
     let tabelaDePrecoId: number | null = null;
 
+    // Validate user contract and active ads limit
+    const usuario = await prisma.usracessos.findUnique({
+      where: { id: validatedData.usuarioId },
+      select: {
+        dataVigenciaContrato: true,
+        numeroAnunciosAtivos: true,
+      },
+    });
+
+    if (!usuario) {
+      return res.status(404).json({
+        success: false,
+        error: "Usuário não encontrado",
+      });
+    }
+
+    // Check if contract is still valid
+    const today = new Date();
+    if (usuario.dataVigenciaContrato < today) {
+      return res.status(403).json({
+        success: false,
+        error: "Contrato vencido. Entre em contato com o suporte.",
+      });
+    }
+
+    // Check if user has reached the limit of 3 active ads
+    if ((usuario.numeroAnunciosAtivos || 0) >= 3) {
+      return res.status(403).json({
+        success: false,
+        error: "Limite de 3 anúncios ativos atingido. Aguarde a expiração de anúncios antigos.",
+      });
+    }
+
     // Only validate product if one is provided (product is optional)
     if (validatedData.productId && validatedData.productId > 0) {
       // Verify that the product belongs to the anunciante
