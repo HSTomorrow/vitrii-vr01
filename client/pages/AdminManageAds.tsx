@@ -56,7 +56,9 @@ export default function AdminManageAds() {
     queryKey: ["admin-anuncios"],
     enabled: isAdmin,
     queryFn: async () => {
-      const response = await fetch("/api/anuncios?includeInactive=true", {
+      // Fetch with limit=100 to get all ads (API max is 100)
+      // includeInactive=true to show inactive ads in admin view
+      const response = await fetch("/api/anuncios?includeInactive=true&limit=100", {
         headers: {
           "x-user-id": user?.id ? String(user.id) : "",
         },
