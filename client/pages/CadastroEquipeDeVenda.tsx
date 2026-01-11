@@ -795,7 +795,7 @@ export default function CadastroEquipeDeVenda() {
                                           setIsAddingMember(false);
                                           setEditingMemberId(null);
                                           setMemberFormData({
-                                            nome: "",
+                                            nomeMembro: "",
                                             email: "",
                                             whatsapp: "",
                                             status: "disponivel",
