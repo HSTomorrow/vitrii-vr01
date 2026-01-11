@@ -468,7 +468,19 @@ export default function AnuncioDetalhe() {
 
               {/* Contact Actions */}
               <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6 space-y-3">
-                <button className="w-full px-4 py-3 bg-walmart-yellow text-walmart-text rounded-lg font-semibold hover:bg-walmart-yellow-dark transition-colors">
+                <button
+                  onClick={() => {
+                    if (equipes.length === 0) {
+                      toast.error("Nenhuma equipe de vendas disponível");
+                    } else if (equipes.length === 1) {
+                      setSelectedEquipeId(equipes[0].id);
+                      setShowMembrosModal(true);
+                    } else {
+                      setShowMembrosModal(true);
+                    }
+                  }}
+                  className="w-full px-4 py-3 bg-walmart-yellow text-walmart-text rounded-lg font-semibold hover:bg-walmart-yellow-dark transition-colors"
+                >
                   Chamar Vendedor
                 </button>
                 <button className="w-full px-4 py-3 border-2 border-walmart-blue text-walmart-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors flex items-center justify-center gap-2">
