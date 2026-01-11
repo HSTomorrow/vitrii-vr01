@@ -501,7 +501,7 @@ export default function AdminDashboard() {
                             <div className="flex gap-2">
                               <button
                                 onClick={() => setEditingUser(usuario)}
-                                className="flex-1 px-3 py-2 bg-walmart-green text-white rounded-lg hover:bg-walmart-green-dark transition flex items-center justify-center gap-2"
+                                className="flex-1 px-3 py-2 bg-walmart-yellow text-walmart-text rounded-lg hover:bg-walmart-yellow-dark transition flex items-center justify-center gap-2"
                               >
                                 <Edit2 className="w-4 h-4" />
                                 Editar
