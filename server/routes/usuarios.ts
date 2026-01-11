@@ -343,7 +343,7 @@ export const updateUsuario: RequestHandler = async (req, res) => {
 
     // Check if CPF already exists for a different user
     if (validatedData.cpf && validatedData.cpf.trim()) {
-      const existingCpf = await prisma.usracesso.findFirst({
+      const existingCpf = await prisma.usracessos.findFirst({
         where: {
           cpf: validatedData.cpf,
           id: { not: userId }, // Exclude current user
