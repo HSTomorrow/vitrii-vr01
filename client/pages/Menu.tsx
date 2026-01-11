@@ -18,6 +18,7 @@ import {
   Tag,
   Layers,
   Users,
+  Package,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
