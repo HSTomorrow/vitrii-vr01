@@ -121,8 +121,8 @@ model EquipeDeVenda {
 model MembroEquipe {
   id            Int       @id @default(autoincrement())
   equipeId      Int
-  usuarioId     Int?
-  nome          String    @db.VarChar(255)           // Nome do membro da equipe
+  usuarioId     Int       // Usuário que cadastrou este membro
+  nomeMembro    String    @db.VarChar(255)           // Nome do membro da equipe
   email         String    @db.VarChar(255)           // Email do membro
   whatsapp      String?   @db.VarChar(20)            // WhatsApp do membro
   status        String    @default("disponivel")     // "disponivel", "nao_disponivel", "cancelado"
@@ -131,9 +131,9 @@ model MembroEquipe {
 
   // Relations
   equipe        EquipeDeVenda @relation(fields: [equipeId], references: [id], onDelete: Cascade)
-  usuario       Usuario?  @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+  usuario       Usuario   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
-  @@unique([equipeId, usuarioId])
+  @@unique([equipeId, email])
   @@map("membros_equipe")
 }
 
