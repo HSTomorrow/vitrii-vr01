@@ -390,7 +390,17 @@ const UsuarioAdminUpdateSchema = z.object({
   facebook: z.string().optional().or(z.literal("")),
   endereco: z.string().optional().or(z.literal("")),
   tipoUsuario: z.enum(["adm", "comum"]).optional(),
-  dataVigenciaContrato: z.string().datetime().optional(),
+  dataVigenciaContrato: z
+    .string()
+    .refine(
+      (value) => {
+        if (!value) return true; // Allow empty
+        // Accept both date (YYYY-MM-DD) and datetime (ISO 8601) formats
+        return /^\d{4}-\d{2}-\d{2}(T|$)/.test(value);
+      },
+      "Data de vigência deve estar no formato YYYY-MM-DD ou ISO 8601"
+    )
+    .optional(),
 });
 
 // UPDATE user (only safe fields allowed)
