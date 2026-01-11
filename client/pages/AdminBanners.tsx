@@ -1,0 +1,451 @@
+import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import { useNavigate } from "react-router-dom";
+import {
+  Plus,
+  Trash2,
+  Edit2,
+  AlertCircle,
+  Eye,
+  EyeOff,
+  GripVertical,
+  Lock,
+} from "lucide-react";
+
+interface Banner {
+  id: number;
+  titulo: string;
+  descricao?: string;
+  imagemUrl: string;
+  link?: string;
+  ordem: number;
+  ativo: boolean;
+  dataCriacao: string;
+}
+
+export default function AdminBanners() {
+  const queryClient = useQueryClient();
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [isCreating, setIsCreating] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [formData, setFormData] = useState({
+    titulo: "",
+    descricao: "",
+    imagemUrl: "",
+    link: "",
+    ativo: true,
+  });
+
+  // Check if user is admin
+  const isAdmin = user?.tipoUsuario === "adm";
+
+  // Fetch all banners
+  const { data: bannersData, isLoading } = useQuery({
+    queryKey: ["admin-banners"],
+    enabled: isAdmin,
+    queryFn: async () => {
+      const response = await fetch("/api/banners");
+      if (!response.ok) throw new Error("Erro ao buscar banners");
+      return response.json();
+    },
+  });
+
+  const banners = bannersData?.data || [];
+
+  // Create banner mutation
+  const createBannerMutation = useMutation({
+    mutationFn: async () => {
+      if (!formData.titulo || !formData.imagemUrl) {
+        throw new Error("Título e imagem são obrigatórios");
+      }
+
+      const response = await fetch("/api/banners", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": user?.id ? String(user.id) : "",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.details || error.error);
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      toast.success("Banner criado com sucesso!");
+      queryClient.invalidateQueries({ queryKey: ["admin-banners"] });
+      resetForm();
+      setIsCreating(false);
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : "Erro ao criar");
+    },
+  });
+
+  // Update banner mutation
+  const updateBannerMutation = useMutation({
+    mutationFn: async () => {
+      if (!editingId) throw new Error("ID inválido");
+
+      const response = await fetch(`/api/banners/${editingId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": user?.id ? String(user.id) : "",
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.details || error.error);
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      toast.success("Banner atualizado com sucesso!");
+      queryClient.invalidateQueries({ queryKey: ["admin-banners"] });
+      resetForm();
+      setEditingId(null);
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : "Erro ao atualizar");
+    },
+  });
+
+  // Delete banner mutation
+  const deleteBannerMutation = useMutation({
+    mutationFn: async (bannerId: number) => {
+      const response = await fetch(`/api/banners/${bannerId}`, {
+        method: "DELETE",
+        headers: {
+          "x-user-id": user?.id ? String(user.id) : "",
+        },
+      });
+
+      if (!response.ok) throw new Error("Erro ao deletar banner");
+      return response.json();
+    },
+    onSuccess: () => {
+      toast.success("Banner deletado com sucesso!");
+      queryClient.invalidateQueries({ queryKey: ["admin-banners"] });
+    },
+    onError: () => {
+      toast.error("Erro ao deletar banner");
+    },
+  });
+
+  const resetForm = () => {
+    setFormData({
+      titulo: "",
+      descricao: "",
+      imagemUrl: "",
+      link: "",
+      ativo: true,
+    });
+  };
+
+  const handleEdit = (banner: Banner) => {
+    setFormData({
+      titulo: banner.titulo,
+      descricao: banner.descricao || "",
+      imagemUrl: banner.imagemUrl,
+      link: banner.link || "",
+      ativo: banner.ativo,
+    });
+    setEditingId(banner.id);
+    setIsCreating(false);
+  };
+
+  const handleSubmit = () => {
+    if (editingId) {
+      updateBannerMutation.mutate();
+    } else {
+      createBannerMutation.mutate();
+    }
+  };
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen bg-walmart-bg flex flex-col">
+        <Header />
+        <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-8 flex items-center justify-center">
+          <div className="text-center">
+            <Lock className="w-16 h-16 text-red-500 mx-auto mb-4" />
+            <h1 className="text-3xl font-bold text-walmart-text mb-2">
+              Acesso Restrito
+            </h1>
+            <p className="text-walmart-text-secondary mb-6">
+              Apenas administradores podem acessar esta página.
+            </p>
+            <button
+              onClick={() => navigate("/")}
+              className="px-6 py-2 bg-walmart-blue text-white rounded-lg hover:bg-blue-700 transition"
+            >
+              Voltar para Home
+            </button>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-walmart-bg flex flex-col">
+      <Header />
+
+      <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-8">
+        {/* Page Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-walmart-text mb-2">
+            Gerenciar Banners
+          </h1>
+          <p className="text-walmart-text-secondary">
+            Crie e edite os banners que aparecem na página inicial
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Form Section */}
+          <div className="lg:col-span-1">
+            <div className="bg-white rounded-lg shadow-md p-6 sticky top-6">
+              <h2 className="font-bold text-walmart-text mb-4">
+                {editingId ? "Editar Banner" : "Novo Banner"}
+              </h2>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                    Título *
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.titulo}
+                    onChange={(e) =>
+                      setFormData({ ...formData, titulo: e.target.value })
+                    }
+                    placeholder="Ex: Bem-vindo ao Vitrii"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-walmart-blue"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                    Descrição
+                  </label>
+                  <textarea
+                    value={formData.descricao}
+                    onChange={(e) =>
+                      setFormData({ ...formData, descricao: e.target.value })
+                    }
+                    placeholder="Descrição curta do banner"
+                    rows={3}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-walmart-blue"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                    URL da Imagem *
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.imagemUrl}
+                    onChange={(e) =>
+                      setFormData({ ...formData, imagemUrl: e.target.value })
+                    }
+                    placeholder="https://exemplo.com/imagem.jpg"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-walmart-blue"
+                  />
+                  {formData.imagemUrl && (
+                    <img
+                      src={formData.imagemUrl}
+                      alt="Preview"
+                      className="mt-2 w-full h-40 object-cover rounded-lg"
+                    />
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                    Link (Opcional)
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.link}
+                    onChange={(e) =>
+                      setFormData({ ...formData, link: e.target.value })
+                    }
+                    placeholder="https://exemplo.com"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-walmart-blue"
+                  />
+                </div>
+
+                <div>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.ativo}
+                      onChange={(e) =>
+                        setFormData({ ...formData, ativo: e.target.checked })
+                      }
+                      className="w-4 h-4"
+                    />
+                    <span className="text-sm font-semibold text-walmart-text">
+                      Ativo
+                    </span>
+                  </label>
+                </div>
+
+                <div className="flex gap-2 pt-4">
+                  <button
+                    onClick={handleSubmit}
+                    disabled={
+                      createBannerMutation.isPending ||
+                      updateBannerMutation.isPending
+                    }
+                    className="flex-1 px-4 py-2 bg-walmart-blue text-white rounded-lg font-semibold hover:bg-walmart-blue-dark transition disabled:opacity-50"
+                  >
+                    {editingId ? "Atualizar" : "Criar"}
+                  </button>
+
+                  {editingId && (
+                    <button
+                      onClick={() => {
+                        resetForm();
+                        setEditingId(null);
+                      }}
+                      className="flex-1 px-4 py-2 border-2 border-gray-300 text-walmart-text rounded-lg font-semibold hover:bg-gray-50 transition"
+                    >
+                      Cancelar
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Banners List Section */}
+          <div className="lg:col-span-2">
+            {isLoading ? (
+              <div className="text-center py-12">
+                <p className="text-walmart-text-secondary">Carregando...</p>
+              </div>
+            ) : banners.length === 0 ? (
+              <div className="bg-white rounded-lg shadow-md p-12 text-center">
+                <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <p className="text-walmart-text-secondary">
+                  Nenhum banner criado ainda
+                </p>
+                <button
+                  onClick={() => setIsCreating(true)}
+                  className="mt-4 inline-flex items-center gap-2 text-walmart-blue font-semibold hover:underline"
+                >
+                  <Plus className="w-4 h-4" />
+                  Criar Primeiro Banner
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {banners.map((banner: Banner) => (
+                  <div
+                    key={banner.id}
+                    className="bg-white rounded-lg shadow-md p-4 flex gap-4"
+                  >
+                    <div className="flex-shrink-0">
+                      <img
+                        src={banner.imagemUrl}
+                        alt={banner.titulo}
+                        className="w-24 h-24 object-cover rounded-lg"
+                      />
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <h3 className="font-semibold text-walmart-text">
+                            {banner.titulo}
+                          </h3>
+                          {banner.descricao && (
+                            <p className="text-sm text-walmart-text-secondary line-clamp-2">
+                              {banner.descricao}
+                            </p>
+                          )}
+                          <div className="flex items-center gap-2 mt-2">
+                            {banner.ativo ? (
+                              <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded">
+                                Ativo
+                              </span>
+                            ) : (
+                              <span className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded">
+                                Inativo
+                              </span>
+                            )}
+                            <span className="text-xs text-walmart-text-secondary">
+                              Ordem: {banner.ordem}
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => handleEdit(banner)}
+                            className="p-2 hover:bg-blue-50 rounded-lg transition"
+                            title="Editar"
+                          >
+                            <Edit2 className="w-4 h-4 text-blue-600" />
+                          </button>
+                          <button
+                            onClick={() => {
+                              if (
+                                window.confirm(
+                                  "Tem certeza que deseja deletar este banner?"
+                                )
+                              ) {
+                                deleteBannerMutation.mutate(banner.id);
+                              }
+                            }}
+                            className="p-2 hover:bg-red-50 rounded-lg transition"
+                            title="Deletar"
+                          >
+                            <Trash2 className="w-4 h-4 text-red-600" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Info Box */}
+            <div className="mt-6 bg-blue-50 border-l-4 border-walmart-blue p-4 rounded">
+              <p className="text-sm text-walmart-text font-semibold mb-2">
+                💡 Dica
+              </p>
+              <ul className="text-sm text-walmart-text-secondary space-y-1">
+                <li>• Máximo de 5 banners ativos</li>
+                <li>• Use imagens em proporção 4:1 (1200x300px recomendado)</li>
+                <li>• Banners inativos não aparecem na página principal</li>
+                <li>• A ordem define a sequência de exibição no carousel</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <Footer />
+    </div>
+  );
+}
