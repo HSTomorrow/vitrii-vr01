@@ -1,13 +1,10 @@
-import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Menu,
-  X,
   Search,
   User,
   Plus,
   LogOut,
-  Settings,
   MessageSquare,
   Shield,
   FileText,
