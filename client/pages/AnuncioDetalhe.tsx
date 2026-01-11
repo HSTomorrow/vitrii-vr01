@@ -1,4 +1,4 @@
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useParams, useNavigate, Link, useState } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
@@ -23,13 +23,25 @@ import {
   Instagram,
   Facebook,
   Mail,
+  X,
+  Phone,
 } from "lucide-react";
+
+interface MembroEquipe {
+  id: number;
+  nome: string;
+  email: string;
+  whatsapp?: string;
+  status: string;
+}
 
 export default function AnuncioDetalhe() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user, isLoggedIn } = useAuth();
+  const [showMembrosModal, setShowMembrosModal] = useState(false);
+  const [selectedEquipeId, setSelectedEquipeId] = useState<number | null>(null);
 
   // Fetch ad details
   const { data, isLoading, error } = useQuery({
