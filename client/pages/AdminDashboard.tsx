@@ -70,7 +70,13 @@ export default function AdminDashboard() {
   const { data: usuariosData, isLoading: usuariosLoading } = useQuery({
     queryKey: ["usuarios"],
     queryFn: async () => {
-      const response = await fetch("/api/usracessos");
+      const response = await fetch("/api/usracessos", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": user?.id?.toString() || "",
+        },
+      });
       if (!response.ok) throw new Error("Erro ao buscar usuários");
       return response.json();
     },
