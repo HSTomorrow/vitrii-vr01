@@ -312,10 +312,16 @@ export default function CadastroEquipeDeVenda() {
       teamId: number;
       memberId: number;
     }) => {
+      const headers: Record<string, string> = {};
+      if (user?.id) {
+        headers["X-User-Id"] = user.id.toString();
+      }
+
       const response = await fetch(
         `/api/equipes-venda/${teamId}/membros/${memberId}`,
         {
           method: "DELETE",
+          headers,
         },
       );
       if (!response.ok) {
