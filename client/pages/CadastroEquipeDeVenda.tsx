@@ -23,7 +23,7 @@ interface Usuario {
 
 interface MembroEquipe {
   id: number;
-  nome: string;
+  nomeMembro: string;
   email: string;
   whatsapp?: string;
   status: "disponivel" | "nao_disponivel" | "cancelado";
