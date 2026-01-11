@@ -60,11 +60,13 @@ export default function CadastroEquipeDeVenda() {
     descricao: "",
   });
   const [memberFormData, setMemberFormData] = useState({
-    nome: "",
+    nomeMembro: "",
     email: "",
     whatsapp: "",
     status: "disponivel" as const,
   });
+  const [searchEquipe, setSearchEquipe] = useState("");
+  const [searchMembro, setSearchMembro] = useState({});
 
   // Fetch anunciantes (filtered by current user, or all if admin)
   const { data: anunciantesData } = useQuery({
