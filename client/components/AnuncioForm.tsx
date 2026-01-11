@@ -58,6 +58,7 @@ export default function AnuncioForm({
   anuncianteId,
   anuncioId,
   onSuccess,
+  isDonation,
 }: AnuncioFormProps) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -79,7 +80,7 @@ export default function AnuncioForm({
     endereco: "",
     cidade: "",
     estado: "RS",
-    isDoacao: false,
+    isDoacao: isDonation || false,
     destaque: false,
     categoria: "" as string,
     dadosCategoria: "",
