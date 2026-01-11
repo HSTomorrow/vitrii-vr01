@@ -43,7 +43,6 @@ export default function AdminManageAds() {
   const [searchTerm, setSearchTerm] = useState("");
   const [expandedAd, setExpandedAd] = useState<number | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>("todos");
-  const [currentPage, setCurrentPage] = useState(0);
 
   // Check if user is admin
   const isAdmin = user?.tipoUsuario === "adm";
