@@ -718,6 +718,14 @@ export default function AdminDashboard() {
             )}
           </div>
         )}
+
+        {/* Edit User Modal */}
+        {editingUser && (
+          <AdminEditUserModal
+            usuario={editingUser}
+            onClose={() => setEditingUser(null)}
+          />
+        )}
       </main>
 
       <Footer />
