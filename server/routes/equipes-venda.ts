@@ -12,7 +12,7 @@ const EquipeCreateSchema = z.object({
 const EquipeUpdateSchema = EquipeCreateSchema.partial();
 
 const AdicionarMembroSchema = z.object({
-  usuarioId: z.number().int().positive("Usuário inválido"),
+  usuarioId: z.number().int().optional(),
   nome: z.string().min(1, "Nome do membro é obrigatório"),
   email: z.string().email("Email inválido"),
   whatsapp: z.string().optional(),
