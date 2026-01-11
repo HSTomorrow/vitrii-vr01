@@ -367,7 +367,7 @@ export default function CadastroEquipeDeVenda() {
     e.preventDefault();
 
     // Client-side validation
-    if (!memberFormData.nome) {
+    if (!memberFormData.nomeMembro) {
       toast.error("Nome do membro é obrigatório");
       return;
     }
@@ -384,7 +384,7 @@ export default function CadastroEquipeDeVenda() {
       return;
     }
 
-    if (memberFormData.nome.length > 255) {
+    if (memberFormData.nomeMembro.length > 255) {
       toast.error("Nome não pode ter mais de 255 caracteres");
       return;
     }
