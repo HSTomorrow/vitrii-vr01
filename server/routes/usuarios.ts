@@ -184,6 +184,10 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
     // Hash password with bcrypt
     const senhaHash = await bcryptjs.hash(validatedData.senha, 10);
 
+    // Calculate contract expiration date (30 days from now)
+    const contractExpireDate = new Date();
+    contractExpireDate.setDate(contractExpireDate.getDate() + 30);
+
     const usuario = await prisma.usracessos.create({
       data: {
         nome: validatedData.nome,
@@ -194,6 +198,8 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
         endereco: "",
         tipoUsuario: "comum",
         dataAtualizacao: new Date(),
+        dataVigenciaContrato: contractExpireDate,
+        numeroAnunciosAtivos: 0,
       },
       select: {
         id: true,
@@ -201,6 +207,7 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
         email: true,
         tipoUsuario: true,
         dataCriacao: true,
+        dataVigenciaContrato: true,
       },
     });
 
