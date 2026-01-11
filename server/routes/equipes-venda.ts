@@ -649,7 +649,7 @@ export const getUsuariosDisponiveis: RequestHandler = async (req, res) => {
     }
 
     // Get users who have access to this anunciante but are not members of this team
-    const usuariosDisponiveis = await prisma.usracesso.findMany({
+    const usuariosDisponiveis = await prisma.usracessos.findMany({
       where: {
         usuarioAnunciantes: {
           some: {
