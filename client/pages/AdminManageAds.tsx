@@ -567,6 +567,14 @@ export default function AdminManageAds() {
                 )}
               </div>
             ))}
+
+            {/* Pagination */}
+            <Pagination
+              currentPage={currentPage}
+              totalItems={filteredAnuncios.length}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setCurrentPage}
+            />
           </div>
         )}
 
