@@ -46,7 +46,7 @@ export const getEquipes: RequestHandler = async (req, res) => {
     const equipes = await prisma.equipes_de_venda.findMany({
       where,
       include: {
-        membros: {
+        membros_equipe: {
           include: {
             usuario: {
               select: {
@@ -212,7 +212,7 @@ export const createEquipe: RequestHandler = async (req, res) => {
         descricao: body.descricao,
       },
       include: {
-        membros: {
+        membros_equipe: {
           include: {
             usuario: {
               select: {
@@ -299,7 +299,7 @@ export const updateEquipe: RequestHandler = async (req, res) => {
       where: { id: parseInt(id) },
       data: body,
       include: {
-        membros: {
+        membros_equipe: {
           include: {
             usuario: {
               select: {
