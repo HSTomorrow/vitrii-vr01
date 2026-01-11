@@ -467,29 +467,16 @@ export default function AnuncioDetalhe() {
                 <div className="flex items-baseline">
                   <span className="text-4xl font-bold">
                     R${" "}
-                    {Number(
-                      anuncio.precoAnuncio || anuncio.tabelaDePreco?.preco || 0,
-                    ).toFixed(2)}
+                    {Number(anuncio.preco || 0).toFixed(2)}
                   </span>
                 </div>
-                {anuncio.tabelaDePreco &&
-                  (anuncio.tabelaDePreco.tamanho ||
-                    anuncio.tabelaDePreco.cor) && (
-                    <div className="mt-4 pt-4 border-t border-blue-400">
-                      {anuncio.tabelaDePreco.tamanho && (
-                        <p className="text-sm">
-                          <span className="opacity-75">Tamanho:</span>{" "}
-                          {anuncio.tabelaDePreco.tamanho}
-                        </p>
-                      )}
-                      {anuncio.tabelaDePreco.cor && (
-                        <p className="text-sm">
-                          <span className="opacity-75">Cor:</span>{" "}
-                          {anuncio.tabelaDePreco.cor}
-                        </p>
-                      )}
-                    </div>
-                  )}
+                {anuncio.isDoacao && (
+                  <div className="mt-4 pt-4 border-t border-blue-400">
+                    <p className="text-sm font-semibold">
+                      Este item é gratuito/doação
+                    </p>
+                  </div>
+                )}
               </div>
 
               {/* Contact Actions */}
