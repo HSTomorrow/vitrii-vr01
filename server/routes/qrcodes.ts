@@ -15,7 +15,7 @@ export const generateQRCode: RequestHandler = async (req, res) => {
     const { anuncioId } = req.body;
 
     // Verify the ad exists
-    const anuncio = await prisma.anuncio.findUnique({
+    const anuncio = await prisma.anuncios.findUnique({
       where: { id: anuncioId },
     });
 
