@@ -38,6 +38,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminManageAds from "./pages/AdminManageAds";
 import AdminManageUsers from "./pages/AdminManageUsers";
 import Menu from "./pages/Menu";
+import MeusAnuncios from "./pages/MeusAnuncios";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
