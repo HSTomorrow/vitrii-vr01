@@ -26,7 +26,7 @@ export const getGrupos: RequestHandler = async (req, res) => {
 
     // Get total count and paginated data in parallel
     const [grupos, total] = await Promise.all([
-      prisma.grupoDeProductos.findMany({
+      prisma.gruposProductos.findMany({
         where,
         select: {
           id: true,
@@ -39,7 +39,7 @@ export const getGrupos: RequestHandler = async (req, res) => {
         take: pageLimit,
         skip: pageOffset,
       }),
-      prisma.grupoDeProductos.count({ where }),
+      prisma.gruposProductos.count({ where }),
     ]);
 
     res.json({
@@ -67,7 +67,7 @@ export const getGrupoById: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const grupo = await prisma.grupoDeProductos.findUnique({
+    const grupo = await prisma.gruposProductos.findUnique({
       where: { id: parseInt(id) },
       select: {
         id: true,
@@ -161,7 +161,7 @@ export const createGrupo: RequestHandler = async (req, res) => {
   try {
     const validatedData = GrupoCreateSchema.parse(req.body);
 
-    const grupo = await prisma.grupoDeProductos.create({
+    const grupo = await prisma.gruposProductos.create({
       data: validatedData,
       include: {
         anunciante: {
@@ -201,7 +201,7 @@ export const updateGrupo: RequestHandler = async (req, res) => {
     const { id } = req.params;
     const updateData = GrupoCreateSchema.partial().parse(req.body);
 
-    const grupo = await prisma.grupoDeProductos.update({
+    const grupo = await prisma.gruposProductos.update({
       where: { id: parseInt(id) },
       data: updateData,
       include: {
@@ -241,7 +241,7 @@ export const deleteGrupo: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
-    await prisma.grupoDeProductos.delete({
+    await prisma.gruposProductos.delete({
       where: { id: parseInt(id) },
     });
 
