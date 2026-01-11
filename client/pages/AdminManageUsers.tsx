@@ -76,7 +76,13 @@ export default function AdminManageUsers() {
   const { data: usuariosData, isLoading: usuariosLoading } = useQuery({
     queryKey: ["usuarios-com-senha"],
     queryFn: async () => {
-      const response = await fetch("/api/admin/usracessos-com-senha");
+      const response = await fetch("/api/admin/usracessos-com-senha", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": user?.id?.toString() || "",
+        },
+      });
       if (!response.ok) {
         if (response.status === 403) {
           throw new Error(
