@@ -345,7 +345,7 @@ export default function AdminManageAds() {
           </div>
         ) : (
           <div className="space-y-3">
-            {filteredAnuncios.map((anuncio: Anuncio) => (
+            {paginatedAnuncios.map((anuncio: Anuncio) => (
               <div
                 key={anuncio.id}
                 className="bg-white border border-gray-200 rounded-lg transition hover:shadow-md"
