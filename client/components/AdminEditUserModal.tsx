@@ -124,7 +124,7 @@ export default function AdminEditUserModal({
       dataVigenciaContrato: formData.dataVigenciaContrato
         ? dateToDateTime(formData.dataVigenciaContrato)
         : undefined,
-    };
+    } as any;
 
     updateMutation.mutate(submitData);
   };
