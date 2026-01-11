@@ -584,6 +584,10 @@ export const overrideAnuncioStatus: RequestHandler = async (req, res) => {
     // Check if ad exists
     const anuncio = await prisma.anuncios.findUnique({
       where: { id: parseInt(id) },
+      select: {
+        status: true,
+        usuarioId: true,
+      },
     });
 
     if (!anuncio) {
@@ -598,11 +602,36 @@ export const overrideAnuncioStatus: RequestHandler = async (req, res) => {
       where: { id: parseInt(id) },
       data: { status },
       include: {
-        anunciante: true,
-        producto: true,
-        tabelaDePreco: true,
+        anunciantes: true,
       },
     });
+
+    // Update active ads counter if status is changing
+    const wasActive = anuncio.status === "pago" || anuncio.status === "ativo";
+    const isNowActive =
+      status === "pago" || status === "ativo";
+
+    if (wasActive && !isNowActive) {
+      // Transitioning from active to inactive
+      await prisma.usracessos.update({
+        where: { id: anuncio.usuarioId },
+        data: {
+          numeroAnunciosAtivos: {
+            decrement: 1,
+          },
+        },
+      });
+    } else if (!wasActive && isNowActive) {
+      // Transitioning from inactive to active
+      await prisma.usracessos.update({
+        where: { id: anuncio.usuarioId },
+        data: {
+          numeroAnunciosAtivos: {
+            increment: 1,
+          },
+        },
+      });
+    }
 
     res.json({
       success: true,
