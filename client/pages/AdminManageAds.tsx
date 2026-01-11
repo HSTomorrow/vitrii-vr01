@@ -365,9 +365,9 @@ export default function AdminManageAds() {
                 >
                   <div className="flex items-center gap-4">
                     {/* Thumbnail */}
-                    {anuncio.fotoUrl && (
+                    {anuncio.imagem && (
                       <img
-                        src={anuncio.fotoUrl}
+                        src={anuncio.imagem}
                         alt={anuncio.titulo}
                         className="w-16 h-16 object-cover rounded-lg"
                       />
@@ -384,8 +384,8 @@ export default function AdminManageAds() {
                         )}
                       </div>
                       <p className="text-sm text-walmart-text-secondary truncate">
-                        Anunciante: {anuncio.anunciante?.nome || "N/A"} •
-                        Produto: {anuncio.producto?.nome || "N/A"}
+                        Anunciante: {anuncio.anunciantes?.nome || "N/A"} •
+                        Tipo: {anuncio.tipo}
                       </p>
                       <div className="flex items-center gap-2 mt-2">
                         <span
