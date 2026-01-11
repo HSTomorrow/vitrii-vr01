@@ -123,6 +123,7 @@ export const getEquipeById: RequestHandler = async (req, res) => {
 export const createEquipe: RequestHandler = async (req, res) => {
   try {
     const body = EquipeCreateSchema.parse(req.body);
+    const usuarioId = req.userId;
 
     // Verify anunciante exists
     const anunciante = await prisma.anunciante.findUnique({
@@ -134,6 +135,31 @@ export const createEquipe: RequestHandler = async (req, res) => {
         success: false,
         error: "Anunciante não encontrado",
       });
+    }
+
+    // Check permissions - allow if user is admin or owner of the anunciante
+    if (usuarioId) {
+      const usuario = await prisma.usuario.findUnique({
+        where: { id: usuarioId },
+        select: { tipoUsuario: true },
+      });
+
+      // If not admin, check if user is associated with this anunciante
+      if (usuario?.tipoUsuario !== "adm") {
+        const hasAccess = await prisma.usuarioAnunciante.findFirst({
+          where: {
+            usuarioId: usuarioId,
+            anuncianteId: body.anuncianteId,
+          },
+        });
+
+        if (!hasAccess) {
+          return res.status(403).json({
+            success: false,
+            error: "Você não tem permissão para criar equipes neste anunciante",
+          });
+        }
+      }
     }
 
     const equipe = await prisma.equipeDeVenda.create({
