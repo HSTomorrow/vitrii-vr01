@@ -492,6 +492,22 @@ export const updateAnuncioStatus: RequestHandler = async (req, res) => {
       });
     }
 
+    // Get current status before update
+    const currentAd = await prisma.anuncios.findUnique({
+      where: { id: parseInt(id) },
+      select: {
+        status: true,
+        usuarioId: true,
+      },
+    });
+
+    if (!currentAd) {
+      return res.status(404).json({
+        success: false,
+        error: "Anúncio não encontrado",
+      });
+    }
+
     const anuncio = await prisma.anuncios.update({
       where: { id: parseInt(id) },
       data: {
@@ -499,11 +515,35 @@ export const updateAnuncioStatus: RequestHandler = async (req, res) => {
         dataAtualizacao: new Date(),
       },
       include: {
-        anunciante: true,
-        producto: true,
-        tabelaDePreco: true,
+        anunciantes: true,
       },
     });
+
+    // Update active ads counter if status is changing
+    const wasActive = currentAd.status === "pago";
+    const isNowActive = status === "pago";
+
+    if (wasActive && !isNowActive) {
+      // Transitioning from active to inactive
+      await prisma.usracessos.update({
+        where: { id: currentAd.usuarioId },
+        data: {
+          numeroAnunciosAtivos: {
+            decrement: 1,
+          },
+        },
+      });
+    } else if (!wasActive && isNowActive) {
+      // Transitioning from inactive to active
+      await prisma.usracessos.update({
+        where: { id: currentAd.usuarioId },
+        data: {
+          numeroAnunciosAtivos: {
+            increment: 1,
+          },
+        },
+      });
+    }
 
     res.json({
       success: true,
