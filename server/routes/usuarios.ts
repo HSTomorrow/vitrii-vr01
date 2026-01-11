@@ -193,6 +193,7 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
         telefone: "",
         endereco: "",
         tipoUsuario: "comum",
+        dataAtualizacao: new Date(),
       },
       select: {
         id: true,
