@@ -13,6 +13,17 @@ const EquipeUpdateSchema = EquipeCreateSchema.partial();
 
 const AdicionarMembroSchema = z.object({
   usuarioId: z.number().int().positive("Usuário inválido"),
+  nome: z.string().min(1, "Nome do membro é obrigatório"),
+  email: z.string().email("Email inválido"),
+  whatsapp: z.string().optional(),
+  status: z.enum(["disponivel", "nao_disponivel", "cancelado"]).optional(),
+});
+
+const AtualizarMembroSchema = z.object({
+  nome: z.string().min(1, "Nome do membro é obrigatório").optional(),
+  email: z.string().email("Email inválido").optional(),
+  whatsapp: z.string().optional(),
+  status: z.enum(["disponivel", "nao_disponivel", "cancelado"]).optional(),
 });
 
 // GET all sales teams (filtered by anunciante if provided)
