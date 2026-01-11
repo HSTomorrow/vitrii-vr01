@@ -60,6 +60,7 @@ import {
   validateResetToken,
   getUsuariosComSenha,
   adminResetUserPassword,
+  adminUpdateUserProfile,
 } from "./routes/usuarios";
 import {
   getEquipes,
