@@ -1,11 +1,15 @@
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Star, Package, MapPin } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import Pagination from "@/components/Pagination";
 
 export default function Browse() {
   const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
 
   const { data: anunciosData, isLoading } = useQuery({
     queryKey: ["browse-anuncios"],
@@ -16,7 +20,13 @@ export default function Browse() {
     },
   });
 
-  const anuncios = anunciosData?.data || [];
+  const allAnuncios = anunciosData?.data || [];
+  const totalItems = allAnuncios.length;
+
+  // Calculate pagination indices
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const anuncios = allAnuncios.slice(startIndex, endIndex);
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
