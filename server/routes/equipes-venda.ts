@@ -43,7 +43,7 @@ export const getEquipes: RequestHandler = async (req, res) => {
       ? { anuncianteId: parseInt(anuncianteId as string) }
       : {};
 
-    const equipes = await prisma.equipeDeVenda.findMany({
+    const equipes = await prisma.equipes_de_venda.findMany({
       where,
       include: {
         membros: {
@@ -88,7 +88,7 @@ export const getEquipeById: RequestHandler = async (req, res) => {
     const { id } = req.params;
     const usuarioId = req.userId;
 
-    const equipe = await prisma.equipeDeVenda.findUnique({
+    const equipe = await prisma.equipes_de_venda.findUnique({
       where: { id: parseInt(id) },
       include: {
         anunciante: {
@@ -189,7 +189,7 @@ export const createEquipe: RequestHandler = async (req, res) => {
 
       // If not admin, check if user is associated with this anunciante
       if (usuario?.tipoUsuario !== "adm") {
-        const hasAccess = await prisma.usracessoAnunciante.findFirst({
+        const hasAccess = await prisma.usuarios_anunciantes.findFirst({
           where: {
             usuarioId: usuarioId,
             anuncianteId: body.anuncianteId,
@@ -205,7 +205,7 @@ export const createEquipe: RequestHandler = async (req, res) => {
       }
     }
 
-    const equipe = await prisma.equipeDeVenda.create({
+    const equipe = await prisma.equipes_de_venda.create({
       data: {
         anuncianteId: body.anuncianteId,
         nome: body.nome,
@@ -259,7 +259,7 @@ export const updateEquipe: RequestHandler = async (req, res) => {
     const usuarioId = req.userId;
     const body = EquipeUpdateSchema.parse(req.body);
 
-    const equipe = await prisma.equipeDeVenda.findUnique({
+    const equipe = await prisma.equipes_de_venda.findUnique({
       where: { id: parseInt(id) },
     });
 
@@ -279,7 +279,7 @@ export const updateEquipe: RequestHandler = async (req, res) => {
 
       // If not admin, check if user is associated with this anunciante
       if (usuario?.tipoUsuario !== "adm") {
-        const hasAccess = await prisma.usracessoAnunciante.findFirst({
+        const hasAccess = await prisma.usuarios_anunciantes.findFirst({
           where: {
             usuarioId: usuarioId,
             anuncianteId: equipe.anuncianteId,
@@ -295,7 +295,7 @@ export const updateEquipe: RequestHandler = async (req, res) => {
       }
     }
 
-    const updated = await prisma.equipeDeVenda.update({
+    const updated = await prisma.equipes_de_venda.update({
       where: { id: parseInt(id) },
       data: body,
       include: {
@@ -344,7 +344,7 @@ export const deleteEquipe: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const equipe = await prisma.equipeDeVenda.findUnique({
+    const equipe = await prisma.equipes_de_venda.findUnique({
       where: { id: parseInt(id) },
     });
 
@@ -355,7 +355,7 @@ export const deleteEquipe: RequestHandler = async (req, res) => {
       });
     }
 
-    await prisma.equipeDeVenda.delete({
+    await prisma.equipes_de_venda.delete({
       where: { id: parseInt(id) },
     });
 
@@ -387,7 +387,7 @@ export const adicionarMembro: RequestHandler = async (req, res) => {
       });
     }
 
-    const equipe = await prisma.equipeDeVenda.findUnique({
+    const equipe = await prisma.equipes_de_venda.findUnique({
       where: { id: parseInt(id) },
     });
 
@@ -406,7 +406,7 @@ export const adicionarMembro: RequestHandler = async (req, res) => {
 
     // If not admin, check if user is associated with this anunciante
     if (usuario?.tipoUsuario !== "adm") {
-      const hasAccess = await prisma.usracessoAnunciante.findFirst({
+      const hasAccess = await prisma.usuarios_anunciantes.findFirst({
         where: {
           usuarioId: usuarioId,
           anuncianteId: equipe.anuncianteId,
@@ -637,7 +637,7 @@ export const getUsuariosDisponiveis: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const equipe = await prisma.equipeDeVenda.findUnique({
+    const equipe = await prisma.equipes_de_venda.findUnique({
       where: { id: parseInt(id) },
     });
 
@@ -688,7 +688,7 @@ export const getMembrosDisponiveis: RequestHandler = async (req, res) => {
   try {
     const { equipeId } = req.params;
 
-    const equipe = await prisma.equipeDeVenda.findUnique({
+    const equipe = await prisma.equipes_de_venda.findUnique({
       where: { id: parseInt(equipeId) },
       include: {
         anunciante: {
