@@ -14,7 +14,7 @@ export default function Browse() {
   const { data: anunciosData, isLoading } = useQuery({
     queryKey: ["browse-anuncios"],
     queryFn: async () => {
-      const response = await fetch("/api/anuncios");
+      const response = await fetch("/api/anuncios?limit=500");
       if (!response.ok) throw new Error("Erro ao buscar");
       return response.json();
     },
