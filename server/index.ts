@@ -194,6 +194,12 @@ export function createServer() {
   app.post("/api/auth/forgot-password", forgotPassword);
   app.post("/api/auth/reset-password", resetPassword);
   app.get("/api/auth/validate-reset-token", validateResetToken);
+
+  // OAuth2 routes
+  app.get("/api/oauth/google/authorize", googleAuthorize);
+  app.get("/api/oauth/google/callback", googleCallback);
+  app.post("/api/oauth/google/link", googleLinkAccount);
+
   app.post("/api/usracessos", createUsuario);
   app.put("/api/usracessos/:id", updateUsuario);
   app.delete("/api/usracessos/:id", deleteUsuario);
