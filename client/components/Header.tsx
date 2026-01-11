@@ -16,8 +16,6 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function Header() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isCadastrosOpen, setIsCadastrosOpen] = useState(false);
   const { user, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -25,32 +23,6 @@ export default function Header() {
     logout();
     navigate("/");
   };
-
-  // Close mobile menu when window is resized to desktop size
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth >= 1024) {
-        // lg breakpoint
-        setIsMenuOpen(false);
-      }
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  // Prevent body scroll when mobile menu is open
-  useEffect(() => {
-    if (isMenuOpen) {
-      document.body.classList.add("menu-open");
-    } else {
-      document.body.classList.remove("menu-open");
-    }
-
-    return () => {
-      document.body.classList.remove("menu-open");
-    };
-  }, [isMenuOpen]);
 
   return (
     <>
