@@ -251,11 +251,25 @@
   @media (max-width: 1023px) {
     .mobile-menu-nav {
       display: block !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      visibility: visible !important;
+    }
+
+    .mobile-menu-backdrop {
+      display: block !important;
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      visibility: visible !important;
     }
   }
 
   @media (min-width: 1024px) {
     .mobile-menu-nav {
+      display: none !important;
+    }
+
+    .mobile-menu-backdrop {
       display: none !important;
     }
   }
