@@ -244,11 +244,18 @@ export default function CadastroEquipeDeVenda() {
       memberId: number;
       data: typeof memberFormData;
     }) => {
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (user?.id) {
+        headers["X-User-Id"] = user.id.toString();
+      }
+
       const response = await fetch(
         `/api/equipes-venda/${teamId}/membros/${memberId}`,
         {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
+          headers,
           body: JSON.stringify(data),
         },
       );
