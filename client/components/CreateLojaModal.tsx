@@ -328,7 +328,7 @@ export default function CreateAnuncianteModal({
                   );
                   handleInputChange("whatsapp", "+55" + cleanValue);
                 }}
-                placeholder="(11) 98765-4321"
+                placeholder="(51) 98765-4321"
                 className="flex-1 px-4 py-2 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
               />
             </div>
