@@ -53,7 +53,10 @@ export default function AdminEditUserModal({
         `/api/admin/usracessos/${usuario.id}/profile`,
         {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "x-user-id": user?.id?.toString() || "",
+          },
           body: JSON.stringify(data),
         }
       );
