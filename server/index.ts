@@ -307,6 +307,12 @@ export function createServer() {
     requireAdmin,
     overrideAnuncioStatus,
   );
+  app.patch(
+    "/api/anuncios/:id/destaque",
+    extractUserId,
+    requireAdmin,
+    toggleDestaqueAnuncio,
+  );
   app.patch("/api/anuncios/:id/inactivate", inactivateAnuncio);
   app.patch("/api/anuncios/:id/activate", activateAnuncio);
   app.delete("/api/anuncios/:id", deleteAnuncio);
