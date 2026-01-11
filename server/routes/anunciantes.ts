@@ -233,6 +233,7 @@ export const createAnunciante: RequestHandler = async (req, res) => {
 // Schema for updating anunciante (whitelist safe fields)
 const AnuncianteUpdateSchema = z.object({
   nome: z.string().min(1, "Nome é obrigatório").optional(),
+  tipo: z.enum(["Comum", "Profissional"]).optional(),
   endereco: z.string().min(1, "Endereço é obrigatório").optional(),
   cidade: z.string().min(1, "Cidade é obrigatória").optional(),
   estado: z.string().length(2, "Estado deve ter 2 caracteres").optional(),
