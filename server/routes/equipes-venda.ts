@@ -353,6 +353,15 @@ export const adicionarMembro: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
     const body = AdicionarMembroSchema.parse(req.body);
+    const usuarioId = req.userId;
+
+    // Verify user is authenticated
+    if (!usuarioId) {
+      return res.status(401).json({
+        success: false,
+        error: "Usuário não autenticado",
+      });
+    }
 
     const equipe = await prisma.equipeDeVenda.findUnique({
       where: { id: parseInt(id) },
@@ -365,42 +374,49 @@ export const adicionarMembro: RequestHandler = async (req, res) => {
       });
     }
 
-    // If usuarioId is provided, verify the user exists
-    if (body.usuarioId) {
-      const usuario = await prisma.usuario.findUnique({
-        where: { id: body.usuarioId },
-      });
+    // Check permissions - allow if user is admin or owner of the anunciante
+    const usuario = await prisma.usuario.findUnique({
+      where: { id: usuarioId },
+      select: { tipoUsuario: true },
+    });
 
-      if (!usuario) {
-        return res.status(404).json({
-          success: false,
-          error: "Usuário não encontrado",
-        });
-      }
-
-      // Check if already a member
-      const existingMember = await prisma.membroEquipe.findUnique({
+    // If not admin, check if user is associated with this anunciante
+    if (usuario?.tipoUsuario !== "adm") {
+      const hasAccess = await prisma.usuarioAnunciante.findFirst({
         where: {
-          equipeId_usuarioId: {
-            equipeId: parseInt(id),
-            usuarioId: body.usuarioId,
-          },
+          usuarioId: usuarioId,
+          anuncianteId: equipe.anuncianteId,
         },
       });
 
-      if (existingMember) {
-        return res.status(400).json({
+      if (!hasAccess) {
+        return res.status(403).json({
           success: false,
-          error: "Usuário já é membro desta equipe",
+          error: "Você não tem permissão para adicionar membros a esta equipe",
         });
       }
+    }
+
+    // Check if email already exists in this equipe
+    const existingMember = await prisma.membroEquipe.findFirst({
+      where: {
+        equipeId: parseInt(id),
+        email: body.email,
+      },
+    });
+
+    if (existingMember) {
+      return res.status(400).json({
+        success: false,
+        error: "Um membro com este email já existe nesta equipe",
+      });
     }
 
     const membro = await prisma.membroEquipe.create({
       data: {
         equipeId: parseInt(id),
-        usuarioId: body.usuarioId || null,
-        nome: body.nome,
+        usuarioId: usuarioId, // Preenchido automaticamente com o usuário autenticado
+        nomeMembro: body.nomeMembro,
         email: body.email,
         whatsapp: body.whatsapp || null,
         status: body.status || "disponivel",
@@ -448,7 +464,7 @@ export const adicionarMembro: RequestHandler = async (req, res) => {
       return res.status(400).json({
         success: false,
         error:
-          "Este membro já existe na equipe ou o email já está registrado para outro membro.",
+          "Este membro já existe nesta equipe. Um email não pode ser duplicado na mesma equipe.",
         details: error.message,
       });
     }
