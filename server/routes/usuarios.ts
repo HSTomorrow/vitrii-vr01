@@ -244,7 +244,7 @@ export const createUsuario: RequestHandler = async (req, res) => {
   try {
     const validatedData = UsuarioCreateSchema.parse(req.body);
 
-    // Check if user already exists
+    // Check if user already exists by email
     const existingUser = await prisma.usracessos.findUnique({
       where: { email: validatedData.email },
     });
@@ -265,6 +265,24 @@ export const createUsuario: RequestHandler = async (req, res) => {
       normalizedCpf = validatedData.cpf.replace(/\D/g, "");
     }
 
+    // Check if CPF is already in use by another user
+    if (normalizedCpf) {
+      const existingCpf = await prisma.usracessos.findFirst({
+        where: { cpf: normalizedCpf },
+      });
+
+      if (existingCpf) {
+        return res.status(400).json({
+          success: false,
+          error: "CPF/CNPJ já cadastrado para outro usuário",
+        });
+      }
+    }
+
+    // Calculate contract expiration date (30 days from now)
+    const contractExpireDate = new Date();
+    contractExpireDate.setDate(contractExpireDate.getDate() + 30);
+
     const usuario = await prisma.usracessos.create({
       data: {
         nome: validatedData.nome,
@@ -275,6 +293,8 @@ export const createUsuario: RequestHandler = async (req, res) => {
         endereco: validatedData.endereco || "",
         tipoUsuario: "comum",
         dataAtualizacao: new Date(),
+        dataVigenciaContrato: contractExpireDate,
+        numeroAnunciosAtivos: 0,
       },
       select: {
         id: true,
