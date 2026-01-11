@@ -81,21 +81,21 @@ async function createTestData() {
     });
     console.log(`✅ Tabela de Preço criada/atualizada: R$ ${tabela.preco}\n`);
 
-    // 5. Create test Variante (Variant)
-    console.log("5️⃣ Creating test Variante...");
-    const variante = await prisma.variantes.upsert({
-      where: { id: 999 },
-      update: {},
-      create: {
-        id: 999,
+    // 5. Create test Variante via Price Table (P+G variation)
+    console.log("5️⃣ Creating test Variante (via Tabela de Preço variation)...");
+    const variante = await prisma.tabelas_preco.create({
+      data: {
         productId: producto.id,
-        nome: "Variante Teste - Menu",
-        valor: "Valor Teste",
+        anuncianteId: anunciante.id,
+        preco: 109.90,
+        precoCusto: 60.00,
+        tamanho: "M",
+        cor: "Azul",
         dataCriacao: new Date(),
         dataAtualizacao: new Date(),
       },
     });
-    console.log(`✅ Variante criada/atualizada: ${variante.nome}\n`);
+    console.log(`✅ Variante criada: ${variante.tamanho}/${variante.cor} - R$ ${variante.preco}\n`);
 
     // 6. Create test Equipe de Venda (Sales Team)
     console.log("6️⃣ Creating test Equipe de Venda...");
