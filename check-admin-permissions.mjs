@@ -7,7 +7,7 @@ async function checkAdminPermissions() {
     console.log("🔍 Checking admin user and permissions...\n");
 
     // Find the admin user
-    const admin = await prisma.usuario.findUnique({
+    const admin = await prisma.usracesso.findUnique({
       where: { email: "admin@vitrii.com" },
       include: {
         usuarioXFuncionalidades: {

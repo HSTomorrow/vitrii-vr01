@@ -7,7 +7,7 @@ async function checkAdminUsers() {
     console.log("🔍 Checking for admin users...\n");
 
     // Find all admin users
-    const admins = await prisma.usuario.findMany({
+    const admins = await prisma.usracesso.findMany({
       where: { tipoUsuario: "adm" },
       select: {
         id: true,
@@ -34,7 +34,7 @@ async function checkAdminUsers() {
 
     // Also check if there's any user with "admin" in email
     console.log("\n🔎 Checking for users with 'admin' in email...\n");
-    const adminEmailUsers = await prisma.usuario.findMany({
+    const adminEmailUsers = await prisma.usracesso.findMany({
       where: {
         email: {
           contains: "admin",
