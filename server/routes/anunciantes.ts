@@ -174,7 +174,6 @@ export const createAnunciante: RequestHandler = async (req, res) => {
     const anunciante = await prisma.anunciantes.create({
       data: {
         nome: validatedData.nome,
-        tipo: validatedData.tipo,
         cidade: validatedData.cidade,
         estado: validatedData.estado,
         cnpj: validatedData.cnpj,
