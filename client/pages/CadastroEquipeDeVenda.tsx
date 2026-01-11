@@ -323,8 +323,32 @@ export default function CadastroEquipeDeVenda() {
 
   const handleSubmitMember = (e: React.FormEvent, teamId: number) => {
     e.preventDefault();
-    if (!memberFormData.nome || !memberFormData.email) {
-      toast.error("Nome e email são obrigatórios");
+
+    // Client-side validation
+    if (!memberFormData.nome) {
+      toast.error("Nome do membro é obrigatório");
+      return;
+    }
+
+    if (!memberFormData.email) {
+      toast.error("Email é obrigatório");
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(memberFormData.email)) {
+      toast.error("Email deve ser um endereço de email válido");
+      return;
+    }
+
+    if (memberFormData.nome.length > 255) {
+      toast.error("Nome não pode ter mais de 255 caracteres");
+      return;
+    }
+
+    if (memberFormData.email.length > 255) {
+      toast.error("Email não pode ter mais de 255 caracteres");
       return;
     }
 
