@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { AlertCircle } from "lucide-react";
 import Header from "@/components/Header";
@@ -7,7 +7,9 @@ import AnuncioForm from "@/components/AnuncioForm";
 
 export default function CriarAnuncio() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { isLoggedIn, isLoading } = useAuth();
+  const isDonation = searchParams.get("tipo") === "doacao";
 
   // Show loading state while checking authentication
   if (isLoading) {
