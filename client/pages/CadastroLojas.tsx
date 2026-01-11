@@ -26,6 +26,7 @@ interface Anunciante {
 
 export default function CadastroAnunciantes() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState({
