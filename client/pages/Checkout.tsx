@@ -183,9 +183,9 @@ export default function Checkout() {
 
               {anuncio && (
                 <div className="space-y-4">
-                  {anuncio.fotoUrl && (
+                  {anuncio.imagem && (
                     <img
-                      src={anuncio.fotoUrl}
+                      src={anuncio.imagem}
                       alt={anuncio.titulo}
                       className="w-full h-40 object-cover rounded-lg"
                     />
