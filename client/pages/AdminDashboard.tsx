@@ -464,6 +464,13 @@ export default function AdminDashboard() {
                           <div className="space-y-3">
                             <div className="flex gap-2">
                               <button
+                                onClick={() => setEditingUser(usuario)}
+                                className="flex-1 px-3 py-2 bg-walmart-green text-white rounded-lg hover:bg-walmart-green-dark transition flex items-center justify-center gap-2"
+                              >
+                                <Edit2 className="w-4 h-4" />
+                                Editar
+                              </button>
+                              <button
                                 onClick={() => setSelectedUsuario(usuario.id)}
                                 className="flex-1 px-3 py-2 bg-walmart-blue text-white rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2"
                               >
