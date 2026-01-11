@@ -65,6 +65,7 @@ export default function App() {
                 <Route path="/esqueci-senha" element={<ForgotPassword />} />
                 <Route path="/reset-senha" element={<ResetPassword />} />
                 <Route path="/favoritos" element={<Favoritos />} />
+                <Route path="/meus-anuncios" element={<MeusAnuncios />} />
                 <Route path="/perfil" element={<PerfilUsuario />} />
                 <Route path="/profile" element={<PerfilUsuario />} />
                 <Route path="/anuncio/criar" element={<CriarAnuncio />} />
