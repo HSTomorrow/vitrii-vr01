@@ -223,28 +223,28 @@ export default function Header() {
             <div className="flex flex-col space-y-2 pt-4 pb-20 px-4">
               <Link
                 to="/browse"
-                className="px-4 py-2 text-walmart-text hover:bg-walmart-gray rounded-lg"
+                className="py-2 text-walmart-text hover:bg-walmart-gray rounded-lg"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Ver Anúncios
               </Link>
               <Link
                 to="/sell"
-                className="px-4 py-2 text-walmart-text hover:bg-walmart-gray rounded-lg"
+                className="py-2 text-walmart-text hover:bg-walmart-gray rounded-lg"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Vender
               </Link>
               <Link
                 to="/qrcode"
-                className="px-4 py-2 text-walmart-text hover:bg-walmart-gray rounded-lg"
+                className="py-2 text-walmart-text hover:bg-walmart-gray rounded-lg"
                 onClick={() => setIsMenuOpen(false)}
               >
                 QR Code
               </Link>
               <Link
                 to="/about"
-                className="px-4 py-2 text-walmart-text hover:bg-walmart-gray rounded-lg"
+                className="py-2 text-walmart-text hover:bg-walmart-gray rounded-lg"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Sobre
@@ -253,7 +253,7 @@ export default function Header() {
               {user && (
                 <Link
                   to="/favoritos"
-                  className="px-4 py-2 text-walmart-text hover:bg-walmart-gray rounded-lg flex items-center gap-2"
+                  className="py-2 text-walmart-text hover:bg-walmart-gray rounded-lg flex items-center gap-2"
                   onClick={() => setIsMenuOpen(false)}
                 >
                   <Heart className="w-4 h-4" />
@@ -265,20 +265,20 @@ export default function Header() {
                 <div className="border-t border-gray-300 pt-4 mt-2">
                   <button
                     onClick={() => setIsCadastrosOpen(!isCadastrosOpen)}
-                    className="w-full text-left px-4 py-2 text-walmart-text hover:bg-walmart-gray rounded-lg font-semibold flex items-center gap-2"
+                    className="w-full text-left py-2 text-walmart-text hover:bg-walmart-gray rounded-lg font-semibold flex items-center gap-2"
                   >
                     <Settings className="w-4 h-4" />
                     Cadastros
                   </button>
                   {isCadastrosOpen && (
-                    <div className="pl-4 space-y-2 mt-2">
+                    <div className="space-y-2 mt-2">
                       <Link
                         to="/cadastros/lojas"
                         onClick={() => {
                           setIsMenuOpen(false);
                           setIsCadastrosOpen(false);
                         }}
-                        className="block px-4 py-2 text-sm text-walmart-text hover:bg-walmart-gray rounded-lg"
+                        className="block py-2 text-sm text-walmart-text hover:bg-walmart-gray rounded-lg pl-4"
                       >
                         Cadastro de Lojas
                       </Link>
@@ -288,7 +288,7 @@ export default function Header() {
                           setIsMenuOpen(false);
                           setIsCadastrosOpen(false);
                         }}
-                        className="block px-4 py-2 text-sm text-walmart-text hover:bg-walmart-gray rounded-lg"
+                        className="block py-2 text-sm text-walmart-text hover:bg-walmart-gray rounded-lg pl-4"
                       >
                         Grupos de Produtos
                       </Link>
@@ -298,7 +298,7 @@ export default function Header() {
                           setIsMenuOpen(false);
                           setIsCadastrosOpen(false);
                         }}
-                        className="block px-4 py-2 text-sm text-walmart-text hover:bg-walmart-gray rounded-lg"
+                        className="block py-2 text-sm text-walmart-text hover:bg-walmart-gray rounded-lg pl-4"
                       >
                         Cadastro de Produtos
                       </Link>
@@ -308,7 +308,7 @@ export default function Header() {
                           setIsMenuOpen(false);
                           setIsCadastrosOpen(false);
                         }}
-                        className="block px-4 py-2 text-sm text-walmart-text hover:bg-walmart-gray rounded-lg"
+                        className="block py-2 text-sm text-walmart-text hover:bg-walmart-gray rounded-lg pl-4"
                       >
                         Tabelas de Preço
                       </Link>
@@ -318,7 +318,7 @@ export default function Header() {
                           setIsMenuOpen(false);
                           setIsCadastrosOpen(false);
                         }}
-                        className="block px-4 py-2 text-sm text-walmart-text hover:bg-walmart-gray rounded-lg"
+                        className="block py-2 text-sm text-walmart-text hover:bg-walmart-gray rounded-lg pl-4"
                       >
                         Variantes
                       </Link>
@@ -328,7 +328,7 @@ export default function Header() {
                           setIsMenuOpen(false);
                           setIsCadastrosOpen(false);
                         }}
-                        className="block px-4 py-2 text-sm text-walmart-text hover:bg-walmart-gray rounded-lg"
+                        className="block py-2 text-sm text-walmart-text hover:bg-walmart-gray rounded-lg pl-4"
                       >
                         Equipes de Venda
                       </Link>
@@ -340,13 +340,13 @@ export default function Header() {
               <div className="border-t border-gray-300 pt-4 mt-2">
                 <Link
                   to="/auth/signin"
-                  className="block px-4 py-2 text-walmart-blue"
+                  className="block py-2 text-walmart-blue"
                 >
                   Entrar
                 </Link>
                 <Link
                   to="/auth/signup"
-                  className="block px-4 py-2 bg-walmart-blue text-white rounded-lg"
+                  className="block py-2 bg-walmart-blue text-white rounded-lg text-center"
                 >
                   Cadastrar
                 </Link>
