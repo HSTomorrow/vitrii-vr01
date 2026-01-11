@@ -364,7 +364,7 @@ export const updateUsuario: RequestHandler = async (req, res) => {
       }
     }
 
-    const usuario = await prisma.usracesso.update({
+    const usuario = await prisma.usracessos.update({
       where: { id: userId },
       data: validatedData,
       select: {
