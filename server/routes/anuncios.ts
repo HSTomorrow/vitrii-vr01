@@ -94,14 +94,11 @@ export const getAnuncios: RequestHandler = async (req, res) => {
       pageOffset,
     });
 
-    const where: any = { isActive: true }; // Default: only active ads
+    const where: any = { status: "ativo" }; // Default: only active ads
     if (anuncianteId) where.anuncianteId = parseInt(anuncianteId as string);
     if (status) where.status = status;
-    if (includeInactive === "true") delete where.isActive; // Override to include inactive
-    // Handle isDoacao parameter
-    if (isDoacao !== undefined) {
-      where.isDoacao = isDoacao === "true";
-    }
+    if (includeInactive === "true") delete where.status; // Override to include inactive
+    // Note: isDoacao filtering not supported in current schema
 
     console.log("[getAnuncios] Where clause:", where);
 
