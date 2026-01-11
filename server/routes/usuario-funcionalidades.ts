@@ -24,7 +24,7 @@ export const grantFuncionalidade: RequestHandler = async (req, res) => {
     const validatedData = UsuarioXFuncionalidadeSchema.parse(req.body);
 
     // Check if user exists
-    const usuario = await prisma.usracesso.findUnique({
+    const usuario = await prisma.usracessos.findUnique({
       where: { id: validatedData.usuarioId },
     });
 
@@ -119,7 +119,7 @@ export const grantFuncionalidades: RequestHandler = async (req, res) => {
     const validatedData = GrantFuncionalidadesSchema.parse(req.body);
 
     // Check if user exists
-    const usuario = await prisma.usracesso.findUnique({
+    const usuario = await prisma.usracessos.findUnique({
       where: { id: validatedData.usuarioId },
     });
 
@@ -272,7 +272,7 @@ export const revokeFuncionalidades: RequestHandler = async (req, res) => {
     const validatedData = RevokeFuncionalidadesSchema.parse(req.body);
 
     // Check if user exists
-    const usuario = await prisma.usracesso.findUnique({
+    const usuario = await prisma.usracessos.findUnique({
       where: { id: validatedData.usuarioId },
     });
 
