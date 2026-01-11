@@ -134,25 +134,38 @@ export const createAnunciante: RequestHandler = async (req, res) => {
     const validatedData = AnuncianteCreateSchema.parse(req.body);
     const { usuarioId } = req.body; // Optional userId to link the creator
 
-    // Check if anunciante already exists (only if cnpj is provided)
-    if (validatedData.cnpj) {
-      const existingAnunciante = await prisma.anunciantes.findFirst({
-        where: { cnpj: validatedData.cnpj },
+    // Check if CNPJ/CPF is registered to a user (cross-validation)
+    // Only prevent if it's for a regular user, allow admin exception
+    if (validatedData.cnpj && usuarioId) {
+      const requestingUser = await prisma.usracessos.findUnique({
+        where: { id: usuarioId },
+        select: { tipoUsuario: true },
       });
 
-      if (existingAnunciante) {
-        return res.status(400).json({
-          success: false,
-          error: "Anunciante com este CNPJ/CPF já cadastrado",
-          details: [
-            {
-              path: ["cnpj"],
-              message: "CNPJ/CPF já cadastrado no sistema",
-            },
-          ],
+      // If not admin, check if this CPF/CNPJ is already a user
+      if (requestingUser?.tipoUsuario !== "adm") {
+        const cpfAsUser = await prisma.usracessos.findFirst({
+          where: { cpf: validatedData.cnpj },
         });
+
+        if (cpfAsUser) {
+          return res.status(400).json({
+            success: false,
+            error: "Este CPF/CNPJ já está cadastrado como usuário no sistema",
+            details: [
+              {
+                path: ["cnpj"],
+                message:
+                  "CPF/CNPJ não pode ser reutilizado para anunciante se já é usuário",
+              },
+            ],
+          });
+        }
       }
     }
+
+    // Multiple anunciantes can have the same CNPJ (no restriction between anunciantes)
+    // The restriction is only between user and anunciante
 
     // Create anunciante with required and optional fields
     const anunciante = await prisma.anunciantes.create({
