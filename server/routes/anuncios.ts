@@ -353,6 +353,7 @@ export const createAnuncio: RequestHandler = async (req, res) => {
       const errorMessages = error.errors
         .map((err) => `${err.path.join(".")}: ${err.message}`)
         .join("; ");
+      console.error("[createAnuncio] Validation error:", errorMessages);
       return res.status(400).json({
         success: false,
         error: "Dados inválidos",
@@ -360,7 +361,11 @@ export const createAnuncio: RequestHandler = async (req, res) => {
       });
     }
 
-    console.error("Error creating ad:", error);
+    console.error("[createAnuncio] Unexpected error:", error);
+    console.error("[createAnuncio] Error details:", {
+      message: error instanceof Error ? error.message : "Unknown error",
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     res.status(500).json({
       success: false,
       error: "Erro ao criar anúncio",
