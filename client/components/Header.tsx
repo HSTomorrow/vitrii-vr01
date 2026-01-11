@@ -223,28 +223,28 @@ export default function Header() {
             <div className="flex flex-col space-y-1 pt-2 pb-32 px-2 min-h-full">
               <Link
                 to="/browse"
-                className="py-2 text-walmart-text hover:bg-walmart-gray rounded-lg"
+                className="block px-4 py-2 text-walmart-text hover:bg-walmart-gray rounded-lg"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Ver Anúncios
               </Link>
               <Link
                 to="/sell"
-                className="py-2 text-walmart-text hover:bg-walmart-gray rounded-lg"
+                className="block px-4 py-2 text-walmart-text hover:bg-walmart-gray rounded-lg"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Vender
               </Link>
               <Link
                 to="/qrcode"
-                className="py-2 text-walmart-text hover:bg-walmart-gray rounded-lg"
+                className="block px-4 py-2 text-walmart-text hover:bg-walmart-gray rounded-lg"
                 onClick={() => setIsMenuOpen(false)}
               >
                 QR Code
               </Link>
               <Link
                 to="/about"
-                className="py-2 text-walmart-text hover:bg-walmart-gray rounded-lg"
+                className="block px-4 py-2 text-walmart-text hover:bg-walmart-gray rounded-lg"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Sobre
