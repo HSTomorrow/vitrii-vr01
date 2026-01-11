@@ -245,3 +245,18 @@ model membros_equipe {
   @@unique([equipeId, email])
   @@map("membros_equipe")
 }
+
+// Banners - Admin managed promotional banners for homepage
+model banners {
+  id              Int       @id @default(autoincrement())
+  titulo          String    @db.VarChar(255)
+  descricao       String?   @db.Text
+  imagemUrl       String    @db.VarChar(500)
+  link            String?   @db.VarChar(500)
+  ordem           Int       @default(0)
+  ativo           Boolean   @default(true)
+  dataCriacao     DateTime  @default(now())
+  dataAtualizacao DateTime  @updatedAt
+
+  @@map("banners")
+}
