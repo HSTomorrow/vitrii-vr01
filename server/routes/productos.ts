@@ -19,7 +19,7 @@ export const getProductos: RequestHandler = async (req, res) => {
     const where: any = {};
     if (grupoId) where.grupoId = parseInt(grupoId as string);
 
-    const productos = await prisma.producto.findMany({
+    const productos = await prisma.productos.findMany({
       where,
       include: {
         grupo: {
@@ -54,7 +54,7 @@ export const getProductoById: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const producto = await prisma.producto.findUnique({
+    const producto = await prisma.productos.findUnique({
       where: { id: parseInt(id) },
       include: {
         grupo: {
@@ -103,7 +103,7 @@ export const createProducto: RequestHandler = async (req, res) => {
       });
     }
 
-    const producto = await prisma.producto.create({
+    const producto = await prisma.productos.create({
       data: validatedData,
       include: {
         grupo: {
@@ -142,7 +142,7 @@ export const updateProducto: RequestHandler = async (req, res) => {
     const { id } = req.params;
     const updateData = ProductoCreateSchema.partial().parse(req.body);
 
-    const producto = await prisma.producto.update({
+    const producto = await prisma.productos.update({
       where: { id: parseInt(id) },
       data: updateData,
       include: {
@@ -181,7 +181,7 @@ export const deleteProducto: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
-    await prisma.producto.delete({
+    await prisma.productos.delete({
       where: { id: parseInt(id) },
     });
 
