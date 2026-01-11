@@ -90,7 +90,7 @@ async function main() {
     await prisma.productos_visualizacoes.deleteMany({});
     await prisma.produtos_em_estoque.deleteMany({});
     await prisma.tabelas_preco.deleteMany({});
-    await prisma.movimientos_estoque.deleteMany({});
+    await prisma.movimentos_estoque.deleteMany({});
     await prisma.usuarios_anunciantes.deleteMany({});
     await prisma.fotos_grupos.deleteMany({});
     await prisma.qrcodes_chamadas.deleteMany({});
