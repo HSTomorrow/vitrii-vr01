@@ -257,8 +257,8 @@ export default function AnuncioForm({
         estado: data.estado || null,
         isDoacao: data.isDoacao,
         destaque: data.destaque,
-        categoria: data.categoria,
-        dadosCategoria: data.dadosCategoria,
+        categoria: data.categoria || null,
+        dadosCategoria: data.dadosCategoria || null,
       };
 
       console.log("[AnuncioForm] Submitting form with payload:", payload);
