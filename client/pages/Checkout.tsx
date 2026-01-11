@@ -240,12 +240,20 @@ export default function Checkout() {
                     </div>
                   </div>
 
-                  <button
-                    onClick={() => navigate(`/anuncio/${parsedAnuncioId}`)}
-                    className="w-full mt-4 px-4 py-2 border-2 border-walmart-blue text-walmart-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors"
-                  >
-                    Ver Anúncio Completo
-                  </button>
+                  <div className="space-y-2 mt-4">
+                    <button
+                      onClick={() => navigate(`/anuncio/${parsedAnuncioId}/editar`)}
+                      className="w-full px-4 py-2 bg-walmart-blue text-white rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors"
+                    >
+                      Reeditar Anúncio
+                    </button>
+                    <button
+                      onClick={() => navigate(`/anuncio/${parsedAnuncioId}`)}
+                      className="w-full px-4 py-2 border-2 border-walmart-blue text-walmart-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+                    >
+                      Ver Anúncio Completo
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
