@@ -57,6 +57,7 @@ interface UsuarioXFuncionalidade {
 export default function AdminDashboard() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<"usuarios" | "funcionalidades">(
     "usuarios",
   );
