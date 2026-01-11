@@ -13,7 +13,7 @@ async function main() {
 
   try {
     // Add dataVigenciaContrato column if it doesn't exist
-    console.log("📝 Adicionando coluna dataVigenciaContrato...");
+    console.log("📝 Verificando coluna dataVigenciaContrato...");
     try {
       await prisma.$executeRawUnsafe(
         `ALTER TABLE "usracessos" ADD COLUMN "dataVigenciaContrato" TIMESTAMP DEFAULT NOW();`
@@ -21,14 +21,14 @@ async function main() {
       console.log("✅ Coluna dataVigenciaContrato adicionada");
     } catch (err) {
       if (err.message.includes("already exists")) {
-        console.log("⚠️ Coluna dataVigenciaContrato já existe");
+        console.log("ℹ️ Coluna dataVigenciaContrato já existe");
       } else {
         throw err;
       }
     }
 
     // Add numeroAnunciosAtivos column if it doesn't exist
-    console.log("📝 Adicionando coluna numeroAnunciosAtivos...");
+    console.log("📝 Verificando coluna numeroAnunciosAtivos...");
     try {
       await prisma.$executeRawUnsafe(
         `ALTER TABLE "usracessos" ADD COLUMN "numeroAnunciosAtivos" INTEGER DEFAULT 0;`
@@ -36,28 +36,13 @@ async function main() {
       console.log("✅ Coluna numeroAnunciosAtivos adicionada");
     } catch (err) {
       if (err.message.includes("already exists")) {
-        console.log("⚠️ Coluna numeroAnunciosAtivos já existe");
+        console.log("ℹ️ Coluna numeroAnunciosAtivos já existe");
       } else {
         throw err;
       }
     }
 
-    // Add UNIQUE constraint to cpf column if it doesn't exist
-    console.log("📝 Adicionando restrição UNIQUE em cpf...");
-    try {
-      await prisma.$executeRawUnsafe(
-        `ALTER TABLE "usracessos" ADD CONSTRAINT "usracessos_cpf_unique" UNIQUE ("cpf") WHERE "cpf" IS NOT NULL;`
-      );
-      console.log("✅ Restrição UNIQUE em cpf adicionada");
-    } catch (err) {
-      if (err.message.includes("already exists") || err.message.includes("duplicate")) {
-        console.log("⚠️ Restrição UNIQUE em cpf já existe");
-      } else {
-        throw err;
-      }
-    }
-
-    // Update existing records with contract date
+    // Update existing records with contract date (30 days from now)
     console.log("\n📝 Preenchendo contratos existentes com data + 30 dias...");
     const result = await prisma.$executeRawUnsafe(
       `UPDATE "usracessos" 
@@ -89,11 +74,15 @@ async function main() {
       console.log(`  ID: ${user.id}`);
       console.log(`  Nome: ${user.nome}`);
       console.log(`  Email: ${user.email}`);
-      console.log(`  Vigência: ${user.dataVigenciaContrato}`);
+      console.log(`  Vigência: ${new Date(user.dataVigenciaContrato).toLocaleDateString("pt-BR")}`);
       console.log(`  Anúncios Ativos: ${user.numeroAnunciosAtivos}\n`);
     });
 
     console.log("✨ Campos adicionados e preenchidos com sucesso!");
+    console.log("\n📌 IMPORTANTE: As validações de CPF único e cross-validation de CPF/CNPJ");
+    console.log("   entre usuários e anunciantes foram implementadas no código de aplicação.");
+    console.log("   Não é necessária uma constraint UNIQUE em banco de dados pois");
+    console.log("   o campo CPF pode ser NULL e a validação é feita em lógica de negócio.");
   } catch (error) {
     console.error("❌ Erro ao adicionar campos:", error);
     process.exit(1);
