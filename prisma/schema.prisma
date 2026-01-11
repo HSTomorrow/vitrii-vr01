@@ -173,3 +173,36 @@ model usuarios_anunciantes {
 
   @@unique([usuarioId, anuncianteId], map: "usuarios_lojas_usuarioId_lojaId_key")
 }
+
+// Equipes de Venda (Sales Teams)
+model equipes_de_venda {
+  id              Int               @id @default(autoincrement())
+  anuncianteId    Int
+  nome            String            @db.VarChar(255)
+  descricao       String?           @db.Text
+  isActive        Boolean           @default(true)
+  dataCriacao     DateTime          @default(now())
+  dataAtualizacao DateTime          @updatedAt
+  anunciantes     anunciantes       @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
+  membros_equipe  membros_equipe[]
+
+  @@map("equipes_de_venda")
+}
+
+// Membros da Equipe de Venda (Sales Team Members)
+model membros_equipe {
+  id              Int                @id @default(autoincrement())
+  equipeId        Int
+  usuarioId       Int
+  nomeMembro      String             @db.VarChar(255)
+  email           String             @db.VarChar(255)
+  whatsapp        String?            @db.VarChar(20)
+  status          String             @default("disponivel")
+  dataCriacao     DateTime           @default(now())
+  dataAtualizacao DateTime           @updatedAt
+  equipe          equipes_de_venda   @relation(fields: [equipeId], references: [id], onDelete: Cascade)
+  usuario         usuarios           @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@unique([equipeId, email])
+  @@map("membros_equipe")
+}
