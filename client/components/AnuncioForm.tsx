@@ -80,7 +80,7 @@ export default function AnuncioForm({
     estado: "RS",
     isDoacao: false,
     destaque: false,
-    categoria: null as string | null,
+    categoria: "" as string,
     dadosCategoria: "",
   });
 
