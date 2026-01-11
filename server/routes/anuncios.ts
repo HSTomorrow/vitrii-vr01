@@ -332,6 +332,17 @@ export const createAnuncio: RequestHandler = async (req, res) => {
       },
     });
 
+    console.log("[createAnuncio] Ad created successfully!");
+    console.log("[createAnuncio] Ad details:", {
+      id: anuncio.id,
+      titulo: anuncio.titulo,
+      anuncianteId: anuncio.anuncianteId,
+      status: anuncio.status,
+      isActive: anuncio.isActive,
+      precoAnuncio: anuncio.precoAnuncio,
+      isDoacao: anuncio.isDoacao,
+    });
+
     res.status(201).json({
       success: true,
       data: anuncio,
