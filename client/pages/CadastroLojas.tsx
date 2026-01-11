@@ -41,11 +41,11 @@ export default function CadastroAnunciantes() {
     whatsapp: "",
   });
 
-  // Fetch anunciantes
+  // Fetch anunciantes (filtered by current user, or all if admin)
   const { data: anunciantesData, refetch } = useQuery({
     queryKey: ["anunciantes"],
     queryFn: async () => {
-      const response = await fetch("/api/anunciantes");
+      const response = await fetch("/api/anunciantes/do-usuario/listar");
       if (!response.ok) throw new Error("Erro ao buscar anunciantes");
       const result = await response.json();
       return result.data || [];
