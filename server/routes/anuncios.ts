@@ -142,7 +142,7 @@ export const getAnuncios: RequestHandler = async (req, res) => {
         take: pageLimit,
         skip: pageOffset,
       }),
-      prisma.anuncio.count({ where }),
+      prisma.anuncios.count({ where }),
     ]);
 
     console.log(
