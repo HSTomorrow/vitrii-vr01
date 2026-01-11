@@ -74,9 +74,11 @@ export const getAnuncios: RequestHandler = async (req, res) => {
     } = req.query;
 
     // Validate pagination parameters
+    // Allow up to 500 items for admin requests, 100 for regular users
+    const maxLimit = 500; // Admin can request more
     const pageLimit = Math.min(
       Math.max(parseInt(limit as string) || 20, 1),
-      100,
+      maxLimit,
     );
     const pageOffset = Math.max(parseInt(offset as string) || 0, 0);
 
