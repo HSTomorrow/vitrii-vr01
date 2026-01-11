@@ -532,7 +532,7 @@ export const removerMembro: RequestHandler = async (req, res) => {
 
     // Check permissions - allow if user is admin or creator of this member
     if (usuarioId) {
-      const usuario = await prisma.usracesso.findUnique({
+      const usuario = await prisma.usracessos.findUnique({
         where: { id: usuarioId },
         select: { tipoUsuario: true },
       });
