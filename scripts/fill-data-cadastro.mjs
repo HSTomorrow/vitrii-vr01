@@ -5,18 +5,13 @@ const prisma = new PrismaClient();
 async function main() {
   console.log("🔄 Iniciando preenchimento de datas de cadastro...\n");
 
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  const todayISO = today.toISOString();
-
   try {
     // Update usracessos (usuarios) com dataAtualizacao NULL
     console.log("📝 Atualizando usuários sem dataAtualizacao...");
     const usuariosResult = await prisma.$executeRawUnsafe(
       `UPDATE "usracessos" 
-       SET "dataAtualizacao" = $1 
-       WHERE "dataAtualizacao" IS NULL`,
-      todayISO
+       SET "dataAtualizacao" = NOW() 
+       WHERE "dataAtualizacao" IS NULL`
     );
     console.log(`✅ ${usuariosResult} usuários atualizados\n`);
 
@@ -24,9 +19,8 @@ async function main() {
     console.log("📝 Atualizando anunciantes sem dataAtualizacao...");
     const anunciantesResult = await prisma.$executeRawUnsafe(
       `UPDATE "anunciantes" 
-       SET "dataAtualizacao" = $1 
-       WHERE "dataAtualizacao" IS NULL`,
-      todayISO
+       SET "dataAtualizacao" = NOW() 
+       WHERE "dataAtualizacao" IS NULL`
     );
     console.log(`✅ ${anunciantesResult} anunciantes atualizados\n`);
 
