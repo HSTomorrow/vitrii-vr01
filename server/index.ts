@@ -287,13 +287,13 @@ export function createServer() {
 
   // Equipes de Venda routes
   app.get("/api/equipes-venda", getEquipes);
-  app.get("/api/equipes-venda/:id", getEquipeById);
+  app.get("/api/equipes-venda/:id", extractUserId, getEquipeById);
   app.post("/api/equipes-venda", extractUserId, createEquipe);
   app.put("/api/equipes-venda/:id", extractUserId, updateEquipe);
   app.delete("/api/equipes-venda/:id", deleteEquipe);
-  app.post("/api/equipes-venda/:id/membros", adicionarMembro);
-  app.put("/api/equipes-venda/:id/membros/:membroId", atualizarMembro);
-  app.delete("/api/equipes-venda/:id/membros/:membroId", removerMembro);
+  app.post("/api/equipes-venda/:id/membros", extractUserId, adicionarMembro);
+  app.put("/api/equipes-venda/:id/membros/:membroId", extractUserId, atualizarMembro);
+  app.delete("/api/equipes-venda/:id/membros/:membroId", extractUserId, removerMembro);
   app.get(
     "/api/equipes-venda/:id/usuarios-disponiveis",
     getUsuariosDisponiveis,
