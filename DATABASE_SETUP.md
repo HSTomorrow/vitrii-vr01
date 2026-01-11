@@ -203,7 +203,7 @@ Content-Type: application/json
   "email": "joao@example.com",
   "senha": "senha123",
   "cpf": "12345678901",
-  "telefone": "11999999999",
+  "telefone": "51999999999",
   "endereco": "Rua A, 123, São Paulo"
 }
 ```
