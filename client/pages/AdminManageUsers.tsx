@@ -108,7 +108,10 @@ export default function AdminManageUsers() {
         `/api/admin/usracessos/${usuarioId}/reset-password`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "x-user-id": user?.id?.toString() || "",
+          },
           body: JSON.stringify({ usuarioId, novaSenha }),
         },
       );
