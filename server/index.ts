@@ -292,10 +292,15 @@ export function createServer() {
   app.put("/api/equipes-venda/:id", extractUserId, updateEquipe);
   app.delete("/api/equipes-venda/:id", deleteEquipe);
   app.post("/api/equipes-venda/:id/membros", adicionarMembro);
+  app.put("/api/equipes-venda/:id/membros/:membroId", atualizarMembro);
   app.delete("/api/equipes-venda/:id/membros/:membroId", removerMembro);
   app.get(
     "/api/equipes-venda/:id/usuarios-disponiveis",
     getUsuariosDisponiveis,
+  );
+  app.get(
+    "/api/equipes-venda/:equipeId/membros-disponiveis",
+    getMembrosDisponiveis,
   );
 
   // Favoritos (Favorites) routes
