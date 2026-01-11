@@ -618,69 +618,179 @@ export default function AnuncioForm({
               </p>
             </div>
 
-            {/* Equipe de Venda */}
-            <div>
-              <label className="block text-sm font-semibold text-walmart-text mb-2">
-                Equipe de Venda (Opcional)
-              </label>
-              {selectedAnuncianteId > 0 ? (
-                <select
-                  value={formData.equipeDeVendaId}
-                  onChange={(e) =>
-                    handleInputChange(
-                      "equipeDeVendaId",
-                      parseInt(e.target.value),
-                    )
-                  }
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
-                >
-                  <option value={0}>Nenhuma equipe selecionada</option>
-                  {equipes.map((eq: EquipeDeVenda) => (
-                    <option key={eq.id} value={eq.id}>
-                      {eq.nome}
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <div className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500">
-                  Selecione um anunciante primeiro
+            {/* Informações para Anunciantes Profissionais Section */}
+            <div className="border-t-2 border-gray-200 pt-8 mt-8">
+              <h2 className="text-lg font-bold text-walmart-text mb-6">
+                Informações para Anunciantes Profissionais
+              </h2>
+
+              {/* Produto Selection */}
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-semibold text-walmart-text">
+                    Produto (Opcional)
+                  </label>
+                  {selectedAnuncianteId > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => setShowCreateProducto(true)}
+                      className="inline-flex items-center gap-1 px-3 py-1 text-sm bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
+                      Novo Produto
+                    </button>
+                  )}
                 </div>
-              )}
-            </div>
+                {selectedAnuncianteId > 0 ? (
+                  <select
+                    value={formData.productId}
+                    onChange={(e) => {
+                      const productId = parseInt(e.target.value);
+                      setFormData((prev) => ({
+                        ...prev,
+                        productId,
+                        tabelaDePrecoId: 0,
+                      }));
+                    }}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                  >
+                    <option value={0}>Selecione um produto</option>
+                    {productos.map((p: Producto) => (
+                      <option key={p.id} value={p.id}>
+                        {p.nome}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <div className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500">
+                    Selecione um anunciante primeiro
+                  </div>
+                )}
+                {selectedProducto &&
+                  (selectedProducto.grupo ||
+                    selectedProducto.grupoDeProductos) && (
+                    <p className="mt-2 text-sm text-walmart-text-secondary">
+                      Grupo:{" "}
+                      {
+                        (
+                          selectedProducto.grupo ||
+                          selectedProducto.grupoDeProductos
+                        )?.nome
+                      }
+                    </p>
+                  )}
+                {selectedProducto?.tipo && (
+                  <p className="mt-2 text-sm text-walmart-text-secondary">
+                    Tipo:{" "}
+                    <span className="font-semibold capitalize">
+                      {selectedProducto.tipo === "agenda_recorrente"
+                        ? "Agenda Recorrente"
+                        : selectedProducto.tipo}
+                    </span>
+                  </p>
+                )}
+              </div>
 
-            {/* Destaque (Featured) */}
-            <div className="flex items-center gap-3 p-4 bg-yellow-50 border border-walmart-yellow rounded-lg">
-              <input
-                type="checkbox"
-                id="destaque"
-                checked={formData.destaque}
-                onChange={(e) => {
-                  handleInputChange("destaque", e.target.checked);
-                }}
-                className="w-5 h-5 text-walmart-yellow cursor-pointer rounded"
-              />
-              <label htmlFor="destaque" className="flex-1 cursor-pointer">
-                <p className="font-semibold text-walmart-text">
-                  ⭐ Destaque (Em Destaque)
-                </p>
-                <p className="text-sm text-walmart-text-secondary">
-                  Marque esta opção para colocar o anúncio em destaque na página
-                  principal
-                </p>
-              </label>
-            </div>
+              {/* Tabela de Preço Selection - Only for regular products/services */}
+              {selectedProducto?.tipo &&
+                ["produto", "servico"].includes(selectedProducto.tipo) &&
+                priceTables.length > 0 && (
+                  <div className="mb-6">
+                    <label className="block text-sm font-semibold text-walmart-text mb-2">
+                      Variante (Tamanho/Cor) - Opcional
+                    </label>
+                    {formData.productId > 0 ? (
+                      <select
+                        value={formData.tabelaDePrecoId}
+                        onChange={(e) =>
+                          handleInputChange(
+                            "tabelaDePrecoId",
+                            parseInt(e.target.value),
+                          )
+                        }
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                      >
+                        <option value={0}>
+                          Selecione uma variante (opcional)
+                        </option>
+                        {priceTables.map((pt) => (
+                          <option key={pt.id} value={pt.id}>
+                            {pt.tamanho && pt.cor
+                              ? `${pt.tamanho} - ${pt.cor}`
+                              : pt.tamanho ||
+                                pt.cor ||
+                                `R$ ${Number(pt.preco).toFixed(2)}`}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <div className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500">
+                        Selecione um produto primeiro
+                      </div>
+                    )}
+                    {selectedPriceTable && (
+                      <p className="mt-2 text-sm text-walmart-blue font-semibold">
+                        Preço da Variante: R${" "}
+                        {Number(selectedPriceTable.preco).toFixed(2)}
+                      </p>
+                    )}
+                  </div>
+                )}
+              {selectedProducto?.tipo &&
+                !["produto", "servico"].includes(selectedProducto.tipo) && (
+                  <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg mb-6">
+                    <p className="text-sm text-blue-800">
+                      <strong>ℹ️ Dica:</strong> Este tipo de anúncio não requer
+                      variantes. O preço será definido diretamente no campo "Valor
+                      do Anúncio" acima.
+                    </p>
+                  </div>
+                )}
 
-            {/* Category-Specific Fields */}
-            <CategoryFields
-              categoria={formData.categoria}
-              dadosCategoria={formData.dadosCategoria}
-              onCategoryChange={(categoria) =>
-                handleInputChange("categoria", categoria)
-              }
-              onDadosChange={(dados) =>
-                handleInputChange("dadosCategoria", dados)
-              }
-            />
+              {/* Equipe de Venda */}
+              <div className="mb-6">
+                <label className="block text-sm font-semibold text-walmart-text mb-2">
+                  Equipe de Venda (Opcional)
+                </label>
+                {selectedAnuncianteId > 0 ? (
+                  <select
+                    value={formData.equipeDeVendaId}
+                    onChange={(e) =>
+                      handleInputChange(
+                        "equipeDeVendaId",
+                        parseInt(e.target.value),
+                      )
+                    }
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                  >
+                    <option value={0}>Nenhuma equipe selecionada</option>
+                    {equipes.map((eq: EquipeDeVenda) => (
+                      <option key={eq.id} value={eq.id}>
+                        {eq.nome}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <div className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-500">
+                    Selecione um anunciante primeiro
+                  </div>
+                )}
+              </div>
+
+              {/* Category-Specific Fields */}
+              <div className="mb-6">
+                <CategoryFields
+                  categoria={formData.categoria}
+                  dadosCategoria={formData.dadosCategoria}
+                  onCategoryChange={(categoria) =>
+                    handleInputChange("categoria", categoria)
+                  }
+                  onDadosChange={(dados) =>
+                    handleInputChange("dadosCategoria", dados)
+                  }
+                />
+              </div>
+            </div>
 
             {/* Endereço */}
             <div>
