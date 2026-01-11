@@ -114,7 +114,7 @@ export const getAnuncios: RequestHandler = async (req, res) => {
             },
           },
         },
-        orderBy: [{ destaque: "desc" }, { dataCriacao: "desc" }],
+        orderBy: { dataCriacao: "desc" },
         take: pageLimit,
         skip: pageOffset,
       }),
