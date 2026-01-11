@@ -474,7 +474,7 @@ export default function CadastroAnunciantes() {
                 {!anunciantes || anunciantes.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={6}
+                      colSpan={7}
                       className="px-6 py-4 text-center text-gray-500"
                     >
                       Nenhuma loja cadastrada
@@ -485,6 +485,15 @@ export default function CadastroAnunciantes() {
                     <tr key={loja.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 font-semibold text-walmart-text">
                         {loja.nome}
+                      </td>
+                      <td className="px-6 py-4 text-walmart-text">
+                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                          loja.tipo === "Profissional"
+                            ? "bg-blue-100 text-blue-800"
+                            : "bg-gray-100 text-gray-800"
+                        }`}>
+                          {loja.tipo || "Comum"}
+                        </span>
                       </td>
                       <td className="px-6 py-4 text-walmart-text">
                         {loja.cnpjOuCpf}
