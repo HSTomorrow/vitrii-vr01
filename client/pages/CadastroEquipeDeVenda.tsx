@@ -97,9 +97,18 @@ export default function CadastroEquipeDeVenda() {
         : "/api/equipes-venda";
       const method = editingId ? "PUT" : "POST";
 
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+
+      // Add user ID to header for authentication
+      if (user?.id) {
+        headers["X-User-Id"] = user.id.toString();
+      }
+
       const response = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({
           ...data,
           anuncianteId: selectedAnuncianteId,
