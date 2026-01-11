@@ -188,4 +188,24 @@
   nav[class*="overflow-y-auto"]::-webkit-scrollbar-thumb:hover {
     background: #9ca3af;
   }
+
+  /* Force hamburger menu button visibility on smaller screens/zoom levels */
+  @media (max-width: 1280px) {
+    button[aria-label="Menu de navegação"] {
+      display: flex !important;
+      visibility: visible !important;
+    }
+
+    /* Hide desktop navigation on smaller screens */
+    nav.hidden.lg\:flex {
+      display: none !important;
+    }
+  }
+
+  /* Ensure menu appears even with zoom */
+  @supports (display: flex) {
+    button[aria-label="Menu de navegação"] {
+      display: flex;
+    }
+  }
 }
