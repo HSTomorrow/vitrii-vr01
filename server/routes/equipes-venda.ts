@@ -414,16 +414,53 @@ export const adicionarMembro: RequestHandler = async (req, res) => {
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
+      // Format validation errors with field information
+      const firstError = error.errors[0];
+      const fieldName = firstError.path.join(".");
+      const message = firstError.message;
+
+      console.error(
+        `Validation error adding team member - Field: ${fieldName}, Message: ${message}`,
+      );
+
       return res.status(400).json({
         success: false,
-        error: error.errors[0].message,
+        error: `Erro no campo ${fieldName}: ${message}`,
+        field: fieldName,
+        details: message,
       });
     }
 
-    console.error("Error adding team member:", error);
+    // Handle Prisma unique constraint errors
+    if (
+      error instanceof Error &&
+      error.message.includes("Unique constraint failed")
+    ) {
+      console.error("Unique constraint error adding team member:", error);
+      return res.status(400).json({
+        success: false,
+        error:
+          "Este membro já existe na equipe ou o email já está registrado para outro membro.",
+        details: error.message,
+      });
+    }
+
+    // Handle other database errors
+    if (error instanceof Error && error.message.includes("prisma")) {
+      console.error("Database error adding team member:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Erro ao salvar membro na base de dados",
+        details: error.message,
+      });
+    }
+
+    console.error("Unexpected error adding team member:", error);
     res.status(500).json({
       success: false,
-      error: "Erro ao adicionar membro à equipe",
+      error: "Erro inesperado ao adicionar membro à equipe",
+      details:
+        error instanceof Error ? error.message : "Erro desconhecido",
     });
   }
 };
