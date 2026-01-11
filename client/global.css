@@ -213,6 +213,7 @@
   /* Mobile menu backdrop */
   .mobile-menu-backdrop {
     animation: fadeIn 0.2s ease-in;
+    z-index: 40;
   }
 
   @keyframes fadeIn {
