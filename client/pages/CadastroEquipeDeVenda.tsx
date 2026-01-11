@@ -699,23 +699,25 @@ export default function CadastroEquipeDeVenda() {
                             />
                           )}
                         </div>
-                        {!isAddingMember && editingMemberId === null && (
-                          <button
-                            onClick={() => {
-                              setIsAddingMember(true);
-                              setMemberFormData({
-                                nomeMembro: "",
-                                email: "",
-                                whatsapp: "",
-                                status: "disponivel",
-                              });
-                            }}
-                            className="flex items-center gap-1 px-3 py-1 text-sm bg-walmart-yellow text-walmart-text rounded hover:bg-walmart-yellow-dark transition-colors font-semibold"
-                          >
-                            <Plus className="w-4 h-4" />
-                            Adicionar Membro
-                          </button>
-                        )}
+                        <div>
+                          {!isAddingMember && editingMemberId === null && (
+                            <button
+                              onClick={() => {
+                                setIsAddingMember(true);
+                                setMemberFormData({
+                                  nomeMembro: "",
+                                  email: "",
+                                  whatsapp: "",
+                                  status: "disponivel",
+                                });
+                              }}
+                              className="flex items-center gap-1 px-3 py-1 text-sm bg-walmart-yellow text-walmart-text rounded hover:bg-walmart-yellow-dark transition-colors font-semibold"
+                            >
+                              <Plus className="w-4 h-4" />
+                              Adicionar Membro
+                            </button>
+                          )}
+                        </div>
                       </div>
 
                       {/* Members Table */}
