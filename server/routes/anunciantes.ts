@@ -458,7 +458,7 @@ export const getAnunciantesByUsuario: RequestHandler = async (req, res) => {
       // For regular users, return only anunciantes where they are linked
       anunciantes = await prisma.anunciantes.findMany({
         where: {
-          usuarioAnunciantes: {
+          usuarios_anunciantes: {
             some: {
               usuarioId: usuarioId,
             },
