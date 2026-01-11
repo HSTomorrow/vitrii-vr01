@@ -96,7 +96,7 @@ export default function BannerCarousel({
       {/* Main Carousel */}
       <div className="relative bg-walmart-gray-light overflow-hidden rounded-lg">
         {/* Banner Container */}
-        <div className="relative w-full h-64 sm:h-80 md:h-96">
+        <div className="relative w-full h-32 sm:h-40 md:h-48">
           <BannerContent />
 
           {/* Navigation Buttons */}
