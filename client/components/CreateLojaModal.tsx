@@ -310,9 +310,7 @@ export default function CreateAnuncianteModal({
               WhatsApp (Opcional)
             </label>
             <div className="flex items-center gap-0">
-              <span className="px-4 py-2 border border-r-0 border-gray-300 rounded-l-lg bg-gray-100 text-walmart-text font-semibold">
-                +55
-              </span>
+          
               <input
                 type="text"
                 value={
