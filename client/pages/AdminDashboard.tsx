@@ -62,6 +62,7 @@ export default function AdminDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedUsuario, setSelectedUsuario] = useState<number | null>(null);
   const [expandedUser, setExpandedUser] = useState<number | null>(null);
+  const [editingUser, setEditingUser] = useState<Usuario | null>(null);
 
   // Fetch all users
   const { data: usuariosData, isLoading: usuariosLoading } = useQuery({
