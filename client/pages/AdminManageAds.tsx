@@ -285,18 +285,16 @@ export default function AdminManageAds() {
 
         {/* Pagination Info */}
         {!isLoading && anunciosData && (
-          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg flex items-center justify-between">
-            <div>
-              <p className="text-sm text-blue-900">
-                <span className="font-semibold">{filteredAnuncios.length}</span> anúncio(s) exibido(s)
-                {anunciosData.pagination?.total > filteredAnuncios.length && (
-                  <span className="text-blue-700"> de {anunciosData.pagination.total} total</span>
-                )}
-              </p>
-            </div>
+          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-sm text-blue-900">
+              <span className="font-semibold">{filteredAnuncios.length}</span> anúncio(s) exibido(s)
+              {anunciosData.pagination?.total && (
+                <span className="text-blue-700"> de {anunciosData.pagination.total} total</span>
+              )}
+            </p>
             {anunciosData.pagination?.hasMore && (
-              <p className="text-xs text-blue-700 font-semibold">
-                ⚠️ Limite: máximo 100 ads por página
+              <p className="text-xs text-blue-700 font-semibold mt-2">
+                ⚠️ Há mais anúncios. Limite atual: 500 ads por página
               </p>
             )}
           </div>
