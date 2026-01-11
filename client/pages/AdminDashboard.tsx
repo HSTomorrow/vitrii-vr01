@@ -86,7 +86,13 @@ export default function AdminDashboard() {
   const { data: funcionalidadesData, isLoading: funcLoading } = useQuery({
     queryKey: ["funcionalidades"],
     queryFn: async () => {
-      const response = await fetch("/api/funcionalidades");
+      const response = await fetch("/api/funcionalidades", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": user?.id?.toString() || "",
+        },
+      });
       if (!response.ok) throw new Error("Erro ao buscar funcionalidades");
       return response.json();
     },
