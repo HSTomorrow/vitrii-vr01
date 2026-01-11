@@ -92,6 +92,7 @@ export const getAnuncianteById: RequestHandler = async (req, res) => {
         site: true,
         instagram: true,
         facebook: true,
+        whatsapp: true,
         status: true,
         dataCriacao: true,
         usuarioAnunciantes: {
