@@ -451,6 +451,9 @@ export default function CadastroAnunciantes() {
                     Nome
                   </th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">
+                    Tipo
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">
                     CNPJ/CPF
                   </th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">
