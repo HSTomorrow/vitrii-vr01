@@ -612,18 +612,28 @@ export const getProdutosParaAnuncio: RequestHandler = async (req, res) => {
   try {
     const { anuncianteId } = req.params;
 
+    // Fetch products for the given loja/anunciante
     const productos = await prisma.productos.findMany({
       where: {
         lojaId: parseInt(anuncianteId),
       },
-      include: {
-        tabelasDePreco: {
-          where: {
-            lojaId: parseInt(anuncianteId),
-          },
+    });
+
+    // Fetch price tables for all these products
+    const tabelasDePreco = await prisma.tabelas_preco.findMany({
+      where: {
+        lojaId: parseInt(anuncianteId),
+        productId: {
+          in: productos.map((p) => p.id),
         },
       },
     });
+
+    // Combine products with their price tables
+    const productosComPrecos = productos.map((p) => ({
+      ...p,
+      tabelasDePreco: tabelasDePreco.filter((t) => t.productId === p.id),
+    }));
 
     res.json({
       success: true,
