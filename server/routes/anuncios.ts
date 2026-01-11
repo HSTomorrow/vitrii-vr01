@@ -165,56 +165,16 @@ export const getAnuncioById: RequestHandler = async (req, res) => {
 
     const anuncio = await prisma.anuncios.findUnique({
       where: { id: parseInt(id) },
-      select: {
-        id: true,
-        titulo: true,
-        descricao: true,
-        fotoUrl: true,
-        precoAnuncio: true,
-        isDoacao: true,
-        destaque: true,
-        isActive: true,
-        status: true,
-        dataCriacao: true,
-        dataValidade: true,
-        anuncianteId: true,
-        productId: true,
-        tabelaDePrecoId: true,
-        anunciante: {
+      include: {
+        anunciantes: {
           select: {
             id: true,
             nome: true,
-            fotoUrl: true,
+            tipo: true,
             endereco: true,
             email: true,
-            cnpjOuCpf: true,
-            site: true,
-            instagram: true,
-            facebook: true,
-            whatsapp: true,
-          },
-        },
-        producto: {
-          select: {
-            id: true,
-            nome: true,
-            descricao: true,
-            tipo: true,
-            grupoId: true,
-            grupo: {
-              select: {
-                id: true,
-                nome: true,
-              },
-            },
-          },
-        },
-        tabelaDePreco: {
-          select: {
-            id: true,
-            preco: true,
-            tamanho: true,
-            cor: true,
+            cnpj: true,
+            telefone: true,
           },
         },
       },
