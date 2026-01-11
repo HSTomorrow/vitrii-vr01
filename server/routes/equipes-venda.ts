@@ -517,6 +517,7 @@ export const adicionarMembro: RequestHandler = async (req, res) => {
 export const removerMembro: RequestHandler = async (req, res) => {
   try {
     const { id, membroId } = req.params;
+    const usuarioId = req.userId;
 
     const membro = await prisma.membroEquipe.findUnique({
       where: { id: parseInt(membroId) },
@@ -527,6 +528,22 @@ export const removerMembro: RequestHandler = async (req, res) => {
         success: false,
         error: "Membro não encontrado",
       });
+    }
+
+    // Check permissions - allow if user is admin or creator of this member
+    if (usuarioId) {
+      const usuario = await prisma.usuario.findUnique({
+        where: { id: usuarioId },
+        select: { tipoUsuario: true },
+      });
+
+      // If not admin and not the creator, deny access
+      if (usuario?.tipoUsuario !== "adm" && membro.usuarioId !== usuarioId) {
+        return res.status(403).json({
+          success: false,
+          error: "Você não tem permissão para remover este membro",
+        });
+      }
     }
 
     await prisma.membroEquipe.delete({
