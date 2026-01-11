@@ -12,8 +12,7 @@ const EquipeCreateSchema = z.object({
 const EquipeUpdateSchema = EquipeCreateSchema.partial();
 
 const AdicionarMembroSchema = z.object({
-  usuarioId: z.number().int().optional(),
-  nome: z
+  nomeMembro: z
     .string()
     .min(1, "Nome do membro é obrigatório")
     .max(255, "Nome não pode ter mais de 255 caracteres"),
