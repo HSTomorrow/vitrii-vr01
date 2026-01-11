@@ -10,7 +10,6 @@ datasource db {
 model anunciantes {
   id                   Int                    @id(map: "lojas_pkey") @default(autoincrement())
   nome                 String                 @db.VarChar(255)
-  tipo                 String                 @default("Comum") @db.VarChar(50)
   descricao            String?
   cnpj                 String?                @db.VarChar(14)
   telefone             String?                @db.VarChar(20)
@@ -19,6 +18,12 @@ model anunciantes {
   cidade               String                 @db.VarChar(100)
   estado               String                 @db.VarChar(2)
   cep                  String?                @db.VarChar(8)
+  site                 String?                @db.VarChar(255)
+  instagram            String?                @db.VarChar(255)
+  facebook             String?                @db.VarChar(255)
+  whatsapp             String?                @db.VarChar(20)
+  fotoUrl              String?                @db.VarChar(500)
+  status               String?                @db.VarChar(50)
   dataCriacao          DateTime               @default(now())
   dataAtualizacao      DateTime
   anuncios             anuncios[]
