@@ -373,16 +373,25 @@ export const updateAnuncio: RequestHandler = async (req, res) => {
       updateData.precoAnuncio = null;
     }
 
+    // Map field names to schema
+    const mappedData: any = {};
+    if (updateData.titulo !== undefined) mappedData.titulo = updateData.titulo;
+    if (updateData.descricao !== undefined) mappedData.descricao = updateData.descricao;
+    if (updateData.fotoUrl !== undefined) mappedData.imagem = updateData.fotoUrl;
+    if (updateData.precoAnuncio !== undefined) mappedData.preco = updateData.precoAnuncio;
+    if (updateData.categoria !== undefined) mappedData.categoria = updateData.categoria;
+    if (updateData.cidade !== undefined) mappedData.cidade = updateData.cidade;
+    if (updateData.estado !== undefined) mappedData.estado = updateData.estado;
+    if (updateData.status !== undefined) mappedData.status = updateData.status;
+
     const anuncio = await prisma.anuncios.update({
       where: { id: parseInt(id) },
       data: {
-        ...updateData,
+        ...mappedData,
         dataAtualizacao: new Date(),
       },
       include: {
-        anunciante: true,
-        producto: true,
-        tabelaDePreco: true,
+        anunciantes: true,
       },
     });
 
