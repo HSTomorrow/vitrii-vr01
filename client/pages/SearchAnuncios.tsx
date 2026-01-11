@@ -72,7 +72,7 @@ export default function SearchAnuncios() {
         (ad: any) =>
           ad.titulo.toLowerCase().includes(term) ||
           ad.descricao?.toLowerCase().includes(term) ||
-          ad.anunciante?.nome?.toLowerCase().includes(term),
+          ad.anunciantes?.nome?.toLowerCase().includes(term),
       );
     }
 
@@ -112,8 +112,8 @@ export default function SearchAnuncios() {
         );
       }
 
-      const priceA = a.precoAnuncio || a.tabelaDePreco?.preco || 0;
-      const priceB = b.precoAnuncio || b.tabelaDePreco?.preco || 0;
+      const priceA = a.preco || a.tabelaDePreco?.preco || 0;
+      const priceB = b.preco || b.tabelaDePreco?.preco || 0;
 
       if (sortBy === "price-asc") return priceA - priceB;
       if (sortBy === "price-desc") return priceB - priceA;
@@ -390,9 +390,9 @@ export default function SearchAnuncios() {
                           className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
                         >
                           <div className="aspect-video bg-walmart-gray-light flex items-center justify-center overflow-hidden relative">
-                            {anuncio.fotoUrl ? (
+                            {anuncio.imagem ? (
                               <img
-                                src={anuncio.fotoUrl}
+                                src={anuncio.imagem}
                                 alt={anuncio.titulo}
                                 className="w-full h-full object-cover"
                               />
@@ -412,13 +412,13 @@ export default function SearchAnuncios() {
                             <p className="text-walmart-blue font-bold text-lg mb-2">
                               R${" "}
                               {(
-                                parseFloat(anuncio.precoAnuncio) ||
+                                parseFloat(anuncio.preco) ||
                                 parseFloat(anuncio.tabelaDePreco?.preco) ||
                                 0
                               ).toFixed(2)}
                             </p>
                             <p className="text-sm text-walmart-text-secondary line-clamp-2 mb-3">
-                              {anuncio.anunciante?.nome}
+                              {anuncio.anunciantes?.nome}
                             </p>
                             <p className="text-xs text-walmart-text-secondary">
                               {new Date(anuncio.dataCriacao).toLocaleDateString(
@@ -441,9 +441,9 @@ export default function SearchAnuncios() {
                           className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-shadow cursor-pointer flex gap-4"
                         >
                           <div className="w-32 h-32 bg-walmart-gray-light rounded flex items-center justify-center flex-shrink-0">
-                            {anuncio.fotoUrl ? (
+                            {anuncio.imagem ? (
                               <img
-                                src={anuncio.fotoUrl}
+                                src={anuncio.imagem}
                                 alt={anuncio.titulo}
                                 className="w-full h-full object-cover rounded"
                               />
@@ -460,7 +460,7 @@ export default function SearchAnuncios() {
                               <p className="text-walmart-blue font-bold text-lg">
                                 R${" "}
                                 {(
-                                  parseFloat(anuncio.precoAnuncio) ||
+                                  parseFloat(anuncio.preco) ||
                                   parseFloat(anuncio.tabelaDePreco?.preco) ||
                                   0
                                 ).toFixed(2)}
@@ -472,7 +472,7 @@ export default function SearchAnuncios() {
                             <div className="flex gap-4 text-sm text-walmart-text-secondary">
                               <span className="flex items-center gap-1">
                                 <MapPin className="w-4 h-4" />
-                                {anuncio.anunciante?.nome}
+                                {anuncio.anunciantes?.nome}
                               </span>
                               <span>
                                 {new Date(
