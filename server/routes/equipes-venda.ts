@@ -28,7 +28,7 @@ const AdicionarMembroSchema = z.object({
 });
 
 const AtualizarMembroSchema = z.object({
-  nome: z.string().min(1, "Nome do membro é obrigatório").optional(),
+  nomeMembro: z.string().min(1, "Nome do membro é obrigatório").optional(),
   email: z.string().email("Email inválido").optional(),
   whatsapp: z.string().optional(),
   status: z.enum(["disponivel", "nao_disponivel", "cancelado"]).optional(),
