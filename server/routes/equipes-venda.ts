@@ -57,7 +57,7 @@ export const getEquipes: RequestHandler = async (req, res) => {
             },
           },
         },
-        anunciante: {
+        anunciantes: {
           select: {
             id: true,
             nome: true,
@@ -91,7 +91,7 @@ export const getEquipeById: RequestHandler = async (req, res) => {
     const equipe = await prisma.equipes_de_venda.findUnique({
       where: { id: parseInt(id) },
       include: {
-        anunciante: {
+        anunciantes: {
           select: {
             id: true,
             nome: true,
@@ -223,7 +223,7 @@ export const createEquipe: RequestHandler = async (req, res) => {
             },
           },
         },
-        anunciante: {
+        anunciantes: {
           select: {
             id: true,
             nome: true,
@@ -310,7 +310,7 @@ export const updateEquipe: RequestHandler = async (req, res) => {
             },
           },
         },
-        anunciante: {
+        anunciantes: {
           select: {
             id: true,
             nome: true,
@@ -691,7 +691,7 @@ export const getMembrosDisponiveis: RequestHandler = async (req, res) => {
     const equipe = await prisma.equipes_de_venda.findUnique({
       where: { id: parseInt(equipeId) },
       include: {
-        anunciante: {
+        anunciantes: {
           select: {
             id: true,
             nome: true,
