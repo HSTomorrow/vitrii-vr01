@@ -5,7 +5,7 @@ import bcryptjs from "bcryptjs";
 import { sendPasswordResetEmail, sendWelcomeEmail } from "../lib/emailService";
 import crypto from "crypto";
 
-// NOTE: This file handles Usracesso (User Access) model operations
+// NOTE: This file handles usracessos (User Access) model operations
 // Routes are registered as /api/usracessos in server/index.ts
 
 // Schema validation for signup (basic info only)
