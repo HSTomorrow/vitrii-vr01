@@ -210,12 +210,26 @@
     }
   }
 
+  /* Mobile menu backdrop */
+  .mobile-menu-backdrop {
+    animation: fadeIn 0.2s ease-in;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
   /* Mobile menu navigation styles */
   .mobile-menu-nav {
     display: block !important;
     visibility: visible !important;
     position: fixed;
-    top: 64px;
+    top: calc(4rem + 1px);
     left: 0;
     right: 0;
     bottom: 0;
@@ -223,6 +237,13 @@
     background-color: white;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    will-change: transform;
+    backface-visibility: hidden;
+  }
+
+  /* Prevent scrolling on the body when menu is open */
+  body.menu-open {
+    overflow: hidden;
   }
 
   /* Ensure mobile menu is visible and properly positioned */
