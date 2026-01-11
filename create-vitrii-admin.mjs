@@ -10,7 +10,7 @@ async function createVitriiAdmin() {
     const adminPassword = "AavItrII2025Zzç";
     
     // Check if admin already exists
-    const existingAdmin = await prisma.usracesso.findUnique({
+    const existingAdmin = await prisma.usracessos.findUnique({
       where: { email: adminEmail },
     });
 
@@ -24,7 +24,7 @@ async function createVitriiAdmin() {
     }
 
     // Create admin user
-    const admUser = await prisma.usracesso.create({
+    const admUser = await prisma.usracessos.create({
       data: {
         nome: "Administrador Vitrii",
         email: adminEmail,
