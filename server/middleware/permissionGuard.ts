@@ -34,7 +34,7 @@ export const checkPermission = (
       }
 
       // Fetch user
-      const usuario = await prisma.usracesso.findUnique({
+      const usuario = await prisma.usracessos.findUnique({
         where: { id: userId },
       });
 
