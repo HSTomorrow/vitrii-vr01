@@ -46,6 +46,15 @@ export default function AdminEditUserModal({
     endereco: usuario.endereco || "",
   });
 
+  // Helper function to convert date string to ISO datetime
+  const dateToDateTime = (dateStr: string): string => {
+    if (!dateStr) return "";
+    // If it's already in ISO format with time, return as-is
+    if (dateStr.includes("T")) return dateStr;
+    // If it's just a date, add midnight time
+    return `${dateStr}T00:00:00.000Z`;
+  };
+
   // Mutation to update user profile
   const updateMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
