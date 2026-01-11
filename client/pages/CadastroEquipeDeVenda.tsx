@@ -680,9 +680,25 @@ export default function CadastroEquipeDeVenda() {
                   {expandedTeamId === equipe.id && (
                     <div className="mt-6 pt-6 border-t border-gray-200">
                       <div className="flex items-center justify-between mb-4">
-                        <h4 className="font-semibold text-walmart-text">
-                          Membros da Equipe
-                        </h4>
+                        <div className="flex-1">
+                          <h4 className="font-semibold text-walmart-text mb-3">
+                            Membros da Equipe
+                          </h4>
+                          {equipe.membros.length > 0 && (
+                            <input
+                              type="text"
+                              placeholder="🔍 Buscar por nome, email ou status..."
+                              value={(searchMembro as any)[equipe.id] || ""}
+                              onChange={(e) =>
+                                setSearchMembro({
+                                  ...searchMembro,
+                                  [equipe.id]: e.target.value,
+                                })
+                              }
+                              className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-walmart-blue"
+                            />
+                          )}
+                        </div>
                         {!isAddingMember && editingMemberId === null && (
                           <button
                             onClick={() => {
