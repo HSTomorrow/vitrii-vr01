@@ -189,23 +189,36 @@
     background: #9ca3af;
   }
 
-  /* Force hamburger menu button visibility on smaller screens/zoom levels */
-  @media (max-width: 1280px) {
-    button[aria-label="Menu de navegação"] {
-      display: flex !important;
-      visibility: visible !important;
-    }
+  /* Mobile menu button - show on screens < 1024px (lg breakpoint) */
+  .mobile-menu-button {
+    display: flex;
+  }
 
-    /* Hide desktop navigation on smaller screens */
-    nav.hidden.lg\:flex {
-      display: none !important;
+  /* Hide mobile menu button on large screens only */
+  @media (min-width: 1024px) {
+    .mobile-menu-button {
+      display: none;
     }
   }
 
-  /* Ensure menu appears even with zoom */
+  /* Ensure mobile menu works at any zoom level in Chrome */
   @supports (display: flex) {
-    button[aria-label="Menu de navegação"] {
+    .mobile-menu-button {
+      display: flex !important;
+    }
+  }
+
+  /* Extra fallback for zoom scenarios */
+  @media (min-width: 0px) {
+    .mobile-menu-button {
       display: flex;
+      visibility: visible;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .mobile-menu-button {
+      display: none;
     }
   }
 }
