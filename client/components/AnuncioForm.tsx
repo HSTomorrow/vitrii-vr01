@@ -236,43 +236,52 @@ export default function AnuncioForm({
       const url = anuncioId ? `/api/anuncios/${anuncioId}` : "/api/anuncios";
       const method = anuncioId ? "PUT" : "POST";
 
+      const payload = {
+        titulo: data.titulo,
+        descricao: data.descricao,
+        fotoUrl: data.fotoUrl,
+        precoAnuncio: data.precoAnuncio
+          ? parseFloat(data.precoAnuncio)
+          : null,
+        anuncianteId: selectedAnuncianteId,
+        productId: data.productId > 0 ? data.productId : null,
+        tabelaDePrecoId:
+          data.tabelaDePrecoId > 0 ? data.tabelaDePrecoId : null,
+        dataValidade: data.dataValidade
+          ? new Date(data.dataValidade).toISOString()
+          : null,
+        equipeDeVendaId:
+          data.equipeDeVendaId > 0 ? data.equipeDeVendaId : null,
+        endereco: data.endereco || null,
+        cidade: data.cidade || null,
+        estado: data.estado || null,
+        isDoacao: data.isDoacao,
+        destaque: data.destaque,
+        categoria: data.categoria,
+        dadosCategoria: data.dadosCategoria,
+      };
+
+      console.log("[AnuncioForm] Submitting form with payload:", payload);
+
       const response = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          titulo: data.titulo,
-          descricao: data.descricao,
-          fotoUrl: data.fotoUrl,
-          precoAnuncio: data.precoAnuncio
-            ? parseFloat(data.precoAnuncio)
-            : null,
-          anuncianteId: selectedAnuncianteId,
-          productId: data.productId > 0 ? data.productId : null,
-          tabelaDePrecoId:
-            data.tabelaDePrecoId > 0 ? data.tabelaDePrecoId : null,
-          dataValidade: data.dataValidade
-            ? new Date(data.dataValidade).toISOString()
-            : null,
-          equipeDeVendaId:
-            data.equipeDeVendaId > 0 ? data.equipeDeVendaId : null,
-          endereco: data.endereco || null,
-          cidade: data.cidade || null,
-          estado: data.estado || null,
-          isDoacao: data.isDoacao,
-          destaque: data.destaque,
-          categoria: data.categoria,
-          dadosCategoria: data.dadosCategoria,
-        }),
+        body: JSON.stringify(payload),
       });
+
+      console.log("[AnuncioForm] Response status:", response.status);
 
       if (!response.ok) {
         const errorData = await response.json();
+        console.error("[AnuncioForm] Error response:", errorData);
         const errorMsg =
           errorData.details || errorData.error || "Erro ao salvar anúncio";
         throw new Error(errorMsg);
       }
 
-      return response.json();
+      const result = await response.json();
+      console.log("[AnuncioForm] Success response:", result);
+      return result;
     },
     onSuccess: (result) => {
       queryClient.invalidateQueries({ queryKey: ["anuncios"] });
