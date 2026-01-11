@@ -301,13 +301,3 @@ main().catch((error) => {
   console.error(error);
   process.exit(1);
 });
-
-// Helper for Decimal type
-class Decimal extends Number {
-  constructor(value: string) {
-    super(value);
-  }
-  toString() {
-    return this.valueOf().toString();
-  }
-}
