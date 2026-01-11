@@ -195,12 +195,13 @@ export default function CadastroEquipeDeVenda() {
     onSuccess: () => {
       toast.success("Membro adicionado com sucesso!");
       setMemberFormData({
-        nome: "",
+        nomeMembro: "",
         email: "",
         whatsapp: "",
         status: "disponivel",
       });
       setIsAddingMember(false);
+      setSearchMembro({});
       refetchEquipes();
     },
     onError: (error) => {
