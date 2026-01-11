@@ -1,5 +1,6 @@
 import prisma from "../server/lib/prisma";
 import bcrypt from "bcryptjs";
+import { Decimal } from "@prisma/client/runtime/library";
 
 const stores = [
   {
