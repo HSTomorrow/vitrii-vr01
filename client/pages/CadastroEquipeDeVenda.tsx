@@ -3,7 +3,16 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Plus, Trash2, Edit2, Users, ChevronDown, ChevronUp, Save, X } from "lucide-react";
+import {
+  Plus,
+  Trash2,
+  Edit2,
+  Users,
+  ChevronDown,
+  ChevronUp,
+  Save,
+  X,
+} from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface Usuario {
@@ -38,7 +47,9 @@ interface Anunciante {
 export default function CadastroEquipeDeVenda() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  const [selectedAnuncianteId, setSelectedAnuncianteId] = useState<number | null>(null);
+  const [selectedAnuncianteId, setSelectedAnuncianteId] = useState<
+    number | null
+  >(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [expandedTeamId, setExpandedTeamId] = useState<number | null>(null);
@@ -121,7 +132,9 @@ export default function CadastroEquipeDeVenda() {
     },
     onSuccess: () => {
       toast.success(
-        editingId ? "Equipe atualizada com sucesso!" : "Equipe criada com sucesso!"
+        editingId
+          ? "Equipe atualizada com sucesso!"
+          : "Equipe criada com sucesso!",
       );
       setFormData({ nome: "", descricao: "" });
       setEditingId(null);
@@ -129,7 +142,9 @@ export default function CadastroEquipeDeVenda() {
       refetchEquipes();
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Erro ao salvar equipe");
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao salvar equipe",
+      );
     },
   });
 
@@ -148,7 +163,9 @@ export default function CadastroEquipeDeVenda() {
       setExpandedTeamId(null);
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Erro ao deletar equipe");
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao deletar equipe",
+      );
     },
   });
 
@@ -173,12 +190,19 @@ export default function CadastroEquipeDeVenda() {
     },
     onSuccess: () => {
       toast.success("Membro adicionado com sucesso!");
-      setMemberFormData({ nome: "", email: "", whatsapp: "", status: "disponivel" });
+      setMemberFormData({
+        nome: "",
+        email: "",
+        whatsapp: "",
+        status: "disponivel",
+      });
       setIsAddingMember(false);
       refetchEquipes();
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Erro ao adicionar membro");
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao adicionar membro",
+      );
     },
   });
 
@@ -193,11 +217,14 @@ export default function CadastroEquipeDeVenda() {
       memberId: number;
       data: typeof memberFormData;
     }) => {
-      const response = await fetch(`/api/equipes-venda/${teamId}/membros/${memberId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+      const response = await fetch(
+        `/api/equipes-venda/${teamId}/membros/${memberId}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        },
+      );
 
       if (!response.ok) throw new Error("Erro ao atualizar membro");
       return response.json();
@@ -205,11 +232,18 @@ export default function CadastroEquipeDeVenda() {
     onSuccess: () => {
       toast.success("Membro atualizado com sucesso!");
       setEditingMemberId(null);
-      setMemberFormData({ nome: "", email: "", whatsapp: "", status: "disponivel" });
+      setMemberFormData({
+        nome: "",
+        email: "",
+        whatsapp: "",
+        status: "disponivel",
+      });
       refetchEquipes();
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Erro ao atualizar membro");
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao atualizar membro",
+      );
     },
   });
 
@@ -222,9 +256,12 @@ export default function CadastroEquipeDeVenda() {
       teamId: number;
       memberId: number;
     }) => {
-      const response = await fetch(`/api/equipes-venda/${teamId}/membros/${memberId}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `/api/equipes-venda/${teamId}/membros/${memberId}`,
+        {
+          method: "DELETE",
+        },
+      );
       if (!response.ok) throw new Error("Erro ao remover membro");
       return response.json();
     },
@@ -233,7 +270,9 @@ export default function CadastroEquipeDeVenda() {
       refetchEquipes();
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Erro ao remover membro");
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao remover membro",
+      );
     },
   });
 
@@ -308,10 +347,11 @@ export default function CadastroEquipeDeVenda() {
         <main className="flex-1 max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 text-center">
             <p className="text-yellow-800">
-              Você precisa cadastrar um anunciante antes de criar equipes de venda.
+              Você precisa cadastrar um anunciante antes de criar equipes de
+              venda.
             </p>
             <button
-              onClick={() => window.location.href = "/cadastros/anunciantes"}
+              onClick={() => (window.location.href = "/cadastros/anunciantes")}
               className="mt-4 px-4 py-2 bg-walmart-yellow text-walmart-text rounded-lg hover:bg-walmart-yellow-dark transition-colors font-semibold"
             >
               Ir para Cadastro de Anunciantes
@@ -353,7 +393,8 @@ export default function CadastroEquipeDeVenda() {
                   key={anunciante.id}
                   onClick={() => setSelectedAnuncianteId(anunciante.id)}
                   className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
-                    (selectedAnuncianteId || defaultAnuncianteId) === anunciante.id
+                    (selectedAnuncianteId || defaultAnuncianteId) ===
+                    anunciante.id
                       ? "bg-walmart-blue text-white"
                       : "bg-white text-walmart-text border border-gray-300 hover:border-walmart-blue"
                   }`}
@@ -468,7 +509,8 @@ export default function CadastroEquipeDeVenda() {
                         </p>
                       )}
                       <p className="text-xs text-gray-500 mt-2">
-                        Anunciante: {equipe.anunciante.nome} • {equipe.membros.length} membro(s)
+                        Anunciante: {equipe.anunciante.nome} •{" "}
+                        {equipe.membros.length} membro(s)
                       </p>
                     </div>
 
@@ -476,7 +518,7 @@ export default function CadastroEquipeDeVenda() {
                       <button
                         onClick={() =>
                           setExpandedTeamId(
-                            expandedTeamId === equipe.id ? null : equipe.id
+                            expandedTeamId === equipe.id ? null : equipe.id,
                           )
                         }
                         className="p-2 text-walmart-blue hover:bg-blue-50 rounded-lg transition-colors"
@@ -496,7 +538,9 @@ export default function CadastroEquipeDeVenda() {
                       <button
                         onClick={() => {
                           if (
-                            confirm("Tem certeza que deseja deletar esta equipe?")
+                            confirm(
+                              "Tem certeza que deseja deletar esta equipe?",
+                            )
                           ) {
                             deleteEquipeMutation.mutate(equipe.id);
                           }
@@ -535,7 +579,9 @@ export default function CadastroEquipeDeVenda() {
                       </div>
 
                       {/* Members Table */}
-                      {equipe.membros.length === 0 && !isAddingMember && editingMemberId === null ? (
+                      {equipe.membros.length === 0 &&
+                      !isAddingMember &&
+                      editingMemberId === null ? (
                         <p className="text-gray-500 text-sm py-4">
                           Nenhum membro adicionado
                         </p>
@@ -595,19 +641,26 @@ export default function CadastroEquipeDeVenda() {
                                   </td>
                                   <td className="px-4 py-3">
                                     <div className="flex items-center gap-1">
-                                      <span className="text-gray-600 text-xs">+55</span>
+                                      <span className="text-gray-600 text-xs">
+                                        +55
+                                      </span>
                                       <input
                                         type="text"
                                         value={
-                                          memberFormData.whatsapp.startsWith("+55")
-                                            ? memberFormData.whatsapp.substring(3)
+                                          memberFormData.whatsapp.startsWith(
+                                            "+55",
+                                          )
+                                            ? memberFormData.whatsapp.substring(
+                                                3,
+                                              )
                                             : memberFormData.whatsapp
                                         }
                                         onChange={(e) => {
-                                          const cleanValue = e.target.value.replace(
-                                            /[^\d\s()()-]/g,
-                                            ""
-                                          );
+                                          const cleanValue =
+                                            e.target.value.replace(
+                                              /[^\d\s()()-]/g,
+                                              "",
+                                            );
                                           setMemberFormData({
                                             ...memberFormData,
                                             whatsapp: "+55" + cleanValue,
@@ -629,18 +682,27 @@ export default function CadastroEquipeDeVenda() {
                                       }
                                       className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-walmart-blue bg-white"
                                     >
-                                      <option value="disponivel">Disponível</option>
+                                      <option value="disponivel">
+                                        Disponível
+                                      </option>
                                       <option value="nao_disponivel">
                                         Não Disponível
                                       </option>
-                                      <option value="cancelado">Cancelado</option>
+                                      <option value="cancelado">
+                                        Cancelado
+                                      </option>
                                     </select>
                                   </td>
                                   <td className="px-4 py-3">
                                     <div className="flex items-center justify-center gap-1">
                                       <button
-                                        onClick={(e) => handleSubmitMember(e, equipe.id)}
-                                        disabled={addMemberMutation.isPending || updateMemberMutation.isPending}
+                                        onClick={(e) =>
+                                          handleSubmitMember(e, equipe.id)
+                                        }
+                                        disabled={
+                                          addMemberMutation.isPending ||
+                                          updateMemberMutation.isPending
+                                        }
                                         className="p-1 bg-walmart-blue text-white rounded hover:bg-walmart-blue-dark transition-colors disabled:opacity-50"
                                       >
                                         <Save className="w-4 h-4" />
@@ -667,8 +729,13 @@ export default function CadastroEquipeDeVenda() {
 
                               {/* Existing Members */}
                               {equipe.membros.map((membro) => (
-                                <tr key={membro.id} className="border-b border-gray-200 hover:bg-gray-50">
-                                  <td className="px-4 py-3 text-walmart-text">{membro.nome}</td>
+                                <tr
+                                  key={membro.id}
+                                  className="border-b border-gray-200 hover:bg-gray-50"
+                                >
+                                  <td className="px-4 py-3 text-walmart-text">
+                                    {membro.nome}
+                                  </td>
                                   <td className="px-4 py-3 text-walmart-text text-xs">
                                     {membro.email}
                                   </td>
@@ -692,15 +759,15 @@ export default function CadastroEquipeDeVenda() {
                                         membro.status === "disponivel"
                                           ? "bg-green-100 text-green-800"
                                           : membro.status === "nao_disponivel"
-                                          ? "bg-yellow-100 text-yellow-800"
-                                          : "bg-red-100 text-red-800"
+                                            ? "bg-yellow-100 text-yellow-800"
+                                            : "bg-red-100 text-red-800"
                                       }`}
                                     >
                                       {membro.status === "disponivel"
                                         ? "Disponível"
                                         : membro.status === "nao_disponivel"
-                                        ? "Não Disponível"
-                                        : "Cancelado"}
+                                          ? "Não Disponível"
+                                          : "Cancelado"}
                                     </span>
                                   </td>
                                   <td className="px-4 py-3">
@@ -715,7 +782,7 @@ export default function CadastroEquipeDeVenda() {
                                         onClick={() => {
                                           if (
                                             confirm(
-                                              "Remover este membro da equipe?"
+                                              "Remover este membro da equipe?",
                                             )
                                           ) {
                                             removeMemberMutation.mutate({

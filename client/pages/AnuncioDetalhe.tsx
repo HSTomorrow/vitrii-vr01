@@ -74,7 +74,9 @@ export default function AnuncioDetalhe() {
     queryFn: async () => {
       const anuncianteId = data?.data?.anuncianteId;
       if (!anuncianteId) throw new Error("Anunciante não encontrado");
-      const response = await fetch(`/api/equipes-venda?anuncianteId=${anuncianteId}`);
+      const response = await fetch(
+        `/api/equipes-venda?anuncianteId=${anuncianteId}`,
+      );
       if (!response.ok) throw new Error("Erro ao buscar equipes");
       return response.json();
     },
@@ -85,7 +87,9 @@ export default function AnuncioDetalhe() {
   const { data: membrosData } = useQuery({
     queryKey: ["membros-disponiveis", selectedEquipeId],
     queryFn: async () => {
-      const response = await fetch(`/api/equipes-venda/${selectedEquipeId}/membros-disponiveis`);
+      const response = await fetch(
+        `/api/equipes-venda/${selectedEquipeId}/membros-disponiveis`,
+      );
       if (!response.ok) throw new Error("Erro ao buscar membros");
       return response.json();
     },
@@ -97,7 +101,7 @@ export default function AnuncioDetalhe() {
 
   // Check if there are any available members in any team
   const temMembrosDisponiveis = equipes.some((equipe) =>
-    equipe.membros?.some((membro) => membro.status === "disponivel")
+    equipe.membros?.some((membro) => membro.status === "disponivel"),
   );
 
   // Delete mutation
@@ -575,7 +579,9 @@ export default function AnuncioDetalhe() {
                       onClick={() => setSelectedEquipeId(equipe.id)}
                       className="w-full p-4 border border-gray-300 rounded-lg hover:border-walmart-blue hover:bg-blue-50 transition-colors text-left"
                     >
-                      <p className="font-semibold text-walmart-text">{equipe.nome}</p>
+                      <p className="font-semibold text-walmart-text">
+                        {equipe.nome}
+                      </p>
                       <p className="text-sm text-walmart-text-secondary">
                         {equipe.membros.length} membro(s)
                       </p>
