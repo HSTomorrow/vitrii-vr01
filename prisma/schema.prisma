@@ -56,6 +56,7 @@ model Anunciante {
   site          String?   @db.VarChar(255)
   instagram      String?   @db.VarChar(255)
   facebook      String?   @db.VarChar(255)
+  whatsapp      String?   @db.VarChar(20)
   fotoUrl       String?   @db.Text // URL da foto do anunciante
   status        String    @default("ativa") // "ativa" or "inativa"
   isActive      Boolean   @default(true)
