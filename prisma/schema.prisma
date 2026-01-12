@@ -268,3 +268,20 @@ model banners {
 
   @@map("banners")
 }
+
+// Fotos de Anuncio - Multiple images per ad (up to 5)
+model fotos_anuncio {
+  id                Int       @id @default(autoincrement())
+  anuncio_id        Int
+  url               String    @db.VarChar(500)
+  ordem             Int       @default(1)
+  criado_por        Int
+  data_criacao      DateTime  @default(now())
+  data_atualizacao  DateTime  @default(now())
+
+  anuncio           anuncios  @relation(fields: [anuncio_id], references: [id], onDelete: Cascade)
+  usuario           usracessos @relation(fields: [criado_por], references: [id], onDelete: Restrict)
+
+  @@index([anuncio_id])
+  @@index([anuncio_id, ordem])
+}
