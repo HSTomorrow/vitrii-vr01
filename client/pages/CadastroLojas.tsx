@@ -90,8 +90,33 @@ export default function CadastroAnunciantes() {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Erro ao salvar loja");
+        const errorData = await response.json();
+
+        // Format error message with details if available
+        let errorMessage = errorData.error || "Erro ao salvar loja";
+
+        if (errorData.details) {
+          if (Array.isArray(errorData.details)) {
+            // Format validation errors (Zod errors)
+            const fieldErrors = errorData.details
+              .map((detail: any) => {
+                const fieldName = Array.isArray(detail.path)
+                  ? detail.path.join(".")
+                  : detail.path;
+                return `${fieldName}: ${detail.message}`;
+              })
+              .join("\n");
+            errorMessage = errorMessage + "\n\n" + fieldErrors;
+          } else if (typeof errorData.details === "object") {
+            // Format other error details
+            const detailMessage = errorData.details.message ||
+                                  errorData.details.type ||
+                                  JSON.stringify(errorData.details);
+            errorMessage = errorMessage + "\n" + detailMessage;
+          }
+        }
+
+        throw new Error(errorMessage);
       }
 
       return response.json();
@@ -121,9 +146,11 @@ export default function CadastroAnunciantes() {
       refetch();
     },
     onError: (error) => {
-      toast.error(
-        error instanceof Error ? error.message : "Erro ao salvar loja",
-      );
+      const errorMessage = error instanceof Error ? error.message : "Erro ao salvar loja";
+      // Use toast.error with duration to ensure long error messages are visible
+      toast.error(errorMessage, {
+        duration: 5000,
+      });
     },
   });
 
