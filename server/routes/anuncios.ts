@@ -16,7 +16,7 @@ const AnuncioBaseSchema = z.object({
   fotoUrl: z.string().optional().nullable(),
   precoAnuncio: z
     .number()
-    .positive("Preço do anúncio deve ser maior que 0")
+    .nonnegative("Preço do anúncio deve ser maior ou igual a 0")
     .optional()
     .nullable(),
   dataValidade: z.string().optional().nullable(),
