@@ -97,7 +97,7 @@ export default function Browse() {
 
       // Filter by location
       if (selectedLocation) {
-        const endereco = anuncio.endereco || anuncio.anunciante?.endereco;
+        const endereco = anuncio.endereco || anuncio.anunciantes?.endereco;
         if (!endereco) return false;
         const parts = endereco.split(",");
         const municipality =
