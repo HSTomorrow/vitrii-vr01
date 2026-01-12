@@ -285,7 +285,7 @@ export const createAnuncio: RequestHandler = async (req, res) => {
 
     // For free items: automatically set status to "pago" and zero out price
     const isDoacao = validatedData.isDoacao || false;
-    const precoAnuncio = isDoacao ? null : validatedData.precoAnuncio;
+    const precoAnuncio = isDoacao ? 0 : validatedData.precoAnuncio;
     const status = isDoacao ? "pago" : "em_edicao";
 
     const anuncio = await prisma.anuncios.create({
