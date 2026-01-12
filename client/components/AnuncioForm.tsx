@@ -298,6 +298,7 @@ export default function AnuncioForm({
         endereco: data.endereco || null,
         cidade: data.cidade || null,
         estado: data.estado || null,
+        tipo: data.tipo || "produto",
         isDoacao: data.isDoacao,
         destaque: data.destaque,
         categoria: data.categoria || null,
