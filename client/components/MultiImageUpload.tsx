@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Upload, X } from "lucide-react";
 import { toast } from "sonner";
-import ImageZoom from "./ImageZoom";
+import ImageZoomModal from "./ImageZoomModal";
 
 interface UploadedImage {
   id?: string; // temporary id for new uploads
