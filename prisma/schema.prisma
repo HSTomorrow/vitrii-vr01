@@ -90,7 +90,7 @@ model grupos_produtos {
   descricao       String?
   icone           String?  @db.VarChar(50)
   dataCriacao     DateTime @default(now())
-  dataAtualizacao DateTime
+  dataAtualizacao DateTime @default(now())
   anunciante      anunciantes @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
 
   @@unique([anuncianteId, nome])
