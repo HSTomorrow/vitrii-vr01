@@ -374,7 +374,7 @@ export const updateAnuncio: RequestHandler = async (req, res) => {
     // If updating to donation, automatically set status to "pago" and zero price
     if (updateData.isDoacao === true) {
       updateData.status = "pago";
-      updateData.precoAnuncio = null;
+      updateData.precoAnuncio = 0;
     }
 
     // Map field names to schema
