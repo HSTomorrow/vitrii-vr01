@@ -32,6 +32,7 @@ model anunciantes {
   produtos_em_estoque  produtos_em_estoque[]
   usuarios_anunciantes usuarios_anunciantes[]
   equipes_de_venda     equipes_de_venda[]
+  grupos_produtos      grupos_produtos[]
 }
 
 model anuncios {
