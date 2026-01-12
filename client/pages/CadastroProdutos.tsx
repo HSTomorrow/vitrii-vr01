@@ -58,19 +58,25 @@ export default function CadastroProdutos() {
     enabled: !!user,
   });
 
-  // Fetch grupos for selected loja
+  // Fetch grupos for selected loja with user context
   const { data: grupos = [] } = useQuery<GrupoDeProductos[]>({
-    queryKey: ["grupos", selectedLojaId],
+    queryKey: ["grupos", selectedLojaId, user?.id],
     queryFn: async () => {
       if (!selectedLojaId) return [];
+      const headers: Record<string, string> = {};
+      if (user?.id) {
+        headers["x-user-id"] = user.id.toString();
+      }
+
       const response = await fetch(
         `/api/lojas/${selectedLojaId}/grupos-productos`,
+        { headers },
       );
       if (!response.ok) throw new Error("Erro ao buscar grupos");
       const result = await response.json();
       return result.data || [];
     },
-    enabled: !!selectedLojaId,
+    enabled: !!selectedLojaId && !!user,
   });
 
   // Fetch produtos
