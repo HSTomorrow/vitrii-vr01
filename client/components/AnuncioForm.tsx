@@ -588,7 +588,7 @@ export default function AnuncioForm({
                   const isChecked = e.target.checked;
                   handleInputChange("isDoacao", isChecked);
                   if (isChecked) {
-                    handleInputChange("precoAnuncio", "");
+                    handleInputChange("precoAnuncio", "0");
                   }
                 }}
                 className="w-4 h-4 text-green-600 bg-white border-gray-300 rounded focus:ring-2 focus:ring-green-500"
