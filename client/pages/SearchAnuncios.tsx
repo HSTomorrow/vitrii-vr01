@@ -144,7 +144,7 @@ export default function SearchAnuncios() {
       <Header />
 
       {/* Search Header */}
-      <section className="bg-walmart-blue text-white py-8">
+      <section className="bg-vitrii-blue text-white py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-bold mb-4">Buscar Anúncios</h1>
           <div className="relative">
@@ -157,7 +157,7 @@ export default function SearchAnuncios() {
                 setSearchTerm(e.target.value);
                 setCurrentPage(1);
               }}
-              className="w-full pl-12 pr-4 py-3 rounded-lg bg-blue-50 text-walmart-text placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-walmart-yellow"
+              className="w-full pl-12 pr-4 py-3 rounded-lg bg-blue-50 text-vitrii-text placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-vitrii-yellow"
             />
           </div>
         </div>
@@ -175,12 +175,12 @@ export default function SearchAnuncios() {
                   : "hidden md:block md:w-64 flex-shrink-0"
               }`}
             >
-              <div className="bg-walmart-gray-light rounded-lg p-6 space-y-6">
+              <div className="bg-vitrii-gray-light rounded-lg p-6 space-y-6">
                 <div className="flex items-center justify-between md:hidden">
-                  <h2 className="font-bold text-walmart-text">Filtros</h2>
+                  <h2 className="font-bold text-vitrii-text">Filtros</h2>
                   <button
                     onClick={() => setShowFilters(false)}
-                    className="text-sm text-walmart-blue"
+                    className="text-sm text-vitrii-blue"
                   >
                     Fechar
                   </button>
@@ -188,7 +188,7 @@ export default function SearchAnuncios() {
 
                 {/* Category Filter */}
                 <div>
-                  <h3 className="font-semibold text-walmart-text mb-3">
+                  <h3 className="font-semibold text-vitrii-text mb-3">
                     Categoria
                   </h3>
                   <div className="space-y-2">
@@ -200,9 +200,9 @@ export default function SearchAnuncios() {
                           setSelectedCategory(null);
                           setCurrentPage(1);
                         }}
-                        className="w-4 h-4 text-walmart-blue"
+                        className="w-4 h-4 text-vitrii-blue"
                       />
-                      <span className="text-sm text-walmart-text">Todas</span>
+                      <span className="text-sm text-vitrii-text">Todas</span>
                     </label>
                     {["roupas", "carros", "imoveis"].map((cat) => (
                       <label
@@ -216,9 +216,9 @@ export default function SearchAnuncios() {
                             setSelectedCategory(cat);
                             setCurrentPage(1);
                           }}
-                          className="w-4 h-4 text-walmart-blue"
+                          className="w-4 h-4 text-vitrii-blue"
                         />
-                        <span className="text-sm text-walmart-text capitalize">
+                        <span className="text-sm text-vitrii-text capitalize">
                           {cat === "roupas" && "👕 Roupas"}
                           {cat === "carros" && "🚗 Carros"}
                           {cat === "imoveis" && "🏠 Imóveis"}
@@ -230,7 +230,7 @@ export default function SearchAnuncios() {
 
                 {/* Price Filter */}
                 <div>
-                  <h3 className="font-semibold text-walmart-text mb-3">
+                  <h3 className="font-semibold text-vitrii-text mb-3">
                     Faixa de Preço
                   </h3>
                   <div className="space-y-2">
@@ -259,7 +259,7 @@ export default function SearchAnuncios() {
 
                 {/* Store Filter */}
                 <div>
-                  <h3 className="font-semibold text-walmart-text mb-3">
+                  <h3 className="font-semibold text-vitrii-text mb-3">
                     Anunciante
                   </h3>
                   <select
@@ -283,7 +283,7 @@ export default function SearchAnuncios() {
 
                 {/* Sort */}
                 <div>
-                  <h3 className="font-semibold text-walmart-text mb-3">
+                  <h3 className="font-semibold text-vitrii-text mb-3">
                     Ordenar Por
                   </h3>
                   <select
@@ -315,7 +315,7 @@ export default function SearchAnuncios() {
                       setPriceRange({ min: "", max: "" });
                       setCurrentPage(1);
                     }}
-                    className="w-full px-4 py-2 bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors text-sm font-semibold"
+                    className="w-full px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors text-sm font-semibold"
                   >
                     Limpar Filtros
                   </button>
@@ -328,12 +328,12 @@ export default function SearchAnuncios() {
               {/* Results Header */}
               <div className="flex items-center justify-between mb-6">
                 <div>
-                  <h2 className="text-lg font-bold text-walmart-text">
+                  <h2 className="text-lg font-bold text-vitrii-text">
                     {filteredAds.length} anúncio
                     {filteredAds.length !== 1 ? "s" : ""} encontrado
                     {filteredAds.length !== 1 ? "s" : ""}
                   </h2>
-                  <p className="text-sm text-walmart-text-secondary">
+                  <p className="text-sm text-vitrii-text-secondary">
                     Página {currentPage} de {totalPages || 1}
                   </p>
                 </div>
@@ -351,13 +351,13 @@ export default function SearchAnuncios() {
                 <div className="hidden md:flex gap-2">
                   <button
                     onClick={() => setViewMode("grid")}
-                    className={`p-2 rounded ${viewMode === "grid" ? "bg-walmart-blue text-white" : "border border-gray-300"}`}
+                    className={`p-2 rounded ${viewMode === "grid" ? "bg-vitrii-blue text-white" : "border border-gray-300"}`}
                   >
                     <Grid3x3 className="w-5 h-5" />
                   </button>
                   <button
                     onClick={() => setViewMode("list")}
-                    className={`p-2 rounded ${viewMode === "list" ? "bg-walmart-blue text-white" : "border border-gray-300"}`}
+                    className={`p-2 rounded ${viewMode === "list" ? "bg-vitrii-blue text-white" : "border border-gray-300"}`}
                   >
                     <List className="w-5 h-5" />
                   </button>
@@ -366,15 +366,15 @@ export default function SearchAnuncios() {
 
               {isLoading ? (
                 <div className="text-center py-12">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-walmart-blue mx-auto" />
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-vitrii-blue mx-auto" />
                 </div>
               ) : currentAds.length === 0 ? (
                 <div className="text-center py-12">
                   <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-walmart-text text-lg">
+                  <p className="text-vitrii-text text-lg">
                     Nenhum anúncio encontrado
                   </p>
-                  <p className="text-walmart-text-secondary">
+                  <p className="text-vitrii-text-secondary">
                     Tente ajustar seus filtros
                   </p>
                 </div>
@@ -389,7 +389,7 @@ export default function SearchAnuncios() {
                           onClick={() => navigate(`/anuncio/${anuncio.id}`)}
                           className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
                         >
-                          <div className="aspect-video bg-walmart-gray-light flex items-center justify-center overflow-hidden relative">
+                          <div className="aspect-video bg-vitrii-gray-light flex items-center justify-center overflow-hidden relative">
                             {anuncio.imagem ? (
                               <img
                                 src={anuncio.imagem}
@@ -400,16 +400,16 @@ export default function SearchAnuncios() {
                               <Package className="w-12 h-12 text-gray-400" />
                             )}
                             {anuncio.destaque && (
-                              <div className="absolute top-2 right-2 bg-walmart-yellow text-walmart-text px-2 py-1 rounded text-xs font-bold">
+                              <div className="absolute top-2 right-2 bg-vitrii-yellow text-vitrii-text px-2 py-1 rounded text-xs font-bold">
                                 ⭐ DESTAQUE
                               </div>
                             )}
                           </div>
                           <div className="p-4">
-                            <h3 className="font-bold text-walmart-text line-clamp-2 mb-2">
+                            <h3 className="font-bold text-vitrii-text line-clamp-2 mb-2">
                               {anuncio.titulo}
                             </h3>
-                            <p className="text-walmart-blue font-bold text-lg mb-2">
+                            <p className="text-vitrii-blue font-bold text-lg mb-2">
                               R${" "}
                               {(
                                 parseFloat(anuncio.preco) ||
@@ -417,10 +417,10 @@ export default function SearchAnuncios() {
                                 0
                               ).toFixed(2)}
                             </p>
-                            <p className="text-sm text-walmart-text-secondary line-clamp-2 mb-3">
+                            <p className="text-sm text-vitrii-text-secondary line-clamp-2 mb-3">
                               {anuncio.anunciantes?.nome}
                             </p>
-                            <p className="text-xs text-walmart-text-secondary">
+                            <p className="text-xs text-vitrii-text-secondary">
                               {new Date(anuncio.dataCriacao).toLocaleDateString(
                                 "pt-BR",
                               )}
@@ -440,7 +440,7 @@ export default function SearchAnuncios() {
                           onClick={() => navigate(`/anuncio/${anuncio.id}`)}
                           className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-shadow cursor-pointer flex gap-4"
                         >
-                          <div className="w-32 h-32 bg-walmart-gray-light rounded flex items-center justify-center flex-shrink-0">
+                          <div className="w-32 h-32 bg-vitrii-gray-light rounded flex items-center justify-center flex-shrink-0">
                             {anuncio.imagem ? (
                               <img
                                 src={anuncio.imagem}
@@ -453,11 +453,11 @@ export default function SearchAnuncios() {
                           </div>
                           <div className="flex-1">
                             <div className="flex items-start justify-between mb-2">
-                              <h3 className="font-bold text-walmart-text text-lg">
+                              <h3 className="font-bold text-vitrii-text text-lg">
                                 {anuncio.titulo}
                                 {anuncio.destaque && " ⭐"}
                               </h3>
-                              <p className="text-walmart-blue font-bold text-lg">
+                              <p className="text-vitrii-blue font-bold text-lg">
                                 R${" "}
                                 {(
                                   parseFloat(anuncio.preco) ||
@@ -466,10 +466,10 @@ export default function SearchAnuncios() {
                                 ).toFixed(2)}
                               </p>
                             </div>
-                            <p className="text-sm text-walmart-text-secondary line-clamp-2 mb-2">
+                            <p className="text-sm text-vitrii-text-secondary line-clamp-2 mb-2">
                               {anuncio.descricao}
                             </p>
-                            <div className="flex gap-4 text-sm text-walmart-text-secondary">
+                            <div className="flex gap-4 text-sm text-vitrii-text-secondary">
                               <span className="flex items-center gap-1">
                                 <MapPin className="w-4 h-4" />
                                 {anuncio.anunciantes?.nome}
@@ -506,7 +506,7 @@ export default function SearchAnuncios() {
                             onClick={() => setCurrentPage(page)}
                             className={`px-3 py-2 rounded ${
                               currentPage === page
-                                ? "bg-walmart-blue text-white"
+                                ? "bg-vitrii-blue text-white"
                                 : "border border-gray-300 hover:bg-gray-50"
                             }`}
                           >

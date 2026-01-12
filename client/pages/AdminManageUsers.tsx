@@ -208,12 +208,12 @@ export default function AdminManageUsers() {
           {/* Header */}
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-2">
-              <Lock className="w-8 h-8 text-walmart-blue" />
-              <h1 className="text-3xl font-bold text-walmart-text">
+              <Lock className="w-8 h-8 text-vitrii-blue" />
+              <h1 className="text-3xl font-bold text-vitrii-text">
                 Gerenciar Usuários
               </h1>
             </div>
-            <p className="text-walmart-text-secondary">
+            <p className="text-vitrii-text-secondary">
               Visualize, edite e resete as senhas dos usuários do sistema
             </p>
           </div>
@@ -230,7 +230,7 @@ export default function AdminManageUsers() {
                   setSearchTerm(e.target.value);
                   setCurrentPage(1); // Reset to page 1 when searching
                 }}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-walmart-blue"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
               />
             </div>
           </div>
@@ -253,8 +253,8 @@ export default function AdminManageUsers() {
           {usuariosLoading ? (
             <div className="flex justify-center items-center py-12">
               <div className="text-center">
-                <div className="w-12 h-12 border-4 border-walmart-blue border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                <p className="text-walmart-text-secondary">
+                <div className="w-12 h-12 border-4 border-vitrii-blue border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+                <p className="text-vitrii-text-secondary">
                   Carregando usuários...
                 </p>
               </div>
@@ -264,19 +264,19 @@ export default function AdminManageUsers() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b-2 border-gray-200">
-                    <th className="text-left py-3 px-4 font-semibold text-walmart-text">
+                    <th className="text-left py-3 px-4 font-semibold text-vitrii-text">
                       Nome
                     </th>
-                    <th className="text-left py-3 px-4 font-semibold text-walmart-text">
+                    <th className="text-left py-3 px-4 font-semibold text-vitrii-text">
                       Email
                     </th>
-                    <th className="text-left py-3 px-4 font-semibold text-walmart-text">
+                    <th className="text-left py-3 px-4 font-semibold text-vitrii-text">
                       Senha
                     </th>
-                    <th className="text-left py-3 px-4 font-semibold text-walmart-text">
+                    <th className="text-left py-3 px-4 font-semibold text-vitrii-text">
                       Tipo
                     </th>
-                    <th className="text-left py-3 px-4 font-semibold text-walmart-text">
+                    <th className="text-left py-3 px-4 font-semibold text-vitrii-text">
                       Ações
                     </th>
                   </tr>
@@ -287,10 +287,10 @@ export default function AdminManageUsers() {
                       key={usuario.id}
                       className="border-b border-gray-200 hover:bg-gray-50 transition-colors"
                     >
-                      <td className="py-4 px-4 text-walmart-text font-medium">
+                      <td className="py-4 px-4 text-vitrii-text font-medium">
                         {usuario.nome}
                       </td>
-                      <td className="py-4 px-4 text-walmart-text-secondary text-sm">
+                      <td className="py-4 px-4 text-vitrii-text-secondary text-sm">
                         {usuario.email}
                       </td>
                       <td className="py-4 px-4">
@@ -347,7 +347,7 @@ export default function AdminManageUsers() {
                         <div className="flex gap-2">
                           <button
                             onClick={() => setEditingUser(usuario)}
-                            className="inline-flex items-center gap-2 px-3 py-1 bg-walmart-green text-white rounded-lg hover:bg-walmart-green-dark transition-colors text-sm font-medium"
+                            className="inline-flex items-center gap-2 px-3 py-1 bg-vitrii-green text-white rounded-lg hover:bg-vitrii-green-dark transition-colors text-sm font-medium"
                             title="Editar"
                           >
                             <Edit2 className="w-4 h-4" />
@@ -360,7 +360,7 @@ export default function AdminManageUsers() {
                                 nome: usuario.nome,
                               })
                             }
-                            className="inline-flex items-center gap-2 px-3 py-1 bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors text-sm font-medium"
+                            className="inline-flex items-center gap-2 px-3 py-1 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors text-sm font-medium"
                             title="Resetar Senha"
                           >
                             <RefreshCw className="w-4 h-4" />
@@ -382,7 +382,7 @@ export default function AdminManageUsers() {
           ) : (
             <div className="text-center py-12">
               <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-walmart-text-secondary">
+              <p className="text-vitrii-text-secondary">
                 Nenhum usuário encontrado
               </p>
             </div>
@@ -394,19 +394,19 @@ export default function AdminManageUsers() {
       {resetPasswordModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-            <h2 className="text-2xl font-bold text-walmart-text mb-2">
+            <h2 className="text-2xl font-bold text-vitrii-text mb-2">
               Resetar Senha
             </h2>
-            <p className="text-walmart-text-secondary mb-6">
+            <p className="text-vitrii-text-secondary mb-6">
               Resetar senha para{" "}
-              <strong className="text-walmart-text">
+              <strong className="text-vitrii-text">
                 {resetPasswordModal.nome}
               </strong>
             </p>
 
             <div className="space-y-4 mb-6">
               <div>
-                <label className="block text-sm font-medium text-walmart-text mb-2">
+                <label className="block text-sm font-medium text-vitrii-text mb-2">
                   Nova Senha
                 </label>
                 <input
@@ -414,12 +414,12 @@ export default function AdminManageUsers() {
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="Digite a nova senha"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-walmart-blue"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-walmart-text mb-2">
+                <label className="block text-sm font-medium text-vitrii-text mb-2">
                   Confirmar Senha
                 </label>
                 <input
@@ -427,7 +427,7 @@ export default function AdminManageUsers() {
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Confirme a nova senha"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-walmart-blue"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
                 />
               </div>
             </div>
@@ -439,14 +439,14 @@ export default function AdminManageUsers() {
                   setNewPassword("");
                   setConfirmPassword("");
                 }}
-                className="flex-1 px-4 py-2 border border-gray-300 text-walmart-text rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                className="flex-1 px-4 py-2 border border-gray-300 text-vitrii-text rounded-lg hover:bg-gray-50 transition-colors font-medium"
               >
                 Cancelar
               </button>
               <button
                 onClick={handleResetPassword}
                 disabled={resetPasswordMutation.isPending}
-                className="flex-1 px-4 py-2 bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors font-medium disabled:opacity-50"
+                className="flex-1 px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors font-medium disabled:opacity-50"
               >
                 {resetPasswordMutation.isPending ? "Resetando..." : "Resetar"}
               </button>

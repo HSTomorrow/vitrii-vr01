@@ -65,11 +65,11 @@ export default function AdCard({
   const isDonation = variant === "donation";
   const backgroundColor = isDonation
     ? "from-green-400 to-green-600"
-    : "from-walmart-blue to-walmart-blue-dark";
+    : "from-vitrii-blue to-vitrii-blue-dark";
   const buttonClass = isDonation
     ? "bg-green-600 hover:bg-green-700"
-    : "bg-walmart-blue hover:bg-walmart-blue-dark";
-  const badgeColor = isDonation ? "bg-green-500" : "bg-walmart-blue";
+    : "bg-vitrii-blue hover:bg-vitrii-blue-dark";
+  const badgeColor = isDonation ? "bg-green-500" : "bg-vitrii-blue";
 
   return (
     <div className="vitrii-card overflow-hidden hover:scale-105 transition-transform duration-200 cursor-pointer relative">
@@ -100,7 +100,7 @@ export default function AdCard({
 
       {/* Store Logo Badge */}
       {(anunciante?.fotoUrl || anuncio.anunciante?.fotoUrl) && (
-        <div className="absolute bottom-3 left-3 z-10 w-10 h-10 rounded-full bg-white border-2 border-walmart-blue overflow-hidden flex items-center justify-center shadow-md">
+        <div className="absolute bottom-3 left-3 z-10 w-10 h-10 rounded-full bg-white border-2 border-vitrii-blue overflow-hidden flex items-center justify-center shadow-md">
           <img
             src={anunciante?.fotoUrl || anuncio.anunciante?.fotoUrl}
             alt={anunciante?.nome || anuncio.anunciante?.nome}
@@ -128,10 +128,10 @@ export default function AdCard({
       {/* Content */}
       <div className="p-4 flex flex-col h-full">
         <div>
-          <h4 className="font-semibold text-walmart-text mb-2 line-clamp-2">
+          <h4 className="font-semibold text-vitrii-text mb-2 line-clamp-2">
             {anuncio.titulo}
           </h4>
-          <p className="text-sm text-walmart-text-secondary mb-3 line-clamp-2">
+          <p className="text-sm text-vitrii-text-secondary mb-3 line-clamp-2">
             {anuncio.descricao ||
               (isDonation
                 ? "Item disponível para doação"
@@ -139,7 +139,7 @@ export default function AdCard({
           </p>
 
           {/* Municipality */}
-          <div className="flex items-center gap-1 mb-3 text-xs text-walmart-text-secondary">
+          <div className="flex items-center gap-1 mb-3 text-xs text-vitrii-text-secondary">
             <MapPin className="w-3 h-3" />
             <span className="truncate">
               {extractMunicipality(anuncio.anunciante?.endereco || "")}
@@ -149,14 +149,14 @@ export default function AdCard({
 
         <div className="flex justify-between items-center mb-4 mt-auto">
           <span
-            className={`text-2xl font-bold ${isDonation ? "text-green-600" : "text-walmart-blue"}`}
+            className={`text-2xl font-bold ${isDonation ? "text-green-600" : "text-vitrii-blue"}`}
           >
             {isDonation
               ? "Grátis"
               : `R$ ${anuncio.tabelaDePreco?.preco ? Number(anuncio.tabelaDePreco.preco).toFixed(2) : "0.00"}`}
           </span>
           <div className="flex items-center space-x-1">
-            <Star className="w-4 h-4 fill-walmart-yellow text-walmart-yellow" />
+            <Star className="w-4 h-4 fill-vitrii-yellow text-vitrii-yellow" />
             <span className="text-sm font-semibold">5.0</span>
           </div>
         </div>

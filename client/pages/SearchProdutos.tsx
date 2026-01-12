@@ -172,7 +172,7 @@ export default function SearchProdutos() {
       <Header />
 
       {/* Search Header */}
-      <section className="bg-walmart-blue text-white py-8">
+      <section className="bg-vitrii-blue text-white py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl font-bold mb-4">Buscar Produtos por Loja</h1>
           <div className="relative">
@@ -182,7 +182,7 @@ export default function SearchProdutos() {
               placeholder="Buscar por nome do produto..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 rounded-lg bg-blue-50 text-walmart-text placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-walmart-yellow"
+              className="w-full pl-12 pr-4 py-3 rounded-lg bg-blue-50 text-vitrii-text placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-vitrii-yellow"
             />
           </div>
         </div>
@@ -194,15 +194,15 @@ export default function SearchProdutos() {
           <div className="flex gap-8">
             {/* Filters Sidebar */}
             <div className="w-full md:w-64 flex-shrink-0">
-              <div className="bg-walmart-gray-light rounded-lg p-6 space-y-6">
-                <h2 className="font-bold text-walmart-text flex items-center gap-2">
+              <div className="bg-vitrii-gray-light rounded-lg p-6 space-y-6">
+                <h2 className="font-bold text-vitrii-text flex items-center gap-2">
                   <Filter className="w-5 h-5" />
                   Filtros
                 </h2>
 
                 {/* Store Filter */}
                 <div>
-                  <h3 className="font-semibold text-walmart-text mb-3">Loja</h3>
+                  <h3 className="font-semibold text-vitrii-text mb-3">Loja</h3>
                   <select
                     value={selectedStore || ""}
                     onChange={(e) => {
@@ -223,7 +223,7 @@ export default function SearchProdutos() {
                 {/* Group Filter */}
                 {selectedStore && (
                   <div>
-                    <h3 className="font-semibold text-walmart-text mb-3">Categoria</h3>
+                    <h3 className="font-semibold text-vitrii-text mb-3">Categoria</h3>
                     <select
                       value={selectedGroup || ""}
                       onChange={(e) =>
@@ -245,7 +245,7 @@ export default function SearchProdutos() {
 
                 {/* Price Filter */}
                 <div>
-                  <h3 className="font-semibold text-walmart-text mb-3">Faixa de Preço</h3>
+                  <h3 className="font-semibold text-vitrii-text mb-3">Faixa de Preço</h3>
                   <div className="space-y-2">
                     <input
                       type="number"
@@ -277,7 +277,7 @@ export default function SearchProdutos() {
                       setSelectedGroup(null);
                       setPriceRange({ min: "", max: "" });
                     }}
-                    className="w-full px-4 py-2 bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors text-sm font-semibold"
+                    className="w-full px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors text-sm font-semibold"
                   >
                     Limpar Filtros
                   </button>
@@ -287,19 +287,19 @@ export default function SearchProdutos() {
 
             {/* Results */}
             <div className="flex-1">
-              <h2 className="text-lg font-bold text-walmart-text mb-6">
+              <h2 className="text-lg font-bold text-vitrii-text mb-6">
                 {totalProducts} produto{totalProducts !== 1 ? "s" : ""} encontrado{totalProducts !== 1 ? "s" : ""}
               </h2>
 
               {isLoading ? (
                 <div className="text-center py-12">
-                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-walmart-blue mx-auto" />
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-vitrii-blue mx-auto" />
                 </div>
               ) : totalProducts === 0 ? (
                 <div className="text-center py-12">
                   <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-walmart-text text-lg">Nenhum produto encontrado</p>
-                  <p className="text-walmart-text-secondary">Tente ajustar seus filtros</p>
+                  <p className="text-vitrii-text text-lg">Nenhum produto encontrado</p>
+                  <p className="text-vitrii-text-secondary">Tente ajustar seus filtros</p>
                 </div>
               ) : (
                 <div className="space-y-8">
@@ -320,7 +320,7 @@ export default function SearchProdutos() {
                               expandedStore === storeData.store.id ? null : storeData.store.id
                             )
                           }
-                          className="w-full flex items-center justify-between bg-walmart-blue text-white px-6 py-4 rounded-lg hover:bg-walmart-blue-dark transition-colors mb-4"
+                          className="w-full flex items-center justify-between bg-vitrii-blue text-white px-6 py-4 rounded-lg hover:bg-vitrii-blue-dark transition-colors mb-4"
                         >
                           <div className="flex items-center gap-3">
                             <div>
@@ -334,7 +334,7 @@ export default function SearchProdutos() {
                             </div>
                           </div>
                           <div className="flex items-center gap-3">
-                            <span className="bg-walmart-yellow text-walmart-text px-3 py-1 rounded-full font-semibold">
+                            <span className="bg-vitrii-yellow text-vitrii-text px-3 py-1 rounded-full font-semibold">
                               {storeProducts} produto{storeProducts !== 1 ? "s" : ""}
                             </span>
                             <ChevronRight
@@ -353,7 +353,7 @@ export default function SearchProdutos() {
 
                               return (
                                 <div key={groupData.group.id}>
-                                  <h4 className="font-semibold text-walmart-text mb-3 px-4">
+                                  <h4 className="font-semibold text-vitrii-text mb-3 px-4">
                                     {groupData.group.nome}
                                   </h4>
                                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -362,15 +362,15 @@ export default function SearchProdutos() {
                                         key={product.id}
                                         className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
                                       >
-                                        <div className="bg-walmart-gray-light h-32 flex items-center justify-center">
+                                        <div className="bg-vitrii-gray-light h-32 flex items-center justify-center">
                                           <Package className="w-12 h-12 text-gray-400" />
                                         </div>
                                         <div className="p-4">
-                                          <h5 className="font-bold text-walmart-text line-clamp-2 mb-2">
+                                          <h5 className="font-bold text-vitrii-text line-clamp-2 mb-2">
                                             {product.nome}
                                           </h5>
                                           {product.descricao && (
-                                            <p className="text-sm text-walmart-text-secondary line-clamp-2 mb-3">
+                                            <p className="text-sm text-vitrii-text-secondary line-clamp-2 mb-3">
                                               {product.descricao}
                                             </p>
                                           )}
@@ -379,13 +379,13 @@ export default function SearchProdutos() {
                                           <div className="mb-3">
                                             {product.prices.length > 0 ? (
                                               <div>
-                                                <p className="text-walmart-blue font-bold text-lg">
+                                                <p className="text-vitrii-blue font-bold text-lg">
                                                   R$ {product.minPrice.toFixed(2)}
                                                   {product.minPrice !== product.maxPrice &&
                                                     ` - R$ ${product.maxPrice.toFixed(2)}`}
                                                 </p>
                                                 {product.prices.length > 1 && (
-                                                  <p className="text-xs text-walmart-text-secondary">
+                                                  <p className="text-xs text-vitrii-text-secondary">
                                                     {product.prices.length} variante
                                                     {product.prices.length !== 1 ? "s" : ""}
                                                   </p>
@@ -398,7 +398,7 @@ export default function SearchProdutos() {
 
                                           {/* Variants if limited */}
                                           {product.prices.length > 0 && product.prices.length <= 3 && (
-                                            <div className="text-xs text-walmart-text-secondary space-y-1">
+                                            <div className="text-xs text-vitrii-text-secondary space-y-1">
                                               {product.prices.map((p: any, idx: number) => (
                                                 <div key={idx}>
                                                   {p.tamanho || p.cor
@@ -411,7 +411,7 @@ export default function SearchProdutos() {
                                             </div>
                                           )}
 
-                                          <button className="w-full mt-3 px-3 py-2 bg-walmart-blue text-white rounded font-semibold hover:bg-walmart-blue-dark transition-colors text-sm">
+                                          <button className="w-full mt-3 px-3 py-2 bg-vitrii-blue text-white rounded font-semibold hover:bg-vitrii-blue-dark transition-colors text-sm">
                                             Ver Detalhes
                                           </button>
                                         </div>

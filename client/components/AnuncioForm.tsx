@@ -404,11 +404,11 @@ export default function AnuncioForm({
   // Show loading state while fetching anuncio for editing
   if (anuncioId && isLoadingAnuncio) {
     return (
-      <div className="min-h-screen bg-walmart-gray-light py-12">
+      <div className="min-h-screen bg-vitrii-gray-light py-12">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-walmart-blue mx-auto mb-4"></div>
-            <p className="text-walmart-text-secondary text-lg">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-vitrii-blue mx-auto mb-4"></div>
+            <p className="text-vitrii-text-secondary text-lg">
               Carregando anúncio...
             </p>
           </div>
@@ -420,7 +420,7 @@ export default function AnuncioForm({
   // Show error state if anuncio failed to load
   if (anuncioId && anuncioError) {
     return (
-      <div className="min-h-screen bg-walmart-gray-light py-12">
+      <div className="min-h-screen bg-vitrii-gray-light py-12">
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
             <AlertCircle className="w-12 h-12 text-red-600 mx-auto mb-3" />
@@ -434,7 +434,7 @@ export default function AnuncioForm({
             </p>
             <Link
               to="/sell"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
               Voltar
@@ -446,21 +446,21 @@ export default function AnuncioForm({
   }
 
   return (
-    <div className="min-h-screen bg-walmart-gray-light py-12">
+    <div className="min-h-screen bg-vitrii-gray-light py-12">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
           <Link
             to="/sell"
-            className="inline-flex items-center text-walmart-blue hover:text-walmart-blue-dark font-semibold mb-4"
+            className="inline-flex items-center text-vitrii-blue hover:text-vitrii-blue-dark font-semibold mb-4"
           >
             <ChevronLeft className="w-5 h-5 mr-1" />
             Voltar
           </Link>
-          <h1 className="text-3xl font-bold text-walmart-text">
+          <h1 className="text-3xl font-bold text-vitrii-text">
             {anuncioId ? "Editar Anúncio" : "Novo Anúncio"}
           </h1>
-          <p className="text-walmart-text-secondary mt-2">
+          <p className="text-vitrii-text-secondary mt-2">
             {anuncioId
               ? "Atualize os detalhes do seu anúncio"
               : "Crie um novo anúncio para seus produtos e serviços"}
@@ -473,13 +473,13 @@ export default function AnuncioForm({
             {/* Anunciante Selection */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-semibold text-walmart-text">
+                <label className="block text-sm font-semibold text-vitrii-text">
                   Anunciante *
                 </label>
                 <button
                   type="button"
                   onClick={() => setShowCreateLoja(true)}
-                  className="inline-flex items-center gap-1 px-3 py-1 text-sm bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors"
+                  className="inline-flex items-center gap-1 px-3 py-1 text-sm bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors"
                 >
                   <Plus className="w-4 h-4" />
                   Novo Anunciante
@@ -496,7 +496,7 @@ export default function AnuncioForm({
                   }));
                 }}
                 disabled={!!anuncioId}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent disabled:bg-gray-100"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent disabled:bg-gray-100"
               >
                 <option value={0}>Selecione um anunciante</option>
                 {anunciantes.map((anunciante: Anunciante) => (
@@ -509,7 +509,7 @@ export default function AnuncioForm({
 
             {/* Título */}
             <div>
-              <label className="block text-sm font-semibold text-walmart-text mb-2">
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Título do Anúncio *
               </label>
               <input
@@ -518,16 +518,16 @@ export default function AnuncioForm({
                 onChange={(e) => handleInputChange("titulo", e.target.value)}
                 placeholder="Ex: Camiseta Azul"
                 maxLength={50}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
               />
-              <p className="mt-1 text-sm text-walmart-text-secondary">
+              <p className="mt-1 text-sm text-vitrii-text-secondary">
                 {formData.titulo.length}/50 caracteres
               </p>
             </div>
 
             {/* Descrição */}
             <div>
-              <label className="block text-sm font-semibold text-walmart-text mb-2">
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Descrição (Opcional)
               </label>
               <textarea
@@ -535,17 +535,17 @@ export default function AnuncioForm({
                 onChange={(e) => handleInputChange("descricao", e.target.value)}
                 placeholder="Descreva o produto em detalhes..."
                 rows={5}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
               />
             </div>
 
             {/* Preço do Anúncio - Sempre Visível */}
             <div>
-              <label className="block text-sm font-semibold text-walmart-text mb-2">
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Valor {formData.isDoacao ? "(Gratuito)" : ""}
               </label>
               <div className="flex items-center">
-                <span className="text-walmart-text font-semibold mr-2">R$</span>
+                <span className="text-vitrii-text font-semibold mr-2">R$</span>
                 <input
                   type="number"
                   step="0.01"
@@ -563,7 +563,7 @@ export default function AnuncioForm({
                         ? `Ex: ${Number(selectedPriceTable.preco).toFixed(2)}`
                         : "Ex: 99.90"
                   }
-                  className={`flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent ${
+                  className={`flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent ${
                     formData.isDoacao ? "bg-gray-100 cursor-not-allowed" : ""
                   }`}
                 />
@@ -615,7 +615,7 @@ export default function AnuncioForm({
               <div className="flex-1">
                 <label
                   htmlFor="isDoacao"
-                  className={`text-sm font-semibold text-walmart-text ${
+                  className={`text-sm font-semibold text-vitrii-text ${
                     isDonation ? "cursor-not-allowed opacity-75" : "cursor-pointer"
                   }`}
                 >
@@ -631,7 +631,7 @@ export default function AnuncioForm({
 
             {/* Validade do Anúncio */}
             <div>
-              <label className="block text-sm font-semibold text-walmart-text mb-2">
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Validade do Anúncio
               </label>
               <input
@@ -640,30 +640,30 @@ export default function AnuncioForm({
                 onChange={(e) =>
                   handleInputChange("dataValidade", e.target.value)
                 }
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
               />
-              <p className="mt-2 text-sm text-walmart-text-secondary">
+              <p className="mt-2 text-sm text-vitrii-text-secondary">
                 Padrão: 7 dias a partir da data de criação
               </p>
             </div>
 
             {/* Informações para Anunciantes Profissionais Section */}
             <div className="border-t-2 border-gray-200 pt-8 mt-8">
-              <h2 className="text-lg font-bold text-walmart-text mb-6">
+              <h2 className="text-lg font-bold text-vitrii-text mb-6">
                 Informações para Anunciantes Profissionais
               </h2>
 
               {/* Produto Selection */}
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-2">
-                  <label className="block text-sm font-semibold text-walmart-text">
+                  <label className="block text-sm font-semibold text-vitrii-text">
                     Produto (Opcional)
                   </label>
                   {selectedAnuncianteId > 0 && (
                     <button
                       type="button"
                       onClick={() => setShowCreateProducto(true)}
-                      className="inline-flex items-center gap-1 px-3 py-1 text-sm bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors"
+                      className="inline-flex items-center gap-1 px-3 py-1 text-sm bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors"
                     >
                       <Plus className="w-4 h-4" />
                       Novo Produto
@@ -681,7 +681,7 @@ export default function AnuncioForm({
                         tabelaDePrecoId: 0,
                       }));
                     }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
                   >
                     <option value={0}>Selecione um produto</option>
                     {productos.map((p: Producto) => (
@@ -698,7 +698,7 @@ export default function AnuncioForm({
                 {selectedProducto &&
                   (selectedProducto.grupo ||
                     selectedProducto.grupoDeProductos) && (
-                    <p className="mt-2 text-sm text-walmart-text-secondary">
+                    <p className="mt-2 text-sm text-vitrii-text-secondary">
                       Grupo:{" "}
                       {
                         (
@@ -709,7 +709,7 @@ export default function AnuncioForm({
                     </p>
                   )}
                 {selectedProducto?.tipo && (
-                  <p className="mt-2 text-sm text-walmart-text-secondary">
+                  <p className="mt-2 text-sm text-vitrii-text-secondary">
                     Tipo:{" "}
                     <span className="font-semibold capitalize">
                       {selectedProducto.tipo === "agenda_recorrente"
@@ -725,7 +725,7 @@ export default function AnuncioForm({
                 ["produto", "servico"].includes(selectedProducto.tipo) &&
                 priceTables.length > 0 && (
                   <div className="mb-6">
-                    <label className="block text-sm font-semibold text-walmart-text mb-2">
+                    <label className="block text-sm font-semibold text-vitrii-text mb-2">
                       Variante (Tamanho/Cor) - Opcional
                     </label>
                     {formData.productId > 0 ? (
@@ -737,7 +737,7 @@ export default function AnuncioForm({
                             parseInt(e.target.value),
                           )
                         }
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
                       >
                         <option value={0}>
                           Selecione uma variante (opcional)
@@ -758,7 +758,7 @@ export default function AnuncioForm({
                       </div>
                     )}
                     {selectedPriceTable && (
-                      <p className="mt-2 text-sm text-walmart-blue font-semibold">
+                      <p className="mt-2 text-sm text-vitrii-blue font-semibold">
                         Preço da Variante: R${" "}
                         {Number(selectedPriceTable.preco).toFixed(2)}
                       </p>
@@ -778,7 +778,7 @@ export default function AnuncioForm({
 
               {/* Equipe de Venda */}
               <div className="mb-6">
-                <label className="block text-sm font-semibold text-walmart-text mb-2">
+                <label className="block text-sm font-semibold text-vitrii-text mb-2">
                   Equipe de Venda (Opcional)
                 </label>
                 {selectedAnuncianteId > 0 ? (
@@ -790,7 +790,7 @@ export default function AnuncioForm({
                         parseInt(e.target.value),
                       )
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
                   >
                     <option value={0}>Nenhuma equipe selecionada</option>
                     {equipes.map((eq: EquipeDeVenda) => (
@@ -823,7 +823,7 @@ export default function AnuncioForm({
 
             {/* Endereço */}
             <div>
-              <label className="block text-sm font-semibold text-walmart-text mb-2">
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Endereço (Opcional)
               </label>
               <input
@@ -832,9 +832,9 @@ export default function AnuncioForm({
                 onChange={(e) => handleInputChange("endereco", e.target.value)}
                 placeholder="Ex: Rua das Flores, 123"
                 maxLength={100}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
               />
-              <p className="mt-1 text-sm text-walmart-text-secondary">
+              <p className="mt-1 text-sm text-vitrii-text-secondary">
                 {formData.endereco.length}/100 caracteres
               </p>
             </div>
@@ -842,7 +842,7 @@ export default function AnuncioForm({
             {/* Localização (Município e Estado) */}
             <div className="grid grid-cols-3 gap-4">
               <div className="col-span-2">
-                <label className="block text-sm font-semibold text-walmart-text mb-2">
+                <label className="block text-sm font-semibold text-vitrii-text mb-2">
                   Município (Opcional)
                 </label>
                 <input
@@ -850,17 +850,17 @@ export default function AnuncioForm({
                   value={formData.cidade}
                   onChange={(e) => handleInputChange("cidade", e.target.value)}
                   placeholder="Ex: Belo Horizonte"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-walmart-text mb-2">
+                <label className="block text-sm font-semibold text-vitrii-text mb-2">
                   Estado (Opcional)
                 </label>
                 <select
                   value={formData.estado}
                   onChange={(e) => handleInputChange("estado", e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent bg-white"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent bg-white"
                 >
                   <option value="">-- Selecione um estado --</option>
                   {BRAZILIAN_STATES.map((state) => (
@@ -874,7 +874,7 @@ export default function AnuncioForm({
 
             {/* Foto */}
             <div>
-              <label className="block text-sm font-semibold text-walmart-text mb-2">
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Foto (Opcional)
               </label>
               <div className="space-y-3">
@@ -899,10 +899,10 @@ export default function AnuncioForm({
                   />
                   <label
                     htmlFor="file-upload"
-                    className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-walmart-blue rounded-lg cursor-pointer hover:bg-blue-50 transition-colors"
+                    className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-vitrii-blue rounded-lg cursor-pointer hover:bg-blue-50 transition-colors"
                   >
-                    <Upload className="w-5 h-5 text-walmart-blue" />
-                    <span className="font-semibold text-walmart-text">
+                    <Upload className="w-5 h-5 text-vitrii-blue" />
+                    <span className="font-semibold text-vitrii-text">
                       Clique para fazer upload ou arraste uma imagem
                     </span>
                   </label>
@@ -917,7 +917,7 @@ export default function AnuncioForm({
                       handleInputChange("fotoUrl", e.target.value)
                     }
                     placeholder="Ou cole uma URL de imagem"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent text-sm"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent text-sm"
                   />
                 </div>
 
@@ -946,7 +946,7 @@ export default function AnuncioForm({
             </div>
 
             {/* Destaque (Featured) - Now at the end */}
-            <div className="flex items-center gap-3 p-4 bg-yellow-50 border border-walmart-yellow rounded-lg">
+            <div className="flex items-center gap-3 p-4 bg-yellow-50 border border-vitrii-yellow rounded-lg">
               <input
                 type="checkbox"
                 id="destaque"
@@ -954,13 +954,13 @@ export default function AnuncioForm({
                 onChange={(e) => {
                   handleInputChange("destaque", e.target.checked);
                 }}
-                className="w-5 h-5 text-walmart-yellow cursor-pointer rounded"
+                className="w-5 h-5 text-vitrii-yellow cursor-pointer rounded"
               />
               <label htmlFor="destaque" className="flex-1 cursor-pointer">
-                <p className="font-semibold text-walmart-text">
+                <p className="font-semibold text-vitrii-text">
                   ⭐ Anuncio em Destaque
                 </p>
-                <p className="text-sm text-walmart-text-secondary">
+                <p className="text-sm text-vitrii-text-secondary">
                   Marque esta opção para colocar o anúncio em destaque na página
                   principal
                 </p>
@@ -968,12 +968,12 @@ export default function AnuncioForm({
             </div>
 
             {/* Info Box */}
-            <div className="bg-blue-50 border-l-4 border-walmart-blue p-4 rounded">
+            <div className="bg-blue-50 border-l-4 border-vitrii-blue p-4 rounded">
               <div className="flex gap-3">
-                <AlertCircle className="w-5 h-5 text-walmart-blue flex-shrink-0 mt-0.5" />
-                <div className="text-sm text-walmart-text">
+                <AlertCircle className="w-5 h-5 text-vitrii-blue flex-shrink-0 mt-0.5" />
+                <div className="text-sm text-vitrii-text">
                   <p className="font-semibold">Informações sobre Publicação</p>
-                  <p className="mt-1 text-walmart-text-secondary">
+                  <p className="mt-1 text-vitrii-text-secondary">
                     Você tem 3 anúncios gratuitos. Após isso, será cobrado R$
                     9,90 por anúncio por dia via Pix.
                   </p>
@@ -985,14 +985,14 @@ export default function AnuncioForm({
             <div className="flex gap-4 pt-6 border-t">
               <Link
                 to="/sell"
-                className="flex-1 px-4 py-3 border-2 border-walmart-blue text-walmart-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors text-center"
+                className="flex-1 px-4 py-3 border-2 border-vitrii-blue text-vitrii-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors text-center"
               >
                 Cancelar
               </Link>
               <button
                 type="submit"
                 disabled={mutation.isPending}
-                className="flex-1 px-4 py-3 bg-walmart-blue text-white rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-3 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {mutation.isPending ? (
                   <>

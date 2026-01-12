@@ -230,20 +230,20 @@ export default function AdminManageAds() {
   // Check authorization
   if (!isAdmin) {
     return (
-      <div className="min-h-screen bg-walmart-bg flex flex-col">
+      <div className="min-h-screen bg-vitrii-bg flex flex-col">
         <Header />
         <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-8 flex items-center justify-center">
           <div className="text-center">
             <Lock className="w-16 h-16 text-red-500 mx-auto mb-4" />
-            <h1 className="text-3xl font-bold text-walmart-text mb-2">
+            <h1 className="text-3xl font-bold text-vitrii-text mb-2">
               Acesso Restrito
             </h1>
-            <p className="text-walmart-text-secondary mb-6">
+            <p className="text-vitrii-text-secondary mb-6">
               Apenas administradores podem acessar esta página.
             </p>
             <button
               onClick={() => navigate("/")}
-              className="px-6 py-2 bg-walmart-blue text-white rounded-lg hover:bg-blue-700 transition"
+              className="px-6 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-blue-700 transition"
             >
               Voltar para Home
             </button>
@@ -255,19 +255,19 @@ export default function AdminManageAds() {
   }
 
   return (
-    <div className="min-h-screen bg-walmart-bg flex flex-col">
+    <div className="min-h-screen bg-vitrii-bg flex flex-col">
       <Header />
 
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-8">
         {/* Page Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <FileText className="w-8 h-8 text-walmart-blue" />
-            <h1 className="text-3xl font-bold text-walmart-text">
+            <FileText className="w-8 h-8 text-vitrii-blue" />
+            <h1 className="text-3xl font-bold text-vitrii-text">
               Gerenciar Anúncios
             </h1>
           </div>
-          <p className="text-walmart-text-secondary">
+          <p className="text-vitrii-text-secondary">
             Edite, ative ou desative qualquer anúncio da plataforma
           </p>
         </div>
@@ -277,13 +277,13 @@ export default function AdminManageAds() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Search */}
             <div className="relative">
-              <Search className="absolute left-3 top-3 w-5 h-5 text-walmart-text-secondary" />
+              <Search className="absolute left-3 top-3 w-5 h-5 text-vitrii-text-secondary" />
               <input
                 type="text"
                 placeholder="Buscar por título, loja ou produto..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-walmart-blue"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
               />
             </div>
 
@@ -291,7 +291,7 @@ export default function AdminManageAds() {
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-walmart-blue"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
             >
               <option value="todos">Todos os anúncios</option>
               <option value="ativo">Apenas ativos</option>
@@ -339,14 +339,14 @@ export default function AdminManageAds() {
         )}
         {isLoading ? (
           <div className="text-center py-12">
-            <p className="text-walmart-text-secondary">
+            <p className="text-vitrii-text-secondary">
               Carregando anúncios...
             </p>
           </div>
         ) : filteredAnuncios.length === 0 ? (
           <div className="text-center py-12">
-            <AlertCircle className="w-12 h-12 text-walmart-text-secondary mx-auto mb-2" />
-            <p className="text-walmart-text-secondary">
+            <AlertCircle className="w-12 h-12 text-vitrii-text-secondary mx-auto mb-2" />
+            <p className="text-vitrii-text-secondary">
               Nenhum anúncio encontrado
             </p>
           </div>
@@ -376,14 +376,14 @@ export default function AdminManageAds() {
                     {/* Info */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold text-walmart-text truncate">
+                        <h3 className="font-semibold text-vitrii-text truncate">
                           {anuncio.titulo}
                         </h3>
                         {anuncio.destaque && (
                           <Star className="w-4 h-4 text-yellow-500 flex-shrink-0" />
                         )}
                       </div>
-                      <p className="text-sm text-walmart-text-secondary truncate">
+                      <p className="text-sm text-vitrii-text-secondary truncate">
                         Anunciante: {anuncio.anunciantes?.nome || "N/A"} •
                         Tipo: {anuncio.tipo}
                       </p>
@@ -412,7 +412,7 @@ export default function AdminManageAds() {
                     {anuncio.preco &&
                       typeof anuncio.preco === "number" && (
                         <div className="text-right">
-                          <p className="text-lg font-bold text-walmart-blue">
+                          <p className="text-lg font-bold text-vitrii-blue">
                             R$ {Number(anuncio.preco).toFixed(2)}
                           </p>
                         </div>
@@ -420,9 +420,9 @@ export default function AdminManageAds() {
 
                     {/* Expand button */}
                     {expandedAd === anuncio.id ? (
-                      <ChevronUp className="w-5 h-5 text-walmart-text-secondary flex-shrink-0" />
+                      <ChevronUp className="w-5 h-5 text-vitrii-text-secondary flex-shrink-0" />
                     ) : (
-                      <ChevronDown className="w-5 h-5 text-walmart-text-secondary flex-shrink-0" />
+                      <ChevronDown className="w-5 h-5 text-vitrii-text-secondary flex-shrink-0" />
                     )}
                   </div>
                 </div>
@@ -433,10 +433,10 @@ export default function AdminManageAds() {
                     {/* Description */}
                     {anuncio.descricao && (
                       <div>
-                        <h4 className="font-semibold text-walmart-text mb-2">
+                        <h4 className="font-semibold text-vitrii-text mb-2">
                           Descrição
                         </h4>
-                        <p className="text-walmart-text-secondary line-clamp-3">
+                        <p className="text-vitrii-text-secondary line-clamp-3">
                           {anuncio.descricao}
                         </p>
                       </div>
@@ -445,18 +445,18 @@ export default function AdminManageAds() {
                     {/* Dates */}
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <p className="text-walmart-text-secondary">
+                        <p className="text-vitrii-text-secondary">
                           Data de criação
                         </p>
-                        <p className="font-medium text-walmart-text">
+                        <p className="font-medium text-vitrii-text">
                           {new Date(anuncio.dataCriacao).toLocaleDateString(
                             "pt-BR",
                           )}
                         </p>
                       </div>
                       <div>
-                        <p className="text-walmart-text-secondary">ID</p>
-                        <p className="font-medium text-walmart-text">
+                        <p className="text-vitrii-text-secondary">ID</p>
+                        <p className="font-medium text-vitrii-text">
                           #{anuncio.id}
                         </p>
                       </div>
@@ -464,7 +464,7 @@ export default function AdminManageAds() {
 
                     {/* Status Control */}
                     <div className="mb-4">
-                      <label className="block text-sm font-semibold text-walmart-text mb-2">
+                      <label className="block text-sm font-semibold text-vitrii-text mb-2">
                         Status do Anúncio
                       </label>
                       <div className="flex gap-2 flex-wrap">
@@ -477,7 +477,7 @@ export default function AdminManageAds() {
                             })
                           }
                           disabled={overrideStatusMutation.isPending}
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-walmart-blue text-sm"
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue text-sm"
                         >
                           <option value="em_edicao">Em Edição</option>
                           <option value="aguardando_pagamento">
@@ -488,7 +488,7 @@ export default function AdminManageAds() {
                           <option value="historico">Histórico</option>
                         </select>
                       </div>
-                      <p className="text-xs text-walmart-text-secondary mt-1">
+                      <p className="text-xs text-vitrii-text-secondary mt-1">
                         Status atual:{" "}
                         <span className="font-semibold">{anuncio.status}</span>
                       </p>
@@ -499,7 +499,7 @@ export default function AdminManageAds() {
                       {/* Edit Button */}
                       <Link
                         to={`/anuncio/${anuncio.id}/editar`}
-                        className="px-3 py-2 bg-walmart-blue text-white rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2 text-sm font-semibold"
+                        className="px-3 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2 text-sm font-semibold"
                       >
                         <Edit2 className="w-4 h-4" />
                         Editar
