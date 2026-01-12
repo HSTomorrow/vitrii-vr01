@@ -5,6 +5,7 @@ import { z } from "zod";
 // Schema validation
 const AnuncianteCreateSchema = z.object({
   nome: z.string().min(1, "Nome é obrigatório"),
+  tipo: z.enum(["Padrão", "Profissional"]).default("Padrão"),
   cnpj: z
     .string()
     .regex(/^\d{11,14}$/, "CNPJ/CPF inválido")
