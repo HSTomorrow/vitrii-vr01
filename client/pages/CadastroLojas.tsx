@@ -46,6 +46,7 @@ export default function CadastroAnunciantes() {
     instagram: "",
     facebook: "",
     whatsapp: "",
+    fotoUrl: "",
   });
 
   // Fetch anunciantes (filtered by current user, or all if admin)
