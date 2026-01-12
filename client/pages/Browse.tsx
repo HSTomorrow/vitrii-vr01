@@ -38,32 +38,25 @@ export default function Browse() {
   const [showFilters, setShowFilters] = useState(true);
   const itemsPerPage = 20;
 
-  // Fetch all active ads (both "ativo" for donations and "pago" for paid)
+  // Fetch all active ads with pagination
+  // Note: The API already filters by status="ativo" by default when no status param is provided
   const { data: anunciosData, isLoading } = useQuery({
     queryKey: ["browse-anuncios"],
     queryFn: async () => {
-      // Fetch active ads - both "ativo" (donations) and implicitly published ads
-      const response = await fetch("/api/anuncios?limit=500&includeInactive=false");
+      // Fetch ads with larger limit to allow client-side filtering
+      const response = await fetch("/api/anuncios?limit=500");
       if (!response.ok) {
         console.error("Error fetching ads:", response.status, response.statusText);
         throw new Error("Erro ao buscar anúncios");
       }
       const data = await response.json();
-      console.log("Browse: Fetched ads:", data?.data?.length || 0, "ads");
-      if (data?.data) {
-        // Filter to only show published/active ads
-        const publishedAds = data.data.filter((a: any) =>
-          a.status === "ativo" || a.status === "pago" || a.isDoacao === true
-        );
-        console.log("Browse: Published ads:", publishedAds.length);
-        return { ...data, data: publishedAds };
-      }
+      console.log("Browse: Fetched ads from API:", data?.data?.length || 0, "ads");
       return data;
     },
   });
 
   const allAnuncios = anunciosData?.data || [];
-  console.log("Browse: All anuncios:", allAnuncios.length);
+  console.log("Browse: Total anuncios available:", allAnuncios.length);
 
   // Extract unique locations for filter dropdown
   const uniqueLocations = useMemo(() => {
