@@ -9,10 +9,11 @@ const GrupoCreateSchema = z.object({
   descricao: z.string().optional(),
 });
 
-// GET all grupos (with pagination)
+// GET all grupos (with pagination and user filtering)
 export const getGrupos: RequestHandler = async (req, res) => {
   try {
     const { anuncianteId, limit = "20", offset = "0" } = req.query;
+    const userId = req.userId;
 
     // Validate pagination parameters
     const pageLimit = Math.min(
@@ -23,6 +24,40 @@ export const getGrupos: RequestHandler = async (req, res) => {
 
     const where: any = {};
     if (anuncianteId) where.anuncianteId = parseInt(anuncianteId as string);
+
+    // If user is not an admin, filter by their anunciantes
+    if (userId) {
+      const usuario = await prisma.usracessos.findUnique({
+        where: { id: userId },
+      });
+
+      // If not admin, only show groups for anunciantes the user is associated with
+      if (usuario && usuario.tipoUsuario !== "adm") {
+        const userAnunciantes = await prisma.usuarios_anunciantes.findMany({
+          where: { usuarioId: userId },
+          select: { anuncianteId: true },
+        });
+
+        const anuncianteIds = userAnunciantes.map((ua) => ua.anuncianteId);
+
+        if (anuncianteIds.length === 0) {
+          // User has no anunciantes, return empty list
+          return res.json({
+            success: true,
+            data: [],
+            pagination: {
+              count: 0,
+              total: 0,
+              limit: pageLimit,
+              offset: pageOffset,
+              hasMore: false,
+            },
+          });
+        }
+
+        where.anuncianteId = { in: anuncianteIds };
+      }
+    }
 
     // Get total count and paginated data in parallel
     const [grupos, total] = await Promise.all([
