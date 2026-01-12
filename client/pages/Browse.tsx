@@ -38,17 +38,24 @@ export default function Browse() {
   const [showFilters, setShowFilters] = useState(true);
   const itemsPerPage = 20;
 
-  // Fetch all active ads
+  // Fetch all active ads (both "ativo" for donations and "pago" for paid)
   const { data: anunciosData, isLoading } = useQuery({
     queryKey: ["browse-anuncios"],
     queryFn: async () => {
-      const response = await fetch("/api/anuncios?status=ativo&limit=500");
-      if (!response.ok) throw new Error("Erro ao buscar");
-      return response.json();
+      // Fetch ads with status "ativo" or "pago" - fetch more than needed for filtering
+      const response = await fetch("/api/anuncios?status=ativo&limit=500&includeInactive=false");
+      if (!response.ok) {
+        console.error("Error fetching ads:", response.status, response.statusText);
+        throw new Error("Erro ao buscar anúncios");
+      }
+      const data = await response.json();
+      console.log("Browse: Fetched ads:", data?.data?.length || 0, "ads");
+      return data;
     },
   });
 
   const allAnuncios = anunciosData?.data || [];
+  console.log("Browse: All anuncios:", allAnuncios.length);
 
   // Extract unique locations for filter dropdown
   const uniqueLocations = useMemo(() => {
