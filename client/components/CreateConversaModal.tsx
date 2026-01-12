@@ -29,6 +29,7 @@ export default function CreateConversaModal({
   onSuccess,
   currentUserId,
 }: CreateConversaModalProps) {
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     usuarioId: currentUserId,
     anuncianteId: 0,
@@ -39,15 +40,20 @@ export default function CreateConversaModal({
   const [searchAnunciantes, setSearchAnunciantes] = useState("");
   const [searchAnuncios, setSearchAnuncios] = useState("");
 
-  // Fetch anunciantes
+  // Fetch anunciantes with user context
   const { data: anunciantesData } = useQuery({
-    queryKey: ["anunciantes"],
+    queryKey: ["anunciantes", user?.id],
     queryFn: async () => {
-      const response = await fetch("/api/anunciantes");
+      const headers: Record<string, string> = {};
+      if (user?.id) {
+        headers["x-user-id"] = user.id.toString();
+      }
+
+      const response = await fetch("/api/anunciantes", { headers });
       if (!response.ok) throw new Error("Erro ao buscar anunciantes");
       return response.json();
     },
-    enabled: isOpen,
+    enabled: isOpen && !!user,
   });
 
   // Fetch anuncios for selected anunciante
