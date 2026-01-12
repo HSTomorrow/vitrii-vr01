@@ -60,7 +60,10 @@ export default function CadastroTabelasPreco() {
         headers["x-user-id"] = user.id.toString();
       }
 
-      const response = await fetch(`/api/grupos-productos?anuncianteId=${selectedAnuncianteId}`, { headers });
+      const response = await fetch(
+        `/api/grupos-productos?anuncianteId=${selectedAnuncianteId}`,
+        { headers },
+      );
       if (!response.ok) throw new Error("Erro ao buscar grupos");
       const result = await response.json();
       return result.data || [];
@@ -73,7 +76,9 @@ export default function CadastroTabelasPreco() {
     queryKey: ["productos-grupo", selectedGrupoId],
     queryFn: async () => {
       if (!selectedGrupoId) return [];
-      const response = await fetch(`/api/grupos-productos/${selectedGrupoId}/productos`);
+      const response = await fetch(
+        `/api/grupos-productos/${selectedGrupoId}/productos`,
+      );
       if (!response.ok) throw new Error("Erro ao buscar produtos");
       const result = await response.json();
       return result.data || [];
@@ -95,7 +100,9 @@ export default function CadastroTabelasPreco() {
   // Save tabela mutation
   const saveTabelaMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      const url = editingId ? `/api/tabelas-preco/${editingId}` : "/api/tabelas-preco";
+      const url = editingId
+        ? `/api/tabelas-preco/${editingId}`
+        : "/api/tabelas-preco";
       const method = editingId ? "PUT" : "POST";
 
       const response = await fetch(url, {
@@ -117,21 +124,36 @@ export default function CadastroTabelasPreco() {
       return response.json();
     },
     onSuccess: () => {
-      toast.success(editingId ? "Tabela atualizada com sucesso!" : "Tabela criada com sucesso!");
-      setFormData({ productId: "", anuncianteId: "", preco: "", precoCusto: "" });
+      toast.success(
+        editingId
+          ? "Tabela atualizada com sucesso!"
+          : "Tabela criada com sucesso!",
+      );
+      setFormData({
+        productId: "",
+        anuncianteId: "",
+        preco: "",
+        precoCusto: "",
+      });
       setEditingId(null);
       setIsFormOpen(false);
       refetch();
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Erro ao salvar tabela de preço");
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Erro ao salvar tabela de preço",
+      );
     },
   });
 
   // Delete tabela mutation
   const deleteTabelaMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await fetch(`/api/tabelas-preco/${id}`, { method: "DELETE" });
+      const response = await fetch(`/api/tabelas-preco/${id}`, {
+        method: "DELETE",
+      });
       if (!response.ok) throw new Error("Erro ao deletar tabela");
       return response.json();
     },
@@ -140,7 +162,9 @@ export default function CadastroTabelasPreco() {
       refetch();
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Erro ao deletar tabela");
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao deletar tabela",
+      );
     },
   });
 
@@ -171,12 +195,19 @@ export default function CadastroTabelasPreco() {
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-vitrii-text">Cadastro de Tabelas de Preço</h1>
+          <h1 className="text-3xl font-bold text-vitrii-text">
+            Cadastro de Tabelas de Preço
+          </h1>
           <button
             onClick={() => {
               setIsFormOpen(!isFormOpen);
               setEditingId(null);
-              setFormData({ productId: "", anuncianteId: "", preco: "", precoCusto: "" });
+              setFormData({
+                productId: "",
+                anuncianteId: "",
+                preco: "",
+                precoCusto: "",
+              });
               setSelectedAnuncianteId("");
               setSelectedGrupoId("");
             }}
@@ -191,7 +222,9 @@ export default function CadastroTabelasPreco() {
         {isFormOpen && (
           <div className="bg-white rounded-lg shadow-md p-6 mb-8">
             <h2 className="text-xl font-bold text-vitrii-text mb-6">
-              {editingId ? "Editar Tabela de Preço" : "Criar Nova Tabela de Preço"}
+              {editingId
+                ? "Editar Tabela de Preço"
+                : "Criar Nova Tabela de Preço"}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -205,7 +238,11 @@ export default function CadastroTabelasPreco() {
                     onChange={(e) => {
                       setSelectedAnuncianteId(e.target.value);
                       setSelectedGrupoId("");
-                      setFormData({ ...formData, anuncianteId: e.target.value, productId: "" });
+                      setFormData({
+                        ...formData,
+                        anuncianteId: e.target.value,
+                        productId: "",
+                      });
                     }}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                   >
@@ -248,7 +285,9 @@ export default function CadastroTabelasPreco() {
                   <select
                     required
                     value={formData.productId}
-                    onChange={(e) => setFormData({ ...formData, productId: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, productId: e.target.value })
+                    }
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                     disabled={!selectedGrupoId}
                   >
@@ -270,7 +309,9 @@ export default function CadastroTabelasPreco() {
                     step="0.01"
                     required
                     value={formData.preco}
-                    onChange={(e) => setFormData({ ...formData, preco: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, preco: e.target.value })
+                    }
                     placeholder="0.00"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                   />
@@ -284,7 +325,9 @@ export default function CadastroTabelasPreco() {
                     type="number"
                     step="0.01"
                     value={formData.precoCusto}
-                    onChange={(e) => setFormData({ ...formData, precoCusto: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, precoCusto: e.target.value })
+                    }
                     placeholder="0.00"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                   />
@@ -320,17 +363,30 @@ export default function CadastroTabelasPreco() {
             <table className="w-full">
               <thead className="bg-vitrii-gray">
                 <tr>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">Anunciante</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">Produto</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">Preço</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">Preço de Custo</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">Ações</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
+                    Anunciante
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
+                    Produto
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
+                    Preço
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
+                    Preço de Custo
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
+                    Ações
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {!tabelas || tabelas.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-6 py-4 text-center text-gray-500">
+                    <td
+                      colSpan={5}
+                      className="px-6 py-4 text-center text-gray-500"
+                    >
                       Nenhuma tabela cadastrada
                     </td>
                   </tr>
@@ -347,7 +403,9 @@ export default function CadastroTabelasPreco() {
                         R$ {parseFloat(tabela.preco.toString()).toFixed(2)}
                       </td>
                       <td className="px-6 py-4 text-vitrii-text">
-                        {tabela.precoCusto ? `R$ ${parseFloat(tabela.precoCusto.toString()).toFixed(2)}` : "-"}
+                        {tabela.precoCusto
+                          ? `R$ ${parseFloat(tabela.precoCusto.toString()).toFixed(2)}`
+                          : "-"}
                       </td>
                       <td className="px-6 py-4 flex gap-2">
                         <button
@@ -358,7 +416,11 @@ export default function CadastroTabelasPreco() {
                         </button>
                         <button
                           onClick={() => {
-                            if (confirm("Tem certeza que deseja deletar esta tabela?")) {
+                            if (
+                              confirm(
+                                "Tem certeza que deseja deletar esta tabela?",
+                              )
+                            ) {
                               deleteTabelaMutation.mutate(tabela.id);
                             }
                           }}

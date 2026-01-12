@@ -26,7 +26,11 @@ export default function MeusAnuncios() {
   const [isDeleting, setIsDeleting] = useState(false);
 
   // Fetch user's ads (query is disabled if user is not logged in)
-  const { data: anunciosData, isLoading, refetch } = useQuery({
+  const {
+    data: anunciosData,
+    isLoading,
+    refetch,
+  } = useQuery({
     queryKey: ["meus-anuncios", user?.id],
     queryFn: async () => {
       const response = await fetch("/api/anuncios/do-usuario/listar", {
@@ -77,9 +81,7 @@ export default function MeusAnuncios() {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(
-          error.error || "Erro ao deletar anúncio",
-        );
+        throw new Error(error.error || "Erro ao deletar anúncio");
       }
 
       toast({
@@ -93,9 +95,7 @@ export default function MeusAnuncios() {
       toast({
         title: "Erro",
         description:
-          error instanceof Error
-            ? error.message
-            : "Erro ao cancelar anúncio",
+          error instanceof Error ? error.message : "Erro ao cancelar anúncio",
         variant: "destructive",
       });
     } finally {
@@ -104,28 +104,31 @@ export default function MeusAnuncios() {
   };
 
   const getStatusBadge = (status: string) => {
-    const statusMap: Record<string, { bg: string; text: string; label: string }> = {
-      "em_edicao": {
+    const statusMap: Record<
+      string,
+      { bg: string; text: string; label: string }
+    > = {
+      em_edicao: {
         bg: "bg-yellow-100",
         text: "text-yellow-800",
         label: "Em Edição",
       },
-      "aguardando_pagamento": {
+      aguardando_pagamento: {
         bg: "bg-orange-100",
         text: "text-orange-800",
         label: "Aguardando Pagamento",
       },
-      "pago": {
+      pago: {
         bg: "bg-green-100",
         text: "text-green-800",
         label: "Ativo",
       },
-      "ativo": {
+      ativo: {
         bg: "bg-green-100",
         text: "text-green-800",
         label: "Ativo",
       },
-      "historico": {
+      historico: {
         bg: "bg-gray-100",
         text: "text-gray-800",
         label: "Histórico",
@@ -160,10 +163,7 @@ export default function MeusAnuncios() {
         {isLoading ? (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="vitrii-card p-6 animate-pulse"
-              >
+              <div key={i} className="vitrii-card p-6 animate-pulse">
                 <div className="flex gap-4">
                   <div className="w-24 h-24 bg-gray-300 rounded-lg" />
                   <div className="flex-1 space-y-3">
@@ -227,8 +227,8 @@ export default function MeusAnuncios() {
                     <div className="text-xs text-vitrii-text-secondary mb-4 space-y-1">
                       {anuncio.visualizacoes !== undefined && (
                         <p>
-                          👁️ {anuncio.visualizacoes}{" "}
-                          visualização{anuncio.visualizacoes !== 1 ? "ões" : ""}
+                          👁️ {anuncio.visualizacoes} visualização
+                          {anuncio.visualizacoes !== 1 ? "ões" : ""}
                         </p>
                       )}
                       {anuncio.dataCriacao && (
@@ -253,7 +253,9 @@ export default function MeusAnuncios() {
 
                       {anuncio.status !== "historico" && (
                         <button
-                          onClick={() => navigate(`/anuncio/${anuncio.id}/editar`)}
+                          onClick={() =>
+                            navigate(`/anuncio/${anuncio.id}/editar`)
+                          }
                           className="flex items-center gap-2 px-4 py-2 bg-vitrii-gray text-vitrii-text rounded-lg font-semibold hover:bg-gray-200 transition-colors text-sm"
                         >
                           ✏️ Editar
@@ -291,9 +293,12 @@ export default function MeusAnuncios() {
       </main>
 
       {/* Delete confirmation dialog */}
-      <AlertDialog open={adToDelete !== null} onOpenChange={(open) => {
-        if (!open) setAdToDelete(null);
-      }}>
+      <AlertDialog
+        open={adToDelete !== null}
+        onOpenChange={(open) => {
+          if (!open) setAdToDelete(null);
+        }}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Cancelar anúncio</AlertDialogTitle>

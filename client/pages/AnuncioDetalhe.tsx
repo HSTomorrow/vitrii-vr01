@@ -496,9 +496,7 @@ export default function AnuncioDetalhe() {
 
                 {/* Category */}
                 <div className="bg-white rounded-lg border border-gray-200 p-6">
-                  <h3 className="font-bold text-vitrii-text mb-3">
-                    Categoria
-                  </h3>
+                  <h3 className="font-bold text-vitrii-text mb-3">Categoria</h3>
                   <p className="text-vitrii-text">
                     {anuncio.categoria || "Sem categoria"}
                   </p>

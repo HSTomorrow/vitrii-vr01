@@ -280,14 +280,16 @@ export default function CreateProductoModal({
                 <option value="produto">Produto</option>
                 <option value="servico">Serviço</option>
                 <option value="evento">Evento</option>
-                <option value="agenda_recorrente">Aula / Agenda Disponível</option>
-                <option value="oportunidade">Oportunidade / Vaga de Emprego</option>
+                <option value="agenda_recorrente">
+                  Aula / Agenda Disponível
+                </option>
+                <option value="oportunidade">
+                  Oportunidade / Vaga de Emprego
+                </option>
               </select>
               <p className="mt-2 text-sm text-vitrii-text-secondary">
-                {formData.tipo === "produto" &&
-                  "Produtos físicos para venda"}
-                {formData.tipo === "servico" &&
-                  "Serviços e consultorias"}
+                {formData.tipo === "produto" && "Produtos físicos para venda"}
+                {formData.tipo === "servico" && "Serviços e consultorias"}
                 {formData.tipo === "evento" &&
                   "Eventos, workshops, shows e experiências"}
                 {formData.tipo === "agenda_recorrente" &&

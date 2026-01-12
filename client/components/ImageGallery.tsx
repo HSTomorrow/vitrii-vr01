@@ -76,7 +76,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
     if (!canDelete) return;
 
     const confirmed = window.confirm(
-      "Tem certeza que deseja deletar esta foto?"
+      "Tem certeza que deseja deletar esta foto?",
     );
     if (!confirmed) return;
 
@@ -89,7 +89,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
           headers: {
             "Content-Type": "application/json",
           },
-        }
+        },
       );
 
       if (response.ok) {
@@ -110,7 +110,9 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
   };
 
   const scroll = (direction: "left" | "right") => {
-    const container = document.getElementById(`gallery-thumbnails-${anuncioId}`);
+    const container = document.getElementById(
+      `gallery-thumbnails-${anuncioId}`,
+    );
     if (!container) return;
 
     const scrollAmount = 120;
@@ -250,9 +252,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
         {sortedPhotos.length > 0 && (
           <span>
             {sortedPhotos.length} foto{sortedPhotos.length !== 1 ? "s" : ""}
-            {sortedPhotos.length < 5 && (
-              <span> (máximo 5)</span>
-            )}
+            {sortedPhotos.length < 5 && <span> (máximo 5)</span>}
           </span>
         )}
       </div>

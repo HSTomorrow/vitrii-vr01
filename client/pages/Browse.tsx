@@ -1,14 +1,7 @@
 import { useState, useMemo } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import {
-  Star,
-  Package,
-  MapPin,
-  X,
-  ChevronDown,
-  Search,
-} from "lucide-react";
+import { Star, Package, MapPin, X, ChevronDown, Search } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Pagination from "@/components/Pagination";
@@ -47,11 +40,19 @@ export default function Browse() {
       // Fetch ads with larger limit to allow client-side filtering
       const response = await fetch("/api/anuncios?limit=500");
       if (!response.ok) {
-        console.error("Error fetching ads:", response.status, response.statusText);
+        console.error(
+          "Error fetching ads:",
+          response.status,
+          response.statusText,
+        );
         throw new Error("Erro ao buscar anúncios");
       }
       const data = await response.json();
-      console.log("Browse: Fetched ads from API:", data?.data?.length || 0, "ads");
+      console.log(
+        "Browse: Fetched ads from API:",
+        data?.data?.length || 0,
+        "ads",
+      );
       return data;
     },
   });
@@ -308,14 +309,18 @@ export default function Browse() {
                         type="number"
                         placeholder="Mín."
                         value={priceRange.min}
-                        onChange={(e) => handlePriceChange("min", e.target.value)}
+                        onChange={(e) =>
+                          handlePriceChange("min", e.target.value)
+                        }
                         className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
                       />
                       <input
                         type="number"
                         placeholder="Máx."
                         value={priceRange.max}
-                        onChange={(e) => handlePriceChange("max", e.target.value)}
+                        onChange={(e) =>
+                          handlePriceChange("max", e.target.value)
+                        }
                         className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
                       />
                     </div>
@@ -340,12 +345,14 @@ export default function Browse() {
                   <div>
                     <div className="flex justify-between items-center mb-6">
                       <p className="text-vitrii-text-secondary">
-                        {totalItems} anúncio{totalItems !== 1 ? "s" : ""} encontrado
+                        {totalItems} anúncio{totalItems !== 1 ? "s" : ""}{" "}
+                        encontrado
                         {totalItems !== 1 ? "s" : ""}
                         {hasActiveFilters && " com os filtros aplicados"}
                       </p>
                       <p className="text-sm text-vitrii-text-secondary">
-                        Mostrando {startIndex + 1}-{Math.min(endIndex, totalItems)} de {totalItems}
+                        Mostrando {startIndex + 1}-
+                        {Math.min(endIndex, totalItems)} de {totalItems}
                       </p>
                     </div>
 
@@ -359,7 +366,9 @@ export default function Browse() {
                           <div className="w-full h-40 bg-gradient-to-br from-vitrii-blue to-vitrii-blue-dark flex items-center justify-center overflow-hidden">
                             {anuncio.imagem || anuncio.anunciantes?.fotoUrl ? (
                               <img
-                                src={anuncio.imagem || anuncio.anunciantes?.fotoUrl}
+                                src={
+                                  anuncio.imagem || anuncio.anunciantes?.fotoUrl
+                                }
                                 alt={anuncio.titulo}
                                 className="w-full h-full object-cover"
                               />
@@ -389,7 +398,7 @@ export default function Browse() {
                                 {anuncio.isDoacao
                                   ? "Grátis"
                                   : `R$ ${Number(
-                                      anuncio.preco || 0
+                                      anuncio.preco || 0,
                                     ).toLocaleString("pt-BR", {
                                       minimumFractionDigits: 2,
                                     })}`}

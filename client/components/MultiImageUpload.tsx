@@ -74,7 +74,7 @@ const MultiImageUpload: React.FC<MultiImageUploadProps> = ({
       toast.success(`${uploadedImages.length} imagem(ns) adicionada(s)`);
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Erro ao fazer upload"
+        error instanceof Error ? error.message : "Erro ao fazer upload",
       );
     } finally {
       setIsUploading(false);

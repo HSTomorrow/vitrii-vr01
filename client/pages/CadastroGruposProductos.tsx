@@ -66,10 +66,14 @@ export default function CadastroGruposProductos() {
   // Save grupo mutation
   const saveGrupoMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      const url = editingId ? `/api/grupos-productos/${editingId}` : "/api/grupos-productos";
+      const url = editingId
+        ? `/api/grupos-productos/${editingId}`
+        : "/api/grupos-productos";
       const method = editingId ? "PUT" : "POST";
 
-      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
       if (user?.id) {
         headers["x-user-id"] = user.id.toString();
       }
@@ -92,21 +96,29 @@ export default function CadastroGruposProductos() {
       return response.json();
     },
     onSuccess: () => {
-      toast.success(editingId ? "Grupo atualizado com sucesso!" : "Grupo criado com sucesso!");
+      toast.success(
+        editingId
+          ? "Grupo atualizado com sucesso!"
+          : "Grupo criado com sucesso!",
+      );
       setFormData({ anuncianteId: "", nome: "", descricao: "" });
       setEditingId(null);
       setIsFormOpen(false);
       refetch();
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Erro ao salvar grupo");
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao salvar grupo",
+      );
     },
   });
 
   // Delete grupo mutation
   const deleteGrupoMutation = useMutation({
     mutationFn: async (id: number) => {
-      const response = await fetch(`/api/grupos-productos/${id}`, { method: "DELETE" });
+      const response = await fetch(`/api/grupos-productos/${id}`, {
+        method: "DELETE",
+      });
       if (!response.ok) throw new Error("Erro ao deletar grupo");
       return response.json();
     },
@@ -115,7 +127,9 @@ export default function CadastroGruposProductos() {
       refetch();
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Erro ao deletar grupo");
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao deletar grupo",
+      );
     },
   });
 
@@ -144,7 +158,9 @@ export default function CadastroGruposProductos() {
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-vitrii-text">Cadastro de Grupos de Produtos</h1>
+          <h1 className="text-3xl font-bold text-vitrii-text">
+            Cadastro de Grupos de Produtos
+          </h1>
           <button
             onClick={() => {
               setIsFormOpen(!isFormOpen);
@@ -173,7 +189,9 @@ export default function CadastroGruposProductos() {
                   <select
                     required
                     value={formData.anuncianteId}
-                    onChange={(e) => setFormData({ ...formData, anuncianteId: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, anuncianteId: e.target.value })
+                    }
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                   >
                     <option value="">Selecione um anunciante</option>
@@ -193,7 +211,9 @@ export default function CadastroGruposProductos() {
                     type="text"
                     required
                     value={formData.nome}
-                    onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, nome: e.target.value })
+                    }
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                   />
                 </div>
@@ -205,7 +225,9 @@ export default function CadastroGruposProductos() {
                 </label>
                 <textarea
                   value={formData.descricao}
-                  onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, descricao: e.target.value })
+                  }
                   rows={3}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                 />
@@ -240,16 +262,27 @@ export default function CadastroGruposProductos() {
             <table className="w-full">
               <thead className="bg-vitrii-gray">
                 <tr>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">Anunciante</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">Nome</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">Descrição</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">Ações</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
+                    Anunciante
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
+                    Nome
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
+                    Descrição
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
+                    Ações
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
                 {!grupos || grupos.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className="px-6 py-4 text-center text-gray-500">
+                    <td
+                      colSpan={4}
+                      className="px-6 py-4 text-center text-gray-500"
+                    >
                       Nenhum grupo cadastrado
                     </td>
                   </tr>
@@ -259,8 +292,12 @@ export default function CadastroGruposProductos() {
                       <td className="px-6 py-4 font-semibold text-vitrii-text">
                         {grupo.anunciante?.nome || "N/A"}
                       </td>
-                      <td className="px-6 py-4 font-semibold text-vitrii-text">{grupo.nome}</td>
-                      <td className="px-6 py-4 text-vitrii-text">{grupo.descricao || "-"}</td>
+                      <td className="px-6 py-4 font-semibold text-vitrii-text">
+                        {grupo.nome}
+                      </td>
+                      <td className="px-6 py-4 text-vitrii-text">
+                        {grupo.descricao || "-"}
+                      </td>
                       <td className="px-6 py-4 flex gap-2">
                         <button
                           onClick={() => handleEdit(grupo)}
@@ -270,7 +307,11 @@ export default function CadastroGruposProductos() {
                         </button>
                         <button
                           onClick={() => {
-                            if (confirm("Tem certeza que deseja deletar este grupo?")) {
+                            if (
+                              confirm(
+                                "Tem certeza que deseja deletar este grupo?",
+                              )
+                            ) {
                               deleteGrupoMutation.mutate(grupo.id);
                             }
                           }}

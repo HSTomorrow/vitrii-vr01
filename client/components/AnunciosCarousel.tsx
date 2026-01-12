@@ -161,15 +161,17 @@ export default function AnunciosCarousel({
             onClick={() => navigate(`/anuncio/${anuncio.id}`)}
             className="vitrii-card overflow-hidden hover:scale-105 transition-transform duration-200 cursor-pointer relative flex-shrink-0 w-80"
           >
-            <div className={`w-full h-48 bg-gradient-to-br flex items-center justify-center overflow-hidden ${
-              color === "green"
-                ? "from-green-400 to-green-600"
-                : color === "purple"
-                  ? "from-purple-400 to-purple-600"
-                  : color === "orange"
-                    ? "from-orange-400 to-orange-600"
-                    : "from-vitrii-blue to-vitrii-blue-dark"
-            }`}>
+            <div
+              className={`w-full h-48 bg-gradient-to-br flex items-center justify-center overflow-hidden ${
+                color === "green"
+                  ? "from-green-400 to-green-600"
+                  : color === "purple"
+                    ? "from-purple-400 to-purple-600"
+                    : color === "orange"
+                      ? "from-orange-400 to-orange-600"
+                      : "from-vitrii-blue to-vitrii-blue-dark"
+              }`}
+            >
               {anuncio.imagem ? (
                 <img
                   src={anuncio.imagem}
@@ -182,7 +184,9 @@ export default function AnunciosCarousel({
             </div>
 
             {anuncio.anunciantes?.fotoUrl && (
-              <div className={`absolute bottom-3 left-3 z-10 w-10 h-10 rounded-full bg-white border-2 overflow-hidden flex items-center justify-center shadow-md ${colors.border}`}>
+              <div
+                className={`absolute bottom-3 left-3 z-10 w-10 h-10 rounded-full bg-white border-2 overflow-hidden flex items-center justify-center shadow-md ${colors.border}`}
+              >
                 <img
                   src={anuncio.anunciantes.fotoUrl}
                   alt={anuncio.anunciantes.nome}
@@ -258,15 +262,17 @@ export default function AnunciosCarousel({
               </div>
 
               <div className="flex justify-between items-center mb-4 mt-auto">
-                <span className={`text-2xl font-bold ${
-                  color === "green"
-                    ? "text-green-600"
-                    : color === "purple"
-                      ? "text-purple-600"
-                      : color === "orange"
-                        ? "text-orange-600"
-                        : "text-vitrii-blue"
-                }`}>
+                <span
+                  className={`text-2xl font-bold ${
+                    color === "green"
+                      ? "text-green-600"
+                      : color === "purple"
+                        ? "text-purple-600"
+                        : color === "orange"
+                          ? "text-orange-600"
+                          : "text-vitrii-blue"
+                  }`}
+                >
                   {anuncio.isDoacao
                     ? "Grátis"
                     : `R$ ${anuncio.preco ? Number(anuncio.preco).toFixed(2) : "0.00"}`}

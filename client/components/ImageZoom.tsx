@@ -20,7 +20,9 @@ export default function ImageZoom({
 
   if (!src && !fallbackIcon) {
     return (
-      <div className={`${containerClassName} bg-gray-200 flex items-center justify-center rounded-lg`}>
+      <div
+        className={`${containerClassName} bg-gray-200 flex items-center justify-center rounded-lg`}
+      >
         <div className="text-gray-400">Sem imagem</div>
       </div>
     );
@@ -28,7 +30,9 @@ export default function ImageZoom({
 
   if (!src) {
     return (
-      <div className={`${containerClassName} bg-gray-100 flex items-center justify-center rounded-lg`}>
+      <div
+        className={`${containerClassName} bg-gray-100 flex items-center justify-center rounded-lg`}
+      >
         {fallbackIcon}
       </div>
     );
@@ -40,11 +44,7 @@ export default function ImageZoom({
         className={`${containerClassName} relative bg-gray-100 rounded-lg overflow-hidden cursor-pointer group`}
         onClick={() => setIsZoomed(true)}
       >
-        <img
-          src={src}
-          alt={alt}
-          className={className}
-        />
+        <img src={src} alt={alt} className={className} />
         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
           <ZoomIn className="w-8 h-8 text-white" />
         </div>

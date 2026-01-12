@@ -59,7 +59,9 @@ export default function CreateConversaModal({
   const { data: anunciosData } = useQuery({
     queryKey: ["anuncios-anunciante", formData.anuncianteId],
     queryFn: async () => {
-      const response = await fetch(`/api/anuncios?anuncianteId=${formData.anuncianteId}`);
+      const response = await fetch(
+        `/api/anuncios?anuncianteId=${formData.anuncianteId}`,
+      );
       if (!response.ok) throw new Error("Erro ao buscar anúncios");
       return response.json();
     },
@@ -165,12 +167,17 @@ export default function CreateConversaModal({
                     key={anunciante.id}
                     type="button"
                     onClick={() => {
-                      setFormData((prev) => ({ ...prev, anuncianteId: anunciante.id }));
+                      setFormData((prev) => ({
+                        ...prev,
+                        anuncianteId: anunciante.id,
+                      }));
                       setSearchAnunciantes("");
                     }}
                     className="w-full text-left px-4 py-2 hover:bg-gray-100 border-b last:border-b-0"
                   >
-                    <p className="font-medium text-vitrii-text">{anunciante.nome}</p>
+                    <p className="font-medium text-vitrii-text">
+                      {anunciante.nome}
+                    </p>
                   </button>
                 ))}
               </div>
@@ -179,7 +186,11 @@ export default function CreateConversaModal({
             {formData.anuncianteId > 0 && (
               <div className="mt-2 p-3 bg-blue-50 rounded-lg flex items-center justify-between">
                 <span className="text-sm text-vitrii-text font-medium">
-                  {anunciantes.find((l: Anunciante) => l.id === formData.anuncianteId)?.nome}
+                  {
+                    anunciantes.find(
+                      (l: Anunciante) => l.id === formData.anuncianteId,
+                    )?.nome
+                  }
                 </span>
                 <button
                   type="button"

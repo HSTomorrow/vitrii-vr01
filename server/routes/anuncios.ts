@@ -409,8 +409,10 @@ export const updateAnuncio: RequestHandler = async (req, res) => {
     if (updateData.estado !== undefined) mappedData.estado = updateData.estado;
     if (updateData.status !== undefined) mappedData.status = updateData.status;
     if (updateData.tipo !== undefined) mappedData.tipo = updateData.tipo;
-    if (updateData.isDoacao !== undefined) mappedData.isDoacao = updateData.isDoacao;
-    if (updateData.destaque !== undefined) mappedData.destaque = updateData.destaque;
+    if (updateData.isDoacao !== undefined)
+      mappedData.isDoacao = updateData.isDoacao;
+    if (updateData.destaque !== undefined)
+      mappedData.destaque = updateData.destaque;
 
     // When updating to donation, automatically approve and feature it
     if (updateData.isDoacao === true) {
@@ -1192,11 +1194,12 @@ export const addAnuncioFoto: RequestHandler = async (req, res) => {
     const nextOrdem =
       photoCount === 0
         ? 1
-        : (await prisma.fotos_anuncio.findFirst({
-            where: { anuncio_id: anuncioId },
-            orderBy: { ordem: "desc" },
-            select: { ordem: true },
-          })
+        : (
+            await prisma.fotos_anuncio.findFirst({
+              where: { anuncio_id: anuncioId },
+              orderBy: { ordem: "desc" },
+              select: { ordem: true },
+            })
           )?.ordem! + 1 || photoCount + 1;
 
     // Create photo

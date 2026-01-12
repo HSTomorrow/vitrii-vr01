@@ -71,11 +71,13 @@ export default function CadastroVariantesLista() {
   // Filter productos by selected loja and search term
   const filteredProductos = useMemo(() => {
     return allProductos
-      .filter((p: Producto) => p.grupo?.lojaId === (selectedLojaId || defaultLojaId))
+      .filter(
+        (p: Producto) => p.grupo?.lojaId === (selectedLojaId || defaultLojaId),
+      )
       .filter(
         (p: Producto) =>
           p.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          p.grupo?.nome.toLowerCase().includes(searchTerm.toLowerCase())
+          p.grupo?.nome.toLowerCase().includes(searchTerm.toLowerCase()),
       );
   }, [allProductos, selectedLojaId, defaultLojaId, searchTerm]);
 
@@ -114,7 +116,9 @@ export default function CadastroVariantesLista() {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
             <Palette className="w-8 h-8 text-vitrii-yellow" />
-            <h1 className="text-3xl font-bold text-vitrii-text">Gerenciar Variantes</h1>
+            <h1 className="text-3xl font-bold text-vitrii-text">
+              Gerenciar Variantes
+            </h1>
           </div>
           <p className="text-vitrii-text-secondary mt-2">
             Selecione um produto para gerenciar seus tamanhos, cores e preços
@@ -161,7 +165,9 @@ export default function CadastroVariantesLista() {
           <div className="bg-white rounded-lg shadow-md p-12 text-center">
             <Palette className="w-12 h-12 text-gray-300 mx-auto mb-4" />
             <p className="text-gray-500 text-lg">
-              {searchTerm ? "Nenhum produto encontrado" : "Nenhum produto cadastrado"}
+              {searchTerm
+                ? "Nenhum produto encontrado"
+                : "Nenhum produto cadastrado"}
             </p>
             <p className="text-gray-400 mt-2">
               {searchTerm

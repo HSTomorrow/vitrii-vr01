@@ -348,7 +348,7 @@ export default function AnuncioForm({
         if (uploadedImages.length > 1) {
           console.log(
             "[AnuncioForm] Uploading additional images:",
-            uploadedImages.length
+            uploadedImages.length,
           );
           try {
             for (let i = 1; i < uploadedImages.length; i++) {
@@ -359,11 +359,16 @@ export default function AnuncioForm({
                 body: JSON.stringify({ url: image.url }),
               });
             }
-            console.log("[AnuncioForm] Additional images uploaded successfully");
+            console.log(
+              "[AnuncioForm] Additional images uploaded successfully",
+            );
           } catch (error) {
-            console.error("[AnuncioForm] Error uploading additional images:", error);
+            console.error(
+              "[AnuncioForm] Error uploading additional images:",
+              error,
+            );
             toast.warning(
-              "Anúncio criado, mas houve erro ao salvar algumas imagens"
+              "Anúncio criado, mas houve erro ao salvar algumas imagens",
             );
           }
         }
@@ -686,7 +691,9 @@ export default function AnuncioForm({
                 <label
                   htmlFor="isDoacao"
                   className={`text-sm font-semibold text-vitrii-text ${
-                    isDonation ? "cursor-not-allowed opacity-75" : "cursor-pointer"
+                    isDonation
+                      ? "cursor-not-allowed opacity-75"
+                      : "cursor-pointer"
                   }`}
                 >
                   Este produto/serviço/evento é gratuito

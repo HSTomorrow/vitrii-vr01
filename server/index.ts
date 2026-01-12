@@ -278,11 +278,15 @@ export function createServer() {
   app.get("/api/grupos-productos", extractUserId, getGrupos);
   app.get("/api/grupos-productos/:id", getGrupoById);
   app.get("/api/grupos-productos/:id/productos", getProductosOfGrupo);
-  app.get("/api/lojas/:anuncianteId/grupos-productos", extractUserId, (req, res) => {
-    // Delegate to getGrupos with anuncianteId query param
-    req.query.anuncianteId = req.params.anuncianteId;
-    return getGrupos(req, res);
-  });
+  app.get(
+    "/api/lojas/:anuncianteId/grupos-productos",
+    extractUserId,
+    (req, res) => {
+      // Delegate to getGrupos with anuncianteId query param
+      req.query.anuncianteId = req.params.anuncianteId;
+      return getGrupos(req, res);
+    },
+  );
   app.post("/api/grupos-productos", extractUserId, createGrupo);
   app.put("/api/grupos-productos/:id", updateGrupo);
   app.delete("/api/grupos-productos/:id", deleteGrupo);
@@ -334,8 +338,16 @@ export function createServer() {
   // Anúncio Photos routes
   app.get("/api/anuncios/:id/fotos", getAnuncioFotos);
   app.post("/api/anuncios/:id/fotos", extractUserId, addAnuncioFoto);
-  app.delete("/api/anuncios/:id/fotos/:fotoId", extractUserId, deleteAnuncioFoto);
-  app.patch("/api/anuncios/:id/fotos/reorder", extractUserId, reorderAnuncioFotos);
+  app.delete(
+    "/api/anuncios/:id/fotos/:fotoId",
+    extractUserId,
+    deleteAnuncioFoto,
+  );
+  app.patch(
+    "/api/anuncios/:id/fotos/reorder",
+    extractUserId,
+    reorderAnuncioFotos,
+  );
 
   // Equipes de Venda routes
   app.get("/api/equipes-venda", extractUserId, getEquipes);
@@ -455,12 +467,7 @@ export function createServer() {
   app.post("/api/banners", extractUserId, requireAdmin, createBanner);
   app.put("/api/banners/:id", extractUserId, requireAdmin, updateBanner);
   app.delete("/api/banners/:id", extractUserId, requireAdmin, deleteBanner);
-  app.post(
-    "/api/banners/reorder",
-    extractUserId,
-    requireAdmin,
-    reorderBanners,
-  );
+  app.post("/api/banners/reorder", extractUserId, requireAdmin, reorderBanners);
 
   return app;
 }
