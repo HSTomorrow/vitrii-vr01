@@ -1059,3 +1059,363 @@ export const recordAnuncioView: RequestHandler = async (req, res) => {
     });
   }
 };
+
+// GET all photos for an ad
+export const getAnuncioFotos: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const anuncioId = parseInt(id);
+
+    // Verify ad exists
+    const anuncio = await prisma.anuncios.findUnique({
+      where: { id: anuncioId },
+      select: { id: true },
+    });
+
+    if (!anuncio) {
+      return res.status(404).json({
+        success: false,
+        error: "Anúncio não encontrado",
+      });
+    }
+
+    // Get all photos ordered by priority
+    const fotos = await prisma.fotos_anuncio.findMany({
+      where: { anuncio_id: anuncioId },
+      select: {
+        id: true,
+        url: true,
+        ordem: true,
+        criado_por: true,
+        data_criacao: true,
+      },
+      orderBy: { ordem: "asc" },
+    });
+
+    res.json({
+      success: true,
+      data: fotos,
+      count: fotos.length,
+    });
+  } catch (error) {
+    console.error("Error fetching ad photos:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao buscar fotos do anúncio",
+    });
+  }
+};
+
+// POST new photo to an ad
+export const addAnuncioFoto: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { url } = req.body;
+    const usuarioId = (req as any).userId;
+
+    if (!usuarioId) {
+      return res.status(401).json({
+        success: false,
+        error: "Usuário não autenticado",
+      });
+    }
+
+    if (!url || typeof url !== "string") {
+      return res.status(400).json({
+        success: false,
+        error: "URL da foto é obrigatória",
+      });
+    }
+
+    const anuncioId = parseInt(id);
+
+    // Verify ad exists and get its details
+    const anuncio = await prisma.anuncios.findUnique({
+      where: { id: anuncioId },
+      select: {
+        id: true,
+        usuarioId: true,
+        anuncianteId: true,
+      },
+    });
+
+    if (!anuncio) {
+      return res.status(404).json({
+        success: false,
+        error: "Anúncio não encontrado",
+      });
+    }
+
+    // Check if user has permission (owner or admin)
+    const usuario = await prisma.usracessos.findUnique({
+      where: { id: usuarioId },
+      select: { tipoUsuario: true },
+    });
+
+    const isAdmin = usuario?.tipoUsuario === "adm";
+    const isOwner = anuncio.usuarioId === usuarioId;
+
+    if (!isAdmin && !isOwner) {
+      return res.status(403).json({
+        success: false,
+        error: "Permissão negada para adicionar fotos a este anúncio",
+      });
+    }
+
+    // Check photo limit (max 5 photos)
+    const photoCount = await prisma.fotos_anuncio.count({
+      where: { anuncio_id: anuncioId },
+    });
+
+    if (photoCount >= 5) {
+      return res.status(400).json({
+        success: false,
+        error: "Limite de 5 fotos por anúncio atingido",
+      });
+    }
+
+    // Calculate next ordem value (priority)
+    const nextOrdem =
+      photoCount === 0
+        ? 1
+        : (await prisma.fotos_anuncio.findFirst({
+            where: { anuncio_id: anuncioId },
+            orderBy: { ordem: "desc" },
+            select: { ordem: true },
+          })
+          )?.ordem! + 1 || photoCount + 1;
+
+    // Create photo
+    const foto = await prisma.fotos_anuncio.create({
+      data: {
+        anuncio_id: anuncioId,
+        url,
+        ordem: nextOrdem,
+        criado_por: usuarioId,
+      },
+      select: {
+        id: true,
+        url: true,
+        ordem: true,
+        criado_por: true,
+        data_criacao: true,
+      },
+    });
+
+    res.status(201).json({
+      success: true,
+      data: foto,
+      message: "Foto adicionada com sucesso",
+    });
+  } catch (error) {
+    console.error("Error adding ad photo:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao adicionar foto",
+    });
+  }
+};
+
+// DELETE a photo from an ad
+export const deleteAnuncioFoto: RequestHandler = async (req, res) => {
+  try {
+    const { id, fotoId } = req.params;
+    const usuarioId = (req as any).userId;
+
+    if (!usuarioId) {
+      return res.status(401).json({
+        success: false,
+        error: "Usuário não autenticado",
+      });
+    }
+
+    const anuncioId = parseInt(id);
+    const photoId = parseInt(fotoId);
+
+    // Verify ad exists
+    const anuncio = await prisma.anuncios.findUnique({
+      where: { id: anuncioId },
+      select: {
+        id: true,
+        usuarioId: true,
+      },
+    });
+
+    if (!anuncio) {
+      return res.status(404).json({
+        success: false,
+        error: "Anúncio não encontrado",
+      });
+    }
+
+    // Get photo details
+    const foto = await prisma.fotos_anuncio.findUnique({
+      where: { id: photoId },
+      select: {
+        id: true,
+        anuncio_id: true,
+        criado_por: true,
+        ordem: true,
+      },
+    });
+
+    if (!foto) {
+      return res.status(404).json({
+        success: false,
+        error: "Foto não encontrada",
+      });
+    }
+
+    // Verify photo belongs to the ad
+    if (foto.anuncio_id !== anuncioId) {
+      return res.status(404).json({
+        success: false,
+        error: "Foto não pertence a este anúncio",
+      });
+    }
+
+    // Check permissions (only owner and admin can delete)
+    const usuario = await prisma.usracessos.findUnique({
+      where: { id: usuarioId },
+      select: { tipoUsuario: true },
+    });
+
+    const isAdmin = usuario?.tipoUsuario === "adm";
+    const isOwner = anuncio.usuarioId === usuarioId;
+
+    if (!isAdmin && !isOwner) {
+      return res.status(403).json({
+        success: false,
+        error: "Permissão negada para deletar fotos deste anúncio",
+      });
+    }
+
+    // Delete the photo
+    await prisma.fotos_anuncio.delete({
+      where: { id: photoId },
+    });
+
+    // Reorganize remaining photos' ordem values
+    const remainingFotos = await prisma.fotos_anuncio.findMany({
+      where: { anuncio_id: anuncioId },
+      orderBy: { ordem: "asc" },
+      select: { id: true },
+    });
+
+    // Update ordem for each remaining photo
+    for (let i = 0; i < remainingFotos.length; i++) {
+      await prisma.fotos_anuncio.update({
+        where: { id: remainingFotos[i].id },
+        data: { ordem: i + 1 },
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Foto deletada com sucesso",
+    });
+  } catch (error) {
+    console.error("Error deleting ad photo:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao deletar foto",
+    });
+  }
+};
+
+// REORDER photos for an ad
+export const reorderAnuncioFotos: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { fotosOrder } = req.body; // Array of { id, ordem }
+    const usuarioId = (req as any).userId;
+
+    if (!usuarioId) {
+      return res.status(401).json({
+        success: false,
+        error: "Usuário não autenticado",
+      });
+    }
+
+    if (!Array.isArray(fotosOrder)) {
+      return res.status(400).json({
+        success: false,
+        error: "fotosOrder deve ser um array de { id, ordem }",
+      });
+    }
+
+    const anuncioId = parseInt(id);
+
+    // Verify ad exists and permissions
+    const anuncio = await prisma.anuncios.findUnique({
+      where: { id: anuncioId },
+      select: { usuarioId: true },
+    });
+
+    if (!anuncio) {
+      return res.status(404).json({
+        success: false,
+        error: "Anúncio não encontrado",
+      });
+    }
+
+    // Check permissions
+    const usuario = await prisma.usracessos.findUnique({
+      where: { id: usuarioId },
+      select: { tipoUsuario: true },
+    });
+
+    const isAdmin = usuario?.tipoUsuario === "adm";
+    const isOwner = anuncio.usuarioId === usuarioId;
+
+    if (!isAdmin && !isOwner) {
+      return res.status(403).json({
+        success: false,
+        error: "Permissão negada para reordenar fotos",
+      });
+    }
+
+    // Update ordem for each photo
+    for (const { id: fotoId, ordem } of fotosOrder) {
+      const foto = await prisma.fotos_anuncio.findUnique({
+        where: { id: fotoId },
+        select: { anuncio_id: true },
+      });
+
+      if (!foto || foto.anuncio_id !== anuncioId) {
+        return res.status(400).json({
+          success: false,
+          error: `Foto ${fotoId} não pertence a este anúncio`,
+        });
+      }
+
+      await prisma.fotos_anuncio.update({
+        where: { id: fotoId },
+        data: { ordem },
+      });
+    }
+
+    // Get updated photos
+    const fotos = await prisma.fotos_anuncio.findMany({
+      where: { anuncio_id: anuncioId },
+      select: {
+        id: true,
+        url: true,
+        ordem: true,
+      },
+      orderBy: { ordem: "asc" },
+    });
+
+    res.json({
+      success: true,
+      message: "Fotos reordenadas com sucesso",
+      data: fotos,
+    });
+  } catch (error) {
+    console.error("Error reordering ad photos:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao reordenar fotos",
+    });
+  }
+};
