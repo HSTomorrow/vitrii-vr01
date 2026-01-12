@@ -45,6 +45,7 @@ model anuncios {
   imagem              String?                 @db.VarChar(500)
   status              String                  @default("ativo") @db.VarChar(50)
   tipo                String                  @default("produto") @db.VarChar(50)
+  isDoacao            Boolean                 @default(false)
   diasRestantes       Int?
   statusPagamento     String?                 @default("pendente") @db.VarChar(50)
   dataCriacao         DateTime                @default(now())
