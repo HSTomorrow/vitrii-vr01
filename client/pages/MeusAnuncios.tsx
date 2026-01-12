@@ -25,7 +25,22 @@ export default function MeusAnuncios() {
   const [adToDelete, setAdToDelete] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // Redirect if not logged in
+  // Fetch user's ads (query is disabled if user is not logged in)
+  const { data: anunciosData, isLoading, refetch } = useQuery({
+    queryKey: ["meus-anuncios", user?.id],
+    queryFn: async () => {
+      const response = await fetch("/api/anuncios/do-usuario/listar", {
+        headers: {
+          "x-user-id": String(user?.id),
+        },
+      });
+      if (!response.ok) throw new Error("Erro ao buscar anúncios");
+      return response.json();
+    },
+    enabled: !!user?.id,
+  });
+
+  // Render unauthenticated state if not logged in
   if (!user) {
     return (
       <div className="min-h-screen flex flex-col bg-white">
@@ -48,21 +63,6 @@ export default function MeusAnuncios() {
       </div>
     );
   }
-
-  // Fetch user's ads
-  const { data: anunciosData, isLoading, refetch } = useQuery({
-    queryKey: ["meus-anuncios", user?.id],
-    queryFn: async () => {
-      const response = await fetch("/api/anuncios/do-usuario/listar", {
-        headers: {
-          "x-user-id": String(user?.id),
-        },
-      });
-      if (!response.ok) throw new Error("Erro ao buscar anúncios");
-      return response.json();
-    },
-    enabled: !!user?.id,
-  });
 
   const anuncios = anunciosData?.data || [];
 
