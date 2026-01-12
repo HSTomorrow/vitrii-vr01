@@ -17,6 +17,11 @@ const AnuncianteCreateSchema = z.object({
   email: z.string().email("Email inválido").optional(),
   telefone: z.string().optional(),
   cep: z.string().optional(),
+  site: z.string().optional(),
+  instagram: z.string().optional(),
+  facebook: z.string().optional(),
+  whatsapp: z.string().optional(),
+  fotoUrl: z.string().optional(),
 });
 
 // GET all anunciantes (with pagination)
