@@ -126,7 +126,7 @@ export const getProductosOfGrupo: RequestHandler = async (req, res) => {
           id: true,
           nome: true,
           descricao: true,
-          tipo: true,
+          sku: true,
           grupoId: true,
         },
         orderBy: { dataCriacao: "desc" },
