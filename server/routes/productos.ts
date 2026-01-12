@@ -113,6 +113,7 @@ export const createProducto: RequestHandler = async (req, res) => {
       data: {
         ...validatedData,
         lojaId: grupo.anuncianteId,
+        dataAtualizacao: new Date(),
       },
       include: {
         grupo: {
