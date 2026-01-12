@@ -24,6 +24,7 @@ export default function CreateProductoModal({
   anuncianteId,
   onSuccess,
 }: CreateProductoModalProps) {
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const [showCreateGrupo, setShowCreateGrupo] = useState(false);
   const [formData, setFormData] = useState({
@@ -39,15 +40,21 @@ export default function CreateProductoModal({
 
   // Fetch grupos for this store
   const { data: gruposData } = useQuery({
-    queryKey: ["grupos-store", anuncianteId],
+    queryKey: ["grupos-store", anuncianteId, user?.id],
     queryFn: async () => {
+      const headers: Record<string, string> = {};
+      if (user?.id) {
+        headers["x-user-id"] = user.id.toString();
+      }
+
       const response = await fetch(
         `/api/grupos-productos?anuncianteId=${anuncianteId}`,
+        { headers },
       );
       if (!response.ok) throw new Error("Erro ao buscar grupos");
       return response.json();
     },
-    enabled: isOpen && anuncianteId > 0,
+    enabled: isOpen && anuncianteId > 0 && !!user,
   });
 
   const grupos = gruposData?.data || [];
