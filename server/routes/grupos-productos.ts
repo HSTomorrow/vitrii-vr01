@@ -173,14 +173,33 @@ export const getProductosOfGrupo: RequestHandler = async (req, res) => {
 // CREATE new grupo
 export const createGrupo: RequestHandler = async (req, res) => {
   try {
+    const userId = req.userId;
+
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        error: "Usuário não autenticado",
+      });
+    }
+
     console.log("[createGrupo] Request body:", req.body);
+    console.log("[createGrupo] User ID:", userId);
 
     const validatedData = GrupoCreateSchema.parse(req.body);
     console.log("[createGrupo] Validated data:", validatedData);
 
     const grupo = await prisma.grupos_produtos.create({
-      data: validatedData,
+      data: {
+        ...validatedData,
+        usuarioId: userId,
+      },
       include: {
+        usuario: {
+          select: {
+            id: true,
+            nome: true,
+          },
+        },
         anunciante: {
           select: {
             id: true,
