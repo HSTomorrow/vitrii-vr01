@@ -170,13 +170,11 @@ const MultiImageUpload: React.FC<MultiImageUploadProps> = ({
       )}
 
       {/* Image Zoom Modal */}
-      {zoomedImage && (
-        <ImageZoom
-          imageUrl={zoomedImage}
-          isOpen={true}
-          onClose={() => setZoomedImage(null)}
-        />
-      )}
+      <ImageZoomModal
+        imageUrl={zoomedImage || ""}
+        isOpen={!!zoomedImage}
+        onClose={() => setZoomedImage(null)}
+      />
 
       {/* Info */}
       <p className="text-sm text-vitrii-text-secondary">
