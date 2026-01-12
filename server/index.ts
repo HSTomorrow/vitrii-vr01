@@ -275,10 +275,10 @@ export function createServer() {
   );
 
   // Grupos de Productos routes
-  app.get("/api/grupos-productos", getGrupos);
+  app.get("/api/grupos-productos", extractUserId, getGrupos);
   app.get("/api/grupos-productos/:id", getGrupoById);
   app.get("/api/grupos-productos/:id/productos", getProductosOfGrupo);
-  app.get("/api/lojas/:anuncianteId/grupos-productos", (req, res) => {
+  app.get("/api/lojas/:anuncianteId/grupos-productos", extractUserId, (req, res) => {
     // Delegate to getGrupos with anuncianteId query param
     req.query.anuncianteId = req.params.anuncianteId;
     return getGrupos(req, res);
