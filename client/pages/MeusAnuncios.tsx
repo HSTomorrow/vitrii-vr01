@@ -47,11 +47,11 @@ export default function MeusAnuncios() {
         <Header />
         <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
           <div className="bg-blue-50 border-l-4 border-blue-500 rounded p-4 inline-block">
-            <p className="text-walmart-text">
+            <p className="text-vitrii-text">
               Por favor,{" "}
               <button
                 onClick={() => navigate("/auth/signin")}
-                className="text-walmart-blue font-semibold hover:underline"
+                className="text-vitrii-blue font-semibold hover:underline"
               >
                 faça login
               </button>{" "}
@@ -148,11 +148,11 @@ export default function MeusAnuncios() {
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-12">
-          <h1 className="text-4xl font-bold text-walmart-text mb-2 flex items-center gap-3">
-            <ShoppingBag className="w-8 h-8 text-walmart-blue" />
+          <h1 className="text-4xl font-bold text-vitrii-text mb-2 flex items-center gap-3">
+            <ShoppingBag className="w-8 h-8 text-vitrii-blue" />
             Meus Anúncios
           </h1>
-          <p className="text-walmart-text-secondary">
+          <p className="text-vitrii-text-secondary">
             {anuncios.length} anúncio{anuncios.length !== 1 ? "s" : ""}
           </p>
         </div>
@@ -202,10 +202,10 @@ export default function MeusAnuncios() {
                   <div className="flex-1 min-w-0">
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-2">
                       <div>
-                        <h3 className="text-lg font-semibold text-walmart-text truncate">
+                        <h3 className="text-lg font-semibold text-vitrii-text truncate">
                           {anuncio.titulo}
                         </h3>
-                        <p className="text-sm text-walmart-text-secondary">
+                        <p className="text-sm text-vitrii-text-secondary">
                           {anuncio.anunciantes?.nome || "Anunciante"}
                         </p>
                       </div>
@@ -213,18 +213,18 @@ export default function MeusAnuncios() {
                     </div>
 
                     {/* Description and price */}
-                    <p className="text-sm text-walmart-text-secondary mb-2 line-clamp-2">
+                    <p className="text-sm text-vitrii-text-secondary mb-2 line-clamp-2">
                       {anuncio.descricao || "Sem descrição"}
                     </p>
 
                     {anuncio.preco && (
-                      <p className="text-lg font-bold text-walmart-blue mb-3">
+                      <p className="text-lg font-bold text-vitrii-blue mb-3">
                         R$ {Number(anuncio.preco).toFixed(2)}
                       </p>
                     )}
 
                     {/* Meta info */}
-                    <div className="text-xs text-walmart-text-secondary mb-4 space-y-1">
+                    <div className="text-xs text-vitrii-text-secondary mb-4 space-y-1">
                       {anuncio.visualizacoes !== undefined && (
                         <p>
                           👁️ {anuncio.visualizacoes}{" "}
@@ -245,7 +245,7 @@ export default function MeusAnuncios() {
                     <div className="flex gap-2 flex-wrap">
                       <button
                         onClick={() => navigate(`/anuncio/${anuncio.id}`)}
-                        className="flex items-center gap-2 px-4 py-2 bg-walmart-blue text-white rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors text-sm"
+                        className="flex items-center gap-2 px-4 py-2 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors text-sm"
                       >
                         <Eye className="w-4 h-4" />
                         Visualizar
@@ -254,7 +254,7 @@ export default function MeusAnuncios() {
                       {anuncio.status !== "historico" && (
                         <button
                           onClick={() => navigate(`/anuncio/${anuncio.id}/editar`)}
-                          className="flex items-center gap-2 px-4 py-2 bg-walmart-gray text-walmart-text rounded-lg font-semibold hover:bg-gray-200 transition-colors text-sm"
+                          className="flex items-center gap-2 px-4 py-2 bg-vitrii-gray text-vitrii-text rounded-lg font-semibold hover:bg-gray-200 transition-colors text-sm"
                         >
                           ✏️ Editar
                         </button>
@@ -276,12 +276,12 @@ export default function MeusAnuncios() {
         ) : (
           <div className="text-center py-12">
             <ShoppingBag className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-walmart-text-secondary text-lg mb-6">
+            <p className="text-vitrii-text-secondary text-lg mb-6">
               Você ainda não tem anúncios
             </p>
             <button
               onClick={() => navigate("/anuncio/criar")}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-walmart-blue text-white rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors"
             >
               <span>Criar Anúncio</span>
               <ArrowRight className="w-5 h-5" />

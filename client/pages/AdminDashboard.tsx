@@ -296,19 +296,19 @@ export default function AdminDashboard() {
   });
 
   return (
-    <div className="min-h-screen bg-walmart-bg flex flex-col">
+    <div className="min-h-screen bg-vitrii-bg flex flex-col">
       <Header />
 
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-8">
         {/* Page Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <Shield className="w-8 h-8 text-walmart-blue" />
-            <h1 className="text-3xl font-bold text-walmart-text">
+            <Shield className="w-8 h-8 text-vitrii-blue" />
+            <h1 className="text-3xl font-bold text-vitrii-text">
               Painel de Administrador
             </h1>
           </div>
-          <p className="text-walmart-text-secondary">
+          <p className="text-vitrii-text-secondary">
             Gerencie usuários e suas permissões de acesso no sistema
           </p>
         </div>
@@ -323,11 +323,11 @@ export default function AdminDashboard() {
               <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center group-hover:bg-blue-200 transition-colors">
                 <Key className="w-6 h-6 text-blue-600" />
               </div>
-              <h3 className="font-semibold text-walmart-text">
+              <h3 className="font-semibold text-vitrii-text">
                 Gerenciar Senhas
               </h3>
             </div>
-            <p className="text-sm text-walmart-text-secondary">
+            <p className="text-sm text-vitrii-text-secondary">
               Visualize e resete as senhas dos usuários
             </p>
           </button>
@@ -340,11 +340,11 @@ export default function AdminDashboard() {
               <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center group-hover:bg-green-200 transition-colors">
                 <AlertCircle className="w-6 h-6 text-green-600" />
               </div>
-              <h3 className="font-semibold text-walmart-text">
+              <h3 className="font-semibold text-vitrii-text">
                 Gerenciar Anúncios
               </h3>
             </div>
-            <p className="text-sm text-walmart-text-secondary">
+            <p className="text-sm text-vitrii-text-secondary">
               Modere e controle anúncios do sistema
             </p>
           </button>
@@ -354,11 +354,11 @@ export default function AdminDashboard() {
               <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
                 <Users className="w-6 h-6 text-purple-600" />
               </div>
-              <h3 className="font-semibold text-walmart-text">
+              <h3 className="font-semibold text-vitrii-text">
                 Total de Usuários
               </h3>
             </div>
-            <p className="text-2xl font-bold text-walmart-blue">
+            <p className="text-2xl font-bold text-vitrii-blue">
               {usuariosData?.count || 0}
             </p>
           </div>
@@ -374,8 +374,8 @@ export default function AdminDashboard() {
             }}
             className={`px-6 py-3 font-semibold border-b-2 transition ${
               activeTab === "usuarios"
-                ? "text-walmart-blue border-walmart-blue"
-                : "text-walmart-text-secondary border-transparent hover:text-walmart-text"
+                ? "text-vitrii-blue border-vitrii-blue"
+                : "text-vitrii-text-secondary border-transparent hover:text-vitrii-text"
             }`}
           >
             <div className="flex items-center gap-2">
@@ -387,8 +387,8 @@ export default function AdminDashboard() {
             onClick={() => setActiveTab("funcionalidades")}
             className={`px-6 py-3 font-semibold border-b-2 transition ${
               activeTab === "funcionalidades"
-                ? "text-walmart-blue border-walmart-blue"
-                : "text-walmart-text-secondary border-transparent hover:text-walmart-text"
+                ? "text-vitrii-blue border-vitrii-blue"
+                : "text-vitrii-text-secondary border-transparent hover:text-vitrii-text"
             }`}
           >
             <div className="flex items-center gap-2">
@@ -403,26 +403,26 @@ export default function AdminDashboard() {
           <div className="space-y-6">
             {/* Search */}
             <div className="relative">
-              <Search className="absolute left-3 top-3 w-5 h-5 text-walmart-text-secondary" />
+              <Search className="absolute left-3 top-3 w-5 h-5 text-vitrii-text-secondary" />
               <input
                 type="text"
                 placeholder="Buscar usuário por nome ou email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-walmart-blue"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
               />
             </div>
 
             {usuariosLoading ? (
               <div className="text-center py-8">
-                <p className="text-walmart-text-secondary">
+                <p className="text-vitrii-text-secondary">
                   Carregando usuários...
                 </p>
               </div>
             ) : filteredUsuarios.length === 0 ? (
               <div className="text-center py-8">
-                <AlertCircle className="w-12 h-12 text-walmart-text-secondary mx-auto mb-2" />
-                <p className="text-walmart-text-secondary">
+                <AlertCircle className="w-12 h-12 text-vitrii-text-secondary mx-auto mb-2" />
+                <p className="text-vitrii-text-secondary">
                   Nenhum usuário encontrado
                 </p>
               </div>
@@ -442,14 +442,14 @@ export default function AdminDashboard() {
                       }
                     >
                       <div className="flex items-center gap-4 flex-1">
-                        <div className="w-10 h-10 bg-walmart-blue rounded-full flex items-center justify-center text-white font-bold">
+                        <div className="w-10 h-10 bg-vitrii-blue rounded-full flex items-center justify-center text-white font-bold">
                           {usuario.nome.charAt(0).toUpperCase()}
                         </div>
                         <div>
-                          <h3 className="font-semibold text-walmart-text">
+                          <h3 className="font-semibold text-vitrii-text">
                             {usuario.nome}
                           </h3>
-                          <p className="text-sm text-walmart-text-secondary">
+                          <p className="text-sm text-vitrii-text-secondary">
                             {usuario.email}
                           </p>
                         </div>
@@ -472,9 +472,9 @@ export default function AdminDashboard() {
                         </div>
                       </div>
                       {expandedUser === usuario.id ? (
-                        <ChevronUp className="w-5 h-5 text-walmart-text-secondary" />
+                        <ChevronUp className="w-5 h-5 text-vitrii-text-secondary" />
                       ) : (
-                        <ChevronDown className="w-5 h-5 text-walmart-text-secondary" />
+                        <ChevronDown className="w-5 h-5 text-vitrii-text-secondary" />
                       )}
                     </div>
 
@@ -501,14 +501,14 @@ export default function AdminDashboard() {
                             <div className="flex gap-2">
                               <button
                                 onClick={() => setEditingUser(usuario)}
-                                className="flex-1 px-3 py-2 bg-walmart-yellow text-walmart-text rounded-lg hover:bg-walmart-yellow-dark transition flex items-center justify-center gap-2"
+                                className="flex-1 px-3 py-2 bg-vitrii-yellow text-vitrii-text rounded-lg hover:bg-vitrii-yellow-dark transition flex items-center justify-center gap-2"
                               >
                                 <Edit2 className="w-4 h-4" />
                                 Editar
                               </button>
                               <button
                                 onClick={() => setSelectedUsuario(usuario.id)}
-                                className="flex-1 px-3 py-2 bg-walmart-blue text-white rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2"
+                                className="flex-1 px-3 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2"
                               >
                                 <Lock className="w-4 h-4" />
                                 Gerenciar Permissões
@@ -518,7 +518,7 @@ export default function AdminDashboard() {
                             {selectedUsuario === usuario.id && usuarioFunc && (
                               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-3">
                                 <div className="flex items-center justify-between">
-                                  <h4 className="font-semibold text-walmart-text">
+                                  <h4 className="font-semibold text-vitrii-text">
                                     Permissões do Usuário
                                   </h4>
                                   <div className="flex gap-2">
@@ -556,7 +556,7 @@ export default function AdminDashboard() {
                                 </div>
 
                                 {usuarioFunc.funcionalidades?.length === 0 ? (
-                                  <p className="text-sm text-walmart-text-secondary italic">
+                                  <p className="text-sm text-vitrii-text-secondary italic">
                                     Nenhuma permissão concedida
                                   </p>
                                 ) : (
@@ -567,7 +567,7 @@ export default function AdminDashboard() {
                                           key={categoria}
                                           className="space-y-2"
                                         >
-                                          <h5 className="text-sm font-semibold text-walmart-text-secondary capitalize">
+                                          <h5 className="text-sm font-semibold text-vitrii-text-secondary capitalize">
                                             {categoria === "users"
                                               ? "Usuários"
                                               : categoria === "ads"
@@ -588,7 +588,7 @@ export default function AdminDashboard() {
                                                   className="flex items-center justify-between bg-white p-2 rounded border border-gray-200"
                                                 >
                                                   <div>
-                                                    <p className="text-sm font-medium text-walmart-text">
+                                                    <p className="text-sm font-medium text-vitrii-text">
                                                       {func.nome}
                                                     </p>
                                                   </div>
@@ -621,7 +621,7 @@ export default function AdminDashboard() {
 
                                 {/* Available funcionalidades to grant */}
                                 <div className="border-t border-blue-200 pt-3 mt-3">
-                                  <h5 className="text-sm font-semibold text-walmart-text mb-2">
+                                  <h5 className="text-sm font-semibold text-vitrii-text mb-2">
                                     Adicionar Permissões
                                   </h5>
                                   <div className="grid grid-cols-1 gap-2">
@@ -639,7 +639,7 @@ export default function AdminDashboard() {
                                           className="flex items-center justify-between bg-white p-2 rounded border border-gray-200"
                                         >
                                           <div>
-                                            <p className="text-sm font-medium text-walmart-text">
+                                            <p className="text-sm font-medium text-vitrii-text">
                                               {func.nome}
                                             </p>
                                           </div>
@@ -681,14 +681,14 @@ export default function AdminDashboard() {
           <div className="space-y-6">
             {funcLoading ? (
               <div className="text-center py-8">
-                <p className="text-walmart-text-secondary">
+                <p className="text-vitrii-text-secondary">
                   Carregando funcionalidades...
                 </p>
               </div>
             ) : funcionalidades.length === 0 ? (
               <div className="text-center py-8">
-                <AlertCircle className="w-12 h-12 text-walmart-text-secondary mx-auto mb-2" />
-                <p className="text-walmart-text-secondary">
+                <AlertCircle className="w-12 h-12 text-vitrii-text-secondary mx-auto mb-2" />
+                <p className="text-vitrii-text-secondary">
                   Nenhuma funcionalidade encontrada
                 </p>
               </div>
@@ -706,7 +706,7 @@ export default function AdminDashboard() {
                   ),
                 ).map(([categoria, funcs]) => (
                   <div key={categoria} className="space-y-3">
-                    <h3 className="text-lg font-semibold text-walmart-text capitalize">
+                    <h3 className="text-lg font-semibold text-vitrii-text capitalize">
                       {categoria === "users"
                         ? "Gestão de Usuários"
                         : categoria === "ads"
@@ -727,10 +727,10 @@ export default function AdminDashboard() {
                         >
                           <div className="flex items-start justify-between mb-2">
                             <div>
-                              <h4 className="font-semibold text-walmart-text">
+                              <h4 className="font-semibold text-vitrii-text">
                                 {func.nome}
                               </h4>
-                              <p className="text-xs text-walmart-text-secondary font-mono">
+                              <p className="text-xs text-vitrii-text-secondary font-mono">
                                 {func.chave}
                               </p>
                             </div>
@@ -741,7 +741,7 @@ export default function AdminDashboard() {
                             )}
                           </div>
                           {func.descricao && (
-                            <p className="text-sm text-walmart-text-secondary">
+                            <p className="text-sm text-vitrii-text-secondary">
                               {func.descricao}
                             </p>
                           )}

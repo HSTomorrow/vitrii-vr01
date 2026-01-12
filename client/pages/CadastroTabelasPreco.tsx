@@ -164,7 +164,7 @@ export default function CadastroTabelasPreco() {
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-walmart-text">Cadastro de Tabelas de Preço</h1>
+          <h1 className="text-3xl font-bold text-vitrii-text">Cadastro de Tabelas de Preço</h1>
           <button
             onClick={() => {
               setIsFormOpen(!isFormOpen);
@@ -173,7 +173,7 @@ export default function CadastroTabelasPreco() {
               setSelectedAnuncianteId("");
               setSelectedGrupoId("");
             }}
-            className="flex items-center gap-2 px-4 py-2 bg-walmart-yellow text-walmart-text rounded-lg hover:bg-walmart-yellow-dark transition-colors font-semibold"
+            className="flex items-center gap-2 px-4 py-2 bg-vitrii-yellow text-vitrii-text rounded-lg hover:bg-vitrii-yellow-dark transition-colors font-semibold"
           >
             <Plus className="w-5 h-5" />
             Nova Tabela
@@ -183,13 +183,13 @@ export default function CadastroTabelasPreco() {
         {/* Form */}
         {isFormOpen && (
           <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-            <h2 className="text-xl font-bold text-walmart-text mb-6">
+            <h2 className="text-xl font-bold text-vitrii-text mb-6">
               {editingId ? "Editar Tabela de Preço" : "Criar Nova Tabela de Preço"}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
                     Anunciante *
                   </label>
                   <select
@@ -200,7 +200,7 @@ export default function CadastroTabelasPreco() {
                       setSelectedGrupoId("");
                       setFormData({ ...formData, anuncianteId: e.target.value, productId: "" });
                     }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                   >
                     <option value="">Selecione um anunciante</option>
                     {anunciantes.map((anunciante) => (
@@ -212,7 +212,7 @@ export default function CadastroTabelasPreco() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
                     Grupo de Produtos e Servicos *
                   </label>
                   <select
@@ -222,7 +222,7 @@ export default function CadastroTabelasPreco() {
                       setSelectedGrupoId(e.target.value);
                       setFormData({ ...formData, productId: "" });
                     }}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                     disabled={!selectedAnuncianteId}
                   >
                     <option value="">Selecione um grupo</option>
@@ -235,14 +235,14 @@ export default function CadastroTabelasPreco() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
                     Produto *
                   </label>
                   <select
                     required
                     value={formData.productId}
                     onChange={(e) => setFormData({ ...formData, productId: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                     disabled={!selectedGrupoId}
                   >
                     <option value="">Selecione um produto</option>
@@ -255,7 +255,7 @@ export default function CadastroTabelasPreco() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
                     Preço *
                   </label>
                   <input
@@ -265,12 +265,12 @@ export default function CadastroTabelasPreco() {
                     value={formData.preco}
                     onChange={(e) => setFormData({ ...formData, preco: e.target.value })}
                     placeholder="0.00"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
                     Preço de Custo (Opcional)
                   </label>
                   <input
@@ -279,7 +279,7 @@ export default function CadastroTabelasPreco() {
                     value={formData.precoCusto}
                     onChange={(e) => setFormData({ ...formData, precoCusto: e.target.value })}
                     placeholder="0.00"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                   />
                 </div>
               </div>
@@ -288,7 +288,7 @@ export default function CadastroTabelasPreco() {
                 <button
                   type="submit"
                   disabled={saveTabelaMutation.isPending}
-                  className="px-6 py-2 bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors font-semibold disabled:opacity-50"
+                  className="px-6 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors font-semibold disabled:opacity-50"
                 >
                   {saveTabelaMutation.isPending ? "Salvando..." : "Salvar"}
                 </button>
@@ -298,7 +298,7 @@ export default function CadastroTabelasPreco() {
                     setIsFormOpen(false);
                     setEditingId(null);
                   }}
-                  className="px-6 py-2 bg-gray-300 text-walmart-text rounded-lg hover:bg-gray-400 transition-colors font-semibold"
+                  className="px-6 py-2 bg-gray-300 text-vitrii-text rounded-lg hover:bg-gray-400 transition-colors font-semibold"
                 >
                   Cancelar
                 </button>
@@ -311,13 +311,13 @@ export default function CadastroTabelasPreco() {
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-walmart-gray">
+              <thead className="bg-vitrii-gray">
                 <tr>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">Anunciante</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">Produto</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">Preço</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">Preço de Custo</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">Ações</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">Anunciante</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">Produto</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">Preço</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">Preço de Custo</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -330,22 +330,22 @@ export default function CadastroTabelasPreco() {
                 ) : (
                   tabelas.map((tabela) => (
                     <tr key={tabela.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 font-semibold text-walmart-text">
+                      <td className="px-6 py-4 font-semibold text-vitrii-text">
                         {tabela.anunciante?.nome || "N/A"}
                       </td>
-                      <td className="px-6 py-4 font-semibold text-walmart-text">
+                      <td className="px-6 py-4 font-semibold text-vitrii-text">
                         {tabela.produto?.nome || "N/A"}
                       </td>
-                      <td className="px-6 py-4 text-walmart-text">
+                      <td className="px-6 py-4 text-vitrii-text">
                         R$ {parseFloat(tabela.preco.toString()).toFixed(2)}
                       </td>
-                      <td className="px-6 py-4 text-walmart-text">
+                      <td className="px-6 py-4 text-vitrii-text">
                         {tabela.precoCusto ? `R$ ${parseFloat(tabela.precoCusto.toString()).toFixed(2)}` : "-"}
                       </td>
                       <td className="px-6 py-4 flex gap-2">
                         <button
                           onClick={() => handleEdit(tabela)}
-                          className="p-2 text-walmart-blue hover:bg-blue-50 rounded-lg transition-colors"
+                          className="p-2 text-vitrii-blue hover:bg-blue-50 rounded-lg transition-colors"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>

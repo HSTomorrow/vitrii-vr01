@@ -190,7 +190,7 @@ export default function AnuncioDetalhe() {
       <div className="min-h-screen flex flex-col bg-white">
         <Header />
         <div className="flex-1 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-walmart-blue" />
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-vitrii-blue" />
         </div>
         <Footer />
       </div>
@@ -204,10 +204,10 @@ export default function AnuncioDetalhe() {
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center">
             <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
-            <p className="text-walmart-text text-lg">Anúncio não encontrado</p>
+            <p className="text-vitrii-text text-lg">Anúncio não encontrado</p>
             <Link
               to="/sell"
-              className="text-walmart-blue hover:underline mt-4 inline-block"
+              className="text-vitrii-blue hover:underline mt-4 inline-block"
             >
               Voltar para anúncios
             </Link>
@@ -245,7 +245,7 @@ export default function AnuncioDetalhe() {
           {/* Back Button */}
           <button
             onClick={() => navigate(-1)}
-            className="inline-flex items-center text-walmart-blue hover:text-walmart-blue-dark font-semibold mb-8"
+            className="inline-flex items-center text-vitrii-blue hover:text-vitrii-blue-dark font-semibold mb-8"
           >
             <ChevronLeft className="w-5 h-5 mr-1" />
             Voltar
@@ -255,7 +255,7 @@ export default function AnuncioDetalhe() {
           <div className="flex items-start justify-between mb-8">
             <div>
               <div className="flex items-center gap-4 mb-2 flex-wrap">
-                <h1 className="text-4xl font-bold text-walmart-text">
+                <h1 className="text-4xl font-bold text-vitrii-text">
                   {anuncio.titulo}
                 </h1>
                 {canEdit && (
@@ -273,7 +273,7 @@ export default function AnuncioDetalhe() {
                   </>
                 )}
               </div>
-              <div className="flex items-center gap-4 text-walmart-text-secondary mt-2 mb-2">
+              <div className="flex items-center gap-4 text-vitrii-text-secondary mt-2 mb-2">
                 <div className="flex items-center gap-1">
                   <Eye className="w-4 h-4" />
                   <span>Visualizações: {anuncio.visualizacoes || 0}</span>
@@ -283,9 +283,9 @@ export default function AnuncioDetalhe() {
                   <span>ID: #{anuncio.id}</span>
                 </div>
               </div>
-              <p className="text-sm text-walmart-text-secondary">
+              <p className="text-sm text-vitrii-text-secondary">
                 Publicado por:{" "}
-                <span className="font-semibold text-walmart-text">
+                <span className="font-semibold text-vitrii-text">
                   {anuncio.anunciantes?.nome || "Anunciante desconhecido"}
                 </span>
               </p>
@@ -297,7 +297,7 @@ export default function AnuncioDetalhe() {
                 {!isInactive && (
                   <Link
                     to={`/anuncio/${id}/editar`}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors font-semibold"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors font-semibold"
                   >
                     <Edit className="w-4 h-4" />
                     Editar
@@ -380,7 +380,7 @@ export default function AnuncioDetalhe() {
             {/* Main Content */}
             <div className="lg:col-span-2">
               {/* Product Image */}
-              <div className="bg-walmart-gray-light rounded-lg overflow-hidden mb-8">
+              <div className="bg-vitrii-gray-light rounded-lg overflow-hidden mb-8">
                 {anuncio.imagem ? (
                   <img
                     src={anuncio.imagem}
@@ -396,10 +396,10 @@ export default function AnuncioDetalhe() {
 
               {/* Description */}
               <div className="bg-white rounded-lg border border-gray-200 p-6 mb-8">
-                <h2 className="text-2xl font-bold text-walmart-text mb-4">
+                <h2 className="text-2xl font-bold text-vitrii-text mb-4">
                   Descrição
                 </h2>
-                <p className="text-walmart-text-secondary whitespace-pre-wrap leading-relaxed">
+                <p className="text-vitrii-text-secondary whitespace-pre-wrap leading-relaxed">
                   {anuncio.descricao || "Sem descrição adicional"}
                 </p>
               </div>
@@ -408,14 +408,14 @@ export default function AnuncioDetalhe() {
               <div className="grid grid-cols-2 gap-4">
                 {/* Store Info */}
                 <div className="bg-white rounded-lg border border-gray-200 p-6">
-                  <h3 className="font-bold text-walmart-text mb-3">
+                  <h3 className="font-bold text-vitrii-text mb-3">
                     Anunciante
                   </h3>
                   <div className="space-y-3">
-                    <p className="text-walmart-text font-semibold">
+                    <p className="text-vitrii-text font-semibold">
                       {anuncio.anunciantes?.nome || "Anunciante desconhecido"}
                     </p>
-                    <div className="flex items-center gap-2 text-walmart-text-secondary text-sm">
+                    <div className="flex items-center gap-2 text-vitrii-text-secondary text-sm">
                       <MapPin className="w-4 h-4" />
                       <span>
                         {anuncio.anunciantes?.endereco ||
@@ -434,14 +434,14 @@ export default function AnuncioDetalhe() {
                         </a>
                       )}
                       {anuncio.anunciantes?.cnpj && (
-                        <div className="text-sm text-walmart-text-secondary">
+                        <div className="text-sm text-vitrii-text-secondary">
                           CNPJ: {anuncio.anunciantes.cnpj}
                         </div>
                       )}
                       {anuncio.anunciantes?.telefone && (
                         <a
                           href={`tel:${anuncio.anunciantes.telefone.replace(/\D/g, "")}`}
-                          className="inline-flex items-center gap-1 text-walmart-blue hover:text-walmart-blue-dark transition-colors"
+                          className="inline-flex items-center gap-1 text-vitrii-blue hover:text-vitrii-blue-dark transition-colors"
                           title="Ligar"
                         >
                           <Phone className="w-4 h-4" />
@@ -453,13 +453,13 @@ export default function AnuncioDetalhe() {
 
                 {/* Category */}
                 <div className="bg-white rounded-lg border border-gray-200 p-6">
-                  <h3 className="font-bold text-walmart-text mb-3">
+                  <h3 className="font-bold text-vitrii-text mb-3">
                     Categoria
                   </h3>
-                  <p className="text-walmart-text">
+                  <p className="text-vitrii-text">
                     {anuncio.categoria || "Sem categoria"}
                   </p>
-                  <p className="text-sm text-walmart-text-secondary mt-2">
+                  <p className="text-sm text-vitrii-text-secondary mt-2">
                     Tipo: {anuncio.tipo}
                   </p>
                 </div>
@@ -469,7 +469,7 @@ export default function AnuncioDetalhe() {
             {/* Sidebar */}
             <div className="lg:col-span-1">
               {/* Price Card */}
-              <div className="bg-walmart-blue text-white rounded-lg p-6 mb-6">
+              <div className="bg-vitrii-blue text-white rounded-lg p-6 mb-6">
                 <p className="text-sm opacity-90 mb-1">Preço</p>
                 <div className="flex items-baseline">
                   <span className="text-4xl font-bold">
@@ -497,12 +497,12 @@ export default function AnuncioDetalhe() {
                         setShowMembrosModal(true);
                       }
                     }}
-                    className="w-full px-4 py-3 bg-walmart-yellow text-walmart-text rounded-lg font-semibold hover:bg-walmart-yellow-dark transition-colors"
+                    className="w-full px-4 py-3 bg-vitrii-yellow text-vitrii-text rounded-lg font-semibold hover:bg-vitrii-yellow-dark transition-colors"
                   >
                     Chamar Vendedor
                   </button>
                 )}
-                <button className="w-full px-4 py-3 border-2 border-walmart-blue text-walmart-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors flex items-center justify-center gap-2">
+                <button className="w-full px-4 py-3 border-2 border-vitrii-blue text-vitrii-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors flex items-center justify-center gap-2">
                   <MessageSquare className="w-4 h-4" />
                   Enviar Mensagem
                 </button>
@@ -517,7 +517,7 @@ export default function AnuncioDetalhe() {
                     WhatsApp
                   </a>
                 )}
-                <button className="w-full px-4 py-3 border-2 border-gray-300 text-walmart-text rounded-lg font-semibold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
+                <button className="w-full px-4 py-3 border-2 border-gray-300 text-vitrii-text rounded-lg font-semibold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
                   <Share2 className="w-4 h-4" />
                   Compartilhar
                 </button>
@@ -526,10 +526,10 @@ export default function AnuncioDetalhe() {
               {/* Info Box */}
               <div className="bg-blue-50 rounded-lg border border-blue-200 p-4 space-y-3">
                 <div className="flex gap-2">
-                  <Calendar className="w-5 h-5 text-walmart-blue flex-shrink-0 mt-0.5" />
+                  <Calendar className="w-5 h-5 text-vitrii-blue flex-shrink-0 mt-0.5" />
                   <div className="text-sm">
-                    <p className="text-walmart-text-secondary">Publicado em</p>
-                    <p className="font-semibold text-walmart-text">
+                    <p className="text-vitrii-text-secondary">Publicado em</p>
+                    <p className="font-semibold text-vitrii-text">
                       {new Date(anuncio.dataCriacao).toLocaleDateString(
                         "pt-BR",
                       )}
@@ -538,12 +538,12 @@ export default function AnuncioDetalhe() {
                 </div>
                 {canEdit && (
                   <div className="flex gap-2">
-                    <DollarSign className="w-5 h-5 text-walmart-blue flex-shrink-0 mt-0.5" />
+                    <DollarSign className="w-5 h-5 text-vitrii-blue flex-shrink-0 mt-0.5" />
                     <div className="text-sm">
-                      <p className="text-walmart-text-secondary">
+                      <p className="text-vitrii-text-secondary">
                         Status de Pagamento
                       </p>
-                      <p className="font-semibold text-walmart-text">
+                      <p className="font-semibold text-vitrii-text">
                         {anuncio.status === "pago" ? "Pago" : "Pendente"}
                       </p>
                     </div>
@@ -561,7 +561,7 @@ export default function AnuncioDetalhe() {
           <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full max-h-96 flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
-              <h3 className="text-xl font-bold text-walmart-text">
+              <h3 className="text-xl font-bold text-vitrii-text">
                 Chamar Vendedor
               </h3>
               <button
@@ -579,19 +579,19 @@ export default function AnuncioDetalhe() {
             <div className="flex-1 overflow-y-auto p-6">
               {equipes.length > 1 && !selectedEquipeId && (
                 <div className="space-y-3">
-                  <p className="text-sm text-walmart-text-secondary mb-4">
+                  <p className="text-sm text-vitrii-text-secondary mb-4">
                     Selecione uma equipe de vendas:
                   </p>
                   {equipes.map((equipe) => (
                     <button
                       key={equipe.id}
                       onClick={() => setSelectedEquipeId(equipe.id)}
-                      className="w-full p-4 border border-gray-300 rounded-lg hover:border-walmart-blue hover:bg-blue-50 transition-colors text-left"
+                      className="w-full p-4 border border-gray-300 rounded-lg hover:border-vitrii-blue hover:bg-blue-50 transition-colors text-left"
                     >
-                      <p className="font-semibold text-walmart-text">
+                      <p className="font-semibold text-vitrii-text">
                         {equipe.nome}
                       </p>
-                      <p className="text-sm text-walmart-text-secondary">
+                      <p className="text-sm text-vitrii-text-secondary">
                         {equipe.membros.length} membro(s)
                       </p>
                     </button>
@@ -601,7 +601,7 @@ export default function AnuncioDetalhe() {
 
               {selectedEquipeId && (
                 <div className="space-y-4">
-                  <p className="text-sm text-walmart-text-secondary mb-4">
+                  <p className="text-sm text-vitrii-text-secondary mb-4">
                     Membros disponíveis para contato:
                   </p>
 
@@ -617,16 +617,16 @@ export default function AnuncioDetalhe() {
                         key={membro.id}
                         className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
                       >
-                        <p className="font-semibold text-walmart-text mb-2">
+                        <p className="font-semibold text-vitrii-text mb-2">
                           {membro.nome}
                         </p>
 
                         <div className="space-y-2 text-sm">
-                          <div className="flex items-center gap-2 text-walmart-text-secondary">
+                          <div className="flex items-center gap-2 text-vitrii-text-secondary">
                             <Mail className="w-4 h-4" />
                             <a
                               href={`mailto:${membro.email}`}
-                              className="text-walmart-blue hover:underline"
+                              className="text-vitrii-blue hover:underline"
                             >
                               {membro.email}
                             </a>
@@ -653,7 +653,7 @@ export default function AnuncioDetalhe() {
                   {equipes.length > 1 && (
                     <button
                       onClick={() => setSelectedEquipeId(null)}
-                      className="w-full mt-4 px-4 py-2 border border-gray-300 text-walmart-text rounded-lg hover:bg-gray-50 transition-colors font-semibold text-sm"
+                      className="w-full mt-4 px-4 py-2 border border-gray-300 text-vitrii-text rounded-lg hover:bg-gray-50 transition-colors font-semibold text-sm"
                     >
                       Voltar para Equipes
                     </button>

@@ -177,20 +177,20 @@ export default function AdminBanners() {
 
   if (!isAdmin) {
     return (
-      <div className="min-h-screen bg-walmart-bg flex flex-col">
+      <div className="min-h-screen bg-vitrii-bg flex flex-col">
         <Header />
         <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-8 flex items-center justify-center">
           <div className="text-center">
             <Lock className="w-16 h-16 text-red-500 mx-auto mb-4" />
-            <h1 className="text-3xl font-bold text-walmart-text mb-2">
+            <h1 className="text-3xl font-bold text-vitrii-text mb-2">
               Acesso Restrito
             </h1>
-            <p className="text-walmart-text-secondary mb-6">
+            <p className="text-vitrii-text-secondary mb-6">
               Apenas administradores podem acessar esta página.
             </p>
             <button
               onClick={() => navigate("/")}
-              className="px-6 py-2 bg-walmart-blue text-white rounded-lg hover:bg-blue-700 transition"
+              className="px-6 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-blue-700 transition"
             >
               Voltar para Home
             </button>
@@ -202,16 +202,16 @@ export default function AdminBanners() {
   }
 
   return (
-    <div className="min-h-screen bg-walmart-bg flex flex-col">
+    <div className="min-h-screen bg-vitrii-bg flex flex-col">
       <Header />
 
       <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-8">
         {/* Page Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-walmart-text mb-2">
+          <h1 className="text-3xl font-bold text-vitrii-text mb-2">
             Gerenciar Banners
           </h1>
-          <p className="text-walmart-text-secondary">
+          <p className="text-vitrii-text-secondary">
             Crie e edite os banners que aparecem na página inicial
           </p>
         </div>
@@ -220,13 +220,13 @@ export default function AdminBanners() {
           {/* Form Section */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-md p-6 sticky top-6">
-              <h2 className="font-bold text-walmart-text mb-4">
+              <h2 className="font-bold text-vitrii-text mb-4">
                 {editingId ? "Editar Banner" : "Novo Banner"}
               </h2>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
                     Título *
                   </label>
                   <input
@@ -236,12 +236,12 @@ export default function AdminBanners() {
                       setFormData({ ...formData, titulo: e.target.value })
                     }
                     placeholder="Ex: Bem-vindo ao Vitrii"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-walmart-blue"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
                     Descrição
                   </label>
                   <textarea
@@ -251,12 +251,12 @@ export default function AdminBanners() {
                     }
                     placeholder="Descrição curta do banner"
                     rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-walmart-blue"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
                     URL da Imagem *
                   </label>
                   <input
@@ -266,7 +266,7 @@ export default function AdminBanners() {
                       setFormData({ ...formData, imagemUrl: e.target.value })
                     }
                     placeholder="https://exemplo.com/imagem.jpg"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-walmart-blue"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
                   />
                   {formData.imagemUrl && (
                     <img
@@ -278,7 +278,7 @@ export default function AdminBanners() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
                     Link (Opcional)
                   </label>
                   <input
@@ -288,7 +288,7 @@ export default function AdminBanners() {
                       setFormData({ ...formData, link: e.target.value })
                     }
                     placeholder="https://exemplo.com"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-walmart-blue"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
                   />
                 </div>
 
@@ -302,7 +302,7 @@ export default function AdminBanners() {
                       }
                       className="w-4 h-4"
                     />
-                    <span className="text-sm font-semibold text-walmart-text">
+                    <span className="text-sm font-semibold text-vitrii-text">
                       Ativo
                     </span>
                   </label>
@@ -315,7 +315,7 @@ export default function AdminBanners() {
                       createBannerMutation.isPending ||
                       updateBannerMutation.isPending
                     }
-                    className="flex-1 px-4 py-2 bg-walmart-blue text-white rounded-lg font-semibold hover:bg-walmart-blue-dark transition disabled:opacity-50"
+                    className="flex-1 px-4 py-2 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition disabled:opacity-50"
                   >
                     {editingId ? "Atualizar" : "Criar"}
                   </button>
@@ -326,7 +326,7 @@ export default function AdminBanners() {
                         resetForm();
                         setEditingId(null);
                       }}
-                      className="flex-1 px-4 py-2 border-2 border-gray-300 text-walmart-text rounded-lg font-semibold hover:bg-gray-50 transition"
+                      className="flex-1 px-4 py-2 border-2 border-gray-300 text-vitrii-text rounded-lg font-semibold hover:bg-gray-50 transition"
                     >
                       Cancelar
                     </button>
@@ -340,17 +340,17 @@ export default function AdminBanners() {
           <div className="lg:col-span-2">
             {isLoading ? (
               <div className="text-center py-12">
-                <p className="text-walmart-text-secondary">Carregando...</p>
+                <p className="text-vitrii-text-secondary">Carregando...</p>
               </div>
             ) : banners.length === 0 ? (
               <div className="bg-white rounded-lg shadow-md p-12 text-center">
                 <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-walmart-text-secondary">
+                <p className="text-vitrii-text-secondary">
                   Nenhum banner criado ainda
                 </p>
                 <button
                   onClick={() => setIsCreating(true)}
-                  className="mt-4 inline-flex items-center gap-2 text-walmart-blue font-semibold hover:underline"
+                  className="mt-4 inline-flex items-center gap-2 text-vitrii-blue font-semibold hover:underline"
                 >
                   <Plus className="w-4 h-4" />
                   Criar Primeiro Banner
@@ -374,11 +374,11 @@ export default function AdminBanners() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <h3 className="font-semibold text-walmart-text">
+                          <h3 className="font-semibold text-vitrii-text">
                             {banner.titulo}
                           </h3>
                           {banner.descricao && (
-                            <p className="text-sm text-walmart-text-secondary line-clamp-2">
+                            <p className="text-sm text-vitrii-text-secondary line-clamp-2">
                               {banner.descricao}
                             </p>
                           )}
@@ -392,7 +392,7 @@ export default function AdminBanners() {
                                 Inativo
                               </span>
                             )}
-                            <span className="text-xs text-walmart-text-secondary">
+                            <span className="text-xs text-vitrii-text-secondary">
                               Ordem: {banner.ordem}
                             </span>
                           </div>
@@ -430,11 +430,11 @@ export default function AdminBanners() {
             )}
 
             {/* Info Box */}
-            <div className="mt-6 bg-blue-50 border-l-4 border-walmart-blue p-4 rounded">
-              <p className="text-sm text-walmart-text font-semibold mb-2">
+            <div className="mt-6 bg-blue-50 border-l-4 border-vitrii-blue p-4 rounded">
+              <p className="text-sm text-vitrii-text font-semibold mb-2">
                 💡 Dica
               </p>
-              <ul className="text-sm text-walmart-text-secondary space-y-1">
+              <ul className="text-sm text-vitrii-text-secondary space-y-1">
                 <li>• Máximo de 5 banners ativos</li>
                 <li>• Use imagens em proporção 4:1 (1200x300px recomendado)</li>
                 <li>• Banners inativos não aparecem na página principal</li>
