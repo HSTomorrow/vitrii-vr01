@@ -286,7 +286,7 @@ export default function AnuncioForm({
       console.log("[AnuncioForm] Success response:", result);
       return result;
     },
-    onSuccess: (result) => {
+    onSuccess: async (result) => {
       console.log("[AnuncioForm] Mutation successful, invalidating queries");
       queryClient.invalidateQueries({ queryKey: ["anuncios"] });
 
@@ -297,10 +297,34 @@ export default function AnuncioForm({
       console.log("[AnuncioForm] Showing toast:", successMessage);
       toast.success(successMessage);
 
-      // If creating a new ad (not editing)
+      // If creating a new ad (not editing) and we have additional images
       if (!anuncioId && result.data?.id) {
         console.log("[AnuncioForm] New ad created, ID:", result.data.id);
         console.log("[AnuncioForm] isDoacao:", result.data.isDoacao);
+
+        // Upload additional images if any
+        if (uploadedImages.length > 1) {
+          console.log(
+            "[AnuncioForm] Uploading additional images:",
+            uploadedImages.length
+          );
+          try {
+            for (let i = 1; i < uploadedImages.length; i++) {
+              const image = uploadedImages[i];
+              await fetch(`/api/anuncios/${result.data.id}/fotos`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ url: image.url }),
+              });
+            }
+            console.log("[AnuncioForm] Additional images uploaded successfully");
+          } catch (error) {
+            console.error("[AnuncioForm] Error uploading additional images:", error);
+            toast.warning(
+              "Anúncio criado, mas houve erro ao salvar algumas imagens"
+            );
+          }
+        }
 
         setTimeout(() => {
           // Donations go directly to ad detail (no payment needed)
