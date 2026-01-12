@@ -152,6 +152,17 @@ export default function AnuncioForm({
     enabled: !!anuncioId,
   });
 
+  // Fetch existing photos if editing
+  const { data: fotosData } = useQuery({
+    queryKey: ["anuncio-fotos", anuncioId],
+    queryFn: async () => {
+      const response = await fetch(`/api/anuncios/${anuncioId}/fotos`);
+      if (!response.ok) throw new Error("Erro ao buscar fotos");
+      return response.json();
+    },
+    enabled: !!anuncioId,
+  });
+
   // Fetch productos for selected anunciante
   const { data: productosData } = useQuery({
     queryKey: ["produtos-anuncio", selectedAnuncianteId],
