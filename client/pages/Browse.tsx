@@ -59,19 +59,17 @@ export default function Browse() {
 
   // Extract unique locations for filter dropdown
   const uniqueLocations = useMemo(() => {
-    const locations = new Set(
-      allAnuncios
-        .map((a: any) => {
-          if (!a.endereco && !a.anunciante?.endereco) return null;
-          const endereco = a.endereco || a.anunciante?.endereco;
-          const parts = endereco.split(",");
-          if (parts.length >= 2) {
-            return parts[parts.length - 2].trim();
-          }
-          return null;
-        })
-        .filter(Boolean)
-    );
+    const locations = new Set<string>();
+    allAnuncios.forEach((a: any) => {
+      if (!a.endereco && !a.anunciantes?.endereco) return;
+      const endereco = a.endereco || a.anunciantes?.endereco;
+      if (!endereco) return;
+      const parts = endereco.split(",");
+      if (parts.length >= 2) {
+        const municipality = parts[parts.length - 2].trim();
+        if (municipality) locations.add(municipality);
+      }
+    });
     return Array.from(locations).sort();
   }, [allAnuncios]);
 
