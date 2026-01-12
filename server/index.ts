@@ -17,6 +17,10 @@ import {
   recordAnuncioView,
   getAnunciosDUsuario,
   toggleDestaqueAnuncio,
+  getAnuncioFotos,
+  addAnuncioFoto,
+  deleteAnuncioFoto,
+  reorderAnuncioFotos,
 } from "./routes/anuncios";
 import {
   getAnunciantes,
