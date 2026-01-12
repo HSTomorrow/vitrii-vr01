@@ -84,14 +84,15 @@ model fotos_grupos {
 
 model grupos_produtos {
   id              Int      @id @default(autoincrement())
-  lojaId          Int
+  anuncianteId    Int
   nome            String   @db.VarChar(255)
   descricao       String?
   icone           String?  @db.VarChar(50)
   dataCriacao     DateTime @default(now())
   dataAtualizacao DateTime
+  anunciante      anunciantes @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
 
-  @@unique([lojaId, nome])
+  @@unique([anuncianteId, nome])
 }
 
 model movimentos_estoque {
