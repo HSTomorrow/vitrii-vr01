@@ -111,19 +111,20 @@ export default function AdCard({
         </div>
       )}
 
-      {/* Image */}
-      <div
-        className={`w-full h-48 bg-gradient-to-br ${backgroundColor} flex items-center justify-center overflow-hidden`}
-      >
-        {anuncio.fotoUrl ? (
-          <img
-            src={anuncio.fotoUrl}
-            alt={anuncio.titulo}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          <Package className="w-12 h-12 text-white opacity-50" />
-        )}
+      {/* Image with fallback chain: anuncio > anunciante > icon */}
+      <div className={`w-full bg-gradient-to-br ${backgroundColor}`}>
+        <ImageZoom
+          src={
+            anuncio.imagem ||
+            anuncio.fotoUrl ||
+            anunciante?.fotoUrl ||
+            anuncio.anunciante?.fotoUrl
+          }
+          alt={anuncio.titulo}
+          fallbackIcon={<Package className="w-12 h-12 text-white opacity-50" />}
+          containerClassName="w-full h-48"
+          className="w-full h-full object-cover"
+        />
       </div>
 
       {/* Content */}
