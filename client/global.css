@@ -153,11 +153,11 @@
 
 @layer components {
   .vitrii-button {
-    @apply bg-walmart-blue text-white px-6 py-3 rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors duration-200;
+    @apply bg-vitrii-blue text-white px-6 py-3 rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors duration-200;
   }
 
   .vitrii-button-secondary {
-    @apply bg-walmart-yellow text-walmart-text px-6 py-3 rounded-lg font-semibold hover:bg-walmart-yellow-dark transition-colors duration-200;
+    @apply bg-vitrii-yellow text-vitrii-text px-6 py-3 rounded-lg font-semibold hover:bg-vitrii-yellow-dark transition-colors duration-200;
   }
 
   .vitrii-card {
