@@ -28,6 +28,7 @@ interface TabelaDePreco {
 }
 
 export default function CadastroTabelasPreco() {
+  const { user } = useAuth();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [selectedAnuncianteId, setSelectedAnuncianteId] = useState("");
@@ -50,17 +51,22 @@ export default function CadastroTabelasPreco() {
     },
   });
 
-  // Fetch grupos for selected anunciante
+  // Fetch grupos for selected anunciante with user context
   const { data: grupos = [] } = useQuery({
-    queryKey: ["grupos", selectedAnuncianteId],
+    queryKey: ["grupos", selectedAnuncianteId, user?.id],
     queryFn: async () => {
       if (!selectedAnuncianteId) return [];
-      const response = await fetch(`/api/grupos-productos?anuncianteId=${selectedAnuncianteId}`);
+      const headers: Record<string, string> = {};
+      if (user?.id) {
+        headers["x-user-id"] = user.id.toString();
+      }
+
+      const response = await fetch(`/api/grupos-productos?anuncianteId=${selectedAnuncianteId}`, { headers });
       if (!response.ok) throw new Error("Erro ao buscar grupos");
       const result = await response.json();
       return result.data || [];
     },
-    enabled: !!selectedAnuncianteId,
+    enabled: !!selectedAnuncianteId && !!user,
   });
 
   // Fetch productos for selected grupo
