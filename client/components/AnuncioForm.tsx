@@ -86,6 +86,9 @@ export default function AnuncioForm({
     categoria: "" as string,
     dadosCategoria: "",
   });
+  const [uploadedImages, setUploadedImages] = useState<
+    Array<{ id?: string; url: string }>
+  >([]);
 
   // Handlers for inline creation
   const handleAnuncianteCreated = (newAnuncianteId: number) => {
