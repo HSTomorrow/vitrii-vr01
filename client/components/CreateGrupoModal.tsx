@@ -86,7 +86,7 @@ export default function CreateGrupoModal({
         {/* Header */}
         <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
           <h2 className="text-xl font-bold text-walmart-text">
-            Criar Novo Grupo de Produtos
+            Criar Novo Grupo de Produtos e Serviço
           </h2>
           <button
             onClick={onClose}
