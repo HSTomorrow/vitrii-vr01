@@ -97,7 +97,7 @@ export const createProducto: RequestHandler = async (req, res) => {
   try {
     const validatedData = ProductoCreateSchema.parse(req.body);
 
-    // Verify that the grupo exists
+    // Verify that the grupo exists and get its lojaId (anuncianteId)
     const grupo = await prisma.grupos_produtos.findUnique({
       where: { id: validatedData.grupoId },
     });
@@ -110,7 +110,10 @@ export const createProducto: RequestHandler = async (req, res) => {
     }
 
     const producto = await prisma.productos.create({
-      data: validatedData,
+      data: {
+        ...validatedData,
+        lojaId: grupo.anuncianteId,
+      },
       include: {
         grupo: {
           include: {
