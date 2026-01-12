@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Plus, Trash2, Edit2 } from "lucide-react";
@@ -19,6 +20,7 @@ interface GrupoDeProductos {
 }
 
 export default function CadastroGruposProductos() {
+  const { user } = useAuth();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState({
@@ -38,15 +40,21 @@ export default function CadastroGruposProductos() {
     },
   });
 
-  // Fetch grupos
+  // Fetch grupos with user context
   const { data: grupos, refetch } = useQuery<GrupoDeProductos[]>({
-    queryKey: ["grupos-produtos"],
+    queryKey: ["grupos-produtos", user?.id],
     queryFn: async () => {
-      const response = await fetch("/api/grupos-productos");
+      const headers: Record<string, string> = {};
+      if (user?.id) {
+        headers["x-user-id"] = user.id.toString();
+      }
+
+      const response = await fetch("/api/grupos-productos", { headers });
       if (!response.ok) throw new Error("Erro ao buscar grupos");
       const result = await response.json();
       return result.data || [];
     },
+    enabled: !!user,
   });
 
   // Save grupo mutation
