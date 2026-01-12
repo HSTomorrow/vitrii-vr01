@@ -199,6 +199,11 @@ export default function AnuncioForm({
   const productos = productosData?.data || [];
   const equipes = equipesData?.data || [];
 
+  // Get selected anunciante details
+  const selectedAnunciante = anunciantes.find(
+    (a: Anunciante) => a.id === selectedAnuncianteId,
+  );
+
   // Get selected product details
   const selectedProducto = productos.find(
     (p: Producto) => p.id === formData.productId,
