@@ -180,30 +180,30 @@ export default function PerfilUsuario() {
         {/* Back Button */}
         <button
           onClick={() => navigate(-1)}
-          className="inline-flex items-center text-walmart-blue hover:text-walmart-blue-dark font-semibold mb-8"
+          className="inline-flex items-center text-vitrii-blue hover:text-vitrii-blue-dark font-semibold mb-8"
         >
           <ChevronLeft className="w-5 h-5 mr-1" />
           Voltar
         </button>
 
-        <div className="bg-walmart-gray-light rounded-lg p-8">
+        <div className="bg-vitrii-gray-light rounded-lg p-8">
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-walmart-blue text-white rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-vitrii-blue text-white rounded-full flex items-center justify-center mx-auto mb-4">
               <User className="w-8 h-8" />
             </div>
-            <h1 className="text-3xl font-bold text-walmart-text">
+            <h1 className="text-3xl font-bold text-vitrii-text">
               Completar Perfil
             </h1>
-            <p className="text-walmart-text-secondary mt-2">
+            <p className="text-vitrii-text-secondary mt-2">
               Adicione suas informações de contato para melhorar sua experiência
             </p>
           </div>
 
-          <div className="bg-blue-50 border-l-4 border-walmart-blue rounded p-4 mb-8 flex gap-3">
-            <CheckCircle className="w-5 h-5 text-walmart-blue flex-shrink-0 mt-0.5" />
+          <div className="bg-blue-50 border-l-4 border-vitrii-blue rounded p-4 mb-8 flex gap-3">
+            <CheckCircle className="w-5 h-5 text-vitrii-blue flex-shrink-0 mt-0.5" />
             <div>
-              <h3 className="font-semibold text-walmart-text">Parabéns!</h3>
-              <p className="text-sm text-walmart-text-secondary mt-1">
+              <h3 className="font-semibold text-vitrii-text">Parabéns!</h3>
+              <p className="text-sm text-vitrii-text-secondary mt-1">
                 Sua conta foi criada com sucesso. Complete seu perfil para
                 começar a vender.
               </p>
@@ -213,21 +213,21 @@ export default function PerfilUsuario() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email (Read-only) */}
             <div>
-              <label className="block text-sm font-semibold text-walmart-text mb-2">
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Email
               </label>
-              <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-walmart-text flex items-center gap-2">
-                <Mail className="w-5 h-5 text-walmart-text-secondary flex-shrink-0" />
+              <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-vitrii-text flex items-center gap-2">
+                <Mail className="w-5 h-5 text-vitrii-text-secondary flex-shrink-0" />
                 <span>{user?.email}</span>
               </div>
-              <p className="text-xs text-walmart-text-secondary mt-2">
+              <p className="text-xs text-vitrii-text-secondary mt-2">
                 Para alterar o email, entre em contato com o administrador.
               </p>
             </div>
 
             {/* CPF / CNPJ */}
             <div>
-              <label className="block text-sm font-semibold text-walmart-text mb-2">
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 CPF \ CNPJ *
               </label>
               <input
@@ -261,7 +261,7 @@ export default function PerfilUsuario() {
                 className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-1 transition-colors ${
                   errors.cpf
                     ? "border-red-500 focus:border-red-500 focus:ring-red-500 bg-red-50"
-                    : "border-gray-300 focus:border-walmart-blue focus:ring-walmart-blue"
+                    : "border-gray-300 focus:border-vitrii-blue focus:ring-vitrii-blue"
                 }`}
               />
               {errors.cpf && (
@@ -274,7 +274,7 @@ export default function PerfilUsuario() {
 
             {/* Telefone */}
             <div>
-              <label className="block text-sm font-semibold text-walmart-text mb-2">
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Telefone (opcional)
               </label>
               <input
@@ -292,7 +292,7 @@ export default function PerfilUsuario() {
                 className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-1 transition-colors ${
                   errors.telefone
                     ? "border-red-500 focus:border-red-500 focus:ring-red-500 bg-red-50"
-                    : "border-gray-300 focus:border-walmart-blue focus:ring-walmart-blue"
+                    : "border-gray-300 focus:border-vitrii-blue focus:ring-vitrii-blue"
                 }`}
               />
               {errors.telefone && (
@@ -305,7 +305,7 @@ export default function PerfilUsuario() {
 
             {/* Endereço */}
             <div>
-              <label className="block text-sm font-semibold text-walmart-text mb-2">
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Endereço (opcional)
               </label>
               <input
@@ -316,7 +316,7 @@ export default function PerfilUsuario() {
                 className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-1 transition-colors ${
                   errors.endereco
                     ? "border-red-500 focus:border-red-500 focus:ring-red-500 bg-red-50"
-                    : "border-gray-300 focus:border-walmart-blue focus:ring-walmart-blue"
+                    : "border-gray-300 focus:border-vitrii-blue focus:ring-vitrii-blue"
                 }`}
               />
               {errors.endereco && (
@@ -328,8 +328,8 @@ export default function PerfilUsuario() {
             </div>
 
             {/* Info Box */}
-            <div className="bg-yellow-50 border-l-4 border-walmart-yellow rounded p-4">
-              <p className="text-sm text-walmart-text">
+            <div className="bg-yellow-50 border-l-4 border-vitrii-yellow rounded p-4">
+              <p className="text-sm text-vitrii-text">
                 💡 Essas informações ajudam seus clientes a te localizarem e
                 facilitam a entrega de pedidos.
               </p>
@@ -340,14 +340,14 @@ export default function PerfilUsuario() {
               <button
                 type="button"
                 onClick={() => navigate("/sell")}
-                className="flex-1 px-4 py-3 border-2 border-walmart-blue text-walmart-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+                className="flex-1 px-4 py-3 border-2 border-vitrii-blue text-vitrii-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors"
               >
                 Pular por Enquanto
               </button>
               <button
                 type="submit"
                 disabled={updateMutation.isPending}
-                className="flex-1 px-4 py-3 bg-walmart-blue text-white rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                className="flex-1 px-4 py-3 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {updateMutation.isPending ? (
                   <>

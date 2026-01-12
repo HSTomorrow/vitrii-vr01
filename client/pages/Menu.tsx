@@ -47,9 +47,9 @@ export default function Menu() {
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                 aria-label="Voltar"
               >
-                <ArrowLeft className="w-6 h-6 text-walmart-text" />
+                <ArrowLeft className="w-6 h-6 text-vitrii-text" />
               </button>
-              <h1 className="text-2xl font-bold text-walmart-text">Menu</h1>
+              <h1 className="text-2xl font-bold text-vitrii-text">Menu</h1>
             </div>
           </div>
         </div>
@@ -58,26 +58,26 @@ export default function Menu() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Main Navigation */}
           <section className="mb-8">
-            <h2 className="text-lg font-semibold text-walmart-text mb-4">
+            <h2 className="text-lg font-semibold text-vitrii-text mb-4">
               Navegação
             </h2>
             <div className="space-y-2">
               <Link
                 to="/"
-                className="flex items-center gap-4 px-6 py-4 bg-walmart-gray hover:bg-gray-200 rounded-lg transition-colors"
+                className="flex items-center gap-4 px-6 py-4 bg-vitrii-gray hover:bg-gray-200 rounded-lg transition-colors"
               >
-                <Home className="w-6 h-6 text-walmart-blue" />
-                <span className="text-walmart-text font-medium">
+                <Home className="w-6 h-6 text-vitrii-blue" />
+                <span className="text-vitrii-text font-medium">
                   Página Inicial
                 </span>
               </Link>
 
               <Link
                 to="/browse"
-                className="flex items-center gap-4 px-6 py-4 bg-walmart-gray hover:bg-gray-200 rounded-lg transition-colors"
+                className="flex items-center gap-4 px-6 py-4 bg-vitrii-gray hover:bg-gray-200 rounded-lg transition-colors"
               >
-                <ShoppingBag className="w-6 h-6 text-walmart-blue" />
-                <span className="text-walmart-text font-medium">
+                <ShoppingBag className="w-6 h-6 text-vitrii-blue" />
+                <span className="text-vitrii-text font-medium">
                   Ver Anúncios
                 </span>
               </Link>
@@ -85,10 +85,10 @@ export default function Menu() {
               {user && (
                 <Link
                   to="/anuncio/criar"
-                  className="flex items-center gap-4 px-6 py-4 bg-walmart-yellow hover:bg-walmart-yellow-dark rounded-lg transition-colors"
+                  className="flex items-center gap-4 px-6 py-4 bg-vitrii-yellow hover:bg-vitrii-yellow-dark rounded-lg transition-colors"
                 >
-                  <Plus className="w-6 h-6 text-walmart-text" />
-                  <span className="text-walmart-text font-bold">
+                  <Plus className="w-6 h-6 text-vitrii-text" />
+                  <span className="text-vitrii-text font-bold">
                     Publicar Anúncio
                   </span>
                 </Link>
@@ -97,27 +97,27 @@ export default function Menu() {
               {!user && (
                 <Link
                   to="/anuncio/criar"
-                  className="flex items-center gap-4 px-6 py-4 bg-walmart-yellow hover:bg-walmart-yellow-dark rounded-lg transition-colors"
+                  className="flex items-center gap-4 px-6 py-4 bg-vitrii-yellow hover:bg-vitrii-yellow-dark rounded-lg transition-colors"
                 >
-                  <Plus className="w-6 h-6 text-walmart-text" />
-                  <span className="text-walmart-text font-bold">Vender</span>
+                  <Plus className="w-6 h-6 text-vitrii-text" />
+                  <span className="text-vitrii-text font-bold">Vender</span>
                 </Link>
               )}
 
               <Link
                 to="/qrcode"
-                className="flex items-center gap-4 px-6 py-4 bg-walmart-gray hover:bg-gray-200 rounded-lg transition-colors"
+                className="flex items-center gap-4 px-6 py-4 bg-vitrii-gray hover:bg-gray-200 rounded-lg transition-colors"
               >
-                <QrCode className="w-6 h-6 text-walmart-blue" />
-                <span className="text-walmart-text font-medium">QR Code</span>
+                <QrCode className="w-6 h-6 text-vitrii-blue" />
+                <span className="text-vitrii-text font-medium">QR Code</span>
               </Link>
 
               <Link
                 to="/about"
-                className="flex items-center gap-4 px-6 py-4 bg-walmart-gray hover:bg-gray-200 rounded-lg transition-colors"
+                className="flex items-center gap-4 px-6 py-4 bg-vitrii-gray hover:bg-gray-200 rounded-lg transition-colors"
               >
-                <Info className="w-6 h-6 text-walmart-blue" />
-                <span className="text-walmart-text font-medium">Sobre Nós</span>
+                <Info className="w-6 h-6 text-vitrii-blue" />
+                <span className="text-vitrii-text font-medium">Sobre Nós</span>
               </Link>
             </div>
           </section>
@@ -126,36 +126,36 @@ export default function Menu() {
           {user && (
             <>
               <section className="mb-8">
-                <h2 className="text-lg font-semibold text-walmart-text mb-4">
+                <h2 className="text-lg font-semibold text-vitrii-text mb-4">
                   Minha Conta
                 </h2>
                 <div className="space-y-2">
                   <Link
                     to="/meus-anuncios"
-                    className="flex items-center gap-4 px-6 py-4 bg-walmart-gray hover:bg-gray-200 rounded-lg transition-colors"
+                    className="flex items-center gap-4 px-6 py-4 bg-vitrii-gray hover:bg-gray-200 rounded-lg transition-colors"
                   >
-                    <Package className="w-6 h-6 text-walmart-blue" />
-                    <span className="text-walmart-text font-medium">
+                    <Package className="w-6 h-6 text-vitrii-blue" />
+                    <span className="text-vitrii-text font-medium">
                       Meus Anúncios
                     </span>
                   </Link>
 
                   <Link
                     to="/favoritos"
-                    className="flex items-center gap-4 px-6 py-4 bg-walmart-gray hover:bg-gray-200 rounded-lg transition-colors"
+                    className="flex items-center gap-4 px-6 py-4 bg-vitrii-gray hover:bg-gray-200 rounded-lg transition-colors"
                   >
                     <Heart className="w-6 h-6 text-red-500" />
-                    <span className="text-walmart-text font-medium">
+                    <span className="text-vitrii-text font-medium">
                       Meus Favoritos
                     </span>
                   </Link>
 
                   <Link
                     to="/chat"
-                    className="flex items-center gap-4 px-6 py-4 bg-walmart-gray hover:bg-gray-200 rounded-lg transition-colors"
+                    className="flex items-center gap-4 px-6 py-4 bg-vitrii-gray hover:bg-gray-200 rounded-lg transition-colors"
                   >
-                    <FileText className="w-6 h-6 text-walmart-blue" />
-                    <span className="text-walmart-text font-medium">
+                    <FileText className="w-6 h-6 text-vitrii-blue" />
+                    <span className="text-vitrii-text font-medium">
                       Minhas Mensagens
                     </span>
                   </Link>
@@ -164,66 +164,66 @@ export default function Menu() {
 
               {/* Cadastros Section */}
               <section className="mb-8">
-                <h2 className="text-lg font-semibold text-walmart-text mb-4">
+                <h2 className="text-lg font-semibold text-vitrii-text mb-4">
                   Cadastros
                 </h2>
                 <div className="space-y-2">
                   <Link
                     to="/cadastros/lojas"
-                    className="flex items-center gap-4 px-6 py-4 bg-walmart-gray hover:bg-gray-200 rounded-lg transition-colors"
+                    className="flex items-center gap-4 px-6 py-4 bg-vitrii-gray hover:bg-gray-200 rounded-lg transition-colors"
                   >
-                    <Store className="w-6 h-6 text-walmart-blue" />
-                    <span className="text-walmart-text font-medium">
+                    <Store className="w-6 h-6 text-vitrii-blue" />
+                    <span className="text-vitrii-text font-medium">
                       Cadastro de Lojas
                     </span>
                   </Link>
 
                   <Link
                     to="/cadastros/grupos-productos"
-                    className="flex items-center gap-4 px-6 py-4 bg-walmart-gray hover:bg-gray-200 rounded-lg transition-colors"
+                    className="flex items-center gap-4 px-6 py-4 bg-vitrii-gray hover:bg-gray-200 rounded-lg transition-colors"
                   >
-                    <Grid className="w-6 h-6 text-walmart-blue" />
-                    <span className="text-walmart-text font-medium">
+                    <Grid className="w-6 h-6 text-vitrii-blue" />
+                    <span className="text-vitrii-text font-medium">
                       Grupos de Produtos
                     </span>
                   </Link>
 
                   <Link
                     to="/cadastros/productos"
-                    className="flex items-center gap-4 px-6 py-4 bg-walmart-gray hover:bg-gray-200 rounded-lg transition-colors"
+                    className="flex items-center gap-4 px-6 py-4 bg-vitrii-gray hover:bg-gray-200 rounded-lg transition-colors"
                   >
-                    <ShoppingBag className="w-6 h-6 text-walmart-blue" />
-                    <span className="text-walmart-text font-medium">
+                    <ShoppingBag className="w-6 h-6 text-vitrii-blue" />
+                    <span className="text-vitrii-text font-medium">
                       Cadastro de Produtos
                     </span>
                   </Link>
 
                   <Link
                     to="/cadastros/tabelas-preco"
-                    className="flex items-center gap-4 px-6 py-4 bg-walmart-gray hover:bg-gray-200 rounded-lg transition-colors"
+                    className="flex items-center gap-4 px-6 py-4 bg-vitrii-gray hover:bg-gray-200 rounded-lg transition-colors"
                   >
-                    <Tag className="w-6 h-6 text-walmart-blue" />
-                    <span className="text-walmart-text font-medium">
+                    <Tag className="w-6 h-6 text-vitrii-blue" />
+                    <span className="text-vitrii-text font-medium">
                       Tabelas de Preço
                     </span>
                   </Link>
 
                   <Link
                     to="/cadastros/variantes"
-                    className="flex items-center gap-4 px-6 py-4 bg-walmart-gray hover:bg-gray-200 rounded-lg transition-colors"
+                    className="flex items-center gap-4 px-6 py-4 bg-vitrii-gray hover:bg-gray-200 rounded-lg transition-colors"
                   >
-                    <Layers className="w-6 h-6 text-walmart-blue" />
-                    <span className="text-walmart-text font-medium">
+                    <Layers className="w-6 h-6 text-vitrii-blue" />
+                    <span className="text-vitrii-text font-medium">
                       Variantes
                     </span>
                   </Link>
 
                   <Link
                     to="/cadastros/equipes-venda"
-                    className="flex items-center gap-4 px-6 py-4 bg-walmart-gray hover:bg-gray-200 rounded-lg transition-colors"
+                    className="flex items-center gap-4 px-6 py-4 bg-vitrii-gray hover:bg-gray-200 rounded-lg transition-colors"
                   >
-                    <Users className="w-6 h-6 text-walmart-blue" />
-                    <span className="text-walmart-text font-medium">
+                    <Users className="w-6 h-6 text-vitrii-blue" />
+                    <span className="text-vitrii-text font-medium">
                       Equipes de Venda
                     </span>
                   </Link>
@@ -233,7 +233,7 @@ export default function Menu() {
               {/* Admin Section (only for admins) */}
               {user.tipoUsuario === "adm" && (
                 <section className="mb-8">
-                  <h2 className="text-lg font-semibold text-walmart-text mb-4">
+                  <h2 className="text-lg font-semibold text-vitrii-text mb-4">
                     Administração
                   </h2>
                   <div className="space-y-2">
@@ -264,7 +264,7 @@ export default function Menu() {
 
           {/* Authentication Section */}
           <section>
-            <h2 className="text-lg font-semibold text-walmart-text mb-4">
+            <h2 className="text-lg font-semibold text-vitrii-text mb-4">
               {user ? "Conta" : "Autenticação"}
             </h2>
             <div className="space-y-2">
@@ -306,7 +306,7 @@ export default function Menu() {
 
                   <Link
                     to="/auth/signup"
-                    className="flex items-center gap-4 px-6 py-4 bg-walmart-blue hover:bg-walmart-blue-dark rounded-lg transition-colors text-white"
+                    className="flex items-center gap-4 px-6 py-4 bg-vitrii-blue hover:bg-vitrii-blue-dark rounded-lg transition-colors text-white"
                   >
                     <UserPlus className="w-6 h-6" />
                     <span className="font-medium">Criar Conta</span>
@@ -317,7 +317,7 @@ export default function Menu() {
           </section>
 
           {/* Footer Info */}
-          <div className="mt-12 pt-8 border-t border-gray-200 text-center text-sm text-walmart-text-secondary">
+          <div className="mt-12 pt-8 border-t border-gray-200 text-center text-sm text-vitrii-text-secondary">
             <p>Vitrii Marketplace © 2024</p>
           </div>
         </div>

@@ -13,7 +13,7 @@ export default function EditarAnuncio() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-walmart-gray-light">
+    <div className="min-h-screen flex flex-col bg-vitrii-gray-light">
       <Header />
       <main className="flex-1">
         <AnuncioForm 

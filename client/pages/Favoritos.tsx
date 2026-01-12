@@ -19,11 +19,11 @@ export default function Favoritos() {
         <Header />
         <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
           <div className="bg-blue-50 border-l-4 border-blue-500 rounded p-4 inline-block">
-            <p className="text-walmart-text">
+            <p className="text-vitrii-text">
               Por favor,{" "}
               <button
                 onClick={() => navigate("/auth/signin")}
-                className="text-walmart-blue font-semibold hover:underline"
+                className="text-vitrii-blue font-semibold hover:underline"
               >
                 faça login
               </button>{" "}
@@ -55,11 +55,11 @@ export default function Favoritos() {
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-12">
-          <h1 className="text-4xl font-bold text-walmart-text mb-2 flex items-center gap-3">
+          <h1 className="text-4xl font-bold text-vitrii-text mb-2 flex items-center gap-3">
             <Heart className="w-8 h-8 fill-red-500 text-red-500" />
             Meus Favoritos
           </h1>
-          <p className="text-walmart-text-secondary">
+          <p className="text-vitrii-text-secondary">
             {anuncios.length} anúncio{anuncios.length !== 1 ? "s" : ""} salvo
             {anuncios.length !== 1 ? "s" : ""}
           </p>
@@ -103,12 +103,12 @@ export default function Favoritos() {
         ) : (
           <div className="text-center py-12">
             <Heart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <p className="text-walmart-text-secondary text-lg mb-6">
+            <p className="text-vitrii-text-secondary text-lg mb-6">
               Você ainda não tem favoritos
             </p>
             <button
               onClick={() => navigate("/browse")}
-              className="inline-flex items-center gap-2 px-6 py-3 bg-walmart-blue text-white rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors"
             >
               <span>Explore Anúncios</span>
               <ArrowRight className="w-5 h-5" />
