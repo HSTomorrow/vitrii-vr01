@@ -139,6 +139,16 @@ export default function Index() {
     )
     .slice(0, 20);
 
+  const destaqueOportunidades = allAnuncios
+    .filter(
+      (anuncio: any) =>
+        anuncio.destaque &&
+        anuncio.isActive &&
+        !isGratis(anuncio) &&
+        anuncio.tipo === "oportunidade",
+    )
+    .slice(0, 20);
+
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
