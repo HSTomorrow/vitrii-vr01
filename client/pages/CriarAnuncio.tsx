@@ -68,6 +68,7 @@ export default function CriarAnuncio() {
         <AnuncioForm
           onSuccess={() => navigate("/sell")}
           isDonation={isDonation}
+          anuncioTipo={anuncioTipo}
         />
       </main>
       <Footer />
