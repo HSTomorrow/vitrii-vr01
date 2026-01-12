@@ -15,6 +15,7 @@ interface ImageGalleryProps {
   canDelete?: boolean;
   onPhotoDeleted?: (fotoId: number) => void;
   onReorder?: (fotosOrder: Array<{ id: number; ordem: number }>) => void;
+  anuncianteFotoUrl?: string | null;
 }
 
 const ImageGallery: React.FC<ImageGalleryProps> = ({
