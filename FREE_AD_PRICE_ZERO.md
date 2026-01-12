@@ -1,15 +1,18 @@
 # Anúncios Gratuitos com Preço Zero no Banco
 
 ## Feature Implementada
+
 Quando um anúncio é marcado como "Este produto/serviço/evento é gratuito" (checkbox `isDoacao=true`), o valor é **sempre gravado como 0** no banco de dados, nunca como NULL.
 
 ## O Que Mudou
 
 ### Antes
+
 - Quando `isDoacao=true`, o preço era gravado como `NULL` no banco
 - O campo de preço no formulário era limpo para uma string vazia
 
 ### Depois
+
 - ✅ Quando `isDoacao=true`, o preço é gravado como `0` no banco
 - ✅ O campo de preço no formulário mostra `0` quando marcado como gratuito
 - ✅ Consistência: preço sempre é um valor, nunca NULL para itens gratuitos
@@ -17,63 +20,75 @@ Quando um anúncio é marcado como "Este produto/serviço/evento é gratuito" (c
 ## Implementação Técnica
 
 ### Frontend Changes
+
 **File:** `client/components/AnuncioForm.tsx` (linha 591)
 
 **Antes:**
+
 ```typescript
 if (isChecked) {
-  handleInputChange("precoAnuncio", "");  // ← String vazia
+  handleInputChange("precoAnuncio", ""); // ← String vazia
 }
 ```
 
 **Depois:**
+
 ```typescript
 if (isChecked) {
-  handleInputChange("precoAnuncio", "0");  // ← Zero
+  handleInputChange("precoAnuncio", "0"); // ← Zero
 }
 ```
 
 ### Backend Changes
+
 **File:** `server/routes/anuncios.ts`
 
 #### 1. Create Anúncio (linha 288)
+
 **Antes:**
+
 ```typescript
 const precoAnuncio = isDoacao ? null : validatedData.precoAnuncio;
 ```
 
 **Depois:**
+
 ```typescript
 const precoAnuncio = isDoacao ? 0 : validatedData.precoAnuncio;
 ```
 
 #### 2. Update Anúncio (linha 377)
+
 **Antes:**
+
 ```typescript
 if (updateData.isDoacao === true) {
   updateData.status = "pago";
-  updateData.precoAnuncio = null;  // ← NULL
+  updateData.precoAnuncio = null; // ← NULL
 }
 ```
 
 **Depois:**
+
 ```typescript
 if (updateData.isDoacao === true) {
   updateData.status = "pago";
-  updateData.precoAnuncio = 0;  // ← Zero
+  updateData.precoAnuncio = 0; // ← Zero
 }
 ```
 
 ## Fluxo Completo
 
 ### Criar Anúncio Gratuito
-1. Usuário clica em "Publicar Grátis" 
+
+1. Usuário clica em "Publicar Grátis"
 2. Checkbox "Este produto/serviço/evento é gratuito" vem **pré-selecionado**
 3. Campo de preço mostra **"0"** e está **desabilitado**
 4. Usuário preenche dados e clica "Salvar"
 5. **Banco de dados recebe:** `preco = 0` (não NULL)
 
 ### Editar Anúncio e Marcar como Gratuito
+
 1. Usuário abre um anúncio pago
 2. Seleciona o checkbox "Este produto/serviço/evento é gratuito"
 3. Campo de preço muda para **"0"** e fica **desabilitado**
@@ -83,8 +98,9 @@ if (updateData.isDoacao === true) {
 ## Banco de Dados
 
 ### Antes (NULL)
+
 ```sql
-SELECT id, titulo, preco, isDoacao FROM anuncios 
+SELECT id, titulo, preco, isDoacao FROM anuncios
 WHERE isDoacao = true;
 
 id  | titulo           | preco | isDoacao
@@ -94,8 +110,9 @@ id  | titulo           | preco | isDoacao
 ```
 
 ### Depois (Zero)
+
 ```sql
-SELECT id, titulo, preco, isDoacao FROM anuncios 
+SELECT id, titulo, preco, isDoacao FROM anuncios
 WHERE isDoacao = true;
 
 id  | titulo           | preco | isDoacao
@@ -139,6 +156,7 @@ Para verificar a funcionalidade:
    - Agora funciona com preco = 0 (antes era NULL)
 
 ## Status
+
 ✅ **IMPLEMENTADO E ATIVO**
 
 Todos os anúncios gratuitos criados ou editados a partir de agora terão `preco = 0` no banco de dados.

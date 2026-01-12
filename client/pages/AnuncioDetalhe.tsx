@@ -170,7 +170,9 @@ export default function AnuncioDetalhe() {
       return response.json();
     },
     onSuccess: (data) => {
-      toast.success(data.data?.message || "Status de destaque alterado com sucesso");
+      toast.success(
+        data.data?.message || "Status de destaque alterado com sucesso",
+      );
       queryClient.invalidateQueries({ queryKey: ["anuncio", id] });
       queryClient.invalidateQueries({ queryKey: ["anuncios"] });
     },
@@ -348,7 +350,9 @@ export default function AnuncioDetalhe() {
                     }`}
                   >
                     <Star className="w-4 h-4" />
-                    {anuncio.destaque ? "Remover do Destaque" : "Adicionar ao Destaque"}
+                    {anuncio.destaque
+                      ? "Remover do Destaque"
+                      : "Adicionar ao Destaque"}
                   </button>
                 )}
                 <button
@@ -469,8 +473,7 @@ export default function AnuncioDetalhe() {
                 <p className="text-sm opacity-90 mb-1">Preço</p>
                 <div className="flex items-baseline">
                   <span className="text-4xl font-bold">
-                    R${" "}
-                    {Number(anuncio.preco || 0).toFixed(2)}
+                    R$ {Number(anuncio.preco || 0).toFixed(2)}
                   </span>
                 </div>
                 {anuncio.isDoacao && (

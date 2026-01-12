@@ -1,15 +1,18 @@
 # Criar Anúncio Gratuito - Formulário Pré-preenchido
 
 ## Feature Implementada
+
 Adicionado botão "Publicar Grátis" na seção "Doações, Brindes e Serviços Gratuitos" da homepage, que leva o usuário para o formulário de criação de anúncio com os campos já configurados para um item gratuito.
 
 ## O Que Funciona
 
 ### Desktop (md+)
+
 - Novo botão verde "Publicar Grátis" aparece ao lado de "Ver Todos" na seção de gratuitos
 - Botão leva para `/anuncio/criar?tipo=doacao`
 
 ### Mobile (<md)
+
 - Botão "Publicar Grátis" aparece acima de "Ver Todos os Itens Gratuitos"
 - Mesmo comportamento: leva para `/anuncio/criar?tipo=doacao`
 
@@ -29,9 +32,11 @@ Adicionado botão "Publicar Grátis" na seção "Doações, Brindes e Serviços 
 ## Implementação Técnica
 
 ### Componentes Afetados
+
 **File:** `client/pages/Index.tsx`
 
 #### Adições na Seção de Gratuitos (Desktop)
+
 ```jsx
 <div className="hidden md:flex items-center space-x-4">
   <Link
@@ -52,6 +57,7 @@ Adicionado botão "Publicar Grátis" na seção "Doações, Brindes e Serviços 
 ```
 
 #### Adições na Seção de Gratuitos (Mobile)
+
 ```jsx
 <div className="text-center mt-8 space-y-4">
   <Link
@@ -76,25 +82,27 @@ Adicionado botão "Publicar Grátis" na seção "Doações, Brindes e Serviços 
 ### Componentes Existentes que Suportam Isso
 
 #### CriarAnuncio.tsx
+
 Já detecta o parâmetro `?tipo=doacao`:
+
 ```typescript
 const isDonation = searchParams.get("tipo") === "doacao";
 ```
 
 E passa para o formulário:
+
 ```jsx
-<AnuncioForm
-  onSuccess={() => navigate("/sell")}
-  isDonation={isDonation}
-/>
+<AnuncioForm onSuccess={() => navigate("/sell")} isDonation={isDonation} />
 ```
 
 #### AnuncioForm.tsx
+
 Já tem suporte para pré-preencher o campo:
+
 ```typescript
 const [formData, setFormData] = useState({
   // ... outros campos
-  isDoacao: isDonation || false,  // ← Usa a prop
+  isDoacao: isDonation || false, // ← Usa a prop
   // ... outros campos
 });
 ```

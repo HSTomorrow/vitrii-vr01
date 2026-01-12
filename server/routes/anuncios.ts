@@ -914,11 +914,7 @@ export const getAnunciosDUsuario: RequestHandler = async (req, res) => {
       });
     }
 
-    const {
-      status,
-      limit = "20",
-      offset = "0",
-    } = req.query;
+    const { status, limit = "20", offset = "0" } = req.query;
 
     const pageLimit = Math.min(
       Math.max(parseInt(limit as string) || 20, 1),

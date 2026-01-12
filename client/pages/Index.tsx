@@ -99,7 +99,8 @@ export default function Index() {
 
   // Filter anuncios by type and gratuito status
   // Helper to check if an anuncio is free (donation or price = 0)
-  const isGratis = (anuncio: any) => anuncio.isDoacao || (anuncio.preco === 0 || anuncio.preco === "0");
+  const isGratis = (anuncio: any) =>
+    anuncio.isDoacao || anuncio.preco === 0 || anuncio.preco === "0";
 
   const destacados = allAnuncios
     .filter(
@@ -114,9 +115,7 @@ export default function Index() {
   const destaqueDoacoes = allAnuncios
     .filter(
       (anuncio: any) =>
-        anuncio.destaque &&
-        anuncio.isActive &&
-        isGratis(anuncio),
+        anuncio.destaque && anuncio.isActive && isGratis(anuncio),
     )
     .slice(0, 20);
 
@@ -194,9 +193,7 @@ export default function Index() {
             anuncios={destacados}
             isLoading={allAnunciosLoading}
             isFavorited={(id) => favoritos.has(id)}
-            onToggleFavorito={(id) =>
-              toggleFavoritoMutation.mutate(id)
-            }
+            onToggleFavorito={(id) => toggleFavoritoMutation.mutate(id)}
             emptyMessage="Nenhum anúncio em destaque publicado ainda"
             color="blue"
           />
@@ -249,9 +246,7 @@ export default function Index() {
             anuncios={destaqueDoacoes}
             isLoading={allAnunciosLoading}
             isFavorited={(id) => favoritos.has(id)}
-            onToggleFavorito={(id) =>
-              toggleFavoritoMutation.mutate(id)
-            }
+            onToggleFavorito={(id) => toggleFavoritoMutation.mutate(id)}
             emptyMessage="Nenhum item gratuito publicado ainda"
             color="green"
           />
@@ -303,9 +298,7 @@ export default function Index() {
             anuncios={destaqueEventos}
             isLoading={allAnunciosLoading}
             isFavorited={(id) => favoritos.has(id)}
-            onToggleFavorito={(id) =>
-              toggleFavoritoMutation.mutate(id)
-            }
+            onToggleFavorito={(id) => toggleFavoritoMutation.mutate(id)}
             emptyMessage="Nenhum evento publicado ainda"
             color="purple"
           />
@@ -348,9 +341,7 @@ export default function Index() {
             anuncios={destaqueAgendas}
             isLoading={allAnunciosLoading}
             isFavorited={(id) => favoritos.has(id)}
-            onToggleFavorito={(id) =>
-              toggleFavoritoMutation.mutate(id)
-            }
+            onToggleFavorito={(id) => toggleFavoritoMutation.mutate(id)}
             emptyMessage="Nenhuma agenda recorrente publicada ainda"
             color="orange"
           />
