@@ -98,8 +98,20 @@ export default function AnuncioDetalhe() {
     enabled: !!selectedEquipeId,
   });
 
+  // Fetch photos for the ad
+  const { data: fotosData } = useQuery({
+    queryKey: ["anuncio-fotos", id],
+    queryFn: async () => {
+      const response = await fetch(`/api/anuncios/${id}/fotos`);
+      if (!response.ok) throw new Error("Erro ao buscar fotos");
+      return response.json();
+    },
+    enabled: !!id,
+  });
+
   const equipes = equipesData?.data || [];
   const membros = membrosData?.data || [];
+  const fotos = fotosData?.data || [];
 
   // Check if there are any available members in any team
   const temMembrosDisponiveis = equipes.some((equipe) =>
