@@ -11,6 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 interface Anunciante {
   id: number;
   nome: string;
+  tipo?: string;
   cnpj?: string;
   endereco: string;
   cidade: string;
