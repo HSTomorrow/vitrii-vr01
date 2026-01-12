@@ -503,6 +503,45 @@ export default function CadastroAnunciantes() {
                 />
               </div>
 
+              <div className="space-y-3">
+                <label className="block text-sm font-semibold text-vitrii-text">
+                  Foto da Anunciante (Opcional)
+                </label>
+                {formData.fotoUrl && (
+                  <div className="relative">
+                    <ImageZoom
+                      src={formData.fotoUrl}
+                      alt="Foto da anunciante"
+                      containerClassName="w-full h-48"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, fotoUrl: "" })}
+                      className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
+                <label className="flex items-center gap-2 px-4 py-3 border-2 border-dashed border-vitrii-blue rounded-lg cursor-pointer hover:bg-blue-50 transition-colors">
+                  <Upload className="w-5 h-5 text-vitrii-blue" />
+                  <span className="text-sm font-semibold text-vitrii-blue">
+                    {formData.fotoUrl ? "Alterar Foto" : "Adicionar Foto"}
+                  </span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        handleFileUpload(file);
+                      }
+                    }}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+
               <div className="flex gap-4">
                 <button
                   type="submit"
