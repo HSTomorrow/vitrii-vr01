@@ -98,18 +98,26 @@ export default function Index() {
   const allAnuncios = allAnunciosData?.data || [];
 
   // Filter anuncios by type and gratuito status
+  // Helper to check if an anuncio is free (donation or price = 0)
+  const isGratis = (anuncio: any) => anuncio.isDoacao || (anuncio.preco === 0 || anuncio.preco === "0");
+
   const destacados = allAnuncios
     .filter(
       (anuncio: any) =>
         anuncio.destaque &&
         anuncio.isActive &&
-        !anuncio.isDoacao &&
+        !isGratis(anuncio) &&
         ["produto", "servico"].includes(anuncio.tipo),
     )
     .slice(0, 20);
 
   const destaqueDoacoes = allAnuncios
-    .filter((anuncio: any) => anuncio.destaque && anuncio.isActive && anuncio.isDoacao)
+    .filter(
+      (anuncio: any) =>
+        anuncio.destaque &&
+        anuncio.isActive &&
+        isGratis(anuncio),
+    )
     .slice(0, 20);
 
   const destaqueEventos = allAnuncios
@@ -117,7 +125,7 @@ export default function Index() {
       (anuncio: any) =>
         anuncio.destaque &&
         anuncio.isActive &&
-        !anuncio.isDoacao &&
+        !isGratis(anuncio) &&
         anuncio.tipo === "evento",
     )
     .slice(0, 20);
@@ -127,7 +135,7 @@ export default function Index() {
       (anuncio: any) =>
         anuncio.destaque &&
         anuncio.isActive &&
-        !anuncio.isDoacao &&
+        !isGratis(anuncio) &&
         anuncio.tipo === "agenda_recorrente",
     )
     .slice(0, 20);
