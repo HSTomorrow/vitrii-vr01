@@ -53,7 +53,11 @@ export default function MeusAnuncios() {
   const { data: anunciosData, isLoading, refetch } = useQuery({
     queryKey: ["meus-anuncios", user?.id],
     queryFn: async () => {
-      const response = await fetch("/api/anuncios/do-usuario/listar");
+      const response = await fetch("/api/anuncios/do-usuario/listar", {
+        headers: {
+          "x-user-id": String(user?.id),
+        },
+      });
       if (!response.ok) throw new Error("Erro ao buscar anúncios");
       return response.json();
     },
