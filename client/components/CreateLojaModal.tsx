@@ -142,7 +142,7 @@ export default function CreateAnuncianteModal({
       <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-walmart-text">
+          <h2 className="text-xl font-bold text-vitrii-text">
             Novo Anunciante
           </h2>
           <button
@@ -157,7 +157,7 @@ export default function CreateAnuncianteModal({
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {/* Nome */}
           <div>
-            <label className="block text-sm font-semibold text-walmart-text mb-2">
+            <label className="block text-sm font-semibold text-vitrii-text mb-2">
               Nome do Anunciante *
             </label>
             <input
@@ -165,13 +165,13 @@ export default function CreateAnuncianteModal({
               value={formData.nome}
               onChange={(e) => handleInputChange("nome", e.target.value)}
               placeholder="Ex: Anunciante Central"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
             />
           </div>
 
           {/* CNPJ/CPF */}
           <div>
-            <label className="block text-sm font-semibold text-walmart-text mb-2">
+            <label className="block text-sm font-semibold text-vitrii-text mb-2">
               CNPJ/CPF *
             </label>
             <input
@@ -184,13 +184,13 @@ export default function CreateAnuncianteModal({
                 )
               }
               placeholder="Ex: 12345678901234"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
             />
           </div>
 
           {/* Email */}
           <div>
-            <label className="block text-sm font-semibold text-walmart-text mb-2">
+            <label className="block text-sm font-semibold text-vitrii-text mb-2">
               Email *
             </label>
             <input
@@ -198,13 +198,13 @@ export default function CreateAnuncianteModal({
               value={formData.email}
               onChange={(e) => handleInputChange("email", e.target.value)}
               placeholder="Ex: contato@anunciante.com"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
             />
           </div>
 
           {/* Endereço */}
           <div>
-            <label className="block text-sm font-semibold text-walmart-text mb-2">
+            <label className="block text-sm font-semibold text-vitrii-text mb-2">
               Endereço *
             </label>
             <input
@@ -212,14 +212,14 @@ export default function CreateAnuncianteModal({
               value={formData.endereco}
               onChange={(e) => handleInputChange("endereco", e.target.value)}
               placeholder="Ex: Rua Principal, 123"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
             />
           </div>
 
           {/* Cidade and Estado */}
           <div className="grid grid-cols-3 gap-4">
             <div className="col-span-2">
-              <label className="block text-sm font-semibold text-walmart-text mb-2">
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Cidade *
               </label>
               <input
@@ -227,17 +227,17 @@ export default function CreateAnuncianteModal({
                 value={formData.cidade}
                 onChange={(e) => handleInputChange("cidade", e.target.value)}
                 placeholder="Ex: Belo Horizonte"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-walmart-text mb-2">
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Estado *
               </label>
               <select
                 value={formData.estado}
                 onChange={(e) => handleInputChange("estado", e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent bg-white"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent bg-white"
               >
                 {BRAZILIAN_STATES.map((state) => (
                   <option key={state.code} value={state.code}>
@@ -250,7 +250,7 @@ export default function CreateAnuncianteModal({
 
           {/* Descrição */}
           <div>
-            <label className="block text-sm font-semibold text-walmart-text mb-2">
+            <label className="block text-sm font-semibold text-vitrii-text mb-2">
               Descrição (Opcional)
             </label>
             <textarea
@@ -258,13 +258,13 @@ export default function CreateAnuncianteModal({
               onChange={(e) => handleInputChange("descricao", e.target.value)}
               placeholder="Descreva sua loja..."
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
             />
           </div>
 
           {/* Site */}
           <div>
-            <label className="block text-sm font-semibold text-walmart-text mb-2">
+            <label className="block text-sm font-semibold text-vitrii-text mb-2">
               Site (Opcional)
             </label>
             <input
@@ -272,13 +272,13 @@ export default function CreateAnuncianteModal({
               value={formData.site}
               onChange={(e) => handleInputChange("site", e.target.value)}
               placeholder="Ex: https://www.anunciante.com"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
             />
           </div>
 
           {/* Instagram */}
           <div>
-            <label className="block text-sm font-semibold text-walmart-text mb-2">
+            <label className="block text-sm font-semibold text-vitrii-text mb-2">
               Instagram (Opcional)
             </label>
             <input
@@ -286,13 +286,13 @@ export default function CreateAnuncianteModal({
               value={formData.instagram}
               onChange={(e) => handleInputChange("instagram", e.target.value)}
               placeholder="Ex: @loja"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
             />
           </div>
 
           {/* Facebook */}
           <div>
-            <label className="block text-sm font-semibold text-walmart-text mb-2">
+            <label className="block text-sm font-semibold text-vitrii-text mb-2">
               Facebook (Opcional)
             </label>
             <input
@@ -300,13 +300,13 @@ export default function CreateAnuncianteModal({
               value={formData.facebook}
               onChange={(e) => handleInputChange("facebook", e.target.value)}
               placeholder="Ex: /lojaoficial"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
             />
           </div>
 
           {/* WhatsApp */}
           <div>
-            <label className="block text-sm font-semibold text-walmart-text mb-2">
+            <label className="block text-sm font-semibold text-vitrii-text mb-2">
               WhatsApp (Opcional)
             </label>
             <div className="flex items-center gap-0">
@@ -327,10 +327,10 @@ export default function CreateAnuncianteModal({
                   handleInputChange("whatsapp", "+55" + cleanValue);
                 }}
                 placeholder="(51) 98765-4321"
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-r-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
               />
             </div>
-            <p className="text-xs text-walmart-text-secondary mt-1">
+            <p className="text-xs text-vitrii-text-secondary mt-1">
               Digite apenas DDD e número (ex: 51 98765-4321)
             </p>
           </div>
@@ -340,14 +340,14 @@ export default function CreateAnuncianteModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border-2 border-walmart-blue text-walmart-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+              className="flex-1 px-4 py-2 border-2 border-vitrii-blue text-vitrii-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={mutation.isPending}
-              className="flex-1 px-4 py-2 bg-walmart-blue text-white rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors disabled:opacity-50"
+              className="flex-1 px-4 py-2 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors disabled:opacity-50"
             >
               {mutation.isPending ? "Criando..." : "Criar Anunciante"}
             </button>

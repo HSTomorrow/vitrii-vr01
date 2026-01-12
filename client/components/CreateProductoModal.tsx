@@ -174,7 +174,7 @@ export default function CreateProductoModal({
         <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
           {/* Header */}
           <div className="sticky top-0 bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-            <h2 className="text-xl font-bold text-walmart-text">
+            <h2 className="text-xl font-bold text-vitrii-text">
               Criar Novo Produto
             </h2>
             <button
@@ -190,13 +190,13 @@ export default function CreateProductoModal({
             {/* Grupo Selection */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-semibold text-walmart-text">
+                <label className="block text-sm font-semibold text-vitrii-text">
                   Grupo de Produtos *
                 </label>
                 <button
                   type="button"
                   onClick={() => setShowCreateGrupo(true)}
-                  className="inline-flex items-center gap-1 px-3 py-1 text-sm bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors"
+                  className="inline-flex items-center gap-1 px-3 py-1 text-sm bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors"
                 >
                   <Plus className="w-4 h-4" />
                   Novo Grupo
@@ -205,7 +205,7 @@ export default function CreateProductoModal({
               <select
                 value={formData.grupoId}
                 onChange={(e) => handleInputChange("grupoId", e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
               >
                 <option value={0}>Selecione um grupo</option>
                 {grupos.map((grupo: any) => (
@@ -218,7 +218,7 @@ export default function CreateProductoModal({
 
             {/* Nome */}
             <div>
-              <label className="block text-sm font-semibold text-walmart-text mb-2">
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Nome do Produto *
               </label>
               <input
@@ -226,13 +226,13 @@ export default function CreateProductoModal({
                 value={formData.nome}
                 onChange={(e) => handleInputChange("nome", e.target.value)}
                 placeholder="Ex: Camiseta Azul"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
               />
             </div>
 
             {/* Descrição */}
             <div>
-              <label className="block text-sm font-semibold text-walmart-text mb-2">
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Descrição (Opcional)
               </label>
               <textarea
@@ -240,13 +240,13 @@ export default function CreateProductoModal({
                 onChange={(e) => handleInputChange("descricao", e.target.value)}
                 placeholder="Descreva o produto..."
                 rows={3}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
               />
             </div>
 
             {/* SKU */}
             <div>
-              <label className="block text-sm font-semibold text-walmart-text mb-2">
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Codigo Identificacao \ QRCode (SKU) (Opcional)
               </label>
               <input
@@ -254,26 +254,26 @@ export default function CreateProductoModal({
                 value={formData.sku}
                 onChange={(e) => handleInputChange("sku", e.target.value)}
                 placeholder="Ex: CAM-001"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
               />
             </div>
 
             {/* Tipo */}
             <div>
-              <label className="block text-sm font-semibold text-walmart-text mb-2">
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Tipo *
               </label>
               <select
                 value={formData.tipo}
                 onChange={(e) => handleInputChange("tipo", e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
               >
                 <option value="produto">Produto</option>
                 <option value="servico">Serviço</option>
                 <option value="evento">Evento</option>
                 <option value="agenda_recorrente">Agenda Recorrente</option>
               </select>
-              <p className="mt-2 text-sm text-walmart-text-secondary">
+              <p className="mt-2 text-sm text-vitrii-text-secondary">
                 {formData.tipo === "evento" &&
                   "Selecione este tipo para eventos e shows"}
                 {formData.tipo === "agenda_recorrente" &&
@@ -287,13 +287,13 @@ export default function CreateProductoModal({
             {["produto", "servico"].includes(formData.tipo) && (
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="block text-sm font-semibold text-walmart-text">
+                  <label className="block text-sm font-semibold text-vitrii-text">
                     Variantes (Tamanho/Cor e Preço) *
                   </label>
                   <button
                     type="button"
                     onClick={addTabelaRow}
-                    className="inline-flex items-center gap-1 px-3 py-1 text-sm border border-walmart-blue text-walmart-blue rounded-lg hover:bg-blue-50 transition-colors"
+                    className="inline-flex items-center gap-1 px-3 py-1 text-sm border border-vitrii-blue text-vitrii-blue rounded-lg hover:bg-blue-50 transition-colors"
                   >
                     <Plus className="w-4 h-4" />
                     Adicionar
@@ -311,7 +311,7 @@ export default function CreateProductoModal({
                           onChange={(e) =>
                             handleTabelaChange(index, "tamanho", e.target.value)
                           }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
                         />
                       </div>
                       <div className="flex-1">
@@ -322,12 +322,12 @@ export default function CreateProductoModal({
                           onChange={(e) =>
                             handleTabelaChange(index, "cor", e.target.value)
                           }
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
                         />
                       </div>
                       <div className="flex-1">
                         <div className="flex gap-2 items-center">
-                          <span className="text-sm text-walmart-text">R$</span>
+                          <span className="text-sm text-vitrii-text">R$</span>
                           <input
                             type="number"
                             step="0.01"
@@ -336,7 +336,7 @@ export default function CreateProductoModal({
                             onChange={(e) =>
                               handleTabelaChange(index, "preco", e.target.value)
                             }
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
                           />
                         </div>
                       </div>
@@ -352,7 +352,7 @@ export default function CreateProductoModal({
                     </div>
                   ))}
                 </div>
-                <p className="mt-2 text-sm text-walmart-text-secondary">
+                <p className="mt-2 text-sm text-vitrii-text-secondary">
                   Adicione pelo menos um preço para este produto
                 </p>
               </div>
@@ -363,14 +363,14 @@ export default function CreateProductoModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 px-4 py-2 border-2 border-walmart-blue text-walmart-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+                className="flex-1 px-4 py-2 border-2 border-vitrii-blue text-vitrii-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
                 disabled={mutation.isPending}
-                className="flex-1 px-4 py-2 bg-walmart-blue text-white rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors disabled:opacity-50"
+                className="flex-1 px-4 py-2 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors disabled:opacity-50"
               >
                 {mutation.isPending ? "Criando..." : "Criar Produto"}
               </button>

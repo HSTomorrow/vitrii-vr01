@@ -85,7 +85,7 @@ export default function CreateGrupoModal({
       <div className="bg-white rounded-lg shadow-lg max-w-xl w-full">
         {/* Header */}
         <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-walmart-text">
+          <h2 className="text-xl font-bold text-vitrii-text">
             Criar Novo Grupo de Produtos e Serviço
           </h2>
           <button
@@ -100,7 +100,7 @@ export default function CreateGrupoModal({
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {/* Nome */}
           <div>
-            <label className="block text-sm font-semibold text-walmart-text mb-2">
+            <label className="block text-sm font-semibold text-vitrii-text mb-2">
               Nome do Grupo *
             </label>
             <input
@@ -108,13 +108,13 @@ export default function CreateGrupoModal({
               value={formData.nome}
               onChange={(e) => handleInputChange("nome", e.target.value)}
               placeholder="Ex: Camisetas, Eletrônicos"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
             />
           </div>
 
           {/* Descrição */}
           <div>
-            <label className="block text-sm font-semibold text-walmart-text mb-2">
+            <label className="block text-sm font-semibold text-vitrii-text mb-2">
               Descrição (Opcional)
             </label>
             <textarea
@@ -122,7 +122,7 @@ export default function CreateGrupoModal({
               onChange={(e) => handleInputChange("descricao", e.target.value)}
               placeholder="Descreva o grupo de produtos..."
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
             />
           </div>
 
@@ -131,14 +131,14 @@ export default function CreateGrupoModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border-2 border-walmart-blue text-walmart-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+              className="flex-1 px-4 py-2 border-2 border-vitrii-blue text-vitrii-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={mutation.isPending}
-              className="flex-1 px-4 py-2 bg-walmart-blue text-white rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors disabled:opacity-50"
+              className="flex-1 px-4 py-2 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors disabled:opacity-50"
             >
               {mutation.isPending ? "Criando..." : "Criar Grupo"}
             </button>

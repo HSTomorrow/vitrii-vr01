@@ -488,7 +488,7 @@ export default function CadastroEquipeDeVenda() {
             </p>
             <button
               onClick={() => (window.location.href = "/cadastros/anunciantes")}
-              className="mt-4 px-4 py-2 bg-walmart-yellow text-walmart-text rounded-lg hover:bg-walmart-yellow-dark transition-colors font-semibold"
+              className="mt-4 px-4 py-2 bg-vitrii-yellow text-vitrii-text rounded-lg hover:bg-vitrii-yellow-dark transition-colors font-semibold"
             >
               Ir para Cadastro de Anunciantes
             </button>
@@ -507,12 +507,12 @@ export default function CadastroEquipeDeVenda() {
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <Users className="w-8 h-8 text-walmart-blue" />
-            <h1 className="text-3xl font-bold text-walmart-text">
+            <Users className="w-8 h-8 text-vitrii-blue" />
+            <h1 className="text-3xl font-bold text-vitrii-text">
               Equipes de Venda
             </h1>
           </div>
-          <p className="text-walmart-text-secondary mt-2">
+          <p className="text-vitrii-text-secondary mt-2">
             Organize seus usuários em equipes de vendas por loja
           </p>
         </div>
@@ -520,7 +520,7 @@ export default function CadastroEquipeDeVenda() {
         {/* Anunciante Selector */}
         {anunciantes.length > 1 && (
           <div className="mb-8">
-            <label className="block text-sm font-semibold text-walmart-text mb-3">
+            <label className="block text-sm font-semibold text-vitrii-text mb-3">
               Filtrar por Anunciante
             </label>
             <div className="flex flex-wrap gap-2">
@@ -531,8 +531,8 @@ export default function CadastroEquipeDeVenda() {
                   className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
                     (selectedAnuncianteId || defaultAnuncianteId) ===
                     anunciante.id
-                      ? "bg-walmart-blue text-white"
-                      : "bg-white text-walmart-text border border-gray-300 hover:border-walmart-blue"
+                      ? "bg-vitrii-blue text-white"
+                      : "bg-white text-vitrii-text border border-gray-300 hover:border-vitrii-blue"
                   }`}
                 >
                   {anunciante.nome}
@@ -550,7 +550,7 @@ export default function CadastroEquipeDeVenda() {
               setEditingId(null);
               setFormData({ nome: "", descricao: "" });
             }}
-            className="flex items-center gap-2 px-4 py-2 bg-walmart-yellow text-walmart-text rounded-lg hover:bg-walmart-yellow-dark transition-colors font-semibold"
+            className="flex items-center gap-2 px-4 py-2 bg-vitrii-yellow text-vitrii-text rounded-lg hover:bg-vitrii-yellow-dark transition-colors font-semibold"
           >
             <Plus className="w-5 h-5" />
             Nova Equipe
@@ -560,12 +560,12 @@ export default function CadastroEquipeDeVenda() {
         {/* Form */}
         {isFormOpen && (
           <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-            <h2 className="text-xl font-bold text-walmart-text mb-6">
+            <h2 className="text-xl font-bold text-vitrii-text mb-6">
               {editingId ? "Editar Equipe" : "Criar Nova Equipe"}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-walmart-text mb-2">
+                <label className="block text-sm font-semibold text-vitrii-text mb-2">
                   Nome da Equipe *
                 </label>
                 <input
@@ -575,12 +575,12 @@ export default function CadastroEquipeDeVenda() {
                     setFormData({ ...formData, nome: e.target.value })
                   }
                   placeholder="Ex: Equipe A, Equipe Norte"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-walmart-text mb-2">
+                <label className="block text-sm font-semibold text-vitrii-text mb-2">
                   Descrição
                 </label>
                 <textarea
@@ -590,7 +590,7 @@ export default function CadastroEquipeDeVenda() {
                   }
                   placeholder="Ex: Equipe responsável pelas vendas da região norte"
                   rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                 />
               </div>
 
@@ -598,7 +598,7 @@ export default function CadastroEquipeDeVenda() {
                 <button
                   type="submit"
                   disabled={saveEquipeMutation.isPending}
-                  className="px-6 py-2 bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors font-semibold disabled:opacity-50"
+                  className="px-6 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors font-semibold disabled:opacity-50"
                 >
                   {saveEquipeMutation.isPending ? "Salvando..." : "Salvar"}
                 </button>
@@ -608,7 +608,7 @@ export default function CadastroEquipeDeVenda() {
                     setIsFormOpen(false);
                     setEditingId(null);
                   }}
-                  className="px-6 py-2 bg-gray-300 text-walmart-text rounded-lg hover:bg-gray-400 transition-colors font-semibold"
+                  className="px-6 py-2 bg-gray-300 text-vitrii-text rounded-lg hover:bg-gray-400 transition-colors font-semibold"
                 >
                   Cancelar
                 </button>
@@ -625,7 +625,7 @@ export default function CadastroEquipeDeVenda() {
               placeholder="🔍 Buscar equipe por nome..."
               value={searchEquipe}
               onChange={(e) => setSearchEquipe(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
             />
           </div>
         )}
@@ -655,11 +655,11 @@ export default function CadastroEquipeDeVenda() {
                 <div className="p-6">
                   <div className="flex items-center justify-between">
                     <div className="flex-1">
-                      <h3 className="text-lg font-bold text-walmart-text">
+                      <h3 className="text-lg font-bold text-vitrii-text">
                         {equipe.nome}
                       </h3>
                       {equipe.descricao && (
-                        <p className="text-sm text-walmart-text-secondary mt-1">
+                        <p className="text-sm text-vitrii-text-secondary mt-1">
                           {equipe.descricao}
                         </p>
                       )}
@@ -676,7 +676,7 @@ export default function CadastroEquipeDeVenda() {
                             expandedTeamId === equipe.id ? null : equipe.id,
                           )
                         }
-                        className="p-2 text-walmart-blue hover:bg-blue-50 rounded-lg transition-colors"
+                        className="p-2 text-vitrii-blue hover:bg-blue-50 rounded-lg transition-colors"
                       >
                         {expandedTeamId === equipe.id ? (
                           <ChevronUp className="w-5 h-5" />
@@ -686,7 +686,7 @@ export default function CadastroEquipeDeVenda() {
                       </button>
                       <button
                         onClick={() => handleEdit(equipe)}
-                        className="p-2 text-walmart-blue hover:bg-blue-50 rounded-lg transition-colors"
+                        className="p-2 text-vitrii-blue hover:bg-blue-50 rounded-lg transition-colors"
                       >
                         <Edit2 className="w-5 h-5" />
                       </button>
@@ -712,7 +712,7 @@ export default function CadastroEquipeDeVenda() {
                     <div className="mt-6 pt-6 border-t border-gray-200">
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex-1">
-                          <h4 className="font-semibold text-walmart-text mb-3">
+                          <h4 className="font-semibold text-vitrii-text mb-3">
                             Membros da Equipe
                           </h4>
                           {equipe.membros.length > 0 && (
@@ -726,7 +726,7 @@ export default function CadastroEquipeDeVenda() {
                                   [equipe.id]: e.target.value,
                                 })
                               }
-                              className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-walmart-blue"
+                              className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
                             />
                           )}
                         </div>
@@ -742,7 +742,7 @@ export default function CadastroEquipeDeVenda() {
                                   status: "disponivel",
                                 });
                               }}
-                              className="flex items-center gap-1 px-3 py-1 text-sm bg-walmart-yellow text-walmart-text rounded hover:bg-walmart-yellow-dark transition-colors font-semibold"
+                              className="flex items-center gap-1 px-3 py-1 text-sm bg-vitrii-yellow text-vitrii-text rounded hover:bg-vitrii-yellow-dark transition-colors font-semibold"
                             >
                               <Plus className="w-4 h-4" />
                               Adicionar Membro
@@ -766,19 +766,19 @@ export default function CadastroEquipeDeVenda() {
                           <table className="w-full text-sm">
                             <thead className="bg-gray-100 border-b border-gray-200">
                               <tr>
-                                <th className="px-4 py-2 text-left font-semibold text-walmart-text">
+                                <th className="px-4 py-2 text-left font-semibold text-vitrii-text">
                                   Nome
                                 </th>
-                                <th className="px-4 py-2 text-left font-semibold text-walmart-text">
+                                <th className="px-4 py-2 text-left font-semibold text-vitrii-text">
                                   Email
                                 </th>
-                                <th className="px-4 py-2 text-left font-semibold text-walmart-text">
+                                <th className="px-4 py-2 text-left font-semibold text-vitrii-text">
                                   WhatsApp
                                 </th>
-                                <th className="px-4 py-2 text-left font-semibold text-walmart-text">
+                                <th className="px-4 py-2 text-left font-semibold text-vitrii-text">
                                   Status
                                 </th>
-                                <th className="px-4 py-2 text-center font-semibold text-walmart-text">
+                                <th className="px-4 py-2 text-center font-semibold text-vitrii-text">
                                   Ações
                                 </th>
                               </tr>
@@ -798,7 +798,7 @@ export default function CadastroEquipeDeVenda() {
                                         })
                                       }
                                       placeholder="Nome do membro"
-                                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-walmart-blue"
+                                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
                                     />
                                   </td>
                                   <td className="px-4 py-3">
@@ -812,7 +812,7 @@ export default function CadastroEquipeDeVenda() {
                                         })
                                       }
                                       placeholder="Email"
-                                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-walmart-blue"
+                                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
                                     />
                                   </td>
                                   <td className="px-4 py-3">
@@ -840,7 +840,7 @@ export default function CadastroEquipeDeVenda() {
                                           });
                                         }}
                                         placeholder="(51) 98765-4321"
-                                        className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-walmart-blue"
+                                        className="flex-1 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
                                       />
                                     </div>
                                   </td>
@@ -853,7 +853,7 @@ export default function CadastroEquipeDeVenda() {
                                           status: e.target.value as any,
                                         })
                                       }
-                                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-walmart-blue bg-white"
+                                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-vitrii-blue bg-white"
                                     >
                                       <option value="disponivel">
                                         Disponível
@@ -876,7 +876,7 @@ export default function CadastroEquipeDeVenda() {
                                           addMemberMutation.isPending ||
                                           updateMemberMutation.isPending
                                         }
-                                        className="p-1 bg-walmart-blue text-white rounded hover:bg-walmart-blue-dark transition-colors disabled:opacity-50"
+                                        className="p-1 bg-vitrii-blue text-white rounded hover:bg-vitrii-blue-dark transition-colors disabled:opacity-50"
                                       >
                                         <Save className="w-4 h-4" />
                                       </button>
@@ -891,7 +891,7 @@ export default function CadastroEquipeDeVenda() {
                                             status: "disponivel",
                                           });
                                         }}
-                                        className="p-1 bg-gray-300 text-walmart-text rounded hover:bg-gray-400 transition-colors"
+                                        className="p-1 bg-gray-300 text-vitrii-text rounded hover:bg-gray-400 transition-colors"
                                       >
                                         <X className="w-4 h-4" />
                                       </button>
@@ -909,13 +909,13 @@ export default function CadastroEquipeDeVenda() {
                                   key={membro.id}
                                   className="border-b border-gray-200 hover:bg-gray-50"
                                 >
-                                  <td className="px-4 py-3 text-walmart-text">
+                                  <td className="px-4 py-3 text-vitrii-text">
                                     {membro.nomeMembro}
                                   </td>
-                                  <td className="px-4 py-3 text-walmart-text text-xs">
+                                  <td className="px-4 py-3 text-vitrii-text text-xs">
                                     {membro.email}
                                   </td>
-                                  <td className="px-4 py-3 text-walmart-text text-xs">
+                                  <td className="px-4 py-3 text-vitrii-text text-xs">
                                     {membro.whatsapp ? (
                                       <a
                                         href={`https://wa.me/${membro.whatsapp.replace(/\D/g, "")}`}
@@ -950,7 +950,7 @@ export default function CadastroEquipeDeVenda() {
                                     <div className="flex items-center justify-center gap-2">
                                       <button
                                         onClick={() => handleEditMember(membro)}
-                                        className="p-1 text-walmart-blue hover:bg-blue-50 rounded transition-colors"
+                                        className="p-1 text-vitrii-blue hover:bg-blue-50 rounded transition-colors"
                                       >
                                         <Edit2 className="w-4 h-4" />
                                       </button>
