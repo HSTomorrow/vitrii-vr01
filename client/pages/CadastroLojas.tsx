@@ -258,6 +258,7 @@ export default function CadastroAnunciantes() {
                 instagram: "",
                 facebook: "",
                 whatsapp: "",
+                fotoUrl: "",
               });
             }}
             className="flex items-center gap-2 px-4 py-2 bg-vitrii-yellow text-vitrii-text rounded-lg hover:bg-vitrii-yellow-dark transition-colors font-semibold"
