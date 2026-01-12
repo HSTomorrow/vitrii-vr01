@@ -222,6 +222,7 @@ export const createAnuncio: RequestHandler = async (req, res) => {
       select: {
         dataVigenciaContrato: true,
         numeroAnunciosAtivos: true,
+        tipoUsuario: true,
       },
     });
 
@@ -242,7 +243,9 @@ export const createAnuncio: RequestHandler = async (req, res) => {
     }
 
     // Check if user has reached the limit of 3 active ads
-    if ((usuario.numeroAnunciosAtivos || 0) >= 3) {
+    // Admins are exempt from this limit
+    const isAdmin = usuario.tipoUsuario === "adm";
+    if (!isAdmin && (usuario.numeroAnunciosAtivos || 0) >= 3) {
       return res.status(403).json({
         success: false,
         error:
