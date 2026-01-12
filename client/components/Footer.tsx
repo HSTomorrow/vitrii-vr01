@@ -3,13 +3,13 @@ import { Facebook, Instagram, Twitter, Mail } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="bg-walmart-text text-white mt-16">
+    <footer className="bg-vitrii-text text-white mt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* About */}
           <div>
             <h3 className="font-bold text-lg mb-4 flex items-center space-x-2">
-              <div className="w-8 h-8 bg-walmart-yellow rounded-lg flex items-center justify-center text-walmart-text font-bold">
+              <div className="w-8 h-8 bg-vitrii-yellow rounded-lg flex items-center justify-center text-vitrii-text font-bold">
                 V
               </div>
               <span>Vitrii</span>
@@ -27,7 +27,7 @@ export default function Footer() {
               <li>
                 <Link
                   to="/browse"
-                  className="hover:text-walmart-yellow transition-colors"
+                  className="hover:text-vitrii-yellow transition-colors"
                 >
                   Buscar Produtos
                 </Link>
@@ -35,7 +35,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="hover:text-walmart-yellow transition-colors"
+                  className="hover:text-vitrii-yellow transition-colors"
                 >
                   Categorias
                 </a>
@@ -43,7 +43,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="hover:text-walmart-yellow transition-colors"
+                  className="hover:text-vitrii-yellow transition-colors"
                 >
                   Ofertas
                 </a>
@@ -51,7 +51,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="hover:text-walmart-yellow transition-colors"
+                  className="hover:text-vitrii-yellow transition-colors"
                 >
                   Histórico de Compras
                 </a>
@@ -66,7 +66,7 @@ export default function Footer() {
               <li>
                 <Link
                   to="/sell"
-                  className="hover:text-walmart-yellow transition-colors"
+                  className="hover:text-vitrii-yellow transition-colors"
                 >
                   Começar a Vender
                 </Link>
@@ -74,7 +74,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="hover:text-walmart-yellow transition-colors"
+                  className="hover:text-vitrii-yellow transition-colors"
                 >
                   Gerenciar Lojas
                 </a>
@@ -82,7 +82,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="hover:text-walmart-yellow transition-colors"
+                  className="hover:text-vitrii-yellow transition-colors"
                 >
                   Gerenciar Anúncios
                 </a>
@@ -90,7 +90,7 @@ export default function Footer() {
               <li>
                 <Link
                   to="/qrcode"
-                  className="hover:text-walmart-yellow transition-colors"
+                  className="hover:text-vitrii-yellow transition-colors"
                 >
                   QR Code Studio
                 </Link>
@@ -105,7 +105,7 @@ export default function Footer() {
               <li>
                 <Link
                   to="/about"
-                  className="hover:text-walmart-yellow transition-colors"
+                  className="hover:text-vitrii-yellow transition-colors"
                 >
                   Sobre o Vitrii
                 </Link>
@@ -113,7 +113,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="hover:text-walmart-yellow transition-colors"
+                  className="hover:text-vitrii-yellow transition-colors"
                 >
                   Central de Ajuda
                 </a>
@@ -121,7 +121,7 @@ export default function Footer() {
               <li>
                 <a
                   href="mailto:vitriimarketplace@gmail.com"
-                  className="hover:text-walmart-yellow transition-colors"
+                  className="hover:text-vitrii-yellow transition-colors"
                 >
                   Contato
                 </a>
@@ -129,7 +129,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="hover:text-walmart-yellow transition-colors"
+                  className="hover:text-vitrii-yellow transition-colors"
                 >
                   Políticas
                 </a>
@@ -137,7 +137,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="hover:text-walmart-yellow transition-colors"
+                  className="hover:text-vitrii-yellow transition-colors"
                 >
                   Termos de Uso
                 </a>
@@ -152,25 +152,25 @@ export default function Footer() {
           <div className="flex justify-center space-x-6 mb-6">
             <a
               href="#"
-              className="text-gray-400 hover:text-walmart-yellow transition-colors"
+              className="text-gray-400 hover:text-vitrii-yellow transition-colors"
             >
               <Facebook className="w-5 h-5" />
             </a>
             <a
               href="#"
-              className="text-gray-400 hover:text-walmart-yellow transition-colors"
+              className="text-gray-400 hover:text-vitrii-yellow transition-colors"
             >
               <Instagram className="w-5 h-5" />
             </a>
             <a
               href="#"
-              className="text-gray-400 hover:text-walmart-yellow transition-colors"
+              className="text-gray-400 hover:text-vitrii-yellow transition-colors"
             >
               <Twitter className="w-5 h-5" />
             </a>
             <a
               href="mailto:vitriimarketplace@gmail.com"
-              className="text-gray-400 hover:text-walmart-yellow transition-colors"
+              className="text-gray-400 hover:text-vitrii-yellow transition-colors"
             >
               <Mail className="w-5 h-5" />
             </a>

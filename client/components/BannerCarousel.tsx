@@ -81,7 +81,7 @@ export default function BannerCarousel({
           {currentBanner.link && (
             <a
               href={currentBanner.link}
-              className="inline-block px-3 py-1.5 sm:px-6 sm:py-2 md:px-8 md:py-3 bg-walmart-blue text-white rounded-lg font-semibold text-xs sm:text-sm md:text-base hover:bg-walmart-blue-dark transition-colors whitespace-nowrap"
+              className="inline-block px-3 py-1.5 sm:px-6 sm:py-2 md:px-8 md:py-3 bg-vitrii-blue text-white rounded-lg font-semibold text-xs sm:text-sm md:text-base hover:bg-vitrii-blue-dark transition-colors whitespace-nowrap"
             >
               Saiba Mais
             </a>
@@ -94,7 +94,7 @@ export default function BannerCarousel({
   return (
     <div className="w-full">
       {/* Main Carousel */}
-      <div className="relative bg-walmart-gray-light overflow-hidden rounded-lg">
+      <div className="relative bg-vitrii-gray-light overflow-hidden rounded-lg">
         {/* Banner Container */}
         <div className="relative w-full h-32 sm:h-40 md:h-48">
           <BannerContent />
@@ -107,7 +107,7 @@ export default function BannerCarousel({
                 className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2 bg-white/80 hover:bg-white rounded-full transition-colors"
                 aria-label="Banner anterior"
               >
-                <ChevronLeft className="w-6 h-6 text-walmart-blue" />
+                <ChevronLeft className="w-6 h-6 text-vitrii-blue" />
               </button>
 
               <button
@@ -115,7 +115,7 @@ export default function BannerCarousel({
                 className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-2 bg-white/80 hover:bg-white rounded-full transition-colors"
                 aria-label="Próximo banner"
               >
-                <ChevronRight className="w-6 h-6 text-walmart-blue" />
+                <ChevronRight className="w-6 h-6 text-vitrii-blue" />
               </button>
             </>
           )}
@@ -129,7 +129,7 @@ export default function BannerCarousel({
                 key={index}
                 onClick={() => handleDotClick(index)}
                 className={`w-3 h-3 rounded-full transition-colors ${
-                  index === currentIndex ? "bg-walmart-blue" : "bg-white/50"
+                  index === currentIndex ? "bg-vitrii-blue" : "bg-white/50"
                 }`}
                 aria-label={`Ir para banner ${index + 1}`}
               />
@@ -140,7 +140,7 @@ export default function BannerCarousel({
 
       {/* Banner Counter */}
       {activeBanners.length > 1 && (
-        <div className="text-center py-2 text-sm text-walmart-text-secondary">
+        <div className="text-center py-2 text-sm text-vitrii-text-secondary">
           {currentIndex + 1} de {activeBanners.length}
         </div>
       )}

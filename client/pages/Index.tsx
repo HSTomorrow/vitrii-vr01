@@ -165,7 +165,7 @@ export default function Index() {
       </section>
 
       {/* Featured Listings Section */}
-      <section className="py-3 md:py-3 bg-walmart-gray-light">
+      <section className="py-3 md:py-3 bg-vitrii-gray-light">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-3">
             <div>
@@ -175,13 +175,13 @@ export default function Index() {
               >
                 Anúncios em Destaque
               </h2>
-              <p className="text-sm text-walmart-text-secondary">
+              <p className="text-sm text-vitrii-text-secondary">
                 Veja os produtos e serviços mais procurados
               </p>
             </div>
             <Link
               to="/browse"
-              className="hidden md:inline-flex items-center space-x-2 text-walmart-blue font-semibold hover:space-x-3 transition-all"
+              className="hidden md:inline-flex items-center space-x-2 text-vitrii-blue font-semibold hover:space-x-3 transition-all"
             >
               <span>Ver Todos</span>
               <ArrowRight className="w-5 h-5" />
@@ -201,7 +201,7 @@ export default function Index() {
           <div className="text-center mt-3">
             <Link
               to="/browse"
-              className="inline-flex items-center space-x-2 text-walmart-blue font-semibold hover:space-x-3 transition-all"
+              className="inline-flex items-center space-x-2 text-vitrii-blue font-semibold hover:space-x-3 transition-all"
             >
               <span>Ver Todos os Anúncios</span>
               <ArrowRight className="w-5 h-5" />
@@ -215,10 +215,10 @@ export default function Index() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-3">
             <div>
-              <h2 className="text-2xl md:text-3xl font-bold text-walmart-text mb-1">
+              <h2 className="text-2xl md:text-3xl font-bold text-vitrii-text mb-1">
                 Doações, Brindes e Serviços Gratuitos
               </h2>
-              <p className="text-sm text-walmart-text-secondary">
+              <p className="text-sm text-vitrii-text-secondary">
                 Doações, Brindes, Produtos, Serviços e Eventos disponíveis para
                 experimentação gratuitamente
               </p>
@@ -233,7 +233,7 @@ export default function Index() {
               </Link>
               <Link
                 to="/browse?filter=gratuito"
-                className="inline-flex items-center space-x-2 text-walmart-blue font-semibold hover:space-x-3 transition-all"
+                className="inline-flex items-center space-x-2 text-vitrii-blue font-semibold hover:space-x-3 transition-all"
               >
                 <span>Ver Todos</span>
                 <ArrowRight className="w-5 h-5" />
@@ -262,7 +262,7 @@ export default function Index() {
             <div>
               <Link
                 to="/browse?filter=gratuito"
-                className="inline-flex items-center space-x-2 text-walmart-blue font-semibold hover:space-x-3 transition-all"
+                className="inline-flex items-center space-x-2 text-vitrii-blue font-semibold hover:space-x-3 transition-all"
               >
                 <span>Ver Todos os Itens Gratuitos</span>
                 <ArrowRight className="w-5 h-5" />
@@ -273,20 +273,20 @@ export default function Index() {
       </section>
 
       {/* Events Listings Section */}
-      <section className="py-3 md:py-3 bg-walmart-gray-light">
+      <section className="py-3 md:py-3 bg-vitrii-gray-light">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-3">
             <div>
-              <h2 className="text-2xl md:text-3xl font-bold text-walmart-text mb-1">
+              <h2 className="text-2xl md:text-3xl font-bold text-vitrii-text mb-1">
                 Eventos
               </h2>
-              <p className="text-sm text-walmart-text-secondary">
+              <p className="text-sm text-vitrii-text-secondary">
                 Descubra eventos, workshops e experiências próximas a você
               </p>
             </div>
             <Link
               to="/browse?filter=evento"
-              className="hidden md:inline-flex items-center space-x-2 text-walmart-blue font-semibold hover:space-x-3 transition-all"
+              className="hidden md:inline-flex items-center space-x-2 text-vitrii-blue font-semibold hover:space-x-3 transition-all"
             >
               <span>Ver Todos</span>
               <ArrowRight className="w-5 h-5" />
@@ -306,7 +306,7 @@ export default function Index() {
           <div className="text-center mt-3">
             <Link
               to="/browse?filter=evento"
-              className="inline-flex items-center space-x-2 text-walmart-blue font-semibold hover:space-x-3 transition-all"
+              className="inline-flex items-center space-x-2 text-vitrii-blue font-semibold hover:space-x-3 transition-all"
             >
               <span>Ver Todos os Eventos</span>
               <ArrowRight className="w-5 h-5" />
@@ -320,16 +320,16 @@ export default function Index() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-3">
             <div>
-              <h2 className="text-2xl md:text-3xl font-bold text-walmart-text mb-1">
+              <h2 className="text-2xl md:text-3xl font-bold text-vitrii-text mb-1">
                 Aulas e Agendas Disponiveis
               </h2>
-              <p className="text-sm text-walmart-text-secondary">
+              <p className="text-sm text-vitrii-text-secondary">
                 Aulas, consultas e serviços agendáveis disponíveis
               </p>
             </div>
             <Link
               to="/browse?filter=agenda_recorrente"
-              className="hidden md:inline-flex items-center space-x-2 text-walmart-blue font-semibold hover:space-x-3 transition-all"
+              className="hidden md:inline-flex items-center space-x-2 text-vitrii-blue font-semibold hover:space-x-3 transition-all"
             >
               <span>Ver Todas</span>
               <ArrowRight className="w-5 h-5" />
@@ -349,7 +349,7 @@ export default function Index() {
           <div className="text-center mt-3">
             <Link
               to="/browse?filter=agenda_recorrente"
-              className="inline-flex items-center space-x-2 text-walmart-blue font-semibold hover:space-x-3 transition-all"
+              className="inline-flex items-center space-x-2 text-vitrii-blue font-semibold hover:space-x-3 transition-all"
             >
               <span>Ver Todas as Agendas</span>
               <ArrowRight className="w-5 h-5" />
@@ -361,7 +361,7 @@ export default function Index() {
       {/* Create Ad Section */}
       <section className="py-3 md:py-3 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-r from-walmart-blue to-walmart-blue-dark rounded-lg p-8 text-white text-center">
+          <div className="bg-gradient-to-r from-vitrii-blue to-vitrii-blue-dark rounded-lg p-8 text-white text-center">
             <Plus className="w-12 h-12 mx-auto mb-4 opacity-90" />
             <h2 className="text-2xl md:text-3xl font-bold mb-4">
               Publique Seu Anúncio Agora
@@ -373,13 +373,13 @@ export default function Index() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 to="/anuncio/criar"
-                className="bg-walmart-yellow text-walmart-text px-8 py-3 rounded-lg font-semibold hover:bg-walmart-yellow-dark transition-colors"
+                className="bg-vitrii-yellow text-vitrii-text px-8 py-3 rounded-lg font-semibold hover:bg-vitrii-yellow-dark transition-colors"
               >
                 Criar Anúncio
               </Link>
               <Link
                 to="/sell"
-                className="bg-white text-walmart-blue px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+                className="bg-white text-vitrii-blue px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
               >
                 Gerenciar Anúncios
               </Link>
@@ -392,49 +392,49 @@ export default function Index() {
       <section className="py-3 md:py-3">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-2xl md:text-3xl font-bold text-walmart-text mb-3">
+            <h2 className="text-2xl md:text-3xl font-bold text-vitrii-text mb-3">
               Por que escolher Vitrii?
             </h2>
-            <p className="text-sm text-walmart-text-secondary">
+            <p className="text-sm text-vitrii-text-secondary">
               Recursos que transformam seu negócio
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-walmart-blue bg-opacity-10 rounded-lg flex items-center justify-center mx-auto mb-6">
-                <Zap className="w-8 h-8 text-walmart-blue" />
+              <div className="w-16 h-16 bg-vitrii-blue bg-opacity-10 rounded-lg flex items-center justify-center mx-auto mb-6">
+                <Zap className="w-8 h-8 text-vitrii-blue" />
               </div>
-              <h3 className="text-xl font-bold text-walmart-text mb-3">
+              <h3 className="text-xl font-bold text-vitrii-text mb-3">
                 Rápido e Fácil
               </h3>
-              <p className="text-walmart-text-secondary">
+              <p className="text-vitrii-text-secondary">
                 Comece em minutos. Cadastre sua loja, adicione produtos e comece
                 a vender ou comprar sem complicações.
               </p>
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-walmart-blue bg-opacity-10 rounded-lg flex items-center justify-center mx-auto mb-6">
-                <Users className="w-8 h-8 text-walmart-blue" />
+              <div className="w-16 h-16 bg-vitrii-blue bg-opacity-10 rounded-lg flex items-center justify-center mx-auto mb-6">
+                <Users className="w-8 h-8 text-vitrii-blue" />
               </div>
-              <h3 className="text-xl font-bold text-walmart-text mb-3">
+              <h3 className="text-xl font-bold text-vitrii-text mb-3">
                 Comunidade Ativa
               </h3>
-              <p className="text-walmart-text-secondary">
+              <p className="text-vitrii-text-secondary">
                 Conecte-se com milhares de vendedores e compradores. Cresça sua
                 rede e suas vendas.
               </p>
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-walmart-blue bg-opacity-10 rounded-lg flex items-center justify-center mx-auto mb-6">
-                <BarChart3 className="w-8 h-8 text-walmart-blue" />
+              <div className="w-16 h-16 bg-vitrii-blue bg-opacity-10 rounded-lg flex items-center justify-center mx-auto mb-6">
+                <BarChart3 className="w-8 h-8 text-vitrii-blue" />
               </div>
-              <h3 className="text-xl font-bold text-walmart-text mb-3">
+              <h3 className="text-xl font-bold text-vitrii-text mb-3">
                 Análises Completas
               </h3>
-              <p className="text-walmart-text-secondary">
+              <p className="text-vitrii-text-secondary">
                 Acompanhe suas vendas, clientes e performance com dashboards
                 detalhados.
               </p>
@@ -444,7 +444,7 @@ export default function Index() {
       </section>
 
       {/* Call to Action Section */}
-      <section className="py-8 md:py-12 bg-walmart-blue text-white">
+      <section className="py-8 md:py-12 bg-vitrii-blue text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
             Pronto para crescer seu negócio?
@@ -457,7 +457,7 @@ export default function Index() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               to="/auth/signup"
-              className="bg-walmart-yellow text-walmart-text px-8 py-3 rounded-lg font-semibold hover:bg-walmart-yellow-dark transition-colors inline-block"
+              className="bg-vitrii-yellow text-vitrii-text px-8 py-3 rounded-lg font-semibold hover:bg-vitrii-yellow-dark transition-colors inline-block"
             >
               Comece Grátis
             </Link>
@@ -472,14 +472,14 @@ export default function Index() {
       </section>
 
       {/* Info Banner */}
-      <section className="bg-blue-50 border-t-4 border-walmart-blue py-6">
+      <section className="bg-blue-50 border-t-4 border-vitrii-blue py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-start space-x-4">
-          <AlertCircle className="w-6 h-6 text-walmart-blue flex-shrink-0 mt-1" />
+          <AlertCircle className="w-6 h-6 text-vitrii-blue flex-shrink-0 mt-1" />
           <div>
-            <h3 className="font-semibold text-walmart-text mb-1">
+            <h3 className="font-semibold text-vitrii-text mb-1">
               Informação Importante
             </h3>
-            <p className="text-walmart-text-secondary text-sm">
+            <p className="text-vitrii-text-secondary text-sm">
               Vitrii é um marketplace seguro com autenticação via Google ou
               Usuário/Senha. Suas transações são protegidas e dados
               criptografados.

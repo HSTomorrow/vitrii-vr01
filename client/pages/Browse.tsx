@@ -176,7 +176,7 @@ export default function Browse() {
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
 
-      <section className="bg-gradient-to-r from-walmart-blue to-walmart-blue-dark text-white py-8">
+      <section className="bg-gradient-to-r from-vitrii-blue to-vitrii-blue-dark text-white py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl font-bold mb-2">Explorar Anúncios</h1>
           <p className="text-blue-100">
@@ -196,7 +196,7 @@ export default function Browse() {
             <div className="mb-6 lg:hidden">
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="w-full flex items-center justify-between bg-walmart-blue text-white px-4 py-3 rounded-lg font-semibold"
+                className="w-full flex items-center justify-between bg-vitrii-blue text-white px-4 py-3 rounded-lg font-semibold"
               >
                 <span>Filtros</span>
                 <ChevronDown
@@ -214,10 +214,10 @@ export default function Browse() {
                   showFilters ? "block" : "hidden"
                 } lg:block w-full lg:w-64 flex-shrink-0`}
               >
-                <div className="bg-walmart-gray-light p-6 rounded-lg space-y-6">
+                <div className="bg-vitrii-gray-light p-6 rounded-lg space-y-6">
                   {/* Search Input */}
                   <div>
-                    <label className="block text-sm font-semibold text-walmart-text mb-2">
+                    <label className="block text-sm font-semibold text-vitrii-text mb-2">
                       Buscar
                     </label>
                     <div className="relative">
@@ -227,20 +227,20 @@ export default function Browse() {
                         placeholder="Título ou descrição..."
                         value={searchTerm}
                         onChange={(e) => handleSearchChange(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
                       />
                     </div>
                   </div>
 
                   {/* Category Filter */}
                   <div>
-                    <label className="block text-sm font-semibold text-walmart-text mb-2">
+                    <label className="block text-sm font-semibold text-vitrii-text mb-2">
                       Categoria
                     </label>
                     <select
                       value={selectedCategory}
                       onChange={(e) => handleCategoryChange(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
                     >
                       <option value="">Todas as categorias</option>
                       {CATEGORIES.map((cat) => (
@@ -253,13 +253,13 @@ export default function Browse() {
 
                   {/* Type Filter */}
                   <div>
-                    <label className="block text-sm font-semibold text-walmart-text mb-2">
+                    <label className="block text-sm font-semibold text-vitrii-text mb-2">
                       Tipo
                     </label>
                     <select
                       value={selectedType}
                       onChange={(e) => handleTypeChange(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
                     >
                       <option value="">Todos os tipos</option>
                       {TYPES.map((type) => (
@@ -273,13 +273,13 @@ export default function Browse() {
                   {/* Location Filter */}
                   {uniqueLocations.length > 0 && (
                     <div>
-                      <label className="block text-sm font-semibold text-walmart-text mb-2">
+                      <label className="block text-sm font-semibold text-vitrii-text mb-2">
                         Localização
                       </label>
                       <select
                         value={selectedLocation}
                         onChange={(e) => handleLocationChange(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
                       >
                         <option value="">Todas as localizações</option>
                         {uniqueLocations.map((location) => (
@@ -293,7 +293,7 @@ export default function Browse() {
 
                   {/* Price Range Filter */}
                   <div>
-                    <label className="block text-sm font-semibold text-walmart-text mb-3">
+                    <label className="block text-sm font-semibold text-vitrii-text mb-3">
                       Faixa de Preço
                     </label>
                     <div className="flex gap-2">
@@ -302,14 +302,14 @@ export default function Browse() {
                         placeholder="Mín."
                         value={priceRange.min}
                         onChange={(e) => handlePriceChange("min", e.target.value)}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
                       />
                       <input
                         type="number"
                         placeholder="Máx."
                         value={priceRange.max}
                         onChange={(e) => handlePriceChange("max", e.target.value)}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
                       />
                     </div>
                   </div>
@@ -318,7 +318,7 @@ export default function Browse() {
                   {hasActiveFilters && (
                     <button
                       onClick={clearFilters}
-                      className="w-full flex items-center justify-center gap-2 bg-gray-200 text-walmart-text px-4 py-2 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+                      className="w-full flex items-center justify-center gap-2 bg-gray-200 text-vitrii-text px-4 py-2 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
                     >
                       <X className="w-4 h-4" />
                       Limpar Filtros
@@ -331,7 +331,7 @@ export default function Browse() {
               <div className="flex-1">
                 {totalItems > 0 ? (
                   <div>
-                    <p className="text-walmart-text-secondary mb-6">
+                    <p className="text-vitrii-text-secondary mb-6">
                       {totalItems} anúncio{totalItems !== 1 ? "s" : ""} encontrado
                       {totalItems !== 1 ? "s" : ""}
                       {hasActiveFilters && " com os filtros aplicados"}
@@ -344,7 +344,7 @@ export default function Browse() {
                           className="vitrii-card overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
                           onClick={() => navigate(`/anuncio/${anuncio.id}`)}
                         >
-                          <div className="w-full h-40 bg-gradient-to-br from-walmart-blue to-walmart-blue-dark flex items-center justify-center overflow-hidden">
+                          <div className="w-full h-40 bg-gradient-to-br from-vitrii-blue to-vitrii-blue-dark flex items-center justify-center overflow-hidden">
                             {anuncio.imagem ? (
                               <img
                                 src={anuncio.imagem}
@@ -357,13 +357,13 @@ export default function Browse() {
                           </div>
 
                           <div className="p-4">
-                            <h3 className="font-semibold text-walmart-text mb-2 line-clamp-2">
+                            <h3 className="font-semibold text-vitrii-text mb-2 line-clamp-2">
                               {anuncio.titulo}
                             </h3>
 
                             {(anuncio.endereco ||
                               anuncio.anunciante?.endereco) && (
-                              <div className="flex items-center gap-1 mb-3 text-xs text-walmart-text-secondary">
+                              <div className="flex items-center gap-1 mb-3 text-xs text-vitrii-text-secondary">
                                 <MapPin className="w-3 h-3 flex-shrink-0" />
                                 <span className="truncate">
                                   {anuncio.endereco ||
@@ -373,7 +373,7 @@ export default function Browse() {
                             )}
 
                             <div className="flex justify-between items-center mb-4 pt-2 border-t">
-                              <span className="text-lg font-bold text-walmart-blue">
+                              <span className="text-lg font-bold text-vitrii-blue">
                                 {anuncio.isDoacao
                                   ? "Grátis"
                                   : `R$ ${Number(
@@ -383,7 +383,7 @@ export default function Browse() {
                                     })}`}
                               </span>
                               <div className="flex items-center space-x-1">
-                                <Star className="w-4 h-4 fill-walmart-yellow text-walmart-yellow" />
+                                <Star className="w-4 h-4 fill-vitrii-yellow text-vitrii-yellow" />
                                 <span className="text-sm font-semibold">
                                   5.0
                                 </span>
@@ -395,7 +395,7 @@ export default function Browse() {
                                 e.stopPropagation();
                                 navigate(`/anuncio/${anuncio.id}`);
                               }}
-                              className="w-full bg-walmart-blue text-white py-2 rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors"
+                              className="w-full bg-vitrii-blue text-white py-2 rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors"
                             >
                               Ver Detalhes
                             </button>
@@ -414,7 +414,7 @@ export default function Browse() {
                 ) : (
                   <div className="text-center py-12">
                     <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                    <p className="text-walmart-text-secondary mb-4">
+                    <p className="text-vitrii-text-secondary mb-4">
                       {hasActiveFilters
                         ? "Nenhum anúncio encontrado com esses filtros"
                         : "Nenhum anúncio encontrado"}
@@ -422,14 +422,14 @@ export default function Browse() {
                     {hasActiveFilters && (
                       <button
                         onClick={clearFilters}
-                        className="inline-block bg-walmart-blue text-white px-6 py-2 rounded-lg font-semibold hover:bg-walmart-blue-dark mb-4"
+                        className="inline-block bg-vitrii-blue text-white px-6 py-2 rounded-lg font-semibold hover:bg-vitrii-blue-dark mb-4"
                       >
                         Limpar Filtros
                       </button>
                     )}
                     <Link
                       to="/"
-                      className="inline-block bg-gray-200 text-walmart-text px-6 py-2 rounded-lg font-semibold hover:bg-gray-300"
+                      className="inline-block bg-gray-200 text-vitrii-text px-6 py-2 rounded-lg font-semibold hover:bg-gray-300"
                     >
                       Voltar para Home
                     </Link>

@@ -54,7 +54,7 @@ export default function Header() {
                       );
                     }
                   }}
-                  className="w-full px-4 py-2 pl-10 bg-walmart-gray border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-walmart-blue focus:ring-1 focus:ring-walmart-blue"
+                  className="w-full px-4 py-2 pl-10 bg-vitrii-gray border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-vitrii-blue focus:ring-1 focus:ring-vitrii-blue"
                 />
                 <Search className="absolute left-3 top-2.5 text-gray-400 w-5 h-5" />
               </div>
@@ -64,7 +64,7 @@ export default function Header() {
             <nav className="hidden lg:flex items-center space-x-6">
               <Link
                 to="/browse"
-                className="text-walmart-text-secondary hover:text-walmart-blue transition-colors text-[0.85rem]"
+                className="text-vitrii-text-secondary hover:text-vitrii-blue transition-colors text-[0.85rem]"
               >
                 Ver Anúncios
               </Link>
@@ -74,19 +74,19 @@ export default function Header() {
             <div className="flex items-center space-x-2 sm:space-x-4">
               <Link
                 to="/chat"
-                className="flex-shrink-0 p-2 hover:bg-walmart-gray rounded-lg transition-colors"
+                className="flex-shrink-0 p-2 hover:bg-vitrii-gray rounded-lg transition-colors"
                 title="Minhas mensagens"
               >
-                <MessageSquare className="w-5 h-5 text-walmart-text" />
+                <MessageSquare className="w-5 h-5 text-vitrii-text" />
               </Link>
 
               {user && (
                 <Link
                   to="/favoritos"
-                  className="flex-shrink-0 p-2 hover:bg-walmart-gray rounded-lg transition-colors"
+                  className="flex-shrink-0 p-2 hover:bg-vitrii-gray rounded-lg transition-colors"
                   title="Meus favoritos"
                 >
-                  <Heart className="w-5 h-5 text-walmart-text" />
+                  <Heart className="w-5 h-5 text-vitrii-text" />
                 </Link>
               )}
 
@@ -94,7 +94,7 @@ export default function Header() {
                 <>
                   <Link
                     to="/anuncio/criar"
-                    className="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-walmart-yellow text-walmart-text rounded-lg hover:bg-walmart-yellow-dark transition-colors font-semibold text-[0.85rem]"
+                    className="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-vitrii-yellow text-vitrii-text rounded-lg hover:bg-vitrii-yellow-dark transition-colors font-semibold text-[0.85rem]"
                   >
                     <Plus className="w-4 h-4" />
                     <span className="hidden md:inline">Publicar</span>
@@ -148,7 +148,7 @@ export default function Header() {
                 <>
                   <Link
                     to="/anuncio/criar"
-                    className="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-walmart-yellow text-walmart-text rounded-lg hover:bg-walmart-yellow-dark transition-colors font-semibold text-[0.85rem]"
+                    className="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-vitrii-yellow text-vitrii-text rounded-lg hover:bg-vitrii-yellow-dark transition-colors font-semibold text-[0.85rem]"
                   >
                     <Plus className="w-4 h-4" />
                     <span className="hidden md:inline">Publicar</span>
@@ -156,14 +156,14 @@ export default function Header() {
 
                   <Link
                     to="/auth/signin"
-                    className="px-4 py-2 text-walmart-blue hover:bg-blue-50 rounded-lg transition-colors hidden sm:block text-[0.85rem]"
+                    className="px-4 py-2 text-vitrii-blue hover:bg-blue-50 rounded-lg transition-colors hidden sm:block text-[0.85rem]"
                   >
                     Entrar
                   </Link>
 
                   <Link
                     to="/auth/signup"
-                    className="px-4 py-2 bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors hidden sm:block text-[0.85rem]"
+                    className="px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors hidden sm:block text-[0.85rem]"
                   >
                     Cadastrar
                   </Link>
@@ -173,7 +173,7 @@ export default function Header() {
               {/* Mobile menu button */}
               <Link
                 to="/menu"
-                className="flex-shrink-0 p-2 hover:bg-walmart-gray rounded-lg mobile-menu-button"
+                className="flex-shrink-0 p-2 hover:bg-vitrii-gray rounded-lg mobile-menu-button"
                 aria-label="Menu de navegação"
               >
                 <Menu className="w-5 h-5" />
@@ -197,7 +197,7 @@ export default function Header() {
                     );
                   }
                 }}
-                className="w-full px-4 py-2 pl-10 bg-walmart-gray border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-walmart-blue"
+                className="w-full px-4 py-2 pl-10 bg-vitrii-gray border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-vitrii-blue"
               />
               <Search className="absolute left-3 top-2.5 text-gray-400 w-5 h-5" />
             </div>

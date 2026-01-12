@@ -40,9 +40,9 @@ const extractMunicipality = (endereco: string): string => {
 
 const colorClasses = {
   blue: {
-    button: "bg-walmart-blue hover:bg-walmart-blue-dark",
+    button: "bg-vitrii-blue hover:bg-vitrii-blue-dark",
     badge: "bg-blue-50 text-blue-700",
-    border: "border-walmart-blue",
+    border: "border-vitrii-blue",
   },
   green: {
     button: "bg-green-600 hover:bg-green-700",
@@ -122,10 +122,10 @@ export default function AnunciosCarousel({
     return (
       <div className="text-center py-12">
         <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-        <p className="text-walmart-text-secondary mb-4">{emptyMessage}</p>
+        <p className="text-vitrii-text-secondary mb-4">{emptyMessage}</p>
         <Link
           to="/anuncio/criar"
-          className="inline-flex items-center gap-2 text-walmart-blue font-semibold hover:underline"
+          className="inline-flex items-center gap-2 text-vitrii-blue font-semibold hover:underline"
         >
           Publique um Anúncio
         </Link>
@@ -140,14 +140,14 @@ export default function AnunciosCarousel({
         onClick={() => scroll("left")}
         className="absolute left-2 sm:left-0 top-1/2 -translate-y-1/2 z-10 p-2 bg-white/90 hover:bg-white rounded-full shadow-md transition-all"
       >
-        <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-walmart-blue" />
+        <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-vitrii-blue" />
       </button>
 
       <button
         onClick={() => scroll("right")}
         className="absolute right-2 sm:right-0 top-1/2 -translate-y-1/2 z-10 p-2 bg-white/90 hover:bg-white rounded-full shadow-md transition-all"
       >
-        <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-walmart-blue" />
+        <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-vitrii-blue" />
       </button>
 
       {/* Carousel Container */}
@@ -168,7 +168,7 @@ export default function AnunciosCarousel({
                   ? "from-purple-400 to-purple-600"
                   : color === "orange"
                     ? "from-orange-400 to-orange-600"
-                    : "from-walmart-blue to-walmart-blue-dark"
+                    : "from-vitrii-blue to-vitrii-blue-dark"
             }`}>
               {anuncio.imagem ? (
                 <img
@@ -240,11 +240,11 @@ export default function AnunciosCarousel({
                 >
                   {anuncio.titulo}
                 </h4>
-                <p className="text-sm text-walmart-text-secondary mb-3 line-clamp-2">
+                <p className="text-sm text-vitrii-text-secondary mb-3 line-clamp-2">
                   {anuncio.descricao || "Confira este anúncio"}
                 </p>
 
-                <div className="flex items-center gap-1 mb-3 text-xs text-walmart-text-secondary">
+                <div className="flex items-center gap-1 mb-3 text-xs text-vitrii-text-secondary">
                   <span className="truncate">
                     {extractMunicipality(anuncio.anunciantes?.endereco || "")}
                   </span>
@@ -259,7 +259,7 @@ export default function AnunciosCarousel({
                       ? "text-purple-600"
                       : color === "orange"
                         ? "text-orange-600"
-                        : "text-walmart-blue"
+                        : "text-vitrii-blue"
                 }`}>
                   {anuncio.isDoacao
                     ? "Grátis"
@@ -267,7 +267,7 @@ export default function AnunciosCarousel({
                 </span>
                 <div className="flex items-center space-x-1">
                   <svg
-                    className="w-4 h-4 fill-walmart-yellow text-walmart-yellow"
+                    className="w-4 h-4 fill-vitrii-yellow text-vitrii-yellow"
                     viewBox="0 0 24 24"
                   >
                     <polygon points="12 2 15.09 10.26 24 10.26 17.55 15.74 19.64 24 12 19.52 4.36 24 6.45 15.74 0 10.26 8.91 10.26" />
