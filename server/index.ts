@@ -331,6 +331,12 @@ export function createServer() {
   app.get("/api/anuncios/:id/can-edit", canEditAnuncio);
   app.post("/api/anuncios/:id/view", extractUserId, recordAnuncioView);
 
+  // Anúncio Photos routes
+  app.get("/api/anuncios/:id/fotos", getAnuncioFotos);
+  app.post("/api/anuncios/:id/fotos", extractUserId, addAnuncioFoto);
+  app.delete("/api/anuncios/:id/fotos/:fotoId", extractUserId, deleteAnuncioFoto);
+  app.patch("/api/anuncios/:id/fotos/reorder", extractUserId, reorderAnuncioFotos);
+
   // Equipes de Venda routes
   app.get("/api/equipes-venda", extractUserId, getEquipes);
   app.get("/api/equipes-venda/:id", extractUserId, getEquipeById);
