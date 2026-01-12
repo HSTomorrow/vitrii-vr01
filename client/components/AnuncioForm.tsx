@@ -224,6 +224,16 @@ export default function AnuncioForm({
     }
   }, [anunciantes, anuncioId]);
 
+  // Update tipo when product is selected
+  useEffect(() => {
+    if (selectedProducto && selectedProducto.tipo) {
+      setFormData((prev) => ({
+        ...prev,
+        tipo: selectedProducto.tipo || "produto",
+      }));
+    }
+  }, [selectedProducto?.id]);
+
   // Populate form with anuncio data when editing
   useEffect(() => {
     if (anuncioData?.data) {
