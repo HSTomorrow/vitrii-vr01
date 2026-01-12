@@ -228,8 +228,8 @@ export default function AnuncioForm({
         descricao: ad.descricao || "",
         productId: ad.productId,
         tabelaDePrecoId: ad.tabelaDePrecoId || 0,
-        fotoUrl: ad.fotoUrl || "",
-        precoAnuncio: ad.precoAnuncio ? ad.precoAnuncio.toString() : "",
+        fotoUrl: ad.imagem || "",
+        precoAnuncio: ad.preco ? ad.preco.toString() : "",
         dataValidade: ad.dataValidade
           ? new Date(ad.dataValidade).toISOString().split("T")[0]
           : getDefaultValidityDate(),
@@ -246,6 +246,17 @@ export default function AnuncioForm({
       toast.success("Anúncio carregado com sucesso");
     }
   }, [anuncioData]);
+
+  // Populate photos when editing
+  useEffect(() => {
+    if (fotosData?.data && fotosData.data.length > 0) {
+      const photos = fotosData.data.map((foto: any) => ({
+        id: foto.id,
+        url: foto.url,
+      }));
+      setUploadedImages(photos);
+    }
+  }, [fotosData]);
 
   // Create/update mutation
   const mutation = useMutation({
