@@ -57,7 +57,7 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
-        walmart: {
+        vitrii: {
           blue: "#0071ce",
           "blue-dark": "#0052a3",
           yellow: "#FFC220",
@@ -66,6 +66,9 @@ export default {
           "gray-light": "#fafafa",
           text: "#1a1a1a",
           "text-secondary": "#666666",
+          bg: "#ffffff",
+          green: "#16a34a",
+          "green-dark": "#15803d",
         },
       },
       fontFamily: {
