@@ -259,6 +259,7 @@ export default function AnuncioForm({
         destaque: ad.destaque || false,
         categoria: ad.categoria || "",
         dadosCategoria: ad.dadosCategoria || "",
+        tipo: ad.tipo || "produto",
       });
 
       toast.success("Anúncio carregado com sucesso");
