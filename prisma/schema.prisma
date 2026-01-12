@@ -121,6 +121,7 @@ model productos {
   sku                 String?               @db.VarChar(100)
   dataCriacao         DateTime              @default(now())
   dataAtualizacao     DateTime
+  grupo               grupos_produtos       @relation(fields: [grupoId], references: [id], onDelete: Cascade)
   movimentos_estoque  movimentos_estoque[]
   produtos_em_estoque produtos_em_estoque[]
 }
