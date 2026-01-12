@@ -11,8 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 interface Anunciante {
   id: number;
   nome: string;
-  tipo?: string;
-  cnpjOuCpf: string;
+  cnpj?: string;
   endereco: string;
   cidade: string;
   estado: string;
@@ -32,8 +31,7 @@ export default function CadastroAnunciantes() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState({
     nome: "",
-    tipo: "Comum",
-    cnpjOuCpf: "",
+    cnpj: "",
     endereco: "",
     cidade: "",
     estado: "RS",
@@ -104,7 +102,7 @@ export default function CadastroAnunciantes() {
       );
       setFormData({
         nome: "",
-        cnpjOuCpf: "",
+        cnpj: "",
         endereco: "",
         cidade: "",
         estado: "RS",
@@ -149,13 +147,12 @@ export default function CadastroAnunciantes() {
   const handleEdit = (loja: Anunciante) => {
     setFormData({
       nome: loja.nome,
-      tipo: loja.tipo || "Comum",
-      cnpjOuCpf: loja.cnpjOuCpf,
-      endereco: loja.endereco,
-      cidade: loja.cidade,
-      estado: loja.estado,
-      descricao: loja.descricao,
-      email: loja.email,
+      cnpj: loja.cnpj || "",
+      endereco: loja.endereco || "",
+      cidade: loja.cidade || "",
+      estado: loja.estado || "RS",
+      descricao: loja.descricao || "",
+      email: loja.email || "",
       site: loja.site || "",
       instagram: loja.instagram || "",
       facebook: loja.facebook || "",
@@ -185,7 +182,7 @@ export default function CadastroAnunciantes() {
               setEditingId(null);
               setFormData({
                 nome: "",
-                cnpjOuCpf: "",
+                cnpj: "",
                 endereco: "",
                 cidade: "",
                 estado: "RS",
@@ -227,22 +224,6 @@ export default function CadastroAnunciantes() {
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-semibold text-walmart-text mb-2">
-                    Tipo de Anunciante *
-                  </label>
-                  <select
-                    required
-                    value={formData.tipo}
-                    onChange={(e) =>
-                      setFormData({ ...formData, tipo: e.target.value })
-                    }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50 bg-white"
-                  >
-                    <option value="Comum">Comum</option>
-                    <option value="Profissional">Profissional</option>
-                  </select>
-                </div>
 
                 <div>
                   <label className="block text-sm font-semibold text-walmart-text mb-2">
@@ -251,9 +232,9 @@ export default function CadastroAnunciantes() {
                   <input
                     type="text"
                     required
-                    value={formData.cnpjOuCpf}
+                    value={formData.cnpj}
                     onChange={(e) =>
-                      setFormData({ ...formData, cnpjOuCpf: e.target.value })
+                      setFormData({ ...formData, cnpj: e.target.value })
                     }
                     placeholder="00000000000000"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
@@ -452,9 +433,6 @@ export default function CadastroAnunciantes() {
                     Nome
                   </th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">
-                    Tipo
-                  </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">
                     CNPJ/CPF
                   </th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">
@@ -475,7 +453,7 @@ export default function CadastroAnunciantes() {
                 {!anunciantes || anunciantes.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={7}
+                      colSpan={6}
                       className="px-6 py-4 text-center text-gray-500"
                     >
                       Nenhuma loja cadastrada
@@ -488,16 +466,7 @@ export default function CadastroAnunciantes() {
                         {loja.nome}
                       </td>
                       <td className="px-6 py-4 text-walmart-text">
-                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                          loja.tipo === "Profissional"
-                            ? "bg-blue-100 text-blue-800"
-                            : "bg-gray-100 text-gray-800"
-                        }`}>
-                          {loja.tipo || "Comum"}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-walmart-text">
-                        {loja.cnpjOuCpf}
+                        {loja.cnpj}
                       </td>
                       <td className="px-6 py-4 text-walmart-text">
                         {loja.email}
