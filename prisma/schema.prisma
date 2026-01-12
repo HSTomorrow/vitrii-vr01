@@ -120,6 +120,7 @@ model productos {
   nome                String                @db.VarChar(255)
   descricao           String?
   sku                 String?               @db.VarChar(100)
+  tipo                String                @default("produto") @db.VarChar(50)
   dataCriacao         DateTime              @default(now())
   dataAtualizacao     DateTime
   grupo               grupos_produtos       @relation(fields: [grupoId], references: [id], onDelete: Cascade)
