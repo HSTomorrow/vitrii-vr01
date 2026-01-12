@@ -55,6 +55,7 @@ interface AgendaSlot {
 }
 
 export default function Agenda() {
+  const { user } = useAuth();
   const navigate = useNavigate();
   const { anuncianteId } = useParams<{ anuncianteId?: string }>();
 
@@ -79,13 +80,18 @@ export default function Agenda() {
   // Load lojas and productos on mount
   useEffect(() => {
     loadSelects();
-  }, []);
+  }, [user?.id]);
 
   const loadSelects = async () => {
     try {
       setLoadingSelects(true);
+      const headers: Record<string, string> = {};
+      if (user?.id) {
+        headers["x-user-id"] = user.id.toString();
+      }
+
       const [lojasRes, productosRes] = await Promise.all([
-        fetch("/api/anunciantes"),
+        fetch("/api/anunciantes", { headers }),
         fetch("/api/productos"),
       ]);
 
