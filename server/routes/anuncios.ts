@@ -112,6 +112,7 @@ export const getAnuncios: RequestHandler = async (req, res) => {
             select: {
               id: true,
               nome: true,
+              fotoUrl: true,
             },
           },
         },
@@ -978,6 +979,7 @@ export const getAnunciosDUsuario: RequestHandler = async (req, res) => {
             select: {
               id: true,
               nome: true,
+              fotoUrl: true,
             },
           },
         },
