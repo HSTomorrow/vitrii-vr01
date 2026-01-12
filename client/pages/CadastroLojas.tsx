@@ -196,9 +196,34 @@ export default function CadastroAnunciantes() {
       instagram: loja.instagram || "",
       facebook: loja.facebook || "",
       whatsapp: loja.whatsapp || "",
+      fotoUrl: loja.fotoUrl || "",
     });
     setEditingId(loja.id);
     setIsFormOpen(true);
+  };
+
+  const handleFileUpload = async (file: File) => {
+    try {
+      const formDataFile = new FormData();
+      formDataFile.append("file", file);
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formDataFile,
+      });
+
+      if (!response.ok) {
+        throw new Error("Erro ao fazer upload da imagem");
+      }
+
+      const data = await response.json();
+      setFormData({ ...formData, fotoUrl: data.url });
+      toast.success("Imagem enviada com sucesso!");
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao fazer upload",
+      );
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
