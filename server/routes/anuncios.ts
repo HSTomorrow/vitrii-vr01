@@ -314,8 +314,8 @@ export const createAnuncio: RequestHandler = async (req, res) => {
     });
 
     // Increment active ads counter for the user
-    if (status === "pago") {
-      // Only count as active if payment is already done (donation or paid)
+    if (status === "ativo" || status === "pago") {
+      // Only count as active if donation (ativo) or paid (pago)
       await prisma.usracessos.update({
         where: { id: validatedData.usuarioId },
         data: {
