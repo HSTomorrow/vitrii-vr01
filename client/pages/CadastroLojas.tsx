@@ -83,10 +83,20 @@ export default function CadastroAnunciantes() {
         headers["X-User-Id"] = user.id.toString();
       }
 
+      // For updates, filter out empty strings from optional fields
+      const payload = editingId
+        ? Object.fromEntries(
+            Object.entries(data).filter(([_, value]) => {
+              // Keep non-empty strings and all other values
+              return typeof value !== "string" || value.trim() !== "";
+            })
+          )
+        : data;
+
       const response = await fetch(url, {
         method,
         headers,
-        body: JSON.stringify(data),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
