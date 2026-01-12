@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 export default function SearchProdutos() {
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedStore, setSelectedStore] = useState<number | null>(null);
   const [selectedGroup, setSelectedGroup] = useState<number | null>(null);
@@ -40,14 +41,20 @@ export default function SearchProdutos() {
     },
   });
 
-  // Fetch groups
+  // Fetch groups with user context
   const { data: groupsData } = useQuery({
-    queryKey: ["grupos-productos"],
+    queryKey: ["grupos-productos", user?.id],
     queryFn: async () => {
-      const response = await fetch("/api/grupos-productos");
+      const headers: Record<string, string> = {};
+      if (user?.id) {
+        headers["x-user-id"] = user.id.toString();
+      }
+
+      const response = await fetch("/api/grupos-productos", { headers });
       if (!response.ok) throw new Error("Erro ao buscar grupos");
       return response.json();
     },
+    enabled: !!user,
   });
 
   // Fetch tables de preco for all prices
