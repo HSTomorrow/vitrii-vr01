@@ -392,20 +392,35 @@ export default function AnuncioDetalhe() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-2">
-              {/* Product Image */}
-              <div className="bg-vitrii-gray-light rounded-lg overflow-hidden mb-8">
-                {anuncio.imagem ? (
-                  <img
-                    src={anuncio.imagem}
-                    alt={anuncio.titulo}
-                    className="w-full h-96 object-cover"
+              {/* Product Image / Gallery */}
+              {fotos && fotos.length > 0 ? (
+                <div className="bg-white rounded-lg overflow-hidden mb-8">
+                  <ImageGallery
+                    photos={fotos}
+                    anuncioId={parseInt(id!)}
+                    canDelete={canEdit}
+                    onPhotoDeleted={() => {
+                      queryClient.invalidateQueries({
+                        queryKey: ["anuncio-fotos", id],
+                      });
+                    }}
                   />
-                ) : (
-                  <div className="w-full h-96 flex items-center justify-center bg-gray-300">
-                    <Package className="w-16 h-16 text-gray-600" />
-                  </div>
-                )}
-              </div>
+                </div>
+              ) : (
+                <div className="bg-vitrii-gray-light rounded-lg overflow-hidden mb-8">
+                  {anuncio.imagem ? (
+                    <img
+                      src={anuncio.imagem}
+                      alt={anuncio.titulo}
+                      className="w-full h-96 object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-96 flex items-center justify-center bg-gray-300">
+                      <Package className="w-16 h-16 text-gray-600" />
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Description */}
               <div className="bg-white rounded-lg border border-gray-200 p-6 mb-8">
