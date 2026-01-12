@@ -24,6 +24,7 @@ const TYPES = [
   { value: "servico", label: "Serviço" },
   { value: "evento", label: "Evento" },
   { value: "agenda_recorrente", label: "Aula/Agenda" },
+  { value: "oportunidade", label: "Oportunidade/Vaga de Emprego" },
 ];
 
 export default function Browse() {
