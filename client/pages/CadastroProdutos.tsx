@@ -304,6 +304,9 @@ export default function CadastroProdutos() {
                   >
                     <option value="produto">Produto</option>
                     <option value="servico">Serviço</option>
+                    <option value="evento">Evento</option>
+                    <option value="agenda_recorrente">Aula / Agenda Disponível</option>
+                    <option value="oportunidade">Oportunidade / Vaga de Emprego</option>
                   </select>
                 </div>
               </div>
