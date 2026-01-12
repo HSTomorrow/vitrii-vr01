@@ -67,7 +67,7 @@ export const getGrupoById: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const grupo = await prisma.gruposProductos.findUnique({
+    const grupo = await prisma.grupos_produtos.findUnique({
       where: { id: parseInt(id) },
       select: {
         id: true,
