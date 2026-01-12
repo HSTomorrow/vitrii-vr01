@@ -25,7 +25,11 @@ export const getProductos: RequestHandler = async (req, res) => {
       where,
       include: {
         grupo: {
-          include: {
+          select: {
+            id: true,
+            nome: true,
+            descricao: true,
+            anuncianteId: true,
             anunciante: {
               select: {
                 id: true,
