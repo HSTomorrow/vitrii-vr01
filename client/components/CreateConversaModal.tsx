@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 import { X, Search } from "lucide-react";
 
 interface CreateConversaModalProps {
