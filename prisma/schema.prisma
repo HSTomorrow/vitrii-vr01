@@ -85,7 +85,7 @@ model fotos_grupos {
 
 model grupos_produtos {
   id              Int      @id @default(autoincrement())
-  usuarioId       Int
+  usuarioId       Int?
   anuncianteId    Int
   nome            String   @db.VarChar(255)
   descricao       String?
