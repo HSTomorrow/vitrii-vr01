@@ -146,6 +146,7 @@ export default function CadastroAnunciantes() {
         instagram: "",
         facebook: "",
         whatsapp: "",
+        fotoUrl: "",
       });
       setEditingId(null);
       setIsFormOpen(false);
