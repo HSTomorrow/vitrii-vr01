@@ -32,6 +32,7 @@ export default function CadastroAnunciantes() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState({
     nome: "",
+    tipo: "Padrão",
     cnpj: "",
     endereco: "",
     cidade: "",
