@@ -24,13 +24,49 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
   canDelete = false,
   onPhotoDeleted,
   onReorder,
+  anuncianteFotoUrl,
 }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [isZoomed, setIsZoomed] = useState(false);
 
+  // Show anunciante photo as fallback if no photos exist
   if (!photos || photos.length === 0) {
-    return null;
+    if (!anuncianteFotoUrl) {
+      return null;
+    }
+    // Show only anunciante photo as fallback
+    return (
+      <div className="w-full space-y-4">
+        {/* Main Image */}
+        <div
+          className="relative w-full bg-gray-100 rounded-lg overflow-hidden cursor-pointer aspect-square"
+          onClick={() => setIsZoomed(true)}
+        >
+          <img
+            src={anuncianteFotoUrl}
+            alt="Foto do Anunciante"
+            className="w-full h-full object-cover"
+          />
+          {/* Fallback Badge */}
+          <div className="absolute top-2 left-2 bg-gray-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
+            Foto do Anunciante
+          </div>
+        </div>
+
+        {/* Zoom Modal */}
+        <ImageZoomModal
+          imageUrl={anuncianteFotoUrl}
+          isOpen={isZoomed}
+          onClose={() => setIsZoomed(false)}
+        />
+
+        {/* Info */}
+        <div className="text-sm text-vitrii-text-secondary text-center">
+          Nenhuma foto específica foi adicionada. Exibindo a foto do anunciante.
+        </div>
+      </div>
+    );
   }
 
   const sortedPhotos = [...photos].sort((a, b) => a.ordem - b.ordem);
