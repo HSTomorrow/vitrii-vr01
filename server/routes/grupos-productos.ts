@@ -194,7 +194,10 @@ export const getProductosOfGrupo: RequestHandler = async (req, res) => {
 // CREATE new grupo
 export const createGrupo: RequestHandler = async (req, res) => {
   try {
+    console.log("[createGrupo] Request body:", req.body);
+
     const validatedData = GrupoCreateSchema.parse(req.body);
+    console.log("[createGrupo] Validated data:", validatedData);
 
     const grupo = await prisma.grupos_produtos.create({
       data: validatedData,
@@ -208,6 +211,8 @@ export const createGrupo: RequestHandler = async (req, res) => {
       },
     });
 
+    console.log("[createGrupo] Grupo created successfully:", grupo);
+
     res.status(201).json({
       success: true,
       data: grupo,
@@ -215,6 +220,7 @@ export const createGrupo: RequestHandler = async (req, res) => {
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
+      console.error("[createGrupo] Validation error:", error.errors);
       return res.status(400).json({
         success: false,
         error: "Dados inválidos",
@@ -222,10 +228,16 @@ export const createGrupo: RequestHandler = async (req, res) => {
       });
     }
 
-    console.error("Error creating grupo:", error);
+    console.error("[createGrupo] Error creating grupo:", error);
+    console.error("[createGrupo] Error details:", {
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
+    });
+
     res.status(500).json({
       success: false,
       error: "Erro ao criar grupo de produtos",
+      details: error instanceof Error ? error.message : String(error),
     });
   }
 };
