@@ -24,10 +24,11 @@ const AnuncianteCreateSchema = z.object({
   fotoUrl: z.string().optional(),
 });
 
-// GET all anunciantes (with pagination)
+// GET all anunciantes (with pagination and user filtering)
 export const getAnunciantes: RequestHandler = async (req, res) => {
   try {
     const { limit = "20", offset = "0" } = req.query;
+    const userId = req.userId;
 
     // Validate pagination parameters
     const pageLimit = Math.min(
@@ -36,9 +37,46 @@ export const getAnunciantes: RequestHandler = async (req, res) => {
     );
     const pageOffset = Math.max(parseInt(offset as string) || 0, 0);
 
+    const where: any = {};
+
+    // If user is not an admin, filter by their anunciantes
+    if (userId) {
+      const usuario = await prisma.usracessos.findUnique({
+        where: { id: userId },
+      });
+
+      // If not admin, only show anunciantes the user is associated with
+      if (usuario && usuario.tipoUsuario !== "adm") {
+        const userAnunciantes = await prisma.usuarios_anunciantes.findMany({
+          where: { usuarioId: userId },
+          select: { anuncianteId: true },
+        });
+
+        const anuncianteIds = userAnunciantes.map((ua) => ua.anuncianteId);
+
+        if (anuncianteIds.length === 0) {
+          // User has no anunciantes, return empty list
+          return res.json({
+            success: true,
+            data: [],
+            pagination: {
+              count: 0,
+              total: 0,
+              limit: pageLimit,
+              offset: pageOffset,
+              hasMore: false,
+            },
+          });
+        }
+
+        where.id = { in: anuncianteIds };
+      }
+    }
+
     // Get total count and paginated data in parallel
     const [anunciantes, total] = await Promise.all([
       prisma.anunciantes.findMany({
+        where,
         select: {
           id: true,
           nome: true,
@@ -64,7 +102,7 @@ export const getAnunciantes: RequestHandler = async (req, res) => {
         take: pageLimit,
         skip: pageOffset,
       }),
-      prisma.anunciantes.count(),
+      prisma.anunciantes.count(where ? { where } : undefined),
     ]);
 
     res.json({
