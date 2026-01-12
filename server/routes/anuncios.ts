@@ -36,6 +36,10 @@ const AnuncioBaseSchema = z.object({
     .length(2, "Estado deve ter 2 caracteres")
     .optional()
     .nullable(),
+  tipo: z
+    .enum(["produto", "servico", "evento", "agenda_recorrente", "oportunidade"])
+    .optional()
+    .default("produto"),
   isDoacao: z.boolean().optional().default(false),
   destaque: z.boolean().optional().default(false),
   isActive: z.boolean().optional().default(true),
