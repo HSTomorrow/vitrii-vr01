@@ -174,7 +174,7 @@ export default function Menu() {
                   >
                     <Store className="w-6 h-6 text-vitrii-blue" />
                     <span className="text-vitrii-text font-medium">
-                      Cadastro de Lojas
+                      Cadastro de Anunciantes e Lojas
                     </span>
                   </Link>
 
