@@ -210,7 +210,7 @@ export default function CadastroAnunciantes() {
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-walmart-text">
+          <h1 className="text-3xl font-bold text-vitrii-text">
             Cadastro de Anunciantes
           </h1>
           <button
@@ -233,7 +233,7 @@ export default function CadastroAnunciantes() {
                 whatsapp: "",
               });
             }}
-            className="flex items-center gap-2 px-4 py-2 bg-walmart-yellow text-walmart-text rounded-lg hover:bg-walmart-yellow-dark transition-colors font-semibold"
+            className="flex items-center gap-2 px-4 py-2 bg-vitrii-yellow text-vitrii-text rounded-lg hover:bg-vitrii-yellow-dark transition-colors font-semibold"
           >
             <Plus className="w-5 h-5" />
             Nova Anunciante
@@ -243,13 +243,13 @@ export default function CadastroAnunciantes() {
         {/* Form */}
         {isFormOpen && (
           <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-            <h2 className="text-xl font-bold text-walmart-text mb-6">
+            <h2 className="text-xl font-bold text-vitrii-text mb-6">
               {editingId ? "Editar Anunciante" : "Criar Nova Anunciante"}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
                     Nome da Anunciante *
                   </label>
                   <input
@@ -259,12 +259,12 @@ export default function CadastroAnunciantes() {
                     onChange={(e) =>
                       setFormData({ ...formData, nome: e.target.value })
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
                     Tipo de Anunciante *
                   </label>
                   <select
@@ -273,7 +273,7 @@ export default function CadastroAnunciantes() {
                     onChange={(e) =>
                       setFormData({ ...formData, tipo: e.target.value })
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50 bg-white"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50 bg-white"
                   >
                     <option value="Padrão">Padrão</option>
                     <option value="Profissional">Profissional</option>
@@ -281,7 +281,7 @@ export default function CadastroAnunciantes() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
                     CNPJ/CPF *
                   </label>
                   <input
@@ -292,12 +292,12 @@ export default function CadastroAnunciantes() {
                       setFormData({ ...formData, cnpj: e.target.value })
                     }
                     placeholder="00000000000000"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
                     Endereço *
                   </label>
                   <input
@@ -307,12 +307,12 @@ export default function CadastroAnunciantes() {
                     onChange={(e) =>
                       setFormData({ ...formData, endereco: e.target.value })
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
                     Cidade *
                   </label>
                   <input
@@ -323,12 +323,12 @@ export default function CadastroAnunciantes() {
                       setFormData({ ...formData, cidade: e.target.value })
                     }
                     placeholder="Ex: Belo Horizonte"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
                     Estado (UF) *
                   </label>
                   <select
@@ -337,7 +337,7 @@ export default function CadastroAnunciantes() {
                     onChange={(e) =>
                       setFormData({ ...formData, estado: e.target.value })
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50 bg-white"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50 bg-white"
                   >
                     {BRAZILIAN_STATES.map((state) => (
                       <option key={state.code} value={state.code}>
@@ -348,7 +348,7 @@ export default function CadastroAnunciantes() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
                     Email *
                   </label>
                   <input
@@ -358,12 +358,12 @@ export default function CadastroAnunciantes() {
                     onChange={(e) =>
                       setFormData({ ...formData, email: e.target.value })
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
                     Telefone (Opcional)
                   </label>
                   <input
@@ -378,12 +378,12 @@ export default function CadastroAnunciantes() {
                       setFormData({ ...formData, telefone: cleanValue });
                     }}
                     placeholder="(51) 3333-3333"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
                     Site (Opcional)
                   </label>
                   <input
@@ -393,12 +393,12 @@ export default function CadastroAnunciantes() {
                       setFormData({ ...formData, site: e.target.value })
                     }
                     placeholder="https://example.com"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
                     Instagram (Opcional)
                   </label>
                   <input
@@ -408,12 +408,12 @@ export default function CadastroAnunciantes() {
                       setFormData({ ...formData, instagram: e.target.value })
                     }
                     placeholder="@usuario"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
                     Facebook (Opcional)
                   </label>
                   <input
@@ -423,12 +423,12 @@ export default function CadastroAnunciantes() {
                       setFormData({ ...formData, facebook: e.target.value })
                     }
                     placeholder="nome-da-pagina"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
                     WhatsApp (Opcional)
                   </label>
                   <div className="flex items-center gap-0">
@@ -451,17 +451,17 @@ export default function CadastroAnunciantes() {
                         });
                       }}
                       placeholder="(51) 98765-4321"
-                      className="flex-1 px-4 py-2 border border-gray-300 rounded-r-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+                      className="flex-1 px-4 py-2 border border-gray-300 rounded-r-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                     />
                   </div>
-                  <p className="text-xs text-walmart-text-secondary mt-1">
+                  <p className="text-xs text-vitrii-text-secondary mt-1">
                     Digite apenas DDD e número (ex: 11 98765-4321)
                   </p>
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-walmart-text mb-2">
+                <label className="block text-sm font-semibold text-vitrii-text mb-2">
                   Descrição (Opcional)
                 </label>
                 <textarea
@@ -470,7 +470,7 @@ export default function CadastroAnunciantes() {
                     setFormData({ ...formData, descricao: e.target.value })
                   }
                   rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                 />
               </div>
 
@@ -478,7 +478,7 @@ export default function CadastroAnunciantes() {
                 <button
                   type="submit"
                   disabled={saveAnuncianteMutation.isPending}
-                  className="px-6 py-2 bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors font-semibold disabled:opacity-50"
+                  className="px-6 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors font-semibold disabled:opacity-50"
                 >
                   {saveAnuncianteMutation.isPending ? "Salvando..." : "Salvar"}
                 </button>
@@ -488,7 +488,7 @@ export default function CadastroAnunciantes() {
                     setIsFormOpen(false);
                     setEditingId(null);
                   }}
-                  className="px-6 py-2 bg-gray-300 text-walmart-text rounded-lg hover:bg-gray-400 transition-colors font-semibold"
+                  className="px-6 py-2 bg-gray-300 text-vitrii-text rounded-lg hover:bg-gray-400 transition-colors font-semibold"
                 >
                   Cancelar
                 </button>
@@ -501,27 +501,27 @@ export default function CadastroAnunciantes() {
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-walmart-gray">
+              <thead className="bg-vitrii-gray">
                 <tr>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
                     Nome
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
                     Tipo
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
                     CNPJ/CPF
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
                     Email
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
                     Endereço
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
                     Cidade/Estado
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
                     Ações
                   </th>
                 </tr>
@@ -539,10 +539,10 @@ export default function CadastroAnunciantes() {
                 ) : (
                   anunciantes.map((loja) => (
                     <tr key={loja.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 font-semibold text-walmart-text">
+                      <td className="px-6 py-4 font-semibold text-vitrii-text">
                         {loja.nome}
                       </td>
-                      <td className="px-6 py-4 text-walmart-text">
+                      <td className="px-6 py-4 text-vitrii-text">
                         <span
                           className={`px-2 py-1 rounded-full text-xs font-semibold ${
                             loja.tipo === "Profissional"
@@ -553,16 +553,16 @@ export default function CadastroAnunciantes() {
                           {loja.tipo || "Padrão"}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-walmart-text">
+                      <td className="px-6 py-4 text-vitrii-text">
                         {loja.cnpj}
                       </td>
-                      <td className="px-6 py-4 text-walmart-text">
+                      <td className="px-6 py-4 text-vitrii-text">
                         {loja.email}
                       </td>
-                      <td className="px-6 py-4 text-walmart-text">
+                      <td className="px-6 py-4 text-vitrii-text">
                         {loja.endereco}
                       </td>
-                      <td className="px-6 py-4 text-walmart-text">
+                      <td className="px-6 py-4 text-vitrii-text">
                         {loja.cidade && loja.estado
                           ? `${loja.cidade}, ${loja.estado}`
                           : "—"}
@@ -570,7 +570,7 @@ export default function CadastroAnunciantes() {
                       <td className="px-6 py-4 flex gap-2">
                         <button
                           onClick={() => handleEdit(loja)}
-                          className="p-2 text-walmart-blue hover:bg-blue-50 rounded-lg transition-colors"
+                          className="p-2 text-vitrii-blue hover:bg-blue-50 rounded-lg transition-colors"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>

@@ -195,7 +195,7 @@ export default function ChatBox({
       {/* Messages Container */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 ? (
-          <div className="flex items-center justify-center h-full text-walmart-text-secondary">
+          <div className="flex items-center justify-center h-full text-vitrii-text-secondary">
             <p>Nenhuma mensagem ainda. Inicie a conversa!</p>
           </div>
         ) : (
@@ -205,7 +205,7 @@ export default function ChatBox({
                 {/* Date Separator */}
                 <div className="flex items-center gap-3 my-4">
                   <div className="flex-1 h-px bg-gray-200" />
-                  <span className="text-xs text-walmart-text-secondary">
+                  <span className="text-xs text-vitrii-text-secondary">
                     {date}
                   </span>
                   <div className="flex-1 h-px bg-gray-200" />
@@ -222,7 +222,7 @@ export default function ChatBox({
                       {/* Avatar */}
                       <div
                         className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-semibold flex-shrink-0 ${
-                          isCurrentUser ? "bg-walmart-blue" : "bg-gray-400"
+                          isCurrentUser ? "bg-vitrii-blue" : "bg-gray-400"
                         }`}
                       >
                         {msg.remetente.nome.charAt(0).toUpperCase()}
@@ -232,14 +232,14 @@ export default function ChatBox({
                       <div
                         className={`flex flex-col ${isCurrentUser ? "items-end" : "items-start"}`}
                       >
-                        <p className="text-xs text-walmart-text-secondary mb-1">
+                        <p className="text-xs text-vitrii-text-secondary mb-1">
                           {msg.remetente.nome} • {formatTime(msg.dataCriacao)}
                         </p>
                         <div
                           className={`max-w-xs px-4 py-2 rounded-lg ${
                             isCurrentUser
-                              ? "bg-walmart-blue text-white"
-                              : "bg-gray-100 text-walmart-text"
+                              ? "bg-vitrii-blue text-white"
+                              : "bg-gray-100 text-vitrii-text"
                           }`}
                         >
                           <p className="break-words text-sm">{msg.conteudo}</p>
@@ -284,18 +284,18 @@ export default function ChatBox({
               placeholder="Escreva sua mensagem... (Ctrl+Enter para enviar)"
               maxLength={2000}
               rows={1}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent resize-none"
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent resize-none"
             />
             <button
               type="submit"
               disabled={sendMessageMutation.isPending || !messageText.trim()}
-              className="px-4 py-2 bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors disabled:opacity-50 flex items-center gap-2"
+              className="px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors disabled:opacity-50 flex items-center gap-2"
             >
               <Send className="w-4 h-4" />
               {sendMessageMutation.isPending ? "..." : "Enviar"}
             </button>
           </div>
-          <p className="text-xs text-walmart-text-secondary">
+          <p className="text-xs text-vitrii-text-secondary">
             {messageText.length}/2000 caracteres
           </p>
         </form>

@@ -125,14 +125,14 @@ export default function CadastroGruposProductos() {
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-walmart-text">Cadastro de Grupos de Produtos</h1>
+          <h1 className="text-3xl font-bold text-vitrii-text">Cadastro de Grupos de Produtos</h1>
           <button
             onClick={() => {
               setIsFormOpen(!isFormOpen);
               setEditingId(null);
               setFormData({ anuncianteId: "", nome: "", descricao: "" });
             }}
-            className="flex items-center gap-2 px-4 py-2 bg-walmart-yellow text-walmart-text rounded-lg hover:bg-walmart-yellow-dark transition-colors font-semibold"
+            className="flex items-center gap-2 px-4 py-2 bg-vitrii-yellow text-vitrii-text rounded-lg hover:bg-vitrii-yellow-dark transition-colors font-semibold"
           >
             <Plus className="w-5 h-5" />
             Novo Grupo
@@ -142,20 +142,20 @@ export default function CadastroGruposProductos() {
         {/* Form */}
         {isFormOpen && (
           <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-            <h2 className="text-xl font-bold text-walmart-text mb-6">
+            <h2 className="text-xl font-bold text-vitrii-text mb-6">
               {editingId ? "Editar Grupo" : "Criar Novo Grupo"}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
                     Anunciante *
                   </label>
                   <select
                     required
                     value={formData.anuncianteId}
                     onChange={(e) => setFormData({ ...formData, anuncianteId: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                   >
                     <option value="">Selecione um anunciante</option>
                     {anunciantes.map((anunciante) => (
@@ -167,7 +167,7 @@ export default function CadastroGruposProductos() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
                     Nome do Grupo *
                   </label>
                   <input
@@ -175,20 +175,20 @@ export default function CadastroGruposProductos() {
                     required
                     value={formData.nome}
                     onChange={(e) => setFormData({ ...formData, nome: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-walmart-text mb-2">
+                <label className="block text-sm font-semibold text-vitrii-text mb-2">
                   Descrição (Opcional)
                 </label>
                 <textarea
                   value={formData.descricao}
                   onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
                   rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                 />
               </div>
 
@@ -196,7 +196,7 @@ export default function CadastroGruposProductos() {
                 <button
                   type="submit"
                   disabled={saveGrupoMutation.isPending}
-                  className="px-6 py-2 bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors font-semibold disabled:opacity-50"
+                  className="px-6 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors font-semibold disabled:opacity-50"
                 >
                   {saveGrupoMutation.isPending ? "Salvando..." : "Salvar"}
                 </button>
@@ -206,7 +206,7 @@ export default function CadastroGruposProductos() {
                     setIsFormOpen(false);
                     setEditingId(null);
                   }}
-                  className="px-6 py-2 bg-gray-300 text-walmart-text rounded-lg hover:bg-gray-400 transition-colors font-semibold"
+                  className="px-6 py-2 bg-gray-300 text-vitrii-text rounded-lg hover:bg-gray-400 transition-colors font-semibold"
                 >
                   Cancelar
                 </button>
@@ -219,12 +219,12 @@ export default function CadastroGruposProductos() {
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-walmart-gray">
+              <thead className="bg-vitrii-gray">
                 <tr>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">Anunciante</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">Nome</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">Descrição</th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">Ações</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">Anunciante</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">Nome</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">Descrição</th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">Ações</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
@@ -237,15 +237,15 @@ export default function CadastroGruposProductos() {
                 ) : (
                   grupos.map((grupo) => (
                     <tr key={grupo.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 font-semibold text-walmart-text">
+                      <td className="px-6 py-4 font-semibold text-vitrii-text">
                         {grupo.anunciante?.nome || "N/A"}
                       </td>
-                      <td className="px-6 py-4 font-semibold text-walmart-text">{grupo.nome}</td>
-                      <td className="px-6 py-4 text-walmart-text">{grupo.descricao || "-"}</td>
+                      <td className="px-6 py-4 font-semibold text-vitrii-text">{grupo.nome}</td>
+                      <td className="px-6 py-4 text-vitrii-text">{grupo.descricao || "-"}</td>
                       <td className="px-6 py-4 flex gap-2">
                         <button
                           onClick={() => handleEdit(grupo)}
-                          className="p-2 text-walmart-blue hover:bg-blue-50 rounded-lg transition-colors"
+                          className="p-2 text-vitrii-blue hover:bg-blue-50 rounded-lg transition-colors"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>

@@ -148,7 +148,7 @@ export default function CadastroVariantes() {
         <div className="mb-8">
           <button
             onClick={() => navigate("/cadastros/productos")}
-            className="inline-flex items-center text-walmart-blue hover:text-walmart-blue-dark font-semibold mb-4"
+            className="inline-flex items-center text-vitrii-blue hover:text-vitrii-blue-dark font-semibold mb-4"
           >
             <ChevronLeft className="w-5 h-5 mr-1" />
             Voltar para Produtos
@@ -156,14 +156,14 @@ export default function CadastroVariantes() {
 
           {producto && (
             <div>
-              <h1 className="text-3xl font-bold text-walmart-text">
+              <h1 className="text-3xl font-bold text-vitrii-text">
                 {producto.nome}
               </h1>
-              <p className="text-walmart-text-secondary mt-2">
+              <p className="text-vitrii-text-secondary mt-2">
                 Gerenciar Variantes (Tamanho, Cor, Preço)
               </p>
               {producto.grupo && (
-                <p className="text-sm text-walmart-text-secondary mt-1">
+                <p className="text-sm text-vitrii-text-secondary mt-1">
                   Grupo: {producto.grupo.nome}
                 </p>
               )}
@@ -179,7 +179,7 @@ export default function CadastroVariantes() {
               setEditingId(null);
               setFormData({ tamanho: "", cor: "", preco: "", precoCusto: "" });
             }}
-            className="flex items-center gap-2 px-4 py-2 bg-walmart-yellow text-walmart-text rounded-lg hover:bg-walmart-yellow-dark transition-colors font-semibold"
+            className="flex items-center gap-2 px-4 py-2 bg-vitrii-yellow text-vitrii-text rounded-lg hover:bg-vitrii-yellow-dark transition-colors font-semibold"
           >
             <Plus className="w-5 h-5" />
             Nova Variante
@@ -189,13 +189,13 @@ export default function CadastroVariantes() {
         {/* Form */}
         {isFormOpen && (
           <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-            <h2 className="text-xl font-bold text-walmart-text mb-6">
+            <h2 className="text-xl font-bold text-vitrii-text mb-6">
               {editingId ? "Editar Variante" : "Criar Nova Variante"}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
                     Tamanho (Opcional)
                   </label>
                   <input
@@ -205,12 +205,12 @@ export default function CadastroVariantes() {
                       setFormData({ ...formData, tamanho: e.target.value })
                     }
                     placeholder="Ex: P, M, G, GG"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
                     Cor (Opcional)
                   </label>
                   <input
@@ -220,12 +220,12 @@ export default function CadastroVariantes() {
                       setFormData({ ...formData, cor: e.target.value })
                     }
                     placeholder="Ex: Azul, Vermelho"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
                     Preço *
                   </label>
                   <input
@@ -237,12 +237,12 @@ export default function CadastroVariantes() {
                       setFormData({ ...formData, preco: e.target.value })
                     }
                     placeholder="0.00"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-walmart-text mb-2">
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
                     Preço de Custo (Opcional)
                   </label>
                   <input
@@ -253,7 +253,7 @@ export default function CadastroVariantes() {
                       setFormData({ ...formData, precoCusto: e.target.value })
                     }
                     placeholder="0.00"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                   />
                 </div>
               </div>
@@ -262,7 +262,7 @@ export default function CadastroVariantes() {
                 <button
                   type="submit"
                   disabled={saveVarianteMutation.isPending}
-                  className="px-6 py-2 bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors font-semibold disabled:opacity-50"
+                  className="px-6 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors font-semibold disabled:opacity-50"
                 >
                   {saveVarianteMutation.isPending ? "Salvando..." : "Salvar"}
                 </button>
@@ -272,7 +272,7 @@ export default function CadastroVariantes() {
                     setIsFormOpen(false);
                     setEditingId(null);
                   }}
-                  className="px-6 py-2 bg-gray-300 text-walmart-text rounded-lg hover:bg-gray-400 transition-colors font-semibold"
+                  className="px-6 py-2 bg-gray-300 text-vitrii-text rounded-lg hover:bg-gray-400 transition-colors font-semibold"
                 >
                   Cancelar
                 </button>
@@ -285,21 +285,21 @@ export default function CadastroVariantes() {
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-walmart-gray">
+              <thead className="bg-vitrii-gray">
                 <tr>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
                     Tamanho
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
                     Cor
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
                     Preço
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
                     Preço de Custo
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-walmart-text">
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
                     Ações
                   </th>
                 </tr>
@@ -317,16 +317,16 @@ export default function CadastroVariantes() {
                 ) : (
                   variantes.map((variante: Variante) => (
                     <tr key={variante.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 text-walmart-text">
+                      <td className="px-6 py-4 text-vitrii-text">
                         {variante.tamanho || "-"}
                       </td>
-                      <td className="px-6 py-4 text-walmart-text">
+                      <td className="px-6 py-4 text-vitrii-text">
                         {variante.cor || "-"}
                       </td>
-                      <td className="px-6 py-4 font-semibold text-walmart-text">
+                      <td className="px-6 py-4 font-semibold text-vitrii-text">
                         R$ {parseFloat(variante.preco.toString()).toFixed(2)}
                       </td>
-                      <td className="px-6 py-4 text-walmart-text">
+                      <td className="px-6 py-4 text-vitrii-text">
                         {variante.precoCusto
                           ? `R$ ${parseFloat(variante.precoCusto.toString()).toFixed(2)}`
                           : "-"}
@@ -334,7 +334,7 @@ export default function CadastroVariantes() {
                       <td className="px-6 py-4 flex gap-2">
                         <button
                           onClick={() => handleEdit(variante)}
-                          className="p-2 text-walmart-blue hover:bg-blue-50 rounded-lg transition-colors"
+                          className="p-2 text-vitrii-blue hover:bg-blue-50 rounded-lg transition-colors"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>

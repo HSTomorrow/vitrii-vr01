@@ -91,10 +91,10 @@ export default function SignIn() {
       <Header />
 
       <div className="flex-1 max-w-lg mx-auto w-full px-4 sm:px-6 lg:px-8 py-12">
-        <div className="bg-walmart-gray-light rounded-lg p-8">
+        <div className="bg-vitrii-gray-light rounded-lg p-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-walmart-text">Entrar</h1>
-            <p className="text-walmart-text-secondary mt-2">
+            <h1 className="text-3xl font-bold text-vitrii-text">Entrar</h1>
+            <p className="text-vitrii-text-secondary mt-2">
               Acesse sua conta Vitrii
             </p>
           </div>
@@ -114,7 +114,7 @@ export default function SignIn() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Email */}
             <div>
-              <label className="block text-sm font-semibold text-walmart-text mb-2">
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Email *
               </label>
               <input
@@ -125,7 +125,7 @@ export default function SignIn() {
                 className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-1 transition-colors ${
                   errors.email
                     ? "border-red-500 focus:border-red-500 focus:ring-red-500 bg-red-50"
-                    : "border-gray-300 focus:border-walmart-blue focus:ring-walmart-blue"
+                    : "border-gray-300 focus:border-vitrii-blue focus:ring-vitrii-blue"
                 }`}
               />
               {errors.email && (
@@ -138,7 +138,7 @@ export default function SignIn() {
 
             {/* Senha */}
             <div>
-              <label className="block text-sm font-semibold text-walmart-text mb-2">
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Senha *
               </label>
               <input
@@ -149,7 +149,7 @@ export default function SignIn() {
                 className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-1 transition-colors ${
                   errors.senha
                     ? "border-red-500 focus:border-red-500 focus:ring-red-500 bg-red-50"
-                    : "border-gray-300 focus:border-walmart-blue focus:ring-walmart-blue"
+                    : "border-gray-300 focus:border-vitrii-blue focus:ring-vitrii-blue"
                 }`}
               />
               {errors.senha && (
@@ -167,15 +167,15 @@ export default function SignIn() {
                   type="checkbox"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
-                  className="w-4 h-4 rounded border-gray-300 text-walmart-blue focus:ring-walmart-blue"
+                  className="w-4 h-4 rounded border-gray-300 text-vitrii-blue focus:ring-vitrii-blue"
                 />
-                <span className="text-sm text-walmart-text-secondary">
+                <span className="text-sm text-vitrii-text-secondary">
                   Manter-me conectado
                 </span>
               </label>
               <Link
                 to="/esqueci-senha"
-                className="text-sm text-walmart-blue font-semibold hover:underline"
+                className="text-sm text-vitrii-blue font-semibold hover:underline"
               >
                 Esqueci minha senha
               </Link>
@@ -185,7 +185,7 @@ export default function SignIn() {
             <button
               type="submit"
               disabled={signInMutation.isPending}
-              className="w-full bg-walmart-blue text-white py-3 rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full bg-vitrii-blue text-white py-3 rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {signInMutation.isPending ? (
                 <>
@@ -206,7 +206,7 @@ export default function SignIn() {
                 <div className="w-full border-t border-gray-300" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-walmart-gray-light text-walmart-text-secondary">
+                <span className="px-2 bg-vitrii-gray-light text-vitrii-text-secondary">
                   Ou
                 </span>
               </div>
@@ -216,7 +216,7 @@ export default function SignIn() {
             <button
               type="button"
               disabled
-              className="w-full bg-white border-2 border-gray-300 text-walmart-text py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors disabled:opacity-50"
+              className="w-full bg-white border-2 border-gray-300 text-vitrii-text py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors disabled:opacity-50"
             >
               Entrar com Google (em breve)
             </button>
@@ -224,11 +224,11 @@ export default function SignIn() {
 
           {/* Sign Up Link */}
           <div className="text-center mt-6">
-            <p className="text-walmart-text-secondary">
+            <p className="text-vitrii-text-secondary">
               Não tem conta?{" "}
               <Link
                 to="/auth/signup"
-                className="text-walmart-blue font-semibold hover:underline"
+                className="text-vitrii-blue font-semibold hover:underline"
               >
                 Cadastre-se
               </Link>
@@ -239,7 +239,7 @@ export default function SignIn() {
           <div className="mt-8 pt-8 border-t border-gray-300">
             <Link
               to="/"
-              className="inline-flex items-center space-x-2 text-walmart-blue font-semibold hover:space-x-3 transition-all"
+              className="inline-flex items-center space-x-2 text-vitrii-blue font-semibold hover:space-x-3 transition-all"
             >
               <span>Voltar para Home</span>
               <ArrowRight className="w-5 h-5" />

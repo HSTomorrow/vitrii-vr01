@@ -115,12 +115,12 @@ export default function SignUp() {
       <Header />
 
       <div className="flex-1 max-w-lg mx-auto w-full px-4 sm:px-6 lg:px-8 py-12">
-        <div className="bg-walmart-gray-light rounded-lg p-8">
+        <div className="bg-vitrii-gray-light rounded-lg p-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-walmart-text">
+            <h1 className="text-3xl font-bold text-vitrii-text">
               Criar Conta
             </h1>
-            <p className="text-walmart-text-secondary mt-2">
+            <p className="text-vitrii-text-secondary mt-2">
               Junte-se ao Vitrii gratuitamente
             </p>
           </div>
@@ -138,7 +138,7 @@ export default function SignUp() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Nome */}
             <div>
-              <label className="block text-sm font-semibold text-walmart-text mb-2">
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Nome Completo *
               </label>
               <input
@@ -149,7 +149,7 @@ export default function SignUp() {
                 className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-1 transition-colors ${
                   errors.nome
                     ? "border-red-500 focus:border-red-500 focus:ring-red-500 bg-red-50"
-                    : "border-gray-300 focus:border-walmart-blue focus:ring-walmart-blue"
+                    : "border-gray-300 focus:border-vitrii-blue focus:ring-vitrii-blue"
                 }`}
               />
               {errors.nome && (
@@ -162,7 +162,7 @@ export default function SignUp() {
 
             {/* Email */}
             <div>
-              <label className="block text-sm font-semibold text-walmart-text mb-2">
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Email *
               </label>
               <input
@@ -173,7 +173,7 @@ export default function SignUp() {
                 className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-1 transition-colors ${
                   errors.email
                     ? "border-red-500 focus:border-red-500 focus:ring-red-500 bg-red-50"
-                    : "border-gray-300 focus:border-walmart-blue focus:ring-walmart-blue"
+                    : "border-gray-300 focus:border-vitrii-blue focus:ring-vitrii-blue"
                 }`}
               />
               {errors.email && (
@@ -186,7 +186,7 @@ export default function SignUp() {
 
             {/* Senha */}
             <div>
-              <label className="block text-sm font-semibold text-walmart-text mb-2">
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Senha *
               </label>
               <input
@@ -197,7 +197,7 @@ export default function SignUp() {
                 className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-1 transition-colors ${
                   errors.senha
                     ? "border-red-500 focus:border-red-500 focus:ring-red-500 bg-red-50"
-                    : "border-gray-300 focus:border-walmart-blue focus:ring-walmart-blue"
+                    : "border-gray-300 focus:border-vitrii-blue focus:ring-vitrii-blue"
                 }`}
               />
               {errors.senha && (
@@ -210,7 +210,7 @@ export default function SignUp() {
 
             {/* Confirmar Senha */}
             <div>
-              <label className="block text-sm font-semibold text-walmart-text mb-2">
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Confirmar Senha *
               </label>
               <input
@@ -221,7 +221,7 @@ export default function SignUp() {
                 className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-1 transition-colors ${
                   errors.confirmarSenha
                     ? "border-red-500 focus:border-red-500 focus:ring-red-500 bg-red-50"
-                    : "border-gray-300 focus:border-walmart-blue focus:ring-walmart-blue"
+                    : "border-gray-300 focus:border-vitrii-blue focus:ring-vitrii-blue"
                 }`}
               />
               {errors.confirmarSenha && (
@@ -248,15 +248,15 @@ export default function SignUp() {
                       });
                     }
                   }}
-                  className="w-4 h-4 rounded border-gray-300 text-walmart-blue focus:ring-walmart-blue"
+                  className="w-4 h-4 rounded border-gray-300 text-vitrii-blue focus:ring-vitrii-blue"
                 />
-                <span className="text-sm text-walmart-text-secondary">
+                <span className="text-sm text-vitrii-text-secondary">
                   Concordo com os{" "}
-                  <a href="#" className="text-walmart-blue hover:underline font-semibold">
+                  <a href="#" className="text-vitrii-blue hover:underline font-semibold">
                     Termos de Uso
                   </a>
                   {" "}e{" "}
-                  <a href="#" className="text-walmart-blue hover:underline font-semibold">
+                  <a href="#" className="text-vitrii-blue hover:underline font-semibold">
                     Política de Privacidade
                   </a>
                 </span>
@@ -273,7 +273,7 @@ export default function SignUp() {
             <button
               type="submit"
               disabled={signupMutation.isPending}
-              className="w-full bg-walmart-blue text-white py-3 rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full bg-vitrii-blue text-white py-3 rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {signupMutation.isPending ? (
                 <>
@@ -291,11 +291,11 @@ export default function SignUp() {
 
           {/* Sign In Link */}
           <div className="text-center mt-6">
-            <p className="text-walmart-text-secondary">
+            <p className="text-vitrii-text-secondary">
               Já tem conta?{" "}
               <Link
                 to="/auth/signin"
-                className="text-walmart-blue font-semibold hover:underline"
+                className="text-vitrii-blue font-semibold hover:underline"
               >
                 Entrar
               </Link>
@@ -306,7 +306,7 @@ export default function SignUp() {
           <div className="mt-8 pt-8 border-t border-gray-300">
             <Link
               to="/"
-              className="inline-flex items-center space-x-2 text-walmart-blue font-semibold hover:space-x-3 transition-all"
+              className="inline-flex items-center space-x-2 text-vitrii-blue font-semibold hover:space-x-3 transition-all"
             >
               <span>Voltar para Home</span>
               <ArrowRight className="w-5 h-5" />

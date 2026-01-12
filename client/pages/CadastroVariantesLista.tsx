@@ -89,7 +89,7 @@ export default function CadastroVariantesLista() {
             </p>
             <button
               onClick={() => navigate("/cadastros/lojas")}
-              className="mt-4 px-4 py-2 bg-walmart-yellow text-walmart-text rounded-lg hover:bg-walmart-yellow-dark transition-colors font-semibold"
+              className="mt-4 px-4 py-2 bg-vitrii-yellow text-vitrii-text rounded-lg hover:bg-vitrii-yellow-dark transition-colors font-semibold"
             >
               Ir para Cadastro de Lojas
             </button>
@@ -108,10 +108,10 @@ export default function CadastroVariantesLista() {
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <Palette className="w-8 h-8 text-walmart-yellow" />
-            <h1 className="text-3xl font-bold text-walmart-text">Gerenciar Variantes</h1>
+            <Palette className="w-8 h-8 text-vitrii-yellow" />
+            <h1 className="text-3xl font-bold text-vitrii-text">Gerenciar Variantes</h1>
           </div>
-          <p className="text-walmart-text-secondary mt-2">
+          <p className="text-vitrii-text-secondary mt-2">
             Selecione um produto para gerenciar seus tamanhos, cores e preços
           </p>
         </div>
@@ -119,7 +119,7 @@ export default function CadastroVariantesLista() {
         {/* Loja Selector */}
         {lojas.length > 1 && (
           <div className="mb-8">
-            <label className="block text-sm font-semibold text-walmart-text mb-3">
+            <label className="block text-sm font-semibold text-vitrii-text mb-3">
               Filtrar por Loja
             </label>
             <div className="flex flex-wrap gap-2">
@@ -129,8 +129,8 @@ export default function CadastroVariantesLista() {
                   onClick={() => setSelectedLojaId(loja.id)}
                   className={`px-4 py-2 rounded-lg font-semibold transition-colors ${
                     (selectedLojaId || defaultLojaId) === loja.id
-                      ? "bg-walmart-blue text-white"
-                      : "bg-white text-walmart-text border border-gray-300 hover:border-walmart-blue"
+                      ? "bg-vitrii-blue text-white"
+                      : "bg-white text-vitrii-text border border-gray-300 hover:border-vitrii-blue"
                   }`}
                 >
                   {loja.nome}
@@ -147,7 +147,7 @@ export default function CadastroVariantesLista() {
             placeholder="Buscar por nome do produto ou grupo..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
           />
         </div>
 
@@ -165,7 +165,7 @@ export default function CadastroVariantesLista() {
             </p>
             <button
               onClick={() => navigate("/cadastros/productos")}
-              className="mt-6 px-4 py-2 bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors font-semibold"
+              className="mt-6 px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors font-semibold"
             >
               Ir para Cadastro de Produtos
             </button>
@@ -176,19 +176,19 @@ export default function CadastroVariantesLista() {
               <div
                 key={producto.id}
                 onClick={() => handleSelectProduct(producto.id)}
-                className="bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-shadow hover:border-walmart-blue border-2 border-transparent"
+                className="bg-white rounded-lg shadow-md p-6 cursor-pointer hover:shadow-lg transition-shadow hover:border-vitrii-blue border-2 border-transparent"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div>
-                    <h3 className="text-lg font-semibold text-walmart-text">
+                    <h3 className="text-lg font-semibold text-vitrii-text">
                       {producto.nome}
                     </h3>
-                    <p className="text-sm text-walmart-text-secondary mt-1">
+                    <p className="text-sm text-vitrii-text-secondary mt-1">
                       {producto.grupo?.nome}
                     </p>
                   </div>
                   <div className="p-2 bg-yellow-50 rounded-lg">
-                    <Palette className="w-5 h-5 text-walmart-yellow" />
+                    <Palette className="w-5 h-5 text-vitrii-yellow" />
                   </div>
                 </div>
 
@@ -198,7 +198,7 @@ export default function CadastroVariantesLista() {
                   </p>
                 )}
 
-                <button className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-2 bg-walmart-yellow text-walmart-text rounded-lg hover:bg-walmart-yellow-dark transition-colors font-semibold">
+                <button className="w-full mt-4 flex items-center justify-center gap-2 px-4 py-2 bg-vitrii-yellow text-vitrii-text rounded-lg hover:bg-vitrii-yellow-dark transition-colors font-semibold">
                   Gerenciar Variantes
                   <ChevronRight className="w-4 h-4" />
                 </button>
