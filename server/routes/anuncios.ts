@@ -283,10 +283,12 @@ export const createAnuncio: RequestHandler = async (req, res) => {
       ? new Date(validatedData.dataValidade)
       : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
 
-    // For free items: automatically set status to "pago" and zero out price
+    // For free items: automatically set status to "pago", set statusPagamento to "aprovado", and mark as featured
     const isDoacao = validatedData.isDoacao || false;
     const precoAnuncio = isDoacao ? 0 : validatedData.precoAnuncio;
     const status = isDoacao ? "pago" : "em_edicao";
+    const statusPagamento = isDoacao ? "aprovado" : "pendente";
+    const destaque = isDoacao ? true : false;
 
     const anuncio = await prisma.anuncios.create({
       data: {
@@ -300,6 +302,9 @@ export const createAnuncio: RequestHandler = async (req, res) => {
         cidade: validatedData.cidade,
         estado: validatedData.estado,
         status,
+        statusPagamento,
+        destaque,
+        isDoacao,
         tipo: "produto",
         dataAtualizacao: new Date(),
       },
