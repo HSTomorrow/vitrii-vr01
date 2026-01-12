@@ -900,77 +900,24 @@ export default function AnuncioForm({
               </div>
             </div>
 
-            {/* Foto */}
+            {/* Fotos (Multiple Images) */}
             <div>
               <label className="block text-sm font-semibold text-vitrii-text mb-2">
-                Foto (Opcional)
+                Fotos (Opcional - máximo 5)
               </label>
-              <div className="space-y-3">
-                {/* File Upload Input */}
-                <div className="relative">
-                  <input
-                    type="file"
-                    id="file-upload"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        if (file.size > 5 * 1024 * 1024) {
-                          toast.error("Arquivo deve ter no máximo 5MB");
-                          return;
-                        }
-                        handleFileUpload(file);
-                        e.target.value = "";
-                      }
-                    }}
-                    className="hidden"
-                  />
-                  <label
-                    htmlFor="file-upload"
-                    className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-vitrii-blue rounded-lg cursor-pointer hover:bg-blue-50 transition-colors"
-                  >
-                    <Upload className="w-5 h-5 text-vitrii-blue" />
-                    <span className="font-semibold text-vitrii-text">
-                      Clique para fazer upload ou arraste uma imagem
-                    </span>
-                  </label>
-                </div>
-
-                {/* URL Input (Alternative) */}
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={formData.fotoUrl}
-                    onChange={(e) =>
-                      handleInputChange("fotoUrl", e.target.value)
-                    }
-                    placeholder="Ou cole uma URL de imagem"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent text-sm"
-                  />
-                </div>
-
-                {/* Preview */}
-                {formData.fotoUrl && (
-                  <div className="relative">
-                    <img
-                      src={formData.fotoUrl}
-                      alt="Preview"
-                      className="h-40 w-full object-cover rounded-lg"
-                      onError={() => {
-                        toast.error("Não foi possível carregar a imagem");
-                        handleInputChange("fotoUrl", "");
-                      }}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handleInputChange("fotoUrl", "")}
-                      className="absolute top-2 right-2 px-3 py-1 bg-red-500 text-white rounded-lg text-sm font-semibold hover:bg-red-600"
-                    >
-                      Remover
-                    </button>
-                  </div>
-                )}
-              </div>
+              <MultiImageUpload
+                currentImages={uploadedImages}
+                onImagesChange={(images) => {
+                  setUploadedImages(images);
+                  // Set the first image as the primary image
+                  if (images.length > 0) {
+                    handleInputChange("fotoUrl", images[0].url);
+                  } else {
+                    handleInputChange("fotoUrl", "");
+                  }
+                }}
+                maxImages={5}
+              />
             </div>
 
             {/* Destaque (Featured) - Now at the end */}
