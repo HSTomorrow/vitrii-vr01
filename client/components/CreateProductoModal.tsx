@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { X, Plus } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 import CreateGrupoModal from "./CreateGrupoModal";
 
 interface CreateProductoModalProps {
