@@ -251,7 +251,7 @@ export function createServer() {
     extractUserId,
     getAnunciantesByUsuario,
   );
-  app.get("/api/anunciantes", getAnunciantes);
+  app.get("/api/anunciantes", extractUserId, getAnunciantes);
   app.get("/api/anunciantes/:id", getAnuncianteById);
   app.post("/api/anunciantes", createAnunciante);
   app.put("/api/anunciantes/:id", extractUserId, updateAnunciante);
@@ -264,7 +264,7 @@ export function createServer() {
   );
 
   // Backward compatibility routes (still using /api/lojas)
-  app.get("/api/lojas", getAnunciantes);
+  app.get("/api/lojas", extractUserId, getAnunciantes);
   app.get("/api/lojas/:id", getAnuncianteById);
   app.post("/api/lojas", createAnunciante);
   app.put("/api/lojas/:id", extractUserId, updateAnunciante);
