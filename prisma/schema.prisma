@@ -201,6 +201,7 @@ model usracessos {
   passwordResetTokens   passwordResetToken[]
   anuncioVisualizados   anuncioVisualizados[]
   fotos_anuncio         fotos_anuncio[]
+  grupos_produtos       grupos_produtos[]
 }
 
 model passwordResetToken {
