@@ -944,6 +944,7 @@ export default function AnuncioForm({
                   }
                 }}
                 maxImages={5}
+                anuncianteFotoUrl={selectedAnunciante?.fotoUrl}
               />
             </div>
 
