@@ -327,7 +327,7 @@ export const updateAnunciante: RequestHandler = async (req, res) => {
     const updatedAnunciante = await prisma.anunciantes.update({
       where: { id: parseInt(id) },
       data: {
-        ...validatedData,
+        ...cleanedData,
         dataAtualizacao: new Date(),
       },
     });
