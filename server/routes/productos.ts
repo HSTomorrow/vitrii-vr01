@@ -94,7 +94,7 @@ export const createProducto: RequestHandler = async (req, res) => {
     const validatedData = ProductoCreateSchema.parse(req.body);
 
     // Verify that the grupo exists
-    const grupo = await prisma.grupoDeProductos.findUnique({
+    const grupo = await prisma.grupos_produtos.findUnique({
       where: { id: validatedData.grupoId },
     });
 
