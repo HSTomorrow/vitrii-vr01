@@ -94,7 +94,7 @@ export default function QRCodeGenerator({
   return (
     <div className="space-y-6">
       {/* Generate QR Code Button */}
-      <div className="bg-gradient-to-r from-walmart-blue to-walmart-blue-dark rounded-lg p-6 text-white">
+      <div className="bg-gradient-to-r from-vitrii-blue to-vitrii-blue-dark rounded-lg p-6 text-white">
         <h3 className="text-xl font-bold mb-2">QR Code para este Anúncio</h3>
         <p className="text-blue-100 mb-4">
           Crie um QR Code para compartilhar o anúncio de forma rápida
@@ -102,7 +102,7 @@ export default function QRCodeGenerator({
         <button
           onClick={() => generateMutation.mutate()}
           disabled={generateMutation.isPending}
-          className="inline-flex items-center gap-2 px-6 py-2 bg-white text-walmart-blue font-semibold rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50"
+          className="inline-flex items-center gap-2 px-6 py-2 bg-white text-vitrii-blue font-semibold rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50"
         >
           {generateMutation.isPending ? "Gerando..." : "Gerar QR Code"}
         </button>
@@ -117,7 +117,7 @@ export default function QRCodeGenerator({
         </div>
       ) : (
         <div className="space-y-4">
-          <h3 className="text-lg font-bold text-walmart-text">
+          <h3 className="text-lg font-bold text-vitrii-text">
             QR Codes Gerados ({qrCodes.length})
           </h3>
           {qrCodes.map((qrCode: any) => (
@@ -136,7 +136,7 @@ export default function QRCodeGenerator({
                   <div className="flex gap-2">
                     <button
                       onClick={() => downloadQRCode(qrCode.codigo, `qrcode-${qrCode.id}.png`)}
-                      className="flex items-center gap-1 px-3 py-1 bg-walmart-blue text-white rounded hover:bg-walmart-blue-dark text-sm"
+                      className="flex items-center gap-1 px-3 py-1 bg-vitrii-blue text-white rounded hover:bg-vitrii-blue-dark text-sm"
                     >
                       <Download className="w-4 h-4" />
                       Baixar
@@ -159,7 +159,7 @@ export default function QRCodeGenerator({
                         onClick={() =>
                           copyToClipboard(`${window.location.origin}/anuncio/${anuncioId}`)
                         }
-                        className="px-3 py-2 bg-walmart-blue text-white rounded hover:bg-walmart-blue-dark"
+                        className="px-3 py-2 bg-vitrii-blue text-white rounded hover:bg-vitrii-blue-dark"
                       >
                         <Copy className="w-4 h-4" />
                       </button>
@@ -183,7 +183,7 @@ export default function QRCodeGenerator({
                   <div className="flex gap-2 pt-2">
                     <button
                       onClick={() => setShowStats(!showStats)}
-                      className="flex items-center gap-1 px-3 py-1 bg-gray-200 text-walmart-text rounded hover:bg-gray-300 text-sm"
+                      className="flex items-center gap-1 px-3 py-1 bg-gray-200 text-vitrii-text rounded hover:bg-gray-300 text-sm"
                     >
                       <BarChart3 className="w-4 h-4" />
                       Stats
@@ -257,7 +257,7 @@ function QRCodeStats({ qrCodeId }: { qrCodeId: number }) {
   return (
     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
       <div className="bg-blue-50 rounded p-3">
-        <p className="text-2xl font-bold text-walmart-blue">{stats.totalScans || 0}</p>
+        <p className="text-2xl font-bold text-vitrii-blue">{stats.totalScans || 0}</p>
         <p className="text-sm text-gray-600">Total de Scans</p>
       </div>
       <div className="bg-green-50 rounded p-3">

@@ -88,12 +88,12 @@ export default function ForgotPassword() {
         <Header />
 
         <div className="flex-1 max-w-lg mx-auto w-full px-4 sm:px-6 lg:px-8 py-12">
-          <div className="bg-walmart-gray-light rounded-lg p-8 text-center">
+          <div className="bg-vitrii-gray-light rounded-lg p-8 text-center">
             <div className="mb-8">
               <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <AlertCircle className="w-8 h-8 text-red-600" />
               </div>
-              <h1 className="text-3xl font-bold text-walmart-text">
+              <h1 className="text-3xl font-bold text-vitrii-text">
                 Email não cadastrado
               </h1>
             </div>
@@ -113,7 +113,7 @@ export default function ForgotPassword() {
               </div>
             </div>
 
-            <p className="text-walmart-text-secondary mb-6">
+            <p className="text-vitrii-text-secondary mb-6">
               Verifique se digitou o email corretamente ou crie uma nova conta.
             </p>
 
@@ -123,7 +123,7 @@ export default function ForgotPassword() {
                   setEmailNotFound(false);
                   setEmail("");
                 }}
-                className="w-full bg-walmart-blue text-white py-3 rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors"
+                className="w-full bg-vitrii-blue text-white py-3 rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors"
               >
                 Tentar outro email
               </button>
@@ -137,7 +137,7 @@ export default function ForgotPassword() {
 
               <Link
                 to="/auth/signin"
-                className="block w-full bg-white border-2 border-walmart-blue text-walmart-blue py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+                className="block w-full bg-white border-2 border-vitrii-blue text-vitrii-blue py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
               >
                 Voltar para login
               </Link>
@@ -146,7 +146,7 @@ export default function ForgotPassword() {
             <div className="mt-8 pt-8 border-t border-gray-300">
               <Link
                 to="/"
-                className="inline-flex items-center space-x-2 text-walmart-blue font-semibold hover:space-x-3 transition-all"
+                className="inline-flex items-center space-x-2 text-vitrii-blue font-semibold hover:space-x-3 transition-all"
               >
                 <span>Voltar para Home</span>
                 <ArrowRight className="w-5 h-5" />
@@ -166,12 +166,12 @@ export default function ForgotPassword() {
         <Header />
 
         <div className="flex-1 max-w-lg mx-auto w-full px-4 sm:px-6 lg:px-8 py-12">
-          <div className="bg-walmart-gray-light rounded-lg p-8 text-center">
+          <div className="bg-vitrii-gray-light rounded-lg p-8 text-center">
             <div className="mb-8">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Mail className="w-8 h-8 text-green-600" />
               </div>
-              <h1 className="text-3xl font-bold text-walmart-text">
+              <h1 className="text-3xl font-bold text-vitrii-text">
                 Email Enviado
               </h1>
             </div>
@@ -191,7 +191,7 @@ export default function ForgotPassword() {
               </div>
             </div>
 
-            <p className="text-walmart-text-secondary mb-6">
+            <p className="text-vitrii-text-secondary mb-6">
               O link para redefinir sua senha expira em 1 hora. Se não receber o
               email, verifique sua pasta de spam ou solicite um novo link.
             </p>
@@ -202,14 +202,14 @@ export default function ForgotPassword() {
                   setEmailSent(false);
                   setEmail("");
                 }}
-                className="w-full bg-walmart-blue text-white py-3 rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors"
+                className="w-full bg-vitrii-blue text-white py-3 rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors"
               >
                 Solicitar outro email
               </button>
 
               <Link
                 to="/auth/signin"
-                className="block w-full bg-white border-2 border-walmart-blue text-walmart-blue py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+                className="block w-full bg-white border-2 border-vitrii-blue text-vitrii-blue py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
               >
                 Voltar para login
               </Link>
@@ -218,7 +218,7 @@ export default function ForgotPassword() {
             <div className="mt-8 pt-8 border-t border-gray-300">
               <Link
                 to="/"
-                className="inline-flex items-center space-x-2 text-walmart-blue font-semibold hover:space-x-3 transition-all"
+                className="inline-flex items-center space-x-2 text-vitrii-blue font-semibold hover:space-x-3 transition-all"
               >
                 <span>Voltar para Home</span>
                 <ArrowRight className="w-5 h-5" />
@@ -237,12 +237,12 @@ export default function ForgotPassword() {
       <Header />
 
       <div className="flex-1 max-w-lg mx-auto w-full px-4 sm:px-6 lg:px-8 py-12">
-        <div className="bg-walmart-gray-light rounded-lg p-8">
+        <div className="bg-vitrii-gray-light rounded-lg p-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-walmart-text">
+            <h1 className="text-3xl font-bold text-vitrii-text">
               Esqueci minha Senha
             </h1>
-            <p className="text-walmart-text-secondary mt-2">
+            <p className="text-vitrii-text-secondary mt-2">
               Não se preocupe, vamos ajudar você a recuperar sua conta
             </p>
           </div>
@@ -260,7 +260,7 @@ export default function ForgotPassword() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Email */}
             <div>
-              <label className="block text-sm font-semibold text-walmart-text mb-2">
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Email *
               </label>
               <input
@@ -271,7 +271,7 @@ export default function ForgotPassword() {
                 className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-1 transition-colors ${
                   errors.email
                     ? "border-red-500 focus:border-red-500 focus:ring-red-500 bg-red-50"
-                    : "border-gray-300 focus:border-walmart-blue focus:ring-walmart-blue"
+                    : "border-gray-300 focus:border-vitrii-blue focus:ring-vitrii-blue"
                 }`}
               />
               {errors.email && (
@@ -286,7 +286,7 @@ export default function ForgotPassword() {
             <button
               type="submit"
               disabled={forgotPasswordMutation.isPending}
-              className="w-full bg-walmart-blue text-white py-3 rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full bg-vitrii-blue text-white py-3 rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {forgotPasswordMutation.isPending ? (
                 <>
@@ -307,7 +307,7 @@ export default function ForgotPassword() {
                 <div className="w-full border-t border-gray-300" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-walmart-gray-light text-walmart-text-secondary">
+                <span className="px-2 bg-vitrii-gray-light text-vitrii-text-secondary">
                   Ou
                 </span>
               </div>
@@ -316,11 +316,11 @@ export default function ForgotPassword() {
 
           {/* Sign In Link */}
           <div className="text-center mt-6">
-            <p className="text-walmart-text-secondary">
+            <p className="text-vitrii-text-secondary">
               Lembrou sua senha?{" "}
               <Link
                 to="/auth/signin"
-                className="text-walmart-blue font-semibold hover:underline"
+                className="text-vitrii-blue font-semibold hover:underline"
               >
                 Faça login
               </Link>
@@ -329,11 +329,11 @@ export default function ForgotPassword() {
 
           {/* Sign Up Link */}
           <div className="text-center mt-4">
-            <p className="text-walmart-text-secondary">
+            <p className="text-vitrii-text-secondary">
               Não tem conta?{" "}
               <Link
                 to="/auth/signup"
-                className="text-walmart-blue font-semibold hover:underline"
+                className="text-vitrii-blue font-semibold hover:underline"
               >
                 Cadastre-se
               </Link>
@@ -344,7 +344,7 @@ export default function ForgotPassword() {
           <div className="mt-8 pt-8 border-t border-gray-300">
             <Link
               to="/"
-              className="inline-flex items-center space-x-2 text-walmart-blue font-semibold hover:space-x-3 transition-all"
+              className="inline-flex items-center space-x-2 text-vitrii-blue font-semibold hover:space-x-3 transition-all"
             >
               <span>Voltar para Home</span>
               <ArrowRight className="w-5 h-5" />

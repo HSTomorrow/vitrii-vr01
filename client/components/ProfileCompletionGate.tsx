@@ -19,12 +19,12 @@ export default function ProfileCompletionGate({
       <div className="bg-white rounded-lg shadow-lg max-w-md w-full mx-4 p-6">
         <div className="flex gap-3 mb-4">
           <AlertCircle className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-0.5" />
-          <h2 className="text-lg font-semibold text-walmart-text">
+          <h2 className="text-lg font-semibold text-vitrii-text">
             Perfil Incompleto
           </h2>
         </div>
 
-        <p className="text-walmart-text-secondary mb-4">
+        <p className="text-vitrii-text-secondary mb-4">
           Para {actionLabel}, você precisa completar seu perfil com CPF/CNPJ e
           telefone.
         </p>
@@ -39,14 +39,14 @@ export default function ProfileCompletionGate({
         <div className="flex gap-3">
           <button
             onClick={onClose}
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg font-semibold text-walmart-text hover:bg-gray-50 transition-colors"
+            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg font-semibold text-vitrii-text hover:bg-gray-50 transition-colors"
           >
             Continuar Navegando
           </button>
           <Link
             to="/perfil"
             onClick={onClose}
-            className="flex-1 px-4 py-2 bg-walmart-blue text-white rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors text-center"
+            className="flex-1 px-4 py-2 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors text-center"
           >
             Completar Perfil
           </Link>

@@ -138,7 +138,7 @@ export default function ResetPassword() {
       <div className="min-h-screen flex flex-col bg-white">
         <Header />
         <div className="flex-1 max-w-lg mx-auto w-full px-4 sm:px-6 lg:px-8 py-12 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-walmart-blue" />
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-vitrii-blue" />
         </div>
         <Footer />
       </div>
@@ -151,17 +151,17 @@ export default function ResetPassword() {
       <div className="min-h-screen flex flex-col bg-white">
         <Header />
         <div className="flex-1 max-w-lg mx-auto w-full px-4 sm:px-6 lg:px-8 py-12">
-          <div className="bg-walmart-gray-light rounded-lg p-8 text-center">
+          <div className="bg-vitrii-gray-light rounded-lg p-8 text-center">
             <div className="mb-8">
               <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <AlertCircle className="w-8 h-8 text-red-600" />
               </div>
-              <h1 className="text-3xl font-bold text-walmart-text">
+              <h1 className="text-3xl font-bold text-vitrii-text">
                 Link Inválido ou Expirado
               </h1>
             </div>
 
-            <p className="text-walmart-text-secondary mb-6">
+            <p className="text-vitrii-text-secondary mb-6">
               O link para redefinir sua senha é inválido ou expirou. Por favor,
               solicite um novo link.
             </p>
@@ -169,14 +169,14 @@ export default function ResetPassword() {
             <div className="space-y-3">
               <Link
                 to="/esqueci-senha"
-                className="block w-full bg-walmart-blue text-white py-3 rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors"
+                className="block w-full bg-vitrii-blue text-white py-3 rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors"
               >
                 Solicitar novo link
               </Link>
 
               <Link
                 to="/auth/signin"
-                className="block w-full bg-white border-2 border-walmart-blue text-walmart-blue py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+                className="block w-full bg-white border-2 border-vitrii-blue text-vitrii-blue py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
               >
                 Voltar para login
               </Link>
@@ -185,7 +185,7 @@ export default function ResetPassword() {
             <div className="mt-8 pt-8 border-t border-gray-300">
               <Link
                 to="/"
-                className="inline-flex items-center space-x-2 text-walmart-blue font-semibold hover:space-x-3 transition-all"
+                className="inline-flex items-center space-x-2 text-vitrii-blue font-semibold hover:space-x-3 transition-all"
               >
                 <span>Voltar para Home</span>
                 <ArrowRight className="w-5 h-5" />
@@ -203,12 +203,12 @@ export default function ResetPassword() {
       <Header />
 
       <div className="flex-1 max-w-lg mx-auto w-full px-4 sm:px-6 lg:px-8 py-12">
-        <div className="bg-walmart-gray-light rounded-lg p-8">
+        <div className="bg-vitrii-gray-light rounded-lg p-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-walmart-text">
+            <h1 className="text-3xl font-bold text-vitrii-text">
               Redefinir Senha
             </h1>
-            <p className="text-walmart-text-secondary mt-2">
+            <p className="text-vitrii-text-secondary mt-2">
               Digite sua nova senha abaixo
             </p>
           </div>
@@ -228,7 +228,7 @@ export default function ResetPassword() {
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Nova Senha */}
             <div>
-              <label className="block text-sm font-semibold text-walmart-text mb-2">
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Nova Senha *
               </label>
               <input
@@ -239,7 +239,7 @@ export default function ResetPassword() {
                 className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-1 transition-colors ${
                   errors.novaSenha
                     ? "border-red-500 focus:border-red-500 focus:ring-red-500 bg-red-50"
-                    : "border-gray-300 focus:border-walmart-blue focus:ring-walmart-blue"
+                    : "border-gray-300 focus:border-vitrii-blue focus:ring-vitrii-blue"
                 }`}
               />
               {errors.novaSenha && (
@@ -252,7 +252,7 @@ export default function ResetPassword() {
 
             {/* Confirmar Senha */}
             <div>
-              <label className="block text-sm font-semibold text-walmart-text mb-2">
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Confirmar Senha *
               </label>
               <input
@@ -265,7 +265,7 @@ export default function ResetPassword() {
                 className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-1 transition-colors ${
                   errors.confirmarSenha
                     ? "border-red-500 focus:border-red-500 focus:ring-red-500 bg-red-50"
-                    : "border-gray-300 focus:border-walmart-blue focus:ring-walmart-blue"
+                    : "border-gray-300 focus:border-vitrii-blue focus:ring-vitrii-blue"
                 }`}
               />
               {errors.confirmarSenha && (
@@ -280,7 +280,7 @@ export default function ResetPassword() {
             <button
               type="submit"
               disabled={resetPasswordMutation.isPending}
-              className="w-full bg-walmart-blue text-white py-3 rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full bg-vitrii-blue text-white py-3 rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {resetPasswordMutation.isPending ? (
                 <>
@@ -301,7 +301,7 @@ export default function ResetPassword() {
                 <div className="w-full border-t border-gray-300" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-walmart-gray-light text-walmart-text-secondary">
+                <span className="px-2 bg-vitrii-gray-light text-vitrii-text-secondary">
                   Ou
                 </span>
               </div>
@@ -310,11 +310,11 @@ export default function ResetPassword() {
 
           {/* Sign In Link */}
           <div className="text-center mt-6">
-            <p className="text-walmart-text-secondary">
+            <p className="text-vitrii-text-secondary">
               Lembrou sua senha?{" "}
               <Link
                 to="/auth/signin"
-                className="text-walmart-blue font-semibold hover:underline"
+                className="text-vitrii-blue font-semibold hover:underline"
               >
                 Faça login
               </Link>
@@ -325,7 +325,7 @@ export default function ResetPassword() {
           <div className="mt-8 pt-8 border-t border-gray-300">
             <Link
               to="/"
-              className="inline-flex items-center space-x-2 text-walmart-blue font-semibold hover:space-x-3 transition-all"
+              className="inline-flex items-center space-x-2 text-vitrii-blue font-semibold hover:space-x-3 transition-all"
             >
               <span>Voltar para Home</span>
               <ArrowRight className="w-5 h-5" />

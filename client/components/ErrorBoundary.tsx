@@ -31,15 +31,15 @@ export default class ErrorBoundary extends Component<Props, State> {
           <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
             <div className="flex flex-col items-center text-center">
               <AlertCircle className="w-16 h-16 text-red-500 mb-4" />
-              <h1 className="text-2xl font-bold text-walmart-text mb-4">
+              <h1 className="text-2xl font-bold text-vitrii-text mb-4">
                 Oops! Algo deu errado
               </h1>
-              <p className="text-walmart-text-secondary mb-6">
+              <p className="text-vitrii-text-secondary mb-6">
                 {this.state.error?.message || "Erro desconhecido"}
               </p>
               <button
                 onClick={() => window.location.reload()}
-                className="px-6 py-2 bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors font-semibold"
+                className="px-6 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors font-semibold"
               >
                 Recarregar Página
               </button>

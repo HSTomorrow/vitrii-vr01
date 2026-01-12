@@ -138,7 +138,7 @@ export default function AdminEditUserModal({
       <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 sticky top-0 bg-white">
-          <h2 className="text-2xl font-bold text-walmart-text">
+          <h2 className="text-2xl font-bold text-vitrii-text">
             Editar Perfil do Usuário
           </h2>
           <button
@@ -153,12 +153,12 @@ export default function AdminEditUserModal({
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
           {/* Basic Information */}
           <div className="border-b border-gray-200 pb-6">
-            <h3 className="text-lg font-semibold text-walmart-text mb-4">
+            <h3 className="text-lg font-semibold text-vitrii-text mb-4">
               Informações Básicas
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-walmart-text mb-2">
+                <label className="block text-sm font-medium text-vitrii-text mb-2">
                   Nome *
                 </label>
                 <input
@@ -166,12 +166,12 @@ export default function AdminEditUserModal({
                   name="nome"
                   value={formData.nome}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-walmart-blue"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-walmart-text mb-2">
+                <label className="block text-sm font-medium text-vitrii-text mb-2">
                   Email *
                 </label>
                 <input
@@ -179,12 +179,12 @@ export default function AdminEditUserModal({
                   name="email"
                   value={formData.email}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-walmart-blue"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-walmart-text mb-2">
+                <label className="block text-sm font-medium text-vitrii-text mb-2">
                   CPF \ CNPJ
                 </label>
                 <input
@@ -193,19 +193,19 @@ export default function AdminEditUserModal({
                   value={formData.cpf}
                   onChange={handleInputChange}
                   placeholder="000.000.000-00"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-walmart-blue"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-walmart-text mb-2">
+                <label className="block text-sm font-medium text-vitrii-text mb-2">
                   Tipo de Usuário *
                 </label>
                 <select
                   name="tipoUsuario"
                   value={formData.tipoUsuario}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-walmart-blue"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
                 >
                   <option value="comum">Comum</option>
                   <option value="adm">Administrador</option>
@@ -216,12 +216,12 @@ export default function AdminEditUserModal({
 
           {/* Contact Information */}
           <div className="border-b border-gray-200 pb-6">
-            <h3 className="text-lg font-semibold text-walmart-text mb-4">
+            <h3 className="text-lg font-semibold text-vitrii-text mb-4">
               Informações de Contato
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-walmart-text mb-2">
+                <label className="block text-sm font-medium text-vitrii-text mb-2">
                   Telefone
                 </label>
                 <input
@@ -229,12 +229,12 @@ export default function AdminEditUserModal({
                   name="telefone"
                   value={formData.telefone}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-walmart-blue"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-walmart-text mb-2">
+                <label className="block text-sm font-medium text-vitrii-text mb-2">
                   WhatsApp
                 </label>
                 <input
@@ -242,12 +242,12 @@ export default function AdminEditUserModal({
                   name="whatsapp"
                   value={formData.whatsapp}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-walmart-blue"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-walmart-text mb-2">
+                <label className="block text-sm font-medium text-vitrii-text mb-2">
                   LinkedIn
                 </label>
                 <input
@@ -256,12 +256,12 @@ export default function AdminEditUserModal({
                   value={formData.linkedin}
                   onChange={handleInputChange}
                   placeholder="https://linkedin.com/in/..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-walmart-blue"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-walmart-text mb-2">
+                <label className="block text-sm font-medium text-vitrii-text mb-2">
                   Facebook
                 </label>
                 <input
@@ -270,12 +270,12 @@ export default function AdminEditUserModal({
                   value={formData.facebook}
                   onChange={handleInputChange}
                   placeholder="https://facebook.com/..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-walmart-blue"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
                 />
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-walmart-text mb-2">
+                <label className="block text-sm font-medium text-vitrii-text mb-2">
                   Endereço
                 </label>
                 <input
@@ -283,7 +283,7 @@ export default function AdminEditUserModal({
                   name="endereco"
                   value={formData.endereco}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-walmart-blue"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
                 />
               </div>
             </div>
@@ -291,12 +291,12 @@ export default function AdminEditUserModal({
 
           {/* Contract Information */}
           <div className="border-b border-gray-200 pb-6">
-            <h3 className="text-lg font-semibold text-walmart-text mb-4">
+            <h3 className="text-lg font-semibold text-vitrii-text mb-4">
               Informações do Contrato
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-walmart-text mb-2">
+                <label className="block text-sm font-medium text-vitrii-text mb-2">
                   Data de Vigência do Contrato
                 </label>
                 <input
@@ -304,12 +304,12 @@ export default function AdminEditUserModal({
                   name="dataVigenciaContrato"
                   value={formData.dataVigenciaContrato}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-walmart-blue"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-walmart-text mb-2">
+                <label className="block text-sm font-medium text-vitrii-text mb-2">
                   Número de Anúncios Ativos
                 </label>
                 <input
@@ -318,7 +318,7 @@ export default function AdminEditUserModal({
                   value={usuario.numeroAnunciosAtivos}
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-600"
                 />
-                <p className="text-xs text-walmart-text-secondary mt-1">
+                <p className="text-xs text-vitrii-text-secondary mt-1">
                   (Somente leitura - atualizado automaticamente)
                 </p>
               </div>
@@ -326,7 +326,7 @@ export default function AdminEditUserModal({
           </div>
 
           {/* Metadata */}
-          <div className="text-sm text-walmart-text-secondary">
+          <div className="text-sm text-vitrii-text-secondary">
             <p>ID do usuário: {usuario.id}</p>
             <p>
               Data de criação:{" "}
@@ -339,14 +339,14 @@ export default function AdminEditUserModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 text-walmart-text rounded-lg hover:bg-gray-50 transition-colors font-medium"
+              className="flex-1 px-4 py-2 border border-gray-300 text-vitrii-text rounded-lg hover:bg-gray-50 transition-colors font-medium"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={updateMutation.isPending}
-              className="flex-1 px-4 py-2 bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors font-medium disabled:opacity-50"
+              className="flex-1 px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors font-medium disabled:opacity-50"
             >
               {updateMutation.isPending ? "Salvando..." : "Salvar Mudanças"}
             </button>

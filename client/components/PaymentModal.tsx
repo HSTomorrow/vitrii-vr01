@@ -139,7 +139,7 @@ export default function PaymentModal({
       <div className="bg-white rounded-lg shadow-lg max-w-md w-full">
         {/* Header */}
         <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-xl font-bold text-walmart-text">
+          <h2 className="text-xl font-bold text-vitrii-text">
             Pagamento via Pix
           </h2>
           <button
@@ -184,7 +184,7 @@ export default function PaymentModal({
               {/* QR Code */}
               {payment.qrCode && (
                 <div className="text-center">
-                  <p className="text-sm text-walmart-text-secondary mb-3">
+                  <p className="text-sm text-vitrii-text-secondary mb-3">
                     Escaneie o QR Code com seu aplicativo bancário
                   </p>
                   <div className="bg-gray-100 p-4 rounded-lg flex justify-center">
@@ -202,7 +202,7 @@ export default function PaymentModal({
               {/* Copy and Paste Code */}
               {payment.urlCopiaECola && (
                 <div>
-                  <p className="text-sm text-walmart-text-secondary mb-2">
+                  <p className="text-sm text-vitrii-text-secondary mb-2">
                     Ou copie o código Pix abaixo:
                   </p>
                   <button
@@ -210,10 +210,10 @@ export default function PaymentModal({
                     onClick={handleCopyPixCode}
                     className="w-full bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-lg p-3 flex items-center justify-between transition-colors"
                   >
-                    <code className="text-xs text-walmart-text truncate">
+                    <code className="text-xs text-vitrii-text truncate">
                       {payment.urlCopiaECola.substring(0, 40)}...
                     </code>
-                    <Copy className="w-4 h-4 text-walmart-blue flex-shrink-0" />
+                    <Copy className="w-4 h-4 text-vitrii-blue flex-shrink-0" />
                   </button>
                   {copied && (
                     <p className="text-sm text-green-600 mt-2 text-center">
@@ -226,13 +226,13 @@ export default function PaymentModal({
               {/* Timer */}
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <div className="flex items-center gap-2 justify-center">
-                  <Clock className="w-5 h-5 text-walmart-blue" />
-                  <p className="text-sm text-walmart-text">
+                  <Clock className="w-5 h-5 text-vitrii-blue" />
+                  <p className="text-sm text-vitrii-text">
                     <span className="font-semibold">
                       {String(minutes).padStart(2, "0")}:
                       {String(seconds).padStart(2, "0")}
                     </span>
-                    <span className="text-walmart-text-secondary">
+                    <span className="text-vitrii-text-secondary">
                       {" "}
                       para expiração
                     </span>
@@ -242,17 +242,17 @@ export default function PaymentModal({
 
               {/* Processing info */}
               <div className="bg-blue-50 rounded-lg p-4 text-center">
-                <p className="text-sm text-walmart-text">
+                <p className="text-sm text-vitrii-text">
                   Aguardando confirmação do pagamento...
                 </p>
                 <div className="mt-2 flex justify-center gap-1">
-                  <div className="w-2 h-2 bg-walmart-blue rounded-full animate-bounce" />
+                  <div className="w-2 h-2 bg-vitrii-blue rounded-full animate-bounce" />
                   <div
-                    className="w-2 h-2 bg-walmart-blue rounded-full animate-bounce"
+                    className="w-2 h-2 bg-vitrii-blue rounded-full animate-bounce"
                     style={{ animationDelay: "0.1s" }}
                   />
                   <div
-                    className="w-2 h-2 bg-walmart-blue rounded-full animate-bounce"
+                    className="w-2 h-2 bg-vitrii-blue rounded-full animate-bounce"
                     style={{ animationDelay: "0.2s" }}
                   />
                 </div>
@@ -263,17 +263,17 @@ export default function PaymentModal({
           {/* Valor */}
           <div className="border-t border-gray-200 pt-4">
             <div className="flex items-center justify-between">
-              <span className="text-walmart-text-secondary">
+              <span className="text-vitrii-text-secondary">
                 Valor a pagar:
               </span>
-              <span className="text-2xl font-bold text-walmart-blue">
+              <span className="text-2xl font-bold text-vitrii-blue">
                 R$ {Number(payment.valor).toFixed(2)}
               </span>
             </div>
           </div>
 
           {/* Info */}
-          <div className="bg-gray-50 rounded-lg p-4 text-sm text-walmart-text-secondary space-y-2">
+          <div className="bg-gray-50 rounded-lg p-4 text-sm text-vitrii-text-secondary space-y-2">
             <p>
               <strong>ID Pix:</strong> {payment.pixId?.substring(0, 20)}...
             </p>
@@ -302,7 +302,7 @@ export default function PaymentModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border-2 border-walmart-blue text-walmart-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+              className="flex-1 px-4 py-2 border-2 border-vitrii-blue text-vitrii-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors"
             >
               {isPaid ? "Fechar" : "Voltar"}
             </button>
