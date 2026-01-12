@@ -248,14 +248,23 @@ export default function Index() {
             color="green"
           />
 
-          <div className="text-center mt-8">
+          <div className="text-center mt-8 space-y-4">
             <Link
-              to="/browse?filter=gratuito"
-              className="inline-flex items-center space-x-2 text-walmart-blue font-semibold hover:space-x-3 transition-all"
+              to="/anuncio/criar?tipo=doacao"
+              className="md:hidden inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors"
             >
-              <span>Ver Todos os Itens Gratuitos</span>
-              <ArrowRight className="w-5 h-5" />
+              <Plus className="w-4 h-4" />
+              Publicar Grátis
             </Link>
+            <div>
+              <Link
+                to="/browse?filter=gratuito"
+                className="inline-flex items-center space-x-2 text-walmart-blue font-semibold hover:space-x-3 transition-all"
+              >
+                <span>Ver Todos os Itens Gratuitos</span>
+                <ArrowRight className="w-5 h-5" />
+              </Link>
+            </div>
           </div>
         </div>
       </section>
