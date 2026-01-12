@@ -219,7 +219,7 @@ export default function MeusAnuncios() {
 
                     {anuncio.preco && (
                       <p className="text-lg font-bold text-walmart-blue mb-3">
-                        R$ {anuncio.preco.toFixed(2)}
+                        R$ {Number(anuncio.preco).toFixed(2)}
                       </p>
                     )}
 
