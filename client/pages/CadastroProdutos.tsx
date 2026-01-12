@@ -29,6 +29,7 @@ interface Producto {
 }
 
 export default function CadastroProdutos() {
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -41,15 +42,21 @@ export default function CadastroProdutos() {
     tipo: "produto",
   });
 
-  // Fetch lojas
+  // Fetch lojas with user context
   const { data: lojas = [] } = useQuery<Loja[]>({
-    queryKey: ["lojas"],
+    queryKey: ["lojas", user?.id],
     queryFn: async () => {
-      const response = await fetch("/api/lojas");
+      const headers: Record<string, string> = {};
+      if (user?.id) {
+        headers["x-user-id"] = user.id.toString();
+      }
+
+      const response = await fetch("/api/lojas", { headers });
       if (!response.ok) throw new Error("Erro ao buscar lojas");
       const result = await response.json();
       return result.data || [];
     },
+    enabled: !!user,
   });
 
   // Fetch grupos for selected loja
