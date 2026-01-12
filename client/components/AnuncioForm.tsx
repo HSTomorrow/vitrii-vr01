@@ -390,6 +390,11 @@ export default function AnuncioForm({
     field: string,
     value: string | number | boolean,
   ) => {
+    // Prevent changes to price or donation checkbox when accessed via "Publicar Grátis"
+    if (isDonation && (field === "precoAnuncio" || field === "isDoacao")) {
+      return;
+    }
+
     setFormData((prev) => ({
       ...prev,
       [field]: value,
