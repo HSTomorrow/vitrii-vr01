@@ -393,34 +393,49 @@ export default function AnuncioDetalhe() {
             {/* Main Content */}
             <div className="lg:col-span-2">
               {/* Product Image / Gallery */}
-              {fotos && fotos.length > 0 ? (
-                <div className="bg-white rounded-lg overflow-hidden mb-8">
+              <div className="bg-white rounded-lg overflow-hidden mb-8">
+                {fotos && fotos.length > 0 ? (
                   <ImageGallery
                     photos={fotos}
                     anuncioId={parseInt(id!)}
                     canDelete={canEdit}
+                    anuncianteFotoUrl={anuncio.anunciantes?.fotoUrl}
                     onPhotoDeleted={() => {
                       queryClient.invalidateQueries({
                         queryKey: ["anuncio-fotos", id],
                       });
                     }}
                   />
-                </div>
-              ) : (
-                <div className="bg-vitrii-gray-light rounded-lg overflow-hidden mb-8">
-                  {anuncio.imagem ? (
-                    <img
-                      src={anuncio.imagem}
-                      alt={anuncio.titulo}
-                      className="w-full h-96 object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-96 flex items-center justify-center bg-gray-300">
-                      <Package className="w-16 h-16 text-gray-600" />
+                ) : (
+                  <div className="w-full space-y-4">
+                    {/* Show primary image or anunciante photo or placeholder */}
+                    <div className="relative w-full bg-gray-100 rounded-lg overflow-hidden aspect-square">
+                      {anuncio.imagem ? (
+                        <img
+                          src={anuncio.imagem}
+                          alt={anuncio.titulo}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : anuncio.anunciantes?.fotoUrl ? (
+                        <>
+                          <img
+                            src={anuncio.anunciantes.fotoUrl}
+                            alt="Foto do Anunciante"
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute top-2 left-2 bg-gray-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                            Foto do Anunciante
+                          </div>
+                        </>
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center bg-gray-300">
+                          <Package className="w-16 h-16 text-gray-600" />
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
-              )}
+                  </div>
+                )}
+              </div>
 
               {/* Description */}
               <div className="bg-white rounded-lg border border-gray-200 p-6 mb-8">
