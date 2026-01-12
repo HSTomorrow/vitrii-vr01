@@ -127,7 +127,7 @@ const MultiImageUpload: React.FC<MultiImageUploadProps> = ({
       </div>
 
       {/* Images Grid */}
-      {images.length > 0 && (
+      {images.length > 0 ? (
         <div className="grid grid-cols-3 gap-3 md:grid-cols-5">
           {images.map((image, index) => (
             <div
@@ -169,7 +169,20 @@ const MultiImageUpload: React.FC<MultiImageUploadProps> = ({
             </div>
           ))}
         </div>
-      )}
+      ) : anuncianteFotoUrl ? (
+        <div className="relative rounded-lg overflow-hidden bg-gray-100 h-24">
+          <img
+            src={anuncianteFotoUrl}
+            alt="Foto do Anunciante"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center">
+            <p className="text-white text-xs font-semibold text-center px-2">
+              Foto do Anunciante (fallback)
+            </p>
+          </div>
+        </div>
+      ) : null}
 
       {/* Image Zoom Modal */}
       <ImageZoomModal
@@ -180,8 +193,9 @@ const MultiImageUpload: React.FC<MultiImageUploadProps> = ({
 
       {/* Info */}
       <p className="text-sm text-vitrii-text-secondary">
-        A primeira imagem será a principal. Você pode adicionar até {maxImages}{" "}
-        imagens no total.
+        {images.length === 0 && anuncianteFotoUrl
+          ? "Nenhuma foto foi adicionada. A foto do anunciante será usada como padrão. Você pode adicionar até 5 imagens."
+          : `A primeira imagem será a principal. Você pode adicionar até ${maxImages} imagens no total.`}
       </p>
     </div>
   );
