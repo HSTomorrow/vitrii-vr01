@@ -299,7 +299,10 @@ export const updateAnunciante: RequestHandler = async (req, res) => {
 
     const updatedAnunciante = await prisma.anunciantes.update({
       where: { id: parseInt(id) },
-      data: validatedData,
+      data: {
+        ...validatedData,
+        dataAtualizacao: new Date(),
+      },
     });
 
     res.json({
@@ -319,10 +322,60 @@ export const updateAnunciante: RequestHandler = async (req, res) => {
       });
     }
 
-    console.error("Error updating anunciante:", error);
+    // Log detailed error information for debugging
+    console.error("Error updating anunciante:", {
+      id: req.params.id,
+      body: req.body,
+      errorName: error instanceof Error ? error.name : "Unknown",
+      errorMessage: error instanceof Error ? error.message : String(error),
+      errorCode: error instanceof Error && "code" in error ? (error as any).code : undefined,
+      errorMeta: error instanceof Error && "meta" in error ? (error as any).meta : undefined,
+    });
+
+    // Check for specific Prisma error types
+    if (error instanceof Error) {
+      const errorMessage = error.message;
+      const errorName = error.name;
+      const code = (error as any).code;
+
+      // Handle unique constraint violations
+      if (code === "P2002") {
+        const field = (error as any).meta?.target?.[0];
+        return res.status(409).json({
+          success: false,
+          error: `Este ${field || "valor"} já está cadastrado no sistema`,
+          details: {
+            type: "unique_constraint_violation",
+            field: field,
+          },
+        });
+      }
+
+      // Handle record not found errors
+      if (code === "P2025") {
+        return res.status(404).json({
+          success: false,
+          error: "Anunciante não encontrado",
+        });
+      }
+
+      // Return generic error with message for investigation
+      return res.status(500).json({
+        success: false,
+        error: "Erro ao atualizar anunciante",
+        details: {
+          message: errorMessage,
+          type: errorName,
+        },
+      });
+    }
+
     res.status(500).json({
       success: false,
       error: "Erro ao atualizar anunciante",
+      details: {
+        message: String(error),
+      },
     });
   }
 };
