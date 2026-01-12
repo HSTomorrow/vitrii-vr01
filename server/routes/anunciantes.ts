@@ -255,6 +255,11 @@ export const updateAnunciante: RequestHandler = async (req, res) => {
     // Check if anunciante exists
     const anunciante = await prisma.anunciantes.findUnique({
       where: { id: parseInt(id) },
+      select: {
+        id: true,
+        nome: true,
+        cnpj: true,
+      },
     });
 
     if (!anunciante) {
