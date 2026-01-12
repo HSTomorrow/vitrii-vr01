@@ -153,7 +153,10 @@ export const updateProducto: RequestHandler = async (req, res) => {
 
     const producto = await prisma.productos.update({
       where: { id: parseInt(id) },
-      data: updateData,
+      data: {
+        ...updateData,
+        dataAtualizacao: new Date(),
+      },
       include: {
         grupo: {
           include: {
