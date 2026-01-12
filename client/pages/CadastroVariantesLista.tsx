@@ -91,7 +91,7 @@ export default function CadastroVariantesLista() {
               onClick={() => navigate("/cadastros/lojas")}
               className="mt-4 px-4 py-2 bg-vitrii-yellow text-vitrii-text rounded-lg hover:bg-vitrii-yellow-dark transition-colors font-semibold"
             >
-              Ir para Cadastro de Lojas
+              Ir para Cadastro de Anunciantes e Lojas
             </button>
           </div>
         </main>
