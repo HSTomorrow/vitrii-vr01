@@ -42,14 +42,22 @@ export default function Browse() {
   const { data: anunciosData, isLoading } = useQuery({
     queryKey: ["browse-anuncios"],
     queryFn: async () => {
-      // Fetch ads with status "ativo" or "pago" - fetch more than needed for filtering
-      const response = await fetch("/api/anuncios?status=ativo&limit=500&includeInactive=false");
+      // Fetch active ads - both "ativo" (donations) and implicitly published ads
+      const response = await fetch("/api/anuncios?limit=500&includeInactive=false");
       if (!response.ok) {
         console.error("Error fetching ads:", response.status, response.statusText);
         throw new Error("Erro ao buscar anúncios");
       }
       const data = await response.json();
       console.log("Browse: Fetched ads:", data?.data?.length || 0, "ads");
+      if (data?.data) {
+        // Filter to only show published/active ads
+        const publishedAds = data.data.filter((a: any) =>
+          a.status === "ativo" || a.status === "pago" || a.isDoacao === true
+        );
+        console.log("Browse: Published ads:", publishedAds.length);
+        return { ...data, data: publishedAds };
+      }
       return data;
     },
   });
