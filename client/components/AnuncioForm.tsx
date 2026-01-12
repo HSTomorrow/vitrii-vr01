@@ -579,26 +579,49 @@ export default function AnuncioForm({
             </div>
 
             {/* Gratuito - Moved after Valor field */}
-            <div className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg">
+            <div
+              className={`flex items-center gap-3 p-4 border rounded-lg ${
+                isDonation
+                  ? "bg-blue-50 border-blue-200"
+                  : "bg-green-50 border-green-200"
+              }`}
+            >
               <input
                 type="checkbox"
                 id="isDoacao"
                 checked={formData.isDoacao}
                 onChange={(e) => {
-                  const isChecked = e.target.checked;
-                  handleInputChange("isDoacao", isChecked);
-                  if (isChecked) {
-                    handleInputChange("precoAnuncio", "0");
+                  // Only allow changes if not accessed via "Publicar Grátis"
+                  if (!isDonation) {
+                    const isChecked = e.target.checked;
+                    handleInputChange("isDoacao", isChecked);
+                    if (isChecked) {
+                      handleInputChange("precoAnuncio", "0");
+                    }
                   }
                 }}
-                className="w-4 h-4 text-green-600 bg-white border-gray-300 rounded focus:ring-2 focus:ring-green-500"
+                disabled={isDonation}
+                className={`w-4 h-4 rounded focus:ring-2 ${
+                  isDonation
+                    ? "bg-gray-100 border-gray-300 cursor-not-allowed text-blue-600 focus:ring-blue-500"
+                    : "bg-white border-gray-300 text-green-600 focus:ring-green-500 cursor-pointer"
+                }`}
               />
-              <label
-                htmlFor="isDoacao"
-                className="text-sm font-semibold text-walmart-text cursor-pointer"
-              >
-                Este produto/serviço/evento é gratuito
-              </label>
+              <div className="flex-1">
+                <label
+                  htmlFor="isDoacao"
+                  className={`text-sm font-semibold text-walmart-text ${
+                    isDonation ? "cursor-not-allowed opacity-75" : "cursor-pointer"
+                  }`}
+                >
+                  Este produto/serviço/evento é gratuito
+                </label>
+                {isDonation && (
+                  <p className="text-xs text-blue-600 mt-1">
+                    ℹ️ Esta opção foi pré-selecionada e não pode ser alterada
+                  </p>
+                )}
+              </div>
             </div>
 
             {/* Validade do Anúncio */}
