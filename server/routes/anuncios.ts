@@ -376,9 +376,9 @@ export const updateAnuncio: RequestHandler = async (req, res) => {
     let updateData = AnuncioUpdateSchema.parse(req.body);
     console.log("[updateAnuncio] Validated data:", updateData);
 
-    // If updating to donation, automatically set status to "pago", statusPagamento to "aprovado", and mark as featured
+    // If updating to donation, automatically set status to "ativo", statusPagamento to "aprovado", and mark as featured
     if (updateData.isDoacao === true) {
-      updateData.status = "pago";
+      updateData.status = "ativo";
       updateData.precoAnuncio = 0;
     }
 
