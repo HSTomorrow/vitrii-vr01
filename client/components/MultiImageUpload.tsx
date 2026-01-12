@@ -20,6 +20,7 @@ const MultiImageUpload: React.FC<MultiImageUploadProps> = ({
   onImagesChange,
   currentImages = [],
   maxImages = 5,
+  anuncianteFotoUrl,
 }) => {
   const [images, setImages] = useState<UploadedImage[]>(currentImages);
   const [isUploading, setIsUploading] = useState(false);
