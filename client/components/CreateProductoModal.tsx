@@ -269,25 +269,31 @@ export default function CreateProductoModal({
             {/* Tipo */}
             <div>
               <label className="block text-sm font-semibold text-vitrii-text mb-2">
-                Tipo *
+                Tipo de Produto/Serviço *
               </label>
               <select
                 value={formData.tipo}
                 onChange={(e) => handleInputChange("tipo", e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
               >
+                <option value="">Selecione um tipo</option>
                 <option value="produto">Produto</option>
                 <option value="servico">Serviço</option>
                 <option value="evento">Evento</option>
-                <option value="agenda_recorrente">Agenda Recorrente</option>
+                <option value="agenda_recorrente">Aula / Agenda Disponível</option>
+                <option value="oportunidade">Oportunidade / Vaga de Emprego</option>
               </select>
               <p className="mt-2 text-sm text-vitrii-text-secondary">
+                {formData.tipo === "produto" &&
+                  "Produtos físicos para venda"}
+                {formData.tipo === "servico" &&
+                  "Serviços e consultorias"}
                 {formData.tipo === "evento" &&
-                  "Selecione este tipo para eventos e shows"}
+                  "Eventos, workshops, shows e experiências"}
                 {formData.tipo === "agenda_recorrente" &&
-                  "Selecione este tipo para agendamentos recorrentes (aulas, consultas, etc)"}
-                {formData.tipo === "doacao" &&
-                  "Selecione este tipo para itens que serão doados gratuitamente"}
+                  "Aulas, consultas, agendamentos recorrentes e serviços agendáveis"}
+                {formData.tipo === "oportunidade" &&
+                  "Oportunidades profissionais e vagas de emprego"}
               </p>
             </div>
 
