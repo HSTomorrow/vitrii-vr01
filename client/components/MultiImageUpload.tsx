@@ -13,6 +13,7 @@ interface MultiImageUploadProps {
   onImagesChange: (images: UploadedImage[]) => void;
   currentImages?: UploadedImage[];
   maxImages?: number;
+  anuncianteFotoUrl?: string | null;
 }
 
 const MultiImageUpload: React.FC<MultiImageUploadProps> = ({
