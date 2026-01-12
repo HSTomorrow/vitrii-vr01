@@ -100,16 +100,20 @@ export default function AdCard({
       </button>
 
       {/* Store Logo Badge */}
-      {(anunciante?.fotoUrl || anuncio.anunciante?.fotoUrl) && (
-        <div className="absolute bottom-3 left-3 z-10 w-10 h-10 rounded-full bg-white border-2 border-vitrii-blue overflow-hidden flex items-center justify-center shadow-md">
+      <div className="absolute bottom-3 left-3 z-10 w-10 h-10 rounded-full bg-white border-2 border-vitrii-blue overflow-hidden flex items-center justify-center shadow-md">
+        {anunciante?.fotoUrl || anuncio.anunciante?.fotoUrl ? (
           <img
             src={anunciante?.fotoUrl || anuncio.anunciante?.fotoUrl}
             alt={anunciante?.nome || anuncio.anunciante?.nome}
             className="w-full h-full object-cover"
             title={anunciante?.nome || anuncio.anunciante?.nome}
           />
-        </div>
-      )}
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-vitrii-blue text-white text-xs font-bold">
+            V
+          </div>
+        )}
+      </div>
 
       {/* Image with fallback chain: anuncio > anunciante > icon */}
       <div className={`w-full bg-gradient-to-br ${backgroundColor}`}>
