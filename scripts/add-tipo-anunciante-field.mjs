@@ -1,70 +1,47 @@
-import { PrismaClient } from "@prisma/client";
+import pkg from '@prisma/client';
+const { PrismaClient } = pkg;
 
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log("🔄 Adding tipo field to anunciantes table...\n");
-
   try {
-    // Using raw SQL to add column
+    console.log('Starting migration: Adding tipo field to anunciantes table...');
+
+    // Execute raw SQL to add the column if it doesn't exist
     await prisma.$executeRaw`
-      ALTER TABLE "anunciantes"
-      ADD COLUMN IF NOT EXISTS "tipo" VARCHAR(50) DEFAULT 'Comum';
+      ALTER TABLE "public"."anunciantes" 
+      ADD COLUMN IF NOT EXISTS "tipo" VARCHAR(50) DEFAULT 'Padrão';
     `;
 
-    console.log("✅ Column added successfully!");
+    console.log('✓ Column "tipo" added to anunciantes table');
 
-    // Verify the column exists
-    const result = await prisma.$queryRaw`
-      SELECT column_name, data_type, is_nullable, column_default
-      FROM information_schema.columns
-      WHERE table_name = 'anunciantes' AND column_name = 'tipo';
+    // Update all existing records to 'Padrão' where tipo is NULL
+    const result = await prisma.$executeRaw`
+      UPDATE "public"."anunciantes" 
+      SET "tipo" = 'Padrão' 
+      WHERE "tipo" IS NULL OR "tipo" = '';
     `;
 
-    console.log("\n📋 Column information:");
-    result.forEach((col) => {
-      console.log(
-        `   - ${col.column_name}: ${col.data_type} (nullable: ${col.is_nullable}, default: ${col.column_default})`,
-      );
-    });
+    console.log(`✓ Updated ${result} existing records to tipo='Padrão'`);
 
-    // Count anunciantes
+    // Verify the changes
     const count = await prisma.anunciantes.count();
-    console.log(`\n📊 Total advertisers in database: ${count}`);
+    console.log(`✓ Total anunciantes in database: ${count}`);
 
-    // Show sample of anunciantes with tipo status
-    const sampleAnunciantes = await prisma.anunciantes.findMany({
-      select: {
-        id: true,
-        nome: true,
-        tipo: true,
-      },
+    // Get a sample to verify
+    const sample = await prisma.anunciantes.findMany({
+      select: { id: true, nome: true, tipo: true },
       take: 5,
     });
 
-    console.log("\n📝 Sample advertisers with tipo field:");
-    sampleAnunciantes.forEach((anunciante) => {
-      console.log(
-        `   - ID ${anunciante.id}: "${anunciante.nome}" | Tipo: ${anunciante.tipo}`,
-      );
+    console.log('✓ Sample records:');
+    sample.forEach(record => {
+      console.log(`  - ID: ${record.id}, Nome: ${record.nome}, Tipo: ${record.tipo}`);
     });
 
-    // Count by tipo
-    const tipoStats = await prisma.$queryRaw`
-      SELECT "tipo", COUNT(*) as count
-      FROM "anunciantes"
-      GROUP BY "tipo"
-      ORDER BY "tipo";
-    `;
-
-    console.log("\n📊 Advertisers by type:");
-    tipoStats.forEach((stat) => {
-      console.log(`   - ${stat.tipo}: ${stat.count} advertiser(s)`);
-    });
-
-    console.log("\n✨ Migration completed successfully!");
+    console.log('\n✓ Migration completed successfully!');
   } catch (error) {
-    console.error("❌ Error during migration:", error);
+    console.error('✗ Migration failed:', error);
     process.exit(1);
   } finally {
     await prisma.$disconnect();
