@@ -21,6 +21,7 @@ interface AnuncioFormProps {
   anuncioId?: number;
   onSuccess?: () => void;
   isDonation?: boolean;
+  anuncioTipo?: string | null;
 }
 
 interface Producto {
