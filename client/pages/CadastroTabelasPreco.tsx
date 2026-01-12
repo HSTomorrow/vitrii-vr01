@@ -213,7 +213,7 @@ export default function CadastroTabelasPreco() {
 
                 <div>
                   <label className="block text-sm font-semibold text-walmart-text mb-2">
-                    Grupo de Produtos *
+                    Grupo de Produtos e Servicos *
                   </label>
                   <select
                     required
