@@ -350,9 +350,9 @@ export default function Browse() {
                           onClick={() => navigate(`/anuncio/${anuncio.id}`)}
                         >
                           <div className="w-full h-40 bg-gradient-to-br from-vitrii-blue to-vitrii-blue-dark flex items-center justify-center overflow-hidden">
-                            {anuncio.imagem ? (
+                            {anuncio.imagem || anuncio.anunciantes?.fotoUrl ? (
                               <img
-                                src={anuncio.imagem}
+                                src={anuncio.imagem || anuncio.anunciantes?.fotoUrl}
                                 alt={anuncio.titulo}
                                 className="w-full h-full object-cover"
                               />
@@ -367,12 +367,12 @@ export default function Browse() {
                             </h3>
 
                             {(anuncio.endereco ||
-                              anuncio.anunciante?.endereco) && (
+                              anuncio.anunciantes?.endereco) && (
                               <div className="flex items-center gap-1 mb-3 text-xs text-vitrii-text-secondary">
                                 <MapPin className="w-3 h-3 flex-shrink-0" />
                                 <span className="truncate">
                                   {anuncio.endereco ||
-                                    anuncio.anunciante?.endereco}
+                                    anuncio.anunciantes?.endereco}
                                 </span>
                               </div>
                             )}
