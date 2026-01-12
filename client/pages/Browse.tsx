@@ -337,11 +337,16 @@ export default function Browse() {
               <div className="flex-1">
                 {totalItems > 0 ? (
                   <div>
-                    <p className="text-vitrii-text-secondary mb-6">
-                      {totalItems} anúncio{totalItems !== 1 ? "s" : ""} encontrado
-                      {totalItems !== 1 ? "s" : ""}
-                      {hasActiveFilters && " com os filtros aplicados"}
-                    </p>
+                    <div className="flex justify-between items-center mb-6">
+                      <p className="text-vitrii-text-secondary">
+                        {totalItems} anúncio{totalItems !== 1 ? "s" : ""} encontrado
+                        {totalItems !== 1 ? "s" : ""}
+                        {hasActiveFilters && " com os filtros aplicados"}
+                      </p>
+                      <p className="text-sm text-vitrii-text-secondary">
+                        Mostrando {startIndex + 1}-{Math.min(endIndex, totalItems)} de {totalItems}
+                      </p>
+                    </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                       {anuncios.map((anuncio: any) => (
