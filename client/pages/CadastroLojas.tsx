@@ -477,7 +477,7 @@ export default function CadastroAnunciantes() {
                 {!anunciantes || anunciantes.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={6}
+                      colSpan={7}
                       className="px-6 py-4 text-center text-gray-500"
                     >
                       Nenhuma loja cadastrada
