@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { Star, Heart, Package, Calendar, MapPin } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
+import ImageZoom from "./ImageZoom";
 
 interface AdCardProps {
   anuncio: any;
