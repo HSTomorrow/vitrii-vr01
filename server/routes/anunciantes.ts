@@ -255,6 +255,33 @@ export const updateAnunciante: RequestHandler = async (req, res) => {
     // Validate input - only allow safe fields
     const validatedData = AnuncianteUpdateSchema.parse(req.body);
 
+    // Convert empty strings to null for optional fields
+    const cleanedData: Record<string, any> = {};
+    const optionalStringFields = [
+      "cnpj",
+      "telefone",
+      "email",
+      "endereco",
+      "descricao",
+      "site",
+      "instagram",
+      "facebook",
+      "whatsapp",
+      "fotoUrl",
+    ];
+
+    for (const [key, value] of Object.entries(validatedData)) {
+      if (
+        optionalStringFields.includes(key) &&
+        typeof value === "string" &&
+        value.trim() === ""
+      ) {
+        cleanedData[key] = null;
+      } else {
+        cleanedData[key] = value;
+      }
+    }
+
     // Check if anunciante exists
     const anunciante = await prisma.anunciantes.findUnique({
       where: { id: parseInt(id) },
