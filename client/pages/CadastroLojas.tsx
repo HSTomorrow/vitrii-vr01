@@ -18,6 +18,7 @@ interface Anunciante {
   estado: string;
   descricao: string;
   email: string;
+  telefone?: string;
   site?: string;
   instagram?: string;
   facebook?: string;
