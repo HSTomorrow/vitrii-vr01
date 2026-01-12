@@ -283,7 +283,7 @@ export function createServer() {
     req.query.anuncianteId = req.params.anuncianteId;
     return getGrupos(req, res);
   });
-  app.post("/api/grupos-productos", createGrupo);
+  app.post("/api/grupos-productos", extractUserId, createGrupo);
   app.put("/api/grupos-productos/:id", updateGrupo);
   app.delete("/api/grupos-productos/:id", deleteGrupo);
 
