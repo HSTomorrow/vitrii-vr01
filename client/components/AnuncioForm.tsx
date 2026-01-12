@@ -87,6 +87,7 @@ export default function AnuncioForm({
     destaque: false,
     categoria: "" as string,
     dadosCategoria: "",
+    tipo: anuncioTipo || ("produto" as string),
   });
   const [uploadedImages, setUploadedImages] = useState<
     Array<{ id?: string; url: string }>
