@@ -111,9 +111,10 @@ export default function CadastroAnunciantes() {
             errorMessage = errorMessage + "\n\n" + fieldErrors;
           } else if (typeof errorData.details === "object") {
             // Format other error details
-            const detailMessage = errorData.details.message ||
-                                  errorData.details.type ||
-                                  JSON.stringify(errorData.details);
+            const detailMessage =
+              errorData.details.message ||
+              errorData.details.type ||
+              JSON.stringify(errorData.details);
             errorMessage = errorMessage + "\n" + detailMessage;
           }
         }
@@ -149,7 +150,8 @@ export default function CadastroAnunciantes() {
       refetch();
     },
     onError: (error) => {
-      const errorMessage = error instanceof Error ? error.message : "Erro ao salvar loja";
+      const errorMessage =
+        error instanceof Error ? error.message : "Erro ao salvar loja";
       // Use toast.error with duration to ensure long error messages are visible
       toast.error(errorMessage, {
         duration: 5000,

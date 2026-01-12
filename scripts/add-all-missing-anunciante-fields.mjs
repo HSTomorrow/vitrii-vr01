@@ -30,9 +30,7 @@ async function main() {
       ADD COLUMN IF NOT EXISTS "dataAtualizacao" TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
     `;
 
-    console.log(
-      "✓ All columns added to anunciantes table (or already exist)",
-    );
+    console.log("✓ All columns added to anunciantes table (or already exist)");
 
     // Update required fields for existing records that might have NULLs
     await prisma.$executeRaw`

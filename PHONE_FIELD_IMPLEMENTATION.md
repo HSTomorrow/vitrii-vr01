@@ -1,14 +1,17 @@
 # Telefone Field Implementation for Anunciante Cadastro
 
 ## Problem
+
 The "Cadastro de Anunciantes" form was missing the dedicated "Telefone" (Phone) field for editing and creating advertisers. Only WhatsApp was available, but not a general phone number field.
 
 ## Solution Implemented
 
 ### 1. Updated TypeScript Interface
+
 **File:** `client/pages/CadastroLojas.tsx`
 
 Added `telefone` as an optional property to the `Anunciante` interface:
+
 ```typescript
 interface Anunciante {
   // ... existing fields ...
@@ -18,7 +21,9 @@ interface Anunciante {
 ```
 
 ### 2. Updated Form State
+
 Added `telefone` to the `formData` state initialization:
+
 ```typescript
 const [formData, setFormData] = useState({
   // ... existing fields ...
@@ -28,10 +33,13 @@ const [formData, setFormData] = useState({
 ```
 
 ### 3. Updated Form Data Handling
+
 Updated three places where `formData` is reset:
 
 #### a) handleEdit Function
+
 When editing an existing advertiser, the form now loads the telefone value:
+
 ```typescript
 const handleEdit = (loja: Anunciante) => {
   setFormData({
@@ -45,7 +53,9 @@ const handleEdit = (loja: Anunciante) => {
 ```
 
 #### b) onSuccess Callback
+
 After successful save, the form is reset including telefone:
+
 ```typescript
 onSuccess: () => {
   setFormData({
@@ -54,11 +64,13 @@ onSuccess: () => {
     // ... other fields ...
   });
   // ... rest of callback ...
-}
+};
 ```
 
 #### c) Nova Anunciante Button
+
 When opening a new advertiser form, telefone is initialized to empty string:
+
 ```typescript
 onClick={() => {
   setFormData({
@@ -70,6 +82,7 @@ onClick={() => {
 ```
 
 ### 4. Added Telefone Form Input Field
+
 A new form field was added in the form, positioned between Email and Site fields:
 
 ```jsx
@@ -82,10 +95,7 @@ A new form field was added in the form, positioned between Email and Site fields
     value={formData.telefone}
     onChange={(e) => {
       // Only allow digits, spaces, parentheses, and hyphens
-      const cleanValue = e.target.value.replace(
-        /[^\d\s()()-]/g,
-        "",
-      );
+      const cleanValue = e.target.value.replace(/[^\d\s()()-]/g, "");
       setFormData({ ...formData, telefone: cleanValue });
     }}
     placeholder="(51) 3333-3333"
@@ -105,13 +115,14 @@ A new form field was added in the form, positioned between Email and Site fields
 ## Form Field Order
 
 The complete form now includes fields in this order:
-1. Nome da Anunciante * (Name)
-2. Tipo de Anunciante * (Type)
-3. CNPJ/CPF * (ID Number)
-4. Endereço * (Address)
-5. Cidade * (City)
-6. Estado (UF) * (State)
-7. Email * (Email)
+
+1. Nome da Anunciante \* (Name)
+2. Tipo de Anunciante \* (Type)
+3. CNPJ/CPF \* (ID Number)
+4. Endereço \* (Address)
+5. Cidade \* (City)
+6. Estado (UF) \* (State)
+7. Email \* (Email)
 8. **Telefone (Opcional)** ← NEW
 9. Site (Opcional) (Website)
 10. Instagram (Opcional) (Instagram)
@@ -122,6 +133,7 @@ The complete form now includes fields in this order:
 ## Backend Support
 
 The backend already has support for the telefone field:
+
 - **Prisma Schema**: `telefone` field exists in the anunciantes model
 - **Database**: Field was added to the PostgreSQL table via migration
 - **Validation Schema**: `AnuncianteUpdateSchema` includes `telefone` validation
@@ -130,6 +142,7 @@ The backend already has support for the telefone field:
 ## Testing
 
 To verify the implementation:
+
 1. Navigate to "Cadastro de Anunciantes" page
 2. Click "Nova Anunciante" to create a new advertiser
 3. The Telefone field should appear in the form

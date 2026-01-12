@@ -362,8 +362,14 @@ export const updateAnunciante: RequestHandler = async (req, res) => {
       body: req.body,
       errorName: error instanceof Error ? error.name : "Unknown",
       errorMessage: error instanceof Error ? error.message : String(error),
-      errorCode: error instanceof Error && "code" in error ? (error as any).code : undefined,
-      errorMeta: error instanceof Error && "meta" in error ? (error as any).meta : undefined,
+      errorCode:
+        error instanceof Error && "code" in error
+          ? (error as any).code
+          : undefined,
+      errorMeta:
+        error instanceof Error && "meta" in error
+          ? (error as any).meta
+          : undefined,
     });
 
     // Check for specific Prisma error types

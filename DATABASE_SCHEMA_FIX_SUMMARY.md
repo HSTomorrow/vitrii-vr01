@@ -1,22 +1,28 @@
 # Database Schema Fix Summary - Anunciantes Table
 
 ## Problem
+
 The PostgreSQL/Supabase database was missing several columns that were defined in the Prisma schema, causing update operations to fail with errors like:
+
 - "The column `anunciantes.site` does not exist in the current database"
 - "The column `anunciantes.fotoUrl` does not exist in the current database"
 - "The column `anunciantes.instagram` does not exist in the current database"
 
 ## Root Cause
+
 The Prisma schema file (`prisma/schema.prisma`) defined optional fields for the `anunciantes` model, but these columns had never been created in the actual PostgreSQL database. This mismatch occurred because:
+
 1. The schema was updated with new fields
 2. No database migration was executed to create the corresponding columns
 
 ## Solution Implemented
 
 ### 1. Database Migration
+
 Created and executed a comprehensive migration script (`scripts/add-all-missing-anunciante-fields.mjs`) that added ALL missing columns to the `anunciantes` table:
 
 **Columns Added:**
+
 - `descricao` (TEXT) - Description of advertiser
 - `cnpj` (VARCHAR 14) - CNPJ/CPF number
 - `telefone` (VARCHAR 20) - Phone number
@@ -34,6 +40,7 @@ Created and executed a comprehensive migration script (`scripts/add-all-missing-
 - `dataAtualizacao` (TIMESTAMP) - Update date with current timestamp default
 
 **Migration Execution:**
+
 ```bash
 pnpm node scripts/add-all-missing-anunciante-fields.mjs
 ```
@@ -46,7 +53,9 @@ pnpm node scripts/add-all-missing-anunciante-fields.mjs
 ### 2. Backend API Updates
 
 #### Updated `AnuncianteUpdateSchema` (server/routes/anunciantes.ts)
+
 Added the following fields to the update schema validation:
+
 - `cnpj` - With regex validation for 11-14 digit format
 - `telefone` - Optional string
 - `cep` - Optional string
@@ -54,13 +63,17 @@ Added the following fields to the update schema validation:
 These were previously missing, preventing updates to these fields.
 
 #### Enhanced Empty String Handling
+
 Updated the `updateAnunciante` function to:
+
 - Convert empty strings to `null` for all optional fields
 - Prevent Prisma validation errors when optional fields are left blank
 - Updated timestamp (`dataAtualizacao`) on every update
 
 ### 3. Frontend Form Validation
+
 Verified that `client/pages/CadastroLojas.tsx` includes all form fields:
+
 - Nome (Name) ✓
 - Tipo (Type) ✓
 - CNPJ/CPF ✓
@@ -79,6 +92,7 @@ Verified that `client/pages/CadastroLojas.tsx` includes all form fields:
 ## Verification
 
 **Test Case: Daniel Pelegrinelli (ID 22)**
+
 ```json
 {
   "id": 22,
@@ -126,6 +140,7 @@ All fields are now present in the database and can be updated successfully.
    - All should now update successfully
 
 2. **Verification**: Check the database to confirm updates are saved:
+
    ```bash
    pnpm node scripts/check-anunciante-22.mjs
    ```
@@ -135,6 +150,7 @@ All fields are now present in the database and can be updated successfully.
 ## Error Handling Improvements
 
 When updates now fail, users see:
+
 - **Validation Errors**: Field-specific messages (e.g., "CNPJ/CPF inválido")
 - **Constraint Violations**: "Este cnpj já está cadastrado no sistema"
 - **Not Found Errors**: "Anunciante não encontrado"
