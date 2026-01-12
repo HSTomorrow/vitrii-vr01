@@ -69,9 +69,14 @@ export default function CadastroGruposProductos() {
       const url = editingId ? `/api/grupos-productos/${editingId}` : "/api/grupos-productos";
       const method = editingId ? "PUT" : "POST";
 
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (user?.id) {
+        headers["x-user-id"] = user.id.toString();
+      }
+
       const response = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({
           anuncianteId: parseInt(data.anuncianteId),
           nome: data.nome,
