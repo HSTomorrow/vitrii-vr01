@@ -61,6 +61,7 @@ export default function AnuncioForm({
   anuncioId,
   onSuccess,
   isDonation,
+  anuncioTipo,
 }: AnuncioFormProps) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
