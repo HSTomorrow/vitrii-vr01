@@ -137,6 +137,7 @@ export default function CadastroAnunciantes() {
         estado: "RS",
         descricao: "",
         email: "",
+        telefone: "",
         site: "",
         instagram: "",
         facebook: "",
