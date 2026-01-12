@@ -408,6 +408,7 @@ export const updateAnuncio: RequestHandler = async (req, res) => {
     if (updateData.cidade !== undefined) mappedData.cidade = updateData.cidade;
     if (updateData.estado !== undefined) mappedData.estado = updateData.estado;
     if (updateData.status !== undefined) mappedData.status = updateData.status;
+    if (updateData.tipo !== undefined) mappedData.tipo = updateData.tipo;
     if (updateData.isDoacao !== undefined) mappedData.isDoacao = updateData.isDoacao;
     if (updateData.destaque !== undefined) mappedData.destaque = updateData.destaque;
 
