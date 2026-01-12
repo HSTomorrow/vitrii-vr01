@@ -210,6 +210,12 @@ export default function AnunciosCarousel({
               </div>
             )}
 
+            {anuncio.tipo === "oportunidade" && (
+              <div className="absolute top-3 right-3 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold z-10">
+                OPORTUNIDADE
+              </div>
+            )}
+
             <button
               onClick={(e) => handleToggleFavorito(anuncio.id, e)}
               className="absolute top-3 left-3 z-10 p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
