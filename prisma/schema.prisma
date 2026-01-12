@@ -196,6 +196,7 @@ model usracessos {
   membros_equipe        membros_equipe[]
   passwordResetTokens   passwordResetToken[]
   anuncioVisualizados   anuncioVisualizados[]
+  fotos_anuncio         fotos_anuncio[]
 }
 
 model passwordResetToken {
