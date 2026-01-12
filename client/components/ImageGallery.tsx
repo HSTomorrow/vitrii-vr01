@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { Button } from "./ui/button";
-import ImageZoom from "./ImageZoom";
+import ImageZoomModal from "./ImageZoomModal";
 
 export interface GalleryPhoto {
   id: number;
