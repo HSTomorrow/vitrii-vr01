@@ -362,6 +362,26 @@ export default function CadastroAnunciantes() {
 
                 <div>
                   <label className="block text-sm font-semibold text-walmart-text mb-2">
+                    Telefone (Opcional)
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.telefone}
+                    onChange={(e) => {
+                      // Only allow digits, spaces, parentheses, and hyphens
+                      const cleanValue = e.target.value.replace(
+                        /[^\d\s()()-]/g,
+                        "",
+                      );
+                      setFormData({ ...formData, telefone: cleanValue });
+                    }}
+                    placeholder="(51) 3333-3333"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-walmart-blue focus:ring-2 focus:ring-walmart-blue focus:ring-opacity-50"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-walmart-text mb-2">
                     Site (Opcional)
                   </label>
                   <input
