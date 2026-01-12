@@ -378,7 +378,6 @@ export default function CadastroAnunciantes() {
                     WhatsApp (Opcional)
                   </label>
                   <div className="flex items-center gap-0">
-                    
                     <input
                       type="text"
                       value={
@@ -490,11 +489,13 @@ export default function CadastroAnunciantes() {
                         {loja.nome}
                       </td>
                       <td className="px-6 py-4 text-walmart-text">
-                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                          loja.tipo === "Profissional"
-                            ? "bg-blue-100 text-blue-800"
-                            : "bg-gray-100 text-gray-800"
-                        }`}>
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                            loja.tipo === "Profissional"
+                              ? "bg-blue-100 text-blue-800"
+                              : "bg-gray-100 text-gray-800"
+                          }`}
+                        >
                           {loja.tipo || "Padrão"}
                         </span>
                       </td>

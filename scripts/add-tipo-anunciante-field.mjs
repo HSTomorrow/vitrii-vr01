@@ -1,11 +1,13 @@
-import pkg from '@prisma/client';
+import pkg from "@prisma/client";
 const { PrismaClient } = pkg;
 
 const prisma = new PrismaClient();
 
 async function main() {
   try {
-    console.log('Starting migration: Adding tipo field to anunciantes table...');
+    console.log(
+      "Starting migration: Adding tipo field to anunciantes table...",
+    );
 
     // Execute raw SQL to add the column if it doesn't exist
     await prisma.$executeRaw`
@@ -34,14 +36,16 @@ async function main() {
       take: 5,
     });
 
-    console.log('✓ Sample records:');
-    sample.forEach(record => {
-      console.log(`  - ID: ${record.id}, Nome: ${record.nome}, Tipo: ${record.tipo}`);
+    console.log("✓ Sample records:");
+    sample.forEach((record) => {
+      console.log(
+        `  - ID: ${record.id}, Nome: ${record.nome}, Tipo: ${record.tipo}`,
+      );
     });
 
-    console.log('\n✓ Migration completed successfully!');
+    console.log("\n✓ Migration completed successfully!");
   } catch (error) {
-    console.error('✗ Migration failed:', error);
+    console.error("✗ Migration failed:", error);
     process.exit(1);
   } finally {
     await prisma.$disconnect();
