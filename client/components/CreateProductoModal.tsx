@@ -134,8 +134,8 @@ export default function CreateProductoModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.grupoId || !formData.nome) {
-      toast.error("Grupo e Nome do produto são obrigatórios");
+    if (!formData.grupoId || !formData.nome || !formData.tipo) {
+      toast.error("Grupo, Nome e Tipo do produto são obrigatórios");
       return;
     }
 
