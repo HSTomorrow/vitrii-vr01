@@ -26,7 +26,7 @@ export const getGrupos: RequestHandler = async (req, res) => {
 
     // Get total count and paginated data in parallel
     const [grupos, total] = await Promise.all([
-      prisma.gruposProductos.findMany({
+      prisma.grupos_produtos.findMany({
         where,
         select: {
           id: true,
@@ -39,7 +39,7 @@ export const getGrupos: RequestHandler = async (req, res) => {
         take: pageLimit,
         skip: pageOffset,
       }),
-      prisma.gruposProductos.count({ where }),
+      prisma.grupos_produtos.count({ where }),
     ]);
 
     res.json({
