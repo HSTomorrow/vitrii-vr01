@@ -18,14 +18,14 @@ export default function Checkout() {
 
   if (!anuncioId) {
     return (
-      <div className="min-h-screen bg-walmart-gray-light flex items-center justify-center">
+      <div className="min-h-screen bg-vitrii-gray-light flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-walmart-text">
+          <h1 className="text-2xl font-bold text-vitrii-text">
             ID do anúncio não encontrado
           </h1>
           <Link
             to="/sell"
-            className="text-walmart-blue hover:text-walmart-blue-dark mt-4 inline-block"
+            className="text-vitrii-blue hover:text-vitrii-blue-dark mt-4 inline-block"
           >
             Voltar para meus anúncios
           </Link>
@@ -154,21 +154,21 @@ export default function Checkout() {
   };
 
   return (
-    <div className="min-h-screen bg-walmart-gray-light py-12">
+    <div className="min-h-screen bg-vitrii-gray-light py-12">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
           <Link
             to="/sell"
-            className="inline-flex items-center text-walmart-blue hover:text-walmart-blue-dark font-semibold mb-4"
+            className="inline-flex items-center text-vitrii-blue hover:text-vitrii-blue-dark font-semibold mb-4"
           >
             <ChevronLeft className="w-5 h-5 mr-1" />
             Voltar
           </Link>
-          <h1 className="text-3xl font-bold text-walmart-text">
+          <h1 className="text-3xl font-bold text-vitrii-text">
             Finalizar Pagamento
           </h1>
-          <p className="text-walmart-text-secondary mt-2">
+          <p className="text-vitrii-text-secondary mt-2">
             Realize o pagamento via Pix para ativar seu anúncio
           </p>
         </div>
@@ -177,7 +177,7 @@ export default function Checkout() {
           {/* Left: Ad Summary */}
           <div className="md:col-span-1">
             <div className="bg-white rounded-lg shadow-md p-6 sticky top-6">
-              <h2 className="font-semibold text-walmart-text mb-4">
+              <h2 className="font-semibold text-vitrii-text mb-4">
                 Resumo do Anúncio
               </h2>
 
@@ -192,20 +192,20 @@ export default function Checkout() {
                   )}
 
                   <div>
-                    <p className="text-sm text-walmart-text-secondary">
+                    <p className="text-sm text-vitrii-text-secondary">
                       Título
                     </p>
-                    <p className="font-semibold text-walmart-text">
+                    <p className="font-semibold text-vitrii-text">
                       {anuncio.titulo}
                     </p>
                   </div>
 
                   {anuncio.descricao && (
                     <div>
-                      <p className="text-sm text-walmart-text-secondary">
+                      <p className="text-sm text-vitrii-text-secondary">
                         Descrição
                       </p>
-                      <p className="text-sm text-walmart-text line-clamp-2">
+                      <p className="text-sm text-vitrii-text line-clamp-2">
                         {anuncio.descricao}
                       </p>
                     </div>
@@ -213,16 +213,16 @@ export default function Checkout() {
 
                   <div className="border-t border-gray-200 pt-4">
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-walmart-text-secondary">
+                      <span className="text-vitrii-text-secondary">
                         Preço do anúncio:
                       </span>
-                      <span className="font-semibold text-walmart-text">
+                      <span className="font-semibold text-vitrii-text">
                         R$ 9,90
                       </span>
                     </div>
                     {anuncio.destaque && (
                       <div className="flex justify-between items-center mb-2">
-                        <span className="text-walmart-text-secondary">
+                        <span className="text-vitrii-text-secondary">
                           Em destaque:
                         </span>
                         <span className="text-sm font-semibold text-yellow-600">
@@ -231,10 +231,10 @@ export default function Checkout() {
                       </div>
                     )}
                     <div className="flex justify-between items-center pt-2 border-t border-gray-200 mt-2">
-                      <span className="font-semibold text-walmart-text">
+                      <span className="font-semibold text-vitrii-text">
                         Total:
                       </span>
-                      <span className="text-2xl font-bold text-walmart-blue">
+                      <span className="text-2xl font-bold text-vitrii-blue">
                         R$ 9,90
                       </span>
                     </div>
@@ -243,13 +243,13 @@ export default function Checkout() {
                   <div className="space-y-2 mt-4">
                     <button
                       onClick={() => navigate(`/anuncio/${parsedAnuncioId}/editar`)}
-                      className="w-full px-4 py-2 bg-walmart-blue text-white rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors"
+                      className="w-full px-4 py-2 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors"
                     >
                       Reeditar Anúncio
                     </button>
                     <button
                       onClick={() => navigate(`/anuncio/${parsedAnuncioId}`)}
-                      className="w-full px-4 py-2 border-2 border-walmart-blue text-walmart-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+                      className="w-full px-4 py-2 border-2 border-vitrii-blue text-vitrii-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors"
                     >
                       Ver Anúncio Completo
                     </button>
@@ -308,7 +308,7 @@ export default function Checkout() {
               <>
                 {/* QR Code Section */}
                 <div className="bg-white rounded-lg shadow-md p-6">
-                  <h2 className="font-bold text-walmart-text mb-4 text-lg">
+                  <h2 className="font-bold text-vitrii-text mb-4 text-lg">
                     Escaneie o QR Code
                   </h2>
 
@@ -326,16 +326,16 @@ export default function Checkout() {
                         </div>
                       </div>
 
-                      <p className="text-center text-walmart-text-secondary">
+                      <p className="text-center text-vitrii-text-secondary">
                         Abra seu aplicativo bancário e escaneie o código acima
                       </p>
                     </div>
                   ) : (
                     <div className="text-center py-12">
                       <div className="inline-block animate-spin">
-                        <div className="w-8 h-8 border-4 border-walmart-blue border-t-transparent rounded-full" />
+                        <div className="w-8 h-8 border-4 border-vitrii-blue border-t-transparent rounded-full" />
                       </div>
-                      <p className="text-walmart-text-secondary mt-4">
+                      <p className="text-vitrii-text-secondary mt-4">
                         Gerando código Pix...
                       </p>
                     </div>
@@ -345,11 +345,11 @@ export default function Checkout() {
                 {/* Copy Code Section */}
                 {payment && (
                   <div className="bg-white rounded-lg shadow-md p-6">
-                    <h2 className="font-bold text-walmart-text mb-4 text-lg">
+                    <h2 className="font-bold text-vitrii-text mb-4 text-lg">
                       Copiar Código Pix
                     </h2>
 
-                    <p className="text-sm text-walmart-text-secondary mb-3">
+                    <p className="text-sm text-vitrii-text-secondary mb-3">
                       Se preferir, copie o código abaixo e cole no seu
                       aplicativo bancário
                     </p>
@@ -358,10 +358,10 @@ export default function Checkout() {
                       onClick={handleCopyPixCode}
                       className="w-full bg-gray-100 hover:bg-gray-200 border-2 border-gray-300 rounded-lg p-4 flex items-center justify-between transition-colors mb-3"
                     >
-                      <code className="text-sm text-walmart-text font-mono truncate">
+                      <code className="text-sm text-vitrii-text font-mono truncate">
                         {payment.urlCopiaECola.substring(0, 50)}...
                       </code>
-                      <Copy className="w-5 h-5 text-walmart-blue flex-shrink-0 ml-2" />
+                      <Copy className="w-5 h-5 text-vitrii-blue flex-shrink-0 ml-2" />
                     </button>
 
                     {copied && (
@@ -376,12 +376,12 @@ export default function Checkout() {
                 {payment && (
                   <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-6">
                     <div className="flex items-center gap-3 justify-center">
-                      <Clock className="w-6 h-6 text-walmart-blue" />
+                      <Clock className="w-6 h-6 text-vitrii-blue" />
                       <div className="text-center">
-                        <p className="text-sm text-walmart-text-secondary">
+                        <p className="text-sm text-vitrii-text-secondary">
                           Tempo restante:
                         </p>
-                        <p className="text-3xl font-bold text-walmart-blue mt-1">
+                        <p className="text-3xl font-bold text-vitrii-blue mt-1">
                           {String(minutes).padStart(2, "0")}:
                           {String(seconds).padStart(2, "0")}
                         </p>
@@ -393,21 +393,21 @@ export default function Checkout() {
                 {/* Payment Details */}
                 {payment && (
                   <div className="bg-white rounded-lg shadow-md p-6">
-                    <h2 className="font-bold text-walmart-text mb-4">
+                    <h2 className="font-bold text-vitrii-text mb-4">
                       Detalhes do Pagamento
                     </h2>
 
                     <div className="space-y-3 text-sm">
                       <div className="flex justify-between">
-                        <span className="text-walmart-text-secondary">
+                        <span className="text-vitrii-text-secondary">
                           ID Pix:
                         </span>
-                        <span className="font-mono text-walmart-text">
+                        <span className="font-mono text-vitrii-text">
                           {payment.pixId?.substring(0, 20)}...
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-walmart-text-secondary">
+                        <span className="text-vitrii-text-secondary">
                           Status:
                         </span>
                         <span className="font-semibold text-blue-600">
@@ -417,10 +417,10 @@ export default function Checkout() {
                         </span>
                       </div>
                       <div className="flex justify-between pt-3 border-t border-gray-200">
-                        <span className="text-walmart-text-secondary font-semibold">
+                        <span className="text-vitrii-text-secondary font-semibold">
                           Valor:
                         </span>
-                        <span className="font-bold text-walmart-blue">
+                        <span className="font-bold text-vitrii-blue">
                           R$ {Number(payment.valor).toFixed(2)}
                         </span>
                       </div>
@@ -429,11 +429,11 @@ export default function Checkout() {
                 )}
 
                 {/* Info Box */}
-                <div className="bg-blue-50 border-l-4 border-walmart-blue p-4 rounded">
-                  <p className="text-sm text-walmart-text font-semibold mb-2">
+                <div className="bg-blue-50 border-l-4 border-vitrii-blue p-4 rounded">
+                  <p className="text-sm text-vitrii-text font-semibold mb-2">
                     💡 Dica
                   </p>
-                  <p className="text-sm text-walmart-text-secondary">
+                  <p className="text-sm text-vitrii-text-secondary">
                     O pagamento é processado instantaneamente após você
                     confirmar a transferência Pix. Seu anúncio será ativado
                     automaticamente!

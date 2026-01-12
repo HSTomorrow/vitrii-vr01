@@ -17,7 +17,7 @@ export default function CriarAnuncio() {
       <div className="min-h-screen flex flex-col bg-white">
         <Header />
         <div className="flex-1 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-walmart-blue" />
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-vitrii-blue" />
         </div>
         <Footer />
       </div>
@@ -32,23 +32,23 @@ export default function CriarAnuncio() {
         <div className="flex-1 flex items-center justify-center">
           <div className="text-center max-w-md">
             <AlertCircle className="w-12 h-12 text-blue-600 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-walmart-text mb-2">
+            <h2 className="text-2xl font-bold text-vitrii-text mb-2">
               Acesso Restrito
             </h2>
-            <p className="text-walmart-text-secondary mb-6">
+            <p className="text-vitrii-text-secondary mb-6">
               Para criar anúncios, você precisa estar logado com uma conta
               válida.
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => navigate("/auth/signin")}
-                className="flex-1 px-4 py-3 bg-walmart-blue text-white rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors"
+                className="flex-1 px-4 py-3 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors"
               >
                 Entrar
               </button>
               <button
                 onClick={() => navigate("/auth/signup")}
-                className="flex-1 px-4 py-3 border-2 border-walmart-blue text-walmart-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+                className="flex-1 px-4 py-3 border-2 border-vitrii-blue text-vitrii-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors"
               >
                 Cadastrar
               </button>
@@ -61,7 +61,7 @@ export default function CriarAnuncio() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-walmart-gray-light">
+    <div className="min-h-screen flex flex-col bg-vitrii-gray-light">
       <Header />
       <main className="flex-1">
         <AnuncioForm

@@ -102,23 +102,23 @@ export default function Chat() {
   };
 
   return (
-    <div className="min-h-screen bg-walmart-gray-light">
+    <div className="min-h-screen bg-vitrii-gray-light">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
           <Link
             to="/"
-            className="inline-flex items-center text-walmart-blue hover:text-walmart-blue-dark font-semibold"
+            className="inline-flex items-center text-vitrii-blue hover:text-vitrii-blue-dark font-semibold"
           >
             <ChevronLeft className="w-5 h-5 mr-1" />
             Voltar
           </Link>
-          <h1 className="text-2xl font-bold text-walmart-text">
+          <h1 className="text-2xl font-bold text-vitrii-text">
             Minhas Mensagens
           </h1>
           <button
             onClick={handleCreateConversa}
-            className="flex items-center gap-2 px-4 py-2 bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors"
           >
             <Plus className="w-4 h-4" />
             Nova Conversa
@@ -144,10 +144,10 @@ export default function Chat() {
               <div className="flex flex-col h-full">
                 {/* Conversation Header */}
                 <div className="bg-white rounded-t-lg shadow-md border-b border-gray-200 p-4">
-                  <h2 className="font-bold text-walmart-text text-lg">
+                  <h2 className="font-bold text-vitrii-text text-lg">
                     {selectedConversa.assunto}
                   </h2>
-                  <p className="text-sm text-walmart-text-secondary">
+                  <p className="text-sm text-vitrii-text-secondary">
                     com {selectedConversa.anunciante.nome} •{" "}
                     {selectedConversa.usuario.nome}
                   </p>
@@ -173,12 +173,12 @@ export default function Chat() {
             ) : (
               <div className="bg-white rounded-lg shadow-md flex items-center justify-center h-full">
                 <div className="text-center">
-                  <p className="text-walmart-text-secondary text-lg mb-4">
+                  <p className="text-vitrii-text-secondary text-lg mb-4">
                     Selecione uma conversa para começar
                   </p>
                   <button
                     onClick={handleCreateConversa}
-                    className="px-6 py-2 bg-walmart-blue text-white rounded-lg hover:bg-walmart-blue-dark transition-colors"
+                    className="px-6 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors"
                   >
                     + Iniciar Conversa
                   </button>

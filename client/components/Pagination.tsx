@@ -57,7 +57,7 @@ export default function Pagination({
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="p-2 rounded-lg border border-gray-300 text-walmart-text hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="p-2 rounded-lg border border-gray-300 text-vitrii-text hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         title="Página anterior"
       >
         <ChevronLeft className="w-4 h-4" />
@@ -69,7 +69,7 @@ export default function Pagination({
             return (
               <span
                 key={`ellipsis-${idx}`}
-                className="px-2 py-2 text-walmart-text-secondary"
+                className="px-2 py-2 text-vitrii-text-secondary"
               >
                 {page}
               </span>
@@ -85,8 +85,8 @@ export default function Pagination({
               onClick={() => onPageChange(pageNum)}
               className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
                 isActive
-                  ? "bg-walmart-blue text-white"
-                  : "border border-gray-300 text-walmart-text hover:bg-gray-100"
+                  ? "bg-vitrii-blue text-white"
+                  : "border border-gray-300 text-vitrii-text hover:bg-gray-100"
               }`}
             >
               {pageNum}
@@ -98,13 +98,13 @@ export default function Pagination({
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="p-2 rounded-lg border border-gray-300 text-walmart-text hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className="p-2 rounded-lg border border-gray-300 text-vitrii-text hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         title="Próxima página"
       >
         <ChevronRight className="w-4 h-4" />
       </button>
 
-      <div className="ml-4 text-sm text-walmart-text-secondary">
+      <div className="ml-4 text-sm text-vitrii-text-secondary">
         Página <span className="font-semibold">{currentPage}</span> de{" "}
         <span className="font-semibold">{totalPages}</span>
       </div>

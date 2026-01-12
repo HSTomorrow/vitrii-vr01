@@ -122,7 +122,7 @@ export default function CreateConversaModal({
       <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-0">
-          <h2 className="text-xl font-bold text-walmart-text">
+          <h2 className="text-xl font-bold text-vitrii-text">
             Iniciar Nova Conversa
           </h2>
           <button
@@ -137,7 +137,7 @@ export default function CreateConversaModal({
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           {/* Anunciante Selection */}
           <div>
-            <label className="block text-sm font-semibold text-walmart-text mb-2">
+            <label className="block text-sm font-semibold text-vitrii-text mb-2">
               Anunciante *
             </label>
             <div className="relative">
@@ -147,7 +147,7 @@ export default function CreateConversaModal({
                 placeholder="Buscar anunciante..."
                 value={searchAnunciantes}
                 onChange={(e) => setSearchAnunciantes(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
               />
             </div>
 
@@ -163,7 +163,7 @@ export default function CreateConversaModal({
                     }}
                     className="w-full text-left px-4 py-2 hover:bg-gray-100 border-b last:border-b-0"
                   >
-                    <p className="font-medium text-walmart-text">{anunciante.nome}</p>
+                    <p className="font-medium text-vitrii-text">{anunciante.nome}</p>
                   </button>
                 ))}
               </div>
@@ -171,7 +171,7 @@ export default function CreateConversaModal({
 
             {formData.anuncianteId > 0 && (
               <div className="mt-2 p-3 bg-blue-50 rounded-lg flex items-center justify-between">
-                <span className="text-sm text-walmart-text font-medium">
+                <span className="text-sm text-vitrii-text font-medium">
                   {anunciantes.find((l: Anunciante) => l.id === formData.anuncianteId)?.nome}
                 </span>
                 <button
@@ -190,7 +190,7 @@ export default function CreateConversaModal({
           {/* Anuncio Selection (Optional) */}
           {formData.anuncianteId > 0 && (
             <div>
-              <label className="block text-sm font-semibold text-walmart-text mb-2">
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Anúncio (Opcional)
               </label>
               <div className="relative">
@@ -200,7 +200,7 @@ export default function CreateConversaModal({
                   placeholder="Buscar anúncio..."
                   value={searchAnuncios}
                   onChange={(e) => setSearchAnuncios(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
                 />
               </div>
 
@@ -219,7 +219,7 @@ export default function CreateConversaModal({
                       }}
                       className="w-full text-left px-4 py-2 hover:bg-gray-100 border-b last:border-b-0"
                     >
-                      <p className="font-medium text-walmart-text">
+                      <p className="font-medium text-vitrii-text">
                         {anuncio.titulo}
                       </p>
                     </button>
@@ -229,7 +229,7 @@ export default function CreateConversaModal({
 
               {formData.anuncioId > 0 && (
                 <div className="mt-2 p-3 bg-green-50 rounded-lg flex items-center justify-between">
-                  <span className="text-sm text-walmart-text font-medium">
+                  <span className="text-sm text-vitrii-text font-medium">
                     {
                       anuncios.find((a: Anuncio) => a.id === formData.anuncioId)
                         ?.titulo
@@ -251,7 +251,7 @@ export default function CreateConversaModal({
 
           {/* Assunto */}
           <div>
-            <label className="block text-sm font-semibold text-walmart-text mb-2">
+            <label className="block text-sm font-semibold text-vitrii-text mb-2">
               Assunto da Conversa *
             </label>
             <input
@@ -262,13 +262,13 @@ export default function CreateConversaModal({
               }
               placeholder="Ex: Dúvida sobre o produto"
               maxLength={255}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-walmart-blue focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
             />
           </div>
 
           {/* Tipo */}
           <div>
-            <label className="block text-sm font-semibold text-walmart-text mb-2">
+            <label className="block text-sm font-semibold text-vitrii-text mb-2">
               Tipo de Conversa
             </label>
             <div className="flex gap-4">
@@ -287,7 +287,7 @@ export default function CreateConversaModal({
                     }
                     className="w-4 h-4"
                   />
-                  <span className="text-sm text-walmart-text">
+                  <span className="text-sm text-vitrii-text">
                     {tipo === "privada"
                       ? "Privada (apenas eu e o anunciante)"
                       : "Pública"}
@@ -302,14 +302,14 @@ export default function CreateConversaModal({
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border-2 border-walmart-blue text-walmart-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+              className="flex-1 px-4 py-2 border-2 border-vitrii-blue text-vitrii-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={createMutation.isPending}
-              className="flex-1 px-4 py-2 bg-walmart-blue text-white rounded-lg font-semibold hover:bg-walmart-blue-dark transition-colors disabled:opacity-50"
+              className="flex-1 px-4 py-2 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors disabled:opacity-50"
             >
               {createMutation.isPending ? "Criando..." : "Iniciar Conversa"}
             </button>
