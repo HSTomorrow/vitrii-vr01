@@ -185,6 +185,7 @@ export default function CadastroAnunciantes() {
       estado: loja.estado || "RS",
       descricao: loja.descricao || "",
       email: loja.email || "",
+      telefone: loja.telefone || "",
       site: loja.site || "",
       instagram: loja.instagram || "",
       facebook: loja.facebook || "",
