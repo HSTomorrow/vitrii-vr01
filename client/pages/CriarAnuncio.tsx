@@ -10,6 +10,7 @@ export default function CriarAnuncio() {
   const [searchParams] = useSearchParams();
   const { isLoggedIn, isLoading } = useAuth();
   const isDonation = searchParams.get("tipo") === "doacao";
+  const anuncioTipo = searchParams.get("tipo");
 
   // Show loading state while checking authentication
   if (isLoading) {
