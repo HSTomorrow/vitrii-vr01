@@ -104,6 +104,7 @@ export default function CadastroAnunciantes() {
       );
       setFormData({
         nome: "",
+        tipo: "Padrão",
         cnpj: "",
         endereco: "",
         cidade: "",
