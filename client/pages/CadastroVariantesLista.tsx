@@ -31,11 +31,16 @@ export default function CadastroVariantesLista() {
   const [selectedLojaId, setSelectedLojaId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Fetch user's lojas
+  // Fetch user's lojas with user context
   const { data: lojasData } = useQuery({
-    queryKey: ["lojas"],
+    queryKey: ["lojas", user?.id],
     queryFn: async () => {
-      const response = await fetch("/api/lojas");
+      const headers: Record<string, string> = {};
+      if (user?.id) {
+        headers["x-user-id"] = user.id.toString();
+      }
+
+      const response = await fetch("/api/lojas", { headers });
       if (!response.ok) throw new Error("Erro ao buscar lojas");
       return response.json();
     },
