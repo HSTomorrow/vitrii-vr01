@@ -274,6 +274,7 @@ export const updateAnunciante: RequestHandler = async (req, res) => {
       "facebook",
       "whatsapp",
       "fotoUrl",
+      "cep",
     ];
 
     for (const [key, value] of Object.entries(validatedData)) {
