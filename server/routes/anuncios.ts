@@ -214,6 +214,7 @@ export const createAnuncio: RequestHandler = async (req, res) => {
     console.log("[createAnuncio] Data validated successfully:", validatedData);
 
     let tabelaDePrecoId: number | null = null;
+    let anuncioTipo: string = validatedData.tipo || "produto";
 
     // Validate user contract and active ads limit
     const usuario = await prisma.usracessos.findUnique({
@@ -261,6 +262,11 @@ export const createAnuncio: RequestHandler = async (req, res) => {
           success: false,
           error: "Produto não pertence ao anunciante selecionado",
         });
+      }
+
+      // Use product's tipo if available
+      if (producto.tipo) {
+        anuncioTipo = producto.tipo;
       }
 
       // Verify that the price table belongs to the product if provided
@@ -311,7 +317,7 @@ export const createAnuncio: RequestHandler = async (req, res) => {
         statusPagamento,
         destaque,
         isDoacao,
-        tipo: "produto",
+        tipo: anuncioTipo,
         dataAtualizacao: new Date(),
       },
       include: {
