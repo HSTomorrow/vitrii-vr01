@@ -234,11 +234,17 @@ export const createAnunciante: RequestHandler = async (req, res) => {
 const AnuncianteUpdateSchema = z.object({
   nome: z.string().min(1, "Nome é obrigatório").optional(),
   tipo: z.enum(["Padrão", "Profissional"]).optional(),
+  cnpj: z
+    .string()
+    .regex(/^\d{11,14}$/, "CNPJ/CPF inválido")
+    .optional(),
   endereco: z.string().min(1, "Endereço é obrigatório").optional(),
   cidade: z.string().min(1, "Cidade é obrigatória").optional(),
   estado: z.string().length(2, "Estado deve ter 2 caracteres").optional(),
   descricao: z.string().optional(),
   email: z.string().email("Email inválido").optional(),
+  telefone: z.string().optional(),
+  cep: z.string().optional(),
   site: z.string().optional(),
   instagram: z.string().optional(),
   facebook: z.string().optional(),
