@@ -173,6 +173,7 @@ export const getAnuncioById: RequestHandler = async (req, res) => {
             endereco: true,
             email: true,
             cnpj: true,
+            telefone: true,
             whatsapp: true,
           },
         },
