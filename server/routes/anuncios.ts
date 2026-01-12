@@ -376,7 +376,7 @@ export const updateAnuncio: RequestHandler = async (req, res) => {
     let updateData = AnuncioUpdateSchema.parse(req.body);
     console.log("[updateAnuncio] Validated data:", updateData);
 
-    // If updating to donation, automatically set status to "pago" and zero price
+    // If updating to donation, automatically set status to "pago", statusPagamento to "aprovado", and mark as featured
     if (updateData.isDoacao === true) {
       updateData.status = "pago";
       updateData.precoAnuncio = 0;
@@ -396,6 +396,14 @@ export const updateAnuncio: RequestHandler = async (req, res) => {
     if (updateData.cidade !== undefined) mappedData.cidade = updateData.cidade;
     if (updateData.estado !== undefined) mappedData.estado = updateData.estado;
     if (updateData.status !== undefined) mappedData.status = updateData.status;
+    if (updateData.isDoacao !== undefined) mappedData.isDoacao = updateData.isDoacao;
+    if (updateData.destaque !== undefined) mappedData.destaque = updateData.destaque;
+
+    // When updating to donation, automatically approve and feature it
+    if (updateData.isDoacao === true) {
+      mappedData.statusPagamento = "aprovado";
+      mappedData.destaque = true;
+    }
 
     const anuncio = await prisma.anuncios.update({
       where: { id: parseInt(id) },
