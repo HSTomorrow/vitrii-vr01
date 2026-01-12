@@ -25,38 +25,17 @@ export const getGrupos: RequestHandler = async (req, res) => {
     const where: any = {};
     if (anuncianteId) where.anuncianteId = parseInt(anuncianteId as string);
 
-    // If user is not an admin, filter by their anunciantes
+    // Filter by user who created the group
     if (userId) {
       const usuario = await prisma.usracessos.findUnique({
         where: { id: userId },
       });
 
-      // If not admin, only show groups for anunciantes the user is associated with
+      // If not admin, only show groups created by this user
       if (usuario && usuario.tipoUsuario !== "adm") {
-        const userAnunciantes = await prisma.usuarios_anunciantes.findMany({
-          where: { usuarioId: userId },
-          select: { anuncianteId: true },
-        });
-
-        const anuncianteIds = userAnunciantes.map((ua) => ua.anuncianteId);
-
-        if (anuncianteIds.length === 0) {
-          // User has no anunciantes, return empty list
-          return res.json({
-            success: true,
-            data: [],
-            pagination: {
-              count: 0,
-              total: 0,
-              limit: pageLimit,
-              offset: pageOffset,
-              hasMore: false,
-            },
-          });
-        }
-
-        where.anuncianteId = { in: anuncianteIds };
+        where.usuarioId = userId;
       }
+      // If admin, show all groups (no userId filter)
     }
 
     // Get total count and paginated data in parallel
