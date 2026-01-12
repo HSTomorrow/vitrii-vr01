@@ -368,6 +368,49 @@ export default function Index() {
         </div>
       </section>
 
+      {/* Job Opportunities Listings Section */}
+      <section className="py-3 md:py-3 bg-vitrii-gray-light">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center mb-3">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-bold text-vitrii-text mb-1">
+                Oportunidades e Vagas de Emprego
+              </h2>
+              <p className="text-sm text-vitrii-text-secondary">
+                Descubra oportunidades profissionais e vagas de emprego
+              </p>
+            </div>
+            <Link
+              to="/browse?filter=oportunidade"
+              className="hidden md:inline-flex items-center space-x-2 text-vitrii-blue font-semibold hover:space-x-3 transition-all"
+            >
+              <span>Ver Todas</span>
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+
+          {/* Job Opportunities Cards Carousel */}
+          <AnunciosCarousel
+            anuncios={destaqueOportunidades}
+            isLoading={allAnunciosLoading}
+            isFavorited={(id) => favoritos.has(id)}
+            onToggleFavorito={(id) => toggleFavoritoMutation.mutate(id)}
+            emptyMessage="Nenhuma oportunidade de emprego publicada ainda"
+            color="red"
+          />
+
+          <div className="text-center mt-3">
+            <Link
+              to="/browse?filter=oportunidade"
+              className="inline-flex items-center space-x-2 text-vitrii-blue font-semibold hover:space-x-3 transition-all"
+            >
+              <span>Ver Todas as Oportunidades</span>
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Create Ad Section */}
       <section className="py-3 md:py-3 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
