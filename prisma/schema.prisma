@@ -57,6 +57,7 @@ model anuncios {
   isActive            Boolean                 @default(true)
   anunciantes         anunciantes             @relation(fields: [anuncianteId], references: [id], onDelete: Cascade, map: "anuncios_lojaId_fkey")
   anuncioVisualizados anuncioVisualizados[]
+  fotos               fotos_anuncio[]
 }
 
 // Anuncio Visualizacoes - Log table to track ad views
