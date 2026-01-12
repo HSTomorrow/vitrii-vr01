@@ -29,15 +29,21 @@ export default function CadastroGruposProductos() {
     descricao: "",
   });
 
-  // Fetch anunciantes
+  // Fetch anunciantes with user context
   const { data: anunciantes = [] } = useQuery<Loja[]>({
-    queryKey: ["anunciantes"],
+    queryKey: ["anunciantes", user?.id],
     queryFn: async () => {
-      const response = await fetch("/api/anunciantes");
+      const headers: Record<string, string> = {};
+      if (user?.id) {
+        headers["x-user-id"] = user.id.toString();
+      }
+
+      const response = await fetch("/api/anunciantes", { headers });
       if (!response.ok) throw new Error("Erro ao buscar anunciantes");
       const result = await response.json();
       return result.data || [];
     },
+    enabled: !!user,
   });
 
   // Fetch grupos with user context
