@@ -144,7 +144,7 @@ export default function Index() {
       <Header />
 
       {/* Banner Carousel Section */}
-      <section className="py-4 md:py-6 bg-white">
+      <section className="py-2 md:py-2 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {bannersData?.data && bannersData.data.length > 0 ? (
             <BannerCarousel banners={bannersData.data} autoPlay={true} />
@@ -165,9 +165,9 @@ export default function Index() {
       </section>
 
       {/* Featured Listings Section */}
-      <section className="py-8 md:py-12 bg-walmart-gray-light">
+      <section className="py-3 md:py-3 bg-walmart-gray-light">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center mb-8">
+          <div className="flex justify-between items-center mb-3">
             <div>
               <h2
                 style={{ color: "#025CBA" }}
@@ -198,7 +198,7 @@ export default function Index() {
             color="blue"
           />
 
-          <div className="text-center mt-8">
+          <div className="text-center mt-3">
             <Link
               to="/browse"
               className="inline-flex items-center space-x-2 text-walmart-blue font-semibold hover:space-x-3 transition-all"
@@ -211,9 +211,9 @@ export default function Index() {
       </section>
 
       {/* Free/Gratuito Listings Section */}
-      <section className="py-8 md:py-12 bg-white">
+      <section className="py-3 md:py-3 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center mb-8">
+          <div className="flex justify-between items-center mb-3">
             <div>
               <h2 className="text-2xl md:text-3xl font-bold text-walmart-text mb-1">
                 Doações, Brindes e Serviços Gratuitos
@@ -251,7 +251,7 @@ export default function Index() {
             color="green"
           />
 
-          <div className="text-center mt-8 space-y-4">
+          <div className="text-center mt-3 space-y-4">
             <Link
               to="/anuncio/criar?tipo=doacao"
               className="md:hidden inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors"
@@ -273,9 +273,9 @@ export default function Index() {
       </section>
 
       {/* Events Listings Section */}
-      <section className="py-8 md:py-12 bg-walmart-gray-light">
+      <section className="py-3 md:py-3 bg-walmart-gray-light">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center mb-8">
+          <div className="flex justify-between items-center mb-3">
             <div>
               <h2 className="text-2xl md:text-3xl font-bold text-walmart-text mb-1">
                 Eventos
@@ -303,7 +303,7 @@ export default function Index() {
             color="purple"
           />
 
-          <div className="text-center mt-8">
+          <div className="text-center mt-3">
             <Link
               to="/browse?filter=evento"
               className="inline-flex items-center space-x-2 text-walmart-blue font-semibold hover:space-x-3 transition-all"
@@ -316,9 +316,9 @@ export default function Index() {
       </section>
 
       {/* Recurring Schedule Listings Section */}
-      <section className="py-8 md:py-12 bg-white">
+      <section className="py-3 md:py-3 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center mb-8">
+          <div className="flex justify-between items-center mb-3">
             <div>
               <h2 className="text-2xl md:text-3xl font-bold text-walmart-text mb-1">
                 Aulas e Agendas Disponiveis
@@ -346,7 +346,7 @@ export default function Index() {
             color="orange"
           />
 
-          <div className="text-center mt-8">
+          <div className="text-center mt-3">
             <Link
               to="/browse?filter=agenda_recorrente"
               className="inline-flex items-center space-x-2 text-walmart-blue font-semibold hover:space-x-3 transition-all"
@@ -359,7 +359,7 @@ export default function Index() {
       </section>
 
       {/* Create Ad Section */}
-      <section className="py-8 md:py-12 bg-white">
+      <section className="py-3 md:py-3 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-gradient-to-r from-walmart-blue to-walmart-blue-dark rounded-lg p-8 text-white text-center">
             <Plus className="w-12 h-12 mx-auto mb-4 opacity-90" />
@@ -389,7 +389,7 @@ export default function Index() {
       </section>
 
       {/* Why Choose Vitrii Section */}
-      <section className="py-8 md:py-12">
+      <section className="py-3 md:py-3">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-2xl md:text-3xl font-bold text-walmart-text mb-3">
