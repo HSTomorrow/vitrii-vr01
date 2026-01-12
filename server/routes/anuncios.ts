@@ -175,6 +175,7 @@ export const getAnuncioById: RequestHandler = async (req, res) => {
             cnpj: true,
             telefone: true,
             whatsapp: true,
+            fotoUrl: true,
           },
         },
       },
