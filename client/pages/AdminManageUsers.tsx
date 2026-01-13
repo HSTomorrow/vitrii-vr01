@@ -278,6 +278,9 @@ export default function AdminManageUsers() {
                       Tipo
                     </th>
                     <th className="text-left py-3 px-4 font-semibold text-vitrii-text">
+                      Assinatura
+                    </th>
+                    <th className="text-left py-3 px-4 font-semibold text-vitrii-text">
                       Ações
                     </th>
                   </tr>
