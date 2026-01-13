@@ -394,6 +394,7 @@ const UsuarioAdminUpdateSchema = z.object({
   facebook: z.string().optional().or(z.literal("")),
   endereco: z.string().optional().or(z.literal("")),
   tipoUsuario: z.enum(["adm", "comum"]).optional(),
+  tassinatura: z.enum(["Gratuito", "Padrao", "Premium", "Master"]).optional(),
   dataVigenciaContrato: z
     .string()
     .refine((value) => {
