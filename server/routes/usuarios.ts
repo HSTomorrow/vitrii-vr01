@@ -134,6 +134,7 @@ export const signInUsuario: RequestHandler = async (req, res) => {
         email: true,
         senha: true,
         tipoUsuario: true,
+        tassinatura: true,
         cpf: true,
         telefone: true,
         endereco: true,
