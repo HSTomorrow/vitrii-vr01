@@ -348,6 +348,21 @@ export default function AdminManageUsers() {
                         </span>
                       </td>
                       <td className="py-4 px-4">
+                        <span
+                          className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
+                            usuario.tassinatura === "Master"
+                              ? "bg-purple-100 text-purple-800"
+                              : usuario.tassinatura === "Premium"
+                                ? "bg-yellow-100 text-yellow-800"
+                                : usuario.tassinatura === "Padrao"
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-gray-100 text-gray-800"
+                          }`}
+                        >
+                          {usuario.tassinatura || "Gratuito"}
+                        </span>
+                      </td>
+                      <td className="py-4 px-4">
                         <div className="flex gap-2">
                           <button
                             onClick={() => setEditingUser(usuario)}
