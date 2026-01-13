@@ -41,6 +41,7 @@ export default function AdminEditUserModal({
     linkedin: usuario.linkedin || "",
     facebook: usuario.facebook || "",
     tipoUsuario: usuario.tipoUsuario,
+    tassinatura: usuario.tassinatura || "Gratuito",
     dataVigenciaContrato: new Date(usuario.dataVigenciaContrato)
       .toISOString()
       .split("T")[0],
