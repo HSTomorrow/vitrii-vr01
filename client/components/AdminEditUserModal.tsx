@@ -213,6 +213,23 @@ export default function AdminEditUserModal({
                   <option value="adm">Administrador</option>
                 </select>
               </div>
+
+              <div>
+                <label className="block text-sm font-medium text-vitrii-text mb-2">
+                  Tipo de Assinatura *
+                </label>
+                <select
+                  name="tassinatura"
+                  value={formData.tassinatura}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+                >
+                  <option value="Gratuito">Gratuito</option>
+                  <option value="Padrao">Padrão</option>
+                  <option value="Premium">Premium</option>
+                  <option value="Master">Master</option>
+                </select>
+              </div>
             </div>
           </div>
 
