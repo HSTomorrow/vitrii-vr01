@@ -194,6 +194,7 @@ model usracessos {
   linkedin              String?                @db.VarChar(255)
   facebook              String?                @db.VarChar(255)
   tipoUsuario           String                 @default("common") @db.VarChar(20)
+  tassinatura           String                 @default("Gratuito") @db.VarChar(20)
   dataCriacao           DateTime               @default(now())
   dataAtualizacao       DateTime
   endereco              String?
