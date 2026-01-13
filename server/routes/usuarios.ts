@@ -783,6 +783,7 @@ export const getUsuariosComSenha: RequestHandler = async (req, res) => {
         linkedin: true,
         facebook: true,
         tipoUsuario: true,
+        tassinatura: true,
         dataCriacao: true,
         dataVigenciaContrato: true,
         numeroAnunciosAtivos: true,
