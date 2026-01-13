@@ -456,6 +456,7 @@ export const updateUsuario: RequestHandler = async (req, res) => {
         telefone: true,
         endereco: true,
         tipoUsuario: true,
+        tassinatura: true,
         dataCriacao: true,
       },
     });
