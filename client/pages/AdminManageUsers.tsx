@@ -28,6 +28,7 @@ interface Usuario {
   linkedin?: string;
   facebook?: string;
   tipoUsuario: string;
+  tassinatura?: string;
   dataCriacao: string;
   dataVigenciaContrato: string;
   numeroAnunciosAtivos: number;
