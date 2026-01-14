@@ -245,7 +245,14 @@ export const createAnuncio: RequestHandler = async (req, res) => {
     // Check if user has reached the limit of 3 active ads
     // Admins are exempt from this limit
     const isAdmin = usuario.tipoUsuario === "adm";
+    console.log("[createAnuncio] Admin check:", {
+      usuarioId: validatedData.usuarioId,
+      tipoUsuario: usuario.tipoUsuario,
+      isAdmin,
+      numeroAnunciosAtivos: usuario.numeroAnunciosAtivos,
+    });
     if (!isAdmin && (usuario.numeroAnunciosAtivos || 0) >= 3) {
+      console.log("[createAnuncio] User limit reached - blocking ad creation");
       return res.status(403).json({
         success: false,
         error:
