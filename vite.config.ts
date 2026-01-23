@@ -23,6 +23,12 @@ export default defineConfig(({ mode }) => ({
       "@shared": path.resolve(__dirname, "./shared"),
     },
   },
+  ssr: {
+    noExternal: ["@prisma/client"],
+  },
+  optimizeDeps: {
+    exclude: ["@prisma/client"],
+  },
 }));
 
 function expressPlugin(): Plugin {
