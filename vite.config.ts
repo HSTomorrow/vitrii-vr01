@@ -34,13 +34,15 @@ function expressPlugin(): Plugin {
   return {
     name: "express-plugin",
     apply: "serve", // Only apply during development (serve mode)
-    configureServer(server) {
+    async configureServer(server) {
       // Lazy import to avoid bundling Prisma during config load
-      const { createServer } = require("./server");
+      const { createServer } = await import("./server");
       const app = createServer();
 
       // Add Express app as middleware to Vite dev server
-      server.middlewares.use(app);
+      return () => {
+        server.middlewares.use(app);
+      };
     },
   };
 }
