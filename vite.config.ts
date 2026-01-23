@@ -9,9 +9,8 @@ export default defineConfig(({ mode }) => ({
     port: 8080,
     fs: {
       allow: [".", "./client", "./shared"],
-      deny: [".env", ".env.*", "*.{crt,pem}", "**/.git/**", "server/**"],
+      deny: [".env", ".env.*", "*.{crt,pem}", "**/.git/**"],
     },
-    middlewareMode: true,
   },
   build: {
     outDir: "dist/spa",
@@ -22,11 +21,5 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./client"),
       "@shared": path.resolve(__dirname, "./shared"),
     },
-  },
-  ssr: {
-    noExternal: ["@prisma/client"],
-  },
-  optimizeDeps: {
-    exclude: ["@prisma/client"],
   },
 }));
