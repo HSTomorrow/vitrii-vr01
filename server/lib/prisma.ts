@@ -1,8 +1,7 @@
-import prismaModule from "@prisma/client";
+// @ts-ignore
+import { PrismaClient } from "@prisma/client/index.js";
 
-const { PrismaClient } = prismaModule;
-
-const globalForPrisma = global as unknown as { prisma: InstanceType<typeof PrismaClient> };
+const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
 export const prisma =
   globalForPrisma.prisma ||
