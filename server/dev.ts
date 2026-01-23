@@ -1,8 +1,12 @@
 import "dotenv/config";
-import express from "express";
+import fs from "fs";
 import path from "path";
+import express from "express";
+import { fileURLToPath } from "url";
 import { createServer as createViteServer } from "vite";
 import { createServer as createExpressServer } from "./index";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 async function setupDev() {
   const app = express();
@@ -42,6 +46,3 @@ async function setupDev() {
 }
 
 setupDev().catch(console.error);
-
-// Need to import fs at the top level to avoid timing issues
-import fs from "fs";
