@@ -28,7 +28,10 @@ async function setupDev() {
   app.use(vite.middlewares);
 
   // Handle SPA fallback for client routes
-  app.use("*", async (req, res, next) => {
+  app.use(async (req, res, next) => {
+    if (req.path.startsWith("/api")) {
+      return next();
+    }
     try {
       const html = await vite.transformIndexHtml(
         req.originalUrl,
