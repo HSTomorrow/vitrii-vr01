@@ -281,7 +281,7 @@ export default function CreateProductoModal({
                 <option value="servico">Serviço</option>
                 <option value="evento">Evento</option>
                 <option value="agenda_recorrente">
-                  Aula / Agenda Disponível
+                  Aulas, Cursos e Serviços Especializados
                 </option>
                 <option value="oportunidade">
                   Oportunidade / Vaga de Emprego
@@ -293,7 +293,7 @@ export default function CreateProductoModal({
                 {formData.tipo === "evento" &&
                   "Eventos, workshops, shows e experiências"}
                 {formData.tipo === "agenda_recorrente" &&
-                  "Aulas, consultas, agendamentos recorrentes e serviços agendáveis"}
+                  "Agendas de Aulas, Cursos e Serviços Especializados"}
                 {formData.tipo === "oportunidade" &&
                   "Oportunidades profissionais e vagas de emprego"}
               </p>
