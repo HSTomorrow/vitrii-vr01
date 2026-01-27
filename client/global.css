@@ -167,7 +167,7 @@
   /* Responsive section title color */
   .section-title-blue {
     @apply text-2xl md:text-3xl font-bold mb-1;
-    color: #025CBA;
+    color: #025cba;
   }
 
   @media (max-width: 991px) {

@@ -287,9 +287,7 @@ export default function Index() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-3">
             <div>
-              <h2 className="section-title-blue">
-                Eventos
-              </h2>
+              <h2 className="section-title-blue">Eventos</h2>
               <p className="text-sm text-vitrii-text-secondary">
                 Descubra eventos, workshops e experiências próximas a você
               </p>
@@ -318,7 +316,9 @@ export default function Index() {
               to="/browse?filter=evento"
               className="inline-flex items-center space-x-2 text-vitrii-blue font-semibold hover:space-x-3 transition-all"
             >
-              <span className="ver-todos-mobile-green">Ver Todos os Eventos</span>
+              <span className="ver-todos-mobile-green">
+                Ver Todos os Eventos
+              </span>
               <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
@@ -445,9 +445,7 @@ export default function Index() {
       <section className="py-3 md:py-3">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="section-title-green">
-              Por que escolher Vitrii?
-            </h2>
+            <h2 className="section-title-green">Por que escolher Vitrii?</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
