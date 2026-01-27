@@ -228,6 +228,7 @@ export default function Index() {
               <h2 className="text-2xl md:text-3xl font-bold text-vitrii-text mb-1">
                 Doações, Brindes e Serviços Gratuitos
               </h2>
+                 style={{ color: "#025CBA" }}
               <p className="text-sm text-vitrii-text-secondary">
                 Doações, Brindes, Produtos, Serviços e Eventos disponíveis para
                 experimentação gratuitamente
