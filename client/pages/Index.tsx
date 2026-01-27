@@ -334,7 +334,7 @@ export default function Index() {
                 Agendas de Aulas, Cursos e Serviços Especializados
               </h2>
               <p className="text-sm text-vitrii-text-secondary">
-                Aulas, consultas e serviços agendáveis disponíveis
+                Agendas de Aulas, Cursos e Serviços Especializados
               </p>
             </div>
             <Link
