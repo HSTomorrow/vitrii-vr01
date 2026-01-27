@@ -37,8 +37,7 @@ export default function CriarAnuncio() {
               Acesso Restrito
             </h2>
             <p className="text-vitrii-text-secondary mb-6">
-              Para criar anúncios, você precisa estar logado com uma conta
-              válida.
+              Para criar anuncios, entre com o seu usuario ou cadastre um novo.
             </p>
             <div className="flex gap-3">
               <button
