@@ -225,7 +225,7 @@ export default function Index() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-3">
             <div>
-              <h2 style={{ color: "#025CBA" }} className="text-2xl md:text-3xl font-bold mb-1">
+              <h2 style={{ color: "#025CBA", fontWeight: "bold" }} className="text-2xl md:text-3xl mb-1">
                 Doações, Brindes e Serviços Gratuitos
               </h2>
               <p className="text-sm text-vitrii-text-secondary">
@@ -287,7 +287,7 @@ export default function Index() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-3">
             <div>
-              <h2 style={{ color: "#025CBA" }} className="text-2xl md:text-3xl font-bold mb-1">
+              <h2 style={{ color: "#025CBA", fontWeight: "bold" }} className="text-2xl md:text-3xl mb-1">
                 Eventos
               </h2>
               <p className="text-sm text-vitrii-text-secondary">
@@ -330,7 +330,7 @@ export default function Index() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-3">
             <div>
-              <h2 style={{ color: "#025CBA" }} className="text-2xl md:text-3xl font-bold mb-1">
+              <h2 style={{ color: "#025CBA", fontWeight: "bold" }} className="text-2xl md:text-3xl mb-1">
                 Agendas de Aulas, Cursos e Serviços Especializados
               </h2>
               <p className="text-sm text-vitrii-text-secondary">
@@ -373,7 +373,7 @@ export default function Index() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-3">
             <div>
-              <h2 style={{ color: "#025CBA" }} className="text-2xl md:text-3xl font-bold mb-1">
+              <h2 style={{ color: "#025CBA", fontWeight: "bold" }} className="text-2xl md:text-3xl mb-1">
                 Oportunidades e Vagas de Emprego
               </h2>
               <p className="text-sm text-vitrii-text-secondary">
