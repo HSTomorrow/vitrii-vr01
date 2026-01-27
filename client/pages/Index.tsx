@@ -331,7 +331,7 @@ export default function Index() {
           <div className="flex justify-between items-center mb-3">
             <div>
               <h2 className="text-2xl md:text-3xl font-bold text-vitrii-text mb-1">
-                Aulas e Agendas Disponiveis
+                Agendas de Aulas, Cursos e Serviços Especializados
               </h2>
               <p className="text-sm text-vitrii-text-secondary">
                 Aulas, consultas e serviços agendáveis disponíveis
