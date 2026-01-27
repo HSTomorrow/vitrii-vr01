@@ -164,6 +164,34 @@
     @apply bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-200;
   }
 
+  /* Responsive section title color */
+  .section-title-blue {
+    @apply text-2xl md:text-3xl font-bold mb-1;
+    color: #025CBA;
+  }
+
+  @media (max-width: 991px) {
+    .section-title-blue {
+      color: rgba(2, 92, 186, 1);
+    }
+  }
+
+  /* Responsive section title color for "Por que escolher" */
+  .section-title-green {
+    color: rgba(2, 192, 86, 1);
+  }
+
+  /* Responsive "Ver Todos" text color */
+  .ver-todos-mobile-green {
+    color: inherit;
+  }
+
+  @media (max-width: 991px) {
+    .ver-todos-mobile-green {
+      color: rgba(2, 192, 86, 1);
+    }
+  }
+
   /* Hide scrollbar but keep functionality */
   .scrollbar-hide {
     -ms-overflow-style: none; /* IE and Edge */
