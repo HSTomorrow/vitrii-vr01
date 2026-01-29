@@ -32,8 +32,8 @@ RUN pnpm install --prod --frozen-lockfile
 # Copy Prisma schema
 COPY prisma ./prisma
 
-# Generate Prisma Client for production
-RUN npx prisma generate
+# Generate Prisma Client for production (using placeholder URL for schema generation)
+RUN DATABASE_URL="postgresql://user:password@localhost:5432/dummy" npx prisma generate
 
 # Copy frontend build from builder
 COPY --from=builder /app/dist ./dist
