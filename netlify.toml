@@ -1,11 +1,11 @@
 [build]
-  command = "npx prisma generate && npm run build:client"
+  command = "npm install && npx prisma generate && npm run build:client"
   functions = "netlify/functions"
   publish = "dist/spa"
 
 [functions]
   node_bundler = "esbuild"
-  # Let esbuild bundle @prisma with the function
+  external_node_modules = ["@prisma/client"]
 
 [[redirects]]
   from = "/api/*"
