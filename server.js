@@ -3,7 +3,9 @@ import express from "express";
 import cors from "cors";
 import path from "path";
 import { fileURLToPath } from "url";
-import { createServer } from "./server/index.js";
+
+// Import the createServer function - it's defined directly here for runtime
+// or compiled in dist/server if build was run
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
