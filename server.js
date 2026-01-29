@@ -36,7 +36,8 @@ app.use((err, req, res, next) => {
   console.error("[Server Error]", err);
   res.status(500).json({
     error: "Internal Server Error",
-    message: process.env.NODE_ENV === "development" ? err.message : "Unknown error",
+    message:
+      process.env.NODE_ENV === "development" ? err.message : "Unknown error",
   });
 });
 
@@ -44,5 +45,7 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
   console.log(`📦 Serving static files from: ${staticPath}`);
-  console.log(`🗄️  Database: ${process.env.DATABASE_URL ? "Connected" : "Not configured"}`);
+  console.log(
+    `🗄️  Database: ${process.env.DATABASE_URL ? "Connected" : "Not configured"}`,
+  );
 });

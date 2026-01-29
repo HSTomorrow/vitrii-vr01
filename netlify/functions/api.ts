@@ -5,7 +5,10 @@ let server: any;
 
 export const handler = async (event: any, context: any) => {
   try {
-    console.log("[Netlify] DATABASE_URL:", process.env.DATABASE_URL ? "SET" : "NOT SET");
+    console.log(
+      "[Netlify] DATABASE_URL:",
+      process.env.DATABASE_URL ? "SET" : "NOT SET",
+    );
     console.log("[Netlify] NODE_ENV:", process.env.NODE_ENV);
 
     if (!server) {
@@ -21,7 +24,10 @@ export const handler = async (event: any, context: any) => {
     return response;
   } catch (error) {
     console.error("[Netlify Function] Error:", error);
-    console.error("[Netlify Function] DATABASE_URL:", process.env.DATABASE_URL ? "SET" : "NOT SET");
+    console.error(
+      "[Netlify Function] DATABASE_URL:",
+      process.env.DATABASE_URL ? "SET" : "NOT SET",
+    );
     return {
       statusCode: 500,
       body: JSON.stringify({
