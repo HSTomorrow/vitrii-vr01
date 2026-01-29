@@ -1,4 +1,8 @@
-import "dotenv/config";
+try {
+  require("dotenv/config");
+} catch (e) {
+  // .env file may not exist in production/serverless environments
+}
 import express from "express";
 import cors from "cors";
 import { handleDemo } from "./routes/demo";
