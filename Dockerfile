@@ -20,18 +20,11 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-# Install pnpm
-RUN npm install -g pnpm
+# Copy entire node_modules from builder (includes .prisma and @prisma)
+COPY --from=builder /app/node_modules ./node_modules
 
 # Copy package files
 COPY package.json pnpm-lock.yaml ./
-
-# Install production dependencies only
-RUN pnpm install --prod --frozen-lockfile
-
-# Copy generated Prisma Client from builder stage
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 
 # Copy Prisma schema
 COPY prisma ./prisma
