@@ -31,5 +31,5 @@ dist-ssr
 .env.*.local
 
 # Prisma
-.prisma/
+# .prisma/ - Keep generated client for Netlify deployment
 prisma/migrations/
