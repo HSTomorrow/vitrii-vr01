@@ -1,11 +1,12 @@
 [build]
-  command = "npx prisma generate && npm run build:client"
+  command = "npm ci && npx prisma generate && npm run build:client"
   functions = "netlify/functions"
   publish = "dist/spa"
 
 
 [functions]
   node_bundler = "esbuild"
+  included_files = [".prisma/**"]
   
 [[redirects]]
   force = true
