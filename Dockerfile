@@ -29,10 +29,10 @@ COPY package.json pnpm-lock.yaml ./
 # Copy Prisma schema
 COPY prisma ./prisma
 
-# Copy frontend build from builder
+# Copy builds from builder (frontend and compiled server)
 COPY --from=builder /app/dist ./dist
 
-# Copy server code
+# Copy server code and entry point
 COPY server ./server
 COPY server.js .
 COPY .env* ./
