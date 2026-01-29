@@ -13,7 +13,7 @@ RUN npm install -g pnpm && pnpm install --frozen-lockfile
 COPY . .
 
 # Generate Prisma Client and build frontend
-RUN npx prisma generate && npm run build:client
+RUN DATABASE_URL="postgresql://user:password@localhost:5432/dummy" npx prisma generate && npm run build:client
 
 # Production stage
 FROM node:22-alpine
