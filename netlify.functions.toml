@@ -1,8 +1,0 @@
-[[functions]]
-name = "api"
-node_bundler = "esbuild"
-
-[functions.esbuild_config]
-bundle = true
-platform = "node"
-packages = "bundle"

@@ -5,6 +5,9 @@
 
 [functions]
   node_bundler = "esbuild"
+  # This tells esbuild not to treat @prisma as an external module
+  # so it will be bundled with the function
+  # Note: node_modules will be available at runtime anyway
 
 [[redirects]]
   from = "/api/*"
