@@ -8,19 +8,10 @@ import { createServer } from "./server/index.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// Create and mount the API server
-const apiServer = createServer();
-
-// Mount all API routes
-app.use("/api", apiServer);
+// Create the main app with API routes already mounted
+const app = createServer();
 
 // Serve static files from Vite build
 const staticPath = path.join(__dirname, "dist/spa");
