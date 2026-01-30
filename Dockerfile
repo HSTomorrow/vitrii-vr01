@@ -44,7 +44,9 @@ COPY prisma ./prisma
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/server ./server
 COPY server.js ./
-COPY .env* ./
+
+# Note: .env is in .gitignore, so it's not available here
+# Environment variables must be set via Fly secrets
 
 EXPOSE 3000
 
