@@ -185,6 +185,25 @@ export function createServer() {
     });
   });
 
+  // Quick database test
+  app.get("/api/db-test", async (_req, res) => {
+    try {
+      const count = await prisma.anuncios.count();
+      const anuncios = await prisma.anuncios.findMany({ take: 5 });
+      res.json({
+        status: "ok",
+        total_ads: count,
+        sample_ads: anuncios,
+      });
+    } catch (error) {
+      console.error("[db-test] Error:", error);
+      res.status(500).json({
+        status: "error",
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  });
+
   // Health check and diagnostics
   app.get("/api/health", async (_req, res) => {
     try {
