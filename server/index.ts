@@ -214,10 +214,33 @@ export function createServer() {
         node_env: process.env.NODE_ENV,
       },
       prisma_status: "not tested",
+      raw_connection_test: "not tested",
       error: null,
     };
 
     try {
+      // First, test raw connection without Prisma
+      if (process.env.DATABASE_URL) {
+        console.log("[DB-Diagnostic] Testing raw PostgreSQL connection...");
+        try {
+          const dbUrl = new URL(process.env.DATABASE_URL);
+          diagnostics.database_host = dbUrl.hostname;
+          diagnostics.database_port = dbUrl.port || "5432";
+          diagnostics.database_name = dbUrl.pathname.split("/")[1];
+
+          // Attempt basic DNS resolution
+          const { execSync } = await import("child_process");
+          try {
+            execSync(`ping -c 1 ${dbUrl.hostname}`, { timeout: 3000 });
+            diagnostics.raw_connection_test = "host reachable";
+          } catch {
+            diagnostics.raw_connection_test = "host not reachable (expected in sandbox)";
+          }
+        } catch (e) {
+          diagnostics.raw_connection_test = "error parsing DATABASE_URL";
+        }
+      }
+
       console.log("[DB-Diagnostic] Attempting Prisma connection test...");
 
       // Import Prisma inside try block to catch initialization errors
@@ -242,7 +265,7 @@ export function createServer() {
       diagnostics.prisma_status = "error";
       diagnostics.error = error instanceof Error ? error.message : String(error);
       diagnostics.error_stack =
-        error instanceof Error ? error.stack : "no stack trace";
+        error instanceof Error ? error.stack?.substring(0, 500) : "no stack trace";
 
       res.status(500).json(diagnostics);
     }
