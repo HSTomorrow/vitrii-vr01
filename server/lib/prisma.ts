@@ -8,7 +8,10 @@ console.log(
   process.env.DATABASE_URL ? "SET" : "NOT SET",
 );
 console.log("[Prisma] NODE_ENV:", process.env.NODE_ENV);
-console.log("[Prisma] Platform:", process.env.NETLIFY_FUNCTION_NAME ? "Netlify" : "Standalone");
+console.log(
+  "[Prisma] Platform:",
+  process.env.NETLIFY_FUNCTION_NAME ? "Netlify" : "Standalone",
+);
 
 if (!process.env.DATABASE_URL) {
   console.error("[Prisma] ⚠️  WARNING: DATABASE_URL is not set!");
