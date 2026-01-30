@@ -9,15 +9,12 @@ COPY package.json pnpm-lock.yaml ./
 # Install dependencies
 RUN npm install -g pnpm && pnpm install --frozen-lockfile
 
-# Copy prisma schema first (before other files)
+# Copy prisma schema early
 COPY prisma ./prisma
 
-# Generate Prisma Client with explicit settings
-# - Set DATABASE_URL to any valid format (just for schema parsing)
-# - PRISMA_CLI_QUERY_ENGINE_TYPE controls which engine to use
-# - The binaryTargets in schema.prisma will be respected
-RUN DATABASE_URL="postgresql://dummy:dummy@localhost/dummy" \
-    npx prisma generate
+# Generate Prisma Client
+# The DATABASE_URL doesn't need to be valid - Prisma just needs to parse the schema
+RUN DATABASE_URL="postgresql://dummy:dummy@localhost/dummy" npx prisma generate
 
 # Copy remaining source files
 COPY . .
@@ -30,32 +27,29 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-# Install OpenSSL for Prisma compatibility
-RUN apk add --no-cache openssl
+# Install OpenSSL for Prisma runtime compatibility
+RUN apk add --no-cache openssl libstdc++
 
-# Copy entire node_modules from builder (includes .prisma and @prisma)
+# Copy node_modules with all Prisma binaries
 COPY --from=builder /app/node_modules ./node_modules
 
-# Copy package files
+# Copy package files (needed for Prisma runtime)
 COPY package.json pnpm-lock.yaml ./
 
-# Copy Prisma schema
+# Copy Prisma schema (needed for Prisma runtime)
 COPY prisma ./prisma
 
-# Copy builds from builder (frontend and compiled server)
+# Copy built artifacts
 COPY --from=builder /app/dist ./dist
-
-# Copy server code and entry point
-COPY server ./server
-COPY server.js .
+COPY --from=builder /app/server ./server
+COPY server.js ./
 COPY .env* ./
 
-# Expose port
 EXPOSE 3000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3000/api/health', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})"
+  CMD node -e "require('http').get('http://localhost:3000/api/health', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})" || exit 1
 
-# Start server with tsx to support TypeScript imports
+# Start server
 CMD ["npx", "tsx", "server.js"]
