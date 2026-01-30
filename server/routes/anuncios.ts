@@ -105,7 +105,18 @@ export const getAnuncios: RequestHandler = async (req, res) => {
     if (includeInactive === "true") delete where.status; // Override to include inactive
     // Note: isDoacao filtering not supported in current schema
 
-    console.log("[getAnuncios] Where clause:", where);
+    console.log("[getAnuncios] Where clause:", JSON.stringify(where));
+    console.log("[getAnuncios] Attempting database query with Prisma...");
+
+    // Test simple count first
+    let countResult = 0;
+    try {
+      countResult = await prisma.anuncios.count({ where });
+      console.log("[getAnuncios] Count query successful, found:", countResult, "ads");
+    } catch (countError) {
+      console.error("[getAnuncios] Count query failed:", countError);
+      throw countError;
+    }
 
     // Get total count and paginated data in parallel
     const [anuncios, total] = await Promise.all([
