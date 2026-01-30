@@ -12,8 +12,12 @@ RUN npm install -g pnpm && pnpm install --frozen-lockfile
 # Copy prisma schema first (before other files)
 COPY prisma ./prisma
 
-# Generate Prisma Client (will read binaryTargets from schema.prisma)
-RUN DATABASE_URL="postgresql://user:password@localhost:5432/dummy" npx prisma generate
+# Generate Prisma Client with explicit settings
+# - Set DATABASE_URL to any valid format (just for schema parsing)
+# - PRISMA_CLI_QUERY_ENGINE_TYPE controls which engine to use
+# - The binaryTargets in schema.prisma will be respected
+RUN DATABASE_URL="postgresql://dummy:dummy@localhost/dummy" \
+    npx prisma generate
 
 # Copy remaining source files
 COPY . .
