@@ -41,11 +41,33 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start server
-app.listen(PORT, () => {
+// Start server with error handling
+const server = app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
   console.log(`📦 Serving static files from: ${staticPath}`);
   console.log(
     `🗄️  Database: ${process.env.DATABASE_URL ? "Connected" : "Not configured"}`,
   );
+  console.log("[Server] ✓ Ready to accept requests");
+});
+
+// Handle uncaught exceptions
+process.on("uncaughtException", (error) => {
+  console.error("[Server] ❌ Uncaught Exception:", error);
+  process.exit(1);
+});
+
+// Handle unhandled promise rejections
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("[Server] ❌ Unhandled Rejection at:", promise, "reason:", reason);
+  process.exit(1);
+});
+
+// Graceful shutdown
+process.on("SIGTERM", () => {
+  console.log("[Server] SIGTERM received, shutting down gracefully...");
+  server.close(() => {
+    console.log("[Server] ✓ Server closed");
+    process.exit(0);
+  });
 });
