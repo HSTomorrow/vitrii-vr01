@@ -50,9 +50,8 @@ COPY server.js ./
 
 EXPOSE 3000
 
-# Health check - simple endpoint that doesn't require database
-HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3000/api/test', (r) => {if (r.statusCode !== 200) throw new Error(r.statusCode)})" || exit 1
+# Note: Health check disabled - Fly.io will handle monitoring
+# Previously the health check was killing the container prematurely
 
 # Start server
 CMD ["npx", "tsx", "server.js"]
