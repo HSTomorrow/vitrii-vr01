@@ -112,7 +112,11 @@ export const getAnuncios: RequestHandler = async (req, res) => {
     let countResult = 0;
     try {
       countResult = await prisma.anuncios.count({ where });
-      console.log("[getAnuncios] Count query successful, found:", countResult, "ads");
+      console.log(
+        "[getAnuncios] Count query successful, found:",
+        countResult,
+        "ads",
+      );
     } catch (countError) {
       console.error("[getAnuncios] Count query failed:", countError);
       throw countError;
@@ -163,12 +167,21 @@ export const getAnuncios: RequestHandler = async (req, res) => {
   } catch (error) {
     console.error("[getAnuncios] ❌ ERROR fetching ads:", error);
     console.error("[getAnuncios] Error type:", typeof error);
-    console.error("[getAnuncios] Error instanceof Error:", error instanceof Error);
+    console.error(
+      "[getAnuncios] Error instanceof Error:",
+      error instanceof Error,
+    );
     if (error instanceof Error) {
       console.error("[getAnuncios] Error message:", error.message);
-      console.error("[getAnuncios] Error stack:", error.stack?.substring(0, 1000));
+      console.error(
+        "[getAnuncios] Error stack:",
+        error.stack?.substring(0, 1000),
+      );
     }
-    console.error("[getAnuncios] Full error object:", JSON.stringify(error, null, 2));
+    console.error(
+      "[getAnuncios] Full error object:",
+      JSON.stringify(error, null, 2),
+    );
 
     res.status(500).json({
       success: false,
