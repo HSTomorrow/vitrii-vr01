@@ -28,8 +28,8 @@ FROM node:22-alpine
 
 WORKDIR /app
 
-# Install OpenSSL for Prisma runtime compatibility
-RUN apk add --no-cache openssl libstdc++
+# Install OpenSSL for Prisma runtime compatibility and pnpm
+RUN apk add --no-cache openssl libstdc++ && npm install -g pnpm
 
 # Copy node_modules with all Prisma binaries
 COPY --from=builder /app/node_modules ./node_modules
@@ -53,5 +53,5 @@ EXPOSE 3000
 # Note: Health check disabled - Fly.io will handle monitoring
 # Previously the health check was killing the container prematurely
 
-# Start server
-CMD ["npx", "tsx", "server.js"]
+# Start server with pnpm
+CMD ["pnpm", "exec", "tsx", "server.js"]
