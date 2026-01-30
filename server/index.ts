@@ -175,6 +175,16 @@ export function createServer() {
     res.json({ message: ping });
   });
 
+  // Simple test - returns immediately
+  app.get("/api/test", (_req, res) => {
+    res.json({
+      status: "ok",
+      message: "Server is responding",
+      database_url_set: !!process.env.DATABASE_URL,
+      node_env: process.env.NODE_ENV,
+    });
+  });
+
   // Health check and diagnostics
   app.get("/api/health", async (_req, res) => {
     try {
@@ -234,8 +244,7 @@ export function createServer() {
             execSync(`ping -c 1 ${dbUrl.hostname}`, { timeout: 3000 });
             diagnostics.raw_connection_test = "host reachable";
           } catch {
-            diagnostics.raw_connection_test =
-              "host not reachable (expected in sandbox)";
+            diagnostics.raw_connection_test = "host not reachable (expected in sandbox)";
           }
         } catch (e) {
           diagnostics.raw_connection_test = "error parsing DATABASE_URL";
@@ -264,12 +273,9 @@ export function createServer() {
     } catch (error) {
       console.error("[DB-Diagnostic] Error:", error);
       diagnostics.prisma_status = "error";
-      diagnostics.error =
-        error instanceof Error ? error.message : String(error);
+      diagnostics.error = error instanceof Error ? error.message : String(error);
       diagnostics.error_stack =
-        error instanceof Error
-          ? error.stack?.substring(0, 500)
-          : "no stack trace";
+        error instanceof Error ? error.stack?.substring(0, 500) : "no stack trace";
 
       res.status(500).json(diagnostics);
     }
