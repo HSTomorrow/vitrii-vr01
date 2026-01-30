@@ -20,6 +20,9 @@ FROM node:22-alpine
 
 WORKDIR /app
 
+# Install OpenSSL for Prisma compatibility
+RUN apk add --no-cache openssl
+
 # Copy entire node_modules from builder (includes .prisma and @prisma)
 COPY --from=builder /app/node_modules ./node_modules
 
