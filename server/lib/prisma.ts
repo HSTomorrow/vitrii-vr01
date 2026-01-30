@@ -5,15 +5,10 @@ const globalForPrisma = global as unknown as { prisma: PrismaClient };
 console.log("[Prisma] Initializing Prisma Client...");
 console.log(
   "[Prisma] DATABASE_URL:",
-  process.env.DATABASE_URL
-    ? "SET (length: " + process.env.DATABASE_URL.length + ")"
-    : "NOT SET",
+  process.env.DATABASE_URL ? "SET (length: " + process.env.DATABASE_URL.length + ")" : "NOT SET",
 );
 console.log("[Prisma] NODE_ENV:", process.env.NODE_ENV);
-console.log(
-  "[Prisma] Platform:",
-  process.env.NETLIFY_FUNCTION_NAME ? "Netlify" : "Standalone",
-);
+console.log("[Prisma] Platform:", process.env.NETLIFY_FUNCTION_NAME ? "Netlify" : "Standalone");
 
 if (!process.env.DATABASE_URL) {
   console.error("[Prisma] ⚠️  WARNING: DATABASE_URL is not set!");
@@ -36,10 +31,19 @@ export const prisma =
         emit: "stdout",
         level: "warn",
       },
+      {
+        emit: "event",
+        level: "query",
+      },
     ],
   });
 
 console.log("[Prisma] ✓ Prisma Client created successfully");
+
+// Handle connection errors
+prisma.$on("error", (e: any) => {
+  console.error("[Prisma Event] Error event:", e);
+});
 
 if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
 
