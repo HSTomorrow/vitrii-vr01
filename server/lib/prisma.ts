@@ -45,6 +45,15 @@ export const prisma =
 
 console.log("[Prisma] ✓ Prisma Client created successfully");
 
+// Test connection immediately
+prisma.$queryRaw`SELECT 1`
+  .then(() => {
+    console.log("[Prisma] ✅ Database connection verified");
+  })
+  .catch((error) => {
+    console.error("[Prisma] ❌ Database connection failed:", error.message);
+  });
+
 // Handle connection errors
 prisma.$on("error", (e: any) => {
   console.error("[Prisma Event] Error event:", e);
