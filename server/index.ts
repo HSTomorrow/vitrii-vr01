@@ -553,5 +553,27 @@ export function createServer() {
   app.delete("/api/banners/:id", extractUserId, requireAdmin, deleteBanner);
   app.post("/api/banners/reorder", extractUserId, requireAdmin, reorderBanners);
 
+  // Global error handling middleware for this sub-app
+  // Must be added AFTER all routes
+  app.use((err: any, req: any, res: any, next: any) => {
+    console.error("[API Error]", {
+      message: err.message,
+      stack: err.stack?.substring(0, 500),
+      status: err.status || 500,
+    });
+
+    res.status(err.status || 500).json({
+      success: false,
+      error: "Erro no servidor",
+      message:
+        process.env.NODE_ENV === "development"
+          ? err.message
+          : "Erro interno do servidor",
+      ...(process.env.NODE_ENV === "development" && {
+        stack: err.stack?.substring(0, 300),
+      }),
+    });
+  });
+
   return app;
 }
