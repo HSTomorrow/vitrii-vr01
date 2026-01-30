@@ -201,6 +201,53 @@ export function createServer() {
     }
   });
 
+  // Database diagnostic endpoint
+  app.get("/api/db-diagnostic", async (_req, res) => {
+    console.log("[DB-Diagnostic] Starting database diagnostic check");
+    const diagnostics: Record<string, any> = {
+      timestamp: new Date().toISOString(),
+      environment_variables: {
+        has_database_url: !!process.env.DATABASE_URL,
+        database_url_starts_with: process.env.DATABASE_URL
+          ? process.env.DATABASE_URL.substring(0, 30) + "..."
+          : "NOT SET",
+        node_env: process.env.NODE_ENV,
+      },
+      prisma_status: "not tested",
+      error: null,
+    };
+
+    try {
+      console.log("[DB-Diagnostic] Attempting Prisma connection test...");
+
+      // Import Prisma inside try block to catch initialization errors
+      const { default: prisma } = await import("../lib/prisma");
+
+      console.log("[DB-Diagnostic] Prisma imported successfully");
+
+      // Try a simple query
+      const result = await prisma.usracessos.findFirst({
+        take: 1,
+        select: { id: true },
+      });
+
+      diagnostics.prisma_status = "connected";
+      diagnostics.test_query = "findFirst on usracessos";
+      diagnostics.test_result = result ? "found record" : "no records";
+
+      console.log("[DB-Diagnostic] Database connection successful!");
+      res.json(diagnostics);
+    } catch (error) {
+      console.error("[DB-Diagnostic] Error:", error);
+      diagnostics.prisma_status = "error";
+      diagnostics.error = error instanceof Error ? error.message : String(error);
+      diagnostics.error_stack =
+        error instanceof Error ? error.stack : "no stack trace";
+
+      res.status(500).json(diagnostics);
+    }
+  });
+
   app.get("/api/demo", handleDemo);
 
   // Upload route
