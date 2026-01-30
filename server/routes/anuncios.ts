@@ -161,15 +161,20 @@ export const getAnuncios: RequestHandler = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("[getAnuncios] Error fetching ads:", error);
-    console.error("[getAnuncios] Error details:", {
-      message: error instanceof Error ? error.message : "Unknown error",
-      stack: error instanceof Error ? error.stack : undefined,
-    });
+    console.error("[getAnuncios] ❌ ERROR fetching ads:", error);
+    console.error("[getAnuncios] Error type:", typeof error);
+    console.error("[getAnuncios] Error instanceof Error:", error instanceof Error);
+    if (error instanceof Error) {
+      console.error("[getAnuncios] Error message:", error.message);
+      console.error("[getAnuncios] Error stack:", error.stack?.substring(0, 1000));
+    }
+    console.error("[getAnuncios] Full error object:", JSON.stringify(error, null, 2));
+
     res.status(500).json({
       success: false,
       error: "Erro ao buscar anúncios",
-      details: error instanceof Error ? error.message : "Erro desconhecido",
+      details: error instanceof Error ? error.message : String(error),
+      errorType: error instanceof Error ? error.constructor.name : typeof error,
     });
   }
 };
