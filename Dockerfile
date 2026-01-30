@@ -12,8 +12,8 @@ RUN npm install -g pnpm && pnpm install --frozen-lockfile
 # Copy source files
 COPY . .
 
-# Generate Prisma Client, build server and frontend
-RUN DATABASE_URL="postgresql://user:password@localhost:5432/dummy" npx prisma generate && npm run build:server && npm run build:client
+# Generate Prisma Client with correct binary target, build server and frontend
+RUN DATABASE_URL="postgresql://user:password@localhost:5432/dummy" PRISMA_CLI_BINARY_TARGETS=linux-musl-openssl-3.0.x npx prisma generate && npm run build:server && npm run build:client
 
 # Production stage
 FROM node:22-alpine
