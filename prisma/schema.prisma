@@ -34,6 +34,7 @@ model anunciantes {
   usuarios_anunciantes usuarios_anunciantes[]
   equipes_de_venda     equipes_de_venda[]
   grupos_produtos      grupos_produtos[]
+  wishlist_permissoes  listas_desejos_permissoes[]
 }
 
 model anuncios {
@@ -60,6 +61,7 @@ model anuncios {
   anunciantes         anunciantes             @relation(fields: [anuncianteId], references: [id], onDelete: Cascade, map: "anuncios_lojaId_fkey")
   anuncioVisualizados anuncioVisualizados[]
   fotos               fotos_anuncio[]
+  wishlists_itens     listas_desejos_itens[]
 }
 
 // Anuncio Visualizacoes - Log table to track ad views
@@ -208,6 +210,7 @@ model usracessos {
   anuncioVisualizados   anuncioVisualizados[]
   fotos_anuncio         fotos_anuncio[]
   grupos_produtos       grupos_produtos[]
+  listas_desejos        listas_desejos[]
 }
 
 model passwordResetToken {
@@ -296,4 +299,55 @@ model fotos_anuncio {
 
   @@index([anuncio_id])
   @@index([anuncio_id, ordem])
+}
+
+// Listas de Desejos (Wishlists)
+model listas_desejos {
+  id                    Int                              @id @default(autoincrement())
+  usuarioId             Int
+  titulo                String                           @db.VarChar(255)
+  descricao             String?
+  status                String                           @default("privado") @db.VarChar(20)
+  dataCriacao           DateTime                         @default(now())
+  dataAtualizacao       DateTime                         @updatedAt
+
+  usuario               usracessos                       @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  itens                 listas_desejos_itens[]
+  permissoes            listas_desejos_permissoes[]
+
+  @@index([usuarioId])
+  @@index([status])
+}
+
+// Itens das Listas de Desejos
+model listas_desejos_itens {
+  id                    Int                    @id @default(autoincrement())
+  listaId               Int
+  tipo                  String                 @db.VarChar(50)
+  titulo                String                 @db.VarChar(255)
+  descricao             String?
+  preco                 Decimal?               @db.Decimal(10, 2)
+  imagem                String?                @db.VarChar(500)
+  anuncioId             Int?
+  dados_copiados        Json?
+  dataCriacao           DateTime               @default(now())
+
+  lista                 listas_desejos         @relation(fields: [listaId], references: [id], onDelete: Cascade)
+  anuncio               anuncios?              @relation(fields: [anuncioId], references: [id], onDelete: SetNull)
+
+  @@index([listaId])
+  @@index([anuncioId])
+}
+
+// Permissões de Listas Privadas
+model listas_desejos_permissoes {
+  id                    Int                    @id @default(autoincrement())
+  listaId               Int
+  anuncianteId          Int
+  dataCriacao           DateTime               @default(now())
+
+  lista                 listas_desejos         @relation(fields: [listaId], references: [id], onDelete: Cascade)
+  anunciante            anunciantes            @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
+
+  @@unique([listaId, anuncianteId])
 }

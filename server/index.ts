@@ -89,6 +89,18 @@ import {
   getFavoritoCount,
 } from "./routes/favoritos";
 import {
+  getListasDesejos,
+  getListaDesejosById,
+  createListaDesejos,
+  updateListaDesejos,
+  deleteListaDesejos,
+  addItemLivre,
+  addItemAnuncio,
+  deleteItemListaDesejos,
+  addPermissao,
+  removePermissao,
+} from "./routes/listas_desejos";
+import {
   generateQRCode,
   getQRCodesForAd,
   trackQRCodeScan,
@@ -418,6 +430,42 @@ export function createServer() {
   app.get("/api/favoritos/check", checkFavorito);
   app.post("/api/favoritos/toggle", toggleFavorito);
   app.get("/api/anuncios/:anuncioId/favoritos/count", getFavoritoCount);
+
+  // Listas de Desejos (Wishlists) routes
+  app.get("/api/listas-desejos", extractUserId, getListasDesejos);
+  app.get("/api/listas-desejos/:id", getListaDesejosById);
+  app.post("/api/listas-desejos", extractUserId, createListaDesejos);
+  app.put("/api/listas-desejos/:id", extractUserId, updateListaDesejos);
+  app.delete("/api/listas-desejos/:id", extractUserId, deleteListaDesejos);
+
+  // Wishlist items routes
+  app.post(
+    "/api/listas-desejos/:listaId/itens/livre",
+    extractUserId,
+    addItemLivre,
+  );
+  app.post(
+    "/api/listas-desejos/:listaId/itens/anuncio",
+    extractUserId,
+    addItemAnuncio,
+  );
+  app.delete(
+    "/api/listas-desejos/:listaId/itens/:itemId",
+    extractUserId,
+    deleteItemListaDesejos,
+  );
+
+  // Wishlist permissions routes
+  app.post(
+    "/api/listas-desejos/:listaId/permissoes",
+    extractUserId,
+    addPermissao,
+  );
+  app.delete(
+    "/api/listas-desejos/:listaId/permissoes/:permissaoId",
+    extractUserId,
+    removePermissao,
+  );
 
   // QR Codes routes
   app.post("/api/qrcodes/generate", generateQRCode);
