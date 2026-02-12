@@ -153,21 +153,149 @@
 
 @layer components {
   .vitrii-button {
-    @apply bg-vitrii-blue text-white px-6 py-3 rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors duration-200;
+    @apply bg-vitrii-blue text-white px-6 py-3 rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg;
   }
 
   .vitrii-button-secondary {
-    @apply bg-vitrii-yellow text-vitrii-text px-6 py-3 rounded-lg font-semibold hover:bg-vitrii-yellow-dark transition-colors duration-200;
+    @apply bg-vitrii-yellow text-vitrii-text px-6 py-3 rounded-lg font-semibold hover:bg-vitrii-yellow-dark transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-md hover:shadow-lg;
+  }
+
+  /* Improved button states */
+  button, [type="button"], [type="submit"], [type="reset"] {
+    @apply transition-all duration-300;
+  }
+
+  button:hover:not(:disabled), [type="button"]:hover:not(:disabled), [type="submit"]:hover:not(:disabled), [type="reset"]:hover:not(:disabled) {
+    transform: translateY(-1px);
   }
 
   .vitrii-card {
-    @apply bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-200;
+    @apply bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 border border-gray-200;
+  }
+
+  /* Card hover animation */
+  @keyframes cardHover {
+    0% {
+      transform: translateY(0px);
+    }
+    100% {
+      transform: translateY(-4px);
+    }
+  }
+
+  .vitrii-card:hover {
+    animation: cardHover 0.3s ease-out forwards;
+  }
+
+  /* Pulse animation for better visibility */
+  @keyframes pulse-soft {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.95;
+    }
+  }
+
+  .animate-pulse-soft {
+    animation: pulse-soft 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* Fade in animation for content */
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Stagger animation for carousel items */
+  @keyframes fadeInLeft {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  /* Shimmer animation for loading states */
+  @keyframes shimmer {
+    0% {
+      background-position: -1000px 0;
+    }
+    100% {
+      background-position: 1000px 0;
+    }
+  }
+
+  /* Section fade in */
+  @keyframes sectionFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  section {
+    animation: sectionFadeIn 0.6s ease-out forwards;
+  }
+
+  section:nth-child(n+2) {
+    animation-delay: 0.1s;
+  }
+
+  /* Enhanced button hover effects */
+  @keyframes buttonGlow {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba(2, 92, 186, 0.4);
+    }
+    50% {
+      box-shadow: 0 0 0 8px rgba(2, 92, 186, 0);
+    }
+  }
+
+  /* Title underline animation */
+  @keyframes underlineExpand {
+    from {
+      width: 0;
+    }
+    to {
+      width: 40px;
+    }
+  }
+
+  .section-title-blue::after,
+  .section-title-green::after {
+    animation: underlineExpand 0.6s ease-out forwards;
   }
 
   /* Responsive section title color */
   .section-title-blue {
-    @apply text-2xl md:text-3xl font-bold mb-1;
+    @apply text-2xl md:text-3xl font-bold mb-1 tracking-tight;
     color: #025cba;
+    position: relative;
+  }
+
+  .section-title-blue::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 0;
+    width: 40px;
+    height: 3px;
+    background: linear-gradient(90deg, #025cba 0%, #78BDF6 100%);
+    border-radius: 2px;
   }
 
   @media (max-width: 991px) {
@@ -179,6 +307,19 @@
   /* Responsive section title color for "Por que escolher" */
   .section-title-green {
     color: rgba(2, 192, 86, 1);
+    @apply text-2xl md:text-3xl font-bold tracking-tight;
+    position: relative;
+  }
+
+  .section-title-green::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 0;
+    width: 40px;
+    height: 3px;
+    background: linear-gradient(90deg, #02c056 0%, #34d399 100%);
+    border-radius: 2px;
   }
 
   /* Responsive "Ver Todos" text color */

@@ -147,7 +147,7 @@ export default function Index() {
       <Header />
 
       {/* Banner Carousel Section */}
-      <section className="py-2 md:py-2 bg-white">
+      <section className="py-0 md:py-1 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {bannersData?.data && bannersData.data.length > 0 ? (
             <BannerCarousel banners={bannersData.data} autoPlay={true} />
@@ -168,17 +168,17 @@ export default function Index() {
       </section>
 
       {/* Featured Listings Section */}
-      <section className="py-3 md:py-3 bg-vitrii-gray-light">
+      <section className="py-2 md:py-3 bg-vitrii-gray-light">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center mb-3">
+          <div className="flex justify-between items-center mb-2">
             <div>
               <h2
                 style={{ color: "#025CBA" }}
-                className="text-2xl md:text-3xl font-bold mb-1"
+                className="text-2xl md:text-3xl font-bold mb-0.5"
               >
                 Anúncios em Destaque
               </h2>
-              <p className="text-sm text-vitrii-text-secondary">
+              <p className="text-xs md:text-sm text-vitrii-text-secondary">
                 Veja os produtos e serviços mais procurados
               </p>
             </div>
@@ -201,7 +201,7 @@ export default function Index() {
             color="blue"
           />
 
-          <div className="text-center mt-3">
+          <div className="text-center mt-2">
             <Link
               to="/browse"
               className="inline-flex items-center space-x-2 text-vitrii-blue font-semibold hover:space-x-3 transition-all"
@@ -214,14 +214,14 @@ export default function Index() {
       </section>
 
       {/* Free/Gratuito Listings Section */}
-      <section className="py-3 md:py-3 bg-white">
+      <section className="py-2 md:py-3 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center mb-3">
+          <div className="flex justify-between items-center mb-2">
             <div>
-              <h2 className="section-title-blue">
+              <h2 className="section-title-blue text-2xl md:text-3xl font-bold mb-0.5">
                 Doações, Brindes e Serviços Gratuitos
               </h2>
-              <p className="text-sm text-vitrii-text-secondary">
+              <p className="text-xs md:text-sm text-vitrii-text-secondary">
                 Doações, Brindes, Produtos, Serviços e Eventos disponíveis para
                 experimentação gratuitamente
               </p>
@@ -254,7 +254,7 @@ export default function Index() {
             color="green"
           />
 
-          <div className="text-center mt-3 space-y-4">
+          <div className="text-center mt-2 space-y-2">
             <Link
               to="/anuncio/criar?tipo=doacao"
               className="md:hidden inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-green-700 transition-colors"
@@ -276,12 +276,12 @@ export default function Index() {
       </section>
 
       {/* Events Listings Section */}
-      <section className="py-3 md:py-3 bg-vitrii-gray-light">
+      <section className="py-2 md:py-3 bg-vitrii-gray-light">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center mb-3">
+          <div className="flex justify-between items-center mb-2">
             <div>
-              <h2 className="section-title-blue">Eventos</h2>
-              <p className="text-sm text-vitrii-text-secondary">
+              <h2 className="section-title-blue text-2xl md:text-3xl font-bold mb-0.5">Eventos</h2>
+              <p className="text-xs md:text-sm text-vitrii-text-secondary">
                 Descubra eventos, workshops e experiências próximas a você
               </p>
             </div>
@@ -304,7 +304,7 @@ export default function Index() {
             color="purple"
           />
 
-          <div className="text-center mt-3">
+          <div className="text-center mt-2">
             <Link
               to="/browse?filter=evento"
               className="inline-flex items-center space-x-2 text-vitrii-blue font-semibold hover:space-x-3 transition-all"
@@ -319,14 +319,14 @@ export default function Index() {
       </section>
 
       {/* Recurring Schedule Listings Section */}
-      <section className="py-3 md:py-3 bg-white">
+      <section className="py-2 md:py-3 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center mb-3">
+          <div className="flex justify-between items-center mb-2">
             <div>
-              <h2 className="section-title-blue">
+              <h2 className="section-title-blue text-2xl md:text-3xl font-bold mb-0.5">
                 Agendas de Aulas, Cursos e Serviços Especializados
               </h2>
-              <p className="text-sm text-vitrii-text-secondary">
+              <p className="text-xs md:text-sm text-vitrii-text-secondary">
                 Agendas de Aulas, Cursos e Serviços Especializados
               </p>
             </div>
@@ -349,7 +349,7 @@ export default function Index() {
             color="orange"
           />
 
-          <div className="text-center mt-3">
+          <div className="text-center mt-2">
             <Link
               to="/browse?filter=agenda_recorrente"
               className="inline-flex items-center space-x-2 text-vitrii-blue font-semibold hover:space-x-3 transition-all"
@@ -362,14 +362,14 @@ export default function Index() {
       </section>
 
       {/* Job Opportunities Listings Section */}
-      <section className="py-3 md:py-3 bg-vitrii-gray-light">
+      <section className="py-2 md:py-3 bg-vitrii-gray-light">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center mb-3">
+          <div className="flex justify-between items-center mb-2">
             <div>
-              <h2 className="section-title-blue">
+              <h2 className="section-title-blue text-2xl md:text-3xl font-bold mb-0.5">
                 Oportunidades e Vagas de Emprego
               </h2>
-              <p className="text-sm text-vitrii-text-secondary">
+              <p className="text-xs md:text-sm text-vitrii-text-secondary">
                 Descubra oportunidades profissionais e vagas de emprego
               </p>
             </div>
@@ -392,7 +392,7 @@ export default function Index() {
             color="red"
           />
 
-          <div className="text-center mt-3">
+          <div className="text-center mt-2">
             <Link
               to="/browse?filter=oportunidade"
               className="inline-flex items-center space-x-2 text-vitrii-blue font-semibold hover:space-x-3 transition-all"
@@ -405,27 +405,27 @@ export default function Index() {
       </section>
 
       {/* Create Ad Section */}
-      <section className="py-3 md:py-3 bg-white">
+      <section className="py-2 md:py-3 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-r from-vitrii-blue to-vitrii-blue-dark rounded-lg p-8 text-white text-center">
-            <Plus className="w-12 h-12 mx-auto mb-4 opacity-90" />
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">
+          <div className="bg-gradient-to-r from-vitrii-blue to-vitrii-blue-dark rounded-lg p-6 md:p-8 text-white text-center">
+            <Plus className="w-12 h-12 mx-auto mb-3 opacity-90" />
+            <h2 className="text-2xl md:text-3xl font-bold mb-2">
               Publique Seu Anúncio Agora
             </h2>
-            <p className="text-blue-100 text-base mb-8 max-w-2xl mx-auto">
+            <p className="text-blue-100 text-sm md:text-base mb-6 max-w-2xl mx-auto">
               Aproveite nossos 3 anúncios gratuitos e comece a vender seus
               produtos e serviços para milhares de clientes potenciais
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link
                 to="/anuncio/criar"
-                className="bg-vitrii-yellow text-vitrii-text px-8 py-3 rounded-lg font-semibold hover:bg-vitrii-yellow-dark transition-colors"
+                className="bg-vitrii-yellow text-vitrii-text px-8 py-2.5 rounded-lg font-semibold hover:bg-vitrii-yellow-dark transition-colors"
               >
                 Criar Anúncio
               </Link>
               <Link
                 to="/sell"
-                className="bg-white text-vitrii-blue px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+                className="bg-white text-vitrii-blue px-8 py-2.5 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
               >
                 Gerenciar Anúncios
               </Link>
@@ -435,47 +435,47 @@ export default function Index() {
       </section>
 
       {/* Why Choose Vitrii Section */}
-      <section className="py-3 md:py-3">
+      <section className="py-2 md:py-3">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="section-title-green">Por que escolher Vitrii?</h2>
+          <div className="text-center mb-6">
+            <h2 className="section-title-green text-2xl md:text-3xl font-bold">Por que escolher Vitrii?</h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center">
-              <div className="w-16 h-16 bg-vitrii-blue bg-opacity-10 rounded-lg flex items-center justify-center mx-auto mb-6">
-                <Zap className="w-8 h-8 text-vitrii-blue" />
+              <div className="w-14 h-14 bg-vitrii-blue bg-opacity-10 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <Zap className="w-7 h-7 text-vitrii-blue" />
               </div>
-              <h3 className="text-xl font-bold text-vitrii-text mb-3">
+              <h3 className="text-lg font-bold text-vitrii-text mb-2">
                 Rápido e Fácil
               </h3>
-              <p className="text-vitrii-text-secondary">
+              <p className="text-sm text-vitrii-text-secondary">
                 Comece em minutos. Cadastre sua loja, adicione produtos e comece
                 a vender ou comprar sem complicações.
               </p>
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-vitrii-blue bg-opacity-10 rounded-lg flex items-center justify-center mx-auto mb-6">
-                <Users className="w-8 h-8 text-vitrii-blue" />
+              <div className="w-14 h-14 bg-vitrii-blue bg-opacity-10 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <Users className="w-7 h-7 text-vitrii-blue" />
               </div>
-              <h3 className="text-xl font-bold text-vitrii-text mb-3">
+              <h3 className="text-lg font-bold text-vitrii-text mb-2">
                 Comunidade Ativa
               </h3>
-              <p className="text-vitrii-text-secondary">
+              <p className="text-sm text-vitrii-text-secondary">
                 Conecte-se com milhares de vendedores e compradores. Cresça sua
                 rede e suas vendas.
               </p>
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-vitrii-blue bg-opacity-10 rounded-lg flex items-center justify-center mx-auto mb-6">
-                <BarChart3 className="w-8 h-8 text-vitrii-blue" />
+              <div className="w-14 h-14 bg-vitrii-blue bg-opacity-10 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <BarChart3 className="w-7 h-7 text-vitrii-blue" />
               </div>
-              <h3 className="text-xl font-bold text-vitrii-text mb-3">
+              <h3 className="text-lg font-bold text-vitrii-text mb-2">
                 Análises Completas
               </h3>
-              <p className="text-vitrii-text-secondary">
+              <p className="text-sm text-vitrii-text-secondary">
                 Acompanhe suas vendas, clientes e performance com dashboards
                 detalhados.
               </p>
@@ -485,26 +485,26 @@ export default function Index() {
       </section>
 
       {/* Call to Action Section */}
-      <section className="py-8 md:py-12 bg-vitrii-blue text-white">
+      <section className="py-6 md:py-8 bg-vitrii-blue text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-2xl md:text-3xl font-bold mb-4">
+          <h2 className="text-2xl md:text-3xl font-bold mb-3">
             Pronto para crescer seu negócio?
           </h2>
-          <p className="text-base text-blue-100 mb-6 max-w-2xl mx-auto">
+          <p className="text-sm md:text-base text-blue-100 mb-6 max-w-2xl mx-auto">
             Junte-se a milhares de vendedores que já estão transformando seus
             negócios com Vitrii.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
               to="/auth/signup"
-              className="bg-vitrii-yellow text-vitrii-text px-8 py-3 rounded-lg font-semibold hover:bg-vitrii-yellow-dark transition-colors inline-block"
+              className="bg-vitrii-yellow text-vitrii-text px-8 py-2.5 rounded-lg font-semibold hover:bg-vitrii-yellow-dark transition-colors inline-block"
             >
               Comece Grátis
             </Link>
             <Link
               to="/browse"
-              className="border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:bg-opacity-10 transition-colors inline-block"
+              className="border-2 border-white text-white px-8 py-2.5 rounded-lg font-semibold hover:bg-white hover:bg-opacity-10 transition-colors inline-block"
             >
               Explorar Marketplace
             </Link>
@@ -513,14 +513,14 @@ export default function Index() {
       </section>
 
       {/* Info Banner */}
-      <section className="bg-blue-50 border-t-4 border-vitrii-blue py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-start space-x-4">
-          <AlertCircle className="w-6 h-6 text-vitrii-blue flex-shrink-0 mt-1" />
+      <section className="bg-blue-50 border-t-4 border-vitrii-blue py-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-start space-x-3">
+          <AlertCircle className="w-5 h-5 text-vitrii-blue flex-shrink-0 mt-0.5" />
           <div>
-            <h3 className="font-semibold text-vitrii-text mb-1">
+            <h3 className="font-semibold text-vitrii-text mb-0.5 text-sm">
               Informação Importante
             </h3>
-            <p className="text-vitrii-text-secondary text-sm">
+            <p className="text-vitrii-text-secondary text-xs">
               Vitrii é um marketplace seguro com autenticação via Google ou
               Usuário/Senha. Suas transações são protegidas e dados
               criptografados.

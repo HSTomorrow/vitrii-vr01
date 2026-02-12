@@ -69,11 +69,11 @@ export default function BannerCarousel({
       <div className="absolute inset-0 bg-black/30 flex flex-col items-center justify-center p-2">
         {/* Content */}
         <div className="text-center text-white max-w-3xl px-2 sm:px-4">
-          <h2 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2 line-clamp-2">
+          <h2 className="text-base sm:text-xl md:text-2xl lg:text-3xl font-bold mb-0.5 sm:mb-1.5 line-clamp-2">
             {currentBanner.titulo}
           </h2>
           {currentBanner.descricao && (
-            <p className="text-xs sm:text-sm md:text-lg lg:text-xl text-gray-100 mb-3 sm:mb-6 line-clamp-2">
+            <p className="text-xs sm:text-sm md:text-base text-gray-100 mb-2 sm:mb-4 line-clamp-2">
               {currentBanner.descricao}
             </p>
           )}
@@ -81,7 +81,7 @@ export default function BannerCarousel({
           {currentBanner.link && (
             <a
               href={currentBanner.link}
-              className="inline-block px-3 py-1.5 sm:px-6 sm:py-2 md:px-8 md:py-3 bg-vitrii-blue text-white rounded-lg font-semibold text-xs sm:text-sm md:text-base hover:bg-vitrii-blue-dark transition-colors whitespace-nowrap"
+              className="inline-block px-3 py-1.5 sm:px-5 sm:py-2 md:px-6 md:py-2.5 bg-vitrii-blue text-white rounded-lg font-semibold text-xs sm:text-sm hover:bg-vitrii-blue-dark transition-colors whitespace-nowrap"
             >
               Saiba Mais
             </a>
@@ -96,7 +96,7 @@ export default function BannerCarousel({
       {/* Main Carousel */}
       <div className="relative bg-vitrii-gray-light overflow-hidden rounded-lg">
         {/* Banner Container */}
-        <div className="relative w-full h-32 sm:h-40 md:h-48">
+        <div className="relative w-full h-32 sm:h-36 md:h-44">
           <BannerContent />
 
           {/* Navigation Buttons */}
@@ -104,18 +104,18 @@ export default function BannerCarousel({
             <>
               <button
                 onClick={handlePrevious}
-                className="absolute left-4 top-1/2 -translate-y-1/2 z-20 p-2 bg-white/80 hover:bg-white rounded-full transition-colors"
+                className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 p-2 bg-white/80 hover:bg-white rounded-full transition-all shadow-md hover:shadow-lg"
                 aria-label="Banner anterior"
               >
-                <ChevronLeft className="w-6 h-6 text-vitrii-blue" />
+                <ChevronLeft className="w-5 h-5 text-vitrii-blue" />
               </button>
 
               <button
                 onClick={handleNext}
-                className="absolute right-4 top-1/2 -translate-y-1/2 z-20 p-2 bg-white/80 hover:bg-white rounded-full transition-colors"
+                className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 p-2 bg-white/80 hover:bg-white rounded-full transition-all shadow-md hover:shadow-lg"
                 aria-label="Próximo banner"
               >
-                <ChevronRight className="w-6 h-6 text-vitrii-blue" />
+                <ChevronRight className="w-5 h-5 text-vitrii-blue" />
               </button>
             </>
           )}
@@ -123,12 +123,12 @@ export default function BannerCarousel({
 
         {/* Dot Indicators */}
         {activeBanners.length > 1 && (
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+          <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex gap-1.5">
             {activeBanners.map((_, index) => (
               <button
                 key={index}
                 onClick={() => handleDotClick(index)}
-                className={`w-3 h-3 rounded-full transition-colors ${
+                className={`w-2.5 h-2.5 rounded-full transition-colors ${
                   index === currentIndex ? "bg-vitrii-blue" : "bg-white/50"
                 }`}
                 aria-label={`Ir para banner ${index + 1}`}
@@ -140,7 +140,7 @@ export default function BannerCarousel({
 
       {/* Banner Counter */}
       {activeBanners.length > 1 && (
-        <div className="text-center py-2 text-sm text-vitrii-text-secondary">
+        <div className="text-center py-1 text-xs text-vitrii-text-secondary">
           {currentIndex + 1} de {activeBanners.length}
         </div>
       )}
