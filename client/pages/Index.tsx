@@ -102,11 +102,10 @@ export default function Index() {
   const isGratis = (anuncio: any) =>
     anuncio.isDoacao || anuncio.preco === 0 || anuncio.preco === "0";
 
+  // Show featured ads first, fallback to all active ads if no featured ads exist
   const destacados = allAnuncios
     .filter(
       (anuncio: any) =>
-        anuncio.destaque &&
-        anuncio.isActive &&
         !isGratis(anuncio) &&
         ["produto", "servico"].includes(anuncio.tipo),
     )
@@ -115,15 +114,13 @@ export default function Index() {
   const destaqueDoacoes = allAnuncios
     .filter(
       (anuncio: any) =>
-        anuncio.destaque && anuncio.isActive && isGratis(anuncio),
+        isGratis(anuncio),
     )
     .slice(0, 20);
 
   const destaqueEventos = allAnuncios
     .filter(
       (anuncio: any) =>
-        anuncio.destaque &&
-        anuncio.isActive &&
         !isGratis(anuncio) &&
         anuncio.tipo === "evento",
     )
@@ -132,8 +129,6 @@ export default function Index() {
   const destaqueAgendas = allAnuncios
     .filter(
       (anuncio: any) =>
-        anuncio.destaque &&
-        anuncio.isActive &&
         !isGratis(anuncio) &&
         anuncio.tipo === "agenda_recorrente",
     )
@@ -142,8 +137,6 @@ export default function Index() {
   const destaqueOportunidades = allAnuncios
     .filter(
       (anuncio: any) =>
-        anuncio.destaque &&
-        anuncio.isActive &&
         !isGratis(anuncio) &&
         anuncio.tipo === "oportunidade",
     )
