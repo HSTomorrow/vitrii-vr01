@@ -25,7 +25,7 @@ model anunciantes {
   facebook             String?                @db.VarChar(255)
   whatsapp             String?                @db.VarChar(20)
   fotoUrl              String?                @db.VarChar(500)
-  status               String?                @db.VarChar(50)
+  status               String                 @default("Ativo") @db.VarChar(50) // Ativo ou Desativado
   dataCriacao          DateTime               @default(now())
   dataAtualizacao      DateTime
   anuncios             anuncios[]

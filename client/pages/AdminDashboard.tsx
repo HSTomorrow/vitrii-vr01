@@ -19,6 +19,7 @@ import {
   ChevronDown,
   ChevronUp,
   Key,
+  Store,
 } from "lucide-react";
 import { useState } from "react";
 import AdminEditUserModal from "@/components/AdminEditUserModal";
@@ -314,7 +315,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Quick Links */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <button
             onClick={() => navigate("/admin/usuarios")}
             className="bg-blue-50 border border-blue-200 rounded-lg p-6 hover:shadow-lg transition-shadow text-left group"
@@ -346,6 +347,23 @@ export default function AdminDashboard() {
             </div>
             <p className="text-sm text-vitrii-text-secondary">
               Modere e controle anúncios do sistema
+            </p>
+          </button>
+
+          <button
+            onClick={() => navigate("/admin/anunciantes")}
+            className="bg-orange-50 border border-orange-200 rounded-lg p-6 hover:shadow-lg transition-shadow text-left group"
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center group-hover:bg-orange-200 transition-colors">
+                <Store className="w-6 h-6 text-orange-600" />
+              </div>
+              <h3 className="font-semibold text-vitrii-text">
+                Gerenciar Anunciantes
+              </h3>
+            </div>
+            <p className="text-sm text-vitrii-text-secondary">
+              Controle o status dos anunciantes (Ativo/Desativado)
             </p>
           </button>
 

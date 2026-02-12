@@ -131,9 +131,16 @@ export default function AnunciantesCarousel({
             {/* Content */}
             <div className="p-3 flex flex-col h-full">
               <div>
-                <h4 className="font-bold text-sm mb-1 line-clamp-2 text-vitrii-blue hover:text-vitrii-blue-dark transition-colors duration-200">
+                <div className="flex items-start justify-between mb-1">
+                <h4 className="font-bold text-sm line-clamp-2 text-vitrii-blue hover:text-vitrii-blue-dark transition-colors duration-200 flex-1">
                   {anunciante.nome}
                 </h4>
+                {anunciante.status && anunciante.status !== "Ativo" && (
+                  <span className="ml-2 px-2 py-1 text-xs font-semibold bg-red-100 text-red-700 rounded-full flex-shrink-0">
+                    {anunciante.status}
+                  </span>
+                )}
+              </div>
 
                 <p className="text-xs text-vitrii-text-secondary mb-2 line-clamp-2 hover:text-vitrii-text transition-colors duration-200">
                   {anunciante.descricao || "Loja online"}

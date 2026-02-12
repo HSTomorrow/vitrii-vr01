@@ -100,6 +100,8 @@ export const getAnuncios: RequestHandler = async (req, res) => {
     });
 
     const where: any = { status: "ativo" }; // Default: only active ads
+    const anuncianteWhere: any = { status: "Ativo" }; // Default: only active anunciantes
+
     if (anuncianteId) where.anuncianteId = parseInt(anuncianteId as string);
     if (status) where.status = status;
     if (includeInactive === "true") delete where.status; // Override to include inactive
@@ -111,7 +113,14 @@ export const getAnuncios: RequestHandler = async (req, res) => {
     // Test simple count first
     let countResult = 0;
     try {
-      countResult = await prisma.anuncios.count({ where });
+      countResult = await prisma.anuncios.count({
+        where: {
+          ...where,
+          anunciantes: {
+            is: anuncianteWhere,
+          },
+        },
+      });
       console.log(
         "[getAnuncios] Count query successful, found:",
         countResult,
@@ -125,13 +134,19 @@ export const getAnuncios: RequestHandler = async (req, res) => {
     // Get total count and paginated data in parallel
     const [anuncios, total] = await Promise.all([
       prisma.anuncios.findMany({
-        where,
+        where: {
+          ...where,
+          anunciantes: {
+            is: anuncianteWhere,
+          },
+        },
         include: {
           anunciantes: {
             select: {
               id: true,
               nome: true,
               fotoUrl: true,
+              status: true,
             },
           },
         },
@@ -139,7 +154,14 @@ export const getAnuncios: RequestHandler = async (req, res) => {
         take: pageLimit,
         skip: pageOffset,
       }),
-      prisma.anuncios.count({ where }),
+      prisma.anuncios.count({
+        where: {
+          ...where,
+          anunciantes: {
+            is: anuncianteWhere,
+          },
+        },
+      }),
     ]);
 
     console.log(

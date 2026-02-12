@@ -27,7 +27,7 @@ const AnuncianteCreateSchema = z.object({
 // GET all anunciantes (with pagination and user filtering)
 export const getAnunciantes: RequestHandler = async (req, res) => {
   try {
-    const { limit = "20", offset = "0" } = req.query;
+    const { limit = "20", offset = "0", includeInactive = "false" } = req.query;
     const userId = req.userId;
 
     // Validate pagination parameters
@@ -38,6 +38,11 @@ export const getAnunciantes: RequestHandler = async (req, res) => {
     const pageOffset = Math.max(parseInt(offset as string) || 0, 0);
 
     const where: any = {};
+
+    // Filter by status - only show Ativo unless explicitly requested otherwise
+    if (includeInactive !== "true") {
+      where.status = "Ativo";
+    }
 
     // If user is not an admin, filter by their anunciantes
     if (userId) {
