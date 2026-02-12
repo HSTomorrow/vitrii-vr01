@@ -251,6 +251,7 @@ export const createAnuncio: RequestHandler = async (req, res) => {
       select: {
         dataVigenciaContrato: true,
         numeroAnunciosAtivos: true,
+        maxAnunciosAtivos: true,
         tipoUsuario: true,
       },
     });
@@ -271,14 +272,16 @@ export const createAnuncio: RequestHandler = async (req, res) => {
       });
     }
 
-    // Check if user has reached the limit of 3 active ads
+    // Check if user has reached the limit of active ads
     // Admins are exempt from this limit
     const isAdmin = usuario.tipoUsuario === "adm";
-    if (!isAdmin && (usuario.numeroAnunciosAtivos || 0) >= 3) {
+    const maxAnuncios = usuario.maxAnunciosAtivos || 10;
+    const anunciosAtivos = usuario.numeroAnunciosAtivos || 0;
+
+    if (!isAdmin && anunciosAtivos >= maxAnuncios) {
       return res.status(403).json({
         success: false,
-        error:
-          "Limite de 3 anúncios ativos atingido. Aguarde a expiração de anúncios antigos.",
+        error: `Limite de ${maxAnuncios} anúncios ativos atingido. Aguarde a expiração de anúncios antigos ou entre em contato com o suporte.`,
       });
     }
 

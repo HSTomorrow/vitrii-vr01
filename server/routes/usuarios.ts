@@ -56,6 +56,7 @@ export const getUsuarios: RequestHandler = async (req, res) => {
         dataCriacao: true,
         dataVigenciaContrato: true,
         numeroAnunciosAtivos: true,
+        maxAnunciosAtivos: true,
         endereco: true,
       },
       orderBy: {
@@ -405,6 +406,12 @@ const UsuarioAdminUpdateSchema = z.object({
       return /^\d{4}-\d{2}-\d{2}(T|$)/.test(value);
     }, "Data de vigência deve estar no formato YYYY-MM-DD ou ISO 8601")
     .optional(),
+  maxAnunciosAtivos: z
+    .number()
+    .int()
+    .min(1, "Limite deve ser pelo menos 1")
+    .max(1000, "Limite não pode exceder 1000")
+    .optional(),
 });
 
 // UPDATE user (only safe fields allowed)
@@ -458,6 +465,9 @@ export const updateUsuario: RequestHandler = async (req, res) => {
         tipoUsuario: true,
         tassinatura: true,
         dataCriacao: true,
+        numeroAnunciosAtivos: true,
+        maxAnunciosAtivos: true,
+        dataVigenciaContrato: true,
       },
     });
 
@@ -501,6 +511,60 @@ export const deleteUsuario: RequestHandler = async (req, res) => {
     res.status(500).json({
       success: false,
       error: "Erro ao deletar usuário",
+    });
+  }
+};
+
+// UPDATE max ads limit for a user (Admin only)
+export const updateMaxAnunciosAtivos: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { maxAnunciosAtivos } = req.body;
+
+    // Validate input
+    if (maxAnunciosAtivos === undefined || maxAnunciosAtivos === null) {
+      return res.status(400).json({
+        success: false,
+        error: "maxAnunciosAtivos é obrigatório",
+      });
+    }
+
+    // Validate value
+    if (!Number.isInteger(maxAnunciosAtivos) || maxAnunciosAtivos < 1 || maxAnunciosAtivos > 1000) {
+      return res.status(400).json({
+        success: false,
+        error: "maxAnunciosAtivos deve ser um número inteiro entre 1 e 1000",
+      });
+    }
+
+    const userId = parseInt(id);
+
+    // Update only maxAnunciosAtivos field
+    const usuario = await prisma.usracessos.update({
+      where: { id: userId },
+      data: {
+        maxAnunciosAtivos,
+      },
+      select: {
+        id: true,
+        nome: true,
+        email: true,
+        numeroAnunciosAtivos: true,
+        maxAnunciosAtivos: true,
+        tipoUsuario: true,
+      },
+    });
+
+    res.json({
+      success: true,
+      data: usuario,
+      message: `Limite de anúncios atualizado para ${maxAnunciosAtivos}`,
+    });
+  } catch (error) {
+    console.error("Error updating max ads limit:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao atualizar limite de anúncios",
     });
   }
 };

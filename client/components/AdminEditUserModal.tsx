@@ -18,6 +18,7 @@ interface Usuario {
   dataCriacao: string;
   dataVigenciaContrato: string;
   numeroAnunciosAtivos: number;
+  maxAnunciosAtivos?: number;
   endereco?: string;
 }
 
@@ -47,6 +48,9 @@ export default function AdminEditUserModal({
       .split("T")[0],
     endereco: usuario.endereco || "",
   });
+  const [maxAnunciosAtivos, setMaxAnunciosAtivos] = useState(
+    usuario.maxAnunciosAtivos || 10
+  );
 
   // Helper function to convert date string to ISO datetime
   const dateToDateTime = (dateStr: string): string => {
@@ -56,6 +60,39 @@ export default function AdminEditUserModal({
     // If it's just a date, add midnight time
     return `${dateStr}T00:00:00.000Z`;
   };
+
+  // Mutation to update max ads limit
+  const updateMaxAdsMutation = useMutation({
+    mutationFn: async (max: number) => {
+      const response = await fetch(
+        `/api/admin/usracessos/${usuario.id}/max-anuncios`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            "x-user-id": user?.id?.toString() || "",
+          },
+          body: JSON.stringify({ maxAnunciosAtivos: max }),
+        },
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.error || "Erro ao atualizar limite de anúncios"
+        );
+      }
+
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast.success(data.message);
+      queryClient.invalidateQueries({ queryKey: ["usuarios-com-senha"] });
+    },
+    onError: (error: Error) => {
+      toast.error(error.message);
+    },
+  });
 
   // Mutation to update user profile
   const updateMutation = useMutation({
@@ -108,10 +145,14 @@ export default function AdminEditUserModal({
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    if (name === "maxAnunciosAtivos") {
+      setMaxAnunciosAtivos(parseInt(value) || 0);
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -121,6 +162,17 @@ export default function AdminEditUserModal({
     if (!formData.nome || !formData.email) {
       toast.error("Nome e email são obrigatórios");
       return;
+    }
+
+    // Validate max ads limit
+    if (maxAnunciosAtivos < 1 || maxAnunciosAtivos > 1000) {
+      toast.error("Limite de anúncios deve estar entre 1 e 1000");
+      return;
+    }
+
+    // Update max ads limit if changed
+    if (maxAnunciosAtivos !== (usuario.maxAnunciosAtivos || 10)) {
+      updateMaxAdsMutation.mutate(maxAnunciosAtivos);
     }
 
     // Prepare data for submission
@@ -339,6 +391,24 @@ export default function AdminEditUserModal({
                 />
                 <p className="text-xs text-vitrii-text-secondary mt-1">
                   (Somente leitura - atualizado automaticamente)
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-vitrii-text mb-2">
+                  Limite Máximo de Anúncios *
+                </label>
+                <input
+                  type="number"
+                  name="maxAnunciosAtivos"
+                  value={maxAnunciosAtivos}
+                  onChange={handleInputChange}
+                  min="1"
+                  max="1000"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+                />
+                <p className="text-xs text-vitrii-text-secondary mt-1">
+                  Defina quantos anúncios ativos este usuário pode ter
                 </p>
               </div>
             </div>

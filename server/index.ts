@@ -68,6 +68,7 @@ import {
   getUsuariosComSenha,
   adminResetUserPassword,
   adminUpdateUserProfile,
+  updateMaxAnunciosAtivos,
 } from "./routes/usuarios";
 import {
   getEquipes,
@@ -252,6 +253,14 @@ export function createServer() {
   app.post("/api/usracessos", createUsuario);
   app.put("/api/usracessos/:id", updateUsuario);
   app.delete("/api/usracessos/:id", deleteUsuario);
+
+  // Admin routes for user management
+  app.put(
+    "/api/admin/usracessos/:id/max-anuncios",
+    extractUserId,
+    requireAdmin,
+    updateMaxAnunciosAtivos,
+  );
 
   // Admin routes for user password management
   app.get(
