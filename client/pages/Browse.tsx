@@ -1,7 +1,7 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Star, Package, MapPin, X, ChevronDown, Search } from "lucide-react";
+import { Star, Package, MapPin, X, ChevronDown, Search, ArrowLeft } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Pagination from "@/components/Pagination";
@@ -31,6 +31,7 @@ export default function Browse() {
   const [priceRange, setPriceRange] = useState({ min: "", max: "" });
   const [showFilters, setShowFilters] = useState(true);
   const itemsPerPage = 20;
+  const anuncianteIdParam = searchParams.get("anuncianteId");
 
   // Fetch all active ads with pagination
   // Note: The API already filters by status="ativo" by default when no status param is provided
@@ -57,6 +58,17 @@ export default function Browse() {
     },
   });
 
+  // Fetch anunciante details if filtering by anunciante
+  const { data: anuncianteData } = useQuery({
+    queryKey: ["anunciante", anuncianteIdParam],
+    queryFn: async () => {
+      const response = await fetch(`/api/anunciantes/${anuncianteIdParam}`);
+      if (!response.ok) throw new Error("Erro ao buscar anunciante");
+      return response.json();
+    },
+    enabled: !!anuncianteIdParam,
+  });
+
   const allAnuncios = anunciosData?.data || [];
   console.log("Browse: Total anuncios available:", allAnuncios.length);
 
@@ -79,6 +91,13 @@ export default function Browse() {
   // Apply filters client-side
   const filteredAnuncios = useMemo(() => {
     return allAnuncios.filter((anuncio: any) => {
+      // Filter by anunciante if parameter is provided
+      if (anuncianteIdParam) {
+        if (anuncio.anuncianteId !== parseInt(anuncianteIdParam)) {
+          return false;
+        }
+      }
+
       // Search by title or description
       if (searchTerm) {
         const searchLower = searchTerm.toLowerCase();
@@ -124,6 +143,7 @@ export default function Browse() {
     selectedType,
     selectedLocation,
     priceRange,
+    anuncianteIdParam,
   ]);
 
   const totalItems = filteredAnuncios.length;
@@ -186,10 +206,30 @@ export default function Browse() {
 
       <section className="bg-gradient-to-r from-vitrii-blue to-vitrii-blue-dark text-white py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-bold mb-2">Explorar Anúncios</h1>
-          <p className="text-blue-100">
-            Encontre os melhores produtos e serviços
-          </p>
+          {anuncianteIdParam && anuncianteData?.data ? (
+            <>
+              <button
+                onClick={() => navigate(`/anunciante/${anuncianteIdParam}`)}
+                className="inline-flex items-center gap-2 text-blue-100 hover:text-white mb-4 transition-colors"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Voltar ao perfil
+              </button>
+              <h1 className="text-4xl font-bold mb-2">
+                O que temos na Vitrini de {anuncianteData.data.nome}
+              </h1>
+              <p className="text-blue-100">
+                Confira todos os anúncios disponíveis
+              </p>
+            </>
+          ) : (
+            <>
+              <h1 className="text-4xl font-bold mb-2">Explorar Anúncios</h1>
+              <p className="text-blue-100">
+                Encontre os melhores produtos e serviços
+              </p>
+            </>
+          )}
         </div>
       </section>
 

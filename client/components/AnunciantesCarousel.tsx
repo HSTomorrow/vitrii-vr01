@@ -154,12 +154,20 @@ export default function AnunciantesCarousel({
                 </div>
               )}
 
-              <button
-                onClick={() => navigate(`/anunciante/${anunciante.id}`)}
-                className="w-full text-white py-1.5 text-xs rounded-md font-semibold bg-vitrii-blue hover:bg-vitrii-blue-dark transition-all duration-300 transform hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 mt-auto"
-              >
-                Ver Perfil
-              </button>
+              <div className="flex gap-2 mt-auto">
+                <button
+                  onClick={() => navigate(`/anunciante/${anunciante.id}`)}
+                  className="flex-1 text-white py-1.5 text-xs rounded-md font-semibold bg-vitrii-blue hover:bg-vitrii-blue-dark transition-all duration-300 transform hover:shadow-md hover:-translate-y-0.5 active:translate-y-0"
+                >
+                  Ver Perfil
+                </button>
+                <button
+                  onClick={() => navigate(`/browse?anuncianteId=${anunciante.id}`)}
+                  className="flex-1 text-white py-1.5 text-xs rounded-md font-semibold bg-green-600 hover:bg-green-700 transition-all duration-300 transform hover:shadow-md hover:-translate-y-0.5 active:translate-y-0"
+                >
+                  🛍️ Vitrini
+                </button>
+              </div>
             </div>
           </div>
         ))}

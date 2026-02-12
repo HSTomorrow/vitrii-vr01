@@ -206,6 +206,16 @@ export default function AnuncianteProfile() {
           </div>
         </div>
 
+        {/* CTA Button - O que temos na Vitrini */}
+        <div className="mb-8">
+          <button
+            onClick={() => navigate(`/browse?anuncianteId=${anunciante.id}`)}
+            className="w-full bg-gradient-to-r from-vitrii-blue to-vitrii-blue-dark hover:shadow-lg text-white py-4 rounded-lg font-bold text-lg transition-all duration-300 transform hover:-translate-y-1"
+          >
+            🛍️ O que temos na Vitrini
+          </button>
+        </div>
+
         {/* Contact Information */}
         <div className="bg-vitrii-gray-light rounded-lg p-6 md:p-8 mb-8">
           <h2 className="text-2xl font-bold text-vitrii-text mb-6">
