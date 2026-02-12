@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
 import BannerCarousel from "@/components/BannerCarousel";
 import AnunciosCarousel from "@/components/AnunciosCarousel";
+import AnunciantesCarousel from "@/components/AnunciantesCarousel";
 import {
   Star,
   ArrowRight,
@@ -19,6 +20,7 @@ import {
   Heart,
   Users,
   Zap,
+  User,
 } from "lucide-react";
 
 const extractMunicipality = (endereco: string): string => {
@@ -91,6 +93,16 @@ export default function Index() {
     queryFn: async () => {
       const response = await fetch("/api/anuncios");
       if (!response.ok) throw new Error("Erro ao buscar anúncios");
+      return response.json();
+    },
+  });
+
+  // Fetch all anunciantes
+  const { data: anunciantesData, isLoading: anunciantesLoading } = useQuery({
+    queryKey: ["anunciantes-all"],
+    queryFn: async () => {
+      const response = await fetch("/api/anunciantes?limit=50&offset=0");
+      if (!response.ok) throw new Error("Erro ao buscar anunciantes");
       return response.json();
     },
   });
@@ -213,8 +225,51 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Free/Gratuito Listings Section */}
+      {/* Featured Anunciantes Section */}
       <section className="py-2 md:py-3 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center mb-2">
+            <div>
+              <h2
+                style={{ color: "#025CBA" }}
+                className="text-2xl md:text-3xl font-bold mb-0.5"
+              >
+                Anunciantes em Destaque
+              </h2>
+              <p className="text-xs md:text-sm text-vitrii-text-secondary">
+                Conheça os principais anunciantes da plataforma
+              </p>
+            </div>
+            <Link
+              to="/browse"
+              className="hidden md:inline-flex items-center space-x-2 text-vitrii-blue font-semibold hover:space-x-3 transition-all"
+            >
+              <span>Ver Todos</span>
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+
+          {/* Featured Anunciantes Carousel */}
+          <AnunciantesCarousel
+            anunciantes={anunciantesData?.data || []}
+            isLoading={anunciantesLoading}
+            emptyMessage="Nenhum anunciante disponível no momento"
+          />
+
+          <div className="text-center mt-2">
+            <Link
+              to="/browse"
+              className="inline-flex items-center space-x-2 text-vitrii-blue font-semibold hover:space-x-3 transition-all"
+            >
+              <span>Explorar Todos os Anunciantes</span>
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Free/Gratuito Listings Section */}
+      <section className="py-2 md:py-3 bg-vitrii-gray-light">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-2">
             <div>

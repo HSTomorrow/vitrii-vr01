@@ -135,10 +135,13 @@ export const getAnuncianteById: RequestHandler = async (req, res) => {
       select: {
         id: true,
         nome: true,
-
+        tipo: true,
+        fotoUrl: true,
+        telefone: true,
         endereco: true,
         cidade: true,
         estado: true,
+        cep: true,
         email: true,
         cnpj: true,
         descricao: true,

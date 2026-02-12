@@ -1,0 +1,169 @@
+import { useRef } from "react";
+import { ChevronLeft, ChevronRight, User } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+
+interface Anunciante {
+  id: number;
+  nome: string;
+  descricao?: string;
+  fotoUrl?: string;
+  tipo: string;
+  cidade?: string;
+  estado?: string;
+  telefone?: string;
+  email?: string;
+}
+
+interface AnunciantesCarouselProps {
+  anunciantes: Anunciante[];
+  isLoading: boolean;
+  emptyMessage?: string;
+}
+
+export default function AnunciantesCarousel({
+  anunciantes,
+  isLoading,
+  emptyMessage = "Nenhum anunciante disponível",
+}: AnunciantesCarouselProps) {
+  const navigate = useNavigate();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  const scroll = (direction: "left" | "right") => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = 400;
+      scrollContainerRef.current.scrollBy({
+        left: direction === "left" ? -scrollAmount : scrollAmount,
+        behavior: "smooth",
+      });
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="relative">
+        <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+          {[1, 2, 3, 4, 5].map((item) => (
+            <div
+              key={item}
+              className="vitrii-card overflow-hidden animate-pulse flex-shrink-0 w-56"
+            >
+              <div className="w-full h-56 bg-gray-300" />
+              <div className="p-4 space-y-3">
+                <div className="h-4 bg-gray-300 rounded" />
+                <div className="h-3 bg-gray-300 rounded w-3/4" />
+                <div className="h-3 bg-gray-300 rounded w-1/2" />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (anunciantes.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <User className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+        <p className="text-vitrii-text-secondary">{emptyMessage}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative group">
+      {/* Navigation Buttons */}
+      <button
+        onClick={() => scroll("left")}
+        className="absolute left-2 sm:left-0 top-1/2 -translate-y-1/2 z-10 p-2 bg-white/90 hover:bg-white rounded-full shadow-md transition-all"
+      >
+        <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-vitrii-blue" />
+      </button>
+
+      <button
+        onClick={() => scroll("right")}
+        className="absolute right-2 sm:right-0 top-1/2 -translate-y-1/2 z-10 p-2 bg-white/90 hover:bg-white rounded-full shadow-md transition-all"
+      >
+        <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-vitrii-blue" />
+      </button>
+
+      {/* Carousel Container */}
+      <div
+        ref={scrollContainerRef}
+        className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide scroll-smooth"
+      >
+        {anunciantes.map((anunciante) => (
+          <div
+            key={anunciante.id}
+            onClick={() => navigate(`/anunciante/${anunciante.id}`)}
+            className="vitrii-card overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer relative flex-shrink-0 w-56"
+          >
+            {/* Logo/Imagem Container */}
+            <div className="w-full h-56 bg-gradient-to-br from-vitrii-blue to-vitrii-blue-dark flex items-center justify-center overflow-hidden relative group/image">
+              {anunciante.fotoUrl ? (
+                <img
+                  src={anunciante.fotoUrl}
+                  alt={anunciante.nome}
+                  className="w-full h-full object-cover group-hover/image:scale-110 transition-transform duration-300"
+                />
+              ) : (
+                <User className="w-16 h-16 text-white opacity-50" />
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover/image:opacity-100 transition-opacity duration-300" />
+            </div>
+
+            {/* Badge de Tipo */}
+            {anunciante.tipo && (
+              <div
+                className={`absolute top-2.5 right-2.5 px-3 py-1 rounded-full text-xs font-bold z-10 text-white ${
+                  anunciante.tipo === "Profissional"
+                    ? "bg-blue-600"
+                    : anunciante.tipo === "Premium"
+                      ? "bg-purple-600"
+                      : anunciante.tipo === "Master"
+                        ? "bg-yellow-600"
+                        : "bg-gray-600"
+                }`}
+              >
+                {anunciante.tipo}
+              </div>
+            )}
+
+            {/* Content */}
+            <div className="p-3 flex flex-col h-full">
+              <div>
+                <h4 className="font-bold text-sm mb-1 line-clamp-2 text-vitrii-blue hover:text-vitrii-blue-dark transition-colors duration-200">
+                  {anunciante.nome}
+                </h4>
+
+                <p className="text-xs text-vitrii-text-secondary mb-2 line-clamp-2 hover:text-vitrii-text transition-colors duration-200">
+                  {anunciante.descricao || "Loja online"}
+                </p>
+
+                {anunciante.cidade && anunciante.estado && (
+                  <div className="flex items-center gap-1 mb-2 text-xs text-vitrii-text-secondary hover:text-vitrii-text transition-colors duration-200">
+                    <span className="truncate">
+                      {anunciante.cidade}, {anunciante.estado}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {anunciante.telefone && (
+                <div className="text-xs text-vitrii-text-secondary mb-2 truncate">
+                  <span className="font-semibold">📞</span> {anunciante.telefone}
+                </div>
+              )}
+
+              <button
+                onClick={() => navigate(`/anunciante/${anunciante.id}`)}
+                className="w-full text-white py-1.5 text-xs rounded-md font-semibold bg-vitrii-blue hover:bg-vitrii-blue-dark transition-all duration-300 transform hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 mt-auto"
+              >
+                Ver Perfil
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}

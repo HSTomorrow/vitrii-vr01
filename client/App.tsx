@@ -46,6 +46,7 @@ const AdminManageUsers = lazy(() => import("./pages/AdminManageUsers"));
 const AdminBanners = lazy(() => import("./pages/AdminBanners"));
 const Menu = lazy(() => import("./pages/Menu"));
 const MeusAnuncios = lazy(() => import("./pages/MeusAnuncios"));
+const AnuncianteProfile = lazy(() => import("./pages/AnuncianteProfile"));
 
 // Loading fallback component for lazy-loaded pages
 function PageLoader() {
@@ -91,6 +92,7 @@ export default function App() {
                 <Route path="/anuncio/criar" element={<Suspense fallback={<PageLoader />}><CriarAnuncio /></Suspense>} />
                 <Route path="/anuncio/:id" element={<Suspense fallback={<PageLoader />}><AnuncioDetalhe /></Suspense>} />
                 <Route path="/anuncio/:id/editar" element={<Suspense fallback={<PageLoader />}><EditarAnuncio /></Suspense>} />
+                <Route path="/anunciante/:id" element={<Suspense fallback={<PageLoader />}><AnuncianteProfile /></Suspense>} />
                 <Route
                   path="/buscar"
                   element={
