@@ -101,6 +101,21 @@ import {
   removePermissao,
 } from "./routes/listas_desejos";
 import {
+  getAgendas,
+  getAgendaById,
+  createAgenda,
+  updateAgenda,
+  deleteAgenda,
+  createSlot,
+  getSlots,
+  makeReservation,
+  cancelReservation,
+  getUserReservations,
+  getWaitlist,
+  addToWaitlist,
+  removeFromWaitlist,
+} from "./routes/agendas_cursos";
+import {
   generateQRCode,
   getQRCodesForAd,
   trackQRCodeScan,
@@ -465,6 +480,35 @@ export function createServer() {
     "/api/listas-desejos/:listaId/permissoes/:permissaoId",
     extractUserId,
     removePermissao,
+  );
+
+  // Agendas (Aulas, Cursos e Serviços) routes
+  app.get("/api/agendas-cursos", getAgendas);
+  app.get("/api/agendas-cursos/:id", getAgendaById);
+  app.post("/api/agendas-cursos", createAgenda);
+  app.put("/api/agendas-cursos/:id", updateAgenda);
+  app.delete("/api/agendas-cursos/:id", deleteAgenda);
+
+  // Slots routes
+  app.post("/api/agendas-cursos/slots", createSlot);
+  app.get("/api/agendas-cursos/:agendaId/slots", getSlots);
+
+  // Reservations routes
+  app.post("/api/agendas-cursos/reservas", extractUserId, makeReservation);
+  app.delete(
+    "/api/agendas-cursos/reservas/:reservaId",
+    extractUserId,
+    cancelReservation,
+  );
+  app.get("/api/agendas-cursos/reservas/usuario", extractUserId, getUserReservations);
+
+  // Waitlist routes
+  app.get("/api/agendas-cursos/:agendaId/lista-espera", getWaitlist);
+  app.post("/api/agendas-cursos/lista-espera", extractUserId, addToWaitlist);
+  app.delete(
+    "/api/agendas-cursos/lista-espera/:waitlistId",
+    extractUserId,
+    removeFromWaitlist,
   );
 
   // QR Codes routes

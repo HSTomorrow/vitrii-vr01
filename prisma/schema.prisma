@@ -35,6 +35,7 @@ model anunciantes {
   equipes_de_venda     equipes_de_venda[]
   grupos_produtos      grupos_produtos[]
   wishlist_permissoes  listas_desejos_permissoes[]
+  agendas              agendas[]
 }
 
 model anuncios {
@@ -62,6 +63,7 @@ model anuncios {
   anuncioVisualizados anuncioVisualizados[]
   fotos               fotos_anuncio[]
   wishlists_itens     listas_desejos_itens[]
+  agendas             agendas[]
 }
 
 // Anuncio Visualizacoes - Log table to track ad views
@@ -211,6 +213,8 @@ model usracessos {
   fotos_anuncio         fotos_anuncio[]
   grupos_produtos       grupos_produtos[]
   listas_desejos        listas_desejos[]
+  reservas_agenda       reservas_agenda[]
+  lista_espera_agenda   lista_espera_agenda[]
 }
 
 model passwordResetToken {
@@ -350,4 +354,90 @@ model listas_desejos_permissoes {
   anunciante            anunciantes            @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
 
   @@unique([listaId, anuncianteId])
+}
+
+// Agendas para Aulas, Cursos e Serviços
+model agendas {
+  id                    Int                    @id @default(autoincrement())
+  anuncioId             Int
+  anuncianteId          Int
+  titulo                String                 @db.VarChar(255)
+  descricao             String?
+  tipo                  String                 @db.VarChar(50)
+  duracao_minutos       Int                    @default(60)
+  preco                 Decimal?               @db.Decimal(10, 2)
+  capacidade            Int                    @default(1)
+  status                String                 @default("ativo") @db.VarChar(20)
+  dataCriacao           DateTime               @default(now())
+  dataAtualizacao       DateTime               @updatedAt
+
+  anuncio               anuncios               @relation(fields: [anuncioId], references: [id], onDelete: Cascade)
+  anunciante            anunciantes            @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
+  slots                 slots_agenda[]
+  reservas              reservas_agenda[]
+  lista_espera          lista_espera_agenda[]
+
+  @@index([anuncioId])
+  @@index([anuncianteId])
+  @@index([status])
+}
+
+// Slots de Agenda (Horários Disponíveis)
+model slots_agenda {
+  id                    Int                    @id @default(autoincrement())
+  agendaId              Int
+  data_hora_inicio      DateTime
+  data_hora_fim         DateTime
+  vagas_disponiveis     Int
+  vagas_preenchidas     Int                    @default(0)
+  status                String                 @default("disponivel") @db.VarChar(20)
+  dataCriacao           DateTime               @default(now())
+
+  agenda                agendas                @relation(fields: [agendaId], references: [id], onDelete: Cascade)
+  reservas              reservas_agenda[]
+
+  @@index([agendaId])
+  @@index([data_hora_inicio])
+  @@index([status])
+}
+
+// Reservas de Agenda
+model reservas_agenda {
+  id                    Int                    @id @default(autoincrement())
+  slotId                Int
+  usuarioId             Int
+  agendaId              Int
+  status                String                 @default("confirmado") @db.VarChar(20)
+  data_confirmacao      DateTime               @default(now())
+  dataCriacao           DateTime               @default(now())
+
+  slot                  slots_agenda           @relation(fields: [slotId], references: [id], onDelete: Cascade)
+  usuario               usracessos             @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  agenda                agendas                @relation(fields: [agendaId], references: [id], onDelete: Cascade)
+
+  @@unique([slotId, usuarioId])
+  @@index([slotId])
+  @@index([usuarioId])
+  @@index([agendaId])
+  @@index([status])
+}
+
+// Lista de Espera para Agendas
+model lista_espera_agenda {
+  id                    Int                    @id @default(autoincrement())
+  agendaId              Int
+  usuarioId             Int
+  data_horario_desejada DateTime?
+  posicao               Int
+  status                String                 @default("aguardando") @db.VarChar(20)
+  motivo_cancelamento   String?
+  dataCriacao           DateTime               @default(now())
+
+  agenda                agendas                @relation(fields: [agendaId], references: [id], onDelete: Cascade)
+  usuario               usracessos             @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@unique([agendaId, usuarioId])
+  @@index([agendaId])
+  @@index([usuarioId])
+  @@index([status])
 }
