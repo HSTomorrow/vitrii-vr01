@@ -36,6 +36,7 @@ model anunciantes {
   grupos_produtos      grupos_produtos[]
   wishlist_permissoes  listas_desejos_permissoes[]
   agendas              agendas[]
+  links_externos       links_produtos_externos[]
 }
 
 model anuncios {
@@ -131,6 +132,7 @@ model productos {
   grupo               grupos_produtos       @relation(fields: [grupoId], references: [id], onDelete: Cascade)
   movimentos_estoque  movimentos_estoque[]
   produtos_em_estoque produtos_em_estoque[]
+  links_externos      links_produtos_externos[]
 }
 
 model productos_visualizacoes {
@@ -379,6 +381,29 @@ model agendas {
 
   @@index([anuncioId])
   @@index([anuncianteId])
+  @@index([status])
+}
+
+// Links de Produtos Externos (Mercado Livre, Shopee, etc)
+model links_produtos_externos {
+  id                    Int                    @id @default(autoincrement())
+  anuncianteId          Int
+  productId             Int?
+  marketplace           String                 @db.VarChar(50)
+  url                   String                 @db.VarChar(500)
+  preco                 Decimal?               @db.Decimal(10, 2)
+  titulo_externo        String?                @db.VarChar(255)
+  descricao_externa     String?
+  status                String                 @default("ativo") @db.VarChar(20)
+  dataCriacao           DateTime               @default(now())
+  dataAtualizacao       DateTime               @updatedAt
+
+  anunciante            anunciantes            @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
+  product               productos?             @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  @@index([anuncianteId])
+  @@index([productId])
+  @@index([marketplace])
   @@index([status])
 }
 

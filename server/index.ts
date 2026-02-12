@@ -116,6 +116,15 @@ import {
   removeFromWaitlist,
 } from "./routes/agendas_cursos";
 import {
+  getLinksProdutosExternos,
+  getLinkProdutoExternoById,
+  createLinkProdutoExterno,
+  updateLinkProdutoExterno,
+  deleteLinkProdutoExterno,
+  updateLinkStatus,
+  getMarketplaceStats,
+} from "./routes/links_produtos_externos";
+import {
   generateQRCode,
   getQRCodesForAd,
   trackQRCodeScan,
@@ -510,6 +519,18 @@ export function createServer() {
     extractUserId,
     removeFromWaitlist,
   );
+
+  // External Product Links routes (for professional advertisers)
+  app.get("/api/links-produtos-externos", getLinksProdutosExternos);
+  app.get("/api/links-produtos-externos/:id", getLinkProdutoExternoById);
+  app.post("/api/links-produtos-externos", createLinkProdutoExterno);
+  app.put("/api/links-produtos-externos/:id", updateLinkProdutoExterno);
+  app.delete("/api/links-produtos-externos/:id", deleteLinkProdutoExterno);
+  app.patch(
+    "/api/links-produtos-externos/:id/status",
+    updateLinkStatus
+  );
+  app.get("/api/links-produtos-externos/stats/marketplace", getMarketplaceStats);
 
   // QR Codes routes
   app.post("/api/qrcodes/generate", generateQRCode);
