@@ -105,7 +105,7 @@ export default function BannerCarousel({
       {/* Main Carousel */}
       <div className="relative bg-vitrii-gray-light overflow-hidden rounded-lg">
         {/* Banner Container */}
-        <div className="relative w-full h-32 sm:h-36 md:h-44">
+        <div className="relative w-full h-28 sm:h-32 md:h-40">
           <BannerContent />
 
           {/* Navigation Buttons */}

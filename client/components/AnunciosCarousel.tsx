@@ -101,9 +101,9 @@ export default function AnunciosCarousel({
           {[1, 2, 3, 4, 5].map((item) => (
             <div
               key={item}
-              className="vitrii-card overflow-hidden animate-pulse flex-shrink-0 w-72"
+              className="vitrii-card overflow-hidden animate-pulse flex-shrink-0 w-64"
             >
-              <div className="w-full h-48 bg-gray-300" />
+              <div className="w-full h-36 bg-gray-300" />
               <div className="p-4 space-y-3">
                 <div className="h-4 bg-gray-300 rounded" />
                 <div className="h-3 bg-gray-300 rounded w-3/4" />
@@ -159,10 +159,10 @@ export default function AnunciosCarousel({
           <div
             key={anuncio.id}
             onClick={() => navigate(`/anuncio/${anuncio.id}`)}
-            className="vitrii-card overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer relative flex-shrink-0 w-72"
+            className="vitrii-card overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer relative flex-shrink-0 w-64"
           >
             <div
-              className={`w-full h-40 bg-gradient-to-br flex items-center justify-center overflow-hidden relative group ${
+              className={`w-full h-36 bg-gradient-to-br flex items-center justify-center overflow-hidden relative group ${
                 color === "green"
                   ? "from-green-400 to-green-600"
                   : color === "purple"

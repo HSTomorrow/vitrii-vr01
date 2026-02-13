@@ -45,9 +45,9 @@ export default function AnunciantesCarousel({
           {[1, 2, 3, 4, 5].map((item) => (
             <div
               key={item}
-              className="vitrii-card overflow-hidden animate-pulse flex-shrink-0 w-56"
+              className="vitrii-card overflow-hidden animate-pulse flex-shrink-0 w-52"
             >
-              <div className="w-full h-56 bg-gray-300" />
+              <div className="w-full h-52 bg-gray-300" />
               <div className="p-4 space-y-3">
                 <div className="h-4 bg-gray-300 rounded" />
                 <div className="h-3 bg-gray-300 rounded w-3/4" />
@@ -95,10 +95,10 @@ export default function AnunciantesCarousel({
           <div
             key={anunciante.id}
             onClick={() => navigate(`/anunciante/${anunciante.id}`)}
-            className="vitrii-card overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer relative flex-shrink-0 w-56"
+            className="vitrii-card overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer relative flex-shrink-0 w-52"
           >
             {/* Logo/Imagem Container */}
-            <div className="w-full h-56 bg-gradient-to-br from-vitrii-blue to-vitrii-blue-dark flex items-center justify-center overflow-hidden relative group/image">
+            <div className="w-full h-52 bg-gradient-to-br from-vitrii-blue to-vitrii-blue-dark flex items-center justify-center overflow-hidden relative group/image">
               {anunciante.fotoUrl ? (
                 <img
                   src={anunciante.fotoUrl}
