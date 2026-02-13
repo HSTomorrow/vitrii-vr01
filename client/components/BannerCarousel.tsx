@@ -78,13 +78,22 @@ export default function BannerCarousel({
             </p>
           )}
 
-          {currentBanner.link && (
+          {currentBanner.link ? (
             <a
               href={currentBanner.link}
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-block px-3 py-1.5 sm:px-5 sm:py-2 md:px-6 md:py-2.5 bg-vitrii-blue text-white rounded-lg font-semibold text-xs sm:text-sm hover:bg-vitrii-blue-dark transition-colors whitespace-nowrap"
             >
               Saiba Mais
             </a>
+          ) : (
+            <button
+              disabled
+              className="inline-block px-3 py-1.5 sm:px-5 sm:py-2 md:px-6 md:py-2.5 bg-gray-400 text-white rounded-lg font-semibold text-xs sm:text-sm cursor-not-allowed opacity-50"
+            >
+              Link não configurado
+            </button>
           )}
         </div>
       </div>

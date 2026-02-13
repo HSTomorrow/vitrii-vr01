@@ -14,12 +14,24 @@ const BannerSchema = z.object({
       (url) => url.startsWith("http://") || url.startsWith("https://") || url.startsWith("data:image/"),
       "A imagem deve ser uma URL válida ou uma imagem codificada em base64"
     ),
-  link: z.string().url("URL do link inválida").optional().nullable(),
+  link: z.string()
+    .min(1, "Link é obrigatório")
+    .url("URL do link inválida"),
   ordem: z.number().int().nonnegative().default(0),
   ativo: z.boolean().default(true),
 });
 
-const BannerUpdateSchema = BannerSchema.partial();
+const BannerUpdateSchema = BannerSchema.partial().refine(
+  (data) => {
+    // If link is provided, it must be a valid URL
+    if (data.link !== undefined && data.link !== null && data.link.trim()) {
+      return true;
+    }
+    // Link is optional during update if not provided
+    return true;
+  },
+  { message: "Link deve ser uma URL válida se fornecido" }
+);
 
 // GET all banners
 export const getBanners: RequestHandler = async (req, res) => {

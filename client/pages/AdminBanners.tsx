@@ -67,8 +67,12 @@ export default function AdminBanners() {
     mutationFn: async () => {
       console.log("[createBannerMutation] Iniciando criação de banner");
 
-      if (!formData.titulo || !formData.imagemUrl) {
-        const err = "Preencha o título e selecione uma imagem";
+      if (!formData.titulo || !formData.imagemUrl || !formData.link) {
+        const missing = [];
+        if (!formData.titulo) missing.push("título");
+        if (!formData.imagemUrl) missing.push("imagem");
+        if (!formData.link) missing.push("link");
+        const err = `Preencha os campos obrigatórios: ${missing.join(", ")}`;
         console.warn("[createBannerMutation]", err);
         throw new Error(err);
       }
@@ -504,7 +508,7 @@ export default function AdminBanners() {
 
                 <div>
                   <label className="block text-sm font-semibold text-vitrii-text mb-2">
-                    Link (Opcional)
+                    Link *
                   </label>
                   <input
                     type="url"
@@ -513,8 +517,12 @@ export default function AdminBanners() {
                       setFormData({ ...formData, link: e.target.value })
                     }
                     placeholder="https://exemplo.com"
+                    required
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
                   />
+                  <p className="text-xs text-vitrii-text-secondary mt-1">
+                    Campo obrigatório. O link será aberto em uma nova aba ao clicar em "Saiba Mais"
+                  </p>
                 </div>
 
                 <div>
@@ -533,6 +541,20 @@ export default function AdminBanners() {
                   </label>
                 </div>
 
+                {/* Missing Fields Alert */}
+                {(!formData.titulo || !formData.imagemUrl || !formData.link) && (
+                  <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <p className="text-sm font-semibold text-yellow-800">
+                      ⚠️ Campos obrigatórios faltando:
+                    </p>
+                    <ul className="text-xs text-yellow-700 mt-1 list-disc list-inside">
+                      {!formData.titulo && <li>Título</li>}
+                      {!formData.imagemUrl && <li>Imagem</li>}
+                      {!formData.link && <li>Link</li>}
+                    </ul>
+                  </div>
+                )}
+
                 <div className="flex gap-2 pt-4 border-t border-gray-200">
                   <button
                     onClick={handleSubmit}
@@ -540,7 +562,8 @@ export default function AdminBanners() {
                       createBannerMutation.isPending ||
                       updateBannerMutation.isPending ||
                       !formData.titulo ||
-                      !formData.imagemUrl
+                      !formData.imagemUrl ||
+                      !formData.link
                     }
                     className="flex-1 px-4 py-3 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
