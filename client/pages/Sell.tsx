@@ -287,10 +287,10 @@ export default function Sell() {
               </p>
 
               <div className="text-3xl font-bold text-vitrii-blue mb-1">
-                R$ 9,90
+                R$ 19,90
               </div>
               <p className="text-vitrii-text-secondary text-sm mb-6">
-                por anúncio / por dia
+                3 meses de ativação por anúncio
               </p>
 
               <ul className="space-y-3 mb-8">

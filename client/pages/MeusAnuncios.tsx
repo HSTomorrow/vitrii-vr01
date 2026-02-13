@@ -19,6 +19,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 
+const PIX_KEY = "heres.tomorrow@email.com"; // TODO: Replace with actual Heres Tomorrow PIX key (CPF, CNPJ, email or phone)
+
 export default function MeusAnuncios() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -405,7 +407,7 @@ export default function MeusAnuncios() {
                 <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
                   <li>Abra seu app bancário</li>
                   <li>Escaneie o QR Code abaixo OU copie a chave PIX</li>
-                  <li>Confirme o pagamento de R$ 9,90</li>
+                  <li>Confirme o pagamento de R$ 19,90 (3 meses de anúncio)</li>
                   <li>Clique em "Pagamento Realizado" para validar</li>
                 </ol>
               </div>
@@ -437,16 +439,18 @@ export default function MeusAnuncios() {
                 </p>
                 <button
                   onClick={() => {
-                    const pixKey = "00020126580014br.gov.bcb.brcode...";
-                    navigator.clipboard.writeText(pixKey);
-                    setCopied(true);
-                    toast.success("Chave PIX copiada!");
-                    setTimeout(() => setCopied(false), 2000);
+                    navigator.clipboard.writeText(PIX_KEY).then(() => {
+                      setCopied(true);
+                      toast.success("Chave PIX copiada!");
+                      setTimeout(() => setCopied(false), 2000);
+                    }).catch(() => {
+                      toast.error("Erro ao copiar chave PIX");
+                    });
                   }}
                   className="w-full bg-gray-100 hover:bg-gray-200 border-2 border-gray-300 rounded-lg p-4 flex items-center justify-between transition-colors"
                 >
                   <code className="text-xs text-vitrii-text font-mono truncate">
-                    00020126580014br.gov.bcb...
+                    {PIX_KEY}
                   </code>
                   {copied ? (
                     <Check className="w-5 h-5 text-green-600 flex-shrink-0 ml-2" />

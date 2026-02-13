@@ -83,7 +83,7 @@ export default function Checkout() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           anuncioId: parsedAnuncioId,
-          valor: 9.9,
+          valor: 19.9,
         }),
       });
 
@@ -302,7 +302,7 @@ export default function Checkout() {
                         Preço do anúncio:
                       </span>
                       <span className="font-semibold text-vitrii-text">
-                        R$ 9,90
+                        R$ 19,90 (3 meses)
                       </span>
                     </div>
                     {anuncio.destaque && (
@@ -320,7 +320,7 @@ export default function Checkout() {
                         Total:
                       </span>
                       <span className="text-2xl font-bold text-vitrii-blue">
-                        R$ 9,90
+                        R$ 19,90 (3 meses)
                       </span>
                     </div>
                   </div>
