@@ -30,6 +30,8 @@ import {
   Phone,
   Star,
   User,
+  Copy,
+  Check,
 } from "lucide-react";
 
 interface MembroEquipe {
@@ -47,6 +49,8 @@ export default function AnuncioDetalhe() {
   const { user, isLoggedIn } = useAuth();
   const [showMembrosModal, setShowMembrosModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [selectedEquipeId, setSelectedEquipeId] = useState<number | null>(null);
 
   // Fetch ad details
@@ -584,6 +588,15 @@ export default function AnuncioDetalhe() {
                     Acessar Anúncio Externo
                   </a>
                 )}
+                {canEdit && anuncio.statusPagamento === "pendente" && (
+                  <button
+                    onClick={() => setShowPaymentModal(true)}
+                    className="w-full px-4 py-3 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <DollarSign className="w-4 h-4" />
+                    Efetuar Pagamento
+                  </button>
+                )}
                 <button
                   onClick={() => setShowShareModal(true)}
                   className="w-full px-4 py-3 border-2 border-gray-300 text-vitrii-text rounded-lg font-semibold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
@@ -751,6 +764,126 @@ export default function AnuncioDetalhe() {
         whatsappPhone={anuncio.anunciantes?.whatsapp}
         whatsappMessage={`Confira este anúncio: ${anuncio.titulo}`}
       />
+
+      {/* Payment Modal */}
+      {showPaymentModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            {/* Header */}
+            <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-0">
+              <h2 className="text-xl font-bold text-vitrii-text">
+                Efetuar Pagamento - C6 Bank PIX
+              </h2>
+              <button
+                onClick={() => setShowPaymentModal(false)}
+                className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="p-6 space-y-6">
+              {/* Instructions */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-sm font-semibold text-blue-900 mb-2">
+                  📱 Como pagar via PIX:
+                </p>
+                <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
+                  <li>Abra seu app bancário</li>
+                  <li>Escaneie o QR Code abaixo OU copie a chave PIX</li>
+                  <li>Confirme o pagamento de R$ 9,90</li>
+                  <li>Clique em "Pagamento Realizado" para validar</li>
+                </ol>
+              </div>
+
+              {/* QR Code Section */}
+              <div>
+                <h3 className="font-semibold text-vitrii-text mb-3">
+                  QR Code PIX
+                </h3>
+                <div className="flex justify-center">
+                  <div className="bg-gray-100 p-4 rounded-lg border-4 border-vitrii-blue">
+                    <img
+                      src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=00020126580014br.gov.bcb.brcode0136${encodeURIComponent(
+                        "VITRII-PIX-" + anuncio.id,
+                      )}520400005303986540510.005802BR5913Vitrii6009Montenegro62410503***63041D3D`}
+                      alt="PIX QR Code"
+                      className="w-64 h-64"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* PIX Key Section */}
+              <div>
+                <h3 className="font-semibold text-vitrii-text mb-3">
+                  Copiar Chave PIX
+                </h3>
+                <p className="text-xs text-vitrii-text-secondary mb-2">
+                  Clique no botão para copiar a chave e pagar via seu app
+                  bancário
+                </p>
+                <button
+                  onClick={() => {
+                    const pixKey = "00020126580014br.gov.bcb.brcode...";
+                    navigator.clipboard.writeText(pixKey);
+                    setCopied(true);
+                    toast.success("Chave PIX copiada!");
+                    setTimeout(() => setCopied(false), 2000);
+                  }}
+                  className="w-full bg-gray-100 hover:bg-gray-200 border-2 border-gray-300 rounded-lg p-4 flex items-center justify-between transition-colors"
+                >
+                  <code className="text-xs text-vitrii-text font-mono truncate">
+                    00020126580014br.gov.bcb...
+                  </code>
+                  {copied ? (
+                    <Check className="w-5 h-5 text-green-600 flex-shrink-0 ml-2" />
+                  ) : (
+                    <Copy className="w-5 h-5 text-vitrii-blue flex-shrink-0 ml-2" />
+                  )}
+                </button>
+              </div>
+
+              {/* Payment Confirmation */}
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <p className="text-sm text-yellow-900 font-semibold mb-2">
+                  ⚠️ Importante:
+                </p>
+                <p className="text-sm text-yellow-800">
+                  Após realizar o pagamento via PIX, clique no botão abaixo
+                  para registrar o comprovante e iniciar a análise de validação
+                  do pagamento (até 24 horas).
+                </p>
+              </div>
+
+              {/* Buttons */}
+              <div className="flex gap-3 pt-4 border-t">
+                <button
+                  type="button"
+                  onClick={() => setShowPaymentModal(false)}
+                  className="flex-1 px-4 py-2 border-2 border-vitrii-blue text-vitrii-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    toast.info(
+                      "Você será redirecionado para a página de confirmação de pagamento",
+                    );
+                    navigate(`/checkout?anuncioId=${anuncio.id}`);
+                  }}
+                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+                >
+                  <Check className="w-4 h-4" />
+                  Pagamento Realizado
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>
