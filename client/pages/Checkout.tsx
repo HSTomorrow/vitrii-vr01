@@ -280,7 +280,7 @@ export default function Checkout() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Left: Ad Summary */}
-          <div className="md:col-span-1">
+          <div className="md:col-span-3">
             <div className="bg-white rounded-lg shadow-md p-6 sticky top-6">
               <h2 className="font-semibold text-vitrii-text mb-4">
                 Resumo do Anúncio
