@@ -351,7 +351,7 @@ export default function CadastroAnunciantes() {
                     onChange={(e) =>
                       setFormData({ ...formData, cidade: e.target.value })
                     }
-                    placeholder="Ex: Belo Horizonte"
+                    placeholder="Ex: Montenegro"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                   />
                 </div>

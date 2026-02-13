@@ -226,7 +226,7 @@ export default function CreateAnuncianteModal({
                 type="text"
                 value={formData.cidade}
                 onChange={(e) => handleInputChange("cidade", e.target.value)}
-                placeholder="Ex: Belo Horizonte"
+                placeholder="Ex: Montenegro"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
               />
             </div>
@@ -239,6 +239,7 @@ export default function CreateAnuncianteModal({
                 onChange={(e) => handleInputChange("estado", e.target.value)}
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent bg-white"
               >
+                <option value="">-- Selecione um estado (Ex: RS) --</option>
                 {BRAZILIAN_STATES.map((state) => (
                   <option key={state.code} value={state.code}>
                     {state.code} - {state.name}
