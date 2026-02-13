@@ -65,7 +65,7 @@ export default function MinhaAgenda() {
       const headers: Record<string, string> = {
         "x-user-id": user.id.toString(),
       };
-      const response = await fetch("/api/anunciantes/usuario", { headers });
+      const response = await fetch("/api/anunciantes/do-usuario/listar", { headers });
       if (!response.ok) throw new Error("Erro ao buscar anunciantes");
       const result = await response.json();
       return result.data || [];
