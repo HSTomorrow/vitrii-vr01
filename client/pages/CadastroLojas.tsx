@@ -567,29 +567,30 @@ export default function CadastroAnunciantes() {
 
         {/* Anunciantes List */}
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <div className="overflow-x-auto">
+          {/* Desktop Table View */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full">
               <thead className="bg-vitrii-gray">
                 <tr>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-vitrii-text whitespace-nowrap">
                     Nome
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-vitrii-text whitespace-nowrap">
                     Tipo
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-vitrii-text whitespace-nowrap">
                     CNPJ/CPF
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-vitrii-text whitespace-nowrap">
                     Email
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-vitrii-text whitespace-nowrap">
                     Endereço
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-vitrii-text whitespace-nowrap">
                     Cidade/Estado
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-vitrii-text whitespace-nowrap">
                     Ações
                   </th>
                 </tr>
@@ -599,18 +600,18 @@ export default function CadastroAnunciantes() {
                   <tr>
                     <td
                       colSpan={7}
-                      className="px-6 py-4 text-center text-gray-500"
+                      className="px-4 py-4 text-center text-gray-500"
                     >
-                      Nenhuma loja cadastrada
+                      Nenhuma anunciante cadastrada
                     </td>
                   </tr>
                 ) : (
                   anunciantes.map((loja) => (
                     <tr key={loja.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 font-semibold text-vitrii-text">
+                      <td className="px-4 py-4 font-semibold text-vitrii-text text-sm">
                         {loja.nome}
                       </td>
-                      <td className="px-6 py-4 text-vitrii-text">
+                      <td className="px-4 py-4 text-vitrii-text">
                         <span
                           className={`px-2 py-1 rounded-full text-xs font-semibold ${
                             loja.tipo === "Profissional"
@@ -621,24 +622,25 @@ export default function CadastroAnunciantes() {
                           {loja.tipo || "Padrão"}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-vitrii-text">
+                      <td className="px-4 py-4 text-vitrii-text text-sm">
                         {loja.cnpj}
                       </td>
-                      <td className="px-6 py-4 text-vitrii-text">
+                      <td className="px-4 py-4 text-vitrii-text text-sm">
                         {loja.email}
                       </td>
-                      <td className="px-6 py-4 text-vitrii-text">
+                      <td className="px-4 py-4 text-vitrii-text text-sm">
                         {loja.endereco}
                       </td>
-                      <td className="px-6 py-4 text-vitrii-text">
+                      <td className="px-4 py-4 text-vitrii-text text-sm">
                         {loja.cidade && loja.estado
                           ? `${loja.cidade}, ${loja.estado}`
                           : "—"}
                       </td>
-                      <td className="px-6 py-4 flex gap-2">
+                      <td className="px-4 py-4 flex gap-2">
                         <button
                           onClick={() => handleEdit(loja)}
                           className="p-2 text-vitrii-blue hover:bg-blue-50 rounded-lg transition-colors"
+                          title="Editar"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
@@ -646,13 +648,14 @@ export default function CadastroAnunciantes() {
                           onClick={() => {
                             if (
                               confirm(
-                                "Tem certeza que deseja deletar esta loja?",
+                                "Tem certeza que deseja deletar esta anunciante?",
                               )
                             ) {
                               deleteAnuncianteMutation.mutate(loja.id);
                             }
                           }}
                           className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Deletar"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -662,6 +665,97 @@ export default function CadastroAnunciantes() {
                 )}
               </tbody>
             </table>
+          </div>
+
+          {/* Mobile Card View */}
+          <div className="md:hidden">
+            {!anunciantes || anunciantes.length === 0 ? (
+              <div className="px-4 py-8 text-center text-gray-500">
+                Nenhuma anunciante cadastrada
+              </div>
+            ) : (
+              <div className="space-y-3 p-4">
+                {anunciantes.map((loja) => (
+                  <div
+                    key={loja.id}
+                    className="border border-gray-200 rounded-lg p-4 space-y-3 hover:shadow-md transition-shadow"
+                  >
+                    {/* Nome e Tipo */}
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-vitrii-text truncate text-sm">
+                          {loja.nome}
+                        </h3>
+                        <span
+                          className={`inline-block px-2 py-1 rounded-full text-xs font-semibold mt-1 ${
+                            loja.tipo === "Profissional"
+                              ? "bg-blue-100 text-blue-800"
+                              : "bg-gray-100 text-gray-800"
+                          }`}
+                        >
+                          {loja.tipo || "Padrão"}
+                        </span>
+                      </div>
+                      <div className="flex gap-1 flex-shrink-0">
+                        <button
+                          onClick={() => handleEdit(loja)}
+                          className="p-2 text-vitrii-blue hover:bg-blue-50 rounded-lg transition-colors"
+                          title="Editar"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (
+                              confirm(
+                                "Tem certeza que deseja deletar esta anunciante?",
+                              )
+                            ) {
+                              deleteAnuncianteMutation.mutate(loja.id);
+                            }
+                          }}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Deletar"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Email */}
+                    <div>
+                      <p className="text-xs text-vitrii-text-secondary">
+                        Email
+                      </p>
+                      <p className="text-sm text-vitrii-text break-all">
+                        {loja.email}
+                      </p>
+                    </div>
+
+                    {/* CNPJ */}
+                    <div>
+                      <p className="text-xs text-vitrii-text-secondary">
+                        CNPJ/CPF
+                      </p>
+                      <p className="text-sm text-vitrii-text">{loja.cnpj}</p>
+                    </div>
+
+                    {/* Localização */}
+                    <div>
+                      <p className="text-xs text-vitrii-text-secondary">
+                        Localização
+                      </p>
+                      <p className="text-sm text-vitrii-text">
+                        {loja.endereco}
+                        {loja.cidade && loja.estado
+                          ? ` • ${loja.cidade}, ${loja.estado}`
+                          : ""}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </main>
