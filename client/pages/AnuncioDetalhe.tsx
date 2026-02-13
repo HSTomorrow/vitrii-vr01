@@ -624,6 +624,9 @@ export default function AnuncioDetalhe() {
                         "pt-BR",
                       )}
                     </p>
+                    <p className="text-xs text-vitrii-text-secondary mt-1">
+                      ID: {anuncio.id}
+                    </p>
                   </div>
                 </div>
                 {canEdit && (

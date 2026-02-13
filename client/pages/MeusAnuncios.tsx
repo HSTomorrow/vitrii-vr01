@@ -243,6 +243,9 @@ export default function MeusAnuncios() {
                           )}
                         </p>
                       )}
+                      <p className="text-xs text-vitrii-text-secondary">
+                        ID: {anuncio.id}
+                      </p>
                     </div>
 
                     {/* Actions */}

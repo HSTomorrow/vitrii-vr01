@@ -1085,9 +1085,15 @@ export const getAnunciosDUsuario: RequestHandler = async (req, res) => {
       prisma.anuncios.count({ where }),
     ]);
 
+    // Map anuncios to ensure statusPagamento is explicitly included
+    const mappedAnuncios = anuncios.map((anuncio) => ({
+      ...anuncio,
+      statusPagamento: anuncio.statusPagamento || "pendente",
+    }));
+
     res.json({
       success: true,
-      data: anuncios,
+      data: mappedAnuncios,
       pagination: {
         count: anuncios.length,
         total,
