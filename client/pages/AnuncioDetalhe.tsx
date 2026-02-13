@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ImageGallery from "@/components/ImageGallery";
+import ShareModal from "@/components/ShareModal";
 import {
   ChevronLeft,
   AlertCircle,
@@ -44,6 +45,7 @@ export default function AnuncioDetalhe() {
   const queryClient = useQueryClient();
   const { user, isLoggedIn } = useAuth();
   const [showMembrosModal, setShowMembrosModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   const [selectedEquipeId, setSelectedEquipeId] = useState<number | null>(null);
 
   // Fetch ad details
@@ -558,7 +560,10 @@ export default function AnuncioDetalhe() {
                     WhatsApp
                   </a>
                 )}
-                <button className="w-full px-4 py-3 border-2 border-gray-300 text-vitrii-text rounded-lg font-semibold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2">
+                <button
+                  onClick={() => setShowShareModal(true)}
+                  className="w-full px-4 py-3 border-2 border-gray-300 text-vitrii-text rounded-lg font-semibold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+                >
                   <Share2 className="w-4 h-4" />
                   Compartilhar
                 </button>
@@ -705,6 +710,16 @@ export default function AnuncioDetalhe() {
           </div>
         </div>
       )}
+
+      {/* Share Modal */}
+      <ShareModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        title={anuncio.titulo}
+        url={`${window.location.origin}/anuncio/${anuncio.id}`}
+        whatsappPhone={anuncio.anunciantes?.whatsapp}
+        whatsappMessage={`Confira este anúncio: ${anuncio.titulo}`}
+      />
 
       <Footer />
     </div>

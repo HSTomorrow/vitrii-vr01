@@ -1,6 +1,7 @@
 import { useRef } from "react";
 import { ChevronLeft, ChevronRight, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import ShareButton from "./ShareButton";
 
 interface Anunciante {
   id: number;
@@ -111,22 +112,34 @@ export default function AnunciantesCarousel({
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover/image:opacity-100 transition-opacity duration-300" />
             </div>
 
-            {/* Badge de Tipo */}
-            {anunciante.tipo && (
-              <div
-                className={`absolute top-2.5 right-2.5 px-3 py-1 rounded-full text-xs font-bold z-10 text-white ${
-                  anunciante.tipo === "Profissional"
-                    ? "bg-blue-600"
-                    : anunciante.tipo === "Premium"
-                      ? "bg-purple-600"
-                      : anunciante.tipo === "Master"
-                        ? "bg-yellow-600"
-                        : "bg-gray-600"
-                }`}
-              >
-                {anunciante.tipo}
-              </div>
-            )}
+            {/* Top Right Actions */}
+            <div className="absolute top-2.5 right-2.5 z-10 flex gap-2 items-start">
+              {/* Badge de Tipo */}
+              {anunciante.tipo && (
+                <div
+                  className={`px-3 py-1 rounded-full text-xs font-bold text-white ${
+                    anunciante.tipo === "Profissional"
+                      ? "bg-blue-600"
+                      : anunciante.tipo === "Premium"
+                        ? "bg-purple-600"
+                        : anunciante.tipo === "Master"
+                          ? "bg-yellow-600"
+                          : "bg-gray-600"
+                  }`}
+                >
+                  {anunciante.tipo}
+                </div>
+              )}
+
+              {/* Share Button */}
+              <ShareButton
+                title={anunciante.nome}
+                url={`${window.location.origin}/anunciante/${anunciante.id}`}
+                whatsappPhone={anunciante.telefone}
+                whatsappMessage={`Confira este anunciante: ${anunciante.nome}`}
+                variant="icon"
+              />
+            </div>
 
             {/* Content */}
             <div className="p-3 flex flex-col h-full">

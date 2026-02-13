@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, Package, Calendar } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import ShareButton from "./ShareButton";
 
 interface Anuncio {
   id: number;
@@ -17,6 +18,7 @@ interface Anuncio {
     nome: string;
     fotoUrl?: string;
     endereco?: string;
+    whatsapp?: string;
   };
 }
 
@@ -221,31 +223,41 @@ export default function AnunciosCarousel({
               </div>
             )}
 
-            <button
-              onClick={(e) => handleToggleFavorito(anuncio.id, e)}
-              className={`absolute top-2.5 right-2.5 z-10 p-2 rounded-full transition-all shadow-lg hover:shadow-xl transform hover:scale-110 ${
-                isFavorited?.(anuncio.id)
-                  ? "bg-red-500"
-                  : "bg-white hover:bg-gray-100"
-              }`}
-              title={
-                isFavorited?.(anuncio.id)
-                  ? "Remover dos favoritos"
-                  : "Adicionar aos favoritos"
-              }
-            >
-              <svg
-                className={`w-5 h-5 transition-colors ${
+            <div className="absolute top-2.5 right-2.5 z-10 flex gap-2">
+              <ShareButton
+                title={anuncio.titulo}
+                url={`${window.location.origin}/anuncio/${anuncio.id}`}
+                whatsappPhone={anuncio.anunciantes?.whatsapp}
+                whatsappMessage={`Confira este anúncio: ${anuncio.titulo}`}
+                variant="icon"
+              />
+
+              <button
+                onClick={(e) => handleToggleFavorito(anuncio.id, e)}
+                className={`p-2 rounded-full transition-all shadow-lg hover:shadow-xl transform hover:scale-110 ${
                   isFavorited?.(anuncio.id)
-                    ? "fill-white text-white"
-                    : "text-gray-400"
+                    ? "bg-red-500"
+                    : "bg-white hover:bg-gray-100"
                 }`}
-                viewBox="0 0 24 24"
-                fill="currentColor"
+                title={
+                  isFavorited?.(anuncio.id)
+                    ? "Remover dos favoritos"
+                    : "Adicionar aos favoritos"
+                }
               >
-                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
-              </svg>
-            </button>
+                <svg
+                  className={`w-5 h-5 transition-colors ${
+                    isFavorited?.(anuncio.id)
+                      ? "fill-white text-white"
+                      : "text-gray-400"
+                  }`}
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                </svg>
+              </button>
+            </div>
 
             <div className="p-3 flex flex-col h-full">
               <div>
