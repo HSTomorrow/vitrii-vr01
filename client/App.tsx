@@ -140,6 +140,7 @@ export default function App() {
                 <Route path="/agenda" element={<Suspense fallback={<PageLoader />}><Agenda /></Suspense>} />
                 <Route path="/agenda/:anuncianteId" element={<Suspense fallback={<PageLoader />}><Agenda /></Suspense>} />
                 <Route path="/checkout/:anuncioId" element={<Suspense fallback={<PageLoader />}><Checkout /></Suspense>} />
+                <Route path="/checkout" element={<Suspense fallback={<PageLoader />}><Checkout /></Suspense>} />
                 <Route path="/chat" element={<Suspense fallback={<PageLoader />}><Chat /></Suspense>} />
                 <Route path="/menu" element={<Suspense fallback={<PageLoader />}><Menu /></Suspense>} />
                 <Route path="/admin/dashboard" element={<Suspense fallback={<PageLoader />}><AdminDashboard /></Suspense>} />

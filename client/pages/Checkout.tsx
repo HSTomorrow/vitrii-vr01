@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate, Link, useSearchParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import {
@@ -13,7 +14,11 @@ import {
 } from "lucide-react";
 
 export default function Checkout() {
-  const { anuncioId } = useParams<{ anuncioId: string }>();
+  const { anuncioId: paramAnuncioId } = useParams<{ anuncioId: string }>();
+  const [searchParams] = useSearchParams();
+  const queryAnuncioId = searchParams.get("anuncioId");
+  const anuncioId = paramAnuncioId || queryAnuncioId;
+
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [copied, setCopied] = useState(false);
@@ -22,6 +27,16 @@ export default function Checkout() {
   const [proofPreview, setProofPreview] = useState<string>("");
   const [uploadingProof, setUploadingProof] = useState(false);
 
+  // Auto-redirect if no anuncioId
+  useEffect(() => {
+    if (!anuncioId) {
+      const timer = setTimeout(() => {
+        navigate("/meus-anuncios");
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [anuncioId, navigate]);
+
   if (!anuncioId) {
     return (
       <div className="min-h-screen bg-vitrii-gray-light flex items-center justify-center">
@@ -29,11 +44,17 @@ export default function Checkout() {
           <h1 className="text-2xl font-bold text-vitrii-text">
             ID do anúncio não encontrado
           </h1>
+          <p className="text-vitrii-text-secondary mt-2 mb-6">
+            Por favor, selecione um anúncio válido para continuar com o pagamento
+          </p>
+          <p className="text-sm text-vitrii-text-secondary mb-6">
+            Você será redirecionado para Meus Anúncios em 3 segundos...
+          </p>
           <Link
-            to="/sell"
-            className="text-vitrii-blue hover:text-vitrii-blue-dark mt-4 inline-block"
+            to="/meus-anuncios"
+            className="text-vitrii-blue hover:text-vitrii-blue-dark font-semibold"
           >
-            Voltar para meus anúncios
+            ← Voltar para meus anúncios
           </Link>
         </div>
       </div>
