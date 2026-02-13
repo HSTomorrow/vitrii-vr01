@@ -81,13 +81,19 @@ export default function CadastroProdutos() {
 
   // Fetch produtos
   const { data: productos, refetch } = useQuery<Producto[]>({
-    queryKey: ["productos"],
+    queryKey: ["productos", user?.id],
     queryFn: async () => {
-      const response = await fetch("/api/productos");
+      const headers: Record<string, string> = {};
+      if (user?.id) {
+        headers["x-user-id"] = user.id.toString();
+      }
+
+      const response = await fetch("/api/productos", { headers });
       if (!response.ok) throw new Error("Erro ao buscar produtos");
       const result = await response.json();
       return result.data || [];
     },
+    enabled: !!user,
   });
 
   // Save producto mutation
