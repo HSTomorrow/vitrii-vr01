@@ -125,6 +125,10 @@ export const requireAdmin: RequestHandler = async (req, res, next) => {
 
     const usuario = await prisma.usracessos.findUnique({
       where: { id: userId },
+      select: {
+        id: true,
+        tipoUsuario: true,
+      },
     });
 
     if (!usuario || usuario.tipoUsuario !== "adm") {

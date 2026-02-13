@@ -65,9 +65,21 @@ export default function AdminBanners() {
   // Create banner mutation
   const createBannerMutation = useMutation({
     mutationFn: async () => {
+      console.log("[createBannerMutation] Iniciando criação de banner");
+
       if (!formData.titulo || !formData.imagemUrl) {
-        throw new Error("Preencha o título e selecione uma imagem");
+        const err = "Preencha o título e selecione uma imagem";
+        console.warn("[createBannerMutation]", err);
+        throw new Error(err);
       }
+
+      console.log("[createBannerMutation] Enviando dados:", {
+        titulo: formData.titulo,
+        descricao: formData.descricao,
+        ativo: formData.ativo,
+        link: formData.link,
+        imagemUrl: formData.imagemUrl?.substring(0, 50) + "...",
+      });
 
       const response = await fetch("/api/banners", {
         method: "POST",
@@ -78,15 +90,26 @@ export default function AdminBanners() {
         body: JSON.stringify(formData),
       });
 
+      console.log("[createBannerMutation] Status da resposta:", response.status);
+
       if (!response.ok) {
         const error = await response.json();
         const detailedError = error.details || error.error || "Erro desconhecido";
+        console.error("[createBannerMutation] Erro HTTP:", {
+          status: response.status,
+          error,
+          detailedError,
+        });
         throw new Error(detailedError);
       }
 
-      return response.json();
+      const result = await response.json();
+      console.log("[createBannerMutation] ✓ Resposta bem-sucedida:", result);
+      return result;
     },
     onSuccess: (data) => {
+      console.log("[createBannerMutation] onSuccess chamado com:", data);
+
       const bannerTitulo = data.data?.titulo || "Banner";
       const bannerId = data.data?.id || "ID desconhecido";
 
@@ -102,18 +125,37 @@ export default function AdminBanners() {
     },
     onError: (error) => {
       const errorMsg = error instanceof Error ? error.message : "Erro desconhecido ao criar banner";
+      console.error("[createBannerMutation] onError chamado:", {
+        error: errorMsg,
+        stack: error instanceof Error ? error.stack : "Sem stack",
+      });
+
       toast.error("❌ Erro ao criar banner", {
         description: errorMsg,
         duration: 5000,
       });
-      console.error("[AdminBanners] Erro ao criar:", errorMsg);
     },
   });
 
   // Update banner mutation
   const updateBannerMutation = useMutation({
     mutationFn: async () => {
-      if (!editingId) throw new Error("ID do banner não encontrado");
+      console.log("[updateBannerMutation] Iniciando atualização de banner ID:", editingId);
+
+      if (!editingId) {
+        const err = "ID do banner não encontrado";
+        console.error("[updateBannerMutation]", err);
+        throw new Error(err);
+      }
+
+      console.log("[updateBannerMutation] Enviando dados:", {
+        id: editingId,
+        titulo: formData.titulo,
+        descricao: formData.descricao,
+        ativo: formData.ativo,
+        link: formData.link,
+        imagemUrl: formData.imagemUrl?.substring(0, 50) + "...",
+      });
 
       const response = await fetch(`/api/banners/${editingId}`, {
         method: "PUT",
@@ -124,15 +166,26 @@ export default function AdminBanners() {
         body: JSON.stringify(formData),
       });
 
+      console.log("[updateBannerMutation] Status da resposta:", response.status);
+
       if (!response.ok) {
         const error = await response.json();
         const detailedError = error.details || error.error || "Erro desconhecido";
+        console.error("[updateBannerMutation] Erro HTTP:", {
+          status: response.status,
+          error,
+          detailedError,
+        });
         throw new Error(detailedError);
       }
 
-      return response.json();
+      const result = await response.json();
+      console.log("[updateBannerMutation] ✓ Resposta bem-sucedida:", result);
+      return result;
     },
     onSuccess: (data) => {
+      console.log("[updateBannerMutation] onSuccess chamado com:", data);
+
       const bannerTitulo = data.data?.titulo || "Banner";
       const bannerId = data.data?.id || editingId;
 
@@ -148,11 +201,15 @@ export default function AdminBanners() {
     },
     onError: (error) => {
       const errorMsg = error instanceof Error ? error.message : "Erro desconhecido ao atualizar banner";
+      console.error("[updateBannerMutation] onError chamado:", {
+        error: errorMsg,
+        stack: error instanceof Error ? error.stack : "Sem stack",
+      });
+
       toast.error("❌ Erro ao atualizar banner", {
         description: errorMsg,
         duration: 5000,
       });
-      console.error("[AdminBanners] Erro ao atualizar:", errorMsg);
     },
   });
 
