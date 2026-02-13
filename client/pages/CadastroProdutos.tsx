@@ -167,7 +167,7 @@ export default function CadastroProdutos() {
       sku: producto.sku || "",
       tipo: (producto as any).tipo || "produto",
     });
-    if (producto.grupo) {
+    if (producto.grupo && producto.grupo.lojaId) {
       setSelectedLojaId(producto.grupo.lojaId.toString());
     } else {
       setSelectedLojaId("");
