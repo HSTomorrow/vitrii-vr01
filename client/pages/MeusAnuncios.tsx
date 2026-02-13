@@ -487,7 +487,7 @@ export default function MeusAnuncios() {
                     toast.info(
                       "Você será redirecionado para a página de confirmação de pagamento",
                     );
-                    navigate(`/checkout?anuncioId=${selectedAdForPayment.id}`);
+                    navigate(`/checkout/${selectedAdForPayment.id}`);
                   }}
                   className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
                 >
