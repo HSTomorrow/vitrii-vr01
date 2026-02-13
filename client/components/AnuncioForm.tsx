@@ -754,6 +754,9 @@ export default function AnuncioForm({
                 >
                   Gratuito
                 </label>
+                <p className="text-xs text-gray-600 mt-1">
+                  Selecione para produtos, serviços, eventos e aulas gratuitas.
+                </p>
                 {isDonation && (
                   <p className="text-xs text-blue-600 mt-1">
                     ℹ️ Esta opção foi pré-selecionada e não pode ser alterada
