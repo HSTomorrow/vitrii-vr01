@@ -20,6 +20,7 @@ interface Anuncio {
     fotoUrl?: string;
     endereco?: string;
     whatsapp?: string;
+    temAgenda?: boolean;
   };
 }
 
@@ -306,12 +307,12 @@ export default function AnunciosCarousel({
                 </div>
               </div>
 
-              {anuncio.tipo === "servico" ? (
+              {anuncio.anunciantes?.temAgenda ? (
                 <div className="flex gap-1.5">
                   <Link
                     to={`/agenda/anunciante/${anuncio.anuncianteId}`}
                     onClick={(e) => e.stopPropagation()}
-                    className={`flex-1 text-white py-1.5 text-xs rounded-md font-semibold transition-all duration-300 transform hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-1.5 ${colors.button}`}
+                    className={`flex-1 bg-orange-600 hover:bg-orange-700 text-white py-1.5 text-xs rounded-md font-semibold transition-all duration-300 transform hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-1.5`}
                   >
                     <Calendar className="w-3.5 h-3.5" />
                     Agendar

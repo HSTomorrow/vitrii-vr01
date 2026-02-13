@@ -167,11 +167,11 @@ export default function AdCard({
           </div>
         </div>
 
-        {anuncio.producto?.tipo === "servico" ? (
+        {(anunciante?.temAgenda || anuncio.anunciante?.temAgenda) ? (
           <div className="flex gap-2">
             <Link
               to={`/agenda/anunciante/${anuncio.anuncianteId}`}
-              className={`flex-1 ${isDonation ? "bg-green-600 hover:bg-green-700" : "bg-green-600 hover:bg-green-700"} text-white py-2 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2`}
+              className={`flex-1 bg-orange-600 hover:bg-orange-700 text-white py-2 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2`}
             >
               <Calendar className="w-4 h-4" />
               Agendar

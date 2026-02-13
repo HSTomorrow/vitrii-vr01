@@ -25,6 +25,7 @@ interface Anunciante {
   facebook?: string;
   whatsapp?: string;
   fotoUrl?: string;
+  temAgenda?: boolean;
 }
 
 export default function CadastroAnunciantes() {
@@ -47,6 +48,7 @@ export default function CadastroAnunciantes() {
     facebook: "",
     whatsapp: "",
     fotoUrl: "",
+    temAgenda: false,
   });
 
   // Fetch anunciantes (filtered by current user, or all if admin)
@@ -147,6 +149,7 @@ export default function CadastroAnunciantes() {
         facebook: "",
         whatsapp: "",
         fotoUrl: "",
+        temAgenda: false,
       });
       setEditingId(null);
       setIsFormOpen(false);
@@ -198,6 +201,7 @@ export default function CadastroAnunciantes() {
       facebook: loja.facebook || "",
       whatsapp: loja.whatsapp || "",
       fotoUrl: loja.fotoUrl || "",
+      temAgenda: loja.temAgenda || false,
     });
     setEditingId(loja.id);
     setIsFormOpen(true);
@@ -260,6 +264,7 @@ export default function CadastroAnunciantes() {
                 facebook: "",
                 whatsapp: "",
                 fotoUrl: "",
+                temAgenda: false,
               });
             }}
             className="flex items-center gap-2 px-4 py-2 bg-vitrii-yellow text-vitrii-text rounded-lg hover:bg-vitrii-yellow-dark transition-colors font-semibold"
@@ -503,6 +508,27 @@ export default function CadastroAnunciantes() {
                 />
               </div>
 
+              <div className="border-l-4 border-orange-500 bg-orange-50 p-4 rounded">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={formData.temAgenda}
+                    onChange={(e) =>
+                      setFormData({ ...formData, temAgenda: e.target.checked })
+                    }
+                    className="w-5 h-5 rounded border-gray-300 text-orange-500 focus:ring-2 focus:ring-orange-500"
+                  />
+                  <div>
+                    <span className="font-semibold text-vitrii-text">
+                      Habilitar Agenda
+                    </span>
+                    <p className="text-xs text-gray-600 mt-1">
+                      Se marcado, o botão "Agendar" aparecerá nos anúncios deste anunciante
+                    </p>
+                  </div>
+                </label>
+              </div>
+
               <div className="space-y-3">
                 <label className="block text-sm font-semibold text-vitrii-text">
                   Foto da Anunciante (Opcional)
@@ -591,6 +617,9 @@ export default function CadastroAnunciantes() {
                     Cidade/Estado
                   </th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-vitrii-text whitespace-nowrap">
+                    Agenda
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-vitrii-text whitespace-nowrap">
                     Ações
                   </th>
                 </tr>
@@ -599,7 +628,7 @@ export default function CadastroAnunciantes() {
                 {!anunciantes || anunciantes.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={7}
+                      colSpan={8}
                       className="px-4 py-4 text-center text-gray-500"
                     >
                       Nenhuma anunciante cadastrada
@@ -635,6 +664,17 @@ export default function CadastroAnunciantes() {
                         {loja.cidade && loja.estado
                           ? `${loja.cidade}, ${loja.estado}`
                           : "—"}
+                      </td>
+                      <td className="px-4 py-4 text-vitrii-text text-sm">
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                            loja.temAgenda
+                              ? "bg-green-100 text-green-800"
+                              : "bg-gray-100 text-gray-800"
+                          }`}
+                        >
+                          {loja.temAgenda ? "Sim" : "Não"}
+                        </span>
                       </td>
                       <td className="px-4 py-4 flex gap-2">
                         <button
@@ -751,6 +791,22 @@ export default function CadastroAnunciantes() {
                           ? ` • ${loja.cidade}, ${loja.estado}`
                           : ""}
                       </p>
+                    </div>
+
+                    {/* Agenda Status */}
+                    <div>
+                      <p className="text-xs text-vitrii-text-secondary">
+                        Agenda Habilitada
+                      </p>
+                      <span
+                        className={`inline-block px-3 py-1 rounded-full text-xs font-semibold mt-1 ${
+                          loja.temAgenda
+                            ? "bg-green-100 text-green-800"
+                            : "bg-gray-100 text-gray-800"
+                        }`}
+                      >
+                        {loja.temAgenda ? "Sim" : "Não"}
+                      </span>
                     </div>
                   </div>
                 ))}
