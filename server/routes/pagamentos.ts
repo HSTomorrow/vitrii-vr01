@@ -322,6 +322,123 @@ export const cancelPagamento: RequestHandler = async (req, res) => {
   }
 };
 
+// POST - Upload de comprovante de pagamento
+export const uploadComprovantePagemento: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { comprovantePagamento } = req.body;
+
+    if (!comprovantePagamento) {
+      return res.status(400).json({
+        success: false,
+        error: "Comprovante é obrigatório",
+      });
+    }
+
+    // Atualizar pagamento com comprovante
+    const pagamento = await prisma.pagamentos.update({
+      where: { id: parseInt(id) },
+      data: {
+        status: "comprovante_enviado",
+        comprovantePagamento,
+        dataComprovante: new Date(),
+      },
+      include: {
+        anuncio: true,
+      },
+    });
+
+    // Atualizar status do anúncio
+    await prisma.anuncios.update({
+      where: { id: pagamento.anuncioId },
+      data: { status: "em_analise" },
+    });
+
+    res.json({
+      success: true,
+      data: pagamento,
+      message: "Comprovante enviado com sucesso! Análise em até 24 horas.",
+    });
+  } catch (error) {
+    console.error("Erro ao fazer upload de comprovante:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao fazer upload do comprovante",
+    });
+  }
+};
+
+// POST - Confirmar pagamento manualmente (admin)
+export const aprovarPagamento: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const pagamento = await prisma.pagamentos.update({
+      where: { id: parseInt(id) },
+      data: {
+        status: "aprovado",
+      },
+      include: {
+        anuncio: true,
+      },
+    });
+
+    // Ativar o anúncio
+    await prisma.anuncios.update({
+      where: { id: pagamento.anuncioId },
+      data: { status: "ativo", statusPagamento: "pago" },
+    });
+
+    res.json({
+      success: true,
+      data: pagamento,
+      message: "Pagamento aprovado! Anúncio ativado.",
+    });
+  } catch (error) {
+    console.error("Erro ao aprovar pagamento:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao aprovar pagamento",
+    });
+  }
+};
+
+// POST - Rejeitar pagamento (admin)
+export const rejeitarPagamento: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { motivo } = req.body;
+
+    const pagamento = await prisma.pagamentos.update({
+      where: { id: parseInt(id) },
+      data: {
+        status: "rejeitado",
+      },
+      include: {
+        anuncio: true,
+      },
+    });
+
+    // Voltar anúncio para pendente
+    await prisma.anuncios.update({
+      where: { id: pagamento.anuncioId },
+      data: { status: "em_edicao" },
+    });
+
+    res.json({
+      success: true,
+      data: pagamento,
+      message: "Pagamento rejeitado",
+    });
+  } catch (error) {
+    console.error("Erro ao rejeitar pagamento:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao rejeitar pagamento",
+    });
+  }
+};
+
 // Helper function to generate mock Pix QR Code data
 // In production, this would call Mercado Pago API
 function generateMockQRCode(valor: number, pixId: string) {

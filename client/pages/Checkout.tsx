@@ -8,6 +8,8 @@ import {
   CheckCircle,
   Clock,
   AlertCircle,
+  Upload,
+  X,
 } from "lucide-react";
 
 export default function Checkout() {
@@ -15,6 +17,10 @@ export default function Checkout() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [copied, setCopied] = useState(false);
+  const [showProofModal, setShowProofModal] = useState(false);
+  const [proofFile, setProofFile] = useState<File | null>(null);
+  const [proofPreview, setProofPreview] = useState<string>("");
+  const [uploadingProof, setUploadingProof] = useState(false);
 
   if (!anuncioId) {
     return (
@@ -60,7 +66,6 @@ export default function Checkout() {
         `/api/pagamentos/anuncio/${parsedAnuncioId}`,
       );
       if (response.status === 404) {
-        // Payment doesn't exist, create one
         return null;
       }
       if (!response.ok) throw new Error("Erro ao buscar pagamento");
@@ -78,7 +83,7 @@ export default function Checkout() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           anuncioId: parsedAnuncioId,
-          valor: 9.9, // Standard ad cost
+          valor: 9.9,
         }),
       });
 
@@ -94,7 +99,6 @@ export default function Checkout() {
         queryKey: ["pagamento", parsedAnuncioId],
       });
       refetchPayment();
-      toast.success("Código Pix gerado com sucesso!");
     },
     onError: (error) => {
       toast.error(
@@ -103,23 +107,99 @@ export default function Checkout() {
     },
   });
 
-  // Poll payment status
-  useEffect(() => {
-    if (!payment || payment.status !== "pendente") return;
-
-    const interval = setInterval(() => {
-      refetchPayment().then((result) => {
-        if (result.data?.data?.status === "pago") {
-          toast.success("Pagamento confirmado! Seu anúncio foi ativado! 🎉");
-          setTimeout(() => {
-            navigate("/sell");
-          }, 2000);
-        }
+  // Upload proof of payment
+  const uploadProofMutation = useMutation({
+    mutationFn: async (file: File) => {
+      setUploadingProof(true);
+      
+      // In production, upload to cloud storage (S3, Firebase, etc)
+      // For now, we'll create a data URL for demo purposes
+      const reader = new FileReader();
+      return new Promise<string>((resolve, reject) => {
+        reader.onload = () => {
+          resolve(reader.result as string);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
       });
-    }, 3000);
+    },
+    onSuccess: (dataUrl) => {
+      if (!payment?.id) return;
+      
+      // Send proof to backend
+      fetch(`/api/pagamentos/${payment.id}/comprovante`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          comprovantePagamento: dataUrl,
+        }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setUploadingProof(false);
+          if (data.success) {
+            toast.success(data.message);
+            queryClient.invalidateQueries({
+              queryKey: ["pagamento", parsedAnuncioId],
+            });
+            refetchPayment();
+            setShowProofModal(false);
+            setProofFile(null);
+            setProofPreview("");
+          } else {
+            toast.error(data.error || "Erro ao enviar comprovante");
+            setUploadingProof(false);
+          }
+        })
+        .catch((error) => {
+          console.error("Erro:", error);
+          toast.error("Erro ao enviar comprovante");
+          setUploadingProof(false);
+        });
+    },
+    onError: (error) => {
+      setUploadingProof(false);
+      toast.error("Erro ao processar arquivo");
+      console.error(error);
+    },
+  });
 
-    return () => clearInterval(interval);
-  }, [payment?.id, payment?.status]);
+  // Handle proof file selection
+  const handleProofFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file size (max 10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error("Arquivo muito grande. Máximo 10MB.");
+        return;
+      }
+
+      // Validate file type
+      if (!["image/jpeg", "image/png", "application/pdf"].includes(file.type)) {
+        toast.error("Formato inválido. Aceite: JPG, PNG, PDF");
+        return;
+      }
+
+      setProofFile(file);
+
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setProofPreview(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Handle proof upload
+  const handleUploadProof = () => {
+    if (!proofFile) {
+      toast.error("Selecione um arquivo");
+      return;
+    }
+
+    uploadProofMutation.mutate(proofFile);
+  };
 
   // Auto-create payment if doesn't exist
   useEffect(() => {
@@ -128,11 +208,16 @@ export default function Checkout() {
     }
   }, [paymentLoading, payment]);
 
-  const isPaid = payment?.status === "pago";
+  const isPaid = payment?.status === "pago" || payment?.status === "aprovado";
+  const isProofSent = payment?.status === "comprovante_enviado";
+  const isAnalysis =
+    payment?.status === "comprovante_enviado" ||
+    payment?.status === "aprovado" ||
+    payment?.status === "rejeitado";
+  const isRejected = payment?.status === "rejeitado";
   const isExpired =
     payment?.status === "expirado" || payment?.status === "cancelado";
-  const isPending =
-    payment?.status === "pendente" || payment?.status === "processando";
+  const isPending = payment?.status === "pendente";
 
   const expirationTime = payment?.dataExpiracao
     ? new Date(payment.dataExpiracao)
@@ -242,7 +327,9 @@ export default function Checkout() {
 
                   <div className="space-y-2 mt-4">
                     <button
-                      onClick={() => navigate(`/anuncio/${parsedAnuncioId}/editar`)}
+                      onClick={() =>
+                        navigate(`/anuncio/${parsedAnuncioId}/editar`)
+                      }
                       className="w-full px-4 py-2 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors"
                     >
                       Reeditar Anúncio
@@ -261,7 +348,7 @@ export default function Checkout() {
 
           {/* Right: Payment Form */}
           <div className="md:col-span-2 space-y-6">
-            {/* Status Card */}
+            {/* Status: Paid */}
             {isPaid && (
               <div className="bg-green-50 border-2 border-green-200 rounded-lg p-6 flex items-start gap-4">
                 <CheckCircle className="w-8 h-8 text-green-600 flex-shrink-0" />
@@ -283,7 +370,51 @@ export default function Checkout() {
               </div>
             )}
 
-            {isExpired && (
+            {/* Status: Proof Sent */}
+            {isProofSent && !isPaid && (
+              <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-6 flex items-start gap-4">
+                <Clock className="w-8 h-8 text-vitrii-blue flex-shrink-0" />
+                <div>
+                  <h3 className="font-bold text-blue-800 text-lg">
+                    Comprovante Enviado!
+                  </h3>
+                  <p className="text-blue-700 mt-2">
+                    Seu comprovante de pagamento foi recebido. Analisaremos em
+                    até <strong>24 horas</strong> e seu anúncio será ativado em
+                    breve.
+                  </p>
+                  <p className="text-sm text-blue-600 mt-3">
+                    📧 Você receberá um email de confirmação assim que o
+                    pagamento for validado.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Status: Rejected */}
+            {isRejected && (
+              <div className="bg-red-50 border-2 border-red-200 rounded-lg p-6 flex items-start gap-4">
+                <AlertCircle className="w-8 h-8 text-red-600 flex-shrink-0" />
+                <div>
+                  <h3 className="font-bold text-red-800 text-lg">
+                    Pagamento Rejeitado
+                  </h3>
+                  <p className="text-red-700 mt-2">
+                    O comprovante enviado foi rejeitado. Por favor, tente novamente
+                    com um comprovante válido.
+                  </p>
+                  <button
+                    onClick={() => setShowProofModal(true)}
+                    className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg font-semibold hover:bg-red-700 transition-colors"
+                  >
+                    Enviar Novo Comprovante
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Status: Expired */}
+            {isExpired && !isProofSent && (
               <div className="bg-red-50 border-2 border-red-200 rounded-lg p-6 flex items-start gap-4">
                 <AlertCircle className="w-8 h-8 text-red-600 flex-shrink-0" />
                 <div>
@@ -304,21 +435,22 @@ export default function Checkout() {
               </div>
             )}
 
+            {/* Status: Pending Payment */}
             {isPending && (
               <>
                 {/* QR Code Section */}
                 <div className="bg-white rounded-lg shadow-md p-6">
                   <h2 className="font-bold text-vitrii-text mb-4 text-lg">
-                    Escaneie o QR Code
+                    📱 Escaneie o QR Code
                   </h2>
 
                   {payment ? (
                     <div className="space-y-6">
                       <div className="flex justify-center">
-                        <div className="bg-gray-100 p-4 rounded-lg">
+                        <div className="bg-gray-100 p-4 rounded-lg border-4 border-vitrii-blue">
                           <img
                             src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(
-                              payment.urlCopiaECola,
+                              payment.urlCopiaECola || "https://vitrii.com.br",
                             )}`}
                             alt="Pix QR Code"
                             className="w-72 h-72"
@@ -328,6 +460,7 @@ export default function Checkout() {
 
                       <p className="text-center text-vitrii-text-secondary">
                         Abra seu aplicativo bancário e escaneie o código acima
+                        para pagar
                       </p>
                     </div>
                   ) : (
@@ -346,7 +479,7 @@ export default function Checkout() {
                 {payment && (
                   <div className="bg-white rounded-lg shadow-md p-6">
                     <h2 className="font-bold text-vitrii-text mb-4 text-lg">
-                      Copiar Código Pix
+                      📋 Copiar Código Pix
                     </h2>
 
                     <p className="text-sm text-vitrii-text-secondary mb-3">
@@ -358,8 +491,8 @@ export default function Checkout() {
                       onClick={handleCopyPixCode}
                       className="w-full bg-gray-100 hover:bg-gray-200 border-2 border-gray-300 rounded-lg p-4 flex items-center justify-between transition-colors mb-3"
                     >
-                      <code className="text-sm text-vitrii-text font-mono truncate">
-                        {payment.urlCopiaECola.substring(0, 50)}...
+                      <code className="text-xs text-vitrii-text font-mono truncate">
+                        {payment.urlCopiaECola?.substring(0, 40)}...
                       </code>
                       <Copy className="w-5 h-5 text-vitrii-blue flex-shrink-0 ml-2" />
                     </button>
@@ -390,6 +523,17 @@ export default function Checkout() {
                   </div>
                 )}
 
+                {/* Payment Realized Button */}
+                {payment && (
+                  <button
+                    onClick={() => setShowProofModal(true)}
+                    className="w-full px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <CheckCircle className="w-5 h-5" />
+                    Pagamento Realizado
+                  </button>
+                )}
+
                 {/* Payment Details */}
                 {payment && (
                   <div className="bg-white rounded-lg shadow-md p-6">
@@ -400,20 +544,10 @@ export default function Checkout() {
                     <div className="space-y-3 text-sm">
                       <div className="flex justify-between">
                         <span className="text-vitrii-text-secondary">
-                          ID Pix:
-                        </span>
-                        <span className="font-mono text-vitrii-text">
-                          {payment.pixId?.substring(0, 20)}...
-                        </span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-vitrii-text-secondary">
                           Status:
                         </span>
                         <span className="font-semibold text-blue-600">
-                          {payment.status === "pendente" &&
-                            "Aguardando pagamento"}
-                          {payment.status === "processando" && "Processando"}
+                          Aguardando Pagamento
                         </span>
                       </div>
                       <div className="flex justify-between pt-3 border-t border-gray-200">
@@ -434,9 +568,9 @@ export default function Checkout() {
                     💡 Dica
                   </p>
                   <p className="text-sm text-vitrii-text-secondary">
-                    O pagamento é processado instantaneamente após você
-                    confirmar a transferência Pix. Seu anúncio será ativado
-                    automaticamente!
+                    Após realizar o pagamento, clique em "Pagamento Realizado"
+                    para enviar o comprovante. Nossa equipe analisará em até 24
+                    horas.
                   </p>
                 </div>
               </>
@@ -444,6 +578,137 @@ export default function Checkout() {
           </div>
         </div>
       </div>
+
+      {/* Proof Upload Modal */}
+      {showProofModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            {/* Header */}
+            <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-0">
+              <h2 className="text-xl font-bold text-vitrii-text">
+                Enviar Comprovante de Pagamento
+              </h2>
+              <button
+                onClick={() => {
+                  setShowProofModal(false);
+                  setProofFile(null);
+                  setProofPreview("");
+                }}
+                className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="p-6 space-y-6">
+              <div>
+                <p className="text-sm text-vitrii-text-secondary mb-4">
+                  Selecione o comprovante do seu pagamento (JPG, PNG ou PDF)
+                </p>
+
+                {/* File Input */}
+                <label className="block">
+                  <div className="border-2 border-dashed border-vitrii-blue rounded-lg p-8 text-center cursor-pointer hover:bg-blue-50 transition-colors">
+                    {proofPreview ? (
+                      <div className="space-y-4">
+                        {proofFile?.type.startsWith("image/") ? (
+                          <img
+                            src={proofPreview}
+                            alt="Preview"
+                            className="max-h-64 mx-auto rounded-lg"
+                          />
+                        ) : (
+                          <div className="flex items-center justify-center h-32">
+                            <div className="text-center">
+                              <Upload className="w-12 h-12 text-vitrii-blue mx-auto mb-2" />
+                              <p className="text-vitrii-text font-semibold">
+                                PDF: {proofFile?.name}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                        <p className="text-sm text-vitrii-text font-semibold">
+                          {proofFile?.name}
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setProofFile(null);
+                            setProofPreview("");
+                          }}
+                          className="text-sm text-red-600 hover:text-red-700 font-semibold"
+                        >
+                          Remover arquivo
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        <Upload className="w-12 h-12 text-vitrii-blue mx-auto" />
+                        <p className="text-vitrii-text font-semibold">
+                          Clique ou arraste o arquivo aqui
+                        </p>
+                        <p className="text-xs text-vitrii-text-secondary">
+                          JPG, PNG ou PDF • Máximo 10MB
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,application/pdf"
+                    onChange={handleProofFileChange}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+
+              {/* Info */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-sm text-vitrii-text font-semibold mb-2">
+                  ℹ️ Informações Importantes
+                </p>
+                <ul className="text-sm text-vitrii-text-secondary space-y-1">
+                  <li>
+                    • O comprovante deve conter data, valor e identificação de
+                    quem pagou
+                  </li>
+                  <li>
+                    • Enviamos o PIX em nome de "Vitrii" - procure por essa
+                    identificação
+                  </li>
+                  <li>
+                    • Análise feita em até 24 horas úteis
+                  </li>
+                </ul>
+              </div>
+
+              {/* Buttons */}
+              <div className="flex gap-3 pt-4 border-t">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowProofModal(false);
+                    setProofFile(null);
+                    setProofPreview("");
+                  }}
+                  className="flex-1 px-4 py-2 border-2 border-vitrii-blue text-vitrii-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  onClick={handleUploadProof}
+                  disabled={!proofFile || uploadingProof}
+                  className="flex-1 px-4 py-2 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {uploadingProof ? "Enviando..." : "Enviar Comprovante"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

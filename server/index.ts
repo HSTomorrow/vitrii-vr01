@@ -117,6 +117,9 @@ import {
   getPagamentoStatus,
   handlePaymentWebhook,
   cancelPagamento,
+  uploadComprovantePagemento,
+  aprovarPagamento,
+  rejeitarPagamento,
 } from "./routes/pagamentos";
 import {
   getConversas,
@@ -469,6 +472,9 @@ export function createServer() {
   app.patch("/api/pagamentos/:id/status", updatePagamentoStatus);
   app.delete("/api/pagamentos/:id/cancel", cancelPagamento);
   app.post("/api/webhooks/pagamentos", handlePaymentWebhook);
+  app.post("/api/pagamentos/:id/comprovante", uploadComprovantePagemento);
+  app.post("/api/pagamentos/:id/aprovar", aprovarPagamento);
+  app.post("/api/pagamentos/:id/rejeitar", rejeitarPagamento);
 
   // Conversas (Chat Conversations) routes
   app.get("/api/conversas", getConversas);

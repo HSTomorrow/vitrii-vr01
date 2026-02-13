@@ -70,6 +70,7 @@ model anuncios {
   wishlists_itens     listas_desejos_itens[]
   agendas             agendas[]
   conversas           conversas[]
+  pagamento           pagamentos?
 }
 
 // Anuncio Visualizacoes - Log table to track ad views
@@ -519,4 +520,28 @@ model mensagens {
   @@index([dataCriacao])
   @@index([excluido])
   @@map("mensagens")
+}
+
+// Pagamentos de Anúncios
+model pagamentos {
+  id                    Int       @id @default(autoincrement())
+  anuncioId             Int       @unique
+  anuncio               anuncios  @relation(fields: [anuncioId], references: [id], onDelete: Cascade)
+
+  valor                 Decimal   @db.Decimal(10, 2)
+  status                String    @default("pendente") @db.VarChar(50) // pendente, comprovante_enviado, aprovado, rejeitado
+  tipo                  String    @default("pix") @db.VarChar(50)
+
+  // Comprovante
+  comprovantePagamento  String?   @db.VarChar(500) // URL do comprovante (storage)
+  dataComprovante       DateTime?
+
+  // Controle
+  dataCriacao           DateTime  @default(now())
+  dataAtualizacao       DateTime  @updatedAt
+
+  @@index([anuncioId])
+  @@index([status])
+  @@index([dataCriacao])
+  @@map("pagamentos")
 }
