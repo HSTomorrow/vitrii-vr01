@@ -1,10 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
-import { ShoppingBag, ArrowRight, Trash2, Eye } from "lucide-react";
+import { ShoppingBag, ArrowRight, Trash2, Eye, DollarSign, Copy, Check, X } from "lucide-react";
+import { toast } from "sonner";
 import AdCard from "@/components/AdCard";
 import {
   AlertDialog,
@@ -21,9 +23,11 @@ import { useToast } from "@/hooks/use-toast";
 export default function MeusAnuncios() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { toast } = useToast();
+  const { toast: toastShadcn } = useToast();
   const [adToDelete, setAdToDelete] = useState<number | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [selectedAdForPayment, setSelectedAdForPayment] = useState<any | null>(null);
+  const [copied, setCopied] = useState(false);
 
   // Fetch user's ads (query is disabled if user is not logged in)
   const {
@@ -84,7 +88,7 @@ export default function MeusAnuncios() {
         throw new Error(error.error || "Erro ao deletar anúncio");
       }
 
-      toast({
+      toastShadcn({
         title: "Sucesso",
         description: "Anúncio cancelado com sucesso",
       });
@@ -92,7 +96,7 @@ export default function MeusAnuncios() {
       setAdToDelete(null);
       refetch();
     } catch (error) {
-      toast({
+      toastShadcn({
         title: "Erro",
         description:
           error instanceof Error ? error.message : "Erro ao cancelar anúncio",
@@ -251,6 +255,16 @@ export default function MeusAnuncios() {
                         Visualizar
                       </button>
 
+                      {anuncio.statusPagamento === "pendente" && (
+                        <button
+                          onClick={() => setSelectedAdForPayment(anuncio)}
+                          className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 transition-colors text-sm"
+                        >
+                          <DollarSign className="w-4 h-4" />
+                          Efetuar Pagamento
+                        </button>
+                      )}
+
                       {anuncio.status !== "historico" && (
                         <button
                           onClick={() =>
@@ -319,6 +333,126 @@ export default function MeusAnuncios() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Payment Modal */}
+      {selectedAdForPayment && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            {/* Header */}
+            <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-0">
+              <h2 className="text-xl font-bold text-vitrii-text">
+                Efetuar Pagamento - C6 Bank PIX
+              </h2>
+              <button
+                onClick={() => setSelectedAdForPayment(null)}
+                className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="p-6 space-y-6">
+              {/* Instructions */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-sm font-semibold text-blue-900 mb-2">
+                  📱 Como pagar via PIX:
+                </p>
+                <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
+                  <li>Abra seu app bancário</li>
+                  <li>Escaneie o QR Code abaixo OU copie a chave PIX</li>
+                  <li>Confirme o pagamento de R$ 9,90</li>
+                  <li>Clique em "Pagamento Realizado" para validar</li>
+                </ol>
+              </div>
+
+              {/* QR Code Section */}
+              <div>
+                <h3 className="font-semibold text-vitrii-text mb-3">
+                  QR Code PIX
+                </h3>
+                <div className="flex justify-center">
+                  <div className="bg-gray-100 p-4 rounded-lg border-4 border-vitrii-blue">
+                    <img
+                      src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=00020126580014br.gov.bcb.brcode0136${encodeURIComponent(
+                        "VITRII-PIX-" + selectedAdForPayment.id,
+                      )}520400005303986540510.005802BR5913Vitrii6009Montenegro62410503***63041D3D`}
+                      alt="PIX QR Code"
+                      className="w-64 h-64"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* PIX Key Section */}
+              <div>
+                <h3 className="font-semibold text-vitrii-text mb-3">
+                  Copiar Chave PIX
+                </h3>
+                <p className="text-xs text-vitrii-text-secondary mb-2">
+                  Clique no botão para copiar a chave e pagar via seu app
+                  bancário
+                </p>
+                <button
+                  onClick={() => {
+                    const pixKey = "00020126580014br.gov.bcb.brcode...";
+                    navigator.clipboard.writeText(pixKey);
+                    setCopied(true);
+                    toast.success("Chave PIX copiada!");
+                    setTimeout(() => setCopied(false), 2000);
+                  }}
+                  className="w-full bg-gray-100 hover:bg-gray-200 border-2 border-gray-300 rounded-lg p-4 flex items-center justify-between transition-colors"
+                >
+                  <code className="text-xs text-vitrii-text font-mono truncate">
+                    00020126580014br.gov.bcb...
+                  </code>
+                  {copied ? (
+                    <Check className="w-5 h-5 text-green-600 flex-shrink-0 ml-2" />
+                  ) : (
+                    <Copy className="w-5 h-5 text-vitrii-blue flex-shrink-0 ml-2" />
+                  )}
+                </button>
+              </div>
+
+              {/* Payment Confirmation */}
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <p className="text-sm text-yellow-900 font-semibold mb-2">
+                  ⚠️ Importante:
+                </p>
+                <p className="text-sm text-yellow-800">
+                  Após realizar o pagamento via PIX, clique no botão abaixo
+                  para registrar o comprovante e iniciar a análise de validação
+                  do pagamento (até 24 horas).
+                </p>
+              </div>
+
+              {/* Buttons */}
+              <div className="flex gap-3 pt-4 border-t">
+                <button
+                  type="button"
+                  onClick={() => setSelectedAdForPayment(null)}
+                  className="flex-1 px-4 py-2 border-2 border-vitrii-blue text-vitrii-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    toast.info(
+                      "Você será redirecionado para a página de confirmação de pagamento",
+                    );
+                    navigate(`/checkout?anuncioId=${selectedAdForPayment.id}`);
+                  }}
+                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+                >
+                  <Check className="w-4 h-4" />
+                  Pagamento Realizado
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>
