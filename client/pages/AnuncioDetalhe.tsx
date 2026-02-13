@@ -568,7 +568,7 @@ export default function AnuncioDetalhe() {
                     className="w-full px-4 py-3 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors flex items-center justify-center gap-2"
                   >
                     <Globe className="w-4 h-4" />
-                    Mais Detalhes
+                    Acessar Anúncio Externo
                   </a>
                 )}
                 <button

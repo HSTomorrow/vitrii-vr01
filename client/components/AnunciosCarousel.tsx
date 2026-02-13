@@ -339,7 +339,7 @@ export default function AnunciosCarousel({
                       onClick={(e) => e.stopPropagation()}
                       className={`w-full text-white py-1.5 text-xs rounded-md font-semibold transition-all duration-300 transform hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 block text-center opacity-90 hover:opacity-100 ${colors.button}`}
                     >
-                      Mais Detalhes
+                      Acessar Anúncio Externo
                     </a>
                   )}
                 </div>
