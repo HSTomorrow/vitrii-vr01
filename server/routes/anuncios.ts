@@ -260,9 +260,15 @@ export const getAnuncioById: RequestHandler = async (req, res) => {
       });
     }
 
+    // Ensure link field is included in response
+    const response = {
+      ...anuncio,
+      link: anuncio.link || null,
+    };
+
     res.json({
       success: true,
-      data: anuncio,
+      data: response,
     });
   } catch (error) {
     console.error("Error fetching ad:", error);

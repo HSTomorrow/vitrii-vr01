@@ -560,13 +560,6 @@ export default function AnuncioDetalhe() {
                     WhatsApp
                   </a>
                 )}
-                <button
-                  onClick={() => setShowShareModal(true)}
-                  className="w-full px-4 py-3 border-2 border-gray-300 text-vitrii-text rounded-lg font-semibold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
-                >
-                  <Share2 className="w-4 h-4" />
-                  Compartilhar
-                </button>
                 {anuncio.link && (
                   <a
                     href={anuncio.link}
@@ -578,6 +571,13 @@ export default function AnuncioDetalhe() {
                     Mais Detalhes
                   </a>
                 )}
+                <button
+                  onClick={() => setShowShareModal(true)}
+                  className="w-full px-4 py-3 border-2 border-gray-300 text-vitrii-text rounded-lg font-semibold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+                >
+                  <Share2 className="w-4 h-4" />
+                  Compartilhar
+                </button>
               </div>
 
               {/* Info Box */}
