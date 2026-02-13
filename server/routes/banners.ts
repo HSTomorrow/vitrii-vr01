@@ -163,8 +163,8 @@ export const createBanner: RequestHandler = async (req, res) => {
 
 // UPDATE banner
 export const updateBanner: RequestHandler = async (req, res) => {
+  const { id } = req.params;
   try {
-    const { id } = req.params;
     console.log("[updateBanner] Atualizando banner ID:", id, {
       titulo: req.body.titulo,
       ativo: req.body.ativo,
