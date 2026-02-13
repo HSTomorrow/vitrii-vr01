@@ -4,7 +4,6 @@ import {
   Search,
   User,
   Plus,
-  LogOut,
   MessageSquare,
   Shield,
   FileText,
@@ -13,13 +12,8 @@ import {
 import { useAuth } from "@/contexts/AuthContext";
 
 export default function Header() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
-
-  const handleLogout = () => {
-    logout();
-    navigate("/");
-  };
 
   return (
     <>
@@ -136,14 +130,6 @@ export default function Header() {
                       {user.nome.split(" ")[0]}
                     </span>
                   </div>
-
-                  <button
-                    onClick={handleLogout}
-                    className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors hidden sm:flex items-center gap-2 font-semibold text-[0.85rem]"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    <span className="hidden md:inline">Sair</span>
-                  </button>
                 </>
               ) : (
                 <>
