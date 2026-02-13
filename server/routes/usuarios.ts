@@ -117,9 +117,11 @@ export const getUsuarioById: RequestHandler = async (req, res) => {
 export const signInUsuario: RequestHandler = async (req, res) => {
   try {
     const { email, senha } = req.body;
+    console.log("[signInUsuario] Received signin request for email:", email);
 
     // Validate input
     if (!email || !senha) {
+      console.log("[signInUsuario] Missing email or password");
       return res.status(400).json({
         success: false,
         error: "Email e senha são obrigatórios",
@@ -127,6 +129,7 @@ export const signInUsuario: RequestHandler = async (req, res) => {
     }
 
     // Find user by email
+    console.log("[signInUsuario] Looking up user with email:", email);
     const usuario = await prisma.usracessos.findUnique({
       where: { email },
       select: {
@@ -144,15 +147,21 @@ export const signInUsuario: RequestHandler = async (req, res) => {
     });
 
     if (!usuario) {
+      console.log("[signInUsuario] User not found with email:", email);
       return res.status(401).json({
         success: false,
         error: "Email ou senha incorretos",
       });
     }
 
+    console.log("[signInUsuario] User found:", usuario.id, usuario.nome);
+
     // Compare password with bcrypt hash
     const isPasswordValid = await bcryptjs.compare(senha, usuario.senha);
+    console.log("[signInUsuario] Password validation result:", isPasswordValid);
+
     if (!isPasswordValid) {
+      console.log("[signInUsuario] Invalid password for user:", email);
       return res.status(401).json({
         success: false,
         error: "Email ou senha incorretos",
@@ -161,6 +170,7 @@ export const signInUsuario: RequestHandler = async (req, res) => {
 
     // Return user data (without password)
     const { senha: _, ...usuarioSemSenha } = usuario;
+    console.log("[signInUsuario] Login successful for user:", usuarioSemSenha.id);
 
     res.status(200).json({
       success: true,
@@ -168,7 +178,7 @@ export const signInUsuario: RequestHandler = async (req, res) => {
       message: "Login realizado com sucesso",
     });
   } catch (error) {
-    console.error("Error signing in user:", error);
+    console.error("[signInUsuario] Error signing in user:", error);
     res.status(500).json({
       success: false,
       error: "Erro ao fazer login",

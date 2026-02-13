@@ -20,27 +20,45 @@ export default function SignIn() {
   // Sign in mutation
   const signInMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      const response = await fetch("/api/auth/signin", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+      try {
+        const response = await fetch("/api/auth/signin", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Erro ao fazer login");
+        console.log("[SignIn] Response status:", response.status);
+
+        if (!response.ok) {
+          const error = await response.json();
+          console.error("[SignIn] API error response:", error);
+          throw new Error(error.error || "Erro ao fazer login");
+        }
+
+        const result = await response.json();
+        console.log("[SignIn] Login successful, received data:", result);
+        return result;
+      } catch (error) {
+        console.error("[SignIn] Fetch error:", error);
+        throw error;
       }
-
-      return response.json();
     },
-    onSuccess: (data) => {
-      login(data.data);
-      toast.success("Login realizado com sucesso!");
-      setTimeout(() => {
-        navigate("/");
-      }, 1000);
+    onSuccess: (responseData) => {
+      console.log("[SignIn] onSuccess called with:", responseData);
+      if (responseData.data) {
+        login(responseData.data);
+        toast.success("Login realizado com sucesso!");
+        setTimeout(() => {
+          console.log("[SignIn] Navigating to /");
+          navigate("/");
+        }, 500);
+      } else {
+        console.error("[SignIn] No user data in response:", responseData);
+        toast.error("Erro: dados de usuário não retornados");
+      }
     },
     onError: (error) => {
+      console.error("[SignIn] onError called with:", error);
       toast.error(
         error instanceof Error ? error.message : "Erro ao fazer login",
       );
