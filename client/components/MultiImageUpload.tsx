@@ -16,6 +16,17 @@ interface MultiImageUploadProps {
   anuncianteFotoUrl?: string | null;
 }
 
+const MAX_UPLOAD_TIME_MS = 10000; // 10 seconds
+const MAX_FILE_SIZE_MB = 5;
+
+const formatFileSize = (bytes: number): string => {
+  if (bytes === 0) return "0 B";
+  const k = 1024;
+  const sizes = ["B", "KB", "MB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+};
+
 const MultiImageUpload: React.FC<MultiImageUploadProps> = ({
   onImagesChange,
   currentImages = [],
@@ -43,39 +54,80 @@ const MultiImageUpload: React.FC<MultiImageUploadProps> = ({
       const uploadedImages: UploadedImage[] = [];
 
       for (const file of newFiles) {
-        if (file.size > 5 * 1024 * 1024) {
-          toast.error(`${file.name}: Arquivo deve ter no máximo 5MB`);
+        // Validate file size
+        if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
+          const fileSize = formatFileSize(file.size);
+          toast.error(`❌ ${file.name}: Arquivo muito grande`, {
+            description: `Tamanho: ${fileSize} (máximo: ${MAX_FILE_SIZE_MB}MB)`,
+          });
           continue;
         }
+
+        const fileSize = formatFileSize(file.size);
+        const uploadStartTime = Date.now();
 
         const formData = new FormData();
         formData.append("file", file);
 
-        const response = await fetch("/api/upload", {
-          method: "POST",
-          body: formData,
-        });
+        // Create AbortController for timeout
+        const abortController = new AbortController();
+        const uploadTimeoutId = setTimeout(() => {
+          abortController.abort();
+        }, MAX_UPLOAD_TIME_MS);
 
-        if (!response.ok) {
-          throw new Error(`Erro ao fazer upload de ${file.name}`);
+        try {
+          const response = await fetch("/api/upload", {
+            method: "POST",
+            body: formData,
+            signal: abortController.signal,
+          });
+
+          clearTimeout(uploadTimeoutId);
+
+          if (!response.ok) {
+            throw new Error(`Erro ao fazer upload de ${file.name}`);
+          }
+
+          const data = await response.json();
+          const uploadEndTime = Date.now();
+          const uploadDuration = (uploadEndTime - uploadStartTime) / 1000;
+
+          uploadedImages.push({
+            id: `temp-${Date.now()}-${Math.random()}`,
+            url: data.url,
+            file,
+          });
+
+          toast.success(`✓ ${file.name} enviado com sucesso`, {
+            description: `Tamanho: ${fileSize} | Tempo: ${uploadDuration.toFixed(1)}s`,
+            duration: 3000,
+          });
+        } catch (uploadError) {
+          clearTimeout(uploadTimeoutId);
+
+          if (uploadError instanceof Error && uploadError.name === "AbortError") {
+            toast.error(`❌ Upload cancelado - tempo excedido`, {
+              description: `${file.name} demorou mais de ${MAX_UPLOAD_TIME_MS / 1000}s para fazer upload. Tente novamente com uma conexão mais rápida ou um arquivo menor.`,
+              duration: 5000,
+            });
+          } else {
+            toast.error(`❌ Erro ao fazer upload de ${file.name}`, {
+              description: uploadError instanceof Error ? uploadError.message : "Erro desconhecido",
+              duration: 4000,
+            });
+          }
         }
-
-        const data = await response.json();
-        uploadedImages.push({
-          id: `temp-${Date.now()}-${Math.random()}`,
-          url: data.url,
-          file,
-        });
       }
 
-      const updatedImages = [...images, ...uploadedImages];
-      setImages(updatedImages);
-      onImagesChange(updatedImages);
-      toast.success(`${uploadedImages.length} imagem(ns) adicionada(s)`);
+      if (uploadedImages.length > 0) {
+        const updatedImages = [...images, ...uploadedImages];
+        setImages(updatedImages);
+        onImagesChange(updatedImages);
+      }
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "Erro ao fazer upload",
-      );
+      toast.error("Erro ao processar upload", {
+        description: error instanceof Error ? error.message : "Erro desconhecido",
+      });
     } finally {
       setIsUploading(false);
     }
@@ -102,7 +154,7 @@ const MultiImageUpload: React.FC<MultiImageUploadProps> = ({
         />
         <label
           htmlFor="multi-file-upload"
-          className={`flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
+          className={`flex flex-col items-center justify-center gap-2 px-4 py-6 border-2 border-dashed rounded-lg cursor-pointer transition-colors ${
             isUploading || images.length >= maxImages
               ? "bg-gray-50 border-gray-300 cursor-not-allowed"
               : "border-vitrii-blue hover:bg-blue-50"
@@ -114,13 +166,21 @@ const MultiImageUpload: React.FC<MultiImageUploadProps> = ({
               <span className="font-semibold text-vitrii-text">
                 Enviando...
               </span>
+              <span className="text-xs text-vitrii-text-secondary">
+                Máximo 10 segundos por arquivo
+              </span>
             </>
           ) : (
             <>
               <Upload className="w-5 h-5 text-vitrii-blue" />
-              <span className="font-semibold text-vitrii-text">
-                Clique ou arraste imagens ({images.length}/{maxImages})
-              </span>
+              <div className="text-center">
+                <span className="font-semibold text-vitrii-text block">
+                  Clique ou arraste imagens
+                </span>
+                <span className="text-xs text-vitrii-text-secondary">
+                  ({images.length}/{maxImages}) | Máx {MAX_FILE_SIZE_MB}MB por arquivo
+                </span>
+              </div>
             </>
           )}
         </label>
@@ -192,11 +252,16 @@ const MultiImageUpload: React.FC<MultiImageUploadProps> = ({
       />
 
       {/* Info */}
-      <p className="text-sm text-vitrii-text-secondary">
-        {images.length === 0 && anuncianteFotoUrl
-          ? "Nenhuma foto foi adicionada. A foto do anunciante será usada como padrão. Você pode adicionar até 5 imagens."
-          : `A primeira imagem será a principal. Você pode adicionar até ${maxImages} imagens no total.`}
-      </p>
+      <div className="text-sm text-vitrii-text-secondary space-y-1">
+        <p>
+          {images.length === 0 && anuncianteFotoUrl
+            ? "Nenhuma foto foi adicionada. A foto do anunciante será usada como padrão. Você pode adicionar até 5 imagens."
+            : `A primeira imagem será a principal. Você pode adicionar até ${maxImages} imagens no total.`}
+        </p>
+        <p className="text-xs">
+          ⏱️ Cada upload deve ser concluído em até 10 segundos. Se demorar mais, o upload será cancelado automaticamente.
+        </p>
+      </div>
     </div>
   );
 };
