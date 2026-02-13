@@ -56,14 +56,7 @@ export default function Header() {
             </div>
 
             {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center space-x-6">
-              <Link
-                to="/browse"
-                className="text-vitrii-text-secondary hover:text-vitrii-blue transition-colors text-[0.85rem]"
-              >
-                Ver Anúncios
-              </Link>
-            </nav>
+            <nav className="hidden lg:flex items-center space-x-6"></nav>
 
             {/* Right side - Auth and actions */}
             <div className="flex items-center space-x-2 sm:space-x-4">
