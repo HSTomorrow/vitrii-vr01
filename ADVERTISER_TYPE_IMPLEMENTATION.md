@@ -107,8 +107,8 @@ curl -X POST http://localhost:3000/api/anunciantes \
   -d '{
     "nome": "Minha Loja",
     "tipo": "Profissional",
-    "cidade": "Belo Horizonte",
-    "estado": "MG",
+    "cidade": "Montenegro",
+    "estado": "RS",
     "email": "contato@loja.com"
   }'
 ```
