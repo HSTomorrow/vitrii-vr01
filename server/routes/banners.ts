@@ -123,17 +123,31 @@ export const createBanner: RequestHandler = async (req, res) => {
       success: true,
       data: banner,
       message: "Banner criado com sucesso",
+      details: {
+        id: banner.id,
+        titulo: banner.titulo,
+        ativo: banner.ativo,
+        ordem: banner.ordem,
+        timestamp: new Date().toISOString(),
+      },
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const errorMessages = error.errors
-        .map((err) => `${err.path.join(".")}: ${err.message}`)
-        .join("; ");
-      console.warn("[createBanner] ❌ Validação falhou:", errorMessages);
+      const fieldErrors = error.errors.map((err) => ({
+        field: err.path.join("."),
+        message: err.message,
+        code: err.code,
+      }));
+      const errorSummary = fieldErrors
+        .map((e) => `${e.field}: ${e.message}`)
+        .join(" | ");
+
+      console.warn("[createBanner] ❌ Validação falhou:", fieldErrors);
       return res.status(400).json({
         success: false,
-        error: "Dados inválidos",
-        details: errorMessages,
+        error: "Dados inválidos do banner",
+        details: errorSummary,
+        validation_errors: fieldErrors,
       });
     }
 
@@ -142,6 +156,7 @@ export const createBanner: RequestHandler = async (req, res) => {
       success: false,
       error: "Erro ao criar banner",
       details: error instanceof Error ? error.message : "Erro desconhecido",
+      timestamp: new Date().toISOString(),
     });
   }
 };
@@ -172,17 +187,31 @@ export const updateBanner: RequestHandler = async (req, res) => {
       success: true,
       data: banner,
       message: "Banner atualizado com sucesso",
+      details: {
+        id: banner.id,
+        titulo: banner.titulo,
+        ativo: banner.ativo,
+        ordem: banner.ordem,
+        timestamp: new Date().toISOString(),
+      },
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      const errorMessages = error.errors
-        .map((err) => `${err.path.join(".")}: ${err.message}`)
-        .join("; ");
-      console.warn("[updateBanner] ❌ Validação falhou:", errorMessages);
+      const fieldErrors = error.errors.map((err) => ({
+        field: err.path.join("."),
+        message: err.message,
+        code: err.code,
+      }));
+      const errorSummary = fieldErrors
+        .map((e) => `${e.field}: ${e.message}`)
+        .join(" | ");
+
+      console.warn("[updateBanner] ❌ Validação falhou para ID", id, ":", fieldErrors);
       return res.status(400).json({
         success: false,
-        error: "Dados inválidos",
-        details: errorMessages,
+        error: "Dados inválidos do banner",
+        details: errorSummary,
+        validation_errors: fieldErrors,
       });
     }
 
@@ -191,6 +220,7 @@ export const updateBanner: RequestHandler = async (req, res) => {
       success: false,
       error: "Erro ao atualizar banner",
       details: error instanceof Error ? error.message : "Erro desconhecido",
+      timestamp: new Date().toISOString(),
     });
   }
 };
@@ -199,21 +229,36 @@ export const updateBanner: RequestHandler = async (req, res) => {
 export const deleteBanner: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
+    const bannerId = parseInt(id);
 
-    await prisma.banners.delete({
-      where: { id: parseInt(id) },
+    console.log("[deleteBanner] Deletando banner ID:", bannerId);
+
+    const deletedBanner = await prisma.banners.delete({
+      where: { id: bannerId },
+    });
+
+    console.log("[deleteBanner] ✓ Banner deletado com sucesso:", {
+      id: deletedBanner.id,
+      titulo: deletedBanner.titulo,
+      timestamp: new Date().toISOString(),
     });
 
     res.json({
       success: true,
       message: "Banner deletado com sucesso",
+      details: {
+        id: deletedBanner.id,
+        titulo: deletedBanner.titulo,
+        deletedAt: new Date().toISOString(),
+      },
     });
   } catch (error) {
-    console.error("[deleteBanner] Error:", error);
+    console.error("[deleteBanner] 🔴 Erro ao deletar:", error);
     res.status(500).json({
       success: false,
       error: "Erro ao deletar banner",
       details: error instanceof Error ? error.message : "Erro desconhecido",
+      timestamp: new Date().toISOString(),
     });
   }
 };

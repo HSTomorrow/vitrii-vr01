@@ -66,7 +66,7 @@ export default function AdminBanners() {
   const createBannerMutation = useMutation({
     mutationFn: async () => {
       if (!formData.titulo || !formData.imagemUrl) {
-        throw new Error("Título e imagem são obrigatórios");
+        throw new Error("Preencha o título e selecione uma imagem");
       }
 
       const response = await fetch("/api/banners", {
@@ -80,26 +80,40 @@ export default function AdminBanners() {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.details || error.error);
+        const detailedError = error.details || error.error || "Erro desconhecido";
+        throw new Error(detailedError);
       }
 
       return response.json();
     },
-    onSuccess: () => {
-      toast.success("Banner criado com sucesso!");
+    onSuccess: (data) => {
+      const bannerTitulo = data.data?.titulo || "Banner";
+      const bannerId = data.data?.id || "ID desconhecido";
+
+      toast.success(`✓ ${bannerTitulo} criado com sucesso!`, {
+        description: `ID: ${bannerId} | Status: ${data.data?.ativo ? "Ativo" : "Inativo"}`,
+        duration: 4000,
+      });
+
+      console.log("[AdminBanners] Banner criado:", data.data);
       queryClient.invalidateQueries({ queryKey: ["admin-banners"] });
       resetForm();
       setIsCreating(false);
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Erro ao criar");
+      const errorMsg = error instanceof Error ? error.message : "Erro desconhecido ao criar banner";
+      toast.error("❌ Erro ao criar banner", {
+        description: errorMsg,
+        duration: 5000,
+      });
+      console.error("[AdminBanners] Erro ao criar:", errorMsg);
     },
   });
 
   // Update banner mutation
   const updateBannerMutation = useMutation({
     mutationFn: async () => {
-      if (!editingId) throw new Error("ID inválido");
+      if (!editingId) throw new Error("ID do banner não encontrado");
 
       const response = await fetch(`/api/banners/${editingId}`, {
         method: "PUT",
@@ -112,19 +126,33 @@ export default function AdminBanners() {
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.details || error.error);
+        const detailedError = error.details || error.error || "Erro desconhecido";
+        throw new Error(detailedError);
       }
 
       return response.json();
     },
-    onSuccess: () => {
-      toast.success("Banner atualizado com sucesso!");
+    onSuccess: (data) => {
+      const bannerTitulo = data.data?.titulo || "Banner";
+      const bannerId = data.data?.id || editingId;
+
+      toast.success(`✓ ${bannerTitulo} atualizado com sucesso!`, {
+        description: `ID: ${bannerId} | Status: ${data.data?.ativo ? "Ativo" : "Inativo"}`,
+        duration: 4000,
+      });
+
+      console.log("[AdminBanners] Banner atualizado:", data.data);
       queryClient.invalidateQueries({ queryKey: ["admin-banners"] });
       resetForm();
       setEditingId(null);
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Erro ao atualizar");
+      const errorMsg = error instanceof Error ? error.message : "Erro desconhecido ao atualizar banner";
+      toast.error("❌ Erro ao atualizar banner", {
+        description: errorMsg,
+        duration: 5000,
+      });
+      console.error("[AdminBanners] Erro ao atualizar:", errorMsg);
     },
   });
 
@@ -138,34 +166,64 @@ export default function AdminBanners() {
         },
       });
 
-      if (!response.ok) throw new Error("Erro ao deletar banner");
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Erro ao deletar banner");
+      }
+
       return response.json();
     },
-    onSuccess: () => {
-      toast.success("Banner deletado com sucesso!");
+    onSuccess: (data, bannerId) => {
+      toast.success("✓ Banner deletado com sucesso!", {
+        description: `Banner ${bannerId} foi removido permanentemente`,
+        duration: 3000,
+      });
+      console.log("[AdminBanners] Banner deletado:", bannerId);
       queryClient.invalidateQueries({ queryKey: ["admin-banners"] });
     },
-    onError: () => {
-      toast.error("Erro ao deletar banner");
+    onError: (error) => {
+      const errorMsg = error instanceof Error ? error.message : "Erro desconhecido";
+      toast.error("❌ Erro ao deletar banner", {
+        description: errorMsg,
+        duration: 5000,
+      });
+      console.error("[AdminBanners] Erro ao deletar:", errorMsg);
     },
   });
 
   const handleFileUpload = (file: File) => {
     if (!file.type.startsWith("image/")) {
-      toast.error("Selecione um arquivo de imagem válido");
+      toast.error("❌ Tipo de arquivo inválido", {
+        description: `Apenas imagens são aceitas. Você selecionou: ${file.type}`,
+      });
       return;
     }
 
+    const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
     if (file.size > 5 * 1024 * 1024) {
-      toast.error("Arquivo deve ser menor que 5MB");
+      toast.error("❌ Arquivo muito grande", {
+        description: `Arquivo tem ${fileSizeMB}MB. Máximo: 5MB`,
+      });
       return;
     }
 
     setUploadedFile(file);
     const reader = new FileReader();
+    reader.onloadstart = () => {
+      toast.info("Processando imagem...", { duration: 1000 });
+    };
     reader.onloadend = () => {
       setPreviewUrl(reader.result as string);
       setFormData({ ...formData, imagemUrl: reader.result as string });
+      toast.success("✓ Imagem carregada com sucesso!", {
+        description: `${file.name} (${fileSizeMB}MB)`,
+        duration: 3000,
+      });
+    };
+    reader.onerror = () => {
+      toast.error("❌ Erro ao processar imagem", {
+        description: "Tente novamente com outro arquivo",
+      });
     };
     reader.readAsDataURL(file);
   };
