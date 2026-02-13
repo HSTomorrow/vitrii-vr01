@@ -44,7 +44,9 @@ const MultiImageUpload: React.FC<MultiImageUploadProps> = ({
     const totalImages = images.length + newFiles.length;
 
     if (totalImages > maxImages) {
-      toast.error(`Máximo de ${maxImages} imagens permitidas`);
+      toast.error(`❌ Máximo de imagens atingido`, {
+        description: `Máximo permitido: ${maxImages} imagens. Você tem ${images.length}.`,
+      });
       return;
     }
 
@@ -54,11 +56,38 @@ const MultiImageUpload: React.FC<MultiImageUploadProps> = ({
       const uploadedImages: UploadedImage[] = [];
 
       for (const file of newFiles) {
+        // Validate file type
+        const allowedMimes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+        if (!allowedMimes.includes(file.type)) {
+          toast.error(`❌ ${file.name}: Formato inválido`, {
+            description: `Tipo: ${file.type || "desconhecido"} | Use: JPEG, PNG, GIF, WEBP`,
+          });
+          continue;
+        }
+
+        // Validate file extension
+        const extension = file.name.split(".").pop()?.toLowerCase();
+        const validExtensions = ["jpg", "jpeg", "png", "gif", "webp"];
+        if (!extension || !validExtensions.includes(extension)) {
+          toast.error(`❌ ${file.name}: Extensão inválida`, {
+            description: `Extensão: .${extension || "sem extensão"} | Use: ${validExtensions.join(", ")}`,
+          });
+          continue;
+        }
+
+        // Validate file is not empty
+        if (file.size === 0) {
+          toast.error(`❌ ${file.name}: Arquivo vazio`, {
+            description: "O arquivo está vazio. Selecione outro arquivo.",
+          });
+          continue;
+        }
+
         // Validate file size
         if (file.size > MAX_FILE_SIZE_MB * 1024 * 1024) {
           const fileSize = formatFileSize(file.size);
           toast.error(`❌ ${file.name}: Arquivo muito grande`, {
-            description: `Tamanho: ${fileSize} (máximo: ${MAX_FILE_SIZE_MB}MB)`,
+            description: `Tamanho: ${fileSize} | Máximo: ${MAX_FILE_SIZE_MB}MB`,
           });
           continue;
         }
@@ -85,10 +114,23 @@ const MultiImageUpload: React.FC<MultiImageUploadProps> = ({
           clearTimeout(uploadTimeoutId);
 
           if (!response.ok) {
-            throw new Error(`Erro ao fazer upload de ${file.name}`);
+            const errorData = await response.json().catch(() => ({}));
+            const errorMsg = errorData.details || errorData.error || `Erro ao fazer upload de ${file.name}`;
+
+            if (response.status === 413) {
+              throw new Error("Arquivo muito grande para o servidor");
+            } else if (response.status === 400) {
+              throw new Error(errorMsg);
+            } else {
+              throw new Error(errorMsg || `Erro HTTP ${response.status}`);
+            }
           }
 
           const data = await response.json();
+          if (!data.url) {
+            throw new Error("URL do arquivo não retornada pelo servidor");
+          }
+
           const uploadEndTime = Date.now();
           const uploadDuration = (uploadEndTime - uploadStartTime) / 1000;
 
@@ -105,14 +147,26 @@ const MultiImageUpload: React.FC<MultiImageUploadProps> = ({
         } catch (uploadError) {
           clearTimeout(uploadTimeoutId);
 
-          if (uploadError instanceof Error && uploadError.name === "AbortError") {
-            toast.error(`❌ Upload cancelado - tempo excedido`, {
-              description: `${file.name} demorou mais de ${MAX_UPLOAD_TIME_MS / 1000}s para fazer upload. Tente novamente com uma conexão mais rápida ou um arquivo menor.`,
-              duration: 5000,
-            });
+          if (uploadError instanceof Error) {
+            if (uploadError.name === "AbortError") {
+              toast.error(`❌ Upload cancelado - tempo excedido`, {
+                description: `${file.name} demorou mais de ${MAX_UPLOAD_TIME_MS / 1000}s. Tente uma conexão mais rápida.`,
+                duration: 5000,
+              });
+            } else if (uploadError.message.includes("muito grande")) {
+              toast.error(`❌ ${file.name}: Arquivo muito grande`, {
+                description: "O arquivo excede o limite do servidor (5MB). Comprima a imagem.",
+                duration: 5000,
+              });
+            } else {
+              toast.error(`❌ Erro ao fazer upload de ${file.name}`, {
+                description: uploadError.message,
+                duration: 4000,
+              });
+            }
           } else {
             toast.error(`❌ Erro ao fazer upload de ${file.name}`, {
-              description: uploadError instanceof Error ? uploadError.message : "Erro desconhecido",
+              description: "Erro desconhecido durante o upload",
               duration: 4000,
             });
           }
@@ -125,7 +179,7 @@ const MultiImageUpload: React.FC<MultiImageUploadProps> = ({
         onImagesChange(updatedImages);
       }
     } catch (error) {
-      toast.error("Erro ao processar upload", {
+      toast.error("❌ Erro ao processar upload", {
         description: error instanceof Error ? error.message : "Erro desconhecido",
       });
     } finally {

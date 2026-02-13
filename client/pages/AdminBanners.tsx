@@ -257,40 +257,125 @@ export default function AdminBanners() {
   });
 
   const handleFileUpload = (file: File) => {
-    if (!file.type.startsWith("image/")) {
-      toast.error("❌ Tipo de arquivo inválido", {
-        description: `Apenas imagens são aceitas. Você selecionou: ${file.type}`,
+    // Validate file exists
+    if (!file) {
+      toast.error("❌ Arquivo inválido", {
+        description: "Nenhum arquivo foi selecionado",
       });
       return;
     }
 
+    // Validate file type
+    const allowedMimes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+    if (!allowedMimes.includes(file.type)) {
+      toast.error("❌ Formato de arquivo não permitido", {
+        description: `Apenas JPEG, PNG, GIF e WEBP são aceitos. Você selecionou: ${file.type || "desconhecido"}`,
+      });
+      return;
+    }
+
+    // Validate file extension matches MIME type
+    const extension = file.name.split(".").pop()?.toLowerCase();
+    const validExtensions = ["jpg", "jpeg", "png", "gif", "webp"];
+    if (!extension || !validExtensions.includes(extension)) {
+      toast.error("❌ Extensão de arquivo inválida", {
+        description: `Use: ${validExtensions.join(", ")}. Seu arquivo: .${extension || "sem extensão"}`,
+      });
+      return;
+    }
+
+    // Validate file size
     const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
-    if (file.size > 5 * 1024 * 1024) {
+    const MAX_SIZE_MB = 5;
+    if (file.size > MAX_SIZE_MB * 1024 * 1024) {
       toast.error("❌ Arquivo muito grande", {
-        description: `Arquivo tem ${fileSizeMB}MB. Máximo: 5MB`,
+        description: `Tamanho: ${fileSizeMB}MB | Máximo permitido: ${MAX_SIZE_MB}MB`,
       });
       return;
     }
 
+    // Warn if file is empty
+    if (file.size === 0) {
+      toast.error("❌ Arquivo vazio", {
+        description: "O arquivo selecionado está vazio. Selecione outro arquivo.",
+      });
+      return;
+    }
+
+    // Process file with FileReader
     setUploadedFile(file);
     const reader = new FileReader();
+
+    let processingToastId: string | number | undefined;
+
     reader.onloadstart = () => {
-      toast.info("Processando imagem...", { duration: 1000 });
+      processingToastId = toast.loading("⏳ Processando imagem...", {
+        duration: Infinity
+      });
     };
-    reader.onloadend = () => {
-      setPreviewUrl(reader.result as string);
-      setFormData({ ...formData, imagemUrl: reader.result as string });
+
+    reader.onload = () => {
+      // Validate that data URL was created
+      if (!reader.result || typeof reader.result !== "string") {
+        if (processingToastId) toast.dismiss(processingToastId);
+        toast.error("❌ Erro ao processar imagem", {
+          description: "Falha ao ler o arquivo. Tente novamente.",
+        });
+        return;
+      }
+
+      // Validate data URL size (base64 encoded)
+      const dataUrlSizeMB = (reader.result.length / (1024 * 1024)).toFixed(2);
+      if (reader.result.length > 10 * 1024 * 1024) {
+        if (processingToastId) toast.dismiss(processingToastId);
+        toast.error("❌ Imagem muito grande após processamento", {
+          description: `Tamanho processado: ${dataUrlSizeMB}MB. Tente com uma imagem menor.`,
+        });
+        return;
+      }
+
+      setPreviewUrl(reader.result);
+      setFormData({ ...formData, imagemUrl: reader.result });
+
+      if (processingToastId) toast.dismiss(processingToastId);
       toast.success("✓ Imagem carregada com sucesso!", {
-        description: `${file.name} (${fileSizeMB}MB)`,
+        description: `${file.name} (${fileSizeMB}MB) - Pronto para usar`,
         duration: 3000,
       });
     };
+
     reader.onerror = () => {
+      if (processingToastId) toast.dismiss(processingToastId);
+      const errorMsg = reader.error?.name === "NotReadableError"
+        ? "O arquivo não pode ser lido. Pode estar corrompido."
+        : "Erro ao processar imagem";
+
       toast.error("❌ Erro ao processar imagem", {
-        description: "Tente novamente com outro arquivo",
+        description: errorMsg,
       });
+      setUploadedFile(null);
+      setPreviewUrl("");
     };
-    reader.readAsDataURL(file);
+
+    reader.onabort = () => {
+      if (processingToastId) toast.dismiss(processingToastId);
+      toast.warning("⚠️ Leitura do arquivo cancelada", {
+        description: "Tente novamente",
+      });
+      setUploadedFile(null);
+      setPreviewUrl("");
+    };
+
+    try {
+      reader.readAsDataURL(file);
+    } catch (error) {
+      if (processingToastId) toast.dismiss(processingToastId);
+      toast.error("❌ Erro ao iniciar leitura do arquivo", {
+        description: error instanceof Error ? error.message : "Erro desconhecido",
+      });
+      setUploadedFile(null);
+      setPreviewUrl("");
+    }
   };
 
   const handleDragOver = (e: React.DragEvent) => {
