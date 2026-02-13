@@ -30,6 +30,25 @@ export default function MeusAnuncios() {
   const [selectedAdForPayment, setSelectedAdForPayment] = useState<any | null>(null);
   const [copied, setCopied] = useState(false);
 
+  // Fallback copy function for older browsers
+  const fallbackCopy = (text: string) => {
+    try {
+      const textArea = document.createElement("textarea");
+      textArea.value = text;
+      textArea.style.position = "fixed";
+      textArea.style.left = "-9999px";
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textArea);
+      setCopied(true);
+      toast.success("✓ Chave PIX copiada com sucesso!");
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      toast.error("Erro ao copiar. Tente selecionar e copiar manualmente.");
+    }
+  };
+
   // Fetch user's ads (query is disabled if user is not logged in)
   const {
     data: anunciosData,
@@ -431,31 +450,70 @@ export default function MeusAnuncios() {
               {/* PIX Key Section */}
               <div>
                 <h3 className="font-semibold text-vitrii-text mb-3">
-                  Copiar Chave PIX
+                  Chave PIX para Pagamento
                 </h3>
-                <p className="text-xs text-vitrii-text-secondary mb-2">
-                  Clique no botão para copiar a chave e pagar via seu app
-                  bancário
-                </p>
+
+                {/* PIX Info Card */}
+                <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 mb-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm font-semibold text-blue-900">Dados do PIX</span>
+                    <span className="text-lg font-bold text-vitrii-blue">R$ 19,90</span>
+                  </div>
+                  <p className="text-sm text-blue-800">
+                    <strong>Chave PIX (Email):</strong> contato@herestomorrow.com
+                  </p>
+                </div>
+
+                {/* PIX Key Display */}
+                <div className="mb-3">
+                  <label className="text-xs font-semibold text-vitrii-text-secondary block mb-2">
+                    Chave PIX Completa (Copia Automática):
+                  </label>
+                  <div className="bg-gray-50 border-2 border-gray-300 rounded-lg p-4 mb-3">
+                    <code className="text-xs text-vitrii-text font-mono break-all whitespace-normal leading-relaxed">
+                      {PIX_KEY}
+                    </code>
+                  </div>
+                </div>
+
+                {/* Copy Button */}
                 <button
                   onClick={() => {
-                    navigator.clipboard.writeText(PIX_KEY).then(() => {
-                      setCopied(true);
-                      toast.success("Chave PIX copiada!");
-                      setTimeout(() => setCopied(false), 2000);
-                    }).catch(() => {
-                      toast.error("Erro ao copiar chave PIX");
-                    });
+                    try {
+                      // Modern Clipboard API
+                      if (navigator.clipboard && window.isSecureContext) {
+                        navigator.clipboard.writeText(PIX_KEY).then(() => {
+                          setCopied(true);
+                          toast.success("✓ Chave PIX copiada com sucesso!");
+                          setTimeout(() => setCopied(false), 2000);
+                        }).catch(() => {
+                          // Fallback: try old method
+                          fallbackCopy(PIX_KEY);
+                        });
+                      } else {
+                        // Fallback for older browsers
+                        fallbackCopy(PIX_KEY);
+                      }
+                    } catch (error) {
+                      toast.error("Erro ao copiar. Tente selecionar e copiar manualmente.");
+                    }
                   }}
-                  className="w-full bg-gray-100 hover:bg-gray-200 border-2 border-gray-300 rounded-lg p-4 flex items-center justify-between transition-colors"
+                  className={`w-full px-4 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${
+                    copied
+                      ? "bg-green-100 text-green-700 border-2 border-green-300"
+                      : "bg-vitrii-blue text-white border-2 border-vitrii-blue hover:bg-vitrii-blue-dark"
+                  }`}
                 >
-                  <code className="text-xs text-vitrii-text font-mono truncate">
-                    {PIX_KEY}
-                  </code>
                   {copied ? (
-                    <Check className="w-5 h-5 text-green-600 flex-shrink-0 ml-2" />
+                    <>
+                      <Check className="w-5 h-5" />
+                      Copiado!
+                    </>
                   ) : (
-                    <Copy className="w-5 h-5 text-vitrii-blue flex-shrink-0 ml-2" />
+                    <>
+                      <Copy className="w-5 h-5" />
+                      Copiar Chave PIX
+                    </>
                   )}
                 </button>
               </div>
