@@ -42,7 +42,7 @@ interface MembroEquipe {
   status: string;
 }
 
-const PIX_KEY = "heres.tomorrow@email.com"; // TODO: Replace with actual Heres Tomorrow PIX key (CPF, CNPJ, email or phone)
+const PIX_KEY = "00020101021126470014br.gov.bcb.pix0125contato@herestomorrow.com520400005303986540519.905802BR5914HERES TOMORROW6009SAO PAULO622905251KHC5J8MPZBEFKH86HJ3H33VE6304A7E5";
 
 export default function AnuncioDetalhe() {
   const { id } = useParams<{ id: string }>();
