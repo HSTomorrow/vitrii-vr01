@@ -546,6 +546,54 @@ export const confirmarPagamento: RequestHandler = async (req, res) => {
   }
 };
 
+// POST - Mark payment as realized (from MeusAnuncios modal)
+// This function updates ad status immediately when user clicks "Pagamento Realizado"
+export const marcarPagamentoRealizado: RequestHandler = async (req, res) => {
+  try {
+    const { anuncioId } = req.body;
+
+    if (!anuncioId) {
+      return res.status(400).json({
+        success: false,
+        error: "anuncioId é obrigatório",
+      });
+    }
+
+    // Verify that the anuncio exists
+    const anuncio = await prisma.anuncios.findUnique({
+      where: { id: parseInt(anuncioId) },
+    });
+
+    if (!anuncio) {
+      return res.status(404).json({
+        success: false,
+        error: "Anúncio não encontrado",
+      });
+    }
+
+    // Update ad status to "em_analise" and statusPagamento to "aguardando_confirmacao_pagamento"
+    const anuncioAtualizado = await prisma.anuncios.update({
+      where: { id: parseInt(anuncioId) },
+      data: {
+        status: "em_analise",
+        statusPagamento: "aguardando_confirmacao_pagamento",
+      },
+    });
+
+    res.json({
+      success: true,
+      data: anuncioAtualizado,
+      message: "Pagamento marcado como realizado. Aguardando análise.",
+    });
+  } catch (error) {
+    console.error("Erro ao marcar pagamento como realizado:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao marcar pagamento como realizado",
+    });
+  }
+};
+
 // Helper function to generate mock Pix QR Code data
 // In production, this would call Mercado Pago API
 function generateMockQRCode(valor: number, pixId: string) {

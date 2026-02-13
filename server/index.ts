@@ -139,6 +139,7 @@ import {
   rejeitarPagamento,
   confirmarPagamento,
   getPagamentos,
+  marcarPagamentoRealizado,
 } from "./routes/pagamentos";
 import {
   getConversas,
@@ -512,6 +513,7 @@ export function createServer() {
   app.post("/api/pagamentos/:id/comprovante", uploadComprovantePagemento);
   app.post("/api/pagamentos/:id/aprovar", aprovarPagamento);
   app.post("/api/pagamentos/:id/rejeitar", rejeitarPagamento);
+  app.post("/api/anuncios/:anuncioId/marcar-pagamento-realizado", marcarPagamentoRealizado);
   app.patch(
     "/api/pagamentos/:id/confirmar",
     extractUserId,

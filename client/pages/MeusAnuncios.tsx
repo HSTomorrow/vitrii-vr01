@@ -29,6 +29,7 @@ export default function MeusAnuncios() {
   const [isDeleting, setIsDeleting] = useState(false);
   const [selectedAdForPayment, setSelectedAdForPayment] = useState<any | null>(null);
   const [copied, setCopied] = useState(false);
+  const [isMarkingPayment, setIsMarkingPayment] = useState(false);
 
   // Fallback copy function for older browsers
   const fallbackCopy = (text: string) => {
@@ -124,6 +125,40 @@ export default function MeusAnuncios() {
       });
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handleMarcarPagamentoRealizado = async () => {
+    if (!selectedAdForPayment?.id) return;
+
+    setIsMarkingPayment(true);
+    try {
+      const response = await fetch(
+        `/api/anuncios/${selectedAdForPayment.id}/marcar-pagamento-realizado`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({}),
+        }
+      );
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Erro ao marcar pagamento");
+      }
+
+      toast.success("Pagamento marcado como realizado! Aguardando análise...");
+      setSelectedAdForPayment(null);
+      refetch();
+      setTimeout(() => {
+        navigate(`/checkout/${selectedAdForPayment.id}`);
+      }, 1000);
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao marcar pagamento"
+      );
+    } finally {
+      setIsMarkingPayment(false);
     }
   };
 
@@ -410,25 +445,25 @@ export default function MeusAnuncios() {
           <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             {/* Header */}
             <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between sticky top-0">
-              <h2 className="text-xl font-bold text-vitrii-text">
+              <h2 className="text-lg font-bold text-vitrii-text">
                 Efetuar Pagamento - C6 Bank PIX
               </h2>
               <button
                 onClick={() => setSelectedAdForPayment(null)}
                 className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                <X className="w-5 h-5 text-gray-500" />
+                <X className="w-4.5 h-4.5 text-gray-500" />
               </button>
             </div>
 
             {/* Content */}
-            <div className="p-6 space-y-6">
+            <div className="p-5 space-y-5">
               {/* Instructions */}
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-sm font-semibold text-blue-900 mb-2">
+                <p className="text-xs font-semibold text-blue-900 mb-2">
                   📱 Como pagar via PIX:
                 </p>
-                <ol className="text-sm text-blue-800 space-y-1 list-decimal list-inside">
+                <ol className="text-xs text-blue-800 space-y-1 list-decimal list-inside">
                   <li>Abra seu app bancário</li>
                   <li>Escaneie o QR Code abaixo OU copie a chave PIX</li>
                   <li>Confirme o pagamento de R$ 19,90 (3 meses de anúncio)</li>
@@ -438,7 +473,7 @@ export default function MeusAnuncios() {
 
               {/* QR Code Section */}
               <div>
-                <h3 className="font-semibold text-vitrii-text mb-3">
+                <h3 className="font-semibold text-vitrii-text mb-3 text-sm">
                   QR Code PIX
                 </h3>
                 <div className="flex justify-center">
@@ -446,7 +481,7 @@ export default function MeusAnuncios() {
                     <img
                       src="https://cdn.builder.io/api/v1/image/assets%2Ff2e9e91d4cc44d4bae5b9dac3bb6abe8%2F97d00882ea4a4c149ab37215aedb309b?format=webp&width=800&height=1200"
                       alt="PIX QR Code"
-                      className="w-64 h-64 object-contain"
+                      className="w-56 h-56 object-contain"
                     />
                   </div>
                 </div>
@@ -454,17 +489,17 @@ export default function MeusAnuncios() {
 
               {/* PIX Key Section */}
               <div>
-                <h3 className="font-semibold text-vitrii-text mb-3">
+                <h3 className="font-semibold text-vitrii-text mb-3 text-sm">
                   Chave PIX para Pagamento
                 </h3>
 
                 {/* PIX Info Card */}
                 <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 mb-4">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-sm font-semibold text-blue-900">Dados do PIX</span>
-                    <span className="text-lg font-bold text-vitrii-blue">R$ 19,90</span>
+                    <span className="text-xs font-semibold text-blue-900">Dados do PIX</span>
+                    <span className="text-base font-bold text-vitrii-blue">R$ 19,90</span>
                   </div>
-                  <p className="text-sm text-blue-800">
+                  <p className="text-xs text-blue-800">
                     <strong>Chave PIX (Email):</strong> contato@herestomorrow.com
                   </p>
                 </div>
@@ -503,7 +538,7 @@ export default function MeusAnuncios() {
                       toast.error("Erro ao copiar. Tente selecionar e copiar manualmente.");
                     }
                   }}
-                  className={`w-full px-4 py-3 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 ${
+                  className={`w-full px-3.5 py-2.5 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 text-xs ${
                     copied
                       ? "bg-green-100 text-green-700 border-2 border-green-300"
                       : "bg-vitrii-blue text-white border-2 border-vitrii-blue hover:bg-vitrii-blue-dark"
@@ -511,12 +546,12 @@ export default function MeusAnuncios() {
                 >
                   {copied ? (
                     <>
-                      <Check className="w-5 h-5" />
+                      <Check className="w-4 h-4" />
                       Copiado!
                     </>
                   ) : (
                     <>
-                      <Copy className="w-5 h-5" />
+                      <Copy className="w-4 h-4" />
                       Copiar Chave PIX
                     </>
                   )}
@@ -525,10 +560,10 @@ export default function MeusAnuncios() {
 
               {/* Payment Confirmation */}
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <p className="text-sm text-yellow-900 font-semibold mb-2">
+                <p className="text-xs text-yellow-900 font-semibold mb-2">
                   ⚠️ Importante:
                 </p>
-                <p className="text-sm text-yellow-800">
+                <p className="text-xs text-yellow-800">
                   Após realizar o pagamento via PIX, clique no botão abaixo
                   para registrar o comprovante e iniciar a análise de validação
                   do pagamento (até 24 horas).
@@ -540,22 +575,18 @@ export default function MeusAnuncios() {
                 <button
                   type="button"
                   onClick={() => setSelectedAdForPayment(null)}
-                  className="flex-1 px-4 py-2 border-2 border-vitrii-blue text-vitrii-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+                  className="flex-1 px-3.5 py-1.5 border-2 border-vitrii-blue text-vitrii-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors text-xs"
                 >
                   Cancelar
                 </button>
                 <button
                   type="button"
-                  onClick={() => {
-                    toast.info(
-                      "Você será redirecionado para a página de confirmação de pagamento",
-                    );
-                    navigate(`/checkout/${selectedAdForPayment.id}`);
-                  }}
-                  className="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+                  onClick={handleMarcarPagamentoRealizado}
+                  disabled={isMarkingPayment}
+                  className="flex-1 px-3.5 py-1.5 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2 text-xs disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <Check className="w-4 h-4" />
-                  Pagamento Realizado
+                  <Check className="w-3.5 h-3.5" />
+                  {isMarkingPayment ? "Processando..." : "Pagamento Realizado"}
                 </button>
               </div>
             </div>
