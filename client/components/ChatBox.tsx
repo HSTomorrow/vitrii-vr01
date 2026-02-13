@@ -7,10 +7,16 @@ import ProfileCompletionGate from "./ProfileCompletionGate";
 interface Message {
   id: number;
   conteudo: string;
-  tipoRemetente: "usuario" | "anunciante";
   dataCriacao: string;
-  lido: boolean;
-  remetente: {
+  status: "nao_lida" | "lida" | "entregue";
+  excluido: boolean;
+  usuarioId?: number;
+  anuncianteId?: number;
+  usuario?: {
+    id: number;
+    nome: string;
+  };
+  anunciante?: {
     id: number;
     nome: string;
   };
@@ -65,8 +71,8 @@ export default function ChatBox({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           conversaId,
-          remetentId: currentUserId,
-          tipoRemetente: tipoUsuario,
+          usuarioId: tipoUsuario === "usuario" ? currentUserId : null,
+          anuncianteId: tipoUsuario === "anunciante" ? currentUserId : null,
           conteudo,
         }),
       });
@@ -90,7 +96,7 @@ export default function ChatBox({
     },
   });
 
-  // Delete message mutation
+  // Delete message mutation (soft delete)
   const deleteMessageMutation = useMutation({
     mutationFn: async (messageId: number) => {
       const response = await fetch(`/api/mensagens/${messageId}`, {
@@ -102,10 +108,10 @@ export default function ChatBox({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["conversa", conversaId] });
-      toast.success("Mensagem deletada");
+      toast.success("Mensagem deletada com sucesso");
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Erro ao deletar");
+      toast.error(error instanceof Error ? error.message : "Erro ao deletar mensagem");
     },
   });
 
@@ -178,16 +184,19 @@ export default function ChatBox({
   );
 
   // Memoized grouped messages (recalculated only when messages or formatDate change)
+  // Filter out deleted messages
   const groupedMessages = useMemo(() => {
-    return messages.reduce(
-      (acc, msg) => {
-        const date = formatDate(msg.dataCriacao);
-        if (!acc[date]) acc[date] = [];
-        acc[date].push(msg);
-        return acc;
-      },
-      {} as Record<string, Message[]>,
-    );
+    return messages
+      .filter((msg) => !msg.excluido)
+      .reduce(
+        (acc, msg) => {
+          const date = formatDate(msg.dataCriacao);
+          if (!acc[date]) acc[date] = [];
+          acc[date].push(msg);
+          return acc;
+        },
+        {} as Record<string, Message[]>,
+      );
   }, [messages, formatDate]);
 
   return (
@@ -213,7 +222,11 @@ export default function ChatBox({
 
                 {/* Messages for this date */}
                 {msgs.map((msg) => {
-                  const isCurrentUser = msg.remetente.id === currentUserId;
+                  const isCurrentUser = (msg.usuarioId === currentUserId && tipoUsuario === "usuario") ||
+                                       (msg.anuncianteId === currentUserId && tipoUsuario === "anunciante");
+                  const remetente = msg.usuario || msg.anunciante;
+                  const remetenteNome = remetente?.nome || "Usuário desconhecido";
+
                   return (
                     <div
                       key={msg.id}
@@ -225,16 +238,19 @@ export default function ChatBox({
                           isCurrentUser ? "bg-vitrii-blue" : "bg-gray-400"
                         }`}
                       >
-                        {msg.remetente.nome.charAt(0).toUpperCase()}
+                        {remetenteNome.charAt(0).toUpperCase()}
                       </div>
 
                       {/* Message Content */}
                       <div
                         className={`flex flex-col ${isCurrentUser ? "items-end" : "items-start"}`}
                       >
-                        <p className="text-xs text-vitrii-text-secondary mb-1">
-                          {msg.remetente.nome} • {formatTime(msg.dataCriacao)}
-                        </p>
+                        <div className="text-xs text-vitrii-text-secondary mb-1 flex items-center gap-2">
+                          <span>{remetenteNome}</span>
+                          <span>•</span>
+                          <span>{formatTime(msg.dataCriacao)}</span>
+                          {msg.status === "lida" && <span>✓</span>}
+                        </div>
                         <div
                           className={`max-w-xs px-4 py-2 rounded-lg ${
                             isCurrentUser
@@ -251,15 +267,11 @@ export default function ChatBox({
                             onClick={() => deleteMessageMutation.mutate(msg.id)}
                             disabled={deleteMessageMutation.isPending}
                             className="mt-1 text-xs text-gray-400 hover:text-red-600 transition-colors flex items-center gap-1"
+                            title="Deletar mensagem"
                           >
                             <Trash2 className="w-3 h-3" />
                             Deletar
                           </button>
-                        )}
-
-                        {/* Read Status */}
-                        {isCurrentUser && msg.lido && (
-                          <p className="text-xs text-gray-400 mt-1">✓ Lido</p>
                         )}
                       </div>
                     </div>

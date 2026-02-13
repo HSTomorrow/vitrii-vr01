@@ -37,6 +37,8 @@ model anunciantes {
   wishlist_permissoes  listas_desejos_permissoes[]
   agendas              agendas[]
   links_externos       links_produtos_externos[]
+  conversas            conversas[]
+  mensagens            mensagens[]
 }
 
 model anuncios {
@@ -66,6 +68,7 @@ model anuncios {
   fotos               fotos_anuncio[]
   wishlists_itens     listas_desejos_itens[]
   agendas             agendas[]
+  conversas           conversas[]
 }
 
 // Anuncio Visualizacoes - Log table to track ad views
@@ -218,6 +221,8 @@ model usracessos {
   listas_desejos        listas_desejos[]
   reservas_agenda       reservas_agenda[]
   lista_espera_agenda   lista_espera_agenda[]
+  conversas             conversas[]
+  mensagens             mensagens[]
 }
 
 model passwordResetToken {
@@ -466,4 +471,49 @@ model lista_espera_agenda {
   @@index([agendaId])
   @@index([usuarioId])
   @@index([status])
+}
+
+// Conversas (Chat Conversations)
+model conversas {
+  id                  Int         @id @default(autoincrement())
+  usuarioId           Int
+  anuncianteId        Int
+  anuncioId           Int?
+  assunto             String      @db.VarChar(255)
+  tipo                String      @default("privada") @db.VarChar(50) // "privada" ou "publica"
+  dataCriacao         DateTime    @default(now())
+  dataAtualizacao     DateTime    @updatedAt
+
+  usuario             usracessos  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  anunciante          anunciantes @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
+  anuncio             anuncios?   @relation(fields: [anuncioId], references: [id], onDelete: SetNull)
+  mensagens           mensagens[]
+
+  @@index([usuarioId])
+  @@index([anuncianteId])
+  @@index([anuncioId])
+  @@index([dataCriacao])
+}
+
+// Mensagens (Messages)
+model mensagens {
+  id                  Int       @id @default(autoincrement())
+  conversaId          Int
+  usuarioId           Int?
+  anuncianteId        Int?
+  conteudo            String    @db.Text
+  status              String    @default("nao_lida") @db.VarChar(50) // "nao_lida", "lida", "entregue"
+  excluido            Boolean   @default(false) // Soft delete flag
+  dataCriacao         DateTime  @default(now())
+  dataAtualizacao     DateTime  @updatedAt
+
+  conversa            conversas @relation(fields: [conversaId], references: [id], onDelete: Cascade)
+  usuario             usracessos? @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+  anunciante          anunciantes? @relation(fields: [anuncianteId], references: [id], onDelete: SetNull)
+
+  @@index([conversaId])
+  @@index([usuarioId])
+  @@index([anuncianteId])
+  @@index([dataCriacao])
+  @@index([excluido])
 }

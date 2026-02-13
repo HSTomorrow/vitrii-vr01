@@ -1,211 +1,211 @@
-import { RequestHandler } from "express";
-import prisma from "../lib/prisma";
-import { z } from "zod";
+import { Router, Request, Response } from "express";
+import { prisma } from "../lib/prisma";
 
-// Schema validation
-const ConversaCreateSchema = z.object({
-  usuarioId: z.number().int().positive("Usuário é obrigatório"),
-  anuncianteId: z.number().int().positive("Anunciante é obrigatório"),
-  anuncioId: z.number().int().optional(),
-  assunto: z.string().min(1, "Assunto é obrigatório"),
-  tipo: z.enum(["publica", "privada"]).default("privada"),
-});
-
-const MensagemCreateSchema = z.object({
-  conteudo: z
-    .string()
-    .min(1, "Mensagem não pode estar vazia")
-    .max(2000, "Mensagem muito longa"),
-  tipoRemetente: z.enum(["usuario", "anunciante"]),
-});
-
-// GET all conversations for a user/anunciante
-export const getConversas: RequestHandler = async (req, res) => {
+export async function getConversas(req: Request, res: Response) {
   try {
-    const { usuarioId, anuncianteId, tipo } = req.query;
+    const { usuarioId } = req.query;
 
-    const where: any = {};
-    if (usuarioId) where.usuarioId = parseInt(usuarioId as string);
-    if (anuncianteId) where.anuncianteId = parseInt(anuncianteId as string);
-    if (tipo) where.tipo = tipo;
-    where.isActive = true;
+    if (!usuarioId) {
+      return res.status(400).json({ error: "usuarioId é obrigatório" });
+    }
 
-    const conversas = await prisma.conversa.findMany({
-      where,
-      include: {
+    const conversas = await prisma.conversas.findMany({
+      where: {
+        usuarioId: parseInt(usuarioId as string, 10),
+      },
+      select: {
+        id: true,
+        usuarioId: true,
+        anuncianteId: true,
+        anuncioId: true,
+        assunto: true,
+        tipo: true,
+        dataCriacao: true,
+        dataAtualizacao: true,
         usuario: {
-          select: { id: true, nome: true, email: true },
+          select: {
+            id: true,
+            nome: true,
+            email: true,
+          },
         },
         anunciante: {
-          select: { id: true, nome: true },
+          select: {
+            id: true,
+            nome: true,
+          },
         },
         anuncio: {
-          select: { id: true, titulo: true },
+          select: {
+            id: true,
+            titulo: true,
+          },
         },
         mensagens: {
+          where: { excluido: false },
+          select: {
+            id: true,
+            conteudo: true,
+            dataCriacao: true,
+            status: true,
+          },
           orderBy: { dataCriacao: "desc" },
           take: 1,
         },
       },
-      orderBy: { dataUltimaMensagem: "desc" },
+      orderBy: { dataAtualizacao: "desc" },
     });
 
-    res.json({
-      success: true,
-      data: conversas,
-      count: conversas.length,
-    });
+    // Format response with last message
+    const formattedConversas = conversas.map((conversa) => ({
+      ...conversa,
+      ultimaMensagem: conversa.mensagens[0]?.conteudo || "",
+      dataUltimaMensagem:
+        conversa.mensagens[0]?.dataCriacao || conversa.dataCriacao,
+    }));
+
+    res.json({ data: formattedConversas });
   } catch (error) {
-    console.error("Error fetching conversas:", error);
-    res.status(500).json({
-      success: false,
-      error: "Erro ao buscar conversas",
-    });
+    console.error("[getConversas] Error:", error);
+    res.status(500).json({ error: "Erro ao buscar conversas" });
   }
-};
+}
 
-// GET conversation by ID with messages
-export const getConversaById: RequestHandler = async (req, res) => {
+export async function getConversaById(req: Request, res: Response) {
   try {
-    const { id } = req.params;
+    const { conversaId } = req.params;
+    const conversaIdNum = parseInt(conversaId, 10);
 
-    const conversa = await prisma.conversa.findUnique({
-      where: { id: parseInt(id) },
-      include: {
+    const conversa = await prisma.conversas.findUnique({
+      where: { id: conversaIdNum },
+      select: {
+        id: true,
+        usuarioId: true,
+        anuncianteId: true,
+        anuncioId: true,
+        assunto: true,
+        tipo: true,
+        dataCriacao: true,
+        dataAtualizacao: true,
         usuario: {
-          select: { id: true, nome: true, email: true, telefone: true },
+          select: {
+            id: true,
+            nome: true,
+            email: true,
+          },
         },
         anunciante: {
-          select: { id: true, nome: true },
+          select: {
+            id: true,
+            nome: true,
+          },
         },
         anuncio: {
-          select: { id: true, titulo: true, fotoUrl: true },
+          select: {
+            id: true,
+            titulo: true,
+          },
         },
         mensagens: {
-          orderBy: { dataCriacao: "asc" },
-          include: {
-            remetente: {
-              select: { id: true, nome: true },
+          where: { excluido: false },
+          select: {
+            id: true,
+            conversaId: true,
+            conteudo: true,
+            status: true,
+            dataCriacao: true,
+            usuarioId: true,
+            anuncianteId: true,
+            usuario: {
+              select: {
+                id: true,
+                nome: true,
+              },
+            },
+            anunciante: {
+              select: {
+                id: true,
+                nome: true,
+              },
             },
           },
+          orderBy: { dataCriacao: "asc" },
         },
       },
     });
 
     if (!conversa) {
-      return res.status(404).json({
-        success: false,
-        error: "Conversa não encontrada",
+      return res.status(404).json({ error: "Conversa não encontrada" });
+    }
+
+    res.json({ data: conversa });
+  } catch (error) {
+    console.error("[getConversaById] Error:", error);
+    res.status(500).json({ error: "Erro ao buscar conversa" });
+  }
+}
+
+export async function createConversa(req: Request, res: Response) {
+  try {
+    const { usuarioId, anuncianteId, anuncioId, assunto, tipo } = req.body;
+
+    if (!usuarioId || !anuncianteId || !assunto) {
+      return res.status(400).json({
+        error: "usuarioId, anuncianteId, e assunto são obrigatórios",
       });
     }
 
-    res.json({
-      success: true,
-      data: conversa,
-    });
-  } catch (error) {
-    console.error("Error fetching conversa:", error);
-    res.status(500).json({
-      success: false,
-      error: "Erro ao buscar conversa",
-    });
-  }
-};
-
-// CREATE new conversation
-export const createConversa: RequestHandler = async (req, res) => {
-  try {
-    const validatedData = ConversaCreateSchema.parse(req.body);
-
-    // Check if conversation already exists
-    const existingConversa = await prisma.conversa.findUnique({
-      where: {
-        usuarioId_anuncianteId_anuncioId: {
-          usuarioId: validatedData.usuarioId,
-          anuncianteId: validatedData.anuncianteId,
-          anuncioId: validatedData.anuncioId || null,
+    const conversa = await prisma.conversas.create({
+      data: {
+        usuarioId,
+        anuncianteId,
+        anuncioId: anuncioId || null,
+        assunto,
+        tipo: tipo || "privada",
+      },
+      select: {
+        id: true,
+        usuarioId: true,
+        anuncianteId: true,
+        anuncioId: true,
+        assunto: true,
+        tipo: true,
+        dataCriacao: true,
+        dataAtualizacao: true,
+        usuario: {
+          select: {
+            id: true,
+            nome: true,
+          },
+        },
+        anunciante: {
+          select: {
+            id: true,
+            nome: true,
+          },
         },
       },
     });
 
-    if (existingConversa && existingConversa.isActive) {
-      return res.status(400).json({
-        success: false,
-        error: "Conversa já existe",
-        data: existingConversa,
-      });
-    }
-
-    // If conversation was deleted, reactivate it
-    if (existingConversa && !existingConversa.isActive) {
-      const reactivated = await prisma.conversa.update({
-        where: { id: existingConversa.id },
-        data: { isActive: true },
-        include: {
-          usuario: { select: { id: true, nome: true } },
-          anunciante: { select: { id: true, nome: true } },
-          anuncio: { select: { id: true, titulo: true } },
-        },
-      });
-
-      return res.status(201).json({
-        success: true,
-        data: reactivated,
-        message: "Conversa reativada",
-      });
-    }
-
-    const conversa = await prisma.conversa.create({
-      data: validatedData,
-      include: {
-        usuario: { select: { id: true, nome: true } },
-        anunciante: { select: { id: true, nome: true } },
-        anuncio: { select: { id: true, titulo: true } },
-      },
-    });
-
-    res.status(201).json({
-      success: true,
-      data: conversa,
-      message: "Conversa criada com sucesso",
-    });
+    res.status(201).json({ data: conversa });
   } catch (error) {
-    if (error instanceof z.ZodError) {
-      return res.status(400).json({
-        success: false,
-        error: "Dados inválidos",
-        details: error.errors,
-      });
-    }
-
-    console.error("Error creating conversa:", error);
-    res.status(500).json({
-      success: false,
-      error: "Erro ao criar conversa",
-    });
+    console.error("[createConversa] Error:", error);
+    res.status(500).json({ error: "Erro ao criar conversa" });
   }
-};
+}
 
-// DELETE/DEACTIVATE conversation
-export const deleteConversa: RequestHandler = async (req, res) => {
+export async function deleteConversa(req: Request, res: Response) {
   try {
-    const { id } = req.params;
+    const { conversaId } = req.params;
+    const conversaIdNum = parseInt(conversaId, 10);
 
-    const conversa = await prisma.conversa.update({
-      where: { id: parseInt(id) },
-      data: { isActive: false },
+    await prisma.conversas.delete({
+      where: { id: conversaIdNum },
     });
 
-    res.json({
-      success: true,
-      data: conversa,
-      message: "Conversa deletada",
-    });
+    res.json({ data: { message: "Conversa deletada com sucesso" } });
   } catch (error) {
-    console.error("Error deleting conversa:", error);
-    res.status(500).json({
-      success: false,
-      error: "Erro ao deletar conversa",
-    });
+    console.error("[deleteConversa] Error:", error);
+    res.status(500).json({ error: "Erro ao deletar conversa" });
   }
-};
+}

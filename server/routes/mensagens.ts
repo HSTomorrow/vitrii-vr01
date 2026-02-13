@@ -1,259 +1,185 @@
-import { RequestHandler } from "express";
-import prisma from "../lib/prisma";
-import { z } from "zod";
+import { Router, Request, Response } from "express";
+import { prisma } from "../lib/prisma";
 
-// Schema validation
-const MensagemCreateSchema = z.object({
-  conversaId: z.number().int().positive("Conversa é obrigatória"),
-  remetentId: z.number().int().positive("Remetente é obrigatório"),
-  tipoRemetente: z.enum(["usuario", "anunciante"]),
-  conteudo: z
-    .string()
-    .min(1, "Mensagem não pode estar vazia")
-    .max(2000, "Mensagem muito longa"),
-});
-
-// GET messages for a conversation
-export const getMensagensConversa: RequestHandler = async (req, res) => {
+export async function getMensagensConversa(req: Request, res: Response) {
   try {
     const { conversaId } = req.params;
-    const { limit = "50", offset = "0" } = req.query;
+    const conversaIdNum = parseInt(conversaId, 10);
 
-    const conversaIdInt = parseInt(conversaId);
-    const limitInt = Math.min(parseInt(limit as string), 100);
-    const offsetInt = parseInt(offset as string);
-
-    // Verify conversation exists
-    const conversa = await prisma.conversa.findUnique({
-      where: { id: conversaIdInt },
-    });
-
-    if (!conversa) {
-      return res.status(404).json({
-        success: false,
-        error: "Conversa não encontrada",
-      });
-    }
-
-    // Get messages
-    const [mensagens, total] = await Promise.all([
-      prisma.mensagem.findMany({
-        where: {
-          conversaId: conversaIdInt,
-          isActive: true,
-        },
-        include: {
-          remetente: {
-            select: { id: true, nome: true },
-          },
-        },
-        orderBy: { dataCriacao: "desc" },
-        skip: offsetInt,
-        take: limitInt,
-      }),
-      prisma.mensagem.count({
-        where: {
-          conversaId: conversaIdInt,
-          isActive: true,
-        },
-      }),
-    ]);
-
-    // Reverse to get chronological order
-    mensagens.reverse();
-
-    res.json({
-      success: true,
-      data: mensagens,
-      total,
-      count: mensagens.length,
-      hasMore: offsetInt + mensagens.length < total,
-    });
-  } catch (error) {
-    console.error("Error fetching mensagens:", error);
-    res.status(500).json({
-      success: false,
-      error: "Erro ao buscar mensagens",
-    });
-  }
-};
-
-// CREATE new message (with atomic transaction)
-export const createMensagem: RequestHandler = async (req, res) => {
-  try {
-    const validatedData = MensagemCreateSchema.parse(req.body);
-
-    // Verify conversation exists
-    const conversa = await prisma.conversa.findUnique({
-      where: { id: validatedData.conversaId },
-    });
-
-    if (!conversa) {
-      return res.status(404).json({
-        success: false,
-        error: "Conversa não encontrada",
-      });
-    }
-
-    // Use transaction to ensure atomicity (both operations succeed or both fail)
-    // This prevents race conditions where multiple messages arrive simultaneously
-    const [mensagem] = await prisma.$transaction([
-      // Step 1: Create message
-      prisma.mensagem.create({
-        data: {
-          ...validatedData,
-        },
-        include: {
-          remetente: {
-            select: { id: true, nome: true },
-          },
-        },
-      }),
-      // Step 2: Update conversation's last message metadata
-      prisma.conversa.update({
-        where: { id: validatedData.conversaId },
-        data: {
-          ultimaMensagem: validatedData.conteudo.substring(0, 100),
-          dataUltimaMensagem: new Date(),
-        },
-      }),
-    ]);
-
-    res.status(201).json({
-      success: true,
-      data: mensagem,
-      message: "Mensagem enviada com sucesso",
-    });
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return res.status(400).json({
-        success: false,
-        error: "Dados inválidos",
-        details: error.errors,
-      });
-    }
-
-    console.error("Error creating mensagem:", error);
-    res.status(500).json({
-      success: false,
-      error: "Erro ao enviar mensagem",
-    });
-  }
-};
-
-// MARK message as read
-export const markMensagemAsRead: RequestHandler = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const mensagem = await prisma.mensagem.update({
-      where: { id: parseInt(id) },
-      data: { lido: true },
-      include: {
-        remetente: { select: { id: true, nome: true } },
-      },
-    });
-
-    res.json({
-      success: true,
-      data: mensagem,
-    });
-  } catch (error) {
-    console.error("Error marking mensagem as read:", error);
-    res.status(500).json({
-      success: false,
-      error: "Erro ao marcar mensagem como lida",
-    });
-  }
-};
-
-// MARK all messages in conversation as read
-export const markConversaAsRead: RequestHandler = async (req, res) => {
-  try {
-    const { conversaId } = req.params;
-
-    await prisma.mensagem.updateMany({
+    const mensagens = await prisma.mensagens.findMany({
       where: {
-        conversaId: parseInt(conversaId),
-        lido: false,
-      },
-      data: { lido: true },
-    });
-
-    res.json({
-      success: true,
-      message: "Mensagens marcadas como lidas",
-    });
-  } catch (error) {
-    console.error("Error marking conversa as read:", error);
-    res.status(500).json({
-      success: false,
-      error: "Erro ao marcar mensagens como lidas",
-    });
-  }
-};
-
-// GET unread message count for user
-export const getUnreadCount: RequestHandler = async (req, res) => {
-  try {
-    const { usuarioId } = req.params;
-
-    const conversas = await prisma.conversa.findMany({
-      where: {
-        usuarioId: parseInt(usuarioId),
-        isActive: true,
+        conversaId: conversaIdNum,
+        excluido: false, // Soft delete: only get non-deleted messages
       },
       select: {
         id: true,
+        conversaId: true,
+        conteudo: true,
+        status: true,
+        dataCriacao: true,
+        usuarioId: true,
+        anuncianteId: true,
+        usuario: {
+          select: {
+            id: true,
+            nome: true,
+            email: true,
+          },
+        },
+        anunciante: {
+          select: {
+            id: true,
+            nome: true,
+          },
+        },
       },
+      orderBy: { dataCriacao: "asc" },
     });
 
-    const conversaIds = conversas.map((c) => c.id);
-
-    const unreadCount = await prisma.mensagem.count({
-      where: {
-        conversaId: { in: conversaIds },
-        lido: false,
-        NOT: { tipoRemetente: "usuario" }, // Don't count user's own messages
-      },
-    });
-
-    res.json({
-      success: true,
-      unreadCount,
-    });
+    res.json({ data: mensagens });
   } catch (error) {
-    console.error("Error fetching unread count:", error);
-    res.status(500).json({
-      success: false,
-      error: "Erro ao buscar contagem de não lidas",
-    });
+    console.error("[getMensagensConversa] Error:", error);
+    res.status(500).json({ error: "Erro ao buscar mensagens" });
   }
-};
+}
 
-// DELETE/DEACTIVATE message
-export const deleteMensagem: RequestHandler = async (req, res) => {
+export async function createMensagem(req: Request, res: Response) {
   try {
-    const { id } = req.params;
+    const { conversaId, usuarioId, anuncianteId, conteudo } = req.body;
 
-    const mensagem = await prisma.mensagem.update({
-      where: { id: parseInt(id) },
-      data: { isActive: false },
-      include: {
-        remetente: { select: { id: true, nome: true } },
+    if (!conversaId || !conteudo || (!usuarioId && !anuncianteId)) {
+      return res.status(400).json({
+        error: "conversaId, conteudo, e (usuarioId ou anuncianteId) são obrigatórios",
+      });
+    }
+
+    const mensagem = await prisma.mensagens.create({
+      data: {
+        conversaId,
+        usuarioId: usuarioId || null,
+        anuncianteId: anuncianteId || null,
+        conteudo,
+        status: "nao_lida",
+        excluido: false,
+      },
+      select: {
+        id: true,
+        conversaId: true,
+        conteudo: true,
+        status: true,
+        dataCriacao: true,
+        usuarioId: true,
+        anuncianteId: true,
+        usuario: {
+          select: {
+            id: true,
+            nome: true,
+            email: true,
+          },
+        },
+        anunciante: {
+          select: {
+            id: true,
+            nome: true,
+          },
+        },
       },
     });
 
-    res.json({
-      success: true,
-      data: mensagem,
-      message: "Mensagem deletada",
-    });
+    res.status(201).json({ data: mensagem });
   } catch (error) {
-    console.error("Error deleting mensagem:", error);
-    res.status(500).json({
-      success: false,
-      error: "Erro ao deletar mensagem",
-    });
+    console.error("[createMensagem] Error:", error);
+    res.status(500).json({ error: "Erro ao criar mensagem" });
   }
-};
+}
+
+export async function markMensagemAsRead(req: Request, res: Response) {
+  try {
+    const { mensagemId } = req.params;
+
+    const mensagem = await prisma.mensagens.update({
+      where: { id: parseInt(mensagemId, 10) },
+      data: { status: "lida" },
+      select: {
+        id: true,
+        conversaId: true,
+        conteudo: true,
+        status: true,
+        dataCriacao: true,
+      },
+    });
+
+    res.json({ data: mensagem });
+  } catch (error) {
+    console.error("[markMensagemAsRead] Error:", error);
+    res.status(500).json({ error: "Erro ao marcar mensagem como lida" });
+  }
+}
+
+export async function markConversaAsRead(req: Request, res: Response) {
+  try {
+    const { conversaId } = req.params;
+    const conversaIdNum = parseInt(conversaId, 10);
+
+    await prisma.mensagens.updateMany({
+      where: {
+        conversaId: conversaIdNum,
+        status: { not: "lida" },
+      },
+      data: { status: "lida" },
+    });
+
+    res.json({ data: { message: "Conversa marcada como lida" } });
+  } catch (error) {
+    console.error("[markConversaAsRead] Error:", error);
+    res.status(500).json({ error: "Erro ao marcar conversa como lida" });
+  }
+}
+
+export async function getUnreadCount(req: Request, res: Response) {
+  try {
+    const { usuarioId } = req.query;
+
+    if (!usuarioId) {
+      return res.status(400).json({ error: "usuarioId é obrigatório" });
+    }
+
+    const count = await prisma.mensagens.count({
+      where: {
+        status: "nao_lida",
+        excluido: false,
+        conversa: {
+          usuarioId: parseInt(usuarioId as string, 10),
+        },
+      },
+    });
+
+    res.json({ data: { unreadCount: count } });
+  } catch (error) {
+    console.error("[getUnreadCount] Error:", error);
+    res.status(500).json({ error: "Erro ao contar mensagens não lidas" });
+  }
+}
+
+export async function deleteMensagem(req: Request, res: Response) {
+  try {
+    const { mensagemId } = req.params;
+    const mensagemIdNum = parseInt(mensagemId, 10);
+
+    // Soft delete: just mark as excluido = true
+    const mensagem = await prisma.mensagens.update({
+      where: { id: mensagemIdNum },
+      data: { excluido: true },
+      select: {
+        id: true,
+        conversaId: true,
+        excluido: true,
+      },
+    });
+
+    res.json({ data: mensagem });
+  } catch (error) {
+    console.error("[deleteMensagem] Error:", error);
+    res.status(500).json({ error: "Erro ao deletar mensagem" });
+  }
+}
