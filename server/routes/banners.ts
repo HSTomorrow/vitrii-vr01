@@ -21,17 +21,39 @@ const BannerSchema = z.object({
   ativo: z.boolean().default(true),
 });
 
-const BannerUpdateSchema = BannerSchema.partial().refine(
-  (data) => {
-    // If link is provided, it must be a valid URL
-    if (data.link !== undefined && data.link !== null && data.link.trim()) {
-      return true;
-    }
-    // Link is optional during update if not provided
-    return true;
-  },
-  { message: "Link deve ser uma URL válida se fornecido" }
-);
+const BannerUpdateSchema = z.object({
+  titulo: z
+    .string()
+    .min(5, "Título deve ter pelo menos 5 caracteres")
+    .max(100, "Título não pode ter mais de 100 caracteres")
+    .optional(),
+  descricao: z.string().optional().nullable(),
+  imagemUrl: z.string()
+    .refine(
+      (url) => !url || url.startsWith("http://") || url.startsWith("https://") || url.startsWith("data:image/"),
+      "A imagem deve ser uma URL válida ou uma imagem codificada em base64"
+    )
+    .optional(),
+  link: z.string()
+    .refine(
+      (url) => {
+        // If empty or not provided, that's OK for update
+        if (!url || url === "") return true;
+        // If provided, must be valid URL
+        try {
+          new URL(url);
+          return true;
+        } catch {
+          return false;
+        }
+      },
+      "URL do link inválida"
+    )
+    .optional()
+    .nullable(),
+  ordem: z.number().int().nonnegative().optional(),
+  ativo: z.boolean().optional(),
+}).strict();
 
 // GET all banners
 export const getBanners: RequestHandler = async (req, res) => {

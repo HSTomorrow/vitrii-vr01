@@ -174,11 +174,13 @@ export default function AdminBanners() {
 
       if (!response.ok) {
         const error = await response.json();
-        const detailedError = error.details || error.error || "Erro desconhecido";
+        const detailedError = error.details || error.error || JSON.stringify(error) || "Erro desconhecido";
         console.error("[updateBannerMutation] Erro HTTP:", {
           status: response.status,
-          error,
-          detailedError,
+          statusText: response.statusText,
+          error: error,
+          detailedError: detailedError,
+          validationErrors: error.validation_errors,
         });
         throw new Error(detailedError);
       }
@@ -206,7 +208,9 @@ export default function AdminBanners() {
     onError: (error) => {
       const errorMsg = error instanceof Error ? error.message : "Erro desconhecido ao atualizar banner";
       console.error("[updateBannerMutation] onError chamado:", {
-        error: errorMsg,
+        errorMsg: errorMsg,
+        errorType: error?.constructor?.name,
+        fullError: error,
         stack: error instanceof Error ? error.stack : "Sem stack",
       });
 
@@ -333,9 +337,36 @@ export default function AdminBanners() {
   };
 
   const handleSubmit = () => {
+    // Validate required fields
+    const missing = [];
+    if (!formData.titulo) missing.push("título");
+    if (!formData.imagemUrl) missing.push("imagem");
+    if (!formData.link) missing.push("link");
+
+    if (missing.length > 0) {
+      console.warn("[handleSubmit] Campos obrigatórios faltando:", missing);
+      toast.error("❌ Campos obrigatórios não preenchidos", {
+        description: `Preencha: ${missing.join(", ")}`,
+        duration: 4000,
+      });
+      return;
+    }
+
+    // Validate link is a URL if provided
+    if (formData.link && !formData.link.startsWith("http")) {
+      console.warn("[handleSubmit] Link inválido:", formData.link);
+      toast.error("❌ Link inválido", {
+        description: "O link deve começar com http:// ou https://",
+        duration: 4000,
+      });
+      return;
+    }
+
     if (editingId) {
+      console.log("[handleSubmit] Atualizando banner:", { id: editingId, ...formData });
       updateBannerMutation.mutate();
     } else {
+      console.log("[handleSubmit] Criando novo banner:", formData);
       createBannerMutation.mutate();
     }
   };
