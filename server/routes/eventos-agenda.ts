@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import { prisma } from "@/lib/prisma";
+import prisma from "../lib/prisma";
 
 // Get all events for an announcer (only for the announcer)
 export const getEventosByAnunciante: RequestHandler = async (req, res) => {

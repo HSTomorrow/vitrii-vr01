@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import { prisma } from "@/lib/prisma";
+import prisma from "../lib/prisma";
 
 // Create a reservation or waitlist request
 export const criarReservaOuListaEspera: RequestHandler = async (req, res) => {
