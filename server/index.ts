@@ -120,6 +120,14 @@ import {
   removePermissao,
 } from "./routes/eventos-agenda";
 import {
+  criarReservaOuListaEspera,
+  getReservasDoEvento,
+  confirmarReserva,
+  rejeitarReserva,
+  cancelarReserva,
+  getReservaCount,
+} from "./routes/reservas-evento-agenda";
+import {
   getPagamentoByAnuncioId,
   createPagamento,
   updatePagamentoStatus,
@@ -484,6 +492,14 @@ export function createServer() {
   app.delete("/api/eventos-agenda/:id", extractUserId, deleteEvento);
   app.post("/api/eventos-agenda/:id/permissoes", extractUserId, addPermissao);
   app.delete("/api/eventos-agenda/:id/permissoes/:usuarioId", extractUserId, removePermissao);
+
+  // Reservas de Evento routes
+  app.post("/api/reservas-evento", criarReservaOuListaEspera);
+  app.get("/api/reservas-evento/:eventoId", extractUserId, getReservasDoEvento);
+  app.get("/api/reservas-evento/:eventoId/count", getReservaCount);
+  app.patch("/api/reservas-evento/:id/confirmar", extractUserId, confirmarReserva);
+  app.patch("/api/reservas-evento/:id/rejeitar", extractUserId, rejeitarReserva);
+  app.patch("/api/reservas-evento/:id/cancelar", extractUserId, cancelarReserva);
 
   // Pagamentos (Payment) routes
   app.get("/api/pagamentos", extractUserId, requireAdmin, getPagamentos);

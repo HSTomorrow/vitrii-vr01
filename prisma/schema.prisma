@@ -224,6 +224,7 @@ model usracessos {
   reservas_agenda       reservas_agenda[]
   lista_espera_agenda   lista_espera_agenda[]
   eventos_permissoes    eventos_agenda_permissoes[]
+  reservas_evento       reservas_evento_agenda[]
   conversas             conversas[]
   mensagens             mensagens[]
 }
@@ -491,6 +492,7 @@ model eventos_agenda_anunciante {
 
   anunciante            anunciantes                      @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
   permissoes            eventos_agenda_permissoes[]
+  reservas              reservas_evento_agenda[]
 
   @@index([anuncianteId])
   @@index([dataInicio])
@@ -510,6 +512,33 @@ model eventos_agenda_permissoes {
   @@unique([eventoId, usuarioId])
   @@index([eventoId])
   @@index([usuarioId])
+}
+
+// Reservas de Eventos da Agenda
+model reservas_evento_agenda {
+  id                    Int                              @id @default(autoincrement())
+  eventoId              Int
+  usuarioId             Int?                             // Pode ser null se for lista de espera de não-logado
+  emailSolicitante      String?                          @db.VarChar(255)
+  nomeSolicitante       String?                          @db.VarChar(255)
+  telefoneSolicitante   String?                          @db.VarChar(20)
+  tipo                  String                           @default("reserva") @db.VarChar(20) // "reserva" ou "lista_espera"
+  status                String                           @default("pendente") @db.VarChar(20) // "pendente", "confirmada", "rejeitada", "cancelada"
+  posicaoListaEspera    Int?                             // Posição na fila (para lista de espera)
+  motivo                String?                          // Motivo da rejeição
+  dataSolicitacao       DateTime                         @default(now())
+  dataConfirmacao       DateTime?
+  dataCancelamento      DateTime?
+  dataCriacao           DateTime                         @default(now())
+  dataAtualizacao       DateTime                         @updatedAt
+
+  evento                eventos_agenda_anunciante        @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+  usuario               usracessos?                      @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+
+  @@index([eventoId])
+  @@index([usuarioId])
+  @@index([status])
+  @@index([tipo])
 }
 
 // Conversas (Chat Conversations)

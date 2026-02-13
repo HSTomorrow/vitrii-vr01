@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -6,6 +7,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import EventosAgendaCalendar from "@/components/EventosAgendaCalendar";
 import EventoModal from "@/components/EventoModal";
+import ReservasEventoList from "@/components/ReservasEventoList";
 
 interface Evento {
   id: number;
@@ -28,6 +30,7 @@ export default function MinhaAgenda() {
   const [selectedEvento, setSelectedEvento] = useState<Evento | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [selectedAnuncianteId, setSelectedAnuncianteId] = useState<number | null>(null);
+  const [showReservasFor, setShowReservasFor] = useState<number | null>(null);
 
   // Fetch user's anunciantes
   const { data: anunciantes = [] } = useQuery<Anunciante[]>({
@@ -69,6 +72,25 @@ export default function MinhaAgenda() {
       return result.data || [];
     },
     enabled: !!selectedAnuncianteId && !!user?.id,
+  });
+
+  // Fetch reservas for selected evento
+  const { data: reservas = [], refetch: refetchReservas } = useQuery({
+    queryKey: ["reservas-evento", showReservasFor],
+    queryFn: async () => {
+      if (!showReservasFor) return [];
+      const headers: Record<string, string> = {
+        "x-user-id": user?.id?.toString() || "",
+      };
+      const response = await fetch(
+        `/api/reservas-evento/${showReservasFor}`,
+        { headers },
+      );
+      if (!response.ok) throw new Error("Erro ao buscar reservas");
+      const result = await response.json();
+      return result.data || [];
+    },
+    enabled: !!showReservasFor && !!user?.id,
   });
 
   // Create evento mutation
@@ -190,7 +212,8 @@ export default function MinhaAgenda() {
 
   const handleSelectEvento = (evento: Evento) => {
     setSelectedEvento(evento);
-    setIsModalOpen(true);
+    setShowReservasFor(evento.id);
+    setIsModalOpen(false);
   };
 
   const handleSelectDate = (date: Date) => {
@@ -279,6 +302,27 @@ export default function MinhaAgenda() {
                 >
                   + Novo Evento
                 </button>
+              </div>
+            )}
+
+            {/* Reservas Section */}
+            {showReservasFor && (
+              <div className="mt-8 p-6 bg-white rounded-lg shadow-md">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-2xl font-bold text-vitrii-text">
+                    Reservas e Lista de Espera
+                  </h3>
+                  <button
+                    onClick={() => setShowReservasFor(null)}
+                    className="px-4 py-2 bg-gray-200 text-vitrii-text rounded-lg hover:bg-gray-300 transition-colors"
+                  >
+                    Fechar
+                  </button>
+                </div>
+                <ReservasEventoList
+                  reservas={reservas}
+                  onReservasChange={refetchReservas}
+                />
               </div>
             )}
           </>

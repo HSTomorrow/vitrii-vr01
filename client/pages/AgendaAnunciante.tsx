@@ -1,10 +1,13 @@
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import EventosAgendaCalendar from "@/components/EventosAgendaCalendar";
-import { Loader } from "lucide-react";
+import ReservaEventoModal from "@/components/ReservaEventoModal";
+import { Loader, Share2 } from "lucide-react";
 
 interface Evento {
   id: number;
@@ -26,6 +29,8 @@ export default function AgendaAnunciante() {
   const { anuncianteId } = useParams<{ anuncianteId: string }>();
   const { user } = useAuth();
   const userIdStr = user?.id?.toString() || "";
+  const [selectedEvento, setSelectedEvento] = useState<Evento | null>(null);
+  const [isReservaModalOpen, setIsReservaModalOpen] = useState(false);
 
   // Fetch announcer info
   const { data: anunciante, isLoading: isLoadingAnunciante } =
@@ -64,6 +69,32 @@ export default function AgendaAnunciante() {
   const isLoading = isLoadingAnunciante || isLoadingEventos;
   const eventos = eventosData || [];
 
+  const handleShareLink = () => {
+    const url = window.location.href;
+    if (navigator.share) {
+      navigator.share({
+        title: `Agenda de ${anunciante?.nome}`,
+        text: `Confira a agenda e disponibilidade de ${anunciante?.nome}`,
+        url: url,
+      });
+    } else {
+      navigator.clipboard.writeText(url);
+      toast.success("Link copiado!");
+    }
+  };
+
+  const handleShareWhatsApp = () => {
+    const url = window.location.href;
+    const text = `Confira a agenda e disponibilidade de ${anunciante?.nome}: ${url}`;
+    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+    window.open(whatsappUrl, "_blank");
+  };
+
+  const handleSelectEvento = (evento: Evento) => {
+    setSelectedEvento(evento);
+    setIsReservaModalOpen(true);
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex flex-col bg-gray-50">
@@ -100,19 +131,38 @@ export default function AgendaAnunciante() {
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header Section */}
         <div className="mb-8">
-          <div className="flex items-center gap-4 mb-4">
-            {anunciante.fotoUrl && (
-              <img
-                src={anunciante.fotoUrl}
-                alt={anunciante.nome}
-                className="w-16 h-16 rounded-full object-cover border-2 border-vitrii-blue"
-              />
-            )}
-            <div>
-              <h1 className="text-3xl font-bold text-vitrii-text">
-                {anunciante.nome}
-              </h1>
-              <p className="text-gray-600">Agenda e Disponibilidade</p>
+          <div className="flex items-center justify-between gap-4 mb-4">
+            <div className="flex items-center gap-4">
+              {anunciante.fotoUrl && (
+                <img
+                  src={anunciante.fotoUrl}
+                  alt={anunciante.nome}
+                  className="w-16 h-16 rounded-full object-cover border-2 border-vitrii-blue"
+                />
+              )}
+              <div>
+                <h1 className="text-3xl font-bold text-vitrii-text">
+                  {anunciante.nome}
+                </h1>
+                <p className="text-gray-600">Agenda e Disponibilidade</p>
+              </div>
+            </div>
+
+            {/* Share Button */}
+            <div className="flex gap-2">
+              <button
+                onClick={handleShareLink}
+                className="flex items-center gap-2 px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors font-semibold"
+              >
+                <Share2 className="w-5 h-5" />
+                Copiar Link
+              </button>
+              <button
+                onClick={handleShareWhatsApp}
+                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
+              >
+                WhatsApp
+              </button>
             </div>
           </div>
         </div>
@@ -120,6 +170,7 @@ export default function AgendaAnunciante() {
         {/* Calendar */}
         <EventosAgendaCalendar
           eventos={eventos}
+          onSelectEvento={handleSelectEvento}
           isEditable={false}
         />
 
@@ -142,6 +193,16 @@ export default function AgendaAnunciante() {
       </main>
 
       <Footer />
+
+      {/* Reservation Modal */}
+      <ReservaEventoModal
+        isOpen={isReservaModalOpen}
+        evento={selectedEvento}
+        onClose={() => {
+          setIsReservaModalOpen(false);
+          setSelectedEvento(null);
+        }}
+      />
     </div>
   );
 }
