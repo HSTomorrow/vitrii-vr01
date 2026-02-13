@@ -9,9 +9,27 @@ export async function getConversas(req: Request, res: Response) {
       return res.status(400).json({ error: "usuarioId é obrigatório" });
     }
 
+    const numUsuarioId = parseInt(usuarioId as string, 10);
+
+    // First, find all anunciantes this user manages
+    const usuarioAnunciantes = await prisma.usuarios_anunciantes.findMany({
+      where: { usuarioId: numUsuarioId },
+      select: { anuncianteId: true },
+    });
+
+    const anunciantesIds = usuarioAnunciantes.map((ua) => ua.anuncianteId);
+
+    // Get conversations where:
+    // 1. The user is the usuarioId (conversations they initiated), OR
+    // 2. The anuncianteId is one of the anunciantes they manage (messages sent to their business)
     const conversas = await prisma.conversas.findMany({
       where: {
-        usuarioId: parseInt(usuarioId as string, 10),
+        OR: [
+          { usuarioId: numUsuarioId },
+          ...(anunciantesIds.length > 0
+            ? [{ anuncianteId: { in: anunciantesIds } }]
+            : []),
+        ],
       },
       select: {
         id: true,
