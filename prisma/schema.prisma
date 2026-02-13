@@ -36,6 +36,7 @@ model anunciantes {
   grupos_produtos      grupos_produtos[]
   wishlist_permissoes  listas_desejos_permissoes[]
   agendas              agendas[]
+  eventos_agenda       eventos_agenda_anunciante[]
   links_externos       links_produtos_externos[]
   conversas            conversas[]
   mensagens            mensagens[]
