@@ -226,13 +226,20 @@ export const aprovarFilaEspera: RequestHandler = async (req, res) => {
       },
     });
 
-    // Add permissions for the requester user
-    await prisma.eventos_agenda_permissoes.create({
-      data: {
-        eventoId: novoEvento.id,
-        usuarioId: fila.usuarioSolicitanteId,
-      },
-    });
+    // Add permissions for the requester user (auto-link)
+    try {
+      await prisma.eventos_agenda_permissoes.create({
+        data: {
+          eventoId: novoEvento.id,
+          usuarioId: fila.usuarioSolicitanteId,
+        },
+      });
+    } catch (error: any) {
+      // Permission might already exist, ignore unique constraint errors
+      if (!error.message.includes("Unique constraint")) {
+        throw error;
+      }
+    }
 
     // Update the waiting queue entry
     const filaAtualizada = await prisma.filas_espera_agenda.update({

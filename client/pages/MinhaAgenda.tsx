@@ -527,6 +527,7 @@ export default function MinhaAgenda() {
         isOpen={isModalOpen}
         evento={selectedEvento}
         defaultDate={selectedDate || undefined}
+        anuncianteId={selectedAnuncianteId || undefined}
         onClose={() => {
           setIsModalOpen(false);
           setSelectedEvento(null);

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { X } from "lucide-react";
+import { X, Users } from "lucide-react";
 import { toast } from "sonner";
+import EventoUsuariosModal from "./EventoUsuariosModal";
 
 interface Evento {
   id: number;
@@ -16,6 +17,7 @@ interface EventoModalProps {
   isOpen: boolean;
   evento?: Evento | null;
   defaultDate?: Date;
+  anuncianteId?: number;
   onClose: () => void;
   onSave: (evento: Partial<Evento> & { usuariosPermitidos?: number[] }) => void;
   isLoading?: boolean;
@@ -46,10 +48,12 @@ export default function EventoModal({
   isOpen,
   evento,
   defaultDate,
+  anuncianteId,
   onClose,
   onSave,
   isLoading = false,
 }: EventoModalProps) {
+  const [showUsuariosModal, setShowUsuariosModal] = useState(false);
   const [formData, setFormData] = useState({
     titulo: "",
     descricao: "",
@@ -309,6 +313,18 @@ export default function EventoModal({
             </div>
           </div>
 
+          {/* Manage Users Button - only for existing eventos */}
+          {evento && anuncianteId && (
+            <button
+              type="button"
+              onClick={() => setShowUsuariosModal(true)}
+              className="w-full px-4 py-2 border border-blue-300 text-vitrii-blue rounded-lg hover:bg-blue-50 transition-colors font-semibold flex items-center justify-center gap-2"
+            >
+              <Users className="w-4 h-4" />
+              Gerenciar Usuários
+            </button>
+          )}
+
           {/* Buttons */}
           <div className="flex gap-2 pt-4">
             <button
@@ -336,6 +352,17 @@ export default function EventoModal({
             </button>
           )}
         </form>
+
+        {/* Usuarios Modal */}
+        {evento && anuncianteId && (
+          <EventoUsuariosModal
+            isOpen={showUsuariosModal}
+            onClose={() => setShowUsuariosModal(false)}
+            eventoId={evento.id}
+            anuncianteId={anuncianteId}
+            isOwner={true}
+          />
+        )}
       </div>
     </div>
   );

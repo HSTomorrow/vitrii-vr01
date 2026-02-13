@@ -118,6 +118,9 @@ import {
   deleteEvento,
   addPermissao,
   removePermissao,
+  getEventoUsers,
+  searchUsers,
+  addUserToEvento,
 } from "./routes/eventos-agenda";
 import {
   getFilasEsperaParaAnunciante,
@@ -504,6 +507,11 @@ export function createServer() {
   app.post("/api/eventos-agenda/:id/permissoes", extractUserId, addPermissao);
   app.delete("/api/eventos-agenda/:id/permissoes/:usuarioId", extractUserId, removePermissao);
   app.patch("/api/eventos-agenda/:eventoId/status", extractUserId, atualizarStatusEvento);
+  app.get("/api/eventos-agenda/:id/usuarios", extractUserId, getEventoUsers);
+  app.post("/api/eventos-agenda/:id/usuarios", extractUserId, addUserToEvento);
+
+  // Search usuarios route
+  app.get("/api/usuarios/search", extractUserId, searchUsers);
 
   // Filas de Espera para Eventos routes
   app.get("/api/filas-espera/anunciante/:anuncianteId", extractUserId, getFilasEsperaParaAnunciante);

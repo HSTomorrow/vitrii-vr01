@@ -474,3 +474,191 @@ export const removePermissao: RequestHandler = async (req, res) => {
     res.status(500).json({ error: "Erro ao remover permissão" });
   }
 };
+
+// Get all users linked to an event
+export const getEventoUsers: RequestHandler = async (req, res) => {
+  try {
+    const userId = (req as any).userId;
+    const { id } = req.params;
+
+    const eventoId = parseInt(id);
+    if (isNaN(eventoId)) {
+      return res.status(400).json({ error: "Invalid event ID" });
+    }
+
+    // Get event
+    const evento = await prisma.eventos_agenda_anunciante.findUnique({
+      where: { id: eventoId },
+    });
+
+    if (!evento) {
+      return res.status(404).json({ error: "Evento não encontrado" });
+    }
+
+    // Check if user is the announcer
+    const usuarioAnunciante = await prisma.usuarios_anunciantes.findFirst({
+      where: {
+        usuarioId: userId,
+        anuncianteId: evento.anuncianteId,
+      },
+    });
+
+    if (!usuarioAnunciante) {
+      return res
+        .status(403)
+        .json({ error: "Acesso negado. Você não pode ver os usuários deste evento." });
+    }
+
+    // Get all permissions for this event
+    const permissoes = await prisma.eventos_agenda_permissoes.findMany({
+      where: { eventoId: eventoId },
+      include: {
+        usuario: {
+          select: {
+            id: true,
+            nome: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    const usuarios = permissoes.map((p) => ({
+      id: p.usuario.id,
+      nome: p.usuario.nome,
+      email: p.usuario.email,
+      permissaoId: p.id,
+    }));
+
+    res.json({ data: usuarios });
+  } catch (error) {
+    console.error("[getEventoUsers]", error);
+    res.status(500).json({ error: "Erro ao buscar usuários do evento" });
+  }
+};
+
+// Search for users by name or email (for linking)
+export const searchUsers: RequestHandler = async (req, res) => {
+  try {
+    const { query } = req.query;
+
+    if (!query || typeof query !== "string" || query.trim().length < 2) {
+      return res.status(400).json({ error: "Query deve ter pelo menos 2 caracteres" });
+    }
+
+    const usuarios = await prisma.usracessos.findMany({
+      where: {
+        OR: [
+          {
+            nome: {
+              contains: query,
+              mode: "insensitive",
+            },
+          },
+          {
+            email: {
+              contains: query,
+              mode: "insensitive",
+            },
+          },
+        ],
+      },
+      select: {
+        id: true,
+        nome: true,
+        email: true,
+      },
+      take: 10,
+    });
+
+    res.json({ data: usuarios });
+  } catch (error) {
+    console.error("[searchUsers]", error);
+    res.status(500).json({ error: "Erro ao buscar usuários" });
+  }
+};
+
+// Add user to event
+export const addUserToEvento: RequestHandler = async (req, res) => {
+  try {
+    const userId = (req as any).userId;
+    const { id } = req.params;
+    const { usuarioId } = req.body;
+
+    const eventoId = parseInt(id);
+    const novoUsuarioId = parseInt(usuarioId);
+
+    if (isNaN(eventoId) || isNaN(novoUsuarioId)) {
+      return res.status(400).json({ error: "IDs inválidos" });
+    }
+
+    // Get event
+    const evento = await prisma.eventos_agenda_anunciante.findUnique({
+      where: { id: eventoId },
+    });
+
+    if (!evento) {
+      return res.status(404).json({ error: "Evento não encontrado" });
+    }
+
+    // Check if user is the announcer
+    const usuarioAnunciante = await prisma.usuarios_anunciantes.findFirst({
+      where: {
+        usuarioId: userId,
+        anuncianteId: evento.anuncianteId,
+      },
+    });
+
+    if (!usuarioAnunciante) {
+      return res
+        .status(403)
+        .json({ error: "Acesso negado. Você não pode adicionar usuários a este evento." });
+    }
+
+    // Check if user exists
+    const usuarioParaAdicionar = await prisma.usracessos.findUnique({
+      where: { id: novoUsuarioId },
+    });
+
+    if (!usuarioParaAdicionar) {
+      return res.status(404).json({ error: "Usuário não encontrado" });
+    }
+
+    // Add permission (or ignore if already exists)
+    const permissao = await prisma.eventos_agenda_permissoes.upsert({
+      where: {
+        eventoId_usuarioId: {
+          eventoId: eventoId,
+          usuarioId: novoUsuarioId,
+        },
+      },
+      update: {},
+      create: {
+        eventoId: eventoId,
+        usuarioId: novoUsuarioId,
+      },
+      include: {
+        usuario: {
+          select: {
+            id: true,
+            nome: true,
+            email: true,
+          },
+        },
+      },
+    });
+
+    res.json({
+      data: {
+        id: permissao.usuario.id,
+        nome: permissao.usuario.nome,
+        email: permissao.usuario.email,
+        permissaoId: permissao.id,
+      },
+      message: "Usuário adicionado com sucesso",
+    });
+  } catch (error) {
+    console.error("[addUserToEvento]", error);
+    res.status(500).json({ error: "Erro ao adicionar usuário ao evento" });
+  }
+};
