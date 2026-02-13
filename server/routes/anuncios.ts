@@ -260,10 +260,11 @@ export const getAnuncioById: RequestHandler = async (req, res) => {
       });
     }
 
-    // Ensure link field is included in response
+    // Ensure all fields are included in response
     const response = {
       ...anuncio,
       link: anuncio.link || null,
+      statusPagamento: anuncio.statusPagamento || "pendente",
     };
 
     res.json({
