@@ -84,6 +84,7 @@ export default function AnuncioForm({
     cidade: "",
     estado: "RS",
     isDoacao: isDonation || false,
+    aCombinar: false,
     destaque: false,
     categoria: "" as string,
     dadosCategoria: "",
@@ -256,6 +257,7 @@ export default function AnuncioForm({
         cidade: ad.cidade || "",
         estado: ad.estado || "RS",
         isDoacao: ad.isDoacao || false,
+        aCombinar: ad.aCombinar || false,
         destaque: ad.destaque || false,
         categoria: ad.categoria || "",
         dadosCategoria: ad.dadosCategoria || "",
@@ -288,7 +290,7 @@ export default function AnuncioForm({
         titulo: data.titulo,
         descricao: data.descricao,
         fotoUrl: data.fotoUrl,
-        precoAnuncio: data.precoAnuncio ? parseFloat(data.precoAnuncio) : null,
+        precoAnuncio: data.aCombinar ? 0 : (data.precoAnuncio ? parseFloat(data.precoAnuncio) : null),
         anuncianteId: selectedAnuncianteId,
         productId: data.productId > 0 ? data.productId : null,
         tabelaDePrecoId: data.tabelaDePrecoId > 0 ? data.tabelaDePrecoId : null,
@@ -301,6 +303,7 @@ export default function AnuncioForm({
         estado: data.estado || null,
         tipo: data.tipo || "produto",
         isDoacao: data.isDoacao,
+        aCombinar: data.aCombinar,
         destaque: data.destaque,
         categoria: data.categoria || null,
         dadosCategoria: data.dadosCategoria || null,
@@ -619,32 +622,36 @@ export default function AnuncioForm({
               <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Valor {formData.isDoacao ? "(Gratuito)" : ""}
               </label>
-              <div className="flex items-center">
-                <span className="text-vitrii-text font-semibold mr-2">R$</span>
+              <div className="flex items-center gap-2 w-1/2">
+                <span className="text-vitrii-text font-semibold">R$</span>
                 <input
                   type="number"
                   step="0.01"
                   min="0"
-                  value={formData.isDoacao ? "0" : formData.precoAnuncio}
+                  value={formData.isDoacao || formData.aCombinar ? "0" : formData.precoAnuncio}
                   onChange={(e) =>
                     !formData.isDoacao &&
+                    !formData.aCombinar &&
                     handleInputChange("precoAnuncio", e.target.value)
                   }
-                  disabled={formData.isDoacao}
+                  disabled={formData.isDoacao || formData.aCombinar}
                   placeholder={
                     formData.isDoacao
                       ? "0.00 (Gratuito)"
+                      : formData.aCombinar
+                        ? "0.00 (A Combinar)"
                       : selectedPriceTable
                         ? `Ex: ${Number(selectedPriceTable.preco).toFixed(2)}`
                         : "Ex: 99.90"
                   }
                   className={`flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent ${
-                    formData.isDoacao ? "bg-gray-100 cursor-not-allowed" : ""
+                    formData.isDoacao || formData.aCombinar ? "bg-gray-100 cursor-not-allowed" : ""
                   }`}
                 />
               </div>
               {formData.precoAnuncio &&
                 !formData.isDoacao &&
+                !formData.aCombinar &&
                 selectedPriceTable &&
                 Number(formData.precoAnuncio) <
                   Number(selectedPriceTable.preco) && (
@@ -657,6 +664,49 @@ export default function AnuncioForm({
                   </p>
                 )}
             </div>
+
+            {/* "A Combinar" Checkbox - Only for Produtos and Serviços, not for Doações/Brindes */}
+            {formData.tipo !== "doacao" && (
+              <div className="flex items-center gap-3 p-4 border rounded-lg bg-yellow-50 border-yellow-200">
+                <input
+                  type="checkbox"
+                  id="aCombinar"
+                  checked={formData.aCombinar}
+                  onChange={(e) => {
+                    const isChecked = e.target.checked;
+                    if (isChecked && formData.isDoacao) {
+                      toast.error(
+                        "Não é possível usar 'A Combinar' junto com 'Gratuito'"
+                      );
+                      return;
+                    }
+                    handleInputChange("aCombinar", isChecked);
+                    if (isChecked) {
+                      handleInputChange("precoAnuncio", "0");
+                    }
+                  }}
+                  disabled={formData.isDoacao}
+                  className={`w-4 h-4 rounded focus:ring-2 ${
+                    formData.isDoacao
+                      ? "bg-gray-100 border-gray-300 cursor-not-allowed"
+                      : "bg-white border-gray-300 text-yellow-600 focus:ring-yellow-500 cursor-pointer"
+                  }`}
+                />
+                <div className="flex-1">
+                  <label
+                    htmlFor="aCombinar"
+                    className={`text-sm font-semibold text-vitrii-text ${
+                      formData.isDoacao ? "cursor-not-allowed opacity-75" : "cursor-pointer"
+                    }`}
+                  >
+                    A combinar
+                  </label>
+                  <p className="text-xs text-gray-600 mt-1">
+                    Selecione para indicar que o valor será negociado diretamente
+                  </p>
+                </div>
+              </div>
+            )}
 
             {/* Gratuito - Moved after Valor field */}
             <div
@@ -674,6 +724,12 @@ export default function AnuncioForm({
                   // Only allow changes if not accessed via "Publicar Grátis"
                   if (!isDonation) {
                     const isChecked = e.target.checked;
+                    if (isChecked && formData.aCombinar) {
+                      toast.error(
+                        "Não é possível usar 'Gratuito' junto com 'A Combinar'"
+                      );
+                      return;
+                    }
                     handleInputChange("isDoacao", isChecked);
                     if (isChecked) {
                       handleInputChange("precoAnuncio", "0");

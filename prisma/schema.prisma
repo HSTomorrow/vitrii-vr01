@@ -51,6 +51,7 @@ model anuncios {
   status              String                  @default("ativo") @db.VarChar(50)
   tipo                String                  @default("produto") @db.VarChar(50)
   isDoacao            Boolean                 @default(false) @map("isdoacao")
+  aCombinar           Boolean                 @default(false)
   diasRestantes       Int?
   statusPagamento     String?                 @default("pendente") @db.VarChar(50)
   dataCriacao         DateTime                @default(now())
