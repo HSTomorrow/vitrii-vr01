@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
@@ -14,6 +14,8 @@ import {
   EyeOff,
   GripVertical,
   Lock,
+  Upload,
+  X,
 } from "lucide-react";
 
 interface Banner {
@@ -31,6 +33,7 @@ export default function AdminBanners() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const navigate = useNavigate();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [isCreating, setIsCreating] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState({
@@ -40,6 +43,8 @@ export default function AdminBanners() {
     link: "",
     ativo: true,
   });
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string>("");
 
   // Check if user is admin
   const isAdmin = user?.tipoUsuario === "adm";
@@ -145,6 +150,40 @@ export default function AdminBanners() {
     },
   });
 
+  const handleFileUpload = (file: File) => {
+    if (!file.type.startsWith("image/")) {
+      toast.error("Selecione um arquivo de imagem válido");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Arquivo deve ser menor que 5MB");
+      return;
+    }
+
+    setUploadedFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreviewUrl(reader.result as string);
+      setFormData({ ...formData, imagemUrl: reader.result as string });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      handleFileUpload(files[0]);
+    }
+  };
+
   const resetForm = () => {
     setFormData({
       titulo: "",
@@ -153,6 +192,11 @@ export default function AdminBanners() {
       link: "",
       ativo: true,
     });
+    setUploadedFile(null);
+    setPreviewUrl("");
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   const handleEdit = (banner: Banner) => {
@@ -165,6 +209,8 @@ export default function AdminBanners() {
     });
     setEditingId(banner.id);
     setIsCreating(false);
+    setUploadedFile(null);
+    setPreviewUrl(banner.imagemUrl);
   };
 
   const handleSubmit = () => {
@@ -220,9 +266,16 @@ export default function AdminBanners() {
           {/* Form Section */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-md p-6 sticky top-6">
-              <h2 className="font-bold text-vitrii-text mb-4">
-                {editingId ? "Editar Banner" : "Novo Banner"}
-              </h2>
+              <div className="mb-4 pb-4 border-b border-gray-200">
+                <h2 className="font-bold text-lg text-vitrii-text">
+                  {editingId ? "✏️ Editar Banner" : "➕ Novo Banner"}
+                </h2>
+                {editingId && (
+                  <p className="text-xs text-vitrii-text-secondary mt-1">
+                    ID: {editingId}
+                  </p>
+                )}
+              </div>
 
               <div className="space-y-4">
                 <div>
@@ -256,24 +309,81 @@ export default function AdminBanners() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
-                    URL da Imagem *
+                  <label className="block text-sm font-semibold text-vitrii-text mb-3">
+                    Imagem do Banner *
                   </label>
-                  <input
-                    type="url"
-                    value={formData.imagemUrl}
-                    onChange={(e) =>
-                      setFormData({ ...formData, imagemUrl: e.target.value })
-                    }
-                    placeholder="https://exemplo.com/imagem.jpg"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
-                  />
-                  {formData.imagemUrl && (
-                    <img
-                      src={formData.imagemUrl}
-                      alt="Preview"
-                      className="mt-2 w-full h-40 object-cover rounded-lg"
+
+                  {/* Upload Area */}
+                  <div
+                    onDragOver={handleDragOver}
+                    onDrop={handleDrop}
+                    className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-vitrii-blue hover:bg-blue-50 transition-colors mb-3"
+                    onClick={() => fileInputRef.current?.click()}
+                  >
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        if (e.target.files?.[0]) {
+                          handleFileUpload(e.target.files[0]);
+                        }
+                      }}
+                      className="hidden"
                     />
+                    <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                    <p className="text-sm font-semibold text-vitrii-text">
+                      Clique ou arraste uma imagem
+                    </p>
+                    <p className="text-xs text-vitrii-text-secondary mt-1">
+                      PNG, JPG, GIF até 5MB
+                    </p>
+                  </div>
+
+                  {/* URL Input Alternative */}
+                  <div className="mb-3">
+                    <label className="text-xs font-semibold text-vitrii-text-secondary mb-1 block">
+                      Ou use uma URL de imagem
+                    </label>
+                    <input
+                      type="url"
+                      value={!uploadedFile ? formData.imagemUrl : ""}
+                      onChange={(e) => {
+                        setUploadedFile(null);
+                        setPreviewUrl(e.target.value);
+                        setFormData({ ...formData, imagemUrl: e.target.value });
+                      }}
+                      placeholder="https://exemplo.com/imagem.jpg"
+                      disabled={!!uploadedFile}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue disabled:bg-gray-100 disabled:cursor-not-allowed text-sm"
+                    />
+                  </div>
+
+                  {/* Preview */}
+                  {(previewUrl || formData.imagemUrl) && (
+                    <div className="relative">
+                      <img
+                        src={previewUrl || formData.imagemUrl}
+                        alt="Preview"
+                        className="w-full h-40 object-cover rounded-lg border border-gray-200"
+                      />
+                      {uploadedFile && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setUploadedFile(null);
+                            setPreviewUrl("");
+                            setFormData({ ...formData, imagemUrl: "" });
+                            if (fileInputRef.current) {
+                              fileInputRef.current.value = "";
+                            }
+                          }}
+                          className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
                   )}
                 </div>
 
@@ -308,16 +418,28 @@ export default function AdminBanners() {
                   </label>
                 </div>
 
-                <div className="flex gap-2 pt-4">
+                <div className="flex gap-2 pt-4 border-t border-gray-200">
                   <button
                     onClick={handleSubmit}
                     disabled={
                       createBannerMutation.isPending ||
-                      updateBannerMutation.isPending
+                      updateBannerMutation.isPending ||
+                      !formData.titulo ||
+                      !formData.imagemUrl
                     }
-                    className="flex-1 px-4 py-2 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition disabled:opacity-50"
+                    className="flex-1 px-4 py-3 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
-                    {editingId ? "Atualizar" : "Criar"}
+                    {createBannerMutation.isPending ||
+                    updateBannerMutation.isPending ? (
+                      <>
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                        {editingId ? "Atualizando..." : "Criando..."}
+                      </>
+                    ) : (
+                      <>
+                        {editingId ? "✓ Atualizar Banner" : "+ Criar Banner"}
+                      </>
+                    )}
                   </button>
 
                   {editingId && (
@@ -326,9 +448,9 @@ export default function AdminBanners() {
                         resetForm();
                         setEditingId(null);
                       }}
-                      className="flex-1 px-4 py-2 border-2 border-gray-300 text-vitrii-text rounded-lg font-semibold hover:bg-gray-50 transition"
+                      className="flex-1 px-4 py-3 border-2 border-gray-300 text-vitrii-text rounded-lg font-semibold hover:bg-gray-50 transition disabled:opacity-50"
                     >
-                      Cancelar
+                      ✕ Cancelar
                     </button>
                   )}
                 </div>
