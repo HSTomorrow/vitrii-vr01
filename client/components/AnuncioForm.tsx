@@ -752,7 +752,7 @@ export default function AnuncioForm({
                       : "cursor-pointer"
                   }`}
                 >
-                  Este produto/serviço/evento é gratuito
+                  Gratuito
                 </label>
                 {isDonation && (
                   <p className="text-xs text-blue-600 mt-1">
