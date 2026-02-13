@@ -762,7 +762,9 @@ export default function CadastroEquipeDeVenda() {
                             : "Nenhum membro encontrado com os critérios de busca"}
                         </p>
                       ) : (
-                        <div className="overflow-x-auto">
+                        <>
+                          {/* Desktop Members Table */}
+                          <div className="hidden md:block overflow-x-auto">
                           <table className="w-full text-sm">
                             <thead className="bg-gray-100 border-b border-gray-200">
                               <tr>
@@ -977,7 +979,203 @@ export default function CadastroEquipeDeVenda() {
                               ))}
                             </tbody>
                           </table>
-                        </div>
+                          </div>
+
+                          {/* Mobile Members Card View */}
+                          <div className="md:hidden space-y-2">
+                            {getFilteredMembros(
+                              equipe.membros,
+                              equipe.id,
+                            ).length === 0 && !isAddingMember && editingMemberId === null ? (
+                              <p className="text-sm text-vitrii-text-secondary text-center py-4">
+                                {equipe.membros.length === 0
+                                  ? "Nenhum membro adicionado"
+                                  : "Nenhum membro encontrado"}
+                              </p>
+                            ) : (
+                              <>
+                                {(isAddingMember || editingMemberId !== null) && (
+                                  <div className="bg-blue-50 rounded-lg p-3 space-y-2 border border-blue-200">
+                                    <div>
+                                      <input
+                                        type="text"
+                                        value={memberFormData.nomeMembro}
+                                        onChange={(e) =>
+                                          setMemberFormData({
+                                            ...memberFormData,
+                                            nomeMembro: e.target.value,
+                                          })
+                                        }
+                                        placeholder="Nome do membro"
+                                        className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+                                      />
+                                    </div>
+                                    <div>
+                                      <input
+                                        type="email"
+                                        value={memberFormData.email}
+                                        onChange={(e) =>
+                                          setMemberFormData({
+                                            ...memberFormData,
+                                            email: e.target.value,
+                                          })
+                                        }
+                                        placeholder="Email"
+                                        className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+                                      />
+                                    </div>
+                                    <div>
+                                      <input
+                                        type="text"
+                                        value={
+                                          memberFormData.whatsapp.startsWith("+55")
+                                            ? memberFormData.whatsapp.substring(3)
+                                            : memberFormData.whatsapp
+                                        }
+                                        onChange={(e) => {
+                                          const cleanValue = e.target.value.replace(
+                                            /[^\d\s()()-]/g,
+                                            "",
+                                          );
+                                          setMemberFormData({
+                                            ...memberFormData,
+                                            whatsapp: "+55" + cleanValue,
+                                          });
+                                        }}
+                                        placeholder="(51) 98765-4321"
+                                        className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+                                      />
+                                    </div>
+                                    <div>
+                                      <select
+                                        value={memberFormData.status}
+                                        onChange={(e) =>
+                                          setMemberFormData({
+                                            ...memberFormData,
+                                            status: e.target.value as any,
+                                          })
+                                        }
+                                        className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-vitrii-blue bg-white"
+                                      >
+                                        <option value="disponivel">Disponível</option>
+                                        <option value="nao_disponivel">Não Disponível</option>
+                                        <option value="cancelado">Cancelado</option>
+                                      </select>
+                                    </div>
+                                    <div className="flex gap-2 justify-end">
+                                      <button
+                                        onClick={(e) =>
+                                          handleSubmitMember(e, equipe.id)
+                                        }
+                                        disabled={
+                                          addMemberMutation.isPending ||
+                                          updateMemberMutation.isPending
+                                        }
+                                        className="px-3 py-1 bg-vitrii-blue text-white rounded text-sm hover:bg-vitrii-blue-dark transition-colors disabled:opacity-50"
+                                      >
+                                        <Save className="w-4 h-4 inline mr-1" />
+                                        Salvar
+                                      </button>
+                                      <button
+                                        onClick={() => {
+                                          setIsAddingMember(false);
+                                          setEditingMemberId(null);
+                                          setMemberFormData({
+                                            nomeMembro: "",
+                                            email: "",
+                                            whatsapp: "",
+                                            status: "disponivel",
+                                          });
+                                        }}
+                                        className="px-3 py-1 bg-gray-300 text-vitrii-text rounded text-sm hover:bg-gray-400 transition-colors"
+                                      >
+                                        <X className="w-4 h-4 inline" />
+                                      </button>
+                                    </div>
+                                  </div>
+                                )}
+                                {getFilteredMembros(
+                                  equipe.membros,
+                                  equipe.id,
+                                ).map((membro) => (
+                                  <div
+                                    key={membro.id}
+                                    className="border border-gray-200 rounded-lg p-3 space-y-2 hover:shadow-md transition-shadow"
+                                  >
+                                    <div className="flex items-start justify-between gap-2">
+                                      <div className="flex-1 min-w-0">
+                                        <h4 className="font-semibold text-vitrii-text text-sm truncate">
+                                          {membro.nomeMembro}
+                                        </h4>
+                                        <span
+                                          className={`inline-block mt-1 px-2 py-1 rounded text-xs font-semibold ${
+                                            membro.status === "disponivel"
+                                              ? "bg-green-100 text-green-800"
+                                              : membro.status === "nao_disponivel"
+                                                ? "bg-yellow-100 text-yellow-800"
+                                                : "bg-red-100 text-red-800"
+                                          }`}
+                                        >
+                                          {membro.status === "disponivel"
+                                            ? "Disponível"
+                                            : membro.status === "nao_disponivel"
+                                              ? "Não Disponível"
+                                              : "Cancelado"}
+                                        </span>
+                                      </div>
+                                      <div className="flex gap-1 flex-shrink-0">
+                                        <button
+                                          onClick={() => handleEditMember(membro)}
+                                          className="p-1 text-vitrii-blue hover:bg-blue-50 rounded transition-colors"
+                                          title="Editar"
+                                        >
+                                          <Edit2 className="w-4 h-4" />
+                                        </button>
+                                        <button
+                                          onClick={() => {
+                                            if (
+                                              confirm(
+                                                "Remover este membro da equipe?",
+                                              )
+                                            ) {
+                                              removeMemberMutation.mutate({
+                                                teamId: equipe.id,
+                                                memberId: membro.id,
+                                              });
+                                            }
+                                          }}
+                                          className="p-1 text-red-600 hover:bg-red-50 rounded transition-colors"
+                                          title="Remover"
+                                        >
+                                          <Trash2 className="w-4 h-4" />
+                                        </button>
+                                      </div>
+                                    </div>
+                                    <div className="space-y-1 text-xs">
+                                      <div>
+                                        <p className="text-vitrii-text-secondary">Email</p>
+                                        <p className="text-vitrii-text break-all">{membro.email}</p>
+                                      </div>
+                                      {membro.whatsapp && (
+                                        <div>
+                                          <p className="text-vitrii-text-secondary">WhatsApp</p>
+                                          <a
+                                            href={`https://wa.me/${membro.whatsapp.replace(/\D/g, "")}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="text-green-600 hover:underline"
+                                          >
+                                            {membro.whatsapp}
+                                          </a>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                ))}
+                              </>
+                            )}
+                          </div>
+                        </>
                       )}
                     </div>
                   )}

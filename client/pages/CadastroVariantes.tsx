@@ -283,23 +283,24 @@ export default function CadastroVariantes() {
 
         {/* Variantes List */}
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <div className="overflow-x-auto">
+          {/* Desktop Table View */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full">
               <thead className="bg-vitrii-gray">
                 <tr>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-vitrii-text whitespace-nowrap">
                     Tamanho
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-vitrii-text whitespace-nowrap">
                     Cor
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-vitrii-text whitespace-nowrap">
                     Preço
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-vitrii-text whitespace-nowrap">
                     Preço de Custo
                   </th>
-                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-vitrii-text whitespace-nowrap">
                     Ações
                   </th>
                 </tr>
@@ -309,7 +310,7 @@ export default function CadastroVariantes() {
                   <tr>
                     <td
                       colSpan={5}
-                      className="px-6 py-4 text-center text-gray-500"
+                      className="px-4 py-4 text-center text-gray-500"
                     >
                       Nenhuma variante cadastrada
                     </td>
@@ -317,24 +318,25 @@ export default function CadastroVariantes() {
                 ) : (
                   variantes.map((variante: Variante) => (
                     <tr key={variante.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 text-vitrii-text">
+                      <td className="px-4 py-4 text-vitrii-text text-sm">
                         {variante.tamanho || "-"}
                       </td>
-                      <td className="px-6 py-4 text-vitrii-text">
+                      <td className="px-4 py-4 text-vitrii-text text-sm">
                         {variante.cor || "-"}
                       </td>
-                      <td className="px-6 py-4 font-semibold text-vitrii-text">
+                      <td className="px-4 py-4 font-semibold text-vitrii-text text-sm">
                         R$ {parseFloat(variante.preco.toString()).toFixed(2)}
                       </td>
-                      <td className="px-6 py-4 text-vitrii-text">
+                      <td className="px-4 py-4 text-vitrii-text text-sm">
                         {variante.precoCusto
                           ? `R$ ${parseFloat(variante.precoCusto.toString()).toFixed(2)}`
                           : "-"}
                       </td>
-                      <td className="px-6 py-4 flex gap-2">
+                      <td className="px-4 py-4 flex gap-2">
                         <button
                           onClick={() => handleEdit(variante)}
                           className="p-2 text-vitrii-blue hover:bg-blue-50 rounded-lg transition-colors"
+                          title="Editar"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
@@ -349,6 +351,7 @@ export default function CadastroVariantes() {
                             }
                           }}
                           className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Deletar"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -358,6 +361,73 @@ export default function CadastroVariantes() {
                 )}
               </tbody>
             </table>
+          </div>
+
+          {/* Mobile Card View */}
+          <div className="md:hidden">
+            {variantes.length === 0 ? (
+              <div className="px-4 py-8 text-center text-gray-500">
+                Nenhuma variante cadastrada
+              </div>
+            ) : (
+              <div className="space-y-3 p-4">
+                {variantes.map((variante: Variante) => (
+                  <div
+                    key={variante.id}
+                    className="border border-gray-200 rounded-lg p-4 space-y-3 hover:shadow-md transition-shadow"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-vitrii-text text-sm">
+                          {variante.tamanho ? `Tamanho: ${variante.tamanho}` : "Sem tamanho"}
+                          {variante.cor && ` • Cor: ${variante.cor}`}
+                        </h3>
+                      </div>
+                      <div className="flex gap-1 flex-shrink-0">
+                        <button
+                          onClick={() => handleEdit(variante)}
+                          className="p-2 text-vitrii-blue hover:bg-blue-50 rounded-lg transition-colors"
+                          title="Editar"
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (
+                              confirm(
+                                "Tem certeza que deseja deletar esta variante?",
+                              )
+                            ) {
+                              deleteVarianteMutation.mutate(variante.id);
+                            }
+                          }}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          title="Deletar"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 text-xs">
+                      <div>
+                        <p className="text-vitrii-text-secondary">Preço</p>
+                        <p className="text-vitrii-text font-semibold">
+                          R$ {parseFloat(variante.preco.toString()).toFixed(2)}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-vitrii-text-secondary">Preço de Custo</p>
+                        <p className="text-vitrii-text">
+                          {variante.precoCusto
+                            ? `R$ ${parseFloat(variante.precoCusto.toString()).toFixed(2)}`
+                            : "-"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </main>
