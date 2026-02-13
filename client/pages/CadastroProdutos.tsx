@@ -161,7 +161,7 @@ export default function CadastroProdutos() {
 
   const handleEdit = (producto: Producto) => {
     setFormData({
-      grupoId: producto.grupoId.toString(),
+      grupoId: producto.grupoId ? producto.grupoId.toString() : "",
       nome: producto.nome,
       descricao: producto.descricao || "",
       sku: producto.sku || "",
@@ -169,6 +169,8 @@ export default function CadastroProdutos() {
     });
     if (producto.grupo) {
       setSelectedLojaId(producto.grupo.lojaId.toString());
+    } else {
+      setSelectedLojaId("");
     }
     setEditingId(producto.id);
     setIsFormOpen(true);
