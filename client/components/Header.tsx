@@ -147,13 +147,6 @@ export default function Header() {
                   >
                     Entrar
                   </Link>
-
-                  <Link
-                    to="/auth/signup"
-                    className="px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors hidden sm:block text-[0.85rem]"
-                  >
-                    Cadastrar
-                  </Link>
                 </>
               )}
 

@@ -10,7 +10,6 @@ import {
   Settings,
   LogOut,
   LogIn,
-  UserPlus,
   Shield,
   FileText,
   Store,
@@ -302,14 +301,6 @@ export default function Menu() {
                   >
                     <LogIn className="w-6 h-6 text-blue-600" />
                     <span className="text-blue-900 font-medium">Entrar</span>
-                  </Link>
-
-                  <Link
-                    to="/auth/signup"
-                    className="flex items-center gap-4 px-6 py-4 bg-vitrii-blue hover:bg-vitrii-blue-dark rounded-lg transition-colors text-white"
-                  >
-                    <UserPlus className="w-6 h-6" />
-                    <span className="font-medium">Criar Conta</span>
                   </Link>
                 </>
               )}
