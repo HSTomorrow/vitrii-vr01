@@ -184,6 +184,11 @@ export default function MeusAnuncios() {
         text: "text-blue-800",
         label: "Comprovante Enviado",
       },
+      aguardando_confirmacao_pagamento: {
+        bg: "bg-purple-100",
+        text: "text-purple-800",
+        label: "Aguardando Confirmação",
+      },
       aprovado: {
         bg: "bg-green-100",
         text: "text-green-800",

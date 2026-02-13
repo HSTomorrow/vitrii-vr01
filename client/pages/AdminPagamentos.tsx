@@ -114,6 +114,7 @@ export default function AdminPagamentos() {
           {[
             { value: "pendente", label: "Pendentes", icon: Clock },
             { value: "comprovante_enviado", label: "Comprovante Enviado", icon: AlertCircle },
+            { value: "aguardando_confirmacao_pagamento", label: "Aguardando Confirmação", icon: Clock },
             { value: "aprovado", label: "Aprovados", icon: CheckCircle },
           ].map(({ value, label, icon: Icon }) => (
             <button
@@ -205,6 +206,12 @@ export default function AdminPagamentos() {
                           <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">
                             <AlertCircle className="w-4 h-4" />
                             Comprovante Enviado
+                          </div>
+                        )}
+                        {pagamento.status === "aguardando_confirmacao_pagamento" && (
+                          <div className="inline-flex items-center gap-2 px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-semibold">
+                            <Clock className="w-4 h-4" />
+                            Aguardando Confirmação
                           </div>
                         )}
                         {pagamento.status === "aprovado" && (

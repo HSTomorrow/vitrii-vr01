@@ -398,7 +398,12 @@ export default function Checkout() {
                   <h3 className="font-bold text-blue-800 text-lg">
                     Comprovante Enviado!
                   </h3>
-                  <p className="text-blue-700 mt-2">
+                  <p className="text-blue-700 mt-3 text-base font-semibold">
+                    Agradecemos a confirmação do pagamento. Agora é só aguardar
+                    a confirmação do pagamento para que seu anúncio seja
+                    publicada em nossa plataforma.
+                  </p>
+                  <p className="text-blue-700 mt-3">
                     Seu comprovante de pagamento foi recebido. Analisaremos em
                     até <strong>24 horas</strong> e seu anúncio será ativado em
                     breve.

@@ -351,7 +351,10 @@ export const uploadComprovantePagemento: RequestHandler = async (req, res) => {
     // Atualizar status do anúncio
     await prisma.anuncios.update({
       where: { id: pagamento.anuncioId },
-      data: { status: "em_analise" },
+      data: {
+        status: "em_analise",
+        statusPagamento: "aguardando_confirmacao_pagamento"
+      },
     });
 
     res.json({
