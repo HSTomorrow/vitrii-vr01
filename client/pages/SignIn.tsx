@@ -21,47 +21,66 @@ export default function SignIn() {
   const signInMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
       try {
+        console.log("[SignIn] Iniciando autenticação...");
         const response = await fetch("/api/auth/signin", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data),
         });
 
-        console.log("[SignIn] Response status:", response.status);
+        console.log("[SignIn] Status da resposta:", response.status);
 
         if (!response.ok) {
-          const error = await response.json();
-          console.error("[SignIn] API error response:", error);
-          throw new Error(error.error || "Erro ao fazer login");
+          const errorData = await response.json();
+          console.error("[SignIn] Erro da API:", errorData);
+
+          // Customize error messages based on status
+          if (response.status === 401) {
+            throw new Error("Email ou senha incorretos. Verifique suas credenciais.");
+          } else if (response.status === 400) {
+            throw new Error("Por favor, preencha todos os campos obrigatórios.");
+          } else if (response.status === 500) {
+            throw new Error("Erro no servidor. Tente novamente mais tarde.");
+          }
+
+          throw new Error(errorData.error || "Erro ao fazer login");
         }
 
         const result = await response.json();
-        console.log("[SignIn] Login successful, received data:", result);
+        console.log("[SignIn] Login bem-sucedido para usuário:", result.data?.id);
         return result;
       } catch (error) {
-        console.error("[SignIn] Fetch error:", error);
+        console.error("[SignIn] Erro na autenticação:", error);
         throw error;
       }
     },
     onSuccess: (responseData) => {
-      console.log("[SignIn] onSuccess called with:", responseData);
+      console.log("[SignIn] Sucesso - processando dados do usuário");
       if (responseData.data) {
         login(responseData.data);
-        toast.success("Login realizado com sucesso!");
+        const userName = responseData.data.nome.split(" ")[0];
+        toast.success(`Bem-vindo, ${userName}! 🎉`, {
+          description: "Redirecionando para a página inicial...",
+          duration: 2000,
+        });
         setTimeout(() => {
-          console.log("[SignIn] Navigating to /");
+          console.log("[SignIn] Navegando para a home");
           navigate("/");
-        }, 500);
+        }, 1500);
       } else {
-        console.error("[SignIn] No user data in response:", responseData);
-        toast.error("Erro: dados de usuário não retornados");
+        console.error("[SignIn] Erro - dados de usuário ausentes");
+        toast.error("Erro ao processar login", {
+          description: "Dados do usuário não foram retornados. Tente novamente.",
+        });
       }
     },
     onError: (error) => {
-      console.error("[SignIn] onError called with:", error);
-      toast.error(
-        error instanceof Error ? error.message : "Erro ao fazer login",
-      );
+      console.error("[SignIn] Erro no login:", error);
+      const errorMessage = error instanceof Error ? error.message : "Erro desconhecido ao fazer login";
+      toast.error("Falha no login", {
+        description: errorMessage,
+        duration: 4000,
+      });
     },
   });
 
@@ -84,12 +103,26 @@ export default function SignIn() {
 
     if (!formData.email.trim()) {
       newErrors.email = "Email é obrigatório";
+      toast.error("Email é obrigatório", {
+        description: "Por favor, insira seu email para continuar.",
+      });
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Email inválido";
+      newErrors.email = "Digite um email válido (ex: seu.email@exemplo.com)";
+      toast.error("Email inválido", {
+        description: "Verifique se digitou o email corretamente.",
+      });
     }
 
     if (!formData.senha) {
       newErrors.senha = "Senha é obrigatória";
+      toast.error("Senha é obrigatória", {
+        description: "Por favor, insira sua senha para continuar.",
+      });
+    } else if (formData.senha.length < 6) {
+      newErrors.senha = "Senha deve ter no mínimo 6 caracteres";
+      toast.error("Senha muito curta", {
+        description: "A senha deve ter pelo menos 6 caracteres.",
+      });
     }
 
     setErrors(newErrors);
@@ -100,7 +133,10 @@ export default function SignIn() {
     e.preventDefault();
 
     if (validateForm()) {
+      console.log("[SignIn] Formulário validado, iniciando login...");
       signInMutation.mutate(formData);
+    } else {
+      console.log("[SignIn] Validação falhou");
     }
   };
 
@@ -203,17 +239,17 @@ export default function SignIn() {
             <button
               type="submit"
               disabled={signInMutation.isPending}
-              className="w-full bg-vitrii-blue text-white py-3 rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full bg-vitrii-blue text-white py-3 rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {signInMutation.isPending ? (
                 <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-                  Entrando...
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                  <span>Verificando credenciais...</span>
                 </>
               ) : (
                 <>
                   <CheckCircle className="w-5 h-5" />
-                  Entrar
+                  <span>Entrar na Conta</span>
                 </>
               )}
             </button>
