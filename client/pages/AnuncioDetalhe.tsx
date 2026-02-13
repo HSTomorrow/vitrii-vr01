@@ -545,7 +545,19 @@ export default function AnuncioDetalhe() {
                     Chamar Vendedor
                   </button>
                 )}
-                <button className="w-full px-4 py-3 border-2 border-vitrii-blue text-vitrii-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors flex items-center justify-center gap-2">
+                <button
+                  onClick={() => {
+                    if (!user) {
+                      toast.error("Faça login para enviar mensagens");
+                      navigate("/auth/signin");
+                      return;
+                    }
+                    navigate(
+                      `/chat?anuncianteId=${anuncio.anuncianteId}&anuncioId=${anuncio.id}`,
+                    );
+                  }}
+                  className="w-full px-4 py-3 border-2 border-vitrii-blue text-vitrii-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
+                >
                   <MessageSquare className="w-4 h-4" />
                   Enviar Mensagem
                 </button>

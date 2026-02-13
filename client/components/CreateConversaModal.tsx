@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
@@ -9,6 +9,8 @@ interface CreateConversaModalProps {
   onClose: () => void;
   onSuccess: (conversa: any) => void;
   currentUserId: number;
+  preFilledAnuncianteId?: number;
+  preFilledAnuncioId?: number;
 }
 
 interface Anunciante {
@@ -27,6 +29,8 @@ export default function CreateConversaModal({
   onClose,
   onSuccess,
   currentUserId,
+  preFilledAnuncianteId,
+  preFilledAnuncioId,
 }: CreateConversaModalProps) {
   const { user } = useAuth();
   const [formData, setFormData] = useState({
@@ -38,6 +42,17 @@ export default function CreateConversaModal({
   });
   const [searchAnunciantes, setSearchAnunciantes] = useState("");
   const [searchAnuncios, setSearchAnuncios] = useState("");
+
+  // Handle pre-filled data from URL params
+  useEffect(() => {
+    if (isOpen && preFilledAnuncianteId) {
+      setFormData((prev) => ({
+        ...prev,
+        anuncianteId: preFilledAnuncianteId,
+        anuncioId: preFilledAnuncioId || 0,
+      }));
+    }
+  }, [isOpen, preFilledAnuncianteId, preFilledAnuncioId]);
 
   // Fetch anunciantes with user context
   const { data: anunciantesData } = useQuery({

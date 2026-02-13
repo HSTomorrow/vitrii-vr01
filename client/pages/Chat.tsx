@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { ChevronLeft, Plus } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import ConversaList from "../components/ConversaList";
 import ChatBox from "../components/ChatBox";
@@ -47,11 +47,35 @@ interface Conversa {
 export default function Chat() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const [searchParams] = useSearchParams();
   const [selectedConversa, setSelectedConversa] = useState<Conversa | null>(
     null,
   );
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showProfileGate, setShowProfileGate] = useState(false);
+  const [preFilledData, setPreFilledData] = useState<{
+    anuncianteId: number;
+    anuncioId: number;
+  } | null>(null);
+
+  // Check for anuncianteId and anuncioId in URL params
+  useEffect(() => {
+    const anuncianteId = searchParams.get("anuncianteId");
+    const anuncioId = searchParams.get("anuncioId");
+
+    if (anuncianteId && anuncioId) {
+      setPreFilledData({
+        anuncianteId: parseInt(anuncianteId),
+        anuncioId: parseInt(anuncioId),
+      });
+      // Auto-open the modal if user has completed their profile
+      if (user?.cpf && user?.telefone) {
+        setShowCreateModal(true);
+      } else {
+        setShowProfileGate(true);
+      }
+    }
+  }, [searchParams, user?.cpf, user?.telefone]);
 
   // Fetch selected conversation with messages
   const { data: conversaData, refetch: refetchConversa } = useQuery({
@@ -192,9 +216,14 @@ export default function Chat() {
       {/* Create Conversation Modal */}
       <CreateConversaModal
         isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
+        onClose={() => {
+          setShowCreateModal(false);
+          setPreFilledData(null);
+        }}
         onSuccess={handleConversaCreated}
         currentUserId={user?.id || 0}
+        preFilledAnuncianteId={preFilledData?.anuncianteId}
+        preFilledAnuncioId={preFilledData?.anuncioId}
       />
 
       {/* Profile Completion Gate */}
