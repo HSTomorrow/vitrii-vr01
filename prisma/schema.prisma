@@ -476,13 +476,13 @@ model lista_espera_agenda {
 // Conversas (Chat Conversations)
 model conversas {
   id                  Int         @id @default(autoincrement())
-  usuarioId           Int
-  anuncianteId        Int
-  anuncioId           Int?
+  usuarioId           Int         @map("usuarioid")
+  anuncianteId        Int         @map("anuncianteid")
+  anuncioId           Int?        @map("anuncioid")
   assunto             String      @db.VarChar(255)
   tipo                String      @default("privada") @db.VarChar(50) // "privada" ou "publica"
-  dataCriacao         DateTime    @default(now())
-  dataAtualizacao     DateTime    @updatedAt
+  dataCriacao         DateTime    @default(now()) @map("datacriacao")
+  dataAtualizacao     DateTime    @updatedAt @map("dataatualizacao")
 
   usuario             usracessos  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   anunciante          anunciantes @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
@@ -493,19 +493,20 @@ model conversas {
   @@index([anuncianteId])
   @@index([anuncioId])
   @@index([dataCriacao])
+  @@map("conversas")
 }
 
 // Mensagens (Messages)
 model mensagens {
   id                  Int       @id @default(autoincrement())
-  conversaId          Int
-  usuarioId           Int?
-  anuncianteId        Int?
+  conversaId          Int       @map("conversaid")
+  usuarioId           Int?      @map("usuarioid")
+  anuncianteId        Int?      @map("anuncianteid")
   conteudo            String    @db.Text
   status              String    @default("nao_lida") @db.VarChar(50) // "nao_lida", "lida", "entregue"
   excluido            Boolean   @default(false) // Soft delete flag
-  dataCriacao         DateTime  @default(now())
-  dataAtualizacao     DateTime  @updatedAt
+  dataCriacao         DateTime  @default(now()) @map("datacriacao")
+  dataAtualizacao     DateTime  @updatedAt @map("dataatualizacao")
 
   conversa            conversas @relation(fields: [conversaId], references: [id], onDelete: Cascade)
   usuario             usracessos? @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
@@ -516,4 +517,5 @@ model mensagens {
   @@index([anuncianteId])
   @@index([dataCriacao])
   @@index([excluido])
+  @@map("mensagens")
 }
