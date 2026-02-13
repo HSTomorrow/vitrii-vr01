@@ -388,6 +388,7 @@ export const createAnuncio: RequestHandler = async (req, res) => {
         titulo: validatedData.titulo,
         descricao: validatedData.descricao,
         imagem: validatedData.fotoUrl || null,
+        link: validatedData.link || null,
         preco: precoAnuncio,
         categoria: validatedData.categoria,
         cidade: validatedData.cidade,
@@ -480,6 +481,7 @@ export const updateAnuncio: RequestHandler = async (req, res) => {
       mappedData.descricao = updateData.descricao;
     if (updateData.fotoUrl !== undefined)
       mappedData.imagem = updateData.fotoUrl;
+    if (updateData.link !== undefined) mappedData.link = updateData.link;
     if (updateData.precoAnuncio !== undefined)
       mappedData.preco = updateData.precoAnuncio;
     if (updateData.categoria !== undefined)
