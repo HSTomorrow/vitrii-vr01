@@ -439,6 +439,110 @@ export const rejeitarPagamento: RequestHandler = async (req, res) => {
   }
 };
 
+// GET all pagamentos (for admin)
+export const getPagamentos: RequestHandler = async (req, res) => {
+  try {
+    const { status } = req.query;
+
+    const where: any = {};
+    if (status && status !== "all") {
+      where.status = status;
+    }
+
+    const pagamentos = await prisma.pagamento.findMany({
+      where,
+      include: {
+        anuncio: {
+          include: {
+            anunciantes: {
+              select: { nome: true },
+            },
+          },
+        },
+      },
+      orderBy: { dataCriacao: "desc" },
+      take: 100,
+    });
+
+    res.json({
+      success: true,
+      data: pagamentos,
+    });
+  } catch (error) {
+    console.error("[getPagamentos] Error:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao buscar pagamentos",
+    });
+  }
+};
+
+// ADMIN: Confirm payment and activate ad
+export const confirmarPagamento: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Find the payment
+    const pagamento = await prisma.pagamento.findUnique({
+      where: { id: parseInt(id) },
+      include: { anuncio: true },
+    });
+
+    if (!pagamento) {
+      return res.status(404).json({
+        success: false,
+        error: "Pagamento não encontrado",
+      });
+    }
+
+    if (pagamento.status === "aprovado") {
+      return res.status(400).json({
+        success: false,
+        error: "Pagamento já foi confirmado",
+      });
+    }
+
+    // Calculate expiration date: today + 3 months
+    const hoje = new Date();
+    const dataValidade = new Date(hoje.getFullYear(), hoje.getMonth() + 3, hoje.getDate());
+
+    // Update payment status
+    const pagamentoAtualizado = await prisma.pagamento.update({
+      where: { id: parseInt(id) },
+      data: {
+        status: "aprovado",
+        dataPagamento: hoje,
+      },
+    });
+
+    // Update anuncio status and expiration
+    const anuncioAtualizado = await prisma.anuncios.update({
+      where: { id: pagamento.anuncioId },
+      data: {
+        status: "ativo",
+        statusPagamento: "aprovado",
+        dataValidade: dataValidade,
+      },
+    });
+
+    res.json({
+      success: true,
+      message: "Pagamento confirmado com sucesso!",
+      data: {
+        pagamento: pagamentoAtualizado,
+        anuncio: anuncioAtualizado,
+      },
+    });
+  } catch (error) {
+    console.error("[confirmarPagamento] Erro ao confirmar pagamento:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao confirmar pagamento",
+      details: error instanceof Error ? error.message : "Erro desconhecido",
+    });
+  }
+};
+
 // Helper function to generate mock Pix QR Code data
 // In production, this would call Mercado Pago API
 function generateMockQRCode(valor: number, pixId: string) {

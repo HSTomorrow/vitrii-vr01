@@ -120,6 +120,8 @@ import {
   uploadComprovantePagemento,
   aprovarPagamento,
   rejeitarPagamento,
+  confirmarPagamento,
+  getPagamentos,
 } from "./routes/pagamentos";
 import {
   getConversas,
@@ -466,6 +468,7 @@ export function createServer() {
   app.post("/api/agendas/:agendaId/waitlist/promote", promoteFromWaitlist);
 
   // Pagamentos (Payment) routes
+  app.get("/api/pagamentos", extractUserId, requireAdmin, getPagamentos);
   app.get("/api/pagamentos/anuncio/:anuncioId", getPagamentoByAnuncioId);
   app.get("/api/pagamentos/:id/status", getPagamentoStatus);
   app.post("/api/pagamentos", createPagamento);
@@ -475,6 +478,12 @@ export function createServer() {
   app.post("/api/pagamentos/:id/comprovante", uploadComprovantePagemento);
   app.post("/api/pagamentos/:id/aprovar", aprovarPagamento);
   app.post("/api/pagamentos/:id/rejeitar", rejeitarPagamento);
+  app.patch(
+    "/api/pagamentos/:id/confirmar",
+    extractUserId,
+    requireAdmin,
+    confirmarPagamento,
+  );
 
   // Conversas (Chat Conversations) routes
   app.get("/api/conversas", getConversas);

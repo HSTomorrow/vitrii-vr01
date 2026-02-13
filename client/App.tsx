@@ -44,6 +44,7 @@ const AdminManageAds = lazy(() => import("./pages/AdminManageAds"));
 const AdminManageUsers = lazy(() => import("./pages/AdminManageUsers"));
 const AdminBanners = lazy(() => import("./pages/AdminBanners"));
 const AdminAnunciantes = lazy(() => import("./pages/AdminAnunciantes"));
+const AdminPagamentos = lazy(() => import("./pages/AdminPagamentos"));
 const Menu = lazy(() => import("./pages/Menu"));
 const MeusAnuncios = lazy(() => import("./pages/MeusAnuncios"));
 const AnuncianteProfile = lazy(() => import("./pages/AnuncianteProfile"));
@@ -148,6 +149,7 @@ export default function App() {
                 <Route path="/admin/usuarios" element={<Suspense fallback={<PageLoader />}><AdminManageUsers /></Suspense>} />
                 <Route path="/admin/banners" element={<Suspense fallback={<PageLoader />}><AdminBanners /></Suspense>} />
                 <Route path="/admin/anunciantes" element={<Suspense fallback={<PageLoader />}><AdminAnunciantes /></Suspense>} />
+                <Route path="/admin/pagamentos" element={<Suspense fallback={<PageLoader />}><AdminPagamentos /></Suspense>} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
