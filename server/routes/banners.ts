@@ -8,7 +8,12 @@ const BannerSchema = z.object({
     .min(5, "Título deve ter pelo menos 5 caracteres")
     .max(100, "Título não pode ter mais de 100 caracteres"),
   descricao: z.string().optional().nullable(),
-  imagemUrl: z.string().url("URL da imagem inválida"),
+  imagemUrl: z.string()
+    .min(1, "Imagem é obrigatória")
+    .refine(
+      (url) => url.startsWith("http://") || url.startsWith("https://") || url.startsWith("data:image/"),
+      "A imagem deve ser uma URL válida ou uma imagem codificada em base64"
+    ),
   link: z.string().url("URL do link inválida").optional().nullable(),
   ordem: z.number().int().nonnegative().default(0),
   ativo: z.boolean().default(true),
@@ -33,13 +38,19 @@ export const getBanners: RequestHandler = async (req, res) => {
       orderBy: { ordem: "asc" },
     });
 
+    console.log("[getBanners] ✓ Recuperados", banners.length, "banners", {
+      filtro: ativo ? `ativo=${ativo}` : "nenhum",
+      ativos: banners.filter((b) => b.ativo).length,
+      inativos: banners.filter((b) => !b.ativo).length,
+    });
+
     res.json({
       success: true,
       data: banners,
       count: banners.length,
     });
   } catch (error) {
-    console.error("[getBanners] Error:", error);
+    console.error("[getBanners] 🔴 Erro:", error);
     res.status(500).json({
       success: false,
       error: "Erro ao buscar banners",
@@ -80,7 +91,14 @@ export const getBannerById: RequestHandler = async (req, res) => {
 // CREATE banner
 export const createBanner: RequestHandler = async (req, res) => {
   try {
+    console.log("[createBanner] Validando dados:", {
+      titulo: req.body.titulo,
+      ativo: req.body.ativo,
+      imageType: req.body.imagemUrl?.substring(0, 50),
+    });
+
     const validatedData = BannerSchema.parse(req.body);
+    console.log("[createBanner] ✓ Validação bem-sucedida");
 
     // Get the maximum order and add 1
     const maxBanner = await prisma.banners.findFirst({
@@ -95,6 +113,12 @@ export const createBanner: RequestHandler = async (req, res) => {
       },
     });
 
+    console.log("[createBanner] ✓ Banner criado com sucesso:", {
+      id: banner.id,
+      titulo: banner.titulo,
+      ativo: banner.ativo,
+    });
+
     res.status(201).json({
       success: true,
       data: banner,
@@ -105,6 +129,7 @@ export const createBanner: RequestHandler = async (req, res) => {
       const errorMessages = error.errors
         .map((err) => `${err.path.join(".")}: ${err.message}`)
         .join("; ");
+      console.warn("[createBanner] ❌ Validação falhou:", errorMessages);
       return res.status(400).json({
         success: false,
         error: "Dados inválidos",
@@ -112,7 +137,7 @@ export const createBanner: RequestHandler = async (req, res) => {
       });
     }
 
-    console.error("[createBanner] Error:", error);
+    console.error("[createBanner] 🔴 Erro:", error);
     res.status(500).json({
       success: false,
       error: "Erro ao criar banner",
@@ -125,11 +150,22 @@ export const createBanner: RequestHandler = async (req, res) => {
 export const updateBanner: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
+    console.log("[updateBanner] Atualizando banner ID:", id, {
+      titulo: req.body.titulo,
+      ativo: req.body.ativo,
+    });
+
     const validatedData = BannerUpdateSchema.parse(req.body);
 
     const banner = await prisma.banners.update({
       where: { id: parseInt(id) },
       data: validatedData,
+    });
+
+    console.log("[updateBanner] ✓ Banner atualizado com sucesso:", {
+      id: banner.id,
+      titulo: banner.titulo,
+      ativo: banner.ativo,
     });
 
     res.json({
@@ -142,6 +178,7 @@ export const updateBanner: RequestHandler = async (req, res) => {
       const errorMessages = error.errors
         .map((err) => `${err.path.join(".")}: ${err.message}`)
         .join("; ");
+      console.warn("[updateBanner] ❌ Validação falhou:", errorMessages);
       return res.status(400).json({
         success: false,
         error: "Dados inválidos",
@@ -149,7 +186,7 @@ export const updateBanner: RequestHandler = async (req, res) => {
       });
     }
 
-    console.error("[updateBanner] Error:", error);
+    console.error("[updateBanner] 🔴 Erro:", error);
     res.status(500).json({
       success: false,
       error: "Erro ao atualizar banner",
