@@ -29,7 +29,7 @@ export default function Browse() {
   const [selectedType, setSelectedType] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
   const [priceRange, setPriceRange] = useState({ min: "", max: "" });
-  const [showFilters, setShowFilters] = useState(true);
+  const [showFilters, setShowFilters] = useState(false);
   const itemsPerPage = 20;
   const anuncianteIdParam = searchParams.get("anuncianteId");
 
