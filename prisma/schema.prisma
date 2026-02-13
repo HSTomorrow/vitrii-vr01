@@ -37,6 +37,7 @@ model anunciantes {
   wishlist_permissoes  listas_desejos_permissoes[]
   agendas              agendas[]
   eventos_agenda       eventos_agenda_anunciante[]
+  filas_espera         filas_espera_agenda[] @relation("filas_espera_anunciante")
   links_externos       links_produtos_externos[]
   conversas            conversas[]
   mensagens            mensagens[]
@@ -224,6 +225,7 @@ model usracessos {
   listas_desejos        listas_desejos[]
   reservas_agenda       reservas_agenda[]
   lista_espera_agenda   lista_espera_agenda[]
+  filas_espera          filas_espera_agenda[] @relation("fila_espera_usuario")
   eventos_permissoes    eventos_agenda_permissoes[]
   reservas_evento       reservas_evento_agenda[]
   conversas             conversas[]
@@ -488,16 +490,19 @@ model eventos_agenda_anunciante {
   dataFim               DateTime
   privacidade           String                           @default("privado") @db.VarChar(20) // "publico", "privado_usuarios", "privado"
   cor                   String?                          @default("#3B82F6") @db.VarChar(7)
+  status                String                           @default("pendente") @db.VarChar(30) // "pendente", "realizado", "pendente_pagamento", "substituicao"
   dataCriacao           DateTime                         @default(now())
   dataAtualizacao       DateTime                         @updatedAt
 
   anunciante            anunciantes                      @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
   permissoes            eventos_agenda_permissoes[]
   reservas              reservas_evento_agenda[]
+  filasEspera           filas_espera_agenda[]
 
   @@index([anuncianteId])
   @@index([dataInicio])
   @@index([privacidade])
+  @@index([status])
 }
 
 // Permissões para Eventos Privados com Usuários Específicos
@@ -611,4 +616,34 @@ model pagamentos {
   @@index([status])
   @@index([dataCriacao])
   @@map("pagamentos")
+}
+
+// Filas de Espera para Eventos de Agenda (Waiting Queues)
+model filas_espera_agenda {
+  id                      Int                               @id @default(autoincrement())
+  eventoId                Int                               @db.Integer
+  usuarioSolicitanteId    Int
+  anuncianteAlvoId        Int  // Anunciante cuja agenda está recebendo a solicitação
+  titulo                  String                            @db.VarChar(255)
+  descricao               String?
+  dataInicio              DateTime
+  dataFim                 DateTime
+  status                  String                            @default("pendente") @db.VarChar(30) // "pendente", "aprovada", "rejeitada", "cancelada"
+  motivo_rejeicao         String?  // Motivo da rejeição
+  dataSugestao            DateTime?  // Data sugerida pelo dono da agenda para resubmissão
+  horaSugestao            String?  @db.VarChar(5)  // Hora sugerida (HH:mm)
+  dataSolicitacao         DateTime                          @default(now())
+  dataResposta            DateTime?
+  dataCriacao             DateTime                          @default(now())
+  dataAtualizacao         DateTime                          @updatedAt
+
+  evento                  eventos_agenda_anunciante         @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+  usuarioSolicitante      usracessos                        @relation("fila_espera_usuario", fields: [usuarioSolicitanteId], references: [id], onDelete: Cascade)
+  anuncianteAlvo          anunciantes                       @relation("filas_espera_anunciante", fields: [anuncianteAlvoId], references: [id], onDelete: Cascade)
+
+  @@index([eventoId])
+  @@index([usuarioSolicitanteId])
+  @@index([anuncianteAlvoId])
+  @@index([status])
+  @@index([dataSolicitacao])
 }

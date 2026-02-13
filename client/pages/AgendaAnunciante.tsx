@@ -7,7 +7,8 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import EventosAgendaCalendar from "@/components/EventosAgendaCalendar";
 import ReservaEventoModal from "@/components/ReservaEventoModal";
-import { Loader, Share2 } from "lucide-react";
+import ShareAgendaModal from "@/components/ShareAgendaModal";
+import { Loader, Share2, Lock } from "lucide-react";
 
 interface Evento {
   id: number;
@@ -31,6 +32,7 @@ export default function AgendaAnunciante() {
   const userIdStr = user?.id?.toString() || "";
   const [selectedEvento, setSelectedEvento] = useState<Evento | null>(null);
   const [isReservaModalOpen, setIsReservaModalOpen] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   // Fetch announcer info
   const { data: anunciante, isLoading: isLoadingAnunciante } =
@@ -69,28 +71,12 @@ export default function AgendaAnunciante() {
   const isLoading = isLoadingAnunciante || isLoadingEventos;
   const eventos = eventosData || [];
 
-  const handleShareLink = () => {
-    const url = window.location.href;
-    if (navigator.share) {
-      navigator.share({
-        title: `Agenda de ${anunciante?.nome}`,
-        text: `Confira a agenda e disponibilidade de ${anunciante?.nome}`,
-        url: url,
-      });
-    } else {
-      navigator.clipboard.writeText(url);
-      toast.success("Link copiado!");
-    }
-  };
-
-  const handleShareWhatsApp = () => {
-    const url = window.location.href;
-    const text = `Confira a agenda e disponibilidade de ${anunciante?.nome}: ${url}`;
-    const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
-    window.open(whatsappUrl, "_blank");
-  };
 
   const handleSelectEvento = (evento: Evento) => {
+    if (!user) {
+      toast.error("Você precisa estar logado para fazer uma reserva");
+      return;
+    }
     setSelectedEvento(evento);
     setIsReservaModalOpen(true);
   };
@@ -149,21 +135,13 @@ export default function AgendaAnunciante() {
             </div>
 
             {/* Share Button */}
-            <div className="flex gap-2">
-              <button
-                onClick={handleShareLink}
-                className="flex items-center gap-2 px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors font-semibold"
-              >
-                <Share2 className="w-5 h-5" />
-                Copiar Link
-              </button>
-              <button
-                onClick={handleShareWhatsApp}
-                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
-              >
-                WhatsApp
-              </button>
-            </div>
+            <button
+              onClick={() => setShowShareModal(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-blue-600 transition-colors font-semibold"
+            >
+              <Share2 className="w-5 h-5" />
+              Compartilhar Agenda
+            </button>
           </div>
         </div>
 
@@ -203,6 +181,16 @@ export default function AgendaAnunciante() {
           setSelectedEvento(null);
         }}
       />
+
+      {/* Share Modal */}
+      {anuncianteId && (
+        <ShareAgendaModal
+          isOpen={showShareModal}
+          onClose={() => setShowShareModal(false)}
+          anuncianteId={parseInt(anuncianteId)}
+          anuncianteNome={anunciante?.nome || ""}
+        />
+      )}
     </div>
   );
 }

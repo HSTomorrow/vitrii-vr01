@@ -120,6 +120,16 @@ import {
   removePermissao,
 } from "./routes/eventos-agenda";
 import {
+  getFilasEsperaParaAnunciante,
+  getFilasEsperaPorUsuario,
+  createFilaEspera,
+  aprovarFilaEspera,
+  rejeitarFilaEspera,
+  cancelarFilaEspera,
+  atualizarStatusEvento,
+  deletarAgenda,
+} from "./routes/filas-espera-agenda";
+import {
   criarReservaOuListaEspera,
   getReservasDoEvento,
   confirmarReserva,
@@ -493,6 +503,18 @@ export function createServer() {
   app.delete("/api/eventos-agenda/:id", extractUserId, deleteEvento);
   app.post("/api/eventos-agenda/:id/permissoes", extractUserId, addPermissao);
   app.delete("/api/eventos-agenda/:id/permissoes/:usuarioId", extractUserId, removePermissao);
+  app.patch("/api/eventos-agenda/:eventoId/status", extractUserId, atualizarStatusEvento);
+
+  // Filas de Espera para Eventos routes
+  app.get("/api/filas-espera/anunciante/:anuncianteId", extractUserId, getFilasEsperaParaAnunciante);
+  app.get("/api/filas-espera/usuario", extractUserId, getFilasEsperaPorUsuario);
+  app.post("/api/filas-espera", extractUserId, createFilaEspera);
+  app.post("/api/filas-espera/:filaId/aprovar", extractUserId, aprovarFilaEspera);
+  app.post("/api/filas-espera/:filaId/rejeitar", extractUserId, rejeitarFilaEspera);
+  app.post("/api/filas-espera/:filaId/cancelar", extractUserId, cancelarFilaEspera);
+
+  // Agenda deletion route
+  app.delete("/api/agenda/:anuncianteId", extractUserId, deletarAgenda);
 
   // Reservas de Evento routes
   app.post("/api/reservas-evento", criarReservaOuListaEspera);
