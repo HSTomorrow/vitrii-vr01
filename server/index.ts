@@ -1,7 +1,6 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import { handleDemo } from "./routes/demo";
 import {
   getAnuncios,
   getAnuncioById,
@@ -104,37 +103,6 @@ import {
   getAgendas,
   getAgendaById,
   createAgenda,
-  updateAgenda,
-  deleteAgenda,
-  createSlot,
-  getSlots,
-  makeReservation,
-  cancelReservation,
-  getUserReservations,
-  getWaitlist,
-  addToWaitlist,
-  removeFromWaitlist,
-} from "./routes/agendas_cursos";
-import {
-  getLinksProdutosExternos,
-  getLinkProdutoExternoById,
-  createLinkProdutoExterno,
-  updateLinkProdutoExterno,
-  deleteLinkProdutoExterno,
-  updateLinkStatus,
-  getMarketplaceStats,
-} from "./routes/links_produtos_externos";
-import {
-  generateQRCode,
-  getQRCodesForAd,
-  trackQRCodeScan,
-  getQRCodeStats,
-  deleteQRCode,
-} from "./routes/qrcodes";
-import {
-  getAgendas,
-  getAgendaById,
-  createAgenda,
   updateAgendaStatus,
   deleteAgenda,
   addToWaitlist,
@@ -183,11 +151,6 @@ import {
 } from "./routes/usuario-funcionalidades";
 import { uploadMiddleware, handleUpload } from "./routes/upload";
 import { extractUserId, requireAdmin } from "./middleware/permissionGuard";
-import {
-  googleAuthorize,
-  googleCallback,
-  googleLinkAccount,
-} from "./routes/oauth";
 import {
   getBanners,
   getBannerById,
@@ -267,8 +230,6 @@ export function createServer() {
     }
   });
 
-  app.get("/api/demo", handleDemo);
-
   // Upload route
   app.post("/api/upload", uploadMiddleware, handleUpload);
 
@@ -280,11 +241,6 @@ export function createServer() {
   app.post("/api/auth/forgot-password", forgotPassword);
   app.post("/api/auth/reset-password", resetPassword);
   app.get("/api/auth/validate-reset-token", validateResetToken);
-
-  // OAuth2 routes
-  app.get("/api/oauth/google/authorize", googleAuthorize);
-  app.get("/api/oauth/google/callback", googleCallback);
-  app.post("/api/oauth/google/link", googleLinkAccount);
 
   app.post("/api/usracessos", createUsuario);
   app.put("/api/usracessos/:id", updateUsuario);
@@ -491,53 +447,6 @@ export function createServer() {
     removePermissao,
   );
 
-  // Agendas (Aulas, Cursos e Serviços) routes
-  app.get("/api/agendas-cursos", getAgendas);
-  app.get("/api/agendas-cursos/:id", getAgendaById);
-  app.post("/api/agendas-cursos", createAgenda);
-  app.put("/api/agendas-cursos/:id", updateAgenda);
-  app.delete("/api/agendas-cursos/:id", deleteAgenda);
-
-  // Slots routes
-  app.post("/api/agendas-cursos/slots", createSlot);
-  app.get("/api/agendas-cursos/:agendaId/slots", getSlots);
-
-  // Reservations routes
-  app.post("/api/agendas-cursos/reservas", extractUserId, makeReservation);
-  app.delete(
-    "/api/agendas-cursos/reservas/:reservaId",
-    extractUserId,
-    cancelReservation,
-  );
-  app.get("/api/agendas-cursos/reservas/usuario", extractUserId, getUserReservations);
-
-  // Waitlist routes
-  app.get("/api/agendas-cursos/:agendaId/lista-espera", getWaitlist);
-  app.post("/api/agendas-cursos/lista-espera", extractUserId, addToWaitlist);
-  app.delete(
-    "/api/agendas-cursos/lista-espera/:waitlistId",
-    extractUserId,
-    removeFromWaitlist,
-  );
-
-  // External Product Links routes (for professional advertisers)
-  app.get("/api/links-produtos-externos", getLinksProdutosExternos);
-  app.get("/api/links-produtos-externos/:id", getLinkProdutoExternoById);
-  app.post("/api/links-produtos-externos", createLinkProdutoExterno);
-  app.put("/api/links-produtos-externos/:id", updateLinkProdutoExterno);
-  app.delete("/api/links-produtos-externos/:id", deleteLinkProdutoExterno);
-  app.patch(
-    "/api/links-produtos-externos/:id/status",
-    updateLinkStatus
-  );
-  app.get("/api/links-produtos-externos/stats/marketplace", getMarketplaceStats);
-
-  // QR Codes routes
-  app.post("/api/qrcodes/generate", generateQRCode);
-  app.get("/api/anuncios/:anuncioId/qrcodes", getQRCodesForAd);
-  app.post("/api/qrcodes/:qrCodeId/track", trackQRCodeScan);
-  app.get("/api/qrcodes/:qrCodeId/stats", getQRCodeStats);
-  app.delete("/api/qrcodes/:qrCodeId", deleteQRCode);
 
   // Agendas (Service Schedule) routes
   app.get("/api/agendas", getAgendas);
