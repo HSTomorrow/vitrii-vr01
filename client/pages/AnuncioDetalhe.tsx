@@ -29,6 +29,7 @@ import {
   X,
   Phone,
   Star,
+  User,
 } from "lucide-react";
 
 interface MembroEquipe {
@@ -589,6 +590,13 @@ export default function AnuncioDetalhe() {
                 >
                   <Share2 className="w-4 h-4" />
                   Compartilhar
+                </button>
+                <button
+                  onClick={() => navigate(`/anunciante/${anuncio.anuncianteId}`)}
+                  className="w-full px-4 py-3 bg-vitrii-text text-white rounded-lg font-semibold hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
+                >
+                  <User className="w-4 h-4" />
+                  Anunciante
                 </button>
               </div>
 
