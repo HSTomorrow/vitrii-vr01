@@ -18,6 +18,7 @@ import {
   Layers,
   Users,
   Package,
+  Calendar,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
@@ -146,6 +147,16 @@ export default function Menu() {
                     <Heart className="w-6 h-6 text-red-500" />
                     <span className="text-vitrii-text font-medium">
                       Meus Favoritos
+                    </span>
+                  </Link>
+
+                  <Link
+                    to="/minha-agenda"
+                    className="flex items-center gap-4 px-6 py-4 bg-vitrii-gray hover:bg-gray-200 rounded-lg transition-colors"
+                  >
+                    <Calendar className="w-6 h-6 text-vitrii-blue" />
+                    <span className="text-vitrii-text font-medium">
+                      Minha Agenda
                     </span>
                   </Link>
 

@@ -223,6 +223,7 @@ model usracessos {
   listas_desejos        listas_desejos[]
   reservas_agenda       reservas_agenda[]
   lista_espera_agenda   lista_espera_agenda[]
+  eventos_permissoes    eventos_agenda_permissoes[]
   conversas             conversas[]
   mensagens             mensagens[]
 }
@@ -473,6 +474,42 @@ model lista_espera_agenda {
   @@index([agendaId])
   @@index([usuarioId])
   @@index([status])
+}
+
+// Eventos de Agenda do Anunciante (Compromissos, Horários, etc)
+model eventos_agenda_anunciante {
+  id                    Int                              @id @default(autoincrement())
+  anuncianteId          Int
+  titulo                String                           @db.VarChar(255)
+  descricao             String?
+  dataInicio            DateTime
+  dataFim               DateTime
+  privacidade           String                           @default("privado") @db.VarChar(20) // "publico", "privado_usuarios", "privado"
+  cor                   String?                          @default("#3B82F6") @db.VarChar(7)
+  dataCriacao           DateTime                         @default(now())
+  dataAtualizacao       DateTime                         @updatedAt
+
+  anunciante            anunciantes                      @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
+  permissoes            eventos_agenda_permissoes[]
+
+  @@index([anuncianteId])
+  @@index([dataInicio])
+  @@index([privacidade])
+}
+
+// Permissões para Eventos Privados com Usuários Específicos
+model eventos_agenda_permissoes {
+  id                    Int                              @id @default(autoincrement())
+  eventoId              Int
+  usuarioId             Int
+  dataCriacao           DateTime                         @default(now())
+
+  evento                eventos_agenda_anunciante        @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+  usuario               usracessos                       @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@unique([eventoId, usuarioId])
+  @@index([eventoId])
+  @@index([usuarioId])
 }
 
 // Conversas (Chat Conversations)

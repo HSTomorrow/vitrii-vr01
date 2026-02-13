@@ -111,6 +111,15 @@ import {
   promoteFromWaitlist,
 } from "./routes/agendas";
 import {
+  getEventosByAnunciante,
+  getEventosVisivelsPara,
+  createEvento,
+  updateEvento,
+  deleteEvento,
+  addPermissao,
+  removePermissao,
+} from "./routes/eventos-agenda";
+import {
   getPagamentoByAnuncioId,
   createPagamento,
   updatePagamentoStatus,
@@ -466,6 +475,15 @@ export function createServer() {
   app.get("/api/agendas/:agendaId/waitlist", getWaitlist);
   app.delete("/api/agendas/waitlist/:waitlistId", removeFromWaitlist);
   app.post("/api/agendas/:agendaId/waitlist/promote", promoteFromWaitlist);
+
+  // Eventos de Agenda do Anunciante routes
+  app.get("/api/eventos-agenda/anunciante/:anuncianteId", extractUserId, getEventosByAnunciante);
+  app.get("/api/eventos-agenda/visiveis/:anuncianteId", getEventosVisivelsPara);
+  app.post("/api/eventos-agenda", extractUserId, createEvento);
+  app.put("/api/eventos-agenda/:id", extractUserId, updateEvento);
+  app.delete("/api/eventos-agenda/:id", extractUserId, deleteEvento);
+  app.post("/api/eventos-agenda/:id/permissoes", extractUserId, addPermissao);
+  app.delete("/api/eventos-agenda/:id/permissoes/:usuarioId", extractUserId, removePermissao);
 
   // Pagamentos (Payment) routes
   app.get("/api/pagamentos", extractUserId, requireAdmin, getPagamentos);

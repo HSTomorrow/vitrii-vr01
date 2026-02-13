@@ -15,6 +15,7 @@ import {
   ArrowLeft,
   User,
   AlertCircle,
+  Calendar,
 } from "lucide-react";
 
 interface Anunciante {
@@ -206,13 +207,21 @@ export default function AnuncianteProfile() {
           </div>
         </div>
 
-        {/* CTA Button - O que temos na Vitrini */}
-        <div className="mb-8">
+        {/* CTA Buttons */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           <button
             onClick={() => navigate(`/browse?anuncianteId=${anunciante.id}`)}
-            className="w-full bg-gradient-to-r from-vitrii-blue to-vitrii-blue-dark hover:shadow-lg text-white py-4 rounded-lg font-bold text-lg transition-all duration-300 transform hover:-translate-y-1"
+            className="bg-gradient-to-r from-vitrii-blue to-vitrii-blue-dark hover:shadow-lg text-white py-4 rounded-lg font-bold text-lg transition-all duration-300 transform hover:-translate-y-1"
           >
             🛍️ O que temos na Vitrini
+          </button>
+
+          <button
+            onClick={() => navigate(`/agenda/${anunciante.id}`)}
+            className="flex items-center justify-center gap-2 bg-gradient-to-r from-vitrii-yellow to-vitrii-yellow-dark hover:shadow-lg text-vitrii-text py-4 rounded-lg font-bold text-lg transition-all duration-300 transform hover:-translate-y-1"
+          >
+            <Calendar className="w-6 h-6" />
+            Ver Agenda
           </button>
         </div>
 
