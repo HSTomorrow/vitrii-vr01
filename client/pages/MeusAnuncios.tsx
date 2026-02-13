@@ -258,7 +258,7 @@ export default function MeusAnuncios() {
                         Visualizar
                       </button>
 
-                      {anuncio.statusPagamento === "pendente" && (
+                      {anuncio.status === "em_edicao" && anuncio.statusPagamento === "pendente" && (
                         <button
                           onClick={() => setSelectedAdForPayment(anuncio)}
                           className="flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 transition-colors text-sm"

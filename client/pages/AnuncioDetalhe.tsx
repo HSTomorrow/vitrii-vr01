@@ -588,7 +588,7 @@ export default function AnuncioDetalhe() {
                     Acessar Anúncio Externo
                   </a>
                 )}
-                {canEdit && anuncio.statusPagamento === "pendente" && (
+                {canEdit && anuncio.status === "em_edicao" && anuncio.statusPagamento === "pendente" && (
                   <button
                     onClick={() => setShowPaymentModal(true)}
                     className="w-full px-4 py-3 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 transition-colors flex items-center justify-center gap-2"
