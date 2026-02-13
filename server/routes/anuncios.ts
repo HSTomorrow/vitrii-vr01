@@ -48,6 +48,22 @@ const AnuncioBaseSchema = z.object({
     .optional(),
   categoria: z.enum(["roupas", "carros", "imoveis"]).optional().nullable(),
   dadosCategoria: z.string().optional().nullable(), // JSON string
+  link: z
+    .string()
+    .optional()
+    .nullable()
+    .refine(
+      (url) => {
+        if (!url || url === "") return true; // Optional field
+        try {
+          new URL(url); // Validate if provided
+          return true;
+        } catch {
+          return false;
+        }
+      },
+      "URL do link inválida",
+    ),
 });
 
 // Schema validation for creating ad (with refinement)

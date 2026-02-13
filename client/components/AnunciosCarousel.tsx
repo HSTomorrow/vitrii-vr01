@@ -10,6 +10,7 @@ interface Anuncio {
   titulo: string;
   descricao?: string;
   imagem?: string;
+  link?: string;
   preco?: number;
   isDoacao?: boolean;
   tipo: string;
@@ -323,12 +324,25 @@ export default function AnunciosCarousel({
                   </button>
                 </div>
               ) : (
-                <button
-                  onClick={() => navigate(`/anuncio/${anuncio.id}`)}
-                  className={`w-full text-white py-1.5 text-xs rounded-md font-semibold transition-all duration-300 transform hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 ${colors.button}`}
-                >
-                  Ver Detalhes
-                </button>
+                <div className="space-y-1">
+                  <button
+                    onClick={() => navigate(`/anuncio/${anuncio.id}`)}
+                    className={`w-full text-white py-1.5 text-xs rounded-md font-semibold transition-all duration-300 transform hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 ${colors.button}`}
+                  >
+                    Ver Detalhes
+                  </button>
+                  {anuncio.link && (
+                    <a
+                      href={anuncio.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className={`w-full text-white py-1.5 text-xs rounded-md font-semibold transition-all duration-300 transform hover:shadow-md hover:-translate-y-0.5 active:translate-y-0 block text-center opacity-90 hover:opacity-100 ${colors.button}`}
+                    >
+                      Mais Detalhes
+                    </a>
+                  )}
+                </div>
               )}
             </div>
           </div>

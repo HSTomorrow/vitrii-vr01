@@ -50,6 +50,7 @@ model anuncios {
   preco               Decimal?                @db.Decimal(10, 2)
   categoria           String?                 @db.VarChar(100)
   imagem              String?                 @db.VarChar(500)
+  link                String?                 @db.VarChar(500)
   status              String                  @default("ativo") @db.VarChar(50)
   tipo                String                  @default("produto") @db.VarChar(50)
   isDoacao            Boolean                 @default(false) @map("isdoacao")

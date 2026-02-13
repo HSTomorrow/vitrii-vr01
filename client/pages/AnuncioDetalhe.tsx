@@ -567,6 +567,17 @@ export default function AnuncioDetalhe() {
                   <Share2 className="w-4 h-4" />
                   Compartilhar
                 </button>
+                {anuncio.link && (
+                  <a
+                    href={anuncio.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full px-4 py-3 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors flex items-center justify-center gap-2"
+                  >
+                    <Globe className="w-4 h-4" />
+                    Mais Detalhes
+                  </a>
+                )}
               </div>
 
               {/* Info Box */}

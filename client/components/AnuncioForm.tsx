@@ -77,6 +77,7 @@ export default function AnuncioForm({
     productId: 0,
     tabelaDePrecoId: 0,
     fotoUrl: "",
+    link: "",
     precoAnuncio: "",
     dataValidade: getDefaultValidityDate(),
     equipeDeVendaId: 0,
@@ -248,6 +249,7 @@ export default function AnuncioForm({
         productId: ad.productId,
         tabelaDePrecoId: ad.tabelaDePrecoId || 0,
         fotoUrl: ad.imagem || "",
+        link: ad.link || "",
         precoAnuncio: ad.preco ? ad.preco.toString() : "",
         dataValidade: ad.dataValidade
           ? new Date(ad.dataValidade).toISOString().split("T")[0]
@@ -290,6 +292,7 @@ export default function AnuncioForm({
         titulo: data.titulo,
         descricao: data.descricao,
         fotoUrl: data.fotoUrl,
+        link: data.link || null,
         precoAnuncio: data.aCombinar ? 0 : (data.precoAnuncio ? parseFloat(data.precoAnuncio) : null),
         anuncianteId: selectedAnuncianteId,
         productId: data.productId > 0 ? data.productId : null,
@@ -1006,6 +1009,23 @@ export default function AnuncioForm({
                   ))}
                 </select>
               </div>
+            </div>
+
+            {/* Link para Mais Detalhes */}
+            <div>
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                Link para Mais Detalhes (Opcional)
+              </label>
+              <input
+                type="url"
+                value={formData.link}
+                onChange={(e) => handleInputChange("link", e.target.value)}
+                placeholder="https://exemplo.com"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
+              />
+              <p className="mt-1 text-sm text-vitrii-text-secondary">
+                Adicione um link para mais informações sobre o anúncio. Será exibido como um botão "Mais Detalhes".
+              </p>
             </div>
 
             {/* Fotos (Multiple Images) */}
