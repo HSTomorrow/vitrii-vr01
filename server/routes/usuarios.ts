@@ -378,14 +378,18 @@ const UsuarioUpdateSchema = z.object({
     .max(255)
     .optional(),
   telefone: z
-    .string()
-    .min(10, "Telefone deve ter no mínimo 10 dígitos")
-    .optional()
-    .or(z.literal("")), // Allow empty string
-  whatsapp: z.string().optional().or(z.literal("")), // Allow empty string
-  linkedin: z.string().optional().or(z.literal("")), // Allow empty string
-  facebook: z.string().optional().or(z.literal("")), // Allow empty string
-  endereco: z.string().optional().or(z.literal("")), // Allow empty string
+    .union([
+      z.literal(""),
+      z.string().refine(
+        (value) => value.replace(/\D/g, "").length >= 10,
+        "Telefone deve ter no mínimo 10 dígitos"
+      ),
+    ])
+    .optional(),
+  whatsapp: z.string().optional(),
+  linkedin: z.string().optional(),
+  facebook: z.string().optional(),
+  endereco: z.string().optional(),
 });
 
 // Admin schema for updating user profile (includes all fields)

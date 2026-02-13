@@ -208,7 +208,7 @@ model usracessos {
   tipoUsuario           String                 @default("common") @db.VarChar(20)
   tassinatura           String                 @default("Gratuito") @db.VarChar(20)
   dataCriacao           DateTime               @default(now())
-  dataAtualizacao       DateTime
+  dataAtualizacao       DateTime               @updatedAt
   endereco              String?
   dataVigenciaContrato  DateTime               @default(now())
   numeroAnunciosAtivos  Int                    @default(0)
