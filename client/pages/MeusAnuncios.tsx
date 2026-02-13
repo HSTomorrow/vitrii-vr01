@@ -149,6 +149,45 @@ export default function MeusAnuncios() {
     );
   };
 
+  const getPaymentStatusBadge = (status: string) => {
+    const statusMap: Record<
+      string,
+      { bg: string; text: string; label: string }
+    > = {
+      pendente: {
+        bg: "bg-red-100",
+        text: "text-red-800",
+        label: "Pagamento Pendente",
+      },
+      comprovante_enviado: {
+        bg: "bg-blue-100",
+        text: "text-blue-800",
+        label: "Comprovante Enviado",
+      },
+      aprovado: {
+        bg: "bg-green-100",
+        text: "text-green-800",
+        label: "Pagamento Aprovado",
+      },
+      rejeitado: {
+        bg: "bg-red-100",
+        text: "text-red-800",
+        label: "Pagamento Rejeitado",
+      },
+    };
+
+    const config = statusMap[status];
+    if (!config) return null;
+
+    return (
+      <span
+        className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${config.bg} ${config.text}`}
+      >
+        {config.label}
+      </span>
+    );
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
@@ -213,7 +252,10 @@ export default function MeusAnuncios() {
                           {anuncio.anunciantes?.nome || "Anunciante"}
                         </p>
                       </div>
-                      {getStatusBadge(anuncio.status)}
+                      <div className="flex flex-col items-end gap-1">
+                        {getStatusBadge(anuncio.status)}
+                        {anuncio.statusPagamento && getPaymentStatusBadge(anuncio.statusPagamento)}
+                      </div>
                     </div>
 
                     {/* Description and price */}
