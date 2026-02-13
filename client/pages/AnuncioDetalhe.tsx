@@ -808,11 +808,9 @@ export default function AnuncioDetalhe() {
                 <div className="flex justify-center">
                   <div className="bg-gray-100 p-4 rounded-lg border-4 border-vitrii-blue">
                     <img
-                      src={`https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=00020126580014br.gov.bcb.brcode0136${encodeURIComponent(
-                        "VITRII-PIX-" + anuncio.id,
-                      )}520400005303986540510.005802BR5913Vitrii6009Montenegro62410503***63041D3D`}
+                      src="https://cdn.builder.io/api/v1/image/assets%2Ff2e9e91d4cc44d4bae5b9dac3bb6abe8%2F97d00882ea4a4c149ab37215aedb309b?format=webp&width=800&height=1200"
                       alt="PIX QR Code"
-                      className="w-64 h-64"
+                      className="w-64 h-64 object-contain"
                     />
                   </div>
                 </div>
