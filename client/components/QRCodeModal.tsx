@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { X, Download, MessageCircle } from "lucide-react";
-import QRCode from "qrcode.react";
+import { QRCodeSVG } from "qrcode.react";
 import {
   Dialog,
   DialogContent,
@@ -37,18 +37,35 @@ export default function QRCodeModal({
 
     setIsDownloading(true);
     try {
-      const canvas = qrCodeRef.current.querySelector("canvas");
-      if (!canvas) {
+      const svg = qrCodeRef.current.querySelector("svg");
+      if (!svg) {
         toast.error("Erro ao gerar QR Code");
         return;
       }
 
-      const link = document.createElement("a");
-      link.href = canvas.toDataURL("image/png");
-      link.download = `qrcode-${anuncioId}.png`;
-      link.click();
+      // Convert SVG to PNG
+      const canvas = document.createElement("canvas");
+      const svgData = new XMLSerializer().serializeToString(svg);
+      const img = new Image();
+      const blob = new Blob([svgData], { type: "image/svg+xml" });
+      const url = URL.createObjectURL(blob);
 
-      toast.success("QR Code baixado com sucesso!");
+      img.onload = () => {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0);
+          const link = document.createElement("a");
+          link.href = canvas.toDataURL("image/png");
+          link.download = `qrcode-${anuncioId}.png`;
+          link.click();
+          URL.revokeObjectURL(url);
+          toast.success("QR Code baixado com sucesso!");
+        }
+      };
+
+      img.src = url;
     } catch (error) {
       console.error("Error downloading QR Code:", error);
       toast.error("Erro ao baixar QR Code");
@@ -79,7 +96,7 @@ export default function QRCodeModal({
               ref={qrCodeRef}
               className="bg-white p-4 rounded-lg border-2 border-gray-200"
             >
-              <QRCode
+              <QRCodeSVG
                 value={anuncioUrl}
                 size={256}
                 level="H"

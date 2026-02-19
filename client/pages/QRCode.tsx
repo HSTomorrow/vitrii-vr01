@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
-import QRCode from "qrcode.react";
+import { QRCodeSVG } from "qrcode.react";
 import { toast } from "sonner";
 import {
   QrCode,
@@ -54,14 +54,16 @@ export default function QRCodePage() {
       return;
     }
 
-    const canvas = qrElement.querySelector("canvas") as HTMLCanvasElement;
-    if (!canvas) {
+    const svg = qrElement.querySelector("svg") as SVGElement;
+    if (!svg) {
       toast.error("Erro ao gerar QR Code para impressão");
       return;
     }
 
     const anuncio = meusAnuncios.find((a: any) => a.id === anuncioId);
-    const qrImage = canvas.toDataURL("image/png");
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const blob = new Blob([svgData], { type: "image/svg+xml" });
+    const qrImage = URL.createObjectURL(blob);
 
     printWindow.document.write(`
       <!DOCTYPE html>
@@ -114,7 +116,7 @@ export default function QRCodePage() {
           <div class="qr-container">
             <h2>Escaneie para ver o anúncio</h2>
             <div class="qr-image">
-              <img src="${qrImage}" alt="QR Code" />
+              <img src="data:image/svg+xml;base64,${btoa(svgData)}" alt="QR Code" />
             </div>
             <div class="qr-info">
               <h3><strong>Anúncio:</strong> ${anuncio?.titulo || "Sem título"}</h3>
@@ -134,19 +136,36 @@ export default function QRCodePage() {
 
   const handleDownloadQRCode = (anuncioId: number) => {
     const qrElement = document.getElementById(`qr-code-${anuncioId}`);
-    const canvas = qrElement?.querySelector("canvas") as HTMLCanvasElement;
+    const svg = qrElement?.querySelector("svg") as SVGElement;
 
-    if (!canvas) {
+    if (!svg) {
       toast.error("Erro ao gerar QR Code");
       return;
     }
 
-    const link = document.createElement("a");
-    link.href = canvas.toDataURL("image/png");
-    link.download = `qrcode-anuncio-${anuncioId}.png`;
-    link.click();
+    // Convert SVG to PNG
+    const canvas = document.createElement("canvas");
+    const svgData = new XMLSerializer().serializeToString(svg);
+    const img = new Image();
+    const blob = new Blob([svgData], { type: "image/svg+xml" });
+    const url = URL.createObjectURL(blob);
 
-    toast.success("QR Code baixado com sucesso!");
+    img.onload = () => {
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        ctx.drawImage(img, 0, 0);
+        const link = document.createElement("a");
+        link.href = canvas.toDataURL("image/png");
+        link.download = `qrcode-anuncio-${anuncioId}.png`;
+        link.click();
+        URL.revokeObjectURL(url);
+        toast.success("QR Code baixado com sucesso!");
+      }
+    };
+
+    img.src = url;
   };
 
   return (
@@ -258,7 +277,7 @@ export default function QRCodePage() {
                     id={`qr-code-${anuncio.id}`}
                     className="bg-gray-50 p-4 rounded-lg flex justify-center mb-4 border border-gray-200"
                   >
-                    <QRCode
+                    <QRCodeSVG
                       value={`${window.location.origin}/anuncio/${anuncio.id}`}
                       size={200}
                       level="H"
