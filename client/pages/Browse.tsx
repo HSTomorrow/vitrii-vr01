@@ -175,12 +175,24 @@ export default function Browse() {
     localidadeAnunciantesData,
   ]);
 
-  const totalItems = filteredAnuncios.length;
+  // Sort filtered anuncios by ordem (ascending) + id (descending)
+  const sortedAnuncios = useMemo(() => {
+    return [...filteredAnuncios].sort((a: any, b: any) => {
+      // First sort by ordem (ascending)
+      if (a.ordem !== b.ordem) {
+        return a.ordem - b.ordem;
+      }
+      // Then sort by id (descending) for ads with same ordem
+      return b.id - a.id;
+    });
+  }, [filteredAnuncios]);
+
+  const totalItems = sortedAnuncios.length;
 
   // Calculate pagination indices
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const anuncios = filteredAnuncios.slice(startIndex, endIndex);
+  const anuncios = sortedAnuncios.slice(startIndex, endIndex);
 
   // Reset to page 1 when filters change
   const handleFilterChange = () => {

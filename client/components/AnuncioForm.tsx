@@ -87,6 +87,7 @@ export default function AnuncioForm({
     isDoacao: isDonation || false,
     aCombinar: false,
     destaque: false,
+    ordem: 10, // Default order for new ads (admin only)
     categoria: "" as string,
     dadosCategoria: "",
     tipo: anuncioTipo || ("produto" as string),
@@ -261,6 +262,7 @@ export default function AnuncioForm({
         isDoacao: ad.isDoacao || false,
         aCombinar: ad.aCombinar || false,
         destaque: ad.destaque || false,
+        ordem: ad.ordem || 10,
         categoria: ad.categoria || "",
         dadosCategoria: ad.dadosCategoria || "",
         tipo: ad.tipo || "produto",
@@ -311,6 +313,11 @@ export default function AnuncioForm({
         categoria: data.categoria || null,
         dadosCategoria: data.dadosCategoria || null,
       };
+
+      // Add ordem field for admins only
+      if (user?.tipoUsuario === "adm") {
+        (payload as any).ordem = data.ordem;
+      }
 
       console.log("[AnuncioForm] Submitting form with payload:", payload);
 
@@ -1076,6 +1083,28 @@ export default function AnuncioForm({
                 </p>
               </label>
             </div>
+
+            {/* Ordem Field (Admin Only) */}
+            {user?.tipoUsuario === "adm" && (
+              <div className="bg-purple-50 border-l-4 border-purple-400 p-4 rounded">
+                <label htmlFor="ordem" className="block text-sm font-semibold text-vitrii-text mb-2">
+                  Ordem de Exibição (Apenas Admin)
+                </label>
+                <input
+                  type="number"
+                  id="ordem"
+                  min="1"
+                  value={formData.ordem}
+                  onChange={(e) => {
+                    handleInputChange("ordem", parseInt(e.target.value) || 10);
+                  }}
+                  className="w-full px-4 py-2 border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                />
+                <p className="text-xs text-vitrii-text-secondary mt-1">
+                  Padrão: 10. Quanto menor o número, mais visível será o anúncio (ordenado por ordem crescente, depois por ID decrescente)
+                </p>
+              </div>
+            )}
 
             {/* Info Box */}
             <div className="bg-blue-50 border-l-4 border-vitrii-blue p-4 rounded">

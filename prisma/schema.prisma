@@ -67,6 +67,7 @@ model anuncios {
   estado              String?                 @db.VarChar(2)
   visualizacoes       Int                     @default(0)
   destaque            Boolean                 @default(false)
+  ordem               Int                     @default(10)  // Admin can customize, default 10, sorted ascending + id descending
   isActive            Boolean                 @default(true)
   anunciantes         anunciantes             @relation(fields: [anuncianteId], references: [id], onDelete: Cascade, map: "anuncios_lojaId_fkey")
   anuncioVisualizados anuncioVisualizados[]

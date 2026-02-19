@@ -42,6 +42,7 @@ const AnuncioBaseSchema = z.object({
     .default("produto"),
   isDoacao: z.boolean().optional().default(false),
   destaque: z.boolean().optional().default(false),
+  ordem: z.number().int().positive().optional().default(10), // Default 10 for new ads (admin only)
   isActive: z.boolean().optional().default(true),
   status: z
     .enum(["em_edicao", "aguardando_pagamento", "pago", "historico"])
@@ -166,7 +167,10 @@ export const getAnuncios: RequestHandler = async (req, res) => {
             },
           },
         },
-        orderBy: { dataCriacao: "desc" },
+        orderBy: [
+          { ordem: "asc" },
+          { id: "desc" }
+        ],
         take: pageLimit,
         skip: pageOffset,
       }),
@@ -382,6 +386,9 @@ export const createAnuncio: RequestHandler = async (req, res) => {
     const statusPagamento = isDoacao ? "aprovado" : "pendente";
     const destaque = isDoacao ? true : false;
 
+    // Only admins can set custom ordem, otherwise default to 10
+    const ordem = usuario.tipoUsuario === "adm" ? (validatedData.ordem || 10) : 10;
+
     const anuncio = await prisma.anuncios.create({
       data: {
         usuarioId: validatedData.usuarioId,
@@ -397,6 +404,7 @@ export const createAnuncio: RequestHandler = async (req, res) => {
         status,
         statusPagamento,
         destaque,
+        ordem,
         isDoacao,
         tipo: anuncioTipo,
         dataAtualizacao: new Date(),
@@ -1078,7 +1086,10 @@ export const getAnunciosDUsuario: RequestHandler = async (req, res) => {
             },
           },
         },
-        orderBy: { dataCriacao: "desc" },
+        orderBy: [
+          { ordem: "asc" },
+          { id: "desc" }
+        ],
         take: pageLimit,
         skip: pageOffset,
       }),

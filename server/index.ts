@@ -21,6 +21,7 @@ import {
   deleteAnuncioFoto,
   reorderAnuncioFotos,
 } from "./routes/anuncios";
+import { updateAnuncioOrdem } from "./routes/anuncios-ordem";
 import {
   getAnunciantes,
   getAnuncianteById,
@@ -405,6 +406,12 @@ export function createServer() {
     extractUserId,
     requireAdmin,
     toggleDestaqueAnuncio,
+  );
+  app.patch(
+    "/api/anuncios/:id/ordem",
+    extractUserId,
+    requireAdmin,
+    updateAnuncioOrdem,
   );
   app.patch("/api/anuncios/:id/inactivate", inactivateAnuncio);
   app.patch("/api/anuncios/:id/activate", activateAnuncio);
