@@ -1,6 +1,11 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/contexts/AuthContext";
+import QRCode from "qrcode.react";
+import { toast } from "sonner";
 import {
   QrCode,
   AlertCircle,
@@ -9,9 +14,141 @@ import {
   BarChart3,
   ArrowRight,
   Zap,
+  Printer,
+  Download,
+  LogIn,
 } from "lucide-react";
 
 export default function QRCodePage() {
+  const navigate = useNavigate();
+  const { user, isLoggedIn } = useAuth();
+  const [selectedQRCodeId, setSelectedQRCodeId] = useState<number | null>(null);
+
+  // Fetch user's anuncios
+  const { data: meusAnunciosData, isLoading: anunciosLoading } = useQuery({
+    queryKey: ["meus-anuncios-qrcode"],
+    queryFn: async () => {
+      if (!user?.id) return null;
+
+      const response = await fetch(`/api/anuncios?usuarioId=${user.id}&limit=500`, {
+        headers: {
+          "x-user-id": user.id.toString(),
+        },
+      });
+
+      if (!response.ok) throw new Error("Erro ao buscar anúncios");
+      return response.json();
+    },
+    enabled: !!user?.id,
+  });
+
+  const meusAnuncios = meusAnunciosData?.data || [];
+
+  const handlePrintQRCode = (anuncioId: number) => {
+    const qrElement = document.getElementById(`qr-code-${anuncioId}`);
+    if (!qrElement) return;
+
+    const printWindow = window.open("", "", "width=800,height=600");
+    if (!printWindow) {
+      toast.error("Não foi possível abrir a janela de impressão");
+      return;
+    }
+
+    const canvas = qrElement.querySelector("canvas") as HTMLCanvasElement;
+    if (!canvas) {
+      toast.error("Erro ao gerar QR Code para impressão");
+      return;
+    }
+
+    const anuncio = meusAnuncios.find((a: any) => a.id === anuncioId);
+    const qrImage = canvas.toDataURL("image/png");
+
+    printWindow.document.write(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>QR Code - ${anuncio?.titulo || "Anúncio"}</title>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              margin: 20px;
+              background: white;
+            }
+            .qr-container {
+              text-align: center;
+              page-break-inside: avoid;
+              border: 2px solid #000;
+              padding: 20px;
+              margin-bottom: 30px;
+              background: white;
+            }
+            .qr-image {
+              max-width: 300px;
+              margin: 20px auto;
+            }
+            .qr-image img {
+              width: 100%;
+              height: auto;
+            }
+            .qr-info {
+              text-align: left;
+              margin-top: 20px;
+            }
+            .qr-info h3 {
+              margin: 5px 0;
+              font-size: 16px;
+              color: #333;
+            }
+            .qr-info p {
+              margin: 3px 0;
+              font-size: 12px;
+              color: #666;
+            }
+            @media print {
+              body { margin: 0; }
+              .qr-container { border: 1px solid #ccc; }
+            }
+          </style>
+        </head>
+        <body>
+          <div class="qr-container">
+            <h2>Escaneie para ver o anúncio</h2>
+            <div class="qr-image">
+              <img src="${qrImage}" alt="QR Code" />
+            </div>
+            <div class="qr-info">
+              <h3><strong>Anúncio:</strong> ${anuncio?.titulo || "Sem título"}</h3>
+              <p><strong>Descrição:</strong> ${anuncio?.descricao ? anuncio.descricao.substring(0, 100) + "..." : "Sem descrição"}</p>
+              ${anuncio?.preco ? `<p><strong>Preço:</strong> R$ ${parseFloat(anuncio.preco).toFixed(2)}</p>` : ""}
+            </div>
+          </div>
+        </body>
+      </html>
+    `);
+
+    printWindow.document.close();
+    setTimeout(() => {
+      printWindow.print();
+    }, 250);
+  };
+
+  const handleDownloadQRCode = (anuncioId: number) => {
+    const qrElement = document.getElementById(`qr-code-${anuncioId}`);
+    const canvas = qrElement?.querySelector("canvas") as HTMLCanvasElement;
+
+    if (!canvas) {
+      toast.error("Erro ao gerar QR Code");
+      return;
+    }
+
+    const link = document.createElement("a");
+    link.href = canvas.toDataURL("image/png");
+    link.download = `qrcode-anuncio-${anuncioId}.png`;
+    link.click();
+
+    toast.success("QR Code baixado com sucesso!");
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
@@ -20,335 +157,182 @@ export default function QRCodePage() {
       <section className="bg-gradient-to-r from-vitrii-blue to-vitrii-blue-dark text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-4">
-            Vitrines com QR Code
+            QR Codes para Vitrines
           </h1>
           <p className="text-blue-100 text-lg">
-            Revolucione a experiência de compra na sua loja com QR Codes
-            inteligentes
+            {isLoggedIn
+              ? "Imprima os QR Codes de seus anúncios para suas vitrines"
+              : "Faça login para gerenciar seus QR Codes"}
           </p>
         </div>
       </section>
 
-      {/* Hero Section */}
-      <section className="py-16 bg-vitrii-gray-light">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-            {/* Left - Features */}
-            <div>
-              <h2 className="text-3xl font-bold text-vitrii-text mb-6">
-                Como Funciona
+      {/* Main Content */}
+      {!isLoggedIn ? (
+        <section className="py-16">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-8">
+              <LogIn className="w-12 h-12 text-vitrii-blue mx-auto mb-4" />
+              <h2 className="text-2xl font-bold text-vitrii-text mb-3">
+                Faça Login para Continuar
               </h2>
+              <p className="text-vitrii-text-secondary mb-6">
+                Você precisa estar logado para visualizar e gerenciar os QR Codes de
+                seus anúncios.
+              </p>
+              <Link
+                to="/auth/signin"
+                className="inline-flex items-center gap-2 bg-vitrii-blue text-white px-6 py-3 rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors"
+              >
+                Fazer Login
+              </Link>
+            </div>
+          </div>
+        </section>
+      ) : anunciosLoading ? (
+        <section className="py-16">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-vitrii-blue mx-auto" />
+            <p className="text-vitrii-text-secondary mt-4">
+              Carregando seus anúncios...
+            </p>
+          </div>
+        </section>
+      ) : meusAnuncios.length === 0 ? (
+        <section className="py-16">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-8">
+              <QrCode className="w-12 h-12 text-yellow-600 mx-auto mb-4" />
+              <h2 className="text-2xl font-bold text-vitrii-text mb-3">
+                Nenhum Anúncio Encontrado
+              </h2>
+              <p className="text-vitrii-text-secondary mb-6">
+                Você ainda não tem nenhum anúncio publicado. Crie um anúncio para
+                gerar seu QR Code para vitrines.
+              </p>
+              <Link
+                to="/anuncio/criar"
+                className="inline-flex items-center gap-2 bg-vitrii-blue text-white px-6 py-3 rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors"
+              >
+                Criar Anúncio
+              </Link>
+            </div>
+          </div>
+        </section>
+      ) : (
+        <section className="py-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold text-vitrii-text mb-2">
+                Meus Anúncios
+              </h2>
+              <p className="text-vitrii-text-secondary">
+                {meusAnuncios.length} anúncio{meusAnuncios.length !== 1 ? "s" : ""} com
+                QR Code disponível{meusAnuncios.length !== 1 ? "s" : ""}
+              </p>
+            </div>
 
-              <div className="space-y-6">
-                {/* Feature 1 */}
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0">
-                    <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-vitrii-blue text-white">
-                      <QrCode className="h-6 w-6" />
-                    </div>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-vitrii-text">
-                      QR Code na Vitrine
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {meusAnuncios.map((anuncio: any) => (
+                <div
+                  key={anuncio.id}
+                  className="bg-white border-2 border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow"
+                >
+                  {/* Anuncio Info */}
+                  <div className="mb-4">
+                    <h3 className="text-lg font-bold text-vitrii-text line-clamp-2 mb-2">
+                      {anuncio.titulo}
                     </h3>
-                    <p className="text-vitrii-text-secondary">
-                      Distribua QR Codes impressos ou digitais na sua loja
+                    <p className="text-sm text-vitrii-text-secondary line-clamp-3 mb-3">
+                      {anuncio.descricao}
                     </p>
+                    {anuncio.preco && (
+                      <p className="text-lg font-bold text-vitrii-blue">
+                        R$ {parseFloat(anuncio.preco).toFixed(2)}
+                      </p>
+                    )}
                   </div>
-                </div>
 
-                {/* Feature 2 */}
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0">
-                    <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-vitrii-blue text-white">
-                      <Smartphone className="h-6 w-6" />
-                    </div>
+                  {/* QR Code */}
+                  <div
+                    id={`qr-code-${anuncio.id}`}
+                    className="bg-gray-50 p-4 rounded-lg flex justify-center mb-4 border border-gray-200"
+                  >
+                    <QRCode
+                      value={`${window.location.origin}/anuncio/${anuncio.id}`}
+                      size={200}
+                      level="H"
+                      includeMargin={true}
+                      fgColor="#000000"
+                      bgColor="#ffffff"
+                    />
                   </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-vitrii-text">
-                      Cliente Escaneia
-                    </h3>
-                    <p className="text-vitrii-text-secondary">
-                      Clientes escaneiam com seus celulares usando câmera ou app
-                    </p>
-                  </div>
-                </div>
 
-                {/* Feature 3 */}
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0">
-                    <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-vitrii-blue text-white">
-                      <BarChart3 className="h-6 w-6" />
-                    </div>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-vitrii-text">
-                      Informações em Tempo Real
-                    </h3>
-                    <p className="text-vitrii-text-secondary">
-                      Vê preço, tamanhos, cores, estoque disponível e avaliações
-                    </p>
-                  </div>
-                </div>
-
-                {/* Feature 4 */}
-                <div className="flex gap-4">
-                  <div className="flex-shrink-0">
-                    <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-vitrii-blue text-white">
-                      <Bell className="h-6 w-6" />
-                    </div>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-vitrii-text">
-                      Chamar Atendente
-                    </h3>
-                    <p className="text-vitrii-text-secondary">
-                      Cliente clica em &quot;chamar atendente&quot; direto no app
-                    </p>
+                  {/* Actions */}
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => handlePrintQRCode(anuncio.id)}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors font-semibold"
+                    >
+                      <Printer className="w-4 h-4" />
+                      Imprimir
+                    </button>
+                    <button
+                      onClick={() => handleDownloadQRCode(anuncio.id)}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-2 border-2 border-vitrii-blue text-vitrii-blue rounded-lg hover:bg-blue-50 transition-colors font-semibold"
+                    >
+                      <Download className="w-4 h-4" />
+                      Baixar
+                    </button>
+                    <Link
+                      to={`/anuncio/${anuncio.id}`}
+                      className="w-full flex items-center justify-center px-4 py-2 border-2 border-gray-300 text-vitrii-text rounded-lg hover:bg-gray-50 transition-colors font-semibold text-center"
+                    >
+                      Ver Anúncio
+                    </Link>
                   </div>
                 </div>
-              </div>
+              ))}
             </div>
 
-            {/* Right - Illustration */}
-            <div className="hidden md:flex justify-center">
-              <div className="w-80 h-80 bg-white rounded-lg shadow-lg flex items-center justify-center border-4 border-vitrii-blue">
-                <QrCode className="w-32 h-32 text-vitrii-blue opacity-75" />
-              </div>
+            {/* Info Box */}
+            <div className="mt-12 bg-blue-50 border border-blue-200 rounded-lg p-6">
+              <h3 className="text-lg font-bold text-blue-900 mb-4">
+                💡 Como Usar os QR Codes nas Vitrines
+              </h3>
+              <ul className="space-y-3 text-blue-800">
+                <li className="flex gap-3">
+                  <span className="font-bold flex-shrink-0">1.</span>
+                  <span>
+                    Clique em "Imprimir" para abrir a janela de impressão e imprima os
+                    QR Codes em papel de qualidade
+                  </span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="font-bold flex-shrink-0">2.</span>
+                  <span>
+                    Alternativamente, clique em "Baixar" para salvar a imagem do QR Code
+                    e imprimi-la depois
+                  </span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="font-bold flex-shrink-0">3.</span>
+                  <span>
+                    Cole ou fixe os QR Codes nas vitrines ao lado dos produtos/serviços
+                  </span>
+                </li>
+                <li className="flex gap-3">
+                  <span className="font-bold flex-shrink-0">4.</span>
+                  <span>
+                    Clientes podem escanear para ver os detalhes completos e solicitar
+                    ajuda
+                  </span>
+                </li>
+              </ul>
             </div>
           </div>
-        </div>
-      </section>
-
-      {/* Benefits Section */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-vitrii-text mb-12 text-center">
-            Benefícios para sua Loja
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Benefit 1 */}
-            <div className="bg-vitrii-gray-light rounded-lg p-8">
-              <div className="w-12 h-12 bg-vitrii-blue bg-opacity-10 rounded-lg flex items-center justify-center mb-4">
-                <Zap className="w-6 h-6 text-vitrii-blue" />
-              </div>
-              <h3 className="text-xl font-bold text-vitrii-text mb-3">
-                Reduz Tempo de Atendimento
-              </h3>
-              <p className="text-vitrii-text-secondary">
-                Clientes conseguem informações imediatas sem precisar esperar
-                um atendente
-              </p>
-            </div>
-
-            {/* Benefit 2 */}
-            <div className="bg-vitrii-gray-light rounded-lg p-8">
-              <div className="w-12 h-12 bg-vitrii-blue bg-opacity-10 rounded-lg flex items-center justify-center mb-4">
-                <AlertCircle className="w-6 h-6 text-vitrii-blue" />
-              </div>
-              <h3 className="text-xl font-bold text-vitrii-text mb-3">
-                Atendimento Inteligente
-              </h3>
-              <p className="text-vitrii-text-secondary">
-                Alertas sonoros e notificações para que você não perda nenhuma
-                chamada de cliente
-              </p>
-            </div>
-
-            {/* Benefit 3 */}
-            <div className="bg-vitrii-gray-light rounded-lg p-8">
-              <div className="w-12 h-12 bg-vitrii-blue bg-opacity-10 rounded-lg flex items-center justify-center mb-4">
-                <BarChart3 className="w-6 h-6 text-vitrii-blue" />
-              </div>
-              <h3 className="text-xl font-bold text-vitrii-text mb-3">
-                Analíticas Detalhadas
-              </h3>
-              <p className="text-vitrii-text-secondary">
-                Veja quantas pessoas escanearam seus QR Codes e como
-                interagiram
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Use Cases Section */}
-      <section className="py-16 bg-vitrii-gray-light">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-vitrii-text mb-12 text-center">
-            Casos de Uso
-          </h2>
-
-          <div className="space-y-8">
-            {/* Case 1 */}
-            <div className="bg-white rounded-lg p-8 border border-gray-200">
-              <h3 className="text-xl font-bold text-vitrii-text mb-3">
-                Loja de Roupas
-              </h3>
-              <p className="text-vitrii-text-secondary">
-                Clientes escaneiam um QR Code ao lado de cada roupa na vitrine
-                e veem preço, tamanhos disponíveis, cores e comentários. Se
-                quiserem experimentar ou tirar dúvidas, clicam &quot;chamar
-                atendente&quot; e o vendedor é alertado.
-              </p>
-            </div>
-
-            {/* Case 2 */}
-            <div className="bg-white rounded-lg p-8 border border-gray-200">
-              <h3 className="text-xl font-bold text-vitrii-text mb-3">
-                Loja de Eletrônicos
-              </h3>
-              <p className="text-vitrii-text-secondary">
-                Cada produto tem um QR Code com especificações completas,
-                vídeos demonstrativos, avaliações de outros clientes e estoque
-                em tempo real. Clientes podem chamar um especialista para
-                dúvidas técnicas.
-              </p>
-            </div>
-
-            {/* Case 3 */}
-            <div className="bg-white rounded-lg p-8 border border-gray-200">
-              <h3 className="text-xl font-bold text-vitrii-text mb-3">
-                Restaurante / Cafeteria
-              </h3>
-              <p className="text-vitrii-text-secondary">
-                QR Code nas mesas ou no cardápio mostra pratos, preços,
-                ingredientes e fotos. Clientes podem chamar o garçom
-                diretamente pelo app para fazer pedidos ou tirar dúvidas.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-vitrii-text mb-12 text-center">
-            Recursos Disponíveis
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="space-y-4">
-              <div className="flex items-start gap-4">
-                <div className="w-6 h-6 rounded-full bg-vitrii-yellow flex items-center justify-center text-vitrii-text text-sm font-bold flex-shrink-0 mt-1">
-                  ✓
-                </div>
-                <div>
-                  <h4 className="font-bold text-vitrii-text">
-                    Gerador de QR Code
-                  </h4>
-                  <p className="text-sm text-vitrii-text-secondary">
-                    Crie QR Codes dinamicamente para seus produtos
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="w-6 h-6 rounded-full bg-vitrii-yellow flex items-center justify-center text-vitrii-text text-sm font-bold flex-shrink-0 mt-1">
-                  ✓
-                </div>
-                <div>
-                  <h4 className="font-bold text-vitrii-text">
-                    Customização Visual
-                  </h4>
-                  <p className="text-sm text-vitrii-text-secondary">
-                    Personalize cores e design dos QR Codes com sua marca
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="w-6 h-6 rounded-full bg-vitrii-yellow flex items-center justify-center text-vitrii-text text-sm font-bold flex-shrink-0 mt-1">
-                  ✓
-                </div>
-                <div>
-                  <h4 className="font-bold text-vitrii-text">
-                    Rastreamento em Tempo Real
-                  </h4>
-                  <p className="text-sm text-vitrii-text-secondary">
-                    Veja quantas pessoas estão acessando cada QR Code
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex items-start gap-4">
-                <div className="w-6 h-6 rounded-full bg-vitrii-yellow flex items-center justify-center text-vitrii-text text-sm font-bold flex-shrink-0 mt-1">
-                  ✓
-                </div>
-                <div>
-                  <h4 className="font-bold text-vitrii-text">
-                    Sistema de Alertas
-                  </h4>
-                  <p className="text-sm text-vitrii-text-secondary">
-                    Som de campainha e notificações quando cliente chama
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="w-6 h-6 rounded-full bg-vitrii-yellow flex items-center justify-center text-vitrii-text text-sm font-bold flex-shrink-0 mt-1">
-                  ✓
-                </div>
-                <div>
-                  <h4 className="font-bold text-vitrii-text">
-                    Suporte Mobile First
-                  </h4>
-                  <p className="text-sm text-vitrii-text-secondary">
-                    Funciona perfeitamente em qualquer smartphone
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start gap-4">
-                <div className="w-6 h-6 rounded-full bg-vitrii-yellow flex items-center justify-center text-vitrii-text text-sm font-bold flex-shrink-0 mt-1">
-                  ✓
-                </div>
-                <div>
-                  <h4 className="font-bold text-vitrii-text">
-                    Relatórios Detalhados
-                  </h4>
-                  <p className="text-sm text-vitrii-text-secondary">
-                    Análise completa de engajamento e conversão
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="bg-vitrii-blue text-white py-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-4">
-            Transforme sua Loja Hoje
-          </h2>
-          <p className="text-blue-100 text-lg mb-8">
-            Implemente QR Codes inteligentes em sua loja e comece a acompanhar
-            e gerenciar todas as interações
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              to="/auth/signup"
-              className="inline-flex items-center justify-center space-x-2 bg-vitrii-yellow text-vitrii-text px-8 py-3 rounded-lg font-semibold hover:bg-vitrii-yellow-dark transition-colors"
-            >
-              <span>Começar Agora</span>
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-            <Link
-              to="/"
-              className="inline-flex items-center justify-center space-x-2 border-2 border-white text-white px-8 py-3 rounded-lg font-semibold hover:bg-white hover:bg-opacity-10 transition-colors"
-            >
-              <span>Voltar para Home</span>
-            </Link>
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       <Footer />
     </div>

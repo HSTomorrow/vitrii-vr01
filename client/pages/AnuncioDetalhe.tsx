@@ -7,6 +7,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ImageGallery from "@/components/ImageGallery";
 import ShareModal from "@/components/ShareModal";
+import QRCodeModal from "@/components/QRCodeModal";
 import {
   ChevronLeft,
   AlertCircle,
@@ -32,6 +33,7 @@ import {
   User,
   Copy,
   Check,
+  QrCode,
 } from "lucide-react";
 
 interface MembroEquipe {
@@ -52,6 +54,7 @@ export default function AnuncioDetalhe() {
   const [showMembrosModal, setShowMembrosModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showQRCodeModal, setShowQRCodeModal] = useState(false);
   const [copied, setCopied] = useState(false);
   const [selectedEquipeId, setSelectedEquipeId] = useState<number | null>(null);
 
@@ -626,6 +629,13 @@ export default function AnuncioDetalhe() {
                   Compartilhar
                 </button>
                 <button
+                  onClick={() => setShowQRCodeModal(true)}
+                  className="w-full px-4 py-3 border-2 border-vitrii-blue text-vitrii-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
+                >
+                  <QrCode className="w-4 h-4" />
+                  QR Code
+                </button>
+                <button
                   onClick={() => navigate(`/anunciante/${anuncio.anuncianteId}`)}
                   className="w-full px-4 py-3 bg-vitrii-text text-white rounded-lg font-semibold hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
                 >
@@ -788,6 +798,18 @@ export default function AnuncioDetalhe() {
         whatsappPhone={anuncio.anunciantes?.whatsapp}
         whatsappMessage={`Confira este anúncio: ${anuncio.titulo}`}
       />
+
+      {/* QR Code Modal */}
+      {anuncio && (
+        <QRCodeModal
+          open={showQRCodeModal}
+          onOpenChange={setShowQRCodeModal}
+          anuncioId={anuncio.id}
+          anuncioTitulo={anuncio.titulo}
+          anuncianteId={anuncio.anuncianteId}
+          anunciantheName={anuncio.anunciantes?.nome || "Anunciante"}
+        />
+      )}
 
       {/* Payment Modal */}
       {showPaymentModal && (

@@ -1,10 +1,12 @@
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Star, Heart, Package, Calendar, MapPin } from "lucide-react";
+import { Star, Heart, Package, Calendar, MapPin, QrCode } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Link } from "react-router-dom";
+import { useState } from "react";
 import ImageZoom from "./ImageZoom";
+import QRCodeModal from "./QRCodeModal";
 
 interface AdCardProps {
   anuncio: any;
@@ -23,6 +25,7 @@ export default function AdCard({
 }: AdCardProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [showQRCodeModal, setShowQRCodeModal] = useState(false);
 
   const toggleFavoritoMutation = useMutation({
     mutationFn: async (anuncioId: number) => {
@@ -80,24 +83,39 @@ export default function AdCard({
         </div>
       )}
 
-      {/* Favorito Heart Button */}
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          toggleFavoritoMutation.mutate(anuncio.id);
-        }}
-        disabled={toggleFavoritoMutation.isPending}
-        className="absolute top-3 right-3 z-10 p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
-        title={
-          isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"
-        }
-      >
-        <Heart
-          className={`w-5 h-5 transition-colors ${
-            isFavorited ? "fill-red-500 text-red-500" : "text-gray-400"
-          }`}
-        />
-      </button>
+      {/* Action Buttons Container */}
+      <div className="absolute top-3 right-3 z-10 flex gap-2">
+        {/* Favorito Heart Button */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            toggleFavoritoMutation.mutate(anuncio.id);
+          }}
+          disabled={toggleFavoritoMutation.isPending}
+          className="p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
+          title={
+            isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"
+          }
+        >
+          <Heart
+            className={`w-5 h-5 transition-colors ${
+              isFavorited ? "fill-red-500 text-red-500" : "text-gray-400"
+            }`}
+          />
+        </button>
+
+        {/* QR Code Button */}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowQRCodeModal(true);
+          }}
+          className="p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
+          title="Ver QR Code do anúncio"
+        >
+          <QrCode className="w-5 h-5 text-vitrii-blue" />
+        </button>
+      </div>
 
       {/* Store Logo Badge */}
       <div className="absolute bottom-3 left-3 z-10 w-10 h-10 rounded-full bg-white border-2 border-vitrii-blue overflow-hidden flex items-center justify-center shadow-md">
@@ -192,6 +210,16 @@ export default function AdCard({
           </button>
         )}
       </div>
+
+      {/* QR Code Modal */}
+      <QRCodeModal
+        open={showQRCodeModal}
+        onOpenChange={setShowQRCodeModal}
+        anuncioId={anuncio.id}
+        anuncioTitulo={anuncio.titulo}
+        anuncianteId={anuncio.anuncianteId}
+        anunciantheName={anunciante?.nome || anuncio.anunciante?.nome || "Anunciante"}
+      />
     </div>
   );
 }
