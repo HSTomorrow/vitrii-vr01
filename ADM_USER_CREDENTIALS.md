@@ -4,6 +4,18 @@
 
 > **IMPORTANTE**: Guarde estas credenciais com segurança!
 
+### Usuário Principal (Administrador)
+
+```
+Email:    vitriimarketplace@gmail.com
+Senha:    Admin@2025
+Tipo:     ADM (Administrador)
+ID:       21
+Status:   Ativo
+```
+
+### Usuário Secundário (Se necessário)
+
 ```
 Email:    admin@vitrii.com
 Senha:    Admin@2025
