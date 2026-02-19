@@ -31,6 +31,7 @@ import {
   Phone,
   Star,
   User,
+  Users,
   Copy,
   Check,
   QrCode,
@@ -635,6 +636,22 @@ export default function AnuncioDetalhe() {
                   <QrCode className="w-4 h-4" />
                   QR Code
                 </button>
+                {equipes.length > 0 && (
+                  <button
+                    onClick={() => {
+                      if (equipes.length === 1) {
+                        setSelectedEquipeId(equipes[0].id);
+                        setShowMembrosModal(true);
+                      } else {
+                        setShowMembrosModal(true);
+                      }
+                    }}
+                    className="w-full px-4 py-3 bg-orange-600 text-white rounded-lg font-semibold hover:bg-orange-700 transition-colors flex items-center justify-center gap-2"
+                  >
+                    <Users className="w-4 h-4" />
+                    Solicitar Equipe
+                  </button>
+                )}
                 <button
                   onClick={() => navigate(`/anunciante/${anuncio.anuncianteId}`)}
                   className="w-full px-4 py-3 bg-vitrii-text text-white rounded-lg font-semibold hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
