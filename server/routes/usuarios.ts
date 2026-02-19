@@ -1137,8 +1137,11 @@ export const changePassword: RequestHandler = async (req, res) => {
     const userId = parseInt(id);
     const { senhaAtual, senhaNova, senhaConfirm } = req.body;
 
+    console.log("[changePassword] Iniciando alteração de senha para usuário:", userId);
+
     // Validate input
     if (!senhaAtual || !senhaNova || !senhaConfirm) {
+      console.warn("[changePassword] ❌ Campos obrigatórios faltando");
       return res.status(400).json({
         success: false,
         error: "Todos os campos são obrigatórios",
@@ -1146,6 +1149,7 @@ export const changePassword: RequestHandler = async (req, res) => {
     }
 
     if (senhaNova !== senhaConfirm) {
+      console.warn("[changePassword] ❌ Senhas não correspondem");
       return res.status(400).json({
         success: false,
         error: "As senhas não correspondem",
@@ -1153,6 +1157,7 @@ export const changePassword: RequestHandler = async (req, res) => {
     }
 
     if (senhaNova.length < 6) {
+      console.warn("[changePassword] ❌ Senha muito curta");
       return res.status(400).json({
         success: false,
         error: "A nova senha deve ter no mínimo 6 caracteres",
@@ -1165,6 +1170,7 @@ export const changePassword: RequestHandler = async (req, res) => {
     });
 
     if (!usuario) {
+      console.warn("[changePassword] ❌ Usuário não encontrado:", userId);
       return res.status(404).json({
         success: false,
         error: "Usuário não encontrado",
@@ -1172,10 +1178,10 @@ export const changePassword: RequestHandler = async (req, res) => {
     }
 
     // Verify current password
-    const bcrypt = require("bcrypt");
-    const senhaValida = await bcrypt.compare(senhaAtual, usuario.senha);
+    const senhaValida = await bcryptjs.compare(senhaAtual, usuario.senha);
 
     if (!senhaValida) {
+      console.warn("[changePassword] ❌ Senha atual incorreta para usuário:", userId);
       return res.status(401).json({
         success: false,
         error: "Senha atual incorreta",
@@ -1183,7 +1189,7 @@ export const changePassword: RequestHandler = async (req, res) => {
     }
 
     // Hash new password
-    const novoHash = await bcrypt.hash(senhaNova, 10);
+    const novoHash = await bcryptjs.hash(senhaNova, 10);
 
     // Update password
     await prisma.usracessos.update({
@@ -1193,12 +1199,14 @@ export const changePassword: RequestHandler = async (req, res) => {
       },
     });
 
+    console.log("[changePassword] ✅ Senha alterada com sucesso para usuário:", userId);
+
     res.json({
       success: true,
       message: "Senha alterada com sucesso",
     });
   } catch (error) {
-    console.error("Error changing password:", error);
+    console.error("[changePassword] 🔴 Erro:", error instanceof Error ? error.message : String(error));
     res.status(500).json({
       success: false,
       error: "Erro ao alterar senha",
