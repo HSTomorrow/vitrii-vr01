@@ -298,7 +298,7 @@ model banners {
   id              Int       @id @default(autoincrement())
   titulo          String    @db.VarChar(255)
   descricao       String?   @db.Text
-  imagemUrl       String    @db.VarChar(500)
+  imagemUrl       String    @db.Text
   link            String?   @db.VarChar(500)
   ordem           Int       @default(0)
   ativo           Boolean   @default(true)
