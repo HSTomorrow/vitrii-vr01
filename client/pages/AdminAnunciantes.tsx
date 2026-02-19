@@ -14,7 +14,24 @@ interface Anunciante {
   cidade?: string;
   estado?: string;
   status: string;
+  localidadeId?: number | null;
   dataCriacao: string;
+}
+
+interface Localidade {
+  id: number;
+  codigo: string;
+  municipio: string;
+  estado: string;
+  descricao?: string;
+  status: string;
+}
+
+interface EditingData {
+  email?: string;
+  tipo?: string;
+  localidadeId?: number | null;
+  status?: string;
 }
 
 export default function AdminAnunciantes() {
@@ -24,9 +41,21 @@ export default function AdminAnunciantes() {
     "all"
   );
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [editingStatus, setEditingStatus] = useState<"Ativo" | "Desativado">(
-    "Ativo"
-  );
+  const [editingData, setEditingData] = useState<EditingData>({});
+
+  // Fetch all localidades
+  const { data: localidadesData } = useQuery({
+    queryKey: ["localidades-admin"],
+    queryFn: async () => {
+      const response = await fetch("/api/localidades?status=ativo&limit=500");
+      if (!response.ok) throw new Error("Erro ao buscar localidades");
+      return response.json();
+    },
+  });
+
+  const localidades: Localidade[] = useMemo(() => {
+    return (localidadesData?.data || []) as Localidade[];
+  }, [localidadesData?.data]);
 
   // Fetch all anunciantes
   const { data: anunciantesData, isLoading } = useQuery({
@@ -40,24 +69,26 @@ export default function AdminAnunciantes() {
     },
   });
 
-  // Mutation to update anunciante status
-  const updateStatusMutation = useMutation({
-    mutationFn: async (data: { id: number; status: string }) => {
+  // Mutation to update anunciante
+  const updateMutation = useMutation({
+    mutationFn: async (data: { id: number; updates: EditingData }) => {
       const response = await fetch(`/api/anunciantes/${data.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: data.status }),
+        body: JSON.stringify(data.updates),
       });
-      if (!response.ok) throw new Error("Erro ao atualizar status");
+      if (!response.ok) throw new Error("Erro ao atualizar anunciante");
       return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["anunciantes-admin"] });
-      toast.success("Status atualizado com sucesso!");
+      toast.success("Anunciante atualizado com sucesso!");
       setEditingId(null);
+      setEditingData({});
     },
-    onError: () => {
-      toast.error("Erro ao atualizar status");
+    onError: (error) => {
+      toast.error("Erro ao atualizar anunciante");
+      console.error(error);
     },
   });
 
@@ -76,10 +107,20 @@ export default function AdminAnunciantes() {
       .sort((a: any, b: any) => a.nome.localeCompare(b.nome));
   }, [anunciantesData?.data, searchTerm, statusFilter]);
 
-  const handleStatusChange = (id: number, newStatus: string) => {
-    updateStatusMutation.mutate({
+  const handleSave = (id: number) => {
+    updateMutation.mutate({
       id,
-      status: newStatus,
+      updates: editingData,
+    });
+  };
+
+  const handleEdit = (anunciante: Anunciante) => {
+    setEditingId(anunciante.id);
+    setEditingData({
+      email: anunciante.email,
+      tipo: anunciante.tipo,
+      localidadeId: anunciante.localidadeId,
+      status: anunciante.status,
     });
   };
 
@@ -207,37 +248,94 @@ export default function AdminAnunciantes() {
                     <td className="px-6 py-4 text-sm font-semibold text-vitrii-text">
                       {anunciante.nome}
                     </td>
-                    <td className="px-6 py-4 text-sm text-vitrii-text-secondary">
-                      {anunciante.email || "-"}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-vitrii-text">
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                          anunciante.tipo === "Profissional"
-                            ? "bg-blue-100 text-blue-700"
-                            : anunciante.tipo === "Premium"
-                              ? "bg-purple-100 text-purple-700"
-                              : anunciante.tipo === "Master"
-                                ? "bg-yellow-100 text-yellow-700"
-                                : "bg-gray-100 text-gray-700"
-                        }`}
-                      >
-                        {anunciante.tipo}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-vitrii-text-secondary">
-                      {anunciante.cidade && anunciante.estado
-                        ? `${anunciante.cidade}, ${anunciante.estado}`
-                        : "-"}
+                    <td className="px-6 py-4 text-sm">
+                      {editingId === anunciante.id ? (
+                        <input
+                          type="email"
+                          value={editingData.email || ""}
+                          onChange={(e) =>
+                            setEditingData({
+                              ...editingData,
+                              email: e.target.value || undefined,
+                            })
+                          }
+                          className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:border-vitrii-blue"
+                          placeholder="email@example.com"
+                        />
+                      ) : (
+                        <span className="text-vitrii-text-secondary">
+                          {anunciante.email || "-"}
+                        </span>
+                      )}
                     </td>
                     <td className="px-6 py-4 text-sm">
                       {editingId === anunciante.id ? (
                         <select
-                          value={editingStatus}
+                          value={editingData.tipo || ""}
                           onChange={(e) =>
-                            setEditingStatus(
-                              e.target.value as "Ativo" | "Desativado"
-                            )
+                            setEditingData({
+                              ...editingData,
+                              tipo: e.target.value,
+                            })
+                          }
+                          className="px-2 py-1 border border-gray-300 rounded focus:outline-none focus:border-vitrii-blue"
+                        >
+                          <option value="Padrão">Padrão</option>
+                          <option value="Profissional">Profissional</option>
+                        </select>
+                      ) : (
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                            anunciante.tipo === "Profissional"
+                              ? "bg-blue-100 text-blue-700"
+                              : "bg-gray-100 text-gray-700"
+                          }`}
+                        >
+                          {anunciante.tipo}
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-sm">
+                      {editingId === anunciante.id ? (
+                        <select
+                          value={editingData.localidadeId || ""}
+                          onChange={(e) =>
+                            setEditingData({
+                              ...editingData,
+                              localidadeId: e.target.value ? parseInt(e.target.value) : null,
+                            })
+                          }
+                          className="w-full px-2 py-1 border border-gray-300 rounded focus:outline-none focus:border-vitrii-blue"
+                        >
+                          <option value="">Sem localidade</option>
+                          {localidades.map((localidade) => (
+                            <option key={localidade.id} value={localidade.id}>
+                              {localidade.descricao ||
+                                `${localidade.municipio}, ${localidade.estado}`}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <span className="text-vitrii-text-secondary">
+                          {anunciante.localidadeId
+                            ? localidades.find((l) => l.id === anunciante.localidadeId)
+                                ?.descricao ||
+                              localidades
+                                .find((l) => l.id === anunciante.localidadeId)
+                                ?.municipio
+                            : "-"}
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-sm">
+                      {editingId === anunciante.id ? (
+                        <select
+                          value={editingData.status || ""}
+                          onChange={(e) =>
+                            setEditingData({
+                              ...editingData,
+                              status: e.target.value,
+                            })
                           }
                           className="px-3 py-1 border border-gray-300 rounded focus:outline-none focus:border-vitrii-blue"
                         >
@@ -256,13 +354,8 @@ export default function AdminAnunciantes() {
                       {editingId === anunciante.id ? (
                         <div className="flex gap-2">
                           <button
-                            onClick={() => {
-                              handleStatusChange(
-                                anunciante.id,
-                                editingStatus
-                              );
-                            }}
-                            disabled={updateStatusMutation.isPending}
+                            onClick={() => handleSave(anunciante.id)}
+                            disabled={updateMutation.isPending}
                             className="inline-flex items-center gap-1 px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50"
                           >
                             <Check className="w-4 h-4" />
@@ -271,7 +364,7 @@ export default function AdminAnunciantes() {
                           <button
                             onClick={() => {
                               setEditingId(null);
-                              setEditingStatus("Ativo");
+                              setEditingData({});
                             }}
                             className="inline-flex items-center gap-1 px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors"
                           >
@@ -281,12 +374,7 @@ export default function AdminAnunciantes() {
                         </div>
                       ) : (
                         <button
-                          onClick={() => {
-                            setEditingId(anunciante.id);
-                            setEditingStatus(
-                              anunciante.status as "Ativo" | "Desativado"
-                            );
-                          }}
+                          onClick={() => handleEdit(anunciante)}
                           className="inline-flex items-center gap-1 px-3 py-1 bg-vitrii-blue text-white rounded hover:bg-vitrii-blue-dark transition-colors"
                         >
                           <Edit2 className="w-4 h-4" />

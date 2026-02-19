@@ -100,6 +100,7 @@ export const getAnunciantes: RequestHandler = async (req, res) => {
           whatsapp: true,
           fotoUrl: true,
           status: true,
+          localidadeId: true,
           dataCriacao: true,
           dataAtualizacao: true,
         },
@@ -315,6 +316,8 @@ const AnuncianteUpdateSchema = z.object({
   facebook: z.string().optional(),
   whatsapp: z.string().optional(),
   fotoUrl: z.string().optional(),
+  localidadeId: z.number().int().nullable().optional(),
+  status: z.enum(["Ativo", "Desativado"]).optional(),
 });
 
 // UPDATE anunciante (only safe fields allowed)
