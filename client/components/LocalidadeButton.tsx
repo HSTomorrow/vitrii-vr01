@@ -9,6 +9,7 @@ interface Localidade {
   codigo: string;
   municipio: string;
   estado: string;
+  descricao?: string;
   status: string;
 }
 
@@ -105,7 +106,7 @@ export default function LocalidadeButton() {
 
   const localidades = (localidadesData?.data || []) as Localidade[];
   const displayText = selectedLocalidade
-    ? `${selectedLocalidade.municipio}, ${selectedLocalidade.estado}`
+    ? selectedLocalidade.descricao || `${selectedLocalidade.municipio}, ${selectedLocalidade.estado}`
     : "Selecionar";
 
   return (
@@ -142,7 +143,7 @@ export default function LocalidadeButton() {
                         : "text-gray-700 hover:bg-gray-100"
                     } disabled:opacity-50`}
                   >
-                    {localidade.municipio}, {localidade.estado}
+                    {localidade.descricao || `${localidade.municipio}, ${localidade.estado}`}
                   </button>
                 ))
               ) : (

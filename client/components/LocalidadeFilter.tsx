@@ -8,6 +8,7 @@ interface Localidade {
   codigo: string;
   municipio: string;
   estado: string;
+  descricao?: string;
   status: string;
 }
 
@@ -114,7 +115,7 @@ export default function LocalidadeFilter({
           </option>
           {localidades.map((localidade) => (
             <option key={localidade.id} value={localidade.id}>
-              {localidade.municipio}, {localidade.estado}
+              {localidade.descricao || `${localidade.municipio}, ${localidade.estado}`}
             </option>
           ))}
         </select>
