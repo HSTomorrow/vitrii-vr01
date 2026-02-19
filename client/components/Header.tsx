@@ -8,6 +8,7 @@ import {
   Shield,
   FileText,
   Heart,
+  MapPin,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import LocalidadeButton from "./LocalidadeButton";
@@ -115,6 +116,14 @@ export default function Header() {
                       >
                         <Plus className="w-4 h-4" />
                         <span className="hidden md:inline">Banners</span>
+                      </Link>
+                      <Link
+                        to="/admin/localidades"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors font-semibold text-[0.85rem]"
+                        title="Gerenciar Localidades"
+                      >
+                        <MapPin className="w-4 h-4" />
+                        <span className="hidden md:inline">Localidades</span>
                       </Link>
                     </div>
                   )}
