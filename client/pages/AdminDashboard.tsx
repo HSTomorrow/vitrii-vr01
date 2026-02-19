@@ -21,7 +21,7 @@ import {
   Key,
   Store,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import AdminEditUserModal from "@/components/AdminEditUserModal";
 
 interface Usuario {
@@ -67,6 +67,13 @@ export default function AdminDashboard() {
   const [expandedUser, setExpandedUser] = useState<number | null>(null);
   const [editingUser, setEditingUser] = useState<Usuario | null>(null);
 
+  // Check if user is admin
+  useEffect(() => {
+    if (user && user.tipoUsuario !== "adm") {
+      navigate("/");
+    }
+  }, [user, navigate]);
+
   // Fetch all users
   const { data: usuariosData, isLoading: usuariosLoading } = useQuery({
     queryKey: ["usuarios"],
@@ -81,6 +88,7 @@ export default function AdminDashboard() {
       if (!response.ok) throw new Error("Erro ao buscar usuários");
       return response.json();
     },
+    enabled: user?.tipoUsuario === "adm",
   });
 
   // Fetch all funcionalidades
@@ -97,6 +105,7 @@ export default function AdminDashboard() {
       if (!response.ok) throw new Error("Erro ao buscar funcionalidades");
       return response.json();
     },
+    enabled: user?.tipoUsuario === "adm",
   });
 
   // Fetch user funcionalidades
@@ -295,6 +304,33 @@ export default function AdminDashboard() {
     }
     categoriasMap.get(f.categoria)?.push(f);
   });
+
+  // Show loading while checking admin status
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block">
+            <div className="w-12 h-12 border-4 border-slate-200 border-t-vitrii-blue rounded-full animate-spin" />
+          </div>
+          <p className="text-slate-600 font-medium mt-4">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Redirect non-admin users is handled by useEffect, but show fallback
+  if (user.tipoUsuario !== "adm") {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <Shield className="w-16 h-16 mx-auto text-red-500 mb-4" />
+          <p className="text-xl font-semibold text-gray-800">Acesso Negado</p>
+          <p className="text-gray-600 mt-2">Você não tem permissão para acessar este painel.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-vitrii-bg flex flex-col">

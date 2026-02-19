@@ -84,12 +84,18 @@ export const getUsuarioById: RequestHandler = async (req, res) => {
     const { id } = req.params;
     const usuario = await prisma.usracessos.findUnique({
       where: { id: parseInt(id) },
-      include: {
-        usuarioAnunciantes: {
-          include: {
-            anunciante: true,
-          },
-        },
+      select: {
+        id: true,
+        nome: true,
+        email: true,
+        cpf: true,
+        telefone: true,
+        endereco: true,
+        tipoUsuario: true,
+        dataCriacao: true,
+        numeroAnunciosAtivos: true,
+        maxAnunciosAtivos: true,
+        localidadePadraoId: true,
       },
     });
 
