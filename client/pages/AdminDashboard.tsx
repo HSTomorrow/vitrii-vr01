@@ -20,6 +20,7 @@ import {
   ChevronUp,
   Key,
   Store,
+  MapPin,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import AdminEditUserModal from "@/components/AdminEditUserModal";
@@ -114,7 +115,7 @@ export default function AdminDashboard() {
     queryFn: async () => {
       if (!selectedUsuario) return null;
       const response = await fetch(
-        `/api/usracessos/${selectedUsuario}/funcionalidades`,
+        `/api/usuarios/${selectedUsuario}/funcionalidades`,
         {
           method: "GET",
           headers: {
@@ -140,7 +141,7 @@ export default function AdminDashboard() {
       funcionalidadeId: number;
     }) => {
       const response = await fetch(
-        `/api/usracessos/${usuarioId}/funcionalidades/grant`,
+        `/api/usuarios/${usuarioId}/funcionalidades/grant`,
         {
           method: "POST",
           headers: {
@@ -183,7 +184,7 @@ export default function AdminDashboard() {
       funcionalidadeId: number;
     }) => {
       const response = await fetch(
-        `/api/usracessos/${usuarioId}/funcionalidades/${funcionalidadeId}`,
+        `/api/usuarios/${usuarioId}/funcionalidades/${funcionalidadeId}`,
         {
           method: "DELETE",
           headers: {
@@ -219,7 +220,7 @@ export default function AdminDashboard() {
   const grantAllFuncionalidadesMutation = useMutation({
     mutationFn: async (usuarioId: number) => {
       const response = await fetch(
-        `/api/usracessos/${usuarioId}/funcionalidades/grant-all`,
+        `/api/usuarios/${usuarioId}/funcionalidades/grant-all`,
         {
           method: "POST",
           headers: {
@@ -255,7 +256,7 @@ export default function AdminDashboard() {
   const revokeAllFuncionalidadesMutation = useMutation({
     mutationFn: async (usuarioId: number) => {
       const response = await fetch(
-        `/api/usracessos/${usuarioId}/funcionalidades/revoke-all`,
+        `/api/usuarios/${usuarioId}/funcionalidades/revoke-all`,
         {
           method: "POST",
           headers: {
