@@ -285,8 +285,8 @@ export default function Browse() {
                 Voltar ao perfil
               </button>
               <h1 className="text-4xl font-bold mb-2">
-                O que temos no Vitrii de {anuncianteData.data.nome}
-              </h1>S
+                O que temos na Vitrine de {anuncianteData.data.nome} para você!
+              </h1>
               <p className="text-blue-100">
                 Confira todos os anúncios disponíveis
               </p>
