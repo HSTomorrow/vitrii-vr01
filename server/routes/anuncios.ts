@@ -164,6 +164,7 @@ export const getAnuncios: RequestHandler = async (req, res) => {
               nome: true,
               fotoUrl: true,
               status: true,
+              localidadeId: true,
             },
           },
         },

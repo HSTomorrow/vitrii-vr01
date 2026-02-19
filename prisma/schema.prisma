@@ -27,6 +27,7 @@ model anunciantes {
   fotoUrl              String?                @db.VarChar(500)
   status               String                 @default("Ativo") @db.VarChar(50) // Ativo ou Desativado
   temAgenda            Boolean                @default(false) // Se sim, mostra o botão de agenda nos anuncios
+  localidadeId         Int?                   // Default locality for filtering ads
   dataCriacao          DateTime               @default(now())
   dataAtualizacao      DateTime
   anuncios             anuncios[]
@@ -42,6 +43,7 @@ model anunciantes {
   links_externos       links_produtos_externos[]
   conversas            conversas[]
   mensagens            mensagens[]
+  localidade           localidades?          @relation(fields: [localidadeId], references: [id], onDelete: SetNull)
   localidades          anunciantes_x_localidades[]
 }
 
@@ -666,6 +668,7 @@ model localidades {
   dataAtualizacao              DateTime                        @updatedAt
 
   usuarios_padrao              usracessos[]
+  anunciantes_padrao           anunciantes[]
   anunciantes                  anunciantes_x_localidades[]
 
   @@index([status])

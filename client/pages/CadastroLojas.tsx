@@ -26,6 +26,16 @@ interface Anunciante {
   whatsapp?: string;
   fotoUrl?: string;
   temAgenda?: boolean;
+  localidadeId?: number | null;
+}
+
+interface Localidade {
+  id: number;
+  codigo: string;
+  municipio: string;
+  estado: string;
+  descricao?: string;
+  status: string;
 }
 
 export default function CadastroAnunciantes() {
@@ -49,6 +59,7 @@ export default function CadastroAnunciantes() {
     whatsapp: "",
     fotoUrl: "",
     temAgenda: false,
+    localidadeId: null as number | null,
   });
 
   // Fetch anunciantes (filtered by current user, or all if admin)
@@ -71,6 +82,18 @@ export default function CadastroAnunciantes() {
 
   // Ensure anunciantes is always an array
   const anunciantes = Array.isArray(anunciantesData) ? anunciantesData : [];
+
+  // Fetch active localidades
+  const { data: localidadesData } = useQuery({
+    queryKey: ["localidades-anunciantes"],
+    queryFn: async () => {
+      const response = await fetch("/api/localidades?status=ativo&limit=100");
+      if (!response.ok) throw new Error("Erro ao buscar localidades");
+      return response.json();
+    },
+  });
+
+  const localidades = (localidadesData?.data || []) as Localidade[];
 
   // Create/Update loja mutation
   const saveAnuncianteMutation = useMutation({
@@ -150,6 +173,7 @@ export default function CadastroAnunciantes() {
         whatsapp: "",
         fotoUrl: "",
         temAgenda: false,
+        localidadeId: null,
       });
       setEditingId(null);
       setIsFormOpen(false);
@@ -202,6 +226,7 @@ export default function CadastroAnunciantes() {
       whatsapp: loja.whatsapp || "",
       fotoUrl: loja.fotoUrl || "",
       temAgenda: loja.temAgenda || false,
+      localidadeId: loja.localidadeId || null,
     });
     setEditingId(loja.id);
     setIsFormOpen(true);
@@ -265,6 +290,7 @@ export default function CadastroAnunciantes() {
                 whatsapp: "",
                 fotoUrl: "",
                 temAgenda: false,
+                localidadeId: null,
               });
             }}
             className="flex items-center gap-2 px-4 py-2 bg-vitrii-yellow text-vitrii-text rounded-lg hover:bg-vitrii-yellow-dark transition-colors font-semibold"
@@ -376,6 +402,30 @@ export default function CadastroAnunciantes() {
                     {BRAZILIAN_STATES.map((state) => (
                       <option key={state.code} value={state.code}>
                         {state.code} - {state.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                    Localidade *
+                  </label>
+                  <select
+                    required
+                    value={formData.localidadeId || ""}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        localidadeId: e.target.value ? parseInt(e.target.value) : null,
+                      })
+                    }
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50 bg-white"
+                  >
+                    <option value="">Selecione uma localidade</option>
+                    {localidades.map((localidade) => (
+                      <option key={localidade.id} value={localidade.id}>
+                        {localidade.descricao || `${localidade.municipio}, ${localidade.estado}`}
                       </option>
                     ))}
                   </select>
