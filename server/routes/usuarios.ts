@@ -1123,3 +1123,79 @@ export const updateLocalidadePadrao: RequestHandler = async (req, res) => {
     });
   }
 };
+
+// CHANGE user password
+export const changePassword: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = parseInt(id);
+    const { senhaAtual, senhaNova, senhaConfirm } = req.body;
+
+    // Validate input
+    if (!senhaAtual || !senhaNova || !senhaConfirm) {
+      return res.status(400).json({
+        success: false,
+        error: "Todos os campos são obrigatórios",
+      });
+    }
+
+    if (senhaNova !== senhaConfirm) {
+      return res.status(400).json({
+        success: false,
+        error: "As senhas não correspondem",
+      });
+    }
+
+    if (senhaNova.length < 6) {
+      return res.status(400).json({
+        success: false,
+        error: "A nova senha deve ter no mínimo 6 caracteres",
+      });
+    }
+
+    // Find user
+    const usuario = await prisma.usracessos.findUnique({
+      where: { id: userId },
+    });
+
+    if (!usuario) {
+      return res.status(404).json({
+        success: false,
+        error: "Usuário não encontrado",
+      });
+    }
+
+    // Verify current password
+    const bcrypt = require("bcrypt");
+    const senhaValida = await bcrypt.compare(senhaAtual, usuario.senha);
+
+    if (!senhaValida) {
+      return res.status(401).json({
+        success: false,
+        error: "Senha atual incorreta",
+      });
+    }
+
+    // Hash new password
+    const novoHash = await bcrypt.hash(senhaNova, 10);
+
+    // Update password
+    await prisma.usracessos.update({
+      where: { id: userId },
+      data: {
+        senha: novoHash,
+      },
+    });
+
+    res.json({
+      success: true,
+      message: "Senha alterada com sucesso",
+    });
+  } catch (error) {
+    console.error("Error changing password:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao alterar senha",
+    });
+  }
+};

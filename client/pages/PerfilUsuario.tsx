@@ -4,6 +4,7 @@ import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ChangePasswordModal from "@/components/ChangePasswordModal";
 import {
   ChevronLeft,
   AlertCircle,
@@ -12,6 +13,7 @@ import {
   Mail,
   Phone,
   MapPin,
+  Lock,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -20,10 +22,10 @@ export default function PerfilUsuario() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
 
   // Initialize form with cached user data first
   const [formData, setFormData] = useState({
-    cpf: user?.cpf || "",
     telefone: user?.telefone || "",
     endereco: user?.endereco || "",
   });
@@ -53,7 +55,6 @@ export default function PerfilUsuario() {
   useEffect(() => {
     if (freshUserData) {
       setFormData({
-        cpf: freshUserData.cpf || "",
         telefone: freshUserData.telefone || "",
         endereco: freshUserData.endereco || "",
       });
@@ -139,17 +140,6 @@ export default function PerfilUsuario() {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    // CPF/CNPJ validation - required
-    if (!formData.cpf.trim()) {
-      newErrors.cpf = "CPF \ CNPJ é obrigatório";
-    } else {
-      const digitsOnly = formData.cpf.replace(/\D/g, "");
-      // Accept either 11 digits (CPF) or 14 digits (CNPJ)
-      if (!/^\d{11}$|^\d{14}$/.test(digitsOnly)) {
-        newErrors.cpf = "CPF \ CNPJ deve ter 11 ou 14 dígitos";
-      }
-    }
-
     // Phone validation - only if provided
     if (
       formData.telefone.trim() &&
@@ -225,51 +215,18 @@ export default function PerfilUsuario() {
               </p>
             </div>
 
-            {/* CPF / CNPJ */}
+            {/* CPF / CNPJ (Read-only) */}
             <div>
               <label className="block text-sm font-semibold text-vitrii-text mb-2">
-                CPF \ CNPJ *
+                CPF \ CNPJ
               </label>
-              <input
-                type="text"
-                value={formData.cpf}
-                onChange={(e) => {
-                  const input = e.target.value.replace(/\D/g, "");
-                  let formatted = "";
-
-                  // Format based on length: CPF (11) or CNPJ (14)
-                  if (input.length <= 11) {
-                    // CPF format: XXX.XXX.XXX-XX
-                    const cpf = input.slice(0, 11);
-                    formatted = cpf
-                      .replace(/(\d{3})(\d)/, "$1.$2")
-                      .replace(/(\d{3})(\d)/, "$1.$2")
-                      .replace(/(\d{3})(\d{2})$/, "$1-$2");
-                  } else {
-                    // CNPJ format: XX.XXX.XXX/XXXX-XX
-                    const cnpj = input.slice(0, 14);
-                    formatted = cnpj
-                      .replace(/(\d{2})(\d)/, "$1.$2")
-                      .replace(/(\d{3})(\d)/, "$1.$2")
-                      .replace(/(\d{3})(\d)/, "$1/$2")
-                      .replace(/(\d{4})(\d{2})$/, "$1-$2");
-                  }
-
-                  handleInputChange("cpf", formatted);
-                }}
-                placeholder="000.000.000-00 ou 00.000.000/0000-00"
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-1 transition-colors ${
-                  errors.cpf
-                    ? "border-red-500 focus:border-red-500 focus:ring-red-500 bg-red-50"
-                    : "border-gray-300 focus:border-vitrii-blue focus:ring-vitrii-blue"
-                }`}
-              />
-              {errors.cpf && (
-                <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
-                  <AlertCircle className="w-4 h-4" />
-                  {errors.cpf}
-                </p>
-              )}
+              <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-vitrii-text flex items-center gap-2">
+                <User className="w-5 h-5 text-vitrii-text-secondary flex-shrink-0" />
+                <span>{user?.cpf || "Não informado"}</span>
+              </div>
+              <p className="text-xs text-vitrii-text-secondary mt-2">
+                O CPF/CNPJ é um campo primário e não pode ser alterado. Para mudanças, entre em contato com o administrador.
+              </p>
             </div>
 
             {/* Telefone */}
@@ -335,6 +292,28 @@ export default function PerfilUsuario() {
               </p>
             </div>
 
+            {/* Change Password Section */}
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              <button
+                type="button"
+                onClick={() => setIsChangePasswordOpen(true)}
+                className="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-blue-100 transition-colors rounded"
+              >
+                <div className="flex items-center gap-3">
+                  <Lock className="w-5 h-5 text-vitrii-blue" />
+                  <div>
+                    <p className="font-semibold text-vitrii-text">
+                      Alterar Senha
+                    </p>
+                    <p className="text-xs text-vitrii-text-secondary">
+                      Atualize sua senha de forma segura
+                    </p>
+                  </div>
+                </div>
+                <ChevronLeft className="w-5 h-5 text-vitrii-text-secondary rotate-180" />
+              </button>
+            </div>
+
             {/* Buttons */}
             <div className="flex gap-4 pt-6 border-t">
               <button
@@ -367,6 +346,11 @@ export default function PerfilUsuario() {
       </div>
 
       <Footer />
+
+      <ChangePasswordModal
+        isOpen={isChangePasswordOpen}
+        onClose={() => setIsChangePasswordOpen(false)}
+      />
     </div>
   );
 }
