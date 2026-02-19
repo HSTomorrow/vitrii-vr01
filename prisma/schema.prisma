@@ -42,6 +42,7 @@ model anunciantes {
   links_externos       links_produtos_externos[]
   conversas            conversas[]
   mensagens            mensagens[]
+  localidades          anunciantes_x_localidades[]
 }
 
 model anuncios {
@@ -217,6 +218,7 @@ model usracessos {
   dataVigenciaContrato  DateTime               @default(now())
   numeroAnunciosAtivos  Int                    @default(0)
   maxAnunciosAtivos     Int                    @default(10)
+  localidadePadraoId    Int?                   // Default locality for filtering ads
   usuarios_anunciantes  usuarios_anunciantes[]
   membros_equipe        membros_equipe[]
   passwordResetTokens   passwordResetToken[]
@@ -231,6 +233,7 @@ model usracessos {
   reservas_evento       reservas_evento_agenda[]
   conversas             conversas[]
   mensagens             mensagens[]
+  localidadePadrao      localidades?          @relation(fields: [localidadePadraoId], references: [id], onDelete: SetNull)
 }
 
 model passwordResetToken {
@@ -647,4 +650,40 @@ model filas_espera_agenda {
   @@index([anuncianteAlvoId])
   @@index([status])
   @@index([dataSolicitacao])
+}
+
+// Localidades/Localities for geographic filtering
+model localidades {
+  id                           Int                             @id @default(autoincrement())
+  codigo                       String                          @unique @db.VarChar(50)
+  municipio                    String                          @db.VarChar(255)
+  estado                       String                          @db.VarChar(2)
+  descricao                    String?
+  observacao                   String?
+  status                       String                          @default("ativo") @db.VarChar(20) // "ativo" ou "inativo"
+  dataCriacao                  DateTime                        @default(now())
+  dataAtualizacao              DateTime                        @updatedAt
+
+  usuarios_padrao              usracessos[]
+  anunciantes                  anunciantes_x_localidades[]
+
+  @@index([status])
+  @@index([municipio])
+  @@index([estado])
+  @@unique([municipio, estado])
+}
+
+// Junction table: Anunciantes x Localidades (M:N)
+model anunciantes_x_localidades {
+  id                Int         @id @default(autoincrement())
+  anuncianteId      Int
+  localidadeId      Int
+  dataCriacao       DateTime    @default(now())
+
+  anunciante        anunciantes @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
+  localidade        localidades @relation(fields: [localidadeId], references: [id], onDelete: Cascade)
+
+  @@unique([anuncianteId, localidadeId])
+  @@index([anuncianteId])
+  @@index([localidadeId])
 }
