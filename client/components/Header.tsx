@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import LocalidadeButton from "./LocalidadeButton";
+import UserButton from "./UserButton";
 
 export default function Header() {
   const { user } = useAuth();
@@ -120,12 +121,7 @@ export default function Header() {
 
                   <LocalidadeButton />
 
-                  <div className="hidden sm:flex items-center space-x-2 px-4 py-2 bg-green-50 rounded-lg border border-green-200">
-                    <User className="w-4 h-4 text-green-600" />
-                    <span className="text-[0.74rem] font-semibold text-green-800 hidden md:inline">
-                      {user.nome.split(" ")[0]}
-                    </span>
-                  </div>
+                  <UserButton />
                 </>
               ) : (
                 <>
