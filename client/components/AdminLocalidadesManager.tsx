@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Plus, Edit2, Trash2, X, Search } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Localidade {
   id: number;
@@ -25,6 +26,7 @@ interface FormData {
 
 export default function AdminLocalidadesManager() {
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -56,7 +58,10 @@ export default function AdminLocalidadesManager() {
     mutationFn: async (data: FormData) => {
       const response = await fetch("/api/localidades", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": user?.id?.toString() || "",
+        },
         body: JSON.stringify(data),
       });
 
@@ -85,7 +90,10 @@ export default function AdminLocalidadesManager() {
 
       const response = await fetch(`/api/localidades/${editingId}`, {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": user?.id?.toString() || "",
+        },
         body: JSON.stringify(data),
       });
 
@@ -112,6 +120,9 @@ export default function AdminLocalidadesManager() {
     mutationFn: async (id: number) => {
       const response = await fetch(`/api/localidades/${id}`, {
         method: "DELETE",
+        headers: {
+          "x-user-id": user?.id?.toString() || "",
+        },
       });
 
       if (!response.ok) {
