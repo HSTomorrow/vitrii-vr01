@@ -1,10 +1,12 @@
 import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Star, Package, MapPin, X, ChevronDown, Search, ArrowLeft } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Pagination from "@/components/Pagination";
+import LocalidadeFilter from "@/components/LocalidadeFilter";
 
 const CATEGORIES = [
   { value: "roupas", label: "Roupas" },
@@ -28,6 +30,7 @@ export default function Browse() {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedType, setSelectedType] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
+  const [selectedLocalidade, setSelectedLocalidade] = useState<number | null>(null);
   const [priceRange, setPriceRange] = useState({ min: "", max: "" });
   const [showFilters, setShowFilters] = useState(false);
   const itemsPerPage = 20;
@@ -67,6 +70,20 @@ export default function Browse() {
       return response.json();
     },
     enabled: !!anuncianteIdParam,
+  });
+
+  // Fetch anunciantes for selected localidade
+  const { data: localidadeAnunciantesData } = useQuery({
+    queryKey: ["localidade-anunciantes", selectedLocalidade],
+    queryFn: async () => {
+      if (!selectedLocalidade) return null;
+      const response = await fetch(
+        `/api/localidades/${selectedLocalidade}/anunciantes`,
+      );
+      if (!response.ok) throw new Error("Erro ao buscar anunciantes");
+      return response.json();
+    },
+    enabled: !!selectedLocalidade,
   });
 
   const allAnuncios = anunciosData?.data || [];
@@ -134,6 +151,16 @@ export default function Browse() {
         if (priceRange.max && price > parseFloat(priceRange.max)) return false;
       }
 
+      // Filter by localidade if selected
+      if (selectedLocalidade) {
+        const anunciantesFromLocalidade = (
+          localidadeAnunciantesData?.data || []
+        ).map((a: any) => a.id);
+        if (!anunciantesFromLocalidade.includes(anuncio.anuncianteId)) {
+          return false;
+        }
+      }
+
       return true;
     });
   }, [
@@ -144,6 +171,8 @@ export default function Browse() {
     selectedLocation,
     priceRange,
     anuncianteIdParam,
+    selectedLocalidade,
+    localidadeAnunciantesData,
   ]);
 
   const totalItems = filteredAnuncios.length;
@@ -188,6 +217,7 @@ export default function Browse() {
     setSelectedCategory("");
     setSelectedType("");
     setSelectedLocation("");
+    setSelectedLocalidade(null);
     setPriceRange({ min: "", max: "" });
     setCurrentPage(1);
   };
@@ -197,6 +227,7 @@ export default function Browse() {
     selectedCategory ||
     selectedType ||
     selectedLocation ||
+    selectedLocalidade ||
     priceRange.min ||
     priceRange.max;
 
@@ -338,6 +369,14 @@ export default function Browse() {
                       </select>
                     </div>
                   )}
+
+                  {/* Localidade Filter */}
+                  <LocalidadeFilter
+                    value={selectedLocalidade}
+                    onChange={setSelectedLocalidade}
+                    showLabel={true}
+                    placeholder="Todas as localidades"
+                  />
 
                   {/* Price Range Filter */}
                   <div>

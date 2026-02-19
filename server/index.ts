@@ -186,6 +186,16 @@ import {
   revokeAllFuncionalidades,
 } from "./routes/usuario-funcionalidades";
 import { uploadMiddleware, handleUpload } from "./routes/upload";
+import {
+  getLocalidades,
+  getLocalidadeById,
+  createLocalidade,
+  updateLocalidade,
+  deleteLocalidade,
+  getAnunciantesForLocalidade,
+  addAnuncianteToLocalidade,
+  removeAnuncianteFromLocalidade,
+} from "./routes/localidades";
 import { extractUserId, requireAdmin } from "./middleware/permissionGuard";
 import {
   getBanners,
@@ -610,6 +620,16 @@ export function createServer() {
   app.put("/api/banners/:id", extractUserId, requireAdmin, updateBanner);
   app.delete("/api/banners/:id", extractUserId, requireAdmin, deleteBanner);
   app.post("/api/banners/reorder", extractUserId, requireAdmin, reorderBanners);
+
+  // Localidades routes (admin only)
+  app.get("/api/localidades", getLocalidades);
+  app.get("/api/localidades/:id", getLocalidadeById);
+  app.post("/api/localidades", extractUserId, requireAdmin, createLocalidade);
+  app.put("/api/localidades/:id", extractUserId, requireAdmin, updateLocalidade);
+  app.delete("/api/localidades/:id", extractUserId, requireAdmin, deleteLocalidade);
+  app.get("/api/localidades/:id/anunciantes", getAnunciantesForLocalidade);
+  app.post("/api/localidades/:id/anunciantes", extractUserId, requireAdmin, addAnuncianteToLocalidade);
+  app.delete("/api/localidades/:id/anunciantes/:anuncianteId", extractUserId, requireAdmin, removeAnuncianteFromLocalidade);
 
   // Global error handling middleware for this sub-app
   // Must be added AFTER all routes

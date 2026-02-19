@@ -367,6 +367,23 @@ export default function AdminDashboard() {
             </p>
           </button>
 
+          <button
+            onClick={() => navigate("/admin/localidades")}
+            className="bg-cyan-50 border border-cyan-200 rounded-lg p-6 hover:shadow-lg transition-shadow text-left group"
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-cyan-100 rounded-lg flex items-center justify-center group-hover:bg-cyan-200 transition-colors">
+                <MapPin className="w-6 h-6 text-cyan-600" />
+              </div>
+              <h3 className="font-semibold text-vitrii-text">
+                Gerenciar Localidades
+              </h3>
+            </div>
+            <p className="text-sm text-vitrii-text-secondary">
+              Crie e configure localidades para filtragem de anúncios
+            </p>
+          </button>
+
           <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
             <div className="flex items-center gap-3 mb-2">
               <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
