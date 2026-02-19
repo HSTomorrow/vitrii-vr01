@@ -5,7 +5,15 @@ import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
-import { AlertCircle, ArrowRight, CheckCircle } from "lucide-react";
+import { AlertCircle, ArrowRight, CheckCircle, Lock } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 
 export default function SignIn() {
   const navigate = useNavigate();
@@ -16,6 +24,7 @@ export default function SignIn() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [rememberMe, setRememberMe] = useState(false);
+  const [invalidCredentialsAlert, setInvalidCredentialsAlert] = useState(false);
 
   // Sign in mutation
   const signInMutation = useMutation({
@@ -77,10 +86,16 @@ export default function SignIn() {
     onError: (error) => {
       console.error("[SignIn] Erro no login:", error);
       const errorMessage = error instanceof Error ? error.message : "Erro desconhecido ao fazer login";
-      toast.error("Falha no login", {
-        description: errorMessage,
-        duration: 4000,
-      });
+
+      // Check if it's an invalid credentials error (401)
+      if (errorMessage.includes("Email ou senha incorretos")) {
+        setInvalidCredentialsAlert(true);
+      } else {
+        toast.error("Falha no login", {
+          description: errorMessage,
+          duration: 4000,
+        });
+      }
     },
   });
 
@@ -143,6 +158,38 @@ export default function SignIn() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
+
+      {/* Alert Dialog for Invalid Credentials */}
+      <AlertDialog open={invalidCredentialsAlert} onOpenChange={setInvalidCredentialsAlert}>
+        <AlertDialogContent className="max-w-sm">
+          <AlertDialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="bg-red-100 p-3 rounded-full">
+                <AlertCircle className="w-6 h-6 text-red-600" />
+              </div>
+              <AlertDialogTitle className="text-red-600 m-0">
+                Credenciais Inválidas
+              </AlertDialogTitle>
+            </div>
+          </AlertDialogHeader>
+          <AlertDialogDescription className="text-base">
+            <p className="text-gray-700 font-semibold mb-3">
+              Desculpe, não conseguimos entrar na sua conta.
+            </p>
+            <p className="text-gray-600 mb-4">
+              O email ou a senha que você inseriu está incorreto. Por favor, verifique suas credenciais e tente novamente.
+            </p>
+            <ul className="text-gray-600 text-sm space-y-2 ml-4">
+              <li>✓ Verifique se o email está correto</li>
+              <li>✓ Verifique se a senha está correta (maiúsculas importam)</li>
+              <li>✓ Se esqueceu a senha, clique em "Esqueci minha senha"</li>
+            </ul>
+          </AlertDialogDescription>
+          <AlertDialogAction className="bg-red-600 hover:bg-red-700 text-white mt-6">
+            Tentar Novamente
+          </AlertDialogAction>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <div className="flex-1 max-w-lg mx-auto w-full px-4 sm:px-6 lg:px-8 py-12">
         <div className="bg-vitrii-gray-light rounded-lg p-8">
