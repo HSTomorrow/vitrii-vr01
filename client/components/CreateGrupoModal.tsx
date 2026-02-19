@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { X } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface CreateGrupoModalProps {
   isOpen: boolean;
@@ -16,6 +17,7 @@ export default function CreateGrupoModal({
   anuncianteId,
   onSuccess,
 }: CreateGrupoModalProps) {
+  const { user } = useAuth();
   const queryClient = useQueryClient();
   const [formData, setFormData] = useState({
     nome: "",
@@ -24,9 +26,16 @@ export default function CreateGrupoModal({
 
   const mutation = useMutation({
     mutationFn: async (data: any) => {
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (user?.id) {
+        headers["x-user-id"] = user.id.toString();
+      }
+
       const response = await fetch("/api/grupos-productos", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({
           ...data,
           anuncianteId,
