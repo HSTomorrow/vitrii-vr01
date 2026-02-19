@@ -31,6 +31,11 @@ export default function LocalidadeFilter({
     value || null,
   );
 
+  // Only show filter for logged-in users
+  if (!user) {
+    return null;
+  }
+
   // Fetch all active localidades
   const { data: localidadesData } = useQuery({
     queryKey: ["localidades-filter"],
