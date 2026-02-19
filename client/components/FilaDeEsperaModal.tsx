@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { toast } from "sonner";
 import { X } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface FilaDeEsperaModalProps {
   isOpen: boolean;
@@ -17,6 +18,7 @@ export default function FilaDeEsperaModal({
   anuncianteAlvoId,
   anuncianteAlvoNome,
 }: FilaDeEsperaModalProps) {
+  const { user } = useAuth();
   const [titulo, setTitulo] = useState("");
   const [descricao, setDescricao] = useState("");
   const [dataInicio, setDataInicio] = useState("");
@@ -56,11 +58,16 @@ export default function FilaDeEsperaModal({
     setIsLoading(true);
 
     try {
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (user?.id) {
+        headers["x-user-id"] = user.id.toString();
+      }
+
       const response = await fetch("/api/filas-espera", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers,
         body: JSON.stringify({
           eventoId: 0,
           anuncianteAlvoId,

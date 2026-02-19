@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { X, Plus, Trash2, Search } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Usuario {
   id: number;
@@ -24,6 +25,7 @@ export default function EventoUsuariosModal({
   anuncianteId,
   isOwner,
 }: EventoUsuariosModalProps) {
+  const { user } = useAuth();
   const [linkedUsuarios, setLinkedUsuarios] = useState<Usuario[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<Usuario[]>([]);
@@ -40,10 +42,13 @@ export default function EventoUsuariosModal({
   const loadLinkedUsuarios = async () => {
     setIsLoadingLinked(true);
     try {
+      const headers: Record<string, string> = {};
+      if (user?.id) {
+        headers["x-user-id"] = user.id.toString();
+      }
+
       const response = await fetch(`/api/eventos-agenda/${eventoId}/usuarios`, {
-        headers: {
-          "x-user-id": "current-user",
-        },
+        headers,
       });
 
       if (!response.ok) {
@@ -70,12 +75,15 @@ export default function EventoUsuariosModal({
 
     setIsSearching(true);
     try {
+      const headers: Record<string, string> = {};
+      if (user?.id) {
+        headers["x-user-id"] = user.id.toString();
+      }
+
       const response = await fetch(
         `/api/usuarios/search?query=${encodeURIComponent(searchQuery)}`,
         {
-          headers: {
-            "x-user-id": "current-user",
-          },
+          headers,
         }
       );
 
@@ -97,12 +105,16 @@ export default function EventoUsuariosModal({
 
   const handleAddUsuario = async (usuario: Usuario) => {
     try {
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (user?.id) {
+        headers["x-user-id"] = user.id.toString();
+      }
+
       const response = await fetch(`/api/eventos-agenda/${eventoId}/usuarios`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "x-user-id": "current-user",
-        },
+        headers,
         body: JSON.stringify({ usuarioId: usuario.id }),
       });
 
@@ -129,13 +141,16 @@ export default function EventoUsuariosModal({
 
     setIsRemoving(usuarioId);
     try {
+      const headers: Record<string, string> = {};
+      if (user?.id) {
+        headers["x-user-id"] = user.id.toString();
+      }
+
       const response = await fetch(
         `/api/eventos-agenda/${eventoId}/permissoes/${usuarioId}`,
         {
           method: "DELETE",
-          headers: {
-            "x-user-id": "current-user",
-          },
+          headers,
         }
       );
 

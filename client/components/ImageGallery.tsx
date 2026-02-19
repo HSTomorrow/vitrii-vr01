@@ -1,7 +1,9 @@
 import React, { useState } from "react";
+import { useState } from "react";
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { Button } from "./ui/button";
 import ImageZoomModal from "./ImageZoomModal";
+import { useAuth } from "@/contexts/AuthContext";
 
 export interface GalleryPhoto {
   id: number;
@@ -26,6 +28,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
   onReorder,
   anuncianteFotoUrl,
 }) => {
+  const { user } = useAuth();
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [deletingId, setDeletingId] = useState<number | null>(null);
   const [isZoomed, setIsZoomed] = useState(false);
@@ -82,13 +85,18 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
 
     setDeletingId(fotoId);
     try {
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (user?.id) {
+        headers["x-user-id"] = user.id.toString();
+      }
+
       const response = await fetch(
         `/api/anuncios/${anuncioId}/fotos/${fotoId}`,
         {
           method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers,
         },
       );
 

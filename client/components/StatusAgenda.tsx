@@ -1,6 +1,8 @@
 import { useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import { Clock, CheckCircle, AlertCircle, Repeat2, ChevronDown, ChevronUp } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Evento {
   id: number;
@@ -55,6 +57,7 @@ export default function StatusAgenda({
   onStatusChange,
   isLoading = false,
 }: StatusAgendaProps) {
+  const { user } = useAuth();
   const [expandedEventoId, setExpandedEventoId] = useState<number | null>(null);
   const [updatingEventoId, setUpdatingEventoId] = useState<number | null>(null);
 
@@ -89,11 +92,16 @@ export default function StatusAgenda({
     setUpdatingEventoId(eventoId);
 
     try {
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (user?.id) {
+        headers["x-user-id"] = user.id.toString();
+      }
+
       const response = await fetch(`/api/eventos-agenda/${eventoId}/status`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers,
         body: JSON.stringify({ status: newStatus }),
       });
 

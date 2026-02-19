@@ -359,9 +359,15 @@ export default function AnuncioForm({
           try {
             for (let i = 1; i < uploadedImages.length; i++) {
               const image = uploadedImages[i];
+              const headers: Record<string, string> = {
+                "Content-Type": "application/json",
+              };
+              if (user?.id) {
+                headers["x-user-id"] = user.id.toString();
+              }
               await fetch(`/api/anuncios/${result.data.id}/fotos`, {
                 method: "POST",
-                headers: { "Content-Type": "application/json" },
+                headers,
                 body: JSON.stringify({ url: image.url }),
               });
             }

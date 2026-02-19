@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Check, X, Clock, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useMutation } from "@tanstack/react-query";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface Reserva {
   id: number;
@@ -33,13 +34,21 @@ export default function ReservasEventoList({
   reservas,
   onReservasChange,
 }: ReservasEventoListProps) {
+  const { user } = useAuth();
   const [expandedId, setExpandedId] = useState<number | null>(null);
 
   const confirmarMutation = useMutation({
     mutationFn: async (reservaId: number) => {
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (user?.id) {
+        headers["x-user-id"] = user.id.toString();
+      }
+
       const response = await fetch(`/api/reservas-evento/${reservaId}/confirmar`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers,
       });
       if (!response.ok) throw new Error("Erro ao confirmar");
       return response.json();
@@ -55,9 +64,16 @@ export default function ReservasEventoList({
 
   const rejeitarMutation = useMutation({
     mutationFn: async (reservaId: number) => {
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (user?.id) {
+        headers["x-user-id"] = user.id.toString();
+      }
+
       const response = await fetch(`/api/reservas-evento/${reservaId}/rejeitar`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({ motivo: "Rejeitado pelo anunciante" }),
       });
       if (!response.ok) throw new Error("Erro ao rejeitar");
@@ -74,9 +90,16 @@ export default function ReservasEventoList({
 
   const cancelarMutation = useMutation({
     mutationFn: async (reservaId: number) => {
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (user?.id) {
+        headers["x-user-id"] = user.id.toString();
+      }
+
       const response = await fetch(`/api/reservas-evento/${reservaId}/cancelar`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers,
       });
       if (!response.ok) throw new Error("Erro ao cancelar");
       return response.json();

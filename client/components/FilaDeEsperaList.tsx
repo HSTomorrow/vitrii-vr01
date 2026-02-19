@@ -1,6 +1,7 @@
 import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import { CheckCircle, XCircle, Clock, Calendar, User, Mail, Phone } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface FilaEspera {
   id: number;
@@ -32,6 +33,7 @@ export default function FilaDeEsperaList({
   onRefresh,
   isLoading = false,
 }: FilaDeEsperaListProps) {
+  const { user } = useAuth();
   const [selectedFilaForReject, setSelectedFilaForReject] = useState<FilaEspera | null>(null);
   const [rejectReason, setRejectReason] = useState("");
   const [suggestedDate, setSuggestedDate] = useState("");
@@ -61,11 +63,16 @@ export default function FilaDeEsperaList({
   const handleApprove = async (fila: FilaEspera) => {
     setIsProcessing(fila.id);
     try {
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (user?.id) {
+        headers["x-user-id"] = user.id.toString();
+      }
+
       const response = await fetch(`/api/filas-espera/${fila.id}/aprovar`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers,
       });
 
       if (!response.ok) {
@@ -102,13 +109,18 @@ export default function FilaDeEsperaList({
     setIsProcessing(selectedFilaForReject.id);
 
     try {
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (user?.id) {
+        headers["x-user-id"] = user.id.toString();
+      }
+
       const response = await fetch(
         `/api/filas-espera/${selectedFilaForReject.id}/rejeitar`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers,
           body: JSON.stringify({
             motivo: rejectReason.trim(),
             dataSugestao: suggestedDate ? new Date(suggestedDate).toISOString() : null,
