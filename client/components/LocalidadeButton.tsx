@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { MapPin, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
@@ -14,6 +14,7 @@ interface Localidade {
 }
 
 export default function LocalidadeButton() {
+  const queryClient = useQueryClient();
   const { user } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [selectedLocalidade, setSelectedLocalidade] = useState<Localidade | null>(null);
@@ -49,6 +50,12 @@ export default function LocalidadeButton() {
     onSuccess: () => {
       toast.success("Localidade padrão atualizada!");
       setIsOpen(false);
+
+      // Invalidate queries to refresh pages
+      queryClient.invalidateQueries({ queryKey: ["user-localidade"] });
+      queryClient.invalidateQueries({ queryKey: ["anuncios-all"] });
+      queryClient.invalidateQueries({ queryKey: ["browse-anuncios"] });
+      queryClient.invalidateQueries({ queryKey: ["localidade-anunciantes"] });
     },
     onError: () => {
       toast.error("Erro ao atualizar localidade");

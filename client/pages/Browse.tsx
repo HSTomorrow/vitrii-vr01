@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Pagination from "@/components/Pagination";
 import LocalidadeFilter from "@/components/LocalidadeFilter";
+import { useAuth } from "@/contexts/AuthContext";
 
 const CATEGORIES = [
   { value: "roupas", label: "Roupas" },
@@ -23,6 +24,7 @@ const TYPES = [
 
 export default function Browse() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [searchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
@@ -34,6 +36,31 @@ export default function Browse() {
   const [showFilters, setShowFilters] = useState(false);
   const itemsPerPage = 20;
   const anuncianteIdParam = searchParams.get("anuncianteId");
+
+  // Fetch user's default localidade
+  const { data: userLocalidadeData } = useQuery({
+    queryKey: ["user-localidade"],
+    queryFn: async () => {
+      if (!user?.id) return null;
+
+      const response = await fetch(`/api/usracessos/${user.id}`, {
+        headers: {
+          "x-user-id": user.id.toString(),
+        },
+      });
+
+      if (!response.ok) throw new Error("Erro ao buscar localidade do usuário");
+      return response.json();
+    },
+    enabled: !!user?.id,
+  });
+
+  // Update selectedLocalidade when user's default localidade changes
+  useEffect(() => {
+    if (userLocalidadeData?.data?.localidadePadraoId) {
+      setSelectedLocalidade(userLocalidadeData.data.localidadePadraoId);
+    }
+  }, [userLocalidadeData?.data?.localidadePadraoId]);
 
   // Fetch all active ads with pagination
   // Note: The API already filters by status="ativo" by default when no status param is provided

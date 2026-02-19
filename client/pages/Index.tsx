@@ -1,6 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -36,7 +35,6 @@ export default function Index() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [favoritos, setFavoritos] = useState<Set<number>>(new Set());
-  const [userLocalidadeId, setUserLocalidadeId] = useState<number | null>(null);
 
   // All paid ads are fetched and filtered on client side
 
@@ -88,6 +86,26 @@ export default function Index() {
     },
   });
 
+  // Fetch user's default localidade
+  const { data: userLocalidadeData } = useQuery({
+    queryKey: ["user-localidade"],
+    queryFn: async () => {
+      if (!user?.id) return null;
+
+      const response = await fetch(`/api/usracessos/${user.id}`, {
+        headers: {
+          "x-user-id": user.id.toString(),
+        },
+      });
+
+      if (!response.ok) throw new Error("Erro ao buscar localidade do usuário");
+      return response.json();
+    },
+    enabled: !!user?.id,
+  });
+
+  const userLocalidadeId = userLocalidadeData?.data?.localidadePadraoId || null;
+
   // Fetch all active ads without status filter - we'll filter on client side
   const { data: allAnunciosData, isLoading: allAnunciosLoading } = useQuery({
     queryKey: ["anuncios-all"],
@@ -109,38 +127,6 @@ export default function Index() {
   });
 
   const allAnuncios = allAnunciosData?.data || [];
-
-  // Fetch user's default localidade on mount or when user changes
-  useEffect(() => {
-    const getDefaultLocalidade = async () => {
-      if (!user?.id) {
-        setUserLocalidadeId(null);
-        return;
-      }
-
-      try {
-        const response = await fetch(`/api/usracessos/${user.id}`, {
-          headers: {
-            "x-user-id": user.id.toString(),
-          },
-        });
-
-        if (response.ok) {
-          const userData = await response.json();
-          if (userData.data?.localidadePadraoId) {
-            setUserLocalidadeId(userData.data.localidadePadraoId);
-          } else {
-            setUserLocalidadeId(null);
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching user default localidade:", error);
-        setUserLocalidadeId(null);
-      }
-    };
-
-    getDefaultLocalidade();
-  }, [user?.id]);
 
   // Filter anuncios by type and gratuito status
   // Helper to check if an anuncio is free (donation or price = 0)
