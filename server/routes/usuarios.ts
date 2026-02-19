@@ -1063,3 +1063,63 @@ export const adminUpdateUserProfile: RequestHandler = async (req, res) => {
     });
   }
 };
+
+// UPDATE user's default localidade
+export const updateLocalidadePadrao: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = parseInt(id);
+    const { localidadePadraoId } = req.body;
+
+    // Validate user exists
+    const usuario = await prisma.usracessos.findUnique({
+      where: { id: userId },
+    });
+
+    if (!usuario) {
+      return res.status(404).json({
+        success: false,
+        error: "Usuário não encontrado",
+      });
+    }
+
+    // If localidadePadraoId is provided, validate it exists
+    if (localidadePadraoId !== null && localidadePadraoId !== undefined) {
+      const localidade = await prisma.localidades.findUnique({
+        where: { id: localidadePadraoId },
+      });
+
+      if (!localidade) {
+        return res.status(404).json({
+          success: false,
+          error: "Localidade não encontrada",
+        });
+      }
+    }
+
+    // Update user's default localidade
+    const updatedUsuario = await prisma.usracessos.update({
+      where: { id: userId },
+      data: {
+        localidadePadraoId: localidadePadraoId || null,
+      },
+      select: {
+        id: true,
+        nome: true,
+        localidadePadraoId: true,
+      },
+    });
+
+    res.json({
+      success: true,
+      data: updatedUsuario,
+      message: "Localidade padrão atualizada com sucesso",
+    });
+  } catch (error) {
+    console.error("Error updating user's default localidade:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao atualizar localidade padrão",
+    });
+  }
+};

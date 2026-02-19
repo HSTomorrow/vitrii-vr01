@@ -69,6 +69,7 @@ import {
   adminResetUserPassword,
   adminUpdateUserProfile,
   updateMaxAnunciosAtivos,
+  updateLocalidadePadrao,
 } from "./routes/usuarios";
 import {
   getEquipes,
@@ -293,6 +294,7 @@ export function createServer() {
   app.post("/api/usracessos", createUsuario);
   app.put("/api/usracessos/:id", updateUsuario);
   app.delete("/api/usracessos/:id", deleteUsuario);
+  app.patch("/api/usracessos/:id/localidade-padrao", extractUserId, updateLocalidadePadrao);
 
   // Admin routes for user management
   app.put(
