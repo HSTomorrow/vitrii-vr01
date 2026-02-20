@@ -11,12 +11,12 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 
 // Eagerly load core pages for better initial page load performance
 import Index from "./pages/Index";
-import About from "./pages/About";
 import Browse from "./pages/Browse";
-import Sell from "./pages/Sell";
 import NotFound from "./pages/NotFound";
 
 // Lazy-load all other routes to reduce initial bundle size
+const About = lazy(() => import("./pages/About"));
+const Sell = lazy(() => import("./pages/Sell"));
 const QRCodePage = lazy(() => import("./pages/QRCode"));
 const SignIn = lazy(() => import("./pages/SignIn"));
 const SignUp = lazy(() => import("./pages/SignUp"));
@@ -78,9 +78,9 @@ export default function App() {
             <BrowserRouter>
               <Routes>
                 <Route path="/" element={<Index />} />
-                <Route path="/about" element={<About />} />
+                <Route path="/about" element={<Suspense fallback={<PageLoader />}><About /></Suspense>} />
                 <Route path="/browse" element={<Browse />} />
-                <Route path="/sell" element={<Sell />} />
+                <Route path="/sell" element={<Suspense fallback={<PageLoader />}><Sell /></Suspense>} />
                 <Route path="/qrcode" element={<Suspense fallback={<PageLoader />}><QRCodePage /></Suspense>} />
                 <Route path="/auth/signin" element={<Suspense fallback={<PageLoader />}><SignIn /></Suspense>} />
                 <Route path="/entrar" element={<Suspense fallback={<PageLoader />}><SignIn /></Suspense>} />
