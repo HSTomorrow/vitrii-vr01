@@ -1,6 +1,5 @@
 import "./global.css";
 
-import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -49,20 +48,6 @@ import MeusAnuncios from "./pages/MeusAnuncios";
 import MinhaAgenda from "./pages/MinhaAgenda";
 import AgendaAnunciante from "./pages/AgendaAnunciante";
 import AnuncianteProfile from "./pages/AnuncianteProfile";
-
-// Loading fallback component for lazy-loaded pages
-function PageLoader() {
-  return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      <div className="space-y-4 text-center">
-        <div className="inline-block">
-          <div className="w-12 h-12 border-4 border-slate-200 border-t-blue-500 rounded-full animate-spin" />
-        </div>
-        <p className="text-slate-600 font-medium">Carregando...</p>
-      </div>
-    </div>
-  );
-}
 
 const queryClient = new QueryClient();
 
