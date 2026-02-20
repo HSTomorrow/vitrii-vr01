@@ -213,7 +213,7 @@ export default function AnuncianteProfile() {
             onClick={() => navigate(`/browse?anuncianteId=${anunciante.id}`)}
             className="bg-gradient-to-r from-vitrii-blue to-vitrii-blue-dark hover:shadow-lg text-white py-4 rounded-lg font-bold text-lg transition-all duration-300 transform hover:-translate-y-1"
           >
-            🛍️ O que temos no Vitrine para você
+            🛍️ O que temos na Vitrine para você
           </button>
 
           <button
