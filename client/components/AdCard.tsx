@@ -1,10 +1,9 @@
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Star, Heart, Package, Calendar, MapPin, QrCode } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { Link } from "react-router-dom";
-import { useState } from "react";
 import { QRCodeSVG } from "qrcode.react";
 import ImageZoom from "./ImageZoom";
 import QRCodeModal from "./QRCodeModal";
