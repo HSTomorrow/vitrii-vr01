@@ -1,7 +1,7 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { QRCodeSVG } from "qrcode.react";
@@ -17,12 +17,15 @@ import {
   Printer,
   Download,
   LogIn,
+  ExternalLink,
 } from "lucide-react";
 
 export default function QRCodePage() {
   const navigate = useNavigate();
   const { user, isLoggedIn } = useAuth();
   const [selectedQRCodeId, setSelectedQRCodeId] = useState<number | null>(null);
+  const [isDownloadingAnuncianteQR, setIsDownloadingAnuncianteQR] = useState(false);
+  const anuncianteQRRef = useRef<HTMLDivElement>(null);
 
   // Fetch user's anuncios
   const { data: meusAnunciosData, isLoading: anunciosLoading } = useQuery({
@@ -42,7 +45,27 @@ export default function QRCodePage() {
     enabled: !!user?.id,
   });
 
+  // Fetch user's anunciante
+  const { data: anuncianteData, isLoading: anuncianteLoading } = useQuery({
+    queryKey: ["usuario-anunciante"],
+    queryFn: async () => {
+      if (!user?.id) return null;
+
+      const response = await fetch(`/api/anunciantes?limit=1`, {
+        headers: {
+          "x-user-id": user.id.toString(),
+        },
+      });
+
+      if (!response.ok) throw new Error("Erro ao buscar anunciante");
+      return response.json();
+    },
+    enabled: !!user?.id,
+  });
+
   const meusAnuncios = meusAnunciosData?.data || [];
+  const meuAnunciante = anuncianteData?.data?.[0] || null;
+  const anunciantePageUrl = meuAnunciante ? `${window.location.origin}/anunciante/${meuAnunciante.id}` : null;
 
   const handlePrintQRCode = (anuncioId: number) => {
     const qrElement = document.getElementById(`qr-code-${anuncioId}`);
@@ -168,6 +191,48 @@ export default function QRCodePage() {
     img.src = url;
   };
 
+  const handleDownloadAnuncianteQRCode = async () => {
+    if (!anuncianteQRRef.current) return;
+
+    setIsDownloadingAnuncianteQR(true);
+    try {
+      const svg = anuncianteQRRef.current.querySelector("svg") as SVGElement;
+      if (!svg) {
+        toast.error("Erro ao gerar QR Code");
+        return;
+      }
+
+      // Convert SVG to PNG
+      const canvas = document.createElement("canvas");
+      const svgData = new XMLSerializer().serializeToString(svg);
+      const img = new Image();
+      const blob = new Blob([svgData], { type: "image/svg+xml" });
+      const url = URL.createObjectURL(blob);
+
+      img.onload = () => {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0);
+          const link = document.createElement("a");
+          link.href = canvas.toDataURL("image/png");
+          link.download = `qrcode-perfil-anunciante-${meuAnunciante?.id}.png`;
+          link.click();
+          URL.revokeObjectURL(url);
+          toast.success("QR Code baixado com sucesso!");
+        }
+      };
+
+      img.src = url;
+    } catch (error) {
+      console.error("Error downloading QR Code:", error);
+      toast.error("Erro ao baixar QR Code");
+    } finally {
+      setIsDownloadingAnuncianteQR(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
@@ -241,6 +306,99 @@ export default function QRCodePage() {
       ) : (
         <section className="py-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            {/* Meu QRCode Section */}
+            {meuAnunciante && !anuncianteLoading && (
+              <div className="mb-16">
+                <div className="mb-8">
+                  <h2 className="text-2xl font-bold text-vitrii-text mb-2">
+                    Meu QR Code
+                  </h2>
+                  <p className="text-vitrii-text-secondary">
+                    QR Code do seu perfil para compartilhar com clientes
+                  </p>
+                </div>
+
+                <div className="bg-white border-2 border-gray-200 rounded-lg p-8 shadow-sm">
+                  <div className="flex flex-col lg:flex-row gap-8 items-center">
+                    {/* QR Code Display */}
+                    <div className="flex flex-col items-center flex-shrink-0">
+                      <div
+                        ref={anuncianteQRRef}
+                        className="bg-gray-50 p-4 rounded-lg border border-gray-200 flex justify-center"
+                      >
+                        <QRCodeSVG
+                          value={anunciantePageUrl || ""}
+                          size={256}
+                          level="H"
+                          includeMargin={true}
+                          fgColor="#000000"
+                          bgColor="#ffffff"
+                        />
+                      </div>
+
+                      <div className="mt-6 text-center">
+                        <p className="text-sm text-gray-600 mb-2">
+                          <strong>Perfil:</strong> {meuAnunciante.nome}
+                        </p>
+                        <p className="text-xs text-gray-500 break-all font-mono bg-gray-50 p-2 rounded max-w-xs">
+                          {anunciantePageUrl}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Info and Actions */}
+                    <div className="flex-1">
+                      <div className="space-y-4">
+                        <div>
+                          <h3 className="text-lg font-bold text-vitrii-text mb-2">
+                            Como Usar
+                          </h3>
+                          <ul className="space-y-3 text-vitrii-text-secondary text-sm">
+                            <li className="flex gap-3">
+                              <span className="font-bold flex-shrink-0">1.</span>
+                              <span>Clique em "Baixar QR Code" para salvar a imagem</span>
+                            </li>
+                            <li className="flex gap-3">
+                              <span className="font-bold flex-shrink-0">2.</span>
+                              <span>Imprima e cole em suas vitrines ou materiais</span>
+                            </li>
+                            <li className="flex gap-3">
+                              <span className="font-bold flex-shrink-0">3.</span>
+                              <span>Clientes podem escanear para ver seu perfil completo</span>
+                            </li>
+                            <li className="flex gap-3">
+                              <span className="font-bold flex-shrink-0">4.</span>
+                              <span>Compartilhe no WhatsApp, Email e outras redes</span>
+                            </li>
+                          </ul>
+                        </div>
+
+                        <div className="pt-4 space-y-3">
+                          <button
+                            onClick={handleDownloadAnuncianteQRCode}
+                            disabled={isDownloadingAnuncianteQR}
+                            className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors disabled:opacity-50 font-semibold"
+                          >
+                            <Download className="w-5 h-5" />
+                            {isDownloadingAnuncianteQR ? "Baixando..." : "Baixar QR Code"}
+                          </button>
+
+                          <Link
+                            to={`/anunciante/${meuAnunciante.id}`}
+                            className="w-full flex items-center justify-center gap-2 px-6 py-3 border-2 border-vitrii-blue text-vitrii-blue rounded-lg hover:bg-blue-50 transition-colors font-semibold"
+                          >
+                            <ExternalLink className="w-5 h-5" />
+                            Ver Meu Perfil
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Meus Anúncios Section */}
             <div className="mb-8">
               <h2 className="text-2xl font-bold text-vitrii-text mb-2">
                 Meus Anúncios
