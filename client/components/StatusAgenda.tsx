@@ -1,5 +1,4 @@
 import { useState, useMemo } from "react";
-import { useState, useMemo } from "react";
 import { toast } from "sonner";
 import { Clock, CheckCircle, AlertCircle, Repeat2, ChevronDown, ChevronUp } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
