@@ -14,40 +14,11 @@ export default defineConfig(({ mode }) => ({
   },
   build: {
     outDir: "dist/spa",
-    chunkSizeWarningLimit: 1000,
+    chunkSizeWarningLimit: 2000,
     rollupOptions: {
       output: {
-        manualChunks: (id) => {
-          // Separate node_modules into vendor chunks
-          if (id.includes("node_modules")) {
-            // React ecosystem
-            if (id.includes("react") || id.includes("react-dom") || id.includes("react-router")) {
-              return "vendor-react";
-            }
-            // UI and styling
-            if (id.includes("radix") || id.includes("class-variance") || id.includes("clsx")) {
-              return "vendor-ui";
-            }
-            // Forms and validation
-            if (id.includes("react-hook-form") || id.includes("zod")) {
-              return "vendor-forms";
-            }
-            // Query and data
-            if (id.includes("react-query") || id.includes("@tanstack")) {
-              return "vendor-query";
-            }
-            // Charts
-            if (id.includes("recharts")) {
-              return "vendor-charts";
-            }
-            // Utilities
-            if (id.includes("date-fns") || id.includes("next-themes") || id.includes("framer-motion")) {
-              return "vendor-utils";
-            }
-            // Icons and other
-            return "vendor-other";
-          }
-        },
+        // Disable code splitting to prevent React duplication
+        inlineDynamicImports: true,
       },
     },
   },
