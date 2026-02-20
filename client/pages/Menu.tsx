@@ -151,6 +151,16 @@ export default function Menu() {
                   </Link>
 
                   <Link
+                    to="/lista-desejos"
+                    className="flex items-center gap-4 px-6 py-4 bg-vitrii-gray hover:bg-gray-200 rounded-lg transition-colors"
+                  >
+                    <Heart className="w-6 h-6 text-pink-500" />
+                    <span className="text-vitrii-text font-medium">
+                      Lista de Desejos
+                    </span>
+                  </Link>
+
+                  <Link
                     to="/minha-agenda"
                     className="flex items-center gap-4 px-6 py-4 bg-vitrii-gray hover:bg-gray-200 rounded-lg transition-colors"
                   >

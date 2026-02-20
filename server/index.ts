@@ -98,6 +98,7 @@ import {
   deleteListaDesejos,
   addItemLivre,
   addItemAnuncio,
+  updateItemListaDesejos,
   deleteItemListaDesejos,
   addPermissao,
   removePermissao,
@@ -486,6 +487,11 @@ export function createServer() {
     "/api/listas-desejos/:listaId/itens/anuncio",
     extractUserId,
     addItemAnuncio,
+  );
+  app.put(
+    "/api/listas-desejos/:listaId/itens/:itemId",
+    extractUserId,
+    updateItemListaDesejos,
   );
   app.delete(
     "/api/listas-desejos/:listaId/itens/:itemId",

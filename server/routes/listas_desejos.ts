@@ -23,6 +23,16 @@ const ItemLivreSchema = z.object({
 // Schema para copiar anúncio
 const ItemAnuncioSchema = z.object({
   anuncioId: z.number().int().positive("Anúncio é obrigatório"),
+  preco_desejado: z.number().nonnegative().optional().nullable(),
+  observacoes: z.string().optional().nullable(),
+});
+
+// Schema para atualizar item
+const UpdateItemSchema = z.object({
+  preco_desejado: z.number().nonnegative().optional().nullable(),
+  observacoes: z.string().optional().nullable(),
+  titulo: z.string().optional(),
+  descricao: z.string().optional().nullable(),
 });
 
 // GET all wishlists for logged user
@@ -381,6 +391,8 @@ export const addItemAnuncio: RequestHandler = async (req, res) => {
         titulo: anuncio.titulo,
         descricao: anuncio.descricao,
         preco: anuncio.preco,
+        preco_desejado: validatedData.preco_desejado || null,
+        observacoes: validatedData.observacoes || null,
         imagem: anuncio.imagem,
         dados_copiados: {
           anuncioId: anuncio.id,
@@ -414,6 +426,71 @@ export const addItemAnuncio: RequestHandler = async (req, res) => {
     res.status(500).json({
       success: false,
       error: "Erro ao adicionar anúncio",
+    });
+  }
+};
+
+// UPDATE item from wishlist
+export const updateItemListaDesejos: RequestHandler = async (req, res) => {
+  try {
+    const { listaId, itemId } = req.params;
+    const usuarioId = parseInt(req.headers["x-user-id"] as string);
+
+    if (!usuarioId) {
+      return res.status(401).json({
+        success: false,
+        error: "Usuário não autenticado",
+      });
+    }
+
+    // Verify list ownership
+    const lista = await prisma.listas_desejos.findUnique({
+      where: { id: parseInt(listaId) },
+    });
+
+    if (!lista || lista.usuarioId !== usuarioId) {
+      return res.status(403).json({
+        success: false,
+        error: "Acesso negado",
+      });
+    }
+
+    const item = await prisma.listas_desejos_itens.findUnique({
+      where: { id: parseInt(itemId) },
+    });
+
+    if (!item || item.listaId !== parseInt(listaId)) {
+      return res.status(404).json({
+        success: false,
+        error: "Item não encontrado",
+      });
+    }
+
+    const validatedData = UpdateItemSchema.parse(req.body);
+
+    const updatedItem = await prisma.listas_desejos_itens.update({
+      where: { id: parseInt(itemId) },
+      data: validatedData,
+    });
+
+    res.json({
+      success: true,
+      data: updatedItem,
+      message: "Item atualizado com sucesso",
+    });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        success: false,
+        error: "Dados inválidos",
+        details: error.errors,
+      });
+    }
+
+    console.error("Error updating item:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao atualizar item",
     });
   }
 };

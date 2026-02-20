@@ -8,6 +8,7 @@ import Footer from "@/components/Footer";
 import ImageGallery from "@/components/ImageGallery";
 import ShareModal from "@/components/ShareModal";
 import QRCodeModal from "@/components/QRCodeModal";
+import WishlistButton from "@/components/WishlistButton";
 import {
   ChevronLeft,
   AlertCircle,
@@ -636,6 +637,14 @@ export default function AnuncioDetalhe() {
                   <QrCode className="w-4 h-4" />
                   QR Code
                 </button>
+                <WishlistButton
+                  anuncioId={anuncio.id}
+                  anuncioTitulo={anuncio.titulo}
+                  anuncioPreco={
+                    anuncio.preco ? parseFloat(anuncio.preco.toString()) : undefined
+                  }
+                  variant="button"
+                />
                 {equipes.length > 0 && (
                   <button
                     onClick={() => {

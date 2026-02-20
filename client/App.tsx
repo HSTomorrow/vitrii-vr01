@@ -20,6 +20,7 @@ import SignUp from "./pages/SignUp";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Favoritos from "./pages/Favoritos";
+import ListaDesejos from "./pages/ListaDesejos";
 import PerfilUsuario from "./pages/PerfilUsuario";
 import CriarAnuncio from "./pages/CriarAnuncio";
 import AnuncioDetalhe from "./pages/AnuncioDetalhe";
@@ -72,6 +73,7 @@ export default function App() {
                 <Route path="/esqueci-senha" element={<ForgotPassword />} />
                 <Route path="/reset-senha" element={<ResetPassword />} />
                 <Route path="/favoritos" element={<Favoritos />} />
+                <Route path="/lista-desejos" element={<ListaDesejos />} />
                 <Route path="/meus-anuncios" element={<MeusAnuncios />} />
                 <Route path="/minha-agenda" element={<MinhaAgenda />} />
                 <Route path="/agenda/:anuncianteId" element={<AgendaAnunciante />} />

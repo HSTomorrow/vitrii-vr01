@@ -7,6 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { QRCodeSVG } from "qrcode.react";
 import ImageZoom from "./ImageZoom";
 import QRCodeModal from "./QRCodeModal";
+import WishlistButton from "./WishlistButton";
 
 interface AdCardProps {
   anuncio: any;
@@ -103,6 +104,18 @@ export default function AdCard({
             }`}
           />
         </button>
+
+        {/* Wishlist Button */}
+        <div onClick={(e) => e.stopPropagation()}>
+          <WishlistButton
+            anuncioId={anuncio.id}
+            anuncioTitulo={anuncio.titulo}
+            anuncioPreco={
+              anuncio.preco ? parseFloat(anuncio.preco.toString()) : undefined
+            }
+            variant="icon"
+          />
+        </div>
 
         {/* QR Code Button */}
         <button
