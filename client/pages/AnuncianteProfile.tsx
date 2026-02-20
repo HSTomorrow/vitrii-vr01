@@ -1,9 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { QRCodeSVG } from "qrcode.react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import ShareButton from "@/components/ShareButton";
 import {
   MapPin,
   Mail,
@@ -16,6 +18,8 @@ import {
   User,
   AlertCircle,
   Calendar,
+  QrCode,
+  Download,
 } from "lucide-react";
 
 interface Anunciante {
@@ -41,6 +45,9 @@ export default function AnuncianteProfile() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [anunciante, setAnunciante] = useState<Anunciante | null>(null);
+  const [showQRCode, setShowQRCode] = useState(false);
+  const qrCodeRef = useRef<HTMLDivElement>(null);
+  const [isDownloadingQR, setIsDownloadingQR] = useState(false);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["anunciante", id],
@@ -83,6 +90,52 @@ export default function AnuncianteProfile() {
         return "from-yellow-400 to-yellow-600";
       default:
         return "from-vitrii-blue to-vitrii-blue-dark";
+    }
+  };
+
+  const currentPageUrl = typeof window !== "undefined"
+    ? window.location.href
+    : "";
+
+  const handleDownloadQRCode = async () => {
+    if (!qrCodeRef.current) return;
+
+    setIsDownloadingQR(true);
+    try {
+      const svg = qrCodeRef.current.querySelector("svg");
+      if (!svg) {
+        toast.error("Erro ao gerar QR Code");
+        return;
+      }
+
+      // Convert SVG to PNG
+      const canvas = document.createElement("canvas");
+      const svgData = new XMLSerializer().serializeToString(svg);
+      const img = new Image();
+      const blob = new Blob([svgData], { type: "image/svg+xml" });
+      const url = URL.createObjectURL(blob);
+
+      img.onload = () => {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext("2d");
+        if (ctx) {
+          ctx.drawImage(img, 0, 0);
+          const link = document.createElement("a");
+          link.href = canvas.toDataURL("image/png");
+          link.download = `qrcode-${anunciante?.id}.png`;
+          link.click();
+          URL.revokeObjectURL(url);
+          toast.success("QR Code baixado com sucesso!");
+        }
+      };
+
+      img.src = url;
+    } catch (error) {
+      console.error("Error downloading QR Code:", error);
+      toast.error("Erro ao baixar QR Code");
+    } finally {
+      setIsDownloadingQR(false);
     }
   };
 
@@ -223,6 +276,83 @@ export default function AnuncianteProfile() {
             <Calendar className="w-6 h-6" />
             Ver Agenda
           </button>
+        </div>
+
+        {/* Share and QR Code Section */}
+        <div className="bg-white rounded-lg border-2 border-gray-200 p-6 mb-8">
+          <h3 className="text-lg font-bold text-vitrii-text mb-4">Compartilhe este Perfil</h3>
+
+          <div className="flex flex-col sm:flex-row gap-4 items-center sm:items-start">
+            {/* Share Button */}
+            <ShareButton
+              title={`Perfil: ${anunciante.nome}`}
+              url={currentPageUrl}
+              whatsappPhone={anunciante.whatsapp}
+              whatsappMessage={`Confira o perfil do(a) ${anunciante.nome} na Vitrii:`}
+              variant="button"
+              className="flex-1 sm:flex-initial"
+            />
+
+            {/* QR Code Button */}
+            <button
+              onClick={() => setShowQRCode(!showQRCode)}
+              className={`flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-semibold transition-all transform hover:-translate-y-1 ${
+                showQRCode
+                  ? "bg-vitrii-blue text-white"
+                  : "border-2 border-vitrii-blue text-vitrii-blue hover:bg-blue-50"
+              }`}
+            >
+              <QrCode className="w-5 h-5" />
+              {showQRCode ? "Ocultar QR Code" : "Mostrar QR Code"}
+            </button>
+          </div>
+
+          {/* QR Code Display */}
+          {showQRCode && (
+            <div className="mt-6 pt-6 border-t-2 border-gray-200">
+              <div className="flex flex-col items-center gap-4">
+                <div
+                  ref={qrCodeRef}
+                  className="bg-white p-4 rounded-lg border-2 border-gray-200"
+                >
+                  <QRCodeSVG
+                    value={currentPageUrl}
+                    size={256}
+                    level="H"
+                    includeMargin={true}
+                    fgColor="#000000"
+                    bgColor="#ffffff"
+                  />
+                </div>
+
+                <div className="text-center">
+                  <p className="text-sm text-gray-600 mb-2">
+                    <strong>Perfil:</strong> {anunciante.nome}
+                  </p>
+                  <p className="text-xs text-gray-500 break-all font-mono bg-gray-50 p-2 rounded max-w-xs">
+                    {currentPageUrl}
+                  </p>
+                </div>
+
+                {/* Download QR Code Button */}
+                <button
+                  onClick={handleDownloadQRCode}
+                  disabled={isDownloadingQR}
+                  className="flex items-center justify-center gap-2 px-6 py-3 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors disabled:opacity-50 font-semibold"
+                >
+                  <Download className="w-4 h-4" />
+                  {isDownloadingQR ? "Baixando..." : "Baixar QR Code"}
+                </button>
+
+                {/* Info */}
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center w-full">
+                  <p className="text-xs text-blue-800">
+                    💡 <strong>Dica:</strong> Use este QR Code em vitrines ou materiais de marketing. Clientes podem escanear para acessar o perfil completo.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Contact Information */}
