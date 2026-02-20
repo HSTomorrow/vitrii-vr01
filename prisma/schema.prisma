@@ -353,10 +353,13 @@ model listas_desejos_itens {
   titulo                String                 @db.VarChar(255)
   descricao             String?
   preco                 Decimal?               @db.Decimal(10, 2)
+  preco_desejado        Decimal?               @db.Decimal(10, 2)
+  observacoes           String?
   imagem                String?                @db.VarChar(500)
   anuncioId             Int?
   dados_copiados        Json?
   dataCriacao           DateTime               @default(now())
+  dataAtualizacao       DateTime               @updatedAt
 
   lista                 listas_desejos         @relation(fields: [listaId], references: [id], onDelete: Cascade)
   anuncio               anuncios?              @relation(fields: [anuncioId], references: [id], onDelete: SetNull)
