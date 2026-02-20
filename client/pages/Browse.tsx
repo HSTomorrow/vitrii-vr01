@@ -1,7 +1,8 @@
 import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Star, Package, MapPin, X, ChevronDown, Search, ArrowLeft } from "lucide-react";
+import { Star, Package, MapPin, X, ChevronDown, Search, ArrowLeft, Calendar } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Pagination from "@/components/Pagination";
@@ -98,6 +99,20 @@ export default function Browse() {
     enabled: !!anuncianteIdParam,
   });
 
+  // Fetch localidade do anunciante if available
+  const { data: localidadeDoAnuncianteData } = useQuery({
+    queryKey: ["localidade-anunciante", anuncianteData?.data?.localidadeId],
+    queryFn: async () => {
+      if (!anuncianteData?.data?.localidadeId) return null;
+      const response = await fetch(
+        `/api/localidades/${anuncianteData.data.localidadeId}`
+      );
+      if (!response.ok) throw new Error("Erro ao buscar localidade");
+      return response.json();
+    },
+    enabled: !!anuncianteData?.data?.localidadeId,
+  });
+
   // Fetch anunciantes for selected localidade
   const { data: localidadeAnunciantesData } = useQuery({
     queryKey: ["localidade-anunciantes", selectedLocalidade],
@@ -177,8 +192,8 @@ export default function Browse() {
         if (priceRange.max && price > parseFloat(priceRange.max)) return false;
       }
 
-      // Filter by localidade if selected
-      if (selectedLocalidade) {
+      // Filter by localidade if selected (ignore if viewing specific anunciante)
+      if (selectedLocalidade && !anuncianteIdParam) {
         const anunciantesFromLocalidade = (
           localidadeAnunciantesData?.data || []
         ).map((a: any) => a.id);
@@ -408,13 +423,15 @@ export default function Browse() {
                     </div>
                   )}
 
-                  {/* Localidade Filter */}
-                  <LocalidadeFilter
-                    value={selectedLocalidade}
-                    onChange={setSelectedLocalidade}
-                    showLabel={true}
-                    placeholder="Todas as localidades"
-                  />
+                  {/* Localidade Filter - Hide when viewing specific anunciante */}
+                  {!anuncianteIdParam && (
+                    <LocalidadeFilter
+                      value={selectedLocalidade}
+                      onChange={setSelectedLocalidade}
+                      showLabel={true}
+                      placeholder="Todas as localidades"
+                    />
+                  )}
 
                   {/* Price Range Filter */}
                   <div>
@@ -494,7 +511,7 @@ export default function Browse() {
                             )}
                           </div>
 
-                          <div className="p-4">
+                          <div className="p-4 flex flex-col h-full">
                             <h3 className="font-semibold text-vitrii-text mb-2 line-clamp-2">
                               {anuncio.titulo}
                             </h3>
@@ -506,6 +523,16 @@ export default function Browse() {
                                 <span className="truncate">
                                   {anuncio.endereco ||
                                     anuncio.anunciantes?.endereco}
+                                </span>
+                              </div>
+                            )}
+
+                            {anuncianteIdParam && localidadeDoAnuncianteData?.data && (
+                              <div className="flex items-center gap-1 mb-3 text-xs text-vitrii-text-secondary">
+                                <MapPin className="w-3 h-3 flex-shrink-0" />
+                                <span className="truncate">
+                                  {localidadeDoAnuncianteData.data.descricao ||
+                                    `${localidadeDoAnuncianteData.data.municipio}, ${localidadeDoAnuncianteData.data.estado}`}
                                 </span>
                               </div>
                             )}
@@ -528,15 +555,48 @@ export default function Browse() {
                               </div>
                             </div>
 
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                navigate(`/anuncio/${anuncio.id}`);
-                              }}
-                              className="w-full bg-vitrii-blue text-white py-2 rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors"
-                            >
-                              Ver Detalhes
-                            </button>
+                            <div className="space-y-2 mt-auto">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  navigate(`/anuncio/${anuncio.id}`);
+                                }}
+                                className="w-full bg-vitrii-blue text-white py-2 rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors"
+                              >
+                                Ver Detalhes
+                              </button>
+
+                              {anuncianteIdParam && (
+                                <>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      navigate(
+                                        `/browse?anuncianteId=${anuncio.anuncianteId}`
+                                      );
+                                    }}
+                                    className="w-full bg-gradient-to-r from-vitrii-blue to-vitrii-blue-dark text-white py-2 rounded-lg font-semibold hover:shadow-lg transition-all text-sm"
+                                  >
+                                    🛍️ O que temos na Vitrine para você
+                                  </button>
+
+                                  {anuncio.anunciantes?.temAgenda && (
+                                    <button
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        navigate(
+                                          `/agenda/${anuncio.anuncianteId}`
+                                        );
+                                      }}
+                                      className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-vitrii-yellow to-vitrii-yellow-dark text-vitrii-text py-2 rounded-lg font-semibold hover:shadow-lg transition-all text-sm"
+                                    >
+                                      <Calendar className="w-4 h-4" />
+                                      Ver Agenda
+                                    </button>
+                                  )}
+                                </>
+                              )}
+                            </div>
                           </div>
                         </div>
                       ))}
