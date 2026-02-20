@@ -11,11 +11,6 @@ export default defineConfig(({ mode }) => ({
       allow: [".", "./client", "./shared"],
       deny: [".env", ".env.*", "*.{crt,pem}", "**/.git/**"],
     },
-    hmr: {
-      protocol: "ws",
-      host: "localhost",
-      port: 8080,
-    },
   },
   build: {
     outDir: "dist/spa",
@@ -62,9 +57,5 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./client"),
       "@shared": path.resolve(__dirname, "./shared"),
     },
-  },
-  optimizeDeps: {
-    include: ["react", "react-dom", "react-router-dom", "@tanstack/react-query"],
-    exclude: ["qrcode.react"],
   },
 }));
