@@ -172,7 +172,7 @@ export default function SignIn() {
               </AlertDialogTitle>
             </div>
           </AlertDialogHeader>
-          <AlertDialogDescription className="text-base">
+          <div className="text-base">
             <p className="text-gray-700 font-semibold mb-3">
               Desculpe, não conseguimos entrar na sua conta.
             </p>
@@ -184,7 +184,7 @@ export default function SignIn() {
               <li>✓ Verifique se a senha está correta (maiúsculas importam)</li>
               <li>✓ Se esqueceu a senha, clique em "Esqueci minha senha"</li>
             </ul>
-          </AlertDialogDescription>
+          </div>
           <AlertDialogAction className="bg-red-600 hover:bg-red-700 text-white mt-6">
             Tentar Novamente
           </AlertDialogAction>
