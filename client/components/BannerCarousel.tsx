@@ -9,6 +9,7 @@ interface Banner {
   link?: string;
   ordem: number;
   ativo: boolean;
+  corFonte?: string; // "branco", "preto", "amarelo"
 }
 
 interface BannerCarouselProps {
@@ -56,7 +57,21 @@ export default function BannerCarousel({
     setCurrentIndex(index);
   };
 
-  const BannerContent = () => (
+  const getTextColor = (corFonte?: string) => {
+    switch (corFonte) {
+      case "branco":
+        return "text-white";
+      case "preto":
+        return "text-black";
+      case "amarelo":
+      default:
+        return "text-vitrii-yellow";
+    }
+  };
+
+  const BannerContent = () => {
+    const textColor = getTextColor(currentBanner.corFonte);
+    return (
     <div className="w-full h-full relative overflow-hidden rounded-lg">
       {/* Background Image */}
       <img
@@ -69,11 +84,11 @@ export default function BannerCarousel({
       <div className="absolute inset-0 bg-black/30 flex flex-col items-center justify-center p-2">
         {/* Content */}
         <div className="text-center text-white max-w-3xl px-2 sm:px-4">
-          <h2 className="text-base sm:text-xl md:text-2xl lg:text-3xl font-bold mb-0.5 sm:mb-1.5 line-clamp-2 text-vitrii-yellow">
+          <h2 className={`text-base sm:text-xl md:text-2xl lg:text-3xl font-bold mb-0.5 sm:mb-1.5 line-clamp-2 ${textColor}`}>
             {currentBanner.titulo}
           </h2>
           {currentBanner.descricao && (
-            <p className="text-xs sm:text-sm md:text-base text-vitrii-yellow mb-2 sm:mb-4 line-clamp-2">
+            <p className={`text-xs sm:text-sm md:text-base ${textColor} mb-2 sm:mb-4 line-clamp-2`}>
               {currentBanner.descricao}
             </p>
           )}
@@ -99,6 +114,7 @@ export default function BannerCarousel({
       </div>
     </div>
   );
+  };
 
   return (
     <div className="w-full">

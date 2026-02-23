@@ -304,6 +304,7 @@ model banners {
   link            String?   @db.VarChar(500)
   ordem           Int       @default(0)
   ativo           Boolean   @default(true)
+  corFonte        String    @default("amarelo") @db.VarChar(20) // "branco", "preto", "amarelo"
   dataCriacao     DateTime  @default(now())
   dataAtualizacao DateTime  @updatedAt
 

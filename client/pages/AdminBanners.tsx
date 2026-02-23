@@ -26,6 +26,7 @@ interface Banner {
   link?: string;
   ordem: number;
   ativo: boolean;
+  corFonte?: string;
   dataCriacao: string;
 }
 
@@ -42,6 +43,7 @@ export default function AdminBanners() {
     imagemUrl: "",
     link: "",
     ativo: true,
+    corFonte: "amarelo",
   });
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
@@ -399,6 +401,7 @@ export default function AdminBanners() {
       imagemUrl: "",
       link: "",
       ativo: true,
+      corFonte: "amarelo",
     });
     setUploadedFile(null);
     setPreviewUrl("");
@@ -407,13 +410,14 @@ export default function AdminBanners() {
     }
   };
 
-  const handleEdit = (banner: Banner) => {
+  const handleEdit = (banner: Banner & { corFonte?: string }) => {
     setFormData({
       titulo: banner.titulo,
       descricao: banner.descricao || "",
       imagemUrl: banner.imagemUrl,
       link: banner.link || "",
       ativo: banner.ativo,
+      corFonte: banner.corFonte || "amarelo",
     });
     setEditingId(banner.id);
     setIsCreating(false);
@@ -638,6 +642,26 @@ export default function AdminBanners() {
                   />
                   <p className="text-xs text-vitrii-text-secondary mt-1">
                     Campo obrigatório. O link será aberto em uma nova aba ao clicar em "Saiba Mais"
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                    Cor da Fonte
+                  </label>
+                  <select
+                    value={formData.corFonte}
+                    onChange={(e) =>
+                      setFormData({ ...formData, corFonte: e.target.value })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+                  >
+                    <option value="amarelo">Amarelo (padrão)</option>
+                    <option value="branco">Branco</option>
+                    <option value="preto">Preto</option>
+                  </select>
+                  <p className="text-xs text-vitrii-text-secondary mt-1">
+                    Cor do texto do título e descrição do banner
                   </p>
                 </div>
 
