@@ -48,22 +48,8 @@ export default function ShareModal({
   };
 
   const handleShareWhatsApp = () => {
-    if (!whatsappPhone) {
-      toast.error("❌ Número de WhatsApp não disponível", {
-        description: "Este anunciante não forneceu um número de WhatsApp",
-      });
-      return;
-    }
-
-    // Remove non-numeric characters from phone and add country code if needed
-    const phoneNumber = whatsappPhone.replace(/\D/g, "");
-    const finalPhone = phoneNumber.startsWith("55")
-      ? phoneNumber
-      : `55${phoneNumber}`;
-
-    const message = encodeURIComponent(`${whatsappMessage}\n${url}`);
-    const whatsappLink = `https://wa.me/${finalPhone}?text=${message}`;
-    window.open(whatsappLink, "_blank");
+    // Open WhatsApp main page
+    window.open("https://wa.me", "_blank");
   };
 
   return (
@@ -120,27 +106,14 @@ export default function ShareModal({
           {/* WhatsApp Button */}
           <button
             onClick={handleShareWhatsApp}
-            disabled={!whatsappPhone}
-            className={`flex items-center justify-center gap-3 px-4 py-3 rounded-lg font-semibold transition-colors group ${
-              whatsappPhone
-                ? "bg-green-50 border-2 border-green-300 text-green-700 hover:bg-green-100"
-                : "bg-gray-50 border-2 border-gray-300 text-gray-400 cursor-not-allowed"
-            }`}
+            className="flex items-center justify-center gap-3 px-4 py-3 rounded-lg font-semibold transition-colors group bg-green-50 border-2 border-green-300 text-green-700 hover:bg-green-100"
           >
-            <div className={`p-2 rounded-lg transition-colors ${
-              whatsappPhone
-                ? "bg-green-100 group-hover:bg-green-200"
-                : "bg-gray-100"
-            }`}>
+            <div className="p-2 bg-green-100 group-hover:bg-green-200 rounded-lg transition-colors">
               <MessageCircle className="w-5 h-5" />
             </div>
             <div className="text-left">
-              <p className="font-semibold text-sm">
-                {whatsappPhone ? "Enviar WhatsApp" : "WhatsApp Indisponível"}
-              </p>
-              <p className="text-xs opacity-75">
-                {whatsappPhone ? "Abrir WhatsApp Web" : "Sem número cadastrado"}
-              </p>
+              <p className="font-semibold text-sm">Abrir WhatsApp</p>
+              <p className="text-xs opacity-75">WhatsApp Web</p>
             </div>
           </button>
 

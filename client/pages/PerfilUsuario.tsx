@@ -23,6 +23,13 @@ export default function PerfilUsuario() {
   const queryClient = useQueryClient();
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
 
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!user) {
+      navigate("/auth/signin", { replace: true });
+    }
+  }, [user, navigate]);
+
   // Initialize form with cached user data first
   const [formData, setFormData] = useState({
     telefone: user?.telefone || "",
