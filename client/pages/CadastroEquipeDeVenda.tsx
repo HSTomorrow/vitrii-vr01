@@ -797,6 +797,9 @@ export default function CadastroEquipeDeVenda() {
                           <table className="w-full text-sm">
                             <thead className="bg-gray-100 border-b border-gray-200">
                               <tr>
+                                <th className="px-4 py-2 text-left font-semibold text-vitrii-text text-xs">
+                                  ID
+                                </th>
                                 <th className="px-4 py-2 text-left font-semibold text-vitrii-text">
                                   Nome
                                 </th>
@@ -818,6 +821,13 @@ export default function CadastroEquipeDeVenda() {
                               {/* Adding/Editing Form Row */}
                               {(isAddingMember || editingMemberId !== null) && (
                                 <tr className="bg-blue-50 border-b border-gray-200">
+                                  <td className="px-4 py-3">
+                                    {editingMemberId && (
+                                      <span className="text-xs font-mono text-gray-600 bg-gray-200 px-2 py-1 rounded">
+                                        {editingMemberId}
+                                      </span>
+                                    )}
+                                  </td>
                                   <td className="px-4 py-3">
                                     <input
                                       type="text"
@@ -942,6 +952,9 @@ export default function CadastroEquipeDeVenda() {
                                   key={membro.id}
                                   className="border-b border-gray-200 hover:bg-gray-50"
                                 >
+                                  <td className="px-4 py-3 text-xs font-mono text-gray-600 bg-gray-50">
+                                    {membro.id}
+                                  </td>
                                   <td className="px-4 py-3 text-vitrii-text">
                                     {membro.nomeMembro}
                                   </td>
@@ -1027,6 +1040,11 @@ export default function CadastroEquipeDeVenda() {
                               <>
                                 {(isAddingMember || editingMemberId !== null) && (
                                   <div className="bg-blue-50 rounded-lg p-3 space-y-2 border border-blue-200">
+                                    {editingMemberId && (
+                                      <div className="text-xs text-gray-600 font-mono bg-gray-200 px-2 py-1 rounded">
+                                        ID: {editingMemberId}
+                                      </div>
+                                    )}
                                     <div>
                                       <input
                                         type="text"
@@ -1138,8 +1156,11 @@ export default function CadastroEquipeDeVenda() {
                                         <h4 className="font-semibold text-vitrii-text text-sm truncate">
                                           {membro.nomeMembro}
                                         </h4>
+                                        <p className="text-xs text-gray-400 font-mono mt-1 bg-gray-100 px-2 py-1 rounded inline-block">
+                                          ID: {membro.id}
+                                        </p>
                                         <span
-                                          className={`inline-block mt-1 px-2 py-1 rounded text-xs font-semibold ${
+                                          className={`inline-block mt-1 ml-2 px-2 py-1 rounded text-xs font-semibold ${
                                             membro.status === "disponivel"
                                               ? "bg-green-100 text-green-800"
                                               : membro.status === "nao_disponivel"
