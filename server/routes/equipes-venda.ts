@@ -745,7 +745,7 @@ export const getMembrosDisponiveis: RequestHandler = async (req, res) => {
       },
       select: {
         id: true,
-        nome: true,
+        nomeMembro: true,
         email: true,
         whatsapp: true,
         status: true,
@@ -753,15 +753,24 @@ export const getMembrosDisponiveis: RequestHandler = async (req, res) => {
       orderBy: { dataCriacao: "asc" },
     });
 
+    // Transform nomeMembro to nome for frontend compatibility
+    const transformedMembros = membros.map((membro: any) => ({
+      id: membro.id,
+      nome: membro.nomeMembro,
+      email: membro.email,
+      whatsapp: membro.whatsapp,
+      status: membro.status,
+    }));
+
     res.json({
       success: true,
-      data: membros,
+      data: transformedMembros,
       equipe: {
         id: equipe.id,
         nome: equipe.nome,
         anunciante: equipe.anunciante,
       },
-      count: membros.length,
+      count: transformedMembros.length,
     });
   } catch (error) {
     console.error("Error fetching available members:", error);

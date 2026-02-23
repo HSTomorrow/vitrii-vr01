@@ -43,8 +43,6 @@ interface MembroEquipe {
   nome: string;
   email: string;
   whatsapp?: string;
-  telefone?: string;
-  phone?: string;
   status: string;
 }
 
@@ -818,17 +816,17 @@ export default function AnuncioDetalhe() {
                               </a>
                             </div>
 
-                            {/* WhatsApp - Multiple possible field names */}
-                            {(membro.whatsapp || membro.telefone || membro.phone) && (
+                            {/* WhatsApp */}
+                            {membro.whatsapp && (
                               <div className="flex items-center gap-2">
                                 <a
-                                  href={`https://wa.me/${(membro.whatsapp || membro.telefone || membro.phone).replace(/\D/g, "")}`}
+                                  href={`https://wa.me/${membro.whatsapp.replace(/\D/g, "")}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="flex items-center gap-2 text-green-600 hover:text-green-700 font-semibold w-full hover:bg-green-50 px-2 py-1 rounded transition-colors"
                                 >
                                   <MessageCircle className="w-4 h-4 flex-shrink-0" />
-                                  <span>{membro.whatsapp || membro.telefone || membro.phone}</span>
+                                  <span>{membro.whatsapp}</span>
                                 </a>
                               </div>
                             )}
