@@ -290,7 +290,7 @@ export default function Sell() {
                 R$ 19,90
               </div>
               <p className="text-vitrii-text-secondary text-sm mb-6">
-                3 meses de ativação por anúncio
+                Validade de 30 dias por anúncio
               </p>
 
               <ul className="space-y-3 mb-8">

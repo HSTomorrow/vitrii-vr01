@@ -322,7 +322,7 @@ export default function Checkout() {
                         Preço do anúncio:
                       </span>
                       <span className="font-semibold text-vitrii-text">
-                        R$ 19,90 (3 meses)
+                        R$ 19,90 (30 dias)
                       </span>
                     </div>
                     {anuncio.destaque && (
@@ -340,7 +340,7 @@ export default function Checkout() {
                         Total:
                       </span>
                       <span className="text-2xl font-bold text-vitrii-blue">
-                        R$ 19,90 (3 meses)
+                        R$ 19,90 (30 dias)
                       </span>
                     </div>
                   </div>

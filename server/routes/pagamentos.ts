@@ -505,9 +505,9 @@ export const confirmarPagamento: RequestHandler = async (req, res) => {
       });
     }
 
-    // Calculate expiration date: today + 3 months
+    // Calculate expiration date: today + 30 days
     const hoje = new Date();
-    const dataValidade = new Date(hoje.getFullYear(), hoje.getMonth() + 3, hoje.getDate());
+    const dataValidade = new Date(hoje.getTime() + 30 * 24 * 60 * 60 * 1000);
 
     // Update payment status
     const pagamentoAtualizado = await prisma.pagamento.update({

@@ -466,7 +466,7 @@ export default function MeusAnuncios() {
                 <ol className="text-xs text-blue-800 space-y-1 list-decimal list-inside">
                   <li>Abra seu app bancário</li>
                   <li>Escaneie o QR Code abaixo OU copie a chave PIX</li>
-                  <li>Confirme o pagamento de R$ 19,90 (3 meses de anúncio)</li>
+                  <li>Confirme o pagamento de R$ 19,90 (validade de 30 dias)</li>
                   <li>Clique em "Pagamento Realizado" para validar</li>
                 </ol>
               </div>
