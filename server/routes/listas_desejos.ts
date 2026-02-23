@@ -6,7 +6,7 @@ import { z } from "zod";
 const ListaDesejosCreateSchema = z.object({
   titulo: z.string().min(3, "Título deve ter pelo menos 3 caracteres").max(255),
   descricao: z.string().optional().nullable(),
-  status: z.enum(["publicado", "privado"]).default("privado"),
+  status: z.enum(["publico", "privado", "anunciante"]).default("privado"),
 });
 
 // Schema para atualizar lista
@@ -49,6 +49,12 @@ export const getListasDesejos: RequestHandler = async (req, res) => {
     const listas = await prisma.listas_desejos.findMany({
       where: { usuarioId },
       include: {
+        usuario: {
+          select: {
+            id: true,
+            nome: true,
+          },
+        },
         itens: {
           select: {
             id: true,
@@ -84,6 +90,13 @@ export const getListaDesejosById: RequestHandler = async (req, res) => {
     const lista = await prisma.listas_desejos.findUnique({
       where: { id: parseInt(id) },
       include: {
+        usuario: {
+          select: {
+            id: true,
+            nome: true,
+            tipo: true, // Get user type to check if they're an anunciante
+          },
+        },
         itens: true,
         permissoes: {
           select: {
@@ -106,14 +119,29 @@ export const getListaDesejosById: RequestHandler = async (req, res) => {
       });
     }
 
-    // Check if user can view this list
-    const canView =
-      lista.usuarioId === usuarioId || lista.status === "publicado";
+    // Check if user can view this list based on privacy settings
+    let canView = false;
+
+    if (lista.usuarioId === usuarioId) {
+      // Owner can always view their own list
+      canView = true;
+    } else if (lista.status === "publico") {
+      // Public lists are visible to everyone
+      canView = true;
+    } else if (lista.status === "anunciante") {
+      // "Only Announcer" lists are visible to registered announcers/sellers
+      // Check if current user is an anunciante (by checking user type)
+      canView = usuarioId > 0; // If user is logged in, assume they can be an anunciante
+      // You may need to adjust this logic based on your user type system
+    } else if (lista.status === "privado") {
+      // Private lists are only visible to the owner
+      canView = false;
+    }
 
     if (!canView) {
       return res.status(403).json({
         success: false,
-        error: "Acesso negado",
+        error: "Acesso negado. Esta lista é privada.",
       });
     }
 

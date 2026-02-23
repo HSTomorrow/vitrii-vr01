@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -14,6 +14,9 @@ import {
   X,
   Loader,
   AlertCircle,
+  Lock,
+  Globe,
+  User as UserIcon,
 } from "lucide-react";
 
 interface WishlistItem {
@@ -36,17 +39,25 @@ interface Wishlist {
   status: string;
   dataCriacao: string;
   itens: WishlistItem[];
+  usuarioId?: number;
+  usuario?: {
+    id: number;
+    nome: string;
+  };
 }
 
 export default function ListaDesejosPage() {
   const navigate = useNavigate();
   const { user, isLoggedIn } = useAuth();
+  const queryClient = useQueryClient();
   const [selectedListaId, setSelectedListaId] = useState<number | null>(null);
   const [editingItemId, setEditingItemId] = useState<number | null>(null);
+  const [editingPrivacy, setEditingPrivacy] = useState<number | null>(null);
   const [editValues, setEditValues] = useState<{
     preco_desejado?: number;
     observacoes?: string;
   }>({});
+  const [privacyValue, setPrivacyValue] = useState<string>("");
 
   // Fetch user's wishlists
   const { data: listasData, isLoading: listasLoading } = useQuery({
@@ -90,7 +101,8 @@ export default function ListaDesejosPage() {
       if (!response.ok) throw new Error("Erro ao deletar");
 
       toast.success("Item removido com sucesso!");
-      // Refetch would happen automatically with useQuery
+      // Refetch wishlists to reflect the changes
+      queryClient.invalidateQueries({ queryKey: ["user-wishlists"] });
     } catch (error) {
       toast.error("Erro ao remover item");
     }
@@ -115,8 +127,34 @@ export default function ListaDesejosPage() {
       toast.success("Item atualizado com sucesso!");
       setEditingItemId(null);
       setEditValues({});
+
+      // Refetch wishlists to reflect the changes
+      queryClient.invalidateQueries({ queryKey: ["user-wishlists"] });
     } catch (error) {
       toast.error("Erro ao atualizar item");
+    }
+  };
+
+  const handleSavePrivacy = async (listaId: number) => {
+    try {
+      const response = await fetch(`/api/listas-desejos/${listaId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": user?.id?.toString() || "",
+        },
+        body: JSON.stringify({ status: privacyValue }),
+      });
+
+      if (!response.ok) throw new Error("Erro ao atualizar privacidade");
+
+      toast.success("Privacidade atualizada com sucesso!");
+      setEditingPrivacy(null);
+
+      // Refetch wishlists to reflect the changes
+      queryClient.invalidateQueries({ queryKey: ["user-wishlists"] });
+    } catch (error) {
+      toast.error("Erro ao atualizar privacidade");
     }
   };
 
@@ -230,14 +268,73 @@ export default function ListaDesejosPage() {
             <div className="lg:col-span-3">
               {selectedLista ? (
                 <div>
-                  <div className="mb-6">
-                    <h2 className="text-2xl font-bold text-vitrii-text mb-2">
-                      {selectedLista.titulo}
-                    </h2>
-                    <p className="text-vitrii-text-secondary">
-                      {selectedLista.itens.length} item
-                      {selectedLista.itens.length !== 1 ? "ns" : ""}
-                    </p>
+                  <div className="mb-6 bg-white rounded-lg border border-gray-200 p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div>
+                        <h2 className="text-2xl font-bold text-vitrii-text mb-2">
+                          {selectedLista.titulo}
+                        </h2>
+                        <p className="text-vitrii-text-secondary">
+                          {selectedLista.itens.length} item
+                          {selectedLista.itens.length !== 1 ? "ns" : ""}
+                        </p>
+                        {selectedLista.usuario && (
+                          <button
+                            onClick={() => navigate(`/perfil/${selectedLista.usuario?.id}`)}
+                            className="text-sm text-vitrii-blue hover:text-vitrii-blue-dark flex items-center gap-1 mt-2 transition-colors font-semibold"
+                          >
+                            <UserIcon className="w-4 h-4" />
+                            Por {selectedLista.usuario.nome}
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Privacy Control */}
+                      {selectedLista.usuarioId === user?.id && (
+                        <div>
+                          {editingPrivacy === selectedLista.id ? (
+                            <div className="flex gap-2">
+                              <select
+                                value={privacyValue || selectedLista.status}
+                                onChange={(e) => setPrivacyValue(e.target.value)}
+                                className="px-3 py-1 border border-gray-300 rounded text-sm"
+                              >
+                                <option value="privado">🔒 Apenas Eu</option>
+                                <option value="publico">🌐 Pública</option>
+                                <option value="anunciante">👤 Apenas Anunciante</option>
+                              </select>
+                              <button
+                                onClick={() => handleSavePrivacy(selectedLista.id)}
+                                className="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700"
+                              >
+                                Salvar
+                              </button>
+                              <button
+                                onClick={() => setEditingPrivacy(null)}
+                                className="px-3 py-1 bg-gray-400 text-white rounded text-sm hover:bg-gray-500"
+                              >
+                                Cancelar
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => {
+                                setEditingPrivacy(selectedLista.id);
+                                setPrivacyValue(selectedLista.status);
+                              }}
+                              className="flex items-center gap-2 px-3 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors text-sm"
+                            >
+                              {selectedLista.status === "privado" && <Lock className="w-4 h-4" />}
+                              {selectedLista.status === "publico" && <Globe className="w-4 h-4" />}
+                              {selectedLista.status === "anunciante" && <UserIcon className="w-4 h-4" />}
+                              {selectedLista.status === "privado" && "Apenas Eu"}
+                              {selectedLista.status === "publico" && "Pública"}
+                              {selectedLista.status === "anunciante" && "Apenas Anunciante"}
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   {selectedLista.itens.length === 0 ? (
