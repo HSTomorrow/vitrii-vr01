@@ -569,90 +569,7 @@ export default function AnuncioDetalhe() {
 
               {/* Contact Actions */}
               <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6 space-y-3">
-                {temMembrosDisponiveis && (
-                  <button
-                    onClick={() => {
-                      if (equipes.length === 1) {
-                        setSelectedEquipeId(equipes[0].id);
-                        setShowMembrosModal(true);
-                      } else {
-                        setShowMembrosModal(true);
-                      }
-                    }}
-                    className="w-full px-4 py-3 bg-vitrii-yellow text-vitrii-text rounded-lg font-semibold hover:bg-vitrii-yellow-dark transition-colors"
-                  >
-                    Chamar Vendedor
-                  </button>
-                )}
-                <button
-                  onClick={() => {
-                    if (!user) {
-                      toast.error("Faça login para enviar mensagens");
-                      navigate("/auth/signin");
-                      return;
-                    }
-                    navigate(
-                      `/chat?anuncianteId=${anuncio.anuncianteId}&anuncioId=${anuncio.id}`,
-                    );
-                  }}
-                  className="w-full px-4 py-3 border-2 border-vitrii-blue text-vitrii-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
-                >
-                  <MessageSquare className="w-4 h-4" />
-                  Enviar Mensagem
-                </button>
-                {anuncio.anunciantes?.whatsapp && (
-                  <a
-                    href={`https://wa.me/${anuncio.anunciantes.whatsapp.replace(/\D/g, "")}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full px-4 py-3 bg-green-500 text-white rounded-lg font-semibold hover:bg-green-600 transition-colors flex items-center justify-center gap-2"
-                  >
-                    <MessageCircle className="w-4 h-4" />
-                    WhatsApp
-                  </a>
-                )}
-                {anuncio.link && (
-                  <a
-                    href={anuncio.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full px-4 py-3 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors flex items-center justify-center gap-2"
-                  >
-                    <Globe className="w-4 h-4" />
-                    Acessar Anúncio Externo
-                  </a>
-                )}
-                {canEdit && anuncio.status === "em_edicao" && anuncio.statusPagamento === "pendente" && (
-                  <button
-                    onClick={() => setShowPaymentModal(true)}
-                    className="w-full px-4 py-3 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 transition-colors flex items-center justify-center gap-2"
-                  >
-                    <DollarSign className="w-4 h-4" />
-                    Efetuar Pagamento
-                  </button>
-                )}
-                <button
-                  onClick={() => setShowShareModal(true)}
-                  className="w-full px-4 py-3 border-2 border-gray-300 text-vitrii-text rounded-lg font-semibold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
-                >
-                  <Share2 className="w-4 h-4" />
-                  Compartilhar
-                </button>
-                <button
-                  onClick={() => setShowQRCodeModal(true)}
-                  className="w-full px-4 py-3 border-2 border-vitrii-blue text-vitrii-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors flex items-center justify-center gap-2"
-                >
-                  <QrCode className="w-4 h-4" />
-                  QR Code
-                </button>
-                <WishlistButton
-                  anuncioId={anuncio.id}
-                  anuncioTitulo={anuncio.titulo}
-                  anuncioPreco={
-                    anuncio.preco ? parseFloat(anuncio.preco.toString()) : undefined
-                  }
-                  variant="button"
-                />
+                {/* Primary Action - Contact Seller Team */}
                 {equipes.length > 0 && (
                   <button
                     onClick={() => {
@@ -663,19 +580,100 @@ export default function AnuncioDetalhe() {
                         setShowMembrosModal(true);
                       }
                     }}
-                    className="w-full px-4 py-3 bg-orange-600 text-white rounded-lg font-semibold hover:bg-orange-700 transition-colors flex items-center justify-center gap-2"
+                    className="w-full px-4 py-3 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors flex items-center justify-center gap-2"
                   >
                     <Users className="w-4 h-4" />
-                    Solicitar Equipe
+                    Solicitar Equipe de Vendas
                   </button>
                 )}
-                <button
-                  onClick={() => navigate(`/anunciante/${anuncio.anuncianteId}`)}
-                  className="w-full px-4 py-3 bg-vitrii-text text-white rounded-lg font-semibold hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
-                >
-                  <User className="w-4 h-4" />
-                  Anunciante
-                </button>
+
+                {/* Direct Contact Methods */}
+                <div className="space-y-2 pt-2 border-t border-gray-200">
+                  <button
+                    onClick={() => {
+                      if (!user) {
+                        toast.error("Faça login para enviar mensagens");
+                        navigate("/auth/signin");
+                        return;
+                      }
+                      navigate(
+                        `/chat?anuncianteId=${anuncio.anuncianteId}&anuncioId=${anuncio.id}`,
+                      );
+                    }}
+                    className="w-full px-4 py-2 border-2 border-vitrii-blue text-vitrii-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors flex items-center justify-center gap-2 text-sm"
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                    Enviar Mensagem
+                  </button>
+                  {anuncio.anunciantes?.whatsapp && (
+                    <a
+                      href={`https://wa.me/${anuncio.anunciantes.whatsapp.replace(/\D/g, "")}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full px-4 py-2 bg-green-500 text-white rounded-lg font-semibold hover:bg-green-600 transition-colors flex items-center justify-center gap-2 text-sm"
+                    >
+                      <MessageCircle className="w-4 h-4" />
+                      WhatsApp
+                    </a>
+                  )}
+                </div>
+
+                {/* Share & More Options */}
+                <div className="space-y-2 pt-2 border-t border-gray-200">
+                  <button
+                    onClick={() => setShowShareModal(true)}
+                    className="w-full px-4 py-2 border-2 border-gray-300 text-vitrii-text rounded-lg font-semibold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 text-sm"
+                  >
+                    <Share2 className="w-4 h-4" />
+                    Compartilhar
+                  </button>
+                  <button
+                    onClick={() => setShowQRCodeModal(true)}
+                    className="w-full px-4 py-2 border-2 border-vitrii-blue text-vitrii-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors flex items-center justify-center gap-2 text-sm"
+                  >
+                    <QrCode className="w-4 h-4" />
+                    QR Code
+                  </button>
+                  <WishlistButton
+                    anuncioId={anuncio.id}
+                    anuncioTitulo={anuncio.titulo}
+                    anuncioPreco={
+                      anuncio.preco ? parseFloat(anuncio.preco.toString()) : undefined
+                    }
+                    variant="button"
+                  />
+                </div>
+
+                {/* Additional Options */}
+                <div className="space-y-2 pt-2 border-t border-gray-200">
+                  {anuncio.link && (
+                    <a
+                      href={anuncio.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full px-4 py-2 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors flex items-center justify-center gap-2 text-sm"
+                    >
+                      <Globe className="w-4 h-4" />
+                      Acessar Anúncio Externo
+                    </a>
+                  )}
+                  {canEdit && anuncio.status === "em_edicao" && anuncio.statusPagamento === "pendente" && (
+                    <button
+                      onClick={() => setShowPaymentModal(true)}
+                      className="w-full px-4 py-2 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 transition-colors flex items-center justify-center gap-2 text-sm"
+                    >
+                      <DollarSign className="w-4 h-4" />
+                      Efetuar Pagamento
+                    </button>
+                  )}
+                  <button
+                    onClick={() => navigate(`/anunciante/${anuncio.anuncianteId}`)}
+                    className="w-full px-4 py-2 bg-gray-200 text-vitrii-text rounded-lg font-semibold hover:bg-gray-300 transition-colors flex items-center justify-center gap-2 text-sm"
+                  >
+                    <User className="w-4 h-4" />
+                    Ver Anunciante
+                  </button>
+                </div>
               </div>
 
               {/* Info Box */}
@@ -713,14 +711,14 @@ export default function AnuncioDetalhe() {
         </div>
       </main>
 
-      {/* Modal: Chamar Vendedor */}
+      {/* Modal: Solicitar Equipe de Vendas */}
       {showMembrosModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full max-h-96 flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <h3 className="text-xl font-bold text-vitrii-text">
-                Chamar Vendedor
+                Solicitar Equipe de Vendas
               </h3>
               <button
                 onClick={() => {
@@ -1064,7 +1062,7 @@ export default function AnuncioDetalhe() {
           )}
         </div>
 
-        {/* Wishlist & Solicitar Equipe */}
+        {/* Wishlist & Solicitar Equipe de Vendas */}
         <div className="flex gap-2">
           {/* Wishlist - Icon only for mobile */}
           <div className="flex-shrink-0">
@@ -1078,7 +1076,7 @@ export default function AnuncioDetalhe() {
             />
           </div>
 
-          {/* Solicitar Equipe - Full width if available */}
+          {/* Solicitar Equipe de Vendas - Full width if available */}
           {equipes.length > 0 && (
             <button
               onClick={() => {
@@ -1089,10 +1087,10 @@ export default function AnuncioDetalhe() {
                   setShowMembrosModal(true);
                 }
               }}
-              className="flex-1 px-4 py-3 bg-orange-600 text-white rounded-lg font-semibold hover:bg-orange-700 transition-colors flex items-center justify-center gap-2 text-sm"
+              className="flex-1 px-4 py-3 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors flex items-center justify-center gap-2 text-sm"
             >
               <Users className="w-4 h-4" />
-              Solicitar
+              Solicitar Equipe
             </button>
           )}
         </div>
