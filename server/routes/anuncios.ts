@@ -1,6 +1,15 @@
 import { RequestHandler } from "express";
 import prisma from "../lib/prisma";
 import { z } from "zod";
+import {
+  ANUNCIO_STATUS,
+  VALID_UPDATE_STATUS,
+  ACTIVE_COUNTER_STATUS,
+  PUBLIC_LIST_DEFAULT_STATUS,
+  isValidUpdateStatus,
+  isActiveCounterStatus,
+} from "../constants/anuncioStatus";
+import { parseId, parseIdOrThrow } from "../lib/parseId";
 
 // Base schema for ads (without refinement)
 const AnuncioBaseSchema = z.object({
@@ -116,7 +125,7 @@ export const getAnuncios: RequestHandler = async (req, res) => {
       pageOffset,
     });
 
-    const where: any = { status: "ativo" }; // Default: only active ads
+    const where: any = { status: PUBLIC_LIST_DEFAULT_STATUS }; // Default: only active ads
     const anuncianteWhere: any = { status: "Ativo" }; // Default: only active anunciantes
 
     if (anuncianteId) where.anuncianteId = parseInt(anuncianteId as string);
@@ -126,27 +135,6 @@ export const getAnuncios: RequestHandler = async (req, res) => {
 
     console.log("[getAnuncios] Where clause:", JSON.stringify(where));
     console.log("[getAnuncios] Attempting database query with Prisma...");
-
-    // Test simple count first
-    let countResult = 0;
-    try {
-      countResult = await prisma.anuncios.count({
-        where: {
-          ...where,
-          anunciantes: {
-            is: anuncianteWhere,
-          },
-        },
-      });
-      console.log(
-        "[getAnuncios] Count query successful, found:",
-        countResult,
-        "ads",
-      );
-    } catch (countError) {
-      console.error("[getAnuncios] Count query failed:", countError);
-      throw countError;
-    }
 
     // Get total count and paginated data in parallel
     const [anuncios, total] = await Promise.all([
@@ -240,8 +228,16 @@ export const getAnuncioById: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
+    const anuncioId = parseId(id);
+    if (anuncioId === null) {
+      return res.status(400).json({
+        success: false,
+        error: "ID do anúncio inválido",
+      });
+    }
+
     const anuncio = await prisma.anuncios.findUnique({
-      where: { id: parseInt(id) },
+      where: { id: anuncioId },
       include: {
         anunciantes: {
           select: {
@@ -254,6 +250,14 @@ export const getAnuncioById: RequestHandler = async (req, res) => {
             whatsapp: true,
             fotoUrl: true,
           },
+        },
+        fotos: {
+          select: {
+            id: true,
+            url: true,
+            ordem: true,
+          },
+          orderBy: { ordem: "asc" },
         },
       },
     });
@@ -1492,25 +1496,29 @@ export const reorderAnuncioFotos: RequestHandler = async (req, res) => {
       });
     }
 
-    // Update ordem for each photo
-    for (const { id: fotoId, ordem } of fotosOrder) {
-      const foto = await prisma.fotos_anuncio.findUnique({
-        where: { id: fotoId },
-        select: { anuncio_id: true },
-      });
+    // Verify all photos belong to this ad first
+    const fotoIds = fotosOrder.map(f => f.id);
+    const fotosExistentes = await prisma.fotos_anuncio.findMany({
+      where: { id: { in: fotoIds }, anuncio_id: anuncioId },
+      select: { id: true },
+    });
 
-      if (!foto || foto.anuncio_id !== anuncioId) {
-        return res.status(400).json({
-          success: false,
-          error: `Foto ${fotoId} não pertence a este anúncio`,
-        });
-      }
-
-      await prisma.fotos_anuncio.update({
-        where: { id: fotoId },
-        data: { ordem },
+    if (fotosExistentes.length !== fotoIds.length) {
+      return res.status(400).json({
+        success: false,
+        error: "Uma ou mais fotos não pertencem a este anúncio",
       });
     }
+
+    // Update all photos in parallel instead of sequentially (fixes N+1 query issue)
+    await Promise.all(
+      fotosOrder.map(({ id: fotoId, ordem }) =>
+        prisma.fotos_anuncio.update({
+          where: { id: fotoId },
+          data: { ordem },
+        })
+      )
+    );
 
     // Get updated photos
     const fotos = await prisma.fotos_anuncio.findMany({

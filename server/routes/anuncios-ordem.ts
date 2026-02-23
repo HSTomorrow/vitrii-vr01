@@ -91,42 +91,5 @@ export const updateAnuncioOrdem: RequestHandler = async (req, res) => {
   }
 };
 
-// GET ad by ID including ordem field
-export const getAnuncioByIdWithOrdem: RequestHandler = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const anuncio = await prisma.anuncios.findUnique({
-      where: { id: parseInt(id) },
-      include: {
-        anunciantes: true,
-        fotos: {
-          select: {
-            id: true,
-            url: true,
-            ordem: true,
-          },
-          orderBy: { ordem: "asc" },
-        },
-      },
-    });
-
-    if (!anuncio) {
-      return res.status(404).json({
-        success: false,
-        error: "Anúncio não encontrado",
-      });
-    }
-
-    res.json({
-      success: true,
-      data: anuncio,
-    });
-  } catch (error) {
-    console.error("Error fetching ad with ordem:", error);
-    res.status(500).json({
-      success: false,
-      error: "Erro ao buscar anúncio",
-    });
-  }
-};
+// NOTE: getAnuncioByIdWithOrdem has been merged into getAnuncioById in anuncios.ts
+// The fotos (with ordem) are now included by default in getAnuncioById

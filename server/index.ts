@@ -346,30 +346,15 @@ export function createServer() {
     getProdutosParaAnuncio,
   );
 
-  // Backward compatibility routes (still using /api/lojas)
-  app.get("/api/lojas", extractUserId, getAnunciantes);
-  app.get("/api/lojas/:id", getAnuncianteById);
-  app.post("/api/lojas", createAnunciante);
-  app.put("/api/lojas/:id", extractUserId, updateAnunciante);
-  app.delete("/api/lojas/:id", deleteAnunciante);
-  app.get(
-    "/api/lojas/:anuncianteId/produtos-para-anuncio",
-    getProdutosParaAnuncio,
-  );
+  // NOTE: /api/lojas routes have been consolidated with /api/anunciantes routes
+  // All /api/lojas calls should be updated to /api/anunciantes
 
   // Grupos de Productos routes
   app.get("/api/grupos-productos", extractUserId, getGrupos);
   app.get("/api/grupos-productos/:id", getGrupoById);
   app.get("/api/grupos-productos/:id/productos", getProductosOfGrupo);
-  app.get(
-    "/api/lojas/:anuncianteId/grupos-productos",
-    extractUserId,
-    (req, res) => {
-      // Delegate to getGrupos with anuncianteId query param
-      req.query.anuncianteId = req.params.anuncianteId;
-      return getGrupos(req, res);
-    },
-  );
+  // NOTE: /api/lojas/:anuncianteId/grupos-productos has been removed
+  // Use /api/grupos-productos?anuncianteId=X instead
   app.post("/api/grupos-productos", extractUserId, createGrupo);
   app.put("/api/grupos-productos/:id", updateGrupo);
   app.delete("/api/grupos-productos/:id", deleteGrupo);

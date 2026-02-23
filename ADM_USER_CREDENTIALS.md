@@ -1,34 +1,21 @@
 # 🔐 Usuário ADM - Credenciais e Acesso
 
-## Credenciais de Acesso
+## ⚠️ AVISO DE SEGURANÇA
 
-> **IMPORTANTE**: Guarde estas credenciais com segurança!
+**As credenciais foram removidas deste arquivo por motivos de segurança.**
 
-### Usuário Principal (Administrador)
+Todas as credenciais de ADM devem ser acessadas através:
+- **Gerenciador de Senhas Seguro** (1Password, LastPass, Bitwarden, etc)
+- **Variáveis de Ambiente** (para aplicações)
+- **Painel administrativo do serviço de hosting** (Fly.io, Netlify, etc)
 
-```
-Email:    vitriimarketplace@gmail.com
-Senha:    Admin@2025
-Tipo:     ADM (Administrador)
-ID:       21
-Status:   Ativo
-```
-
-### Usuário Secundário (Se necessário)
-
-```
-Email:    admin@vitrii.com
-Senha:    Admin@2025
-Tipo:     ADM (Administrador)
-ID:       45
-Status:   Ativo
-```
+Nunca armazene credenciais em repositórios Git!
 
 ## Como Fazer Login
 
 1. Acesse a página de login: `/auth/signin`
-2. Digite o email: **admin@vitrii.com**
-3. Digite a senha: **Admin@2025**
+2. Digite o email do usuário ADM (armazenado com segurança)
+3. Digite a senha (armazenada com segurança)
 4. Clique em "Entrar"
 
 ## Telas Disponíveis para ADM
@@ -141,7 +128,7 @@ Para cada anúncio, você pode ver:
 
 ### Cenário: Desativar um anúncio problemático
 
-1. Login com: **admin@vitrii.com** / **Admin@2025**
+1. Faça login com credenciais ADM (obtenha em seu gerenciador de senhas)
 2. Clique no botão laranja **"Anúncios"** no header
 3. Use a barra de busca para encontrar o anúncio
 4. Clique para expandir o anúncio
@@ -150,7 +137,7 @@ Para cada anúncio, você pode ver:
 
 ### Cenário: Editar informações de um anúncio
 
-1. Login com credenciais ADM
+1. Faça login com credenciais ADM
 2. Acesse **"Anúncios"** no header
 3. Encontre o anúncio
 4. Expanda para ver detalhes
@@ -161,23 +148,14 @@ Para cada anúncio, você pode ver:
 
 ## Estrutura do Banco de Dados
 
-O usuário ADM foi criado com as seguintes informações:
+O usuário ADM foi criado com as seguintes informações armazenadas de forma segura:
 
-```
-Tabela: usuarios
-ID:              45
-nome:            Administrador
-email:           admin@vitrii.com
-senha:           [bcryptjs hash - Admin@2025]
-cpf:             00000000000
-telefone:        0000000000
-endereco:        Sistema Administrativo
-tipoUsuario:     adm
-isActive:        true
-dataCriacao:     2026-01-08
-```
+- **Tabela**: usuarios
+- **Tipo de usuário**: adm
+- **Status**: Ativo
+- **Funcionalidades**: Todas as 14 funcionalidades foram automaticamente concedidas na tabela `usuarios_x_funcionalidades`
 
-Todas as 14 funcionalidades foram automaticamente concedidas na tabela `usuarios_x_funcionalidades`.
+**Nota**: Senhas são armazenadas com hash bcryptjs - nunca em texto plano!
 
 ## Mudança de Senha (Futura)
 
@@ -238,9 +216,10 @@ _Nota: Esta funcionalidade pode ser implementada em atualizações futuras_
 
 ## 📝 Notas Importantes
 
-- O email correto é **admin@vitrii.com** (com "ii" não "eii")
-- A senha foi resetada e agora está com hash bcrypt (compatível com o sistema de signin)
-- O ID do usuário admin é **45** (não 2)
+- Todas as credenciais devem ser armazenadas de forma segura
+- Senhas são sempre armazenadas com hash bcrypt
+- Nunca compartilhe credenciais através de chat, email ou repositório
+- Use um gerenciador de senhas para administrar credenciais
 
 ## Próximas Etapas
 

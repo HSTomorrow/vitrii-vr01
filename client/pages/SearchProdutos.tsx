@@ -24,7 +24,7 @@ export default function SearchProdutos() {
   const { data: storesData, isLoading: storesLoading } = useQuery({
     queryKey: ["lojas"],
     queryFn: async () => {
-      const response = await fetch("/api/lojas");
+      const response = await fetch("/api/anunciantes");
       if (!response.ok) throw new Error("Erro ao buscar lojas");
       return response.json();
     },

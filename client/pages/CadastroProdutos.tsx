@@ -50,7 +50,7 @@ export default function CadastroProdutos() {
         headers["x-user-id"] = user.id.toString();
       }
 
-      const response = await fetch("/api/lojas", { headers });
+      const response = await fetch("/api/anunciantes", { headers });
       if (!response.ok) throw new Error("Erro ao buscar lojas");
       const result = await response.json();
       return result.data || [];
@@ -69,7 +69,7 @@ export default function CadastroProdutos() {
       }
 
       const response = await fetch(
-        `/api/lojas/${selectedLojaId}/grupos-productos`,
+        `/api/grupos-productos?anuncianteId=${selectedLojaId}`,
         { headers },
       );
       if (!response.ok) throw new Error("Erro ao buscar grupos");

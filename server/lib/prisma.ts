@@ -19,6 +19,25 @@ if (!process.env.DATABASE_URL) {
   console.error("[Prisma] ⚠️  WARNING: DATABASE_URL is not set!");
 }
 
+const logs: any[] = [
+  {
+    emit: "stdout",
+    level: "error",
+  },
+  {
+    emit: "stdout",
+    level: "warn",
+  },
+];
+
+// Only log queries in development to avoid performance degradation and data exposure in production
+if (process.env.NODE_ENV !== "production") {
+  logs.push({
+    emit: "event",
+    level: "query",
+  });
+}
+
 export const prisma =
   globalForPrisma.prisma ||
   new PrismaClient({
@@ -27,20 +46,7 @@ export const prisma =
         url: process.env.DATABASE_URL,
       },
     },
-    log: [
-      {
-        emit: "stdout",
-        level: "error",
-      },
-      {
-        emit: "stdout",
-        level: "warn",
-      },
-      {
-        emit: "event",
-        level: "query",
-      },
-    ],
+    log: logs,
   });
 
 console.log("[Prisma] ✓ Prisma Client created successfully");

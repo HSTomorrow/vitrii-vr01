@@ -39,7 +39,7 @@ export default function CadastroVariantesLista() {
         headers["x-user-id"] = user.id.toString();
       }
 
-      const response = await fetch("/api/lojas", { headers });
+      const response = await fetch("/api/anunciantes", { headers });
       if (!response.ok) throw new Error("Erro ao buscar lojas");
       return response.json();
     },
