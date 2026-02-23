@@ -15,6 +15,7 @@ import {
   Edit2,
   Power,
   RotateCcw,
+  Check,
 } from "lucide-react";
 
 export default function Sell() {
@@ -228,104 +229,145 @@ export default function Sell() {
       <section className="bg-vitrii-gray-light py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold text-vitrii-text mb-12 text-center">
-            Planos Simples e Transparentes
+            Nossos Planos
           </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-2xl mx-auto">
-            {/* Free Plan */}
-            <div className="bg-white rounded-lg border-2 border-gray-300 p-8">
-              <h3 className="text-xl font-bold text-vitrii-text mb-2">
-                Plano Gratuito
-              </h3>
-              <p className="text-vitrii-text-secondary mb-6">
-                Perfeito para começar
-              </p>
-
-              <div className="text-3xl font-bold text-vitrii-blue mb-6">
-                Grátis
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            {/* Plan 1: Por Anúncio */}
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+              <div className="bg-vitrii-blue p-8 text-white">
+                <h3 className="text-2xl font-bold mb-2">Por Anúncio</h3>
+                <p className="text-blue-100">Para vendedores ocasionais</p>
               </div>
 
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-center space-x-2">
-                  <span className="w-5 h-5 rounded-full bg-vitrii-yellow flex items-center justify-center text-sm text-vitrii-text font-bold">
-                    ✓
-                  </span>
-                  <span className="text-vitrii-text">3 anúncios</span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <span className="w-5 h-5 rounded-full bg-vitrii-yellow flex items-center justify-center text-sm text-vitrii-text font-bold">
-                    ✓
-                  </span>
-                  <span className="text-vitrii-text">
-                    Gerenciar catálogo
-                  </span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <span className="w-5 h-5 rounded-full bg-vitrii-yellow flex items-center justify-center text-sm text-vitrii-text font-bold">
-                    ✓
-                  </span>
-                  <span className="text-vitrii-text">Contato básico</span>
-                </li>
-              </ul>
+              <div className="p-8">
+                <div className="mb-8">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-5xl font-bold text-vitrii-text">
+                      R$ 19,90
+                    </span>
+                    <span className="text-vitrii-text-secondary">/mês</span>
+                  </div>
+                  <p className="text-sm text-vitrii-text-secondary mt-2">
+                    Cobrado por anúncio publicado
+                  </p>
+                </div>
 
-              <button className="w-full border-2 border-vitrii-blue text-vitrii-blue py-2 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
-                Começar Grátis
-              </button>
+                <div className="space-y-4 mb-8">
+                  <div className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
+                    <span className="text-vitrii-text">
+                      Publicação ilimitada de anúncios
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
+                    <span className="text-vitrii-text">
+                      Fotos e descrição detalhada
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
+                    <span className="text-vitrii-text">
+                      Validade de 7 dias
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
+                    <span className="text-vitrii-text">
+                      Acesso ao painel de controle
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
+                    <span className="text-vitrii-text">
+                      Contato com compradores
+                    </span>
+                  </div>
+                </div>
+
+                <button className="w-full px-4 py-3 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors">
+                  Comece Agora
+                </button>
+              </div>
             </div>
 
-            {/* Premium Plan */}
-            <div className="bg-white rounded-lg border-2 border-vitrii-blue p-8 shadow-lg">
-              <div className="absolute top-0 right-0 bg-vitrii-blue text-white px-3 py-1 rounded-bl-lg text-sm font-semibold">
-                Popular
+            {/* Plan 2: Profissional */}
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow border-2 border-vitrii-yellow">
+              <div className="bg-vitrii-yellow p-8 text-vitrii-text">
+                <h3 className="text-2xl font-bold mb-2">Profissional</h3>
+                <p className="text-vitrii-text-secondary">Para empresas e grandes vendedores</p>
               </div>
 
-              <h3 className="text-xl font-bold text-vitrii-text mb-2">
-                Plano Premium
-              </h3>
-              <p className="text-vitrii-text-secondary mb-6">
-                Para vendedores profissionais
-              </p>
+              <div className="p-8">
+                <div className="mb-8">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-5xl font-bold text-vitrii-text">
+                      Personalizado
+                    </span>
+                  </div>
+                  <p className="text-sm text-vitrii-text-secondary mt-2">
+                    Contrate conforme suas necessidades
+                  </p>
+                </div>
 
-              <div className="text-3xl font-bold text-vitrii-blue mb-1">
-                R$ 19,90
+                <div className="space-y-4 mb-8">
+                  <div className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
+                    <span className="text-vitrii-text">
+                      Publicação ilimitada
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
+                    <span className="text-vitrii-text">
+                      Equipe de vendas dedicada
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
+                    <span className="text-vitrii-text">
+                      Anúncios em destaque
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
+                    <span className="text-vitrii-text">
+                      Analytics detalhados
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
+                    <span className="text-vitrii-text">
+                      Suporte prioritário
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
+                    <span className="text-vitrii-text">
+                      Integração com seus sistemas
+                    </span>
+                  </div>
+                </div>
+
+                <button className="w-full px-4 py-3 bg-vitrii-yellow text-vitrii-text rounded-lg font-semibold hover:bg-vitrii-yellow-dark transition-colors">
+                  Solicitar Informações
+                </button>
               </div>
-              <p className="text-vitrii-text-secondary text-sm mb-6">
-                Validade de 30 dias por anúncio
-              </p>
-
-              <ul className="space-y-3 mb-8">
-                <li className="flex items-center space-x-2">
-                  <span className="w-5 h-5 rounded-full bg-vitrii-yellow flex items-center justify-center text-sm text-vitrii-text font-bold">
-                    ✓
-                  </span>
-                  <span className="text-vitrii-text">Anúncios ilimitados</span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <span className="w-5 h-5 rounded-full bg-vitrii-yellow flex items-center justify-center text-sm text-vitrii-text font-bold">
-                    ✓
-                  </span>
-                  <span className="text-vitrii-text">
-                    Analíticas avançadas
-                  </span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <span className="w-5 h-5 rounded-full bg-vitrii-yellow flex items-center justify-center text-sm text-vitrii-text font-bold">
-                    ✓
-                  </span>
-                  <span className="text-vitrii-text">Suporte prioritário</span>
-                </li>
-                <li className="flex items-center space-x-2">
-                  <span className="w-5 h-5 rounded-full bg-vitrii-yellow flex items-center justify-center text-sm text-vitrii-text font-bold">
-                    ✓
-                  </span>
-                  <span className="text-vitrii-text">QR Code ilimitados</span>
-                </li>
-              </ul>
-
-              <button className="w-full bg-vitrii-blue text-white py-2 rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors">
-                Comece Hoje
-              </button>
             </div>
+          </div>
+
+          <div className="mt-12 text-center">
+            <p className="text-vitrii-text-secondary mb-4">
+              Quer conhecer todos os detalhes dos nossos planos?
+            </p>
+            <Link
+              to="/planos"
+              className="inline-flex items-center gap-2 text-vitrii-blue font-semibold hover:underline"
+            >
+              <span>Veja a página completa de planos</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
           </div>
         </div>
       </section>
