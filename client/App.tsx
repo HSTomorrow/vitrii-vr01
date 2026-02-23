@@ -3,7 +3,7 @@ import "./global.css";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "next-themes";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -137,6 +137,13 @@ function AppContent() {
           />
           <Route path="/agenda" element={<Agenda />} />
           <Route path="/menu" element={<Menu />} />
+          {/* Redirect old cadastros/* routes to cadastro-* */}
+          <Route path="/cadastros/lojas" element={<Navigate to="/cadastro-lojas" replace />} />
+          <Route path="/cadastros/productos" element={<Navigate to="/cadastro-productos" replace />} />
+          <Route path="/cadastros/grupos-productos" element={<Navigate to="/cadastro-grupos-productos" replace />} />
+          <Route path="/cadastros/tabelas-preco" element={<Navigate to="/cadastro-tabelas-preco" replace />} />
+          <Route path="/cadastros/variantes" element={<Navigate to="/cadastro-variantes" replace />} />
+          <Route path="/cadastros/equipe-venda" element={<Navigate to="/cadastro-equipe-venda" replace />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </PageTransition>
