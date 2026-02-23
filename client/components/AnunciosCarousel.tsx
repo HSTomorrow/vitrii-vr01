@@ -186,7 +186,7 @@ export default function AnunciosCarousel({
             className="vitrii-card overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer relative flex-shrink-0 w-64"
           >
             <div
-              className={`w-full h-[137px] bg-gradient-to-br flex items-center justify-center overflow-hidden relative group ${
+              className={`w-full h-[72px] bg-gradient-to-br flex items-center justify-center overflow-hidden relative group ${
                 color === "green"
                   ? "from-green-400 to-green-600"
                   : color === "purple"
