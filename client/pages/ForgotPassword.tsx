@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { AlertCircle, ArrowRight, CheckCircle, Mail } from "lucide-react";
+import { AlertCircle, ArrowRight, CheckCircle, Mail, AlertTriangle } from "lucide-react";
 
 export default function ForgotPassword() {
   const navigate = useNavigate();
@@ -191,6 +191,15 @@ export default function ForgotPassword() {
               </div>
             </div>
 
+            <div className="bg-yellow-50 border-l-4 border-yellow-500 rounded p-3 mb-6 flex gap-3">
+              <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5 flex-shrink-0" />
+              <div>
+                <p className="text-sm text-yellow-800 font-semibold">
+                  O email pode estar em <strong>Spam ou Lixo Eletrônico</strong>
+                </p>
+              </div>
+            </div>
+
             <p className="text-vitrii-text-secondary mb-6">
               O link para redefinir sua senha expira em 1 hora. Se não receber o
               email, verifique sua pasta de spam ou solicite um novo link.
@@ -253,6 +262,16 @@ export default function ForgotPassword() {
               <h3 className="font-semibold text-blue-900">Como funciona</h3>
               <p className="text-sm text-blue-800 mt-1">
                 Digite seu email e enviaremos um link para redefinir sua senha.
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-yellow-50 border-l-4 border-yellow-500 rounded p-4 mb-8 flex gap-3">
+            <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="font-semibold text-yellow-900">Atenção ao Email de Reset</h3>
+              <p className="text-sm text-yellow-800 mt-1">
+                O email com o link de redefinição de senha pode chegar em sua pasta de <strong>Spam ou Lixo Eletrônico</strong>. Verifique essas pastas se não receber em sua caixa de entrada.
               </p>
             </div>
           </div>

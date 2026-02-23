@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { AlertCircle, ArrowRight, CheckCircle, Mail } from "lucide-react";
+import { AlertCircle, ArrowRight, CheckCircle, Mail, AlertTriangle } from "lucide-react";
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -131,6 +131,16 @@ export default function SignUp() {
               <h3 className="font-semibold text-green-900">Pronto para começar!</h3>
               <p className="text-sm text-green-800 mt-1">
                 Preencha o formulário abaixo para criar sua conta e comece a vender ou comprar.
+              </p>
+            </div>
+          </div>
+
+          <div className="bg-yellow-50 border-l-4 border-yellow-500 rounded p-4 mb-8 flex gap-3">
+            <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="font-semibold text-yellow-900">Atenção ao Email de Verificação</h3>
+              <p className="text-sm text-yellow-800 mt-1">
+                O email de confirmação pode chegar em sua pasta de <strong>Spam ou Lixo Eletrônico</strong>. Verifique essas pastas se não receber em sua caixa de entrada.
               </p>
             </div>
           </div>
