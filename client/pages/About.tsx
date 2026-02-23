@@ -175,7 +175,7 @@ export default function About() {
               </p>
 
               <p>
-                O Vitrii é um exemplo do nosso compromisso em criar soluções que resolvem problemas reais do mercado, trazendo tecnologia acessível e funcional para vendedores e compradores em toda a região.
+                O Vitrii é um exemplo do nosso compromisso em criar soluções que resolvem problemas reais do mercado, trazendo tecnologia acessível e funcional para realizar excelentes negócios em toda a região.
               </p>
 
               <div className="mt-8 pt-8 border-t border-gray-300">

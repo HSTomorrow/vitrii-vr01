@@ -21,7 +21,7 @@ export default function PrivacyPolicy() {
             Como protegemos seus dados pessoais no Vitrii
           </p>
           <p className="text-sm text-vitrii-text-secondary mt-4">
-            Última atualização: Fevereiro de 2024
+            Última atualização: Fevereiro de 2026
           </p>
         </div>
       </section>

@@ -330,7 +330,7 @@ export default function Menu() {
 
           {/* Footer Info */}
           <div className="mt-12 pt-8 border-t border-gray-200 text-center text-sm text-vitrii-text-secondary">
-            <p>Vitrii Marketplace © 2024</p>
+            <p>Vitrii Marketplace © 2026</p>
           </div>
         </div>
       </main>

@@ -181,10 +181,10 @@ export default function Footer() {
           {/* Bottom Text */}
           <div className="text-center text-gray-400 text-sm space-y-2">
             <p>
-              &copy; 2024 Vitrii. Todos os direitos reservados.
+              &copy; 2026 Vitrii. Todos os direitos reservados.
             </p>
             <p>
-              Desenvolvido com ❤️ por <a href="https://herestomorrow.com.br" target="_blank" rel="noopener noreferrer" className="text-vitrii-yellow hover:underline">HeresTomorrow</a>
+              Desenvolvido com ❤️ por <a href="https://herestomorrow.com.br" target="_blank" rel="noopener noreferrer" className="text-vitrii-yellow hover:underline">HeresTomorrow</a> para realizar excelentes negócios
             </p>
           </div>
         </div>
