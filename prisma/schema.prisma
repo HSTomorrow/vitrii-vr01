@@ -46,6 +46,7 @@ model anunciantes {
   mensagens            mensagens[]
   localidade           localidades?                @relation(fields: [localidadeId], references: [id], onDelete: SetNull)
   localidades          anunciantes_x_localidades[]
+  contatos             contatos[]
 }
 
 model anuncios {
@@ -241,6 +242,7 @@ model usracessos {
   conversas               conversas[]
   mensagens               mensagens[]
   favoritos               favorito[]
+  contatos                contato_usuarios[]
   localidadePadrao        localidades?                @relation(fields: [localidadePadraoId], references: [id], onDelete: SetNull)
 }
 
@@ -710,6 +712,40 @@ model anunciantes_x_localidades {
   @@unique([anuncianteId, localidadeId])
   @@index([anuncianteId])
   @@index([localidadeId])
+}
+
+// Contatos - Contact list for announcer (only visible to the announcer who created)
+model contatos {
+  id               Int      @id @default(autoincrement())
+  anuncianteId     Int
+  nome             String   @db.VarChar(255)
+  email            String?  @db.VarChar(255)
+  telefone         String?  @db.VarChar(20)
+  observacoes      String?
+  dataCriacao      DateTime @default(now())
+  dataAtualizacao  DateTime @updatedAt
+
+  anunciante       anunciantes            @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
+  usuarios         contato_usuarios[]
+
+  @@index([anuncianteId])
+  @@map("contatos")
+}
+
+// Junction table: Contatos x Usuarios (N:N)
+model contato_usuarios {
+  id         Int      @id @default(autoincrement())
+  contatoId  Int
+  usuarioId  Int
+  dataCriacao DateTime @default(now())
+
+  contato  contatos   @relation(fields: [contatoId], references: [id], onDelete: Cascade)
+  usuario  usracessos @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@unique([contatoId, usuarioId])
+  @@index([contatoId])
+  @@index([usuarioId])
+  @@map("contato_usuarios")
 }
 
 // Favoritos - User's favorite ads

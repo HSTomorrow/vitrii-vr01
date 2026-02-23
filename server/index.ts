@@ -210,6 +210,14 @@ import {
   deleteBanner,
   reorderBanners,
 } from "./routes/banners";
+import {
+  getContatosByAnunciante,
+  createContato,
+  updateContato,
+  deleteContato,
+  addUsuarioToContato,
+  removeUsuarioFromContato,
+} from "./routes/contatos";
 
 export function createServer() {
   const app = express();
@@ -654,6 +662,14 @@ export function createServer() {
   app.get("/api/localidades/:id/anunciantes", getAnunciantesForLocalidade);
   app.post("/api/localidades/:id/anunciantes", extractUserId, requireAdmin, addAnuncianteToLocalidade);
   app.delete("/api/localidades/:id/anunciantes/:anuncianteId", extractUserId, requireAdmin, removeAnuncianteFromLocalidade);
+
+  // Contatos routes (only announcer can manage)
+  app.get("/api/anunciantes/:anuncianteId/contatos", extractUserId, getContatosByAnunciante);
+  app.post("/api/anunciantes/:anuncianteId/contatos", extractUserId, createContato);
+  app.put("/api/anunciantes/:anuncianteId/contatos/:contatoId", extractUserId, updateContato);
+  app.delete("/api/anunciantes/:anuncianteId/contatos/:contatoId", extractUserId, deleteContato);
+  app.post("/api/anunciantes/:anuncianteId/contatos/:contatoId/usuarios", extractUserId, addUsuarioToContato);
+  app.delete("/api/anunciantes/:anuncianteId/contatos/:contatoId/usuarios/:usuarioId", extractUserId, removeUsuarioFromContato);
 
   // Global error handling middleware for this sub-app
   // Must be added AFTER all routes
