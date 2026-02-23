@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -56,6 +56,7 @@ export default function MinhaAgenda() {
   const [showEditorModal, setShowEditorModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [activeTab, setActiveTab] = useState<"calendar" | "fila-espera" | "status-agenda">("calendar");
+  const reservasRef = useRef<HTMLDivElement>(null);
 
   // Fetch user's anunciantes
   const { data: anunciantes = [] } = useQuery<Anunciante[]>({
@@ -71,6 +72,8 @@ export default function MinhaAgenda() {
       return result.data || [];
     },
     enabled: !!user?.id,
+    staleTime: 600000, // 10 minutes
+    gcTime: 600000, // 10 minutes
   });
 
   // Set first anunciante as default
@@ -79,6 +82,15 @@ export default function MinhaAgenda() {
       setSelectedAnuncianteId(anunciantes[0].id);
     }
   }, [anunciantes, selectedAnuncianteId]);
+
+  // Scroll to reservas section when a event is selected
+  useEffect(() => {
+    if (showReservasFor && reservasRef.current) {
+      setTimeout(() => {
+        reservasRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 300);
+    }
+  }, [showReservasFor]);
 
   // Fetch eventos for selected anunciante
   const { data: eventos = [], refetch: refetchEventos } = useQuery<Evento[]>({
@@ -97,6 +109,8 @@ export default function MinhaAgenda() {
       return result.data || [];
     },
     enabled: !!selectedAnuncianteId && !!user?.id,
+    staleTime: 600000, // 10 minutes
+    gcTime: 600000, // 10 minutes
   });
 
   // Fetch reservas for selected evento
@@ -116,6 +130,8 @@ export default function MinhaAgenda() {
       return result.data || [];
     },
     enabled: !!showReservasFor && !!user?.id,
+    staleTime: 600000, // 10 minutes
+    gcTime: 600000, // 10 minutes
   });
 
   // Fetch filas de espera for selected anunciante
@@ -139,6 +155,8 @@ export default function MinhaAgenda() {
       return result.data || [];
     },
     enabled: !!selectedAnuncianteId && !!user?.id,
+    staleTime: 600000, // 10 minutes
+    gcTime: 600000, // 10 minutes
   });
 
   // Create evento mutation
@@ -474,7 +492,7 @@ export default function MinhaAgenda() {
 
                 {/* Reservas Section */}
                 {showReservasFor && (
-                  <div className="mt-8 p-6 bg-white rounded-lg shadow-md">
+                  <div ref={reservasRef} className="mt-8 p-6 bg-white rounded-lg shadow-md">
                     <div className="flex items-center justify-between mb-6">
                       <h3 className="text-2xl font-bold text-vitrii-text">
                         Reservas e Lista de Espera
