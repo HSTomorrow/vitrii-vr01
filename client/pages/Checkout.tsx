@@ -345,22 +345,6 @@ export default function Checkout() {
                     </div>
                   </div>
 
-                  <div className="space-y-2 mt-4">
-                    <button
-                      onClick={() =>
-                        navigate(`/anuncio/${parsedAnuncioId}/editar`)
-                      }
-                      className="w-full px-4 py-2 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors"
-                    >
-                      Reeditar Anúncio
-                    </button>
-                    <button
-                      onClick={() => navigate(`/anuncio/${parsedAnuncioId}`)}
-                      className="w-full px-4 py-2 border-2 border-vitrii-blue text-vitrii-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors"
-                    >
-                      Ver Anúncio Completo
-                    </button>
-                  </div>
                 </div>
               )}
             </div>
@@ -548,16 +532,6 @@ export default function Checkout() {
                   </div>
                 )}
 
-                {/* Payment Realized Button */}
-                {payment && (
-                  <button
-                    onClick={() => setShowProofModal(true)}
-                    className="w-full px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
-                  >
-                    <CheckCircle className="w-5 h-5" />
-                    Pagamento Realizado
-                  </button>
-                )}
 
                 {/* Payment Details */}
                 {payment && (
@@ -600,6 +574,47 @@ export default function Checkout() {
                 </div>
               </>
             )}
+          </div>
+        </div>
+
+        {/* Action Buttons Section */}
+        <div className="mt-8 bg-white rounded-lg shadow-md p-6">
+          <h2 className="font-semibold text-vitrii-text mb-4">Próximos Passos</h2>
+          <div className="space-y-3">
+            {/* Realizar Pagamento Button - Only if pending */}
+            {isPending && payment && (
+              <button
+                onClick={() => setShowProofModal(true)}
+                className="w-full px-6 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+              >
+                <CheckCircle className="w-5 h-5" />
+                Realizar Pagamento
+              </button>
+            )}
+
+            {/* Reeditar Anúncio Button */}
+            <button
+              onClick={() => navigate(`/anuncio/${parsedAnuncioId}/editar`)}
+              className="w-full px-6 py-3 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors"
+            >
+              Reeditar Anúncio
+            </button>
+
+            {/* Ver Anúncio Completo Button */}
+            <button
+              onClick={() => navigate(`/anuncio/${parsedAnuncioId}`)}
+              className="w-full px-6 py-3 border-2 border-vitrii-blue text-vitrii-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+            >
+              Ver Anúncio Completo
+            </button>
+
+            {/* Voltar para a Página Inicial Button */}
+            <Link
+              to="/"
+              className="w-full px-6 py-3 border-2 border-gray-300 text-vitrii-text rounded-lg font-semibold hover:bg-gray-50 transition-colors text-center"
+            >
+              Voltar para a Página Inicial
+            </Link>
           </div>
         </div>
       </div>
