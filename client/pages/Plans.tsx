@@ -258,10 +258,10 @@ export default function Plans() {
       {/* Contact Section */}
       <div className="bg-vitrii-blue-light py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-vitrii-text mb-8">
+          <h2 className="text-3xl font-bold text-white mb-8">
             Ainda tem dúvidas?
           </h2>
-          <p className="text-lg text-vitrii-text-secondary mb-8">
+          <p className="text-lg text-blue-100 mb-8">
             Entre em contato conosco e nossa equipe ajudará você a escolher o melhor plano
           </p>
 
