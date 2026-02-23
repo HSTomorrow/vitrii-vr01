@@ -22,6 +22,7 @@ const AnuncianteCreateSchema = z.object({
   facebook: z.string().optional(),
   whatsapp: z.string().optional(),
   fotoUrl: z.string().optional(),
+  iconColor: z.enum(["azul", "verde", "rosa", "vermelho", "laranja"]).default("azul"),
 });
 
 // GET all anunciantes (with pagination and user filtering)
@@ -99,6 +100,7 @@ export const getAnunciantes: RequestHandler = async (req, res) => {
           facebook: true,
           whatsapp: true,
           fotoUrl: true,
+          iconColor: true,
           status: true,
           localidadeId: true,
           dataCriacao: true,
@@ -143,6 +145,7 @@ export const getAnuncianteById: RequestHandler = async (req, res) => {
         nome: true,
         tipo: true,
         fotoUrl: true,
+        iconColor: true,
         telefone: true,
         endereco: true,
         cidade: true,
@@ -250,6 +253,7 @@ export const createAnunciante: RequestHandler = async (req, res) => {
         facebook: validatedData.facebook,
         whatsapp: validatedData.whatsapp,
         fotoUrl: validatedData.fotoUrl,
+        iconColor: validatedData.iconColor,
         dataCriacao: new Date(),
         dataAtualizacao: new Date(),
       },
@@ -316,6 +320,7 @@ const AnuncianteUpdateSchema = z.object({
   facebook: z.string().optional(),
   whatsapp: z.string().optional(),
   fotoUrl: z.string().optional(),
+  iconColor: z.enum(["azul", "verde", "rosa", "vermelho", "laranja"]).optional(),
   localidadeId: z.number().int().nullable().optional(),
   status: z.enum(["Ativo", "Desativado"]).optional(),
 });

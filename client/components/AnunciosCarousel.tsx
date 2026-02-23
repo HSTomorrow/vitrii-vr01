@@ -4,6 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import ShareButton from "./ShareButton";
+import AnuncianteIconColor from "./AnuncianteIconColor";
 
 interface Anuncio {
   id: number;
@@ -18,6 +19,7 @@ interface Anuncio {
   anunciantes?: {
     nome: string;
     fotoUrl?: string;
+    iconColor?: string;
     endereco?: string;
     whatsapp?: string;
     temAgenda?: boolean;
@@ -208,18 +210,23 @@ export default function AnunciosCarousel({
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
             </div>
 
-            {anuncio.anunciantes?.fotoUrl && (
-              <div
-                className={`absolute bottom-2.5 left-2.5 z-10 w-9 h-9 rounded-full bg-white border-2 overflow-hidden flex items-center justify-center shadow-lg hover:shadow-xl transition-all ${colors.border}`}
-              >
+            {/* Anunciante Avatar - Photo or Colored Icon */}
+            <div className={`absolute bottom-2.5 left-2.5 z-10 rounded-full border-2 overflow-hidden flex items-center justify-center shadow-lg hover:shadow-xl transition-all ${colors.border}`}>
+              {anuncio.anunciantes?.fotoUrl ? (
                 <img
                   src={anuncio.anunciantes.fotoUrl}
                   alt={anuncio.anunciantes.nome}
-                  className="w-full h-full object-cover"
+                  className="w-9 h-9 object-cover"
                   title={anuncio.anunciantes.nome}
                 />
-              </div>
-            )}
+              ) : (
+                <AnuncianteIconColor
+                  anuncianteName={anuncio.anunciantes?.nome || "Vitrii"}
+                  iconColor={anuncio.anunciantes?.iconColor}
+                  className="w-9 h-9"
+                />
+              )}
+            </div>
 
             {anuncio.isDoacao && (
               <div className="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold z-10">

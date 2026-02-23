@@ -13,6 +13,7 @@ interface Anunciante {
   telefone?: string;
   cidade?: string;
   estado?: string;
+  iconColor?: string;
   status: string;
   localidadeId?: number | null;
   dataCriacao: string;
@@ -30,6 +31,7 @@ interface Localidade {
 interface EditingData {
   email?: string;
   tipo?: string;
+  iconColor?: string;
   localidadeId?: number | null;
   status?: string;
 }
@@ -119,6 +121,7 @@ export default function AdminAnunciantes() {
     setEditingData({
       email: anunciante.email,
       tipo: anunciante.tipo,
+      iconColor: anunciante.iconColor,
       localidadeId: anunciante.localidadeId,
       status: anunciante.status,
     });
@@ -232,6 +235,9 @@ export default function AdminAnunciantes() {
                     Localização
                   </th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
+                    Cor do Ícone
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
                     Status
                   </th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
@@ -325,6 +331,41 @@ export default function AdminAnunciantes() {
                                 ?.municipio
                             : "-"}
                         </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-sm">
+                      {editingId === anunciante.id ? (
+                        <select
+                          value={editingData.iconColor || "azul"}
+                          onChange={(e) =>
+                            setEditingData({
+                              ...editingData,
+                              iconColor: e.target.value,
+                            })
+                          }
+                          className="px-3 py-1 border border-gray-300 rounded focus:outline-none focus:border-vitrii-blue"
+                        >
+                          <option value="azul">Azul</option>
+                          <option value="verde">Verde</option>
+                          <option value="rosa">Rosa</option>
+                          <option value="vermelho">Vermelho</option>
+                          <option value="laranja">Laranja</option>
+                        </select>
+                      ) : (
+                        <span
+                          className={`inline-block w-6 h-6 rounded-full border-2 border-gray-300 ${
+                            anunciante.iconColor === "verde"
+                              ? "bg-green-500"
+                              : anunciante.iconColor === "rosa"
+                                ? "bg-pink-500"
+                                : anunciante.iconColor === "vermelho"
+                                  ? "bg-red-500"
+                                  : anunciante.iconColor === "laranja"
+                                    ? "bg-orange-500"
+                                    : "bg-blue-500"
+                          }`}
+                          title={anunciante.iconColor || "azul"}
+                        />
                       )}
                     </td>
                     <td className="px-6 py-4 text-sm">

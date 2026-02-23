@@ -26,6 +26,7 @@ interface Anunciante {
   facebook?: string;
   whatsapp?: string;
   fotoUrl?: string;
+  iconColor?: string;
   temAgenda?: boolean;
   status?: string;
   localidadeId?: number | null;
@@ -61,6 +62,7 @@ export default function CadastroAnunciantes() {
     facebook: "",
     whatsapp: "",
     fotoUrl: "",
+    iconColor: "azul",
     temAgenda: false,
     localidadeId: null as number | null,
     status: "Ativo",
@@ -177,6 +179,7 @@ export default function CadastroAnunciantes() {
         facebook: "",
         whatsapp: "",
         fotoUrl: "",
+        iconColor: "azul",
         temAgenda: false,
         localidadeId: null,
         status: "Ativo",
@@ -232,6 +235,7 @@ export default function CadastroAnunciantes() {
       facebook: loja.facebook || "",
       whatsapp: loja.whatsapp || "",
       fotoUrl: loja.fotoUrl || "",
+      iconColor: loja.iconColor || "azul",
       temAgenda: loja.temAgenda || false,
       localidadeId: loja.localidadeId || null,
       status: loja.status || "Ativo",
@@ -298,6 +302,7 @@ export default function CadastroAnunciantes() {
                 facebook: "",
                 whatsapp: "",
                 fotoUrl: "",
+                iconColor: "azul",
                 temAgenda: false,
                 localidadeId: null,
                 status: "Ativo",
@@ -663,6 +668,45 @@ export default function CadastroAnunciantes() {
                   />
                 </label>
               </div>
+
+              {/* Icon Color Selector - shown when no photo */}
+              {!formData.fotoUrl && (
+                <div className="space-y-3 border-l-4 border-blue-500 bg-blue-50 p-4 rounded">
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                    Cor do Ícone (mostrado quando sem foto)
+                  </label>
+                  <div className="grid grid-cols-5 gap-2">
+                    {[
+                      { value: "azul", label: "Azul", color: "bg-blue-500" },
+                      { value: "verde", label: "Verde", color: "bg-green-500" },
+                      { value: "rosa", label: "Rosa", color: "bg-pink-500" },
+                      { value: "vermelho", label: "Vermelho", color: "bg-red-500" },
+                      { value: "laranja", label: "Laranja", color: "bg-orange-500" },
+                    ].map((colorOption) => (
+                      <button
+                        key={colorOption.value}
+                        type="button"
+                        onClick={() =>
+                          setFormData({ ...formData, iconColor: colorOption.value })
+                        }
+                        className={`flex flex-col items-center gap-1 p-2 rounded-lg transition-all ${
+                          formData.iconColor === colorOption.value
+                            ? "ring-2 ring-offset-2 ring-vitrii-blue"
+                            : "hover:opacity-80"
+                        }`}
+                      >
+                        <div className={`w-8 h-8 rounded-full ${colorOption.color}`} />
+                        <span className="text-xs font-semibold text-vitrii-text text-center">
+                          {colorOption.label}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-xs text-gray-600 mt-2">
+                    Este ícone será exibido como avatar quando o anunciante não tiver uma foto de perfil.
+                  </p>
+                </div>
+              )}
 
               <div className="flex gap-4">
                 <button
