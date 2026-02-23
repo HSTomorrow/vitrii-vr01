@@ -759,9 +759,21 @@ export default function AnuncioDetalhe() {
 
               {selectedEquipeId && (
                 <div className="space-y-4">
-                  <p className="text-sm text-vitrii-text-secondary mb-4">
-                    Membros disponíveis para contato:
-                  </p>
+                  <div className="space-y-2 pb-3 border-b border-gray-200">
+                    <p className="text-sm font-semibold text-vitrii-text">
+                      Membros da Equipe
+                    </p>
+                    <div className="text-xs text-vitrii-text-secondary space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded-full bg-green-100 text-green-800 font-bold text-xs">✓ Disponível</span>
+                        <span className="text-gray-500">- Pronto para atender</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800 font-bold text-xs">○ Ativo</span>
+                        <span className="text-gray-500">- Fora do atendimento</span>
+                      </div>
+                    </div>
+                  </div>
 
                   {membros.length === 0 ? (
                     <div className="text-center py-8">
@@ -770,42 +782,58 @@ export default function AnuncioDetalhe() {
                       </p>
                     </div>
                   ) : (
-                    membros.map((membro: MembroEquipe) => (
-                      <div
-                        key={membro.id}
-                        className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
-                      >
-                        <p className="font-semibold text-vitrii-text mb-2">
-                          {membro.nome}
-                        </p>
-
-                        <div className="space-y-2 text-sm">
-                          <div className="flex items-center gap-2 text-vitrii-text-secondary">
-                            <Mail className="w-4 h-4" />
-                            <a
-                              href={`mailto:${membro.email}`}
-                              className="text-vitrii-blue hover:underline"
+                    membros.map((membro: MembroEquipe) => {
+                      const isDisponivel = membro.status === "disponivel";
+                      return (
+                        <div
+                          key={membro.id}
+                          className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow bg-white"
+                        >
+                          <div className="flex items-start justify-between mb-3">
+                            <div>
+                              <p className="font-semibold text-vitrii-text">
+                                {membro.nome}
+                              </p>
+                            </div>
+                            <span
+                              className={`px-3 py-1 rounded-full text-xs font-bold whitespace-nowrap ml-2 ${
+                                isDisponivel
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-yellow-100 text-yellow-800"
+                              }`}
                             >
-                              {membro.email}
-                            </a>
+                              {isDisponivel ? "✓ Disponível" : "○ Ativo"}
+                            </span>
                           </div>
 
-                          {membro.whatsapp && (
-                            <div className="flex items-center gap-2">
+                          <div className="space-y-2 text-sm">
+                            <div className="flex items-center gap-2 text-vitrii-text-secondary">
+                              <Mail className="w-4 h-4 flex-shrink-0" />
                               <a
-                                href={`https://wa.me/${membro.whatsapp.replace(/\D/g, "")}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-2 text-green-600 hover:text-green-700 font-semibold"
+                                href={`mailto:${membro.email}`}
+                                className="text-vitrii-blue hover:underline break-all"
                               >
-                                <MessageCircle className="w-4 h-4" />
-                                {membro.whatsapp}
+                                {membro.email}
                               </a>
                             </div>
-                          )}
+
+                            {membro.whatsapp && (
+                              <div className="flex items-center gap-2">
+                                <a
+                                  href={`https://wa.me/${membro.whatsapp.replace(/\D/g, "")}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center gap-2 text-green-600 hover:text-green-700 font-semibold"
+                                >
+                                  <MessageCircle className="w-4 h-4 flex-shrink-0" />
+                                  {membro.whatsapp}
+                                </a>
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    ))
+                      );
+                    })
                   )}
 
                   {equipes.length > 1 && (
