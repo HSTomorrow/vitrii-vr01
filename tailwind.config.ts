@@ -58,17 +58,29 @@ export default {
           ring: "hsl(var(--sidebar-ring))",
         },
         vitrii: {
-          blue: "#0071ce",
-          "blue-dark": "#0052a3",
+          // Primary Colors
+          blue: "#0071CE",
+          "blue-dark": "#0052A3",
           yellow: "#FFC220",
-          "yellow-dark": "#FFB800",
-          gray: "#f7f7f7",
-          "gray-light": "#fafafa",
-          text: "#1a1a1a",
+          green: "#16A34A",
+
+          // Neutral Colors
+          "gray-bg": "#F7F7F7",
+          "gray-light": "#FAFAFA",
+          text: "#1A1A1A",
           "text-secondary": "#666666",
-          bg: "#ffffff",
-          green: "#16a34a",
-          "green-dark": "#15803d",
+          bg: "#FFFFFF",
+
+          // Category Colors
+          purple: "#9333EA",     // Eventos
+          orange: "#EA580C",     // Agendas/Aulas
+          red: "#DC2626",        // Vagas/Oportunidades
+          "orange-alert": "#F97316", // Alerta/Warning
+
+          // Hover/Active states
+          "blue-hover": "#005BAD",
+          "yellow-dark": "#FFB800",
+          "green-dark": "#15803D",
         },
       },
       fontFamily: {
@@ -81,25 +93,37 @@ export default {
       },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
+        "fade-in": {
+          from: { opacity: "0" },
+          to: { opacity: "1" },
+        },
+        "slide-in-up": {
+          from: { transform: "translateY(20px)", opacity: "0" },
+          to: { transform: "translateY(0)", opacity: "1" },
+        },
+        "slide-in-right": {
+          from: { transform: "translateX(20px)", opacity: "0" },
+          to: { transform: "translateX(0)", opacity: "1" },
+        },
+        "pulse-ring": {
+          "0%": { transform: "scale(0.95)", opacity: "1" },
+          "100%": { transform: "scale(1.1)", opacity: "0" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "fade-in": "fade-in 0.25s ease-in-out",
+        "slide-in-up": "slide-in-up 0.3s ease-out",
+        "slide-in-right": "slide-in-right 0.3s ease-out",
+        "pulse-ring": "pulse-ring 2s infinite",
       },
     },
   },

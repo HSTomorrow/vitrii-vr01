@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Pagination from "@/components/Pagination";
 import LocalidadeFilter from "@/components/LocalidadeFilter";
+import SearchOverlay from "@/components/SearchOverlay";
 import { useAuth } from "@/contexts/AuthContext";
 
 const CATEGORIES = [
@@ -352,6 +353,15 @@ export default function Browse() {
           </div>
         ) : (
           <div>
+            {/* Mobile Search Overlay */}
+            <div className="mb-6">
+              <SearchOverlay
+                searchTerm={searchTerm}
+                onSearchChange={handleSearchChange}
+                placeholder="Buscar anúncios..."
+              />
+            </div>
+
             {/* Filter Toggle Button (Mobile) */}
             <div className="mb-6 lg:hidden">
               <button

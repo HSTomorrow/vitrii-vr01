@@ -49,6 +49,7 @@ import MeusAnuncios from "./pages/MeusAnuncios";
 import MinhaAgenda from "./pages/MinhaAgenda";
 import AgendaAnunciante from "./pages/AgendaAnunciante";
 import AnuncianteProfile from "./pages/AnuncianteProfile";
+import BottomNavBar from "@/components/BottomNavBar";
 
 const queryClient = new QueryClient();
 
@@ -60,6 +61,7 @@ export default function App() {
           <TooltipProvider>
             <Toaster />
             <BrowserRouter>
+              <BottomNavBar />
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/about" element={<About />} />

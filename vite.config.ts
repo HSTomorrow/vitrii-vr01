@@ -15,10 +15,21 @@ export default defineConfig(({ mode }) => ({
   build: {
     outDir: "dist/spa",
     chunkSizeWarningLimit: 2000,
+    minify: "terser",
+    terserOptions: {
+      compress: {
+        drop_console: true,
+      },
+    },
     rollupOptions: {
       output: {
-        // Disable code splitting to prevent React duplication
-        inlineDynamicImports: true,
+        // Enable code splitting for better caching and faster loads
+        manualChunks: {
+          // Separate vendor chunks
+          react: ["react", "react-dom", "react-router-dom"],
+          radix: ["@radix-ui/react-dialog", "@radix-ui/react-dropdown-menu"],
+          utils: ["lucide-react", "clsx", "date-fns"],
+        },
       },
     },
   },

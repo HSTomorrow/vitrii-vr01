@@ -77,7 +77,7 @@ export default function AdCard({
   const badgeColor = isDonation ? "bg-green-500" : "bg-vitrii-blue";
 
   return (
-    <div className="vitrii-card overflow-hidden hover:scale-105 transition-transform duration-200 cursor-pointer relative">
+    <div className="vitrii-card card-hover overflow-hidden cursor-pointer relative">
       {isDonation && (
         <div className="absolute top-3 right-3 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold z-10">
           GRÁTIS
@@ -93,13 +93,13 @@ export default function AdCard({
             toggleFavoritoMutation.mutate(anuncio.id);
           }}
           disabled={toggleFavoritoMutation.isPending}
-          className="p-2 bg-white rounded-full hover:bg-gray-100 transition-colors"
+          className="p-2 bg-white rounded-full hover:bg-gray-100 heart-toggle"
           title={
             isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"
           }
         >
           <Heart
-            className={`w-5 h-5 transition-colors ${
+            className={`w-5 h-5 ${
               isFavorited ? "fill-red-500 text-red-500" : "text-gray-400"
             }`}
           />
