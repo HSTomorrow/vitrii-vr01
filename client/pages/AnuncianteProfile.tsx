@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { QRCodeSVG } from "qrcode.react";
@@ -20,7 +21,10 @@ import {
   Calendar,
   QrCode,
   Download,
+  Store,
 } from "lucide-react";
+import ImageWithFallback from "@/components/ImageWithFallback";
+import { getAnuncianteInitials } from "@/utils/imageFallback";
 
 interface Anunciante {
   id: number;
@@ -203,18 +207,15 @@ export default function AnuncianteProfile() {
         {/* Header Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           {/* Logo/Imagem */}
-          <div
-            className={`bg-gradient-to-br ${getTipoBgColor(anunciante.tipo)} rounded-lg h-64 md:h-80 flex items-center justify-center overflow-hidden`}
-          >
-            {anunciante.fotoUrl ? (
-              <img
-                src={anunciante.fotoUrl}
-                alt={anunciante.nome}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <User className="w-24 h-24 text-white opacity-50" />
-            )}
+          <div className={`bg-gradient-to-br ${getTipoBgColor(anunciante.tipo)} rounded-lg h-64 md:h-80 overflow-hidden`}>
+            <ImageWithFallback
+              src={anunciante.fotoUrl || null}
+              alt={anunciante.nome}
+              fallbackIcon={<Store className="w-24 h-24 text-white opacity-50" />}
+              containerClassName="w-full h-full"
+              className="w-full h-full object-cover"
+              fallbackInitials={getAnuncianteInitials(anunciante)}
+            />
           </div>
 
           {/* Info Section */}

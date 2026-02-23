@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import ImageWithFallback from "@/components/ImageWithFallback";
+import { normalizeImageUrl } from "@/utils/imageFallback";
 
 interface Banner {
   id: number;
@@ -73,12 +75,17 @@ export default function BannerCarousel({
     const textColor = getTextColor(currentBanner.corFonte);
     return (
     <div className="w-full h-full relative overflow-hidden rounded-lg">
-      {/* Background Image */}
-      <img
-        src={currentBanner.imagemUrl}
-        alt={currentBanner.titulo}
-        className="w-full h-full object-cover"
-      />
+      {/* Background Image with Fallback */}
+      <div className="absolute inset-0 -z-10">
+        <ImageWithFallback
+          src={normalizeImageUrl(currentBanner.imagemUrl)}
+          alt={currentBanner.titulo}
+          containerClassName="w-full h-full"
+          className="w-full h-full"
+          objectFit="cover"
+          fallbackText={currentBanner.titulo || "Banner"}
+        />
+      </div>
 
       {/* Overlay */}
       <div className="absolute inset-0 bg-black/30 flex flex-col items-center justify-center p-2">

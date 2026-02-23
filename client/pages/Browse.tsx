@@ -8,6 +8,8 @@ import Pagination from "@/components/Pagination";
 import LocalidadeFilter from "@/components/LocalidadeFilter";
 import SearchOverlay from "@/components/SearchOverlay";
 import { useAuth } from "@/contexts/AuthContext";
+import ImageWithFallback from "@/components/ImageWithFallback";
+import { getAnuncioImage, getImageAlt } from "@/utils/imageFallback";
 
 const CATEGORIES = [
   { value: "roupas", label: "Roupas" },
@@ -500,18 +502,14 @@ export default function Browse() {
                           className="vitrii-card overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
                           onClick={() => navigate(`/anuncio/${anuncio.id}`)}
                         >
-                          <div className="w-full h-52 bg-gradient-to-br from-vitrii-blue to-vitrii-blue-dark flex items-center justify-center overflow-hidden">
-                            {anuncio.imagem || anuncio.anunciantes?.fotoUrl ? (
-                              <img
-                                src={
-                                  anuncio.imagem || anuncio.anunciantes?.fotoUrl
-                                }
-                                alt={anuncio.titulo}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <Package className="w-12 h-12 text-white opacity-50" />
-                            )}
+                          <div className="w-full bg-gradient-to-br from-vitrii-blue to-vitrii-blue-dark">
+                            <ImageWithFallback
+                              src={getAnuncioImage(anuncio)}
+                              alt={getImageAlt(anuncio.titulo)}
+                              fallbackIcon={<Package className="w-12 h-12 text-white opacity-50" />}
+                              containerClassName="w-full h-52"
+                              className="w-full h-full object-cover"
+                            />
                           </div>
 
                           <div className="p-4 flex flex-col h-full">

@@ -17,6 +17,8 @@ import {
   Store,
   ArrowRight,
 } from "lucide-react";
+import ImageWithFallback from "@/components/ImageWithFallback";
+import { getAnuncioImage, getImageAlt } from "@/utils/imageFallback";
 
 const ITEMS_PER_PAGE = 12;
 
@@ -418,16 +420,14 @@ export default function SearchAnuncios() {
                             className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
                           >
                             {/* Logo/Imagem */}
-                            <div className="w-full h-40 bg-gradient-to-br from-vitrii-blue to-vitrii-blue-dark flex items-center justify-center overflow-hidden">
-                              {anunciante.fotoUrl ? (
-                                <img
-                                  src={anunciante.fotoUrl}
-                                  alt={anunciante.nome}
-                                  className="w-full h-full object-cover"
-                                />
-                              ) : (
-                                <Store className="w-12 h-12 text-white opacity-50" />
-                              )}
+                            <div className="w-full bg-gradient-to-br from-vitrii-blue to-vitrii-blue-dark">
+                              <ImageWithFallback
+                                src={anunciante.fotoUrl || null}
+                                alt={anunciante.nome}
+                                fallbackIcon={<Store className="w-12 h-12 text-white opacity-50" />}
+                                containerClassName="w-full h-40"
+                                className="w-full h-full object-cover"
+                              />
                             </div>
 
                             {/* Content */}
@@ -523,16 +523,14 @@ export default function SearchAnuncios() {
                           onClick={() => navigate(`/anuncio/${anuncio.id}`)}
                           className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
                         >
-                          <div className="aspect-video bg-vitrii-gray-light flex items-center justify-center overflow-hidden relative">
-                            {anuncio.imagem ? (
-                              <img
-                                src={anuncio.imagem}
-                                alt={anuncio.titulo}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <Package className="w-12 h-12 text-gray-400" />
-                            )}
+                          <div className="bg-vitrii-gray-light relative">
+                            <ImageWithFallback
+                              src={getAnuncioImage(anuncio)}
+                              alt={getImageAlt(anuncio.titulo)}
+                              fallbackIcon={<Package className="w-12 h-12 text-gray-400" />}
+                              containerClassName="w-full aspect-video"
+                              className="w-full h-full object-cover"
+                            />
                             {anuncio.destaque && (
                               <div className="absolute top-2 right-2 bg-vitrii-yellow text-vitrii-text px-2 py-1 rounded text-xs font-bold">
                                 ⭐ DESTAQUE
@@ -574,16 +572,14 @@ export default function SearchAnuncios() {
                           onClick={() => navigate(`/anuncio/${anuncio.id}`)}
                           className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-shadow cursor-pointer flex gap-4"
                         >
-                          <div className="w-32 h-32 bg-vitrii-gray-light rounded flex items-center justify-center flex-shrink-0">
-                            {anuncio.imagem ? (
-                              <img
-                                src={anuncio.imagem}
-                                alt={anuncio.titulo}
-                                className="w-full h-full object-cover rounded"
-                              />
-                            ) : (
-                              <Package className="w-8 h-8 text-gray-400" />
-                            )}
+                          <div className="w-32 h-32 bg-vitrii-gray-light rounded flex-shrink-0 overflow-hidden">
+                            <ImageWithFallback
+                              src={getAnuncioImage(anuncio)}
+                              alt={getImageAlt(anuncio.titulo)}
+                              fallbackIcon={<Package className="w-8 h-8 text-gray-400" />}
+                              containerClassName="w-full h-full"
+                              className="w-full h-full object-cover rounded"
+                            />
                           </div>
                           <div className="flex-1">
                             <div className="flex items-start justify-between mb-2">

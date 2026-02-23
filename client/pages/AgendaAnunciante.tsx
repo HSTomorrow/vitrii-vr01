@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
+import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -8,7 +9,9 @@ import Footer from "@/components/Footer";
 import EventosAgendaCalendar from "@/components/EventosAgendaCalendar";
 import ReservaEventoModal from "@/components/ReservaEventoModal";
 import ShareAgendaModal from "@/components/ShareAgendaModal";
-import { Loader, Share2, Lock } from "lucide-react";
+import { Loader, Share2, Lock, Store } from "lucide-react";
+import ImageWithFallback from "@/components/ImageWithFallback";
+import { getAnuncianteInitials } from "@/utils/imageFallback";
 
 interface Evento {
   id: number;
@@ -118,13 +121,16 @@ export default function AgendaAnunciante() {
         {/* Header Section */}
         <div className="mb-8">
           <div className="flex items-center gap-4 mb-4">
-            {anunciante.fotoUrl && (
-              <img
-                src={anunciante.fotoUrl}
+            <div className="w-16 h-16 rounded-full overflow-hidden flex-shrink-0 border-2 border-vitrii-blue">
+              <ImageWithFallback
+                src={anunciante.fotoUrl || null}
                 alt={anunciante.nome}
-                className="w-16 h-16 rounded-full object-cover border-2 border-vitrii-blue"
+                fallbackIcon={<Store className="w-8 h-8 text-vitrii-blue" />}
+                containerClassName="w-full h-full bg-vitrii-gray-light"
+                className="w-full h-full object-cover"
+                fallbackInitials={getAnuncianteInitials(anunciante)}
               />
-            )}
+            </div>
             <div>
               <h1 className="text-3xl font-bold text-vitrii-text">
                 {anunciante.nome}

@@ -8,6 +8,7 @@ import { QRCodeSVG } from "qrcode.react";
 import ImageZoom from "./ImageZoom";
 import QRCodeModal from "./QRCodeModal";
 import WishlistButton from "./WishlistButton";
+import { getAnuncioImage, getImageAlt, getAnuncianteInitials } from "@/utils/imageFallback";
 
 interface AdCardProps {
   anuncio: any;
@@ -176,13 +177,8 @@ export default function AdCard({
       {/* Image with fallback chain: anuncio > anunciante > icon */}
       <div className={`w-full bg-gradient-to-br ${backgroundColor}`}>
         <ImageZoom
-          src={
-            anuncio.imagem ||
-            anuncio.fotoUrl ||
-            anunciante?.fotoUrl ||
-            anuncio.anunciante?.fotoUrl
-          }
-          alt={anuncio.titulo}
+          src={getAnuncioImage(anuncio)}
+          alt={getImageAlt(anuncio.titulo)}
           fallbackIcon={<Package className="w-12 h-12 text-white opacity-50" />}
           containerClassName="w-full h-[9.6rem]"
           className="w-full h-full object-cover"

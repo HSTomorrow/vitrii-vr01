@@ -18,6 +18,8 @@ import {
   Globe,
   User as UserIcon,
 } from "lucide-react";
+import { AdImageWithFallback } from "@/components/ImageWithFallback";
+import { getImageAlt } from "@/utils/imageFallback";
 
 interface WishlistItem {
   id: number;
@@ -354,19 +356,16 @@ export default function ListaDesejosPage() {
                           className="bg-white border-2 border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
                         >
                           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                            {/* Image */}
-                            {item.imagem && (
-                              <div className="flex items-center justify-center">
-                                <img
-                                  src={item.imagem}
-                                  alt={item.titulo}
-                                  className="h-32 w-32 object-cover rounded-lg"
-                                />
-                              </div>
-                            )}
+                            {/* Image with Fallback */}
+                            <AdImageWithFallback
+                              src={item.imagem || null}
+                              alt={getImageAlt(item.titulo)}
+                              containerClassName="h-32 w-32 rounded-lg flex-shrink-0"
+                              fallbackText={item.titulo?.substring(0, 10) || "Imagem"}
+                            />
 
                             {/* Info */}
-                            <div className={item.imagem ? "md:col-span-2" : "md:col-span-3"}>
+                            <div className="md:col-span-2">
                               <h3 className="text-lg font-bold text-vitrii-text mb-2 line-clamp-2">
                                 {item.titulo}
                               </h3>

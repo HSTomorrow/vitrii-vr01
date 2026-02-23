@@ -1,12 +1,15 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
 import { ShoppingBag, ArrowRight, Trash2, Eye, DollarSign, Copy, Check, X } from "lucide-react";
 import { toast } from "sonner";
 import AdCard from "@/components/AdCard";
+import ImageWithFallback from "@/components/ImageWithFallback";
+import { getAnuncioImage, getImageAlt } from "@/utils/imageFallback";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -288,17 +291,13 @@ export default function MeusAnuncios() {
                 <div className="flex flex-col sm:flex-row gap-4 p-6">
                   {/* Image */}
                   <div className="flex-shrink-0">
-                    {anuncio.imagem ? (
-                      <img
-                        src={anuncio.imagem}
-                        alt={anuncio.titulo}
-                        className="w-24 h-24 object-cover rounded-lg"
-                      />
-                    ) : (
-                      <div className="w-24 h-24 bg-gray-200 rounded-lg flex items-center justify-center">
-                        <ShoppingBag className="w-8 h-8 text-gray-400" />
-                      </div>
-                    )}
+                    <ImageWithFallback
+                      src={getAnuncioImage(anuncio)}
+                      alt={getImageAlt(anuncio.titulo)}
+                      fallbackIcon={<ShoppingBag className="w-8 h-8 text-gray-400" />}
+                      containerClassName="w-24 h-24 rounded-lg"
+                      className="w-full h-full object-cover"
+                    />
                   </div>
 
                   {/* Info */}

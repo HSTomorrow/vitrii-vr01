@@ -15,9 +15,12 @@ import {
   MessageSquare,
   Tag,
   Briefcase,
+  User,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import ImageWithFallback from "@/components/ImageWithFallback";
+import { getUserInitials } from "@/utils/imageFallback";
 
 interface Contato {
   id: number;
@@ -572,9 +575,25 @@ export default function CadastroContatos() {
                         {filteredContatos.map((contato: Contato) => (
                           <div
                             key={contato.id}
-                            className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
+                            className="bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow flex gap-0"
                           >
-                            <div className="flex items-start justify-between mb-3">
+                            {/* Contact Image */}
+                            <div className="w-24 h-24 flex-shrink-0 overflow-hidden rounded-l-lg">
+                              <ImageWithFallback
+                                src={contato.imagem || null}
+                                alt={contato.nome}
+                                fallbackIcon={
+                                  <User className="w-12 h-12 text-vitrii-blue" />
+                                }
+                                containerClassName="w-full h-full bg-vitrii-gray-light"
+                                className="w-full h-full object-cover"
+                                fallbackInitials={getUserInitials(contato)}
+                              />
+                            </div>
+
+                            {/* Contact Info */}
+                            <div className="flex-1 p-4">
+                              <div className="flex items-start justify-between mb-3">
                               <div className="flex-1">
                                 <h3 className="text-lg font-semibold text-vitrii-text">
                                   {contato.nome}
@@ -592,7 +611,7 @@ export default function CadastroContatos() {
                               </span>
                             </div>
 
-                            <div className="space-y-2 mb-4 text-sm">
+                              <div className="space-y-2 mb-4 text-sm">
                               <div className="flex items-center gap-2 text-vitrii-text">
                                 <Phone className="w-4 h-4 text-vitrii-blue" />
                                 <span>{contato.celular}</span>
@@ -620,9 +639,9 @@ export default function CadastroContatos() {
                                   </span>
                                 </div>
                               )}
-                            </div>
+                              </div>
 
-                            <div className="flex gap-2 pt-3 border-t border-gray-100">
+                              <div className="flex gap-2 pt-3 border-t border-gray-100">
                               <button
                                 onClick={() => handleEdit(contato)}
                                 className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 text-vitrii-blue rounded-lg hover:bg-blue-100 transition-colors"
@@ -638,6 +657,7 @@ export default function CadastroContatos() {
                                 <Trash2 className="w-4 h-4" />
                                 Deletar
                               </button>
+                              </div>
                             </div>
                           </div>
                         ))}
