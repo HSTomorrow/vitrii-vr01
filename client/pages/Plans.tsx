@@ -19,8 +19,61 @@ export default function Plans() {
       {/* Plans Section */}
       <div className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Plan 1: Por Anúncio */}
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Plan 1: Gratuito */}
+            <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
+              <div className="bg-gray-500 p-8 text-white">
+                <h2 className="text-2xl font-bold mb-2">Gratuito</h2>
+                <p className="text-gray-100">Para começar sem custo</p>
+              </div>
+
+              <div className="p-8">
+                <div className="mb-8">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-5xl font-bold text-vitrii-text">
+                      R$ 0
+                    </span>
+                    <span className="text-vitrii-text-secondary">/mês</span>
+                  </div>
+                  <p className="text-sm text-vitrii-text-secondary mt-2">
+                    3 anúncios grátis para começar
+                  </p>
+                </div>
+
+                <div className="space-y-4 mb-8">
+                  <div className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
+                    <span className="text-vitrii-text">
+                      3 anúncios gratuitos
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
+                    <span className="text-vitrii-text">
+                      Fotos e descrição
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
+                    <span className="text-vitrii-text">
+                      Validade de 7 dias
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
+                    <span className="text-vitrii-text">
+                      Acesso ao painel de controle
+                    </span>
+                  </div>
+                </div>
+
+                <button className="w-full px-4 py-3 bg-gray-500 text-white rounded-lg font-semibold hover:bg-gray-600 transition-colors">
+                  Comece Grátis
+                </button>
+              </div>
+            </div>
+
+            {/* Plan 2: Por Anúncio */}
             <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow">
               <div className="bg-vitrii-blue p-8 text-white">
                 <h2 className="text-2xl font-bold mb-2">Por Anúncio</h2>
@@ -56,7 +109,7 @@ export default function Plans() {
                   <div className="flex items-center gap-3">
                     <Check className="w-5 h-5 text-green-600 flex-shrink-0" />
                     <span className="text-vitrii-text">
-                      Validade de 7 dias
+                      Validade de 30 dias
                     </span>
                   </div>
                   <div className="flex items-center gap-3">
@@ -168,7 +221,7 @@ export default function Plans() {
                 Quanto tempo dura um anúncio?
               </h3>
               <p className="text-vitrii-text-secondary">
-                Cada anúncio tem uma validade de 7 dias por padrão. Você pode renovar o anúncio ou criar um novo após expiração se quiser continuar anunciando.
+                No plano Por Anúncio, cada anúncio tem uma validade de 30 dias por padrão. No plano Gratuito, a validade é de 7 dias. Você pode renovar o anúncio ou criar um novo após expiração se quiser continuar anunciando.
               </p>
             </div>
 
