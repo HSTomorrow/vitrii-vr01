@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Heart, X, Plus, Loader } from "lucide-react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import {
@@ -34,6 +34,7 @@ export default function WishlistModal({
   anuncioPreco,
 }: WishlistModalProps) {
   const { user, isLoggedIn } = useAuth();
+  const queryClient = useQueryClient();
   const [selectedListaId, setSelectedListaId] = useState<number | null>(null);
   const [precoDesejado, setPrecoDesejado] = useState<string>("");
   const [observacoes, setObservacoes] = useState<string>("");
@@ -78,6 +79,8 @@ export default function WishlistModal({
       return response.json();
     },
     onSuccess: (data) => {
+      // Invalidate the wishlists query to refresh the list
+      queryClient.invalidateQueries({ queryKey: ["user-wishlists"] });
       setSelectedListaId(data.data.id);
       setNewListaTitulo("");
       setShowNewListForm(false);
@@ -116,6 +119,8 @@ export default function WishlistModal({
       return response.json();
     },
     onSuccess: () => {
+      // Invalidate the wishlists query to refresh the items count
+      queryClient.invalidateQueries({ queryKey: ["user-wishlists"] });
       toast.success("Item adicionado à lista de desejos!");
       onOpenChange(false);
       setPrecoDesejado("");
