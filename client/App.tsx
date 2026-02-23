@@ -49,6 +49,9 @@ import MeusAnuncios from "./pages/MeusAnuncios";
 import MinhaAgenda from "./pages/MinhaAgenda";
 import AgendaAnunciante from "./pages/AgendaAnunciante";
 import AnuncianteProfile from "./pages/AnuncianteProfile";
+import HelpAndContact from "./pages/HelpAndContact";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfUse from "./pages/TermsOfUse";
 import BottomNavBar from "@/components/BottomNavBar";
 import PageTransition from "@/components/PageTransition";
 
@@ -67,6 +70,9 @@ export default function App() {
                 <Routes>
                   <Route path="/" element={<Index />} />
                   <Route path="/about" element={<About />} />
+                  <Route path="/ajuda-e-contato" element={<HelpAndContact />} />
+                  <Route path="/privacidade" element={<PrivacyPolicy />} />
+                  <Route path="/termos-de-uso" element={<TermsOfUse />} />
                   <Route path="/browse" element={<Browse />} />
                   <Route path="/sell" element={<Sell />} />
                   <Route path="/qrcode" element={<QRCodePage />} />

@@ -157,6 +157,49 @@ export default function About() {
         </div>
       </section>
 
+      {/* About HeresTomorrow Section */}
+      <section className="py-16 md:py-24 bg-vitrii-gray-light">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="vitrii-card p-8 md:p-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-vitrii-text mb-6">
+              Sobre a HeresTomorrow
+            </h2>
+
+            <div className="space-y-6 text-vitrii-text-secondary">
+              <p className="text-lg">
+                O <span className="font-semibold text-vitrii-text">Vitrii</span> é desenvolvido pela <span className="font-semibold text-vitrii-text">HeresTomorrow</span>, uma empresa especializada em desenvolvimento de soluções tecnológicas inovadoras.
+              </p>
+
+              <p>
+                Somos apaixonados por criar ferramentas que transformam a forma como pessoas e negócios interagem. Com foco em inovação e excelência, desenvolvemos plataformas que conectam, facilitam e inspiram.
+              </p>
+
+              <p>
+                O Vitrii é um exemplo do nosso compromisso em criar soluções que resolvem problemas reais do mercado, trazendo tecnologia acessível e funcional para vendedores e compradores em toda a região.
+              </p>
+
+              <div className="mt-8 pt-8 border-t border-gray-300">
+                <h3 className="font-semibold text-vitrii-text mb-4">Entre em Contato</h3>
+                <div className="space-y-2">
+                  <p>
+                    <span className="font-semibold">Email:</span>{" "}
+                    <a href="mailto:contato@herestomorrow.com.br" className="text-vitrii-blue hover:underline">
+                      contato@herestomorrow.com.br
+                    </a>
+                  </p>
+                  <p>
+                    <span className="font-semibold">Telefone/WhatsApp:</span>{" "}
+                    <a href="https://wa.me/5551991930384" target="_blank" rel="noopener noreferrer" className="text-vitrii-blue hover:underline">
+                      +55 51 99193-0384
+                    </a>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-16 md:py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

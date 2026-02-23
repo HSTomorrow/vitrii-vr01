@@ -14,9 +14,15 @@ export default function Footer() {
               </div>
               <span>Vitrii</span>
             </h3>
-            <p className="text-gray-300 text-sm">
+            <p className="text-gray-300 text-sm mb-3">
               Marketplace conectando compradores e vendedores com tecnologia QR
               Code inovadora.
+            </p>
+            <p className="text-gray-400 text-xs">
+              Desenvolvido pela <span className="font-semibold">HeresTomorrow</span>, especializada em soluções tecnológicas.
+            </p>
+            <p className="text-gray-400 text-xs mt-2">
+              <a href="mailto:contato@herestomorrow.com.br" className="hover:text-vitrii-yellow transition-colors">contato@herestomorrow.com.br</a>
             </p>
           </div>
 
@@ -111,36 +117,28 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <a
-                  href="#"
+                <Link
+                  to="/ajuda-e-contato"
                   className="hover:text-vitrii-yellow transition-colors"
                 >
-                  Central de Ajuda
-                </a>
+                  Ajuda e Contato
+                </Link>
               </li>
               <li>
-                <a
-                  href="mailto:vitriimarketplace@gmail.com"
+                <Link
+                  to="/privacidade"
                   className="hover:text-vitrii-yellow transition-colors"
                 >
-                  Contato
-                </a>
+                  Política de Privacidade
+                </Link>
               </li>
               <li>
-                <a
-                  href="#"
-                  className="hover:text-vitrii-yellow transition-colors"
-                >
-                  Políticas
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
+                <Link
+                  to="/termos-de-uso"
                   className="hover:text-vitrii-yellow transition-colors"
                 >
                   Termos de Uso
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -153,34 +151,40 @@ export default function Footer() {
             <a
               href="#"
               className="text-gray-400 hover:text-vitrii-yellow transition-colors"
+              title="Facebook"
             >
               <Facebook className="w-5 h-5" />
             </a>
             <a
               href="#"
               className="text-gray-400 hover:text-vitrii-yellow transition-colors"
+              title="Instagram"
             >
               <Instagram className="w-5 h-5" />
             </a>
             <a
               href="#"
               className="text-gray-400 hover:text-vitrii-yellow transition-colors"
+              title="Twitter"
             >
               <Twitter className="w-5 h-5" />
             </a>
             <a
-              href="mailto:vitriimarketplace@gmail.com"
+              href="mailto:contato@herestomorrow.com.br"
               className="text-gray-400 hover:text-vitrii-yellow transition-colors"
+              title="Email"
             >
               <Mail className="w-5 h-5" />
             </a>
           </div>
 
           {/* Bottom Text */}
-          <div className="text-center text-gray-400 text-sm">
+          <div className="text-center text-gray-400 text-sm space-y-2">
             <p>
-              &copy; 2024 Vitrii. Todos os direitos reservados. | Desenvolvido
-              com ❤️ para vendedores e compradores
+              &copy; 2024 Vitrii. Todos os direitos reservados.
+            </p>
+            <p>
+              Desenvolvido com ❤️ por <a href="https://herestomorrow.com.br" target="_blank" rel="noopener noreferrer" className="text-vitrii-yellow hover:underline">HeresTomorrow</a>
             </p>
           </div>
         </div>
