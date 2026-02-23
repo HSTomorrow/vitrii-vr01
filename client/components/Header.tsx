@@ -7,7 +7,8 @@ import {
   MessageSquare,
   Shield,
   FileText,
-  Heart,
+  Star,
+  Gift,
   MapPin,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -72,13 +73,23 @@ export default function Header() {
               </Link>
 
               {user && (
-                <Link
-                  to="/favoritos"
-                  className="flex-shrink-0 p-2 hover:bg-vitrii-gray rounded-lg transition-colors"
-                  title="Meus favoritos"
-                >
-                  <Heart className="w-5 h-5 text-vitrii-text" />
-                </Link>
+                <>
+                  <Link
+                    to="/favoritos"
+                    className="flex-shrink-0 p-2 hover:bg-vitrii-gray rounded-lg transition-colors"
+                    title="Meus favoritos"
+                  >
+                    <Star className="w-5 h-5 text-vitrii-text" />
+                  </Link>
+
+                  <Link
+                    to="/lista-de-desejos"
+                    className="flex-shrink-0 p-2 hover:bg-vitrii-gray rounded-lg transition-colors"
+                    title="Minha lista de desejos"
+                  >
+                    <Gift className="w-5 h-5 text-vitrii-text" />
+                  </Link>
+                </>
               )}
 
               {user ? (

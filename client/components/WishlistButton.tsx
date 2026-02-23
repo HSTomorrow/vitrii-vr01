@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Heart } from "lucide-react";
+import { Gift } from "lucide-react";
 import WishlistModal from "./WishlistModal";
 
 interface WishlistButtonProps {
@@ -27,10 +27,10 @@ export default function WishlistButton({
             e.stopPropagation();
             setShowModal(true);
           }}
-          className={`p-2 rounded-full transition-all shadow-lg hover:shadow-xl transform hover:scale-110 bg-white hover:bg-red-50 ${className}`}
+          className={`p-2 rounded-full transition-all shadow-lg hover:shadow-xl transform hover:scale-110 bg-white hover:bg-purple-50 ${className}`}
           title="Adicionar à Lista de Desejos"
         >
-          <Heart className="w-5 h-5 text-red-500" />
+          <Gift className="w-5 h-5 text-purple-600" />
         </button>
         <WishlistModal
           open={showModal}
@@ -47,9 +47,9 @@ export default function WishlistButton({
     <>
       <button
         onClick={() => setShowModal(true)}
-        className={`w-full flex items-center justify-center gap-2 px-4 py-2 border-2 border-red-300 text-red-600 rounded-lg font-semibold hover:bg-red-50 transition-colors text-sm ${className}`}
+        className={`w-full flex items-center justify-center gap-2 px-4 py-2 border-2 border-purple-300 text-purple-600 rounded-lg font-semibold hover:bg-purple-50 transition-colors text-sm ${className}`}
       >
-        <Heart className="w-4 h-4" />
+        <Gift className="w-4 h-4" />
         Lista de Desejos
       </button>
       <WishlistModal
