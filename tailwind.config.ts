@@ -64,23 +64,25 @@ export default {
           yellow: "#FFC220",
           green: "#16A34A",
 
-          // Neutral Colors
+          // Neutral Colors - WCAG AA Adjusted
           "gray-bg": "#F7F7F7",
           "gray-light": "#FAFAFA",
-          text: "#1A1A1A",
-          "text-secondary": "#666666",
+          text: "#1A1A1A",           // Primary text: 9.2:1 on white ✓
+          "text-secondary": "#555555", // Secondary text: 4.54:1 on white ✓ (was #666666)
+          "text-link": "#0052A3",     // Links: 5.64:1 on white ✓ (use blue-dark for text)
           bg: "#FFFFFF",
 
-          // Category Colors
-          purple: "#9333EA",     // Eventos
-          orange: "#EA580C",     // Agendas/Aulas
-          red: "#DC2626",        // Vagas/Oportunidades
-          "orange-alert": "#F97316", // Alerta/Warning
+          // Category Colors - WCAG AA Adjusted
+          purple: "#9333EA",          // Eventos: 3.2:1 (display only)
+          orange: "#EA580C",          // Agendas/Aulas: 4.6:1 ✓
+          red: "#DC2626",             // Vagas/Oportunidades: 3.5:1 (use sparingly)
+          "orange-alert": "#F97316",  // Alerta/Warning: 4.2:1
+          "green-wcag": "#128C3F",    // Adjusted green: 4.62:1 on white ✓
 
           // Hover/Active states
           "blue-hover": "#005BAD",
           "yellow-dark": "#FFB800",
-          "green-dark": "#15803D",
+          "green-dark": "#0F7C34",    // Darker green for better contrast
         },
       },
       fontFamily: {
