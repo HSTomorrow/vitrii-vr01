@@ -448,11 +448,11 @@ export default function ListaDesejosPage() {
                                         className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
                                       >
                                         <option value="">Sem prioridade</option>
-                                        <option value="1">1 - Alto</option>
-                                        <option value="2">2 - Médio-Alto</option>
-                                        <option value="3">3 - Médio</option>
-                                        <option value="4">4 - Médio-Baixo</option>
-                                        <option value="5">5 - Baixo</option>
+                                        <option value="1">1 - Salvo</option>
+                                        <option value="2">2 - Pensando</option>
+                                        <option value="3">3 - Gostei</option>
+                                        <option value="4">4 - Quero Muito</option>
+                                        <option value="5">5 - Adorei</option>
                                       </select>
                                     </div>
 
@@ -517,28 +517,28 @@ export default function ListaDesejosPage() {
                                         </p>
                                         <div className="inline-block">
                                           {item.prioridade === 1 && (
-                                            <span className="text-xs font-bold bg-red-100 text-red-800 px-2 py-1 rounded">
-                                              🔴 Alto
+                                            <span className="text-xs font-bold bg-gray-100 text-gray-800 px-2 py-1 rounded">
+                                              💾 Salvo
                                             </span>
                                           )}
                                           {item.prioridade === 2 && (
-                                            <span className="text-xs font-bold bg-orange-100 text-orange-800 px-2 py-1 rounded">
-                                              🟠 Médio-Alto
+                                            <span className="text-xs font-bold bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                                              🤔 Pensando
                                             </span>
                                           )}
                                           {item.prioridade === 3 && (
                                             <span className="text-xs font-bold bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
-                                              🟡 Médio
+                                              👍 Gostei
                                             </span>
                                           )}
                                           {item.prioridade === 4 && (
-                                            <span className="text-xs font-bold bg-blue-100 text-blue-800 px-2 py-1 rounded">
-                                              🔵 Médio-Baixo
+                                            <span className="text-xs font-bold bg-orange-100 text-orange-800 px-2 py-1 rounded">
+                                              🔥 Quero Muito
                                             </span>
                                           )}
                                           {item.prioridade === 5 && (
-                                            <span className="text-xs font-bold bg-gray-100 text-gray-800 px-2 py-1 rounded">
-                                              ⚪ Baixo
+                                            <span className="text-xs font-bold bg-red-100 text-red-800 px-2 py-1 rounded">
+                                              ❤️ Adorei
                                             </span>
                                           )}
                                         </div>
