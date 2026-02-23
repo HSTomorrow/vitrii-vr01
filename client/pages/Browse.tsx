@@ -124,21 +124,26 @@ export default function Browse() {
   });
 
   // Fetch anunciantes for selected localidade
-  const { data: localidadeAnunciantesData } = useQuery({
+  const { data: localidadeAnunciantesData, isLoading: localidadeLoading } = useQuery({
     queryKey: ["localidade-anunciantes", selectedLocalidade],
     queryFn: async () => {
       if (!selectedLocalidade) return null;
+      console.log("[Browse] Fetching anunciantes for localidade:", selectedLocalidade);
       const response = await fetch(
         `/api/localidades/${selectedLocalidade}/anunciantes`,
       );
       if (!response.ok) throw new Error("Erro ao buscar anunciantes");
-      return response.json();
+      const data = await response.json();
+      console.log("[Browse] Anunciantes fetched:", data);
+      return data;
     },
     enabled: !!selectedLocalidade,
   });
 
   const allAnuncios = anunciosData?.data || [];
   console.log("Browse: Total anuncios available:", allAnuncios.length);
+  console.log("[Browse] selectedLocalidade:", selectedLocalidade);
+  console.log("[Browse] localidadeAnunciantesData:", localidadeAnunciantesData);
 
   // Extract unique locations for filter dropdown
   const uniqueLocations = useMemo(() => {
@@ -204,11 +209,19 @@ export default function Browse() {
 
       // Filter by localidade if selected (ignore if viewing specific anunciante)
       if (selectedLocalidade && !anuncianteIdParam) {
-        const anunciantesFromLocalidade = (
-          localidadeAnunciantesData?.data || []
-        ).map((a: any) => a.id);
-        if (!anunciantesFromLocalidade.includes(anuncio.anuncianteId)) {
-          return false;
+        // Only filter if localidade data has been loaded (avoid filtering while loading)
+        if (localidadeAnunciantesData) {
+          const anunciantesFromLocalidade = (
+            localidadeAnunciantesData?.data || []
+          ).map((a: any) => a.id);
+          // Ensure comparison is done with numbers (convert string to number if needed)
+          const anuncioAnuncianteId = typeof anuncio.anuncianteId === "string"
+            ? parseInt(anuncio.anuncianteId)
+            : anuncio.anuncianteId;
+          console.log("[Browse Filter] Localidade filtering - Anuncios from localidade:", anunciantesFromLocalidade, "Current anuncio anuncianteId:", anuncioAnuncianteId);
+          if (!anunciantesFromLocalidade.includes(anuncioAnuncianteId)) {
+            return false;
+          }
         }
       }
 
@@ -267,6 +280,11 @@ export default function Browse() {
 
   const handleLocationChange = (value: string) => {
     setSelectedLocation(value);
+    handleFilterChange();
+  };
+
+  const handleLocalidadeChange = (value: number | null) => {
+    setSelectedLocalidade(value);
     handleFilterChange();
   };
 
@@ -437,7 +455,7 @@ export default function Browse() {
                   {!anuncianteIdParam && (
                     <LocalidadeFilter
                       value={selectedLocalidade}
-                      onChange={setSelectedLocalidade}
+                      onChange={handleLocalidadeChange}
                       showLabel={true}
                       placeholder="Todas as localidades"
                     />
