@@ -286,7 +286,7 @@ export default function AnuncioDetalhe() {
       <Header />
 
       {/* Main Content */}
-      <main className="flex-1 py-12">
+      <main className="flex-1 py-12 pb-32 md:pb-12">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Back Button */}
           <button
@@ -995,6 +995,69 @@ export default function AnuncioDetalhe() {
           </div>
         </div>
       )}
+
+      {/* Sticky CTA Bar - Mobile Only */}
+      <div className="fixed bottom-0 left-0 right-0 md:hidden bg-white border-t border-gray-200 shadow-lg z-40 p-4 space-y-3">
+        {/* Contact Buttons Row */}
+        <div className="flex gap-2">
+          {/* Phone Contact */}
+          {anuncio.telefone && (
+            <a
+              href={`tel:${anuncio.telefone}`}
+              className="flex-1 px-4 py-3 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors flex items-center justify-center gap-2 text-sm"
+            >
+              <Phone className="w-4 h-4" />
+              Ligar
+            </a>
+          )}
+
+          {/* WhatsApp Contact */}
+          {anuncio.telefone && (
+            <a
+              href={`https://wa.me/55${anuncio.telefone.replace(/\D/g, "")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2 text-sm"
+            >
+              <MessageCircle className="w-4 h-4" />
+              WhatsApp
+            </a>
+          )}
+        </div>
+
+        {/* Wishlist & Solicitar Equipe */}
+        <div className="flex gap-2">
+          {/* Wishlist - Icon only for mobile */}
+          <div className="flex-shrink-0">
+            <WishlistButton
+              anuncioId={anuncio.id}
+              anuncioTitulo={anuncio.titulo}
+              anuncioPreco={
+                anuncio.preco ? parseFloat(anuncio.preco.toString()) : undefined
+              }
+              variant="icon"
+            />
+          </div>
+
+          {/* Solicitar Equipe - Full width if available */}
+          {equipes.length > 0 && (
+            <button
+              onClick={() => {
+                if (equipes.length === 1) {
+                  setSelectedEquipeId(equipes[0].id);
+                  setShowMembrosModal(true);
+                } else {
+                  setShowMembrosModal(true);
+                }
+              }}
+              className="flex-1 px-4 py-3 bg-orange-600 text-white rounded-lg font-semibold hover:bg-orange-700 transition-colors flex items-center justify-center gap-2 text-sm"
+            >
+              <Users className="w-4 h-4" />
+              Solicitar
+            </button>
+          )}
+        </div>
+      </div>
 
       <Footer />
     </div>

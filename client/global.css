@@ -164,48 +164,131 @@
 @layer components {
   /* Typography Classes - Per Specification */
   .text-h1 {
-    @apply text-heading-1 font-bold tracking-tight text-vitrii-text;
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #1a1a1a;
+    letter-spacing: -0.01em;
   }
 
   .text-h2 {
-    @apply text-heading-2 font-bold tracking-tight text-vitrii-text;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 1.3;
+    color: #1a1a1a;
+    letter-spacing: -0.01em;
   }
 
   .text-h3 {
-    @apply text-heading-3 font-semibold text-vitrii-text;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: #1a1a1a;
   }
 
   .text-price {
-    @apply text-price font-bold text-vitrii-blue;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #0071CE;
   }
 
   .text-price-green {
-    @apply text-price font-bold text-vitrii-green;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.2;
+    color: #16A34A;
   }
 
   .text-body {
-    @apply text-body font-normal text-vitrii-text-secondary;
+    font-size: 15px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #666666;
   }
 
   .text-label {
-    @apply text-label font-normal text-vitrii-text-secondary;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.4;
+    color: #666666;
   }
 
   .text-button {
-    @apply text-button font-semibold text-white;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: white;
+    letter-spacing: 0.01em;
   }
 
   .text-footer {
-    @apply text-footer font-normal text-vitrii-text-secondary;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.4;
+    color: #666666;
+  }
+
+  /* Additional utility text sizes */
+  .text-xs-label {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.4;
+    color: #666666;
+  }
+
+  .text-sm-body {
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #666666;
   }
 
   /* Button styles with proper typography */
   .vitrii-button {
-    @apply bg-vitrii-blue text-white text-button px-6 py-3 rounded-lg hover:bg-vitrii-blue-dark transition-all duration-200 btn-press shadow-md hover:shadow-lg;
+    background-color: #0071CE;
+    color: white;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0.01em;
+    transition: all 200ms ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .vitrii-button:hover:not(:disabled) {
+    background-color: #0052A3;
+    box-shadow: 0 8px 15px rgba(0, 113, 206, 0.3);
+    transform: translateY(-2px);
+  }
+
+  .vitrii-button:active {
+    transform: scale(0.97);
   }
 
   .vitrii-button-secondary {
-    @apply bg-vitrii-yellow text-vitrii-text text-button px-6 py-3 rounded-lg hover:bg-vitrii-yellow-dark transition-all duration-200 btn-press shadow-md hover:shadow-lg;
+    background-color: #FFC220;
+    color: #1a1a1a;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0.01em;
+    transition: all 200ms ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .vitrii-button-secondary:hover:not(:disabled) {
+    background-color: #FFB800;
+    box-shadow: 0 8px 15px rgba(255, 194, 32, 0.3);
+    transform: translateY(-2px);
+  }
+
+  .vitrii-button-secondary:active {
+    transform: scale(0.97);
   }
 
   /* Improved button states */
