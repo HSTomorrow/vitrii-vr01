@@ -87,8 +87,8 @@ export default function BottomNavBar() {
               aria-label={item.label}
             >
               {item.id === "publish" ? (
-                <div className="bg-vitrii-yellow rounded-full p-3 shadow-lg">
-                  <Icon className="w-6 h-6 text-vitrii-text" />
+                <div className="bg-vitrii-yellow rounded-full p-2.5 shadow-lg">
+                  <Icon className="w-5 h-5 text-vitrii-text" />
                 </div>
               ) : (
                 <>
