@@ -1,16 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
-import { Heart, ArrowRight } from "lucide-react";
+import { Star, ArrowRight } from "lucide-react";
 import AdCard from "@/components/AdCard";
 
 export default function Favoritos() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const [favoritos, setFavoritos] = useState<Set<number>>(new Set());
 
   // Redirect if not logged in
   if (!user) {
@@ -37,7 +35,7 @@ export default function Favoritos() {
   }
 
   // Fetch user's favoritos
-  const { data: favoritosData, isLoading } = useQuery({
+  const { data: favoritosData, isLoading, refetch } = useQuery({
     queryKey: ["favoritos", user?.id],
     queryFn: async () => {
       const response = await fetch(`/api/favoritos?usuarioId=${user.id}`);
@@ -56,7 +54,7 @@ export default function Favoritos() {
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="mb-12">
           <h1 className="text-4xl font-bold text-vitrii-text mb-2 flex items-center gap-3">
-            <Heart className="w-8 h-8 fill-red-500 text-red-500" />
+            <Star className="w-8 h-8 fill-yellow-400 text-yellow-400" />
             Meus Favoritos
           </h1>
           <p className="text-vitrii-text-secondary">
@@ -90,11 +88,8 @@ export default function Favoritos() {
                 isFavorited={true}
                 onFavoritoToggle={(id, isFavorited) => {
                   if (!isFavorited) {
-                    // Remove from list if unfavorited
-                    const newFavoritos = anuncios.filter(
-                      (a: any) => a.id !== id,
-                    );
-                    favoritosData.data = newFavoritos;
+                    // Refetch favorites when an item is unfavorited
+                    refetch();
                   }
                 }}
               />
@@ -102,7 +97,7 @@ export default function Favoritos() {
           </div>
         ) : (
           <div className="text-center py-12">
-            <Heart className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <Star className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <p className="text-vitrii-text-secondary text-lg mb-6">
               Você ainda não tem favoritos
             </p>

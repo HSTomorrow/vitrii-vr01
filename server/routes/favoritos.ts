@@ -20,26 +20,12 @@ export const getFavoritos: RequestHandler = async (req, res) => {
       include: {
         anuncio: {
           include: {
-            anunciante: {
+            anunciantes: {
               select: {
                 id: true,
                 nome: true,
                 fotoUrl: true,
                 endereco: true,
-              },
-            },
-            producto: {
-              select: {
-                id: true,
-                nome: true,
-                descricao: true,
-                tipo: true,
-              },
-            },
-            tabelaDePreco: {
-              select: {
-                id: true,
-                preco: true,
               },
             },
           },
