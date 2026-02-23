@@ -52,6 +52,7 @@ import AnuncianteProfile from "./pages/AnuncianteProfile";
 import HelpAndContact from "./pages/HelpAndContact";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfUse from "./pages/TermsOfUse";
+import Plans from "./pages/Plans";
 import BottomNavBar from "@/components/BottomNavBar";
 import PageTransition from "@/components/PageTransition";
 
@@ -73,6 +74,7 @@ export default function App() {
                   <Route path="/ajuda-e-contato" element={<HelpAndContact />} />
                   <Route path="/privacidade" element={<PrivacyPolicy />} />
                   <Route path="/termos-de-uso" element={<TermsOfUse />} />
+                  <Route path="/planos" element={<Plans />} />
                   <Route path="/browse" element={<Browse />} />
                   <Route path="/sell" element={<Sell />} />
                   <Route path="/qrcode" element={<QRCodePage />} />

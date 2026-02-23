@@ -118,6 +118,14 @@ export default function Footer() {
               </li>
               <li>
                 <Link
+                  to="/planos"
+                  className="hover:text-vitrii-yellow transition-colors"
+                >
+                  Planos de Pagamento
+                </Link>
+              </li>
+              <li>
+                <Link
                   to="/ajuda-e-contato"
                   className="hover:text-vitrii-yellow transition-colors"
                 >
