@@ -17,6 +17,7 @@ interface Anunciante {
   endereco: string;
   cidade: string;
   estado: string;
+  cep?: string;
   descricao: string;
   email: string;
   telefone?: string;
@@ -26,6 +27,7 @@ interface Anunciante {
   whatsapp?: string;
   fotoUrl?: string;
   temAgenda?: boolean;
+  status?: string;
   localidadeId?: number | null;
 }
 
@@ -50,6 +52,7 @@ export default function CadastroAnunciantes() {
     endereco: "",
     cidade: "",
     estado: "RS",
+    cep: "",
     descricao: "",
     email: "",
     telefone: "",
@@ -60,6 +63,7 @@ export default function CadastroAnunciantes() {
     fotoUrl: "",
     temAgenda: false,
     localidadeId: null as number | null,
+    status: "Ativo",
   });
 
   // Fetch anunciantes (filtered by current user, or all if admin)
@@ -164,6 +168,7 @@ export default function CadastroAnunciantes() {
         endereco: "",
         cidade: "",
         estado: "RS",
+        cep: "",
         descricao: "",
         email: "",
         telefone: "",
@@ -174,6 +179,7 @@ export default function CadastroAnunciantes() {
         fotoUrl: "",
         temAgenda: false,
         localidadeId: null,
+        status: "Ativo",
       });
       setEditingId(null);
       setIsFormOpen(false);
@@ -217,6 +223,7 @@ export default function CadastroAnunciantes() {
       endereco: loja.endereco || "",
       cidade: loja.cidade || "",
       estado: loja.estado || "RS",
+      cep: loja.cep || "",
       descricao: loja.descricao || "",
       email: loja.email || "",
       telefone: loja.telefone || "",
@@ -227,6 +234,7 @@ export default function CadastroAnunciantes() {
       fotoUrl: loja.fotoUrl || "",
       temAgenda: loja.temAgenda || false,
       localidadeId: loja.localidadeId || null,
+      status: loja.status || "Ativo",
     });
     setEditingId(loja.id);
     setIsFormOpen(true);
@@ -281,6 +289,7 @@ export default function CadastroAnunciantes() {
                 endereco: "",
                 cidade: "",
                 estado: "RS",
+                cep: "",
                 descricao: "",
                 email: "",
                 telefone: "",
@@ -291,6 +300,7 @@ export default function CadastroAnunciantes() {
                 fotoUrl: "",
                 temAgenda: false,
                 localidadeId: null,
+                status: "Ativo",
               });
             }}
             className="flex items-center gap-2 px-4 py-2 bg-vitrii-yellow text-vitrii-text rounded-lg hover:bg-vitrii-yellow-dark transition-colors font-semibold"
@@ -405,6 +415,23 @@ export default function CadastroAnunciantes() {
                       </option>
                     ))}
                   </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                    CEP (Opcional)
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.cep}
+                    onChange={(e) => {
+                      // Only allow digits and hyphen
+                      const cleanValue = e.target.value.replace(/[^\d-]/g, "");
+                      setFormData({ ...formData, cep: cleanValue });
+                    }}
+                    placeholder="00000-000"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
+                  />
                 </div>
 
                 <div>
@@ -544,18 +571,37 @@ export default function CadastroAnunciantes() {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-semibold text-vitrii-text mb-2">
-                  Descrição (Opcional)
-                </label>
-                <textarea
-                  value={formData.descricao}
-                  onChange={(e) =>
-                    setFormData({ ...formData, descricao: e.target.value })
-                  }
-                  rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                    Descrição (Opcional)
+                  </label>
+                  <textarea
+                    value={formData.descricao}
+                    onChange={(e) =>
+                      setFormData({ ...formData, descricao: e.target.value })
+                    }
+                    rows={3}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                    Status *
+                  </label>
+                  <select
+                    required
+                    value={formData.status}
+                    onChange={(e) =>
+                      setFormData({ ...formData, status: e.target.value })
+                    }
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50 bg-white"
+                  >
+                    <option value="Ativo">Ativo</option>
+                    <option value="Desativado">Desativado</option>
+                  </select>
+                </div>
               </div>
 
               <div className="border-l-4 border-orange-500 bg-orange-50 p-4 rounded">
