@@ -35,8 +35,8 @@ interface EquipeDeVenda {
   nome: string;
   descricao?: string;
   anuncianteId: number;
-  anunciante: { id: number; nome: string };
-  membros: MembroEquipe[];
+  anunciante?: { id: number; nome: string };
+  membros?: MembroEquipe[];
 }
 
 interface Anunciante {
@@ -101,7 +101,9 @@ export default function CadastroEquipeDeVenda() {
 
       const response = await fetch(url, { headers });
       if (!response.ok) throw new Error("Erro ao buscar equipes");
-      return response.json();
+      const data = await response.json();
+      console.log("[CadastroEquipeDeVenda] Equipes data:", data);
+      return data;
     },
     enabled: !!user && selectedAnuncianteId !== null,
   });
@@ -447,7 +449,9 @@ export default function CadastroEquipeDeVenda() {
   }, [equipes, searchEquipe]);
 
   // Filter membros based on search - memoized to avoid re-filtering on every render
-  const getFilteredMembros = (membros: MembroEquipe[], equipeId: number) => {
+  const getFilteredMembros = (membros: MembroEquipe[] | undefined, equipeId: number) => {
+    if (!membros) return [];
+
     const search = (searchMembro as any)[equipeId];
     if (!search) return membros;
 
@@ -664,8 +668,8 @@ export default function CadastroEquipeDeVenda() {
                         </p>
                       )}
                       <p className="text-xs text-gray-500 mt-2">
-                        Anunciante: {equipe.anunciante.nome} •{" "}
-                        {equipe.membros.length} membro(s)
+                        Anunciante: {equipe.anunciante?.nome || "N/A"} •{" "}
+                        {equipe.membros?.length || 0} membro(s)
                       </p>
                     </div>
 
@@ -715,7 +719,7 @@ export default function CadastroEquipeDeVenda() {
                           <h4 className="font-semibold text-vitrii-text mb-3">
                             Membros da Equipe
                           </h4>
-                          {equipe.membros.length > 0 && (
+                          {equipe.membros && equipe.membros.length > 0 && (
                             <input
                               type="text"
                               placeholder="🔍 Buscar por nome, email ou status..."
@@ -757,7 +761,7 @@ export default function CadastroEquipeDeVenda() {
                       !isAddingMember &&
                       editingMemberId === null ? (
                         <p className="text-gray-500 text-sm py-4">
-                          {equipe.membros.length === 0
+                          {!equipe.membros || equipe.membros.length === 0
                             ? "Nenhum membro adicionado"
                             : "Nenhum membro encontrado com os critérios de busca"}
                         </p>
@@ -988,7 +992,7 @@ export default function CadastroEquipeDeVenda() {
                               equipe.id,
                             ).length === 0 && !isAddingMember && editingMemberId === null ? (
                               <p className="text-sm text-vitrii-text-secondary text-center py-4">
-                                {equipe.membros.length === 0
+                                {!equipe.membros || equipe.membros.length === 0
                                   ? "Nenhum membro adicionado"
                                   : "Nenhum membro encontrado"}
                               </p>
