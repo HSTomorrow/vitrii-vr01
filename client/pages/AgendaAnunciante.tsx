@@ -117,32 +117,30 @@ export default function AgendaAnunciante() {
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header Section */}
         <div className="mb-8">
-          <div className="flex items-center justify-between gap-4 mb-4">
-            <div className="flex items-center gap-4">
-              {anunciante.fotoUrl && (
-                <img
-                  src={anunciante.fotoUrl}
-                  alt={anunciante.nome}
-                  className="w-16 h-16 rounded-full object-cover border-2 border-vitrii-blue"
-                />
-              )}
-              <div>
-                <h1 className="text-3xl font-bold text-vitrii-text">
-                  {anunciante.nome}
-                </h1>
-                <p className="text-gray-600">Agenda e Disponibilidade</p>
-              </div>
+          <div className="flex items-center gap-4 mb-4">
+            {anunciante.fotoUrl && (
+              <img
+                src={anunciante.fotoUrl}
+                alt={anunciante.nome}
+                className="w-16 h-16 rounded-full object-cover border-2 border-vitrii-blue"
+              />
+            )}
+            <div>
+              <h1 className="text-3xl font-bold text-vitrii-text">
+                {anunciante.nome}
+              </h1>
+              <p className="text-gray-600">Agenda e Disponibilidade</p>
             </div>
-
-            {/* Share Button */}
-            <button
-              onClick={() => setShowShareModal(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-blue-600 transition-colors font-semibold"
-            >
-              <Share2 className="w-5 h-5" />
-              Compartilhar Agenda
-            </button>
           </div>
+
+          {/* Share Button */}
+          <button
+            onClick={() => setShowShareModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-blue-600 transition-colors font-semibold"
+          >
+            <Share2 className="w-5 h-5" />
+            Compartilhar Agenda
+          </button>
         </div>
 
         {/* Calendar */}
