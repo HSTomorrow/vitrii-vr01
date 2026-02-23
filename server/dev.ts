@@ -18,6 +18,25 @@ async function setupDev() {
   // Add API routes FIRST (before Vite middleware)
   app.use(apiApp);
 
+  // Add cache control headers
+  app.use((req, res, next) => {
+    // Disable cache for HTML, JSON, and index files
+    if (req.path.endsWith(".html") || req.path === "/" || req.path.endsWith(".json")) {
+      res.set({
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
+        "Pragma": "no-cache",
+        "Expires": "0",
+      });
+    }
+    // Long cache for asset files (JS, CSS, etc.)
+    else if (/\.(js|css|png|jpg|jpeg|gif|svg|woff|woff2|eot|ttf|otf)$/i.test(req.path)) {
+      res.set({
+        "Cache-Control": "public, max-age=31536000, immutable",
+      });
+    }
+    next();
+  });
+
   // Create Vite dev server in middleware mode
   const vite = await createViteServer({
     server: { middlewareMode: true },

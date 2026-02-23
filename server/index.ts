@@ -218,6 +218,26 @@ export function createServer() {
   // Increase body size limit to 10MB to support large base64-encoded images
   app.use(express.json({ limit: "10mb" }));
   app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
+  // Cache control headers
+  app.use((req, res, next) => {
+    // Disable cache for HTML, JSON, and index files
+    if (req.path.endsWith(".html") || req.path === "/" || req.path.endsWith(".json")) {
+      res.set({
+        "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
+        "Pragma": "no-cache",
+        "Expires": "0",
+      });
+    }
+    // Long cache for asset files (JS, CSS, etc.)
+    else if (/\.(js|css|png|jpg|jpeg|gif|svg|woff|woff2|eot|ttf|otf)$/i.test(req.path)) {
+      res.set({
+        "Cache-Control": "public, max-age=31536000, immutable",
+      });
+    }
+    next();
+  });
+
   app.use(express.static("public"));
 
   // Example API routes
