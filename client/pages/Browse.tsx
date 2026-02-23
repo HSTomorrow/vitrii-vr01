@@ -38,41 +38,17 @@ export default function Browse() {
   const itemsPerPage = 20;
   const anuncianteIdParam = searchParams.get("anuncianteId");
 
-  // Fetch user's default localidade
-  const { data: userLocalidadeData } = useQuery({
-    queryKey: ["user-localidade"],
-    queryFn: async () => {
-      if (!user?.id) return null;
-
-      const response = await fetch(`/api/usracessos/${user.id}`, {
-        headers: {
-          "x-user-id": user.id.toString(),
-        },
-      });
-
-      if (!response.ok) throw new Error("Erro ao buscar localidade do usuário");
-      return response.json();
-    },
-    enabled: !!user?.id,
-  });
-
   // Clear all filters on component mount
   useEffect(() => {
     setSearchTerm("");
     setSelectedCategory("");
     setSelectedType("");
     setSelectedLocation("");
+    setSelectedLocalidade(null);
     setPriceRange({ min: "", max: "" });
     setCurrentPage(1);
-    // Note: Not clearing selectedLocalidade here to allow user's default localidade to load below
+    setShowFilters(false);
   }, []);
-
-  // Update selectedLocalidade when user's default localidade changes
-  useEffect(() => {
-    if (userLocalidadeData?.data?.localidadePadraoId) {
-      setSelectedLocalidade(userLocalidadeData.data.localidadePadraoId);
-    }
-  }, [userLocalidadeData?.data?.localidadePadraoId]);
 
   // Fetch all active ads with pagination
   // Note: The API already filters by status="ativo" by default when no status param is provided
@@ -90,11 +66,6 @@ export default function Browse() {
         throw new Error("Erro ao buscar anúncios");
       }
       const data = await response.json();
-      console.log(
-        "Browse: Fetched ads from API:",
-        data?.data?.length || 0,
-        "ads",
-      );
       return data;
     },
   });
@@ -125,26 +96,21 @@ export default function Browse() {
   });
 
   // Fetch anunciantes for selected localidade
-  const { data: localidadeAnunciantesData, isLoading: localidadeLoading } = useQuery({
+  const { data: localidadeAnunciantesData } = useQuery({
     queryKey: ["localidade-anunciantes", selectedLocalidade],
     queryFn: async () => {
       if (!selectedLocalidade) return null;
-      console.log("[Browse] Fetching anunciantes for localidade:", selectedLocalidade);
       const response = await fetch(
         `/api/localidades/${selectedLocalidade}/anunciantes`,
       );
       if (!response.ok) throw new Error("Erro ao buscar anunciantes");
       const data = await response.json();
-      console.log("[Browse] Anunciantes fetched:", data);
       return data;
     },
     enabled: !!selectedLocalidade,
   });
 
   const allAnuncios = anunciosData?.data || [];
-  console.log("Browse: Total anuncios available:", allAnuncios.length);
-  console.log("[Browse] selectedLocalidade:", selectedLocalidade);
-  console.log("[Browse] localidadeAnunciantesData:", localidadeAnunciantesData);
 
   // Extract unique locations for filter dropdown
   const uniqueLocations = useMemo(() => {
@@ -219,7 +185,6 @@ export default function Browse() {
           const anuncioAnuncianteId = typeof anuncio.anuncianteId === "string"
             ? parseInt(anuncio.anuncianteId)
             : anuncio.anuncianteId;
-          console.log("[Browse Filter] Localidade filtering - Anuncios from localidade:", anunciantesFromLocalidade, "Current anuncio anuncianteId:", anuncioAnuncianteId);
           if (!anunciantesFromLocalidade.includes(anuncioAnuncianteId)) {
             return false;
           }
@@ -384,35 +349,35 @@ export default function Browse() {
                   showFilters ? "block" : "hidden"
                 } lg:block w-full lg:w-64 flex-shrink-0`}
               >
-                <div className="bg-vitrii-gray-light p-6 rounded-lg space-y-6">
+                <div className="bg-vitrii-gray-light p-4 rounded-lg space-y-4">
                   {/* Search Input */}
                   <div>
-                    <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                    <label className="block text-xs font-semibold text-vitrii-text mb-1">
                       Buscar
                     </label>
                     <div className="relative">
-                      <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
+                      <Search className="absolute left-3 top-1.5 w-4 h-4 text-gray-400" />
                       <input
                         type="text"
-                        placeholder="Título ou descrição..."
+                        placeholder="Título..."
                         value={searchTerm}
                         onChange={(e) => handleSearchChange(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
+                        className="w-full pl-9 pr-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
                       />
                     </div>
                   </div>
 
                   {/* Category Filter */}
                   <div>
-                    <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                    <label className="block text-xs font-semibold text-vitrii-text mb-1">
                       Categoria
                     </label>
                     <select
                       value={selectedCategory}
                       onChange={(e) => handleCategoryChange(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
+                      className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
                     >
-                      <option value="">Todas as categorias</option>
+                      <option value="">Todas</option>
                       {CATEGORIES.map((cat) => (
                         <option key={cat.value} value={cat.value}>
                           {cat.label}
@@ -423,15 +388,15 @@ export default function Browse() {
 
                   {/* Type Filter */}
                   <div>
-                    <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                    <label className="block text-xs font-semibold text-vitrii-text mb-1">
                       Tipo
                     </label>
                     <select
                       value={selectedType}
                       onChange={(e) => handleTypeChange(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
+                      className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
                     >
-                      <option value="">Todos os tipos</option>
+                      <option value="">Todos</option>
                       {TYPES.map((type) => (
                         <option key={type.value} value={type.value}>
                           {type.label}
@@ -443,15 +408,15 @@ export default function Browse() {
                   {/* Location Filter */}
                   {uniqueLocations.length > 0 && (
                     <div>
-                      <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                      <label className="block text-xs font-semibold text-vitrii-text mb-1">
                         Localização
                       </label>
                       <select
                         value={selectedLocation}
                         onChange={(e) => handleLocationChange(e.target.value)}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
+                        className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
                       >
-                        <option value="">Todas as localizações</option>
+                        <option value="">Todas</option>
                         {uniqueLocations.map((location) => (
                           <option key={location} value={location}>
                             {location}
@@ -467,13 +432,13 @@ export default function Browse() {
                       value={selectedLocalidade}
                       onChange={handleLocalidadeChange}
                       showLabel={true}
-                      placeholder="Todas as localidades"
+                      placeholder="Todas"
                     />
                   )}
 
                   {/* Price Range Filter */}
                   <div>
-                    <label className="block text-sm font-semibold text-vitrii-text mb-3">
+                    <label className="block text-xs font-semibold text-vitrii-text mb-1">
                       Faixa de Preço
                     </label>
                     <div className="flex gap-2">
@@ -484,7 +449,7 @@ export default function Browse() {
                         onChange={(e) =>
                           handlePriceChange("min", e.target.value)
                         }
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
+                        className="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
                       />
                       <input
                         type="number"
@@ -493,7 +458,7 @@ export default function Browse() {
                         onChange={(e) =>
                           handlePriceChange("max", e.target.value)
                         }
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
+                        className="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
                       />
                     </div>
                   </div>
@@ -502,10 +467,10 @@ export default function Browse() {
                   {hasActiveFilters && (
                     <button
                       onClick={clearFilters}
-                      className="w-full flex items-center justify-center gap-2 bg-gray-200 text-vitrii-text px-4 py-2 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
+                      className="w-full flex items-center justify-center gap-1 bg-gray-200 text-vitrii-text px-3 py-1.5 text-sm rounded-lg font-semibold hover:bg-gray-300 transition-colors"
                     >
                       <X className="w-4 h-4" />
-                      Limpar Filtros
+                      Limpar
                     </button>
                   )}
                 </div>
