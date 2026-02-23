@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Star, Heart, Package, Calendar, MapPin, QrCode } from "lucide-react";
+import { Star, Package, Calendar, MapPin, QrCode } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { QRCodeSVG } from "qrcode.react";
 import ImageZoom from "./ImageZoom";
@@ -110,7 +110,7 @@ export default function AdCard({
 
       {/* Action Buttons Container */}
       <div className="absolute top-3 right-3 z-10 flex gap-2">
-        {/* Favorito Heart Button */}
+        {/* Favorito Star Button */}
         <button
           ref={heartButtonRef}
           onClick={(e) => {
@@ -118,14 +118,16 @@ export default function AdCard({
             toggleFavoritoMutation.mutate(anuncio.id);
           }}
           disabled={toggleFavoritoMutation.isPending}
-          className="p-2 bg-white rounded-full hover:bg-gray-100 heart-toggle transition-all"
+          className={`p-2 rounded-full heart-toggle transition-all ${
+            localIsFavorited ? "bg-yellow-400" : "bg-white hover:bg-gray-100"
+          }`}
           title={
             localIsFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"
           }
         >
-          <Heart
+          <Star
             className={`w-5 h-5 transition-colors ${
-              localIsFavorited ? "fill-red-500 text-red-500" : "text-gray-400"
+              localIsFavorited ? "fill-white text-white" : "text-gray-400"
             }`}
           />
         </button>
