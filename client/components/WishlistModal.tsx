@@ -40,7 +40,6 @@ export default function WishlistModal({
   const [observacoes, setObservacoes] = useState<string>("");
   const [showNewListForm, setShowNewListForm] = useState(false);
   const [newListaTitulo, setNewListaTitulo] = useState<string>("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Fetch user's wishlists
   const { data: listasData, isLoading: listasLoading } = useQuery({
@@ -148,11 +147,10 @@ export default function WishlistModal({
       return;
     }
 
-    setIsSubmitting(true);
     try {
       await addItemMutation.mutateAsync();
-    } finally {
-      setIsSubmitting(false);
+    } catch (error) {
+      // Error is handled by useMutation onError
     }
   };
 
@@ -329,10 +327,10 @@ export default function WishlistModal({
               {/* Add Button */}
               <button
                 onClick={handleAddToWishlist}
-                disabled={isSubmitting || addItemMutation.isPending}
+                disabled={addItemMutation.isPending}
                 className="w-full px-4 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-semibold disabled:opacity-50 flex items-center justify-center gap-2"
               >
-                {isSubmitting || addItemMutation.isPending ? (
+                {addItemMutation.isPending ? (
                   <>
                     <Loader className="w-4 h-4 animate-spin" />
                     Adicionando...

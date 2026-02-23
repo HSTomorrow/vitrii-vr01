@@ -9,6 +9,7 @@ import ImageGallery from "@/components/ImageGallery";
 import ShareModal from "@/components/ShareModal";
 import QRCodeModal from "@/components/QRCodeModal";
 import WishlistButton from "@/components/WishlistButton";
+import FavoritesButton from "@/components/FavoritesButton";
 import {
   ChevronLeft,
   AlertCircle,
@@ -608,8 +609,6 @@ export default function AnuncioDetalhe() {
                   {anuncio.anunciantes?.whatsapp && (
                     <a
                       href={`https://wa.me/${anuncio.anunciantes.whatsapp.replace(/\D/g, "")}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
                       className="w-full px-4 py-2 bg-green-500 text-white rounded-lg font-semibold hover:bg-green-600 transition-colors flex items-center justify-center gap-2 text-sm"
                     >
                       <MessageCircle className="w-4 h-4" />
@@ -634,6 +633,10 @@ export default function AnuncioDetalhe() {
                     <QrCode className="w-4 h-4" />
                     QR Code
                   </button>
+                  <FavoritesButton
+                    anuncioId={anuncio.id}
+                    variant="button"
+                  />
                   <WishlistButton
                     anuncioId={anuncio.id}
                     anuncioTitulo={anuncio.titulo}
@@ -1064,8 +1067,16 @@ export default function AnuncioDetalhe() {
           )}
         </div>
 
-        {/* Wishlist & Solicitar Equipe de Vendas */}
+        {/* Favorites, Wishlist & Solicitar Equipe de Vendas */}
         <div className="flex gap-2">
+          {/* Favorites - Icon only for mobile */}
+          <div className="flex-shrink-0">
+            <FavoritesButton
+              anuncioId={anuncio.id}
+              variant="icon"
+            />
+          </div>
+
           {/* Wishlist - Icon only for mobile */}
           <div className="flex-shrink-0">
             <WishlistButton
@@ -1092,7 +1103,7 @@ export default function AnuncioDetalhe() {
               className="flex-1 px-4 py-3 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors flex items-center justify-center gap-2 text-sm"
             >
               <Users className="w-4 h-4" />
-              Solicitar Equipe
+              Solicitar Equipe de Vendas
             </button>
           )}
         </div>
