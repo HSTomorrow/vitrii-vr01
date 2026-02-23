@@ -43,6 +43,8 @@ interface MembroEquipe {
   nome: string;
   email: string;
   whatsapp?: string;
+  telefone?: string;
+  phone?: string;
   status: string;
 }
 
@@ -805,6 +807,7 @@ export default function AnuncioDetalhe() {
                           </div>
 
                           <div className="space-y-2 text-sm">
+                            {/* Email */}
                             <div className="flex items-center gap-2 text-vitrii-text-secondary">
                               <Mail className="w-4 h-4 flex-shrink-0" />
                               <a
@@ -815,16 +818,17 @@ export default function AnuncioDetalhe() {
                               </a>
                             </div>
 
-                            {membro.whatsapp && (
+                            {/* WhatsApp - Multiple possible field names */}
+                            {(membro.whatsapp || membro.telefone || membro.phone) && (
                               <div className="flex items-center gap-2">
                                 <a
-                                  href={`https://wa.me/${membro.whatsapp.replace(/\D/g, "")}`}
+                                  href={`https://wa.me/${(membro.whatsapp || membro.telefone || membro.phone).replace(/\D/g, "")}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
-                                  className="flex items-center gap-2 text-green-600 hover:text-green-700 font-semibold"
+                                  className="flex items-center gap-2 text-green-600 hover:text-green-700 font-semibold w-full hover:bg-green-50 px-2 py-1 rounded transition-colors"
                                 >
                                   <MessageCircle className="w-4 h-4 flex-shrink-0" />
-                                  {membro.whatsapp}
+                                  <span>{membro.whatsapp || membro.telefone || membro.phone}</span>
                                 </a>
                               </div>
                             )}
