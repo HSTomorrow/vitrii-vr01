@@ -7,6 +7,7 @@ import {
   AlertCircle,
   CheckCircle,
   Plus,
+  ChevronRight,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -14,6 +15,7 @@ import CategoryFields from "./CategoryFields";
 import CreateAnuncianteModal from "./CreateLojaModal";
 import CreateProductoModal from "./CreateProductoModal";
 import MultiImageUpload from "./MultiImageUpload";
+import FormStepper from "./FormStepper";
 import { BRAZILIAN_STATES } from "@shared/brazilianStates";
 
 interface AnuncioFormProps {
@@ -66,6 +68,17 @@ export default function AnuncioForm({
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+
+  // Stepper state
+  const [currentStep, setCurrentStep] = useState(0);
+  const steps = [
+    { id: "basic", label: "Básico", description: "Anunciante e Título" },
+    { id: "price", label: "Preço", description: "Valor e Validade" },
+    { id: "details", label: "Detalhes", description: "Produto e Categoria" },
+    { id: "location", label: "Local", description: "Endereço e Localização" },
+    { id: "media", label: "Mídia", description: "Fotos e Finalização" },
+  ];
+
   const [selectedAnuncianteId, setSelectedAnuncianteId] = useState(
     anuncianteId || 0,
   );
@@ -559,6 +572,16 @@ export default function AnuncioForm({
               ? "Atualize os detalhes do seu anúncio"
               : "Crie um novo anúncio para seus produtos e serviços"}
           </p>
+        </div>
+
+        {/* Stepper */}
+        <div className="mb-8 bg-white rounded-lg shadow-md p-6">
+          <FormStepper
+            steps={steps}
+            currentStep={currentStep}
+            onStepChange={setCurrentStep}
+            orientation="horizontal"
+          />
         </div>
 
         {/* Form */}
@@ -1124,27 +1147,51 @@ export default function AnuncioForm({
             <div className="flex gap-4 pt-6 border-t">
               <Link
                 to="/sell"
-                className="flex-1 px-4 py-3 border-2 border-vitrii-blue text-vitrii-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors text-center"
+                className="px-4 py-3 border-2 border-vitrii-blue text-vitrii-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors text-center"
               >
                 Cancelar
               </Link>
-              <button
-                type="submit"
-                disabled={mutation.isPending}
-                className="flex-1 px-4 py-3 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
-              >
-                {mutation.isPending ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-                    Salvando...
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle className="w-5 h-5" />
-                    {anuncioId ? "Atualizar" : "Publicar"} Anúncio
-                  </>
-                )}
-              </button>
+
+              {/* Step Navigation Buttons */}
+              {currentStep > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setCurrentStep(currentStep - 1)}
+                  className="px-4 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-50 transition-colors flex items-center gap-2"
+                >
+                  ← Anterior
+                </button>
+              )}
+
+              {currentStep < steps.length - 1 && (
+                <button
+                  type="button"
+                  onClick={() => setCurrentStep(currentStep + 1)}
+                  className="flex-1 px-4 py-3 bg-vitrii-yellow text-vitrii-text rounded-lg font-semibold hover:bg-vitrii-yellow-dark transition-colors flex items-center justify-center gap-2"
+                >
+                  Próximo <ChevronRight className="w-4 h-4" />
+                </button>
+              )}
+
+              {currentStep === steps.length - 1 && (
+                <button
+                  type="submit"
+                  disabled={mutation.isPending}
+                  className="flex-1 px-4 py-3 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {mutation.isPending ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+                      Salvando...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle className="w-5 h-5" />
+                      {anuncioId ? "Atualizar" : "Publicar"} Anúncio
+                    </>
+                  )}
+                </button>
+              )}
             </div>
           </form>
         </div>
