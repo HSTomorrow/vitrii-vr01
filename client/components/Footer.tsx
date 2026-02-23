@@ -22,18 +22,18 @@ export default function Footer() {
               Desenvolvido pela <span className="font-semibold">HeresTomorrow</span>, especializada em soluções tecnológicas.
             </p>
             <p className="text-gray-400 text-xs mt-2">
-              <a href="mailto:contato@herestomorrow.com.br" className="hover:text-vitrii-yellow transition-colors">contato@herestomorrow.com.br</a>
+              <a href="mailto:contato@herestomorrow.com.br" className="text-white hover:text-vitrii-blue transition-colors">contato@herestomorrow.com.br</a>
             </p>
           </div>
 
           {/* Comprador */}
           <div>
             <h4 className="font-semibold mb-4 text-vitrii-yellow">Para Compradores</h4>
-            <ul className="space-y-2 text-sm text-gray-300">
+            <ul className="space-y-2 text-sm text-white">
               <li>
                 <Link
                   to="/browse"
-                  className="hover:text-vitrii-yellow transition-colors"
+                  className="hover:text-vitrii-blue transition-colors"
                 >
                   Buscar Produtos
                 </Link>
@@ -41,7 +41,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="hover:text-vitrii-yellow transition-colors"
+                  className="hover:text-vitrii-blue transition-colors"
                 >
                   Categorias
                 </a>
@@ -49,7 +49,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="hover:text-vitrii-yellow transition-colors"
+                  className="hover:text-vitrii-blue transition-colors"
                 >
                   Ofertas
                 </a>
@@ -57,7 +57,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="hover:text-vitrii-yellow transition-colors"
+                  className="hover:text-vitrii-blue transition-colors"
                 >
                   Histórico de Compras
                 </a>
@@ -68,11 +68,11 @@ export default function Footer() {
           {/* Vendedor */}
           <div>
             <h4 className="font-semibold mb-4 text-vitrii-yellow">Para Vendedores</h4>
-            <ul className="space-y-2 text-sm text-gray-300">
+            <ul className="space-y-2 text-sm text-white">
               <li>
                 <Link
                   to="/sell"
-                  className="hover:text-vitrii-yellow transition-colors"
+                  className="hover:text-vitrii-blue transition-colors"
                 >
                   Começar a Vender
                 </Link>
@@ -80,7 +80,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="hover:text-vitrii-yellow transition-colors"
+                  className="hover:text-vitrii-blue transition-colors"
                 >
                   Gerenciar Lojas
                 </a>
@@ -88,7 +88,7 @@ export default function Footer() {
               <li>
                 <a
                   href="#"
-                  className="hover:text-vitrii-yellow transition-colors"
+                  className="hover:text-vitrii-blue transition-colors"
                 >
                   Gerenciar Anúncios
                 </a>
@@ -96,7 +96,7 @@ export default function Footer() {
               <li>
                 <Link
                   to="/qrcode"
-                  className="hover:text-vitrii-yellow transition-colors"
+                  className="hover:text-vitrii-blue transition-colors"
                 >
                   QR Code Studio
                 </Link>
@@ -107,11 +107,11 @@ export default function Footer() {
           {/* Suporte */}
           <div>
             <h4 className="font-semibold mb-4 text-vitrii-yellow">Suporte</h4>
-            <ul className="space-y-2 text-sm text-gray-300">
+            <ul className="space-y-2 text-sm text-white">
               <li>
                 <Link
                   to="/about"
-                  className="hover:text-vitrii-yellow transition-colors"
+                  className="hover:text-vitrii-blue transition-colors"
                 >
                   Sobre o Vitrii
                 </Link>
@@ -119,7 +119,7 @@ export default function Footer() {
               <li>
                 <Link
                   to="/planos"
-                  className="hover:text-vitrii-yellow transition-colors"
+                  className="hover:text-vitrii-blue transition-colors"
                 >
                   Planos de Pagamento
                 </Link>
@@ -127,7 +127,7 @@ export default function Footer() {
               <li>
                 <Link
                   to="/ajuda-e-contato"
-                  className="hover:text-vitrii-yellow transition-colors"
+                  className="hover:text-vitrii-blue transition-colors"
                 >
                   Ajuda e Contato
                 </Link>
@@ -135,7 +135,7 @@ export default function Footer() {
               <li>
                 <Link
                   to="/privacidade"
-                  className="hover:text-vitrii-yellow transition-colors"
+                  className="hover:text-vitrii-blue transition-colors"
                 >
                   Política de Privacidade
                 </Link>
@@ -143,7 +143,7 @@ export default function Footer() {
               <li>
                 <Link
                   to="/termos-de-uso"
-                  className="hover:text-vitrii-yellow transition-colors"
+                  className="hover:text-vitrii-blue transition-colors"
                 >
                   Termos de Uso
                 </Link>
@@ -158,28 +158,28 @@ export default function Footer() {
           <div className="flex justify-center space-x-6 mb-6">
             <a
               href="#"
-              className="text-gray-400 hover:text-vitrii-yellow transition-colors"
+              className="text-white hover:text-vitrii-blue transition-colors"
               title="Facebook"
             >
               <Facebook className="w-5 h-5" />
             </a>
             <a
               href="#"
-              className="text-gray-400 hover:text-vitrii-yellow transition-colors"
+              className="text-white hover:text-vitrii-blue transition-colors"
               title="Instagram"
             >
               <Instagram className="w-5 h-5" />
             </a>
             <a
               href="#"
-              className="text-gray-400 hover:text-vitrii-yellow transition-colors"
+              className="text-white hover:text-vitrii-blue transition-colors"
               title="Twitter"
             >
               <Twitter className="w-5 h-5" />
             </a>
             <a
               href="mailto:contato@herestomorrow.com.br"
-              className="text-gray-400 hover:text-vitrii-yellow transition-colors"
+              className="text-white hover:text-vitrii-blue transition-colors"
               title="Email"
             >
               <Mail className="w-5 h-5" />
@@ -192,7 +192,7 @@ export default function Footer() {
               &copy; 2026 Vitrii. Todos os direitos reservados.
             </p>
             <p>
-              Desenvolvido com ❤️ por <a href="https://herestomorrow.com.br" target="_blank" rel="noopener noreferrer" className="text-vitrii-yellow hover:underline">HeresTomorrow</a> para realizar excelentes negócios
+              Desenvolvido com ❤️ por <a href="https://herestomorrow.com.br" target="_blank" rel="noopener noreferrer" className="text-white hover:text-vitrii-blue transition-colors">HeresTomorrow</a> para realizar excelentes negócios
             </p>
           </div>
         </div>
