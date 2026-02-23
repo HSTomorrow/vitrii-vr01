@@ -28,7 +28,7 @@ export default function Footer() {
 
           {/* Comprador */}
           <div>
-            <h4 className="font-semibold mb-4">Para Compradores</h4>
+            <h4 className="font-semibold mb-4 text-vitrii-yellow">Para Compradores</h4>
             <ul className="space-y-2 text-sm text-gray-300">
               <li>
                 <Link
@@ -67,7 +67,7 @@ export default function Footer() {
 
           {/* Vendedor */}
           <div>
-            <h4 className="font-semibold mb-4">Para Vendedores</h4>
+            <h4 className="font-semibold mb-4 text-vitrii-yellow">Para Vendedores</h4>
             <ul className="space-y-2 text-sm text-gray-300">
               <li>
                 <Link
@@ -106,7 +106,7 @@ export default function Footer() {
 
           {/* Suporte */}
           <div>
-            <h4 className="font-semibold mb-4">Suporte</h4>
+            <h4 className="font-semibold mb-4 text-vitrii-yellow">Suporte</h4>
             <ul className="space-y-2 text-sm text-gray-300">
               <li>
                 <Link

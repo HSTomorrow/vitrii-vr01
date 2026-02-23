@@ -44,6 +44,7 @@ interface Producto {
 interface Anunciante {
   id: number;
   nome: string;
+  tipo?: string;
 }
 
 interface EquipeDeVenda {
@@ -661,32 +662,34 @@ export default function AnuncioForm({
               <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Valor {formData.isDoacao ? "(Gratuito)" : ""}
               </label>
-              <div className="flex items-center gap-2 w-1/2">
-                <span className="text-vitrii-text font-semibold">R$</span>
-                <input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  value={formData.isDoacao || formData.aCombinar ? "0" : formData.precoAnuncio}
-                  onChange={(e) =>
-                    !formData.isDoacao &&
-                    !formData.aCombinar &&
-                    handleInputChange("precoAnuncio", e.target.value)
-                  }
-                  disabled={formData.isDoacao || formData.aCombinar}
-                  placeholder={
-                    formData.isDoacao
-                      ? "0.00 (Gratuito)"
-                      : formData.aCombinar
-                        ? "0.00 (A Combinar)"
-                      : selectedPriceTable
-                        ? `Ex: ${Number(selectedPriceTable.preco).toFixed(2)}`
-                        : "Ex: 99.90"
-                  }
-                  className={`flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent ${
-                    formData.isDoacao || formData.aCombinar ? "bg-gray-100 cursor-not-allowed" : ""
-                  }`}
-                />
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 flex-1">
+                  <span className="text-vitrii-text font-semibold text-lg">R$</span>
+                  <input
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    value={formData.isDoacao || formData.aCombinar ? "0" : formData.precoAnuncio}
+                    onChange={(e) =>
+                      !formData.isDoacao &&
+                      !formData.aCombinar &&
+                      handleInputChange("precoAnuncio", e.target.value)
+                    }
+                    disabled={formData.isDoacao || formData.aCombinar}
+                    placeholder={
+                      formData.isDoacao
+                        ? "0.00 (Gratuito)"
+                        : formData.aCombinar
+                          ? "0.00 (A Combinar)"
+                          : selectedPriceTable
+                          ? `Ex: ${Number(selectedPriceTable.preco).toFixed(2)}`
+                          : "Ex: 99.90"
+                    }
+                    className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent text-lg ${
+                      formData.isDoacao || formData.aCombinar ? "bg-gray-100 cursor-not-allowed" : ""
+                    }`}
+                  />
+                </div>
               </div>
               {formData.precoAnuncio &&
                 !formData.isDoacao &&
