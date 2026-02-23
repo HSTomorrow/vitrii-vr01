@@ -248,6 +248,92 @@ export async function sendEmailVerificationEmail(
   }
 }
 
+export async function sendQRCodeExpiredEmail(
+  email: string,
+  anuncianteName: string,
+  anuncioTitulo: string,
+  anuncioLink: string,
+): Promise<boolean> {
+  try {
+    const transporter = await getTransporter();
+    const mailOptions = {
+      from: process.env.MAIL_FROM || "noreply@vitrii.com",
+      to: email,
+      bcc: ["herestomorrow@outlook.com", "vitriimarketplace@gmail.com"],
+      subject: `QRCode Expirado - ${anuncioTitulo}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f5f5f5;">
+          <div style="background-color: white; border-radius: 8px; padding: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <div style="text-align: center; margin-bottom: 30px;">
+              <h1 style="color: #0066cc; margin: 0;">Vitrii</h1>
+              <p style="color: #666; font-size: 14px;">Marketplace Inteligente</p>
+            </div>
+
+            <h2 style="color: #d97706; font-size: 24px; margin: 0 0 20px 0;">QRCode Expirado</h2>
+
+            <p style="color: #666; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
+              Olá <strong>${anuncianteName}</strong>,
+            </p>
+
+            <p style="color: #666; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
+              O QRCode do seu anúncio <strong>"${anuncioTitulo}"</strong> expirou e não está mais ativo na plataforma.
+            </p>
+
+            <p style="color: #666; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
+              Os usuários que acessarem este QRCode serão redirecionados para sua página de anunciante.
+            </p>
+
+            <div style="background-color: #fef3c7; border-left: 4px solid #d97706; padding: 15px; margin: 20px 0;">
+              <p style="color: #92400e; font-size: 14px; margin: 0;">
+                <strong>Você pode:</strong><br>
+                • Renovar o anúncio acessando sua conta<br>
+                • Criar um novo anúncio com validade estendida<br>
+                • Verificar seus planos disponíveis
+              </p>
+            </div>
+
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${anuncioLink}" style="display: inline-block; background-color: #0066cc; color: white; padding: 12px 30px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 16px;">
+                Ver Página de Anunciante
+              </a>
+            </div>
+
+            <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+
+            <p style="color: #999; font-size: 12px; text-align: center; margin: 0;">
+              © 2025 Vitrii. Todos os direitos reservados.
+            </p>
+          </div>
+        </div>
+      `,
+      text: `
+        QRCode Expirado
+
+        Olá ${anuncianteName},
+
+        O QRCode do seu anúncio "${anuncioTitulo}" expirou e não está mais ativo na plataforma.
+
+        Os usuários que acessarem este QRCode serão redirecionados para sua página de anunciante.
+
+        Para renovar ou criar novo anúncio, acesse sua conta na plataforma.
+
+        © 2025 Vitrii
+      `,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log("✅ Email de QRCode expirado enviado com sucesso");
+    console.log("   - Para:", email);
+    console.log("   - Anúncio:", anuncioTitulo);
+    console.log("   - Message ID:", info.messageId);
+
+    return true;
+  } catch (error) {
+    console.error("❌ Erro ao enviar email de QRCode expirado:", error);
+    return false;
+  }
+}
+
 export async function sendWelcomeEmail(
   email: string,
   userName: string,

@@ -10,6 +10,7 @@ import {
   isActiveCounterStatus,
 } from "../constants/anuncioStatus";
 import { parseId, parseIdOrThrow } from "../lib/parseId";
+import { sendQRCodeExpiredEmail } from "../lib/emailService";
 
 // Base schema for ads (without refinement)
 const AnuncioBaseSchema = z.object({
@@ -223,6 +224,14 @@ export const getAnuncios: RequestHandler = async (req, res) => {
   }
 };
 
+// Helper function to check if ad is expired
+function isAnuncioExpired(anuncio: any): boolean {
+  if (!anuncio.dataValidade) {
+    return false; // No expiration date set
+  }
+  return new Date(anuncio.dataValidade) < new Date();
+}
+
 // GET ad by ID with full details (optimized query)
 export const getAnuncioById: RequestHandler = async (req, res) => {
   try {
@@ -269,11 +278,37 @@ export const getAnuncioById: RequestHandler = async (req, res) => {
       });
     }
 
+    // Check if ad is expired and redirect to announcer profile
+    const isExpired = isAnuncioExpired(anuncio);
+    if (isExpired) {
+      // Send email notification to announcer (asynchronously)
+      if (anuncio.anunciantes?.email) {
+        sendQRCodeExpiredEmail(
+          anuncio.anunciantes.email,
+          anuncio.anunciantes.nome,
+          anuncio.titulo,
+          `${process.env.APP_URL || "https://vitrii.com"}/anunciante/${anuncio.anuncianteId}`
+        ).catch((error) => {
+          console.error("Error sending QR code expired email:", error);
+        });
+      }
+
+      return res.status(410).json({
+        success: false,
+        error: "Este anúncio expirou",
+        isExpired: true,
+        anuncianteId: anuncio.anuncianteId,
+        anuncianteName: anuncio.anunciantes?.nome,
+        message: "O QRCode deste anúncio expirou. Redirecionando para a página do anunciante...",
+      });
+    }
+
     // Ensure all fields are included in response
     const response = {
       ...anuncio,
       link: anuncio.link || null,
       statusPagamento: anuncio.statusPagamento || "pendente",
+      isExpired: false,
     };
 
     res.json({

@@ -93,8 +93,21 @@ export default function AnuncioDetalhe() {
     queryKey: ["anuncio", id],
     queryFn: async () => {
       const response = await fetch(`/api/anuncios/${id}`);
+      const responseData = await response.json();
+
+      if (response.status === 410 && responseData.isExpired) {
+        // Ad is expired, redirect to announcer profile
+        if (responseData.anuncianteId) {
+          toast.error("Este anúncio expirou");
+          setTimeout(() => {
+            navigate(`/anunciante/${responseData.anuncianteId}`);
+          }, 2000);
+        }
+        throw new Error("Anúncio expirou");
+      }
+
       if (!response.ok) throw new Error("Anúncio não encontrado");
-      return response.json();
+      return responseData;
     },
   });
 
