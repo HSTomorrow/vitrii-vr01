@@ -19,6 +19,7 @@ const BannerSchema = z.object({
     .url("URL do link inválida"),
   ordem: z.number().int().nonnegative().default(0),
   ativo: z.boolean().default(true),
+  corFonte: z.enum(["amarelo", "branco", "preto"]).default("amarelo").optional(),
 });
 
 const BannerUpdateSchema = z.object({
@@ -53,6 +54,7 @@ const BannerUpdateSchema = z.object({
     .nullable(),
   ordem: z.number().int().nonnegative().optional(),
   ativo: z.boolean().optional(),
+  corFonte: z.enum(["amarelo", "branco", "preto"]).optional(),
 }).strict();
 
 // GET all banners

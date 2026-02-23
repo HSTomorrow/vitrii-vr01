@@ -83,6 +83,7 @@ export default function AdminBanners() {
         titulo: formData.titulo,
         descricao: formData.descricao,
         ativo: formData.ativo,
+        corFonte: formData.corFonte,
         link: formData.link,
         imagemUrl: formData.imagemUrl?.substring(0, 50) + "...",
       });
@@ -159,6 +160,7 @@ export default function AdminBanners() {
         titulo: formData.titulo,
         descricao: formData.descricao,
         ativo: formData.ativo,
+        corFonte: formData.corFonte,
         link: formData.link,
         imagemUrl: formData.imagemUrl?.substring(0, 50) + "...",
       });
