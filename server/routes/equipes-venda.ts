@@ -68,11 +68,13 @@ export const getEquipes: RequestHandler = async (req, res) => {
     });
 
     // Transform response to map membros_equipe to membros for frontend compatibility
-    const transformedEquipes = equipes.map((equipe: any) => ({
-      ...equipe,
-      membros: equipe.membros_equipe,
-      membros_equipe: undefined, // Remove the raw field
-    }));
+    const transformedEquipes = equipes.map((equipe: any) => {
+      const { membros_equipe, ...rest } = equipe;
+      return {
+        ...rest,
+        membros: membros_equipe,
+      };
+    });
 
     res.json({
       success: true,
@@ -240,10 +242,10 @@ export const createEquipe: RequestHandler = async (req, res) => {
     });
 
     // Transform response to map membros_equipe to membros for frontend compatibility
+    const { membros_equipe, ...rest } = equipe;
     const transformedEquipe = {
-      ...equipe,
-      membros: equipe.membros_equipe,
-      membros_equipe: undefined,
+      ...rest,
+      membros: membros_equipe,
     };
 
     res.status(201).json({
@@ -334,10 +336,10 @@ export const updateEquipe: RequestHandler = async (req, res) => {
     });
 
     // Transform response to map membros_equipe to membros for frontend compatibility
+    const { membros_equipe, ...rest } = updated;
     const transformedEquipe = {
-      ...updated,
-      membros: updated.membros_equipe,
-      membros_equipe: undefined,
+      ...rest,
+      membros: membros_equipe,
     };
 
     res.json({
@@ -400,8 +402,14 @@ export const adicionarMembro: RequestHandler = async (req, res) => {
     const body = AdicionarMembroSchema.parse(req.body);
     const usuarioId = req.userId;
 
+    console.log("[adicionarMembro] Iniciando requisição");
+    console.log("[adicionarMembro] Team ID:", id);
+    console.log("[adicionarMembro] User ID:", usuarioId);
+    console.log("[adicionarMembro] Body recebido:", body);
+
     // Verify user is authenticated
     if (!usuarioId) {
+      console.error("[adicionarMembro] Usuário não autenticado");
       return res.status(401).json({
         success: false,
         error: "Usuário não autenticado",
@@ -476,6 +484,8 @@ export const adicionarMembro: RequestHandler = async (req, res) => {
         },
       },
     });
+
+    console.log("[adicionarMembro] Membro criado com sucesso:", membro);
 
     res.status(201).json({
       success: true,

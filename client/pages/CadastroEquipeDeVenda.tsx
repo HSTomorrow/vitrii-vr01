@@ -189,16 +189,23 @@ export default function CadastroEquipeDeVenda() {
         headers["X-User-Id"] = user.id.toString();
       }
 
+      console.log("[addMemberMutation] Iniciando requisição para:", `/api/equipes-venda/${teamId}/membros`);
+      console.log("[addMemberMutation] Dados:", memberFormData);
+
       const response = await fetch(`/api/equipes-venda/${teamId}/membros`, {
         method: "POST",
         headers,
         body: JSON.stringify(memberFormData),
       });
 
+      console.log("[addMemberMutation] Status da resposta:", response.status);
+
       if (!response.ok) {
         const error = await response.json();
         const errorMessage = error.error || "Erro ao adicionar membro";
         const details = error.details || "";
+
+        console.error("[addMemberMutation] Erro da API:", { errorMessage, details });
 
         // Combine error message with details for more context
         const fullMessage = details
@@ -207,7 +214,9 @@ export default function CadastroEquipeDeVenda() {
         throw new Error(fullMessage);
       }
 
-      return response.json();
+      const data = await response.json();
+      console.log("[addMemberMutation] Sucesso! Resposta:", data);
+      return data;
     },
     onSuccess: () => {
       toast.success("Membro adicionado com sucesso!");
@@ -226,6 +235,7 @@ export default function CadastroEquipeDeVenda() {
 
       if (error instanceof Error) {
         errorMessage = error.message;
+        console.error("[addMemberMutation] Erro capturado:", errorMessage);
 
         // Try to extract more detailed error info if available
         if (errorMessage.includes("Erro no campo")) {
@@ -882,9 +892,11 @@ export default function CadastroEquipeDeVenda() {
                                           addMemberMutation.isPending ||
                                           updateMemberMutation.isPending
                                         }
-                                        className="p-1 bg-vitrii-blue text-white rounded hover:bg-vitrii-blue-dark transition-colors disabled:opacity-50"
+                                        className="p-2 bg-vitrii-blue text-white rounded hover:bg-vitrii-blue-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 text-sm font-semibold"
+                                        title={addMemberMutation.isPending || updateMemberMutation.isPending ? "Salvando..." : "Salvar membro"}
                                       >
                                         <Save className="w-4 h-4" />
+                                        {addMemberMutation.isPending || updateMemberMutation.isPending ? "Salvando..." : "Salvar"}
                                       </button>
                                       <button
                                         onClick={() => {
@@ -1075,10 +1087,10 @@ export default function CadastroEquipeDeVenda() {
                                           addMemberMutation.isPending ||
                                           updateMemberMutation.isPending
                                         }
-                                        className="px-3 py-1 bg-vitrii-blue text-white rounded text-sm hover:bg-vitrii-blue-dark transition-colors disabled:opacity-50"
+                                        className="px-3 py-1 bg-vitrii-blue text-white rounded text-sm hover:bg-vitrii-blue-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-semibold"
                                       >
                                         <Save className="w-4 h-4 inline mr-1" />
-                                        Salvar
+                                        {addMemberMutation.isPending || updateMemberMutation.isPending ? "Salvando..." : "Salvar"}
                                       </button>
                                       <button
                                         onClick={() => {
