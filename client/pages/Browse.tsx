@@ -55,6 +55,17 @@ export default function Browse() {
     enabled: !!user?.id,
   });
 
+  // Clear all filters on component mount
+  useEffect(() => {
+    setSearchTerm("");
+    setSelectedCategory("");
+    setSelectedType("");
+    setSelectedLocation("");
+    setPriceRange({ min: "", max: "" });
+    setCurrentPage(1);
+    // Note: Not clearing selectedLocalidade here to allow user's default localidade to load below
+  }, []);
+
   // Update selectedLocalidade when user's default localidade changes
   useEffect(() => {
     if (userLocalidadeData?.data?.localidadePadraoId) {
