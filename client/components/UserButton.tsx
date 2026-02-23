@@ -98,7 +98,7 @@ export default function UserButton() {
               className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
             >
               <Calendar className="w-4 h-4" />
-              <span>Meu Calendário</span>
+              <span>Minha Agenda</span>
             </button>
 
             {user.tipoUsuario === "adm" && (
