@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -27,6 +27,13 @@ export default function AdCard({
   const navigate = useNavigate();
   const { user } = useAuth();
   const [showQRCodeModal, setShowQRCodeModal] = useState(false);
+  const [localIsFavorited, setLocalIsFavorited] = useState(isFavorited);
+  const heartButtonRef = useRef<HTMLButtonElement>(null);
+
+  // Sync local state with prop when prop changes
+  useEffect(() => {
+    setLocalIsFavorited(isFavorited);
+  }, [isFavorited]);
 
   const toggleFavoritoMutation = useMutation({
     mutationFn: async (anuncioId: number) => {
@@ -49,7 +56,24 @@ export default function AdCard({
       return response.json();
     },
     onSuccess: (data) => {
+      // Update local state to trigger animation
+      setLocalIsFavorited(data.isFavorited);
+
+      // Trigger the data-favorited attribute for CSS animation
+      if (heartButtonRef.current) {
+        heartButtonRef.current.setAttribute('data-favorited', String(data.isFavorited));
+
+        // Reset animation trigger after animation completes
+        setTimeout(() => {
+          if (heartButtonRef.current) {
+            heartButtonRef.current.removeAttribute('data-favorited');
+          }
+        }, 350);
+      }
+
+      // Callback to parent component
       onFavoritoToggle?.(anuncio.id, data.isFavorited);
+
       if (data.isFavorited) {
         toast.success("Adicionado aos favoritos!");
       } else {
@@ -88,19 +112,20 @@ export default function AdCard({
       <div className="absolute top-3 right-3 z-10 flex gap-2">
         {/* Favorito Heart Button */}
         <button
+          ref={heartButtonRef}
           onClick={(e) => {
             e.stopPropagation();
             toggleFavoritoMutation.mutate(anuncio.id);
           }}
           disabled={toggleFavoritoMutation.isPending}
-          className="p-2 bg-white rounded-full hover:bg-gray-100 heart-toggle"
+          className="p-2 bg-white rounded-full hover:bg-gray-100 heart-toggle transition-all"
           title={
-            isFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"
+            localIsFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"
           }
         >
           <Heart
-            className={`w-5 h-5 ${
-              isFavorited ? "fill-red-500 text-red-500" : "text-gray-400"
+            className={`w-5 h-5 transition-colors ${
+              localIsFavorited ? "fill-red-500 text-red-500" : "text-gray-400"
             }`}
           />
         </button>

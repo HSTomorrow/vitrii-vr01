@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Package, Calendar } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "sonner";
@@ -76,7 +76,27 @@ export default function AnunciosCarousel({
   const navigate = useNavigate();
   const { user } = useAuth();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const heartButtonRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
+  const [animatingIds, setAnimatingIds] = useState<Set<number>>(new Set());
   const colors = colorClasses[color];
+
+  // Trigger animation when favorite status changes
+  useEffect(() => {
+    anuncios.forEach((anuncio) => {
+      const isFav = isFavorited?.(anuncio.id);
+      const button = heartButtonRefs.current.get(anuncio.id);
+      if (button && isFav && !animatingIds.has(anuncio.id)) {
+        setAnimatingIds(prev => new Set([...prev, anuncio.id]));
+        setTimeout(() => {
+          setAnimatingIds(prev => {
+            const next = new Set(prev);
+            next.delete(anuncio.id);
+            return next;
+          });
+        }, 350);
+      }
+    });
+  }, [isFavorited, anuncios, animatingIds]);
 
   const scroll = (direction: "left" | "right") => {
     if (scrollContainerRef.current) {
@@ -235,12 +255,15 @@ export default function AnunciosCarousel({
               />
 
               <button
+                ref={(el) => {
+                  if (el) heartButtonRefs.current.set(anuncio.id, el);
+                }}
                 onClick={(e) => handleToggleFavorito(anuncio.id, e)}
-                className={`p-2 rounded-full transition-all shadow-lg hover:shadow-xl transform hover:scale-110 ${
+                className={`p-2 rounded-full heart-toggle shadow-lg hover:shadow-xl transition-all ${
                   isFavorited?.(anuncio.id)
                     ? "bg-red-500"
                     : "bg-white hover:bg-gray-100"
-                }`}
+                } ${animatingIds.has(anuncio.id) ? "animate-pulse-soft" : ""}`}
                 title={
                   isFavorited?.(anuncio.id)
                     ? "Remover dos favoritos"
