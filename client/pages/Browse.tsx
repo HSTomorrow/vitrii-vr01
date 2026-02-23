@@ -328,17 +328,17 @@ export default function Browse() {
                 <ArrowLeft className="w-4 h-4" />
                 Voltar ao perfil
               </button>
-              <h1 className="text-4xl font-bold mb-2">
+              <h1 className="text-h1 text-white mb-2">
                 O que temos na Vitrine de {anuncianteData.data.nome} para você!
               </h1>
-              <p className="text-blue-100">
+              <p className="text-label text-blue-100">
                 Confira todos os anúncios disponíveis
               </p>
             </>
           ) : (
             <>
-              <h1 className="text-4xl font-bold mb-2">Explorar Anúncios</h1>
-              <p className="text-blue-100">
+              <h1 className="text-h1 text-white mb-2">Explorar Anúncios</h1>
+              <p className="text-label text-blue-100">
                 Encontre os melhores produtos e serviços
               </p>
             </>

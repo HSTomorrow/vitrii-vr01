@@ -215,13 +215,10 @@ export default function Index() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-2">
             <div>
-              <h2
-                style={{ color: "#025CBA" }}
-                className="text-2xl md:text-3xl font-bold mb-0.5"
-              >
+              <h2 className="text-h2 mb-0.5">
                 Anúncios em Destaque
               </h2>
-              <p className="text-xs md:text-sm text-vitrii-text-secondary">
+              <p className="text-label">
                 Veja os produtos e serviços mais procurados
               </p>
             </div>
@@ -261,13 +258,10 @@ export default function Index() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-2">
             <div>
-              <h2
-                style={{ color: "#025CBA" }}
-                className="text-2xl md:text-3xl font-bold mb-0.5"
-              >
+              <h2 className="text-h2 mb-0.5">
                 Anunciantes em Destaque
               </h2>
-              <p className="text-xs md:text-sm text-vitrii-text-secondary">
+              <p className="text-label">
                 Conheça os principais anunciantes da plataforma
               </p>
             </div>
@@ -304,10 +298,10 @@ export default function Index() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-2">
             <div>
-              <h2 className="section-title-blue text-2xl md:text-3xl font-bold mb-0.5">
+              <h2 className="text-h2 mb-0.5">
                 Doações, Brindes e Serviços Gratuitos
               </h2>
-              <p className="text-xs md:text-sm text-vitrii-text-secondary">
+              <p className="text-label">
                 Doações, Brindes, Produtos, Serviços e Eventos disponíveis para
                 experimentação gratuitamente
               </p>
@@ -366,8 +360,8 @@ export default function Index() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-2">
             <div>
-              <h2 className="section-title-blue text-2xl md:text-3xl font-bold mb-0.5">Eventos</h2>
-              <p className="text-xs md:text-sm text-vitrii-text-secondary">
+              <h2 className="text-h2 mb-0.5">Eventos</h2>
+              <p className="text-label">
                 Descubra eventos, workshops e experiências próximas a você
               </p>
             </div>
@@ -409,10 +403,10 @@ export default function Index() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-2">
             <div>
-              <h2 className="section-title-blue text-2xl md:text-3xl font-bold mb-0.5">
+              <h2 className="text-h2 mb-0.5">
                 Agendas de Aulas, Cursos e Serviços Especializados
               </h2>
-              <p className="text-xs md:text-sm text-vitrii-text-secondary">
+              <p className="text-label">
                 Agendas de Aulas, Cursos e Serviços Especializados
               </p>
             </div>
@@ -452,10 +446,10 @@ export default function Index() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-2">
             <div>
-              <h2 className="section-title-blue text-2xl md:text-3xl font-bold mb-0.5">
+              <h2 className="text-h2 mb-0.5">
                 Oportunidades e Vagas de Emprego
               </h2>
-              <p className="text-xs md:text-sm text-vitrii-text-secondary">
+              <p className="text-label">
                 Descubra oportunidades profissionais e vagas de emprego
               </p>
             </div>

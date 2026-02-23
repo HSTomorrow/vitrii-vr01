@@ -86,6 +86,27 @@ export default {
       fontFamily: {
         sans: ["Inter", "system-ui", "-apple-system", "sans-serif"],
       },
+      fontSize: {
+        // Typography hierarchy per specification
+        "heading-1": ["30px", { lineHeight: "1.2", fontWeight: "700" }],    // H1: Page titles
+        "heading-2": ["24px", { lineHeight: "1.3", fontWeight: "700" }],    // H2: Section titles
+        "heading-3": ["20px", { lineHeight: "1.4", fontWeight: "600" }],    // H3: Subtitles
+        "price": ["22px", { lineHeight: "1.2", fontWeight: "700" }],        // Prices
+        "body": ["15px", { lineHeight: "1.5", fontWeight: "400" }],         // Body text
+        "label": ["13px", { lineHeight: "1.4", fontWeight: "400" }],        // Labels/metadata
+        "button": ["15px", { lineHeight: "1.4", fontWeight: "600" }],       // CTA buttons
+        "footer": ["12px", { lineHeight: "1.4", fontWeight: "400" }],       // Footer/legal
+        // Additional utility sizes
+        "xs-label": ["12px", { lineHeight: "1.4", fontWeight: "400" }],     // Extra small labels
+        "sm-body": ["14px", { lineHeight: "1.5", fontWeight: "400" }],      // Small body text
+      },
+      lineHeight: {
+        tight: "1.2",
+        snug: "1.3",
+        normal: "1.4",
+        relaxed: "1.5",
+        loose: "1.75",
+      },
       borderRadius: {
         lg: "var(--radius)",
         md: "calc(var(--radius) - 2px)",
