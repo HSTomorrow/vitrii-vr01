@@ -67,9 +67,16 @@ export const getEquipes: RequestHandler = async (req, res) => {
       orderBy: { dataCriacao: "desc" },
     });
 
+    // Transform response to map membros_equipe to membros for frontend compatibility
+    const transformedEquipes = equipes.map((equipe: any) => ({
+      ...equipe,
+      membros: equipe.membros_equipe,
+      membros_equipe: undefined, // Remove the raw field
+    }));
+
     res.json({
       success: true,
-      data: equipes,
+      data: transformedEquipes,
       count: equipes.length,
     });
   } catch (error) {
@@ -232,9 +239,16 @@ export const createEquipe: RequestHandler = async (req, res) => {
       },
     });
 
+    // Transform response to map membros_equipe to membros for frontend compatibility
+    const transformedEquipe = {
+      ...equipe,
+      membros: equipe.membros_equipe,
+      membros_equipe: undefined,
+    };
+
     res.status(201).json({
       success: true,
-      data: equipe,
+      data: transformedEquipe,
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -319,9 +333,16 @@ export const updateEquipe: RequestHandler = async (req, res) => {
       },
     });
 
+    // Transform response to map membros_equipe to membros for frontend compatibility
+    const transformedEquipe = {
+      ...updated,
+      membros: updated.membros_equipe,
+      membros_equipe: undefined,
+    };
+
     res.json({
       success: true,
-      data: updated,
+      data: transformedEquipe,
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
