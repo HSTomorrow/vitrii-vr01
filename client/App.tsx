@@ -58,7 +58,18 @@ import VerifyEmail from "./pages/VerifyEmail";
 import BottomNavBar from "@/components/BottomNavBar";
 import PageTransition from "@/components/PageTransition";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 600000, // 10 minutes
+      gcTime: 600000, // 10 minutes (formerly cacheTime)
+      refetchOnWindowFocus: false, // Disable refetch on window focus
+      refetchOnMount: false, // Disable refetch on mount if data is not stale
+      refetchOnReconnect: false, // Disable refetch on reconnect
+      retry: 1, // Retry failed requests once
+    },
+  },
+});
 
 // Separate component to use the hook
 function AppContent() {

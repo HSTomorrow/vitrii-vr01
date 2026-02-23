@@ -7,7 +7,7 @@ export function useAutoUpdate() {
     // Set initial version
     versionRef.current = import.meta.env.VITE_APP_VERSION || "1.0.0";
 
-    // Check for updates every 60 seconds
+    // Check for updates every 10 minutes
     const interval = setInterval(async () => {
       try {
         // Fetch the version file with cache busting
@@ -25,7 +25,7 @@ export function useAutoUpdate() {
             newVersion !== versionRef.current
           ) {
             console.log(
-              `[AutoUpdate] New version detected: ${newVersion} (current: ${versionRef.current}). Reloading...`
+              `[AutoUpdate] New version detected: ${newVersion} (current: ${versionRef.current}). Reloading in 10 minutes...`
             );
             // Force a hard reload to clear all caches
             window.location.reload();
@@ -34,7 +34,7 @@ export function useAutoUpdate() {
       } catch (error) {
         console.error("[AutoUpdate] Error checking for updates:", error);
       }
-    }, 60000); // Check every 60 seconds
+    }, 600000); // Check every 10 minutes
 
     return () => clearInterval(interval);
   }, []);

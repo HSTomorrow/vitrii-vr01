@@ -88,7 +88,7 @@ export default function Chat() {
       return response.json();
     },
     enabled: !!selectedConversa,
-    refetchInterval: 3000, // Poll every 3 seconds for new messages
+    refetchInterval: 10000, // Poll every 10 seconds for new messages
   });
 
   const conversa = conversaData?.data;
