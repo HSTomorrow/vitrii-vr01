@@ -33,6 +33,7 @@ import CadastroTabelasPreco from "./pages/CadastroTabelasPreco";
 import CadastroVariantesLista from "./pages/CadastroVariantesLista";
 import CadastroVariantes from "./pages/CadastroVariantes";
 import CadastroEquipeDeVenda from "./pages/CadastroEquipeDeVenda";
+import CadastroContatos from "./pages/CadastroContatos";
 import Agenda from "./pages/Agenda";
 import SearchAnuncios from "./pages/SearchAnuncios";
 import SearchProdutos from "./pages/SearchProdutos";
@@ -149,6 +150,10 @@ function AppContent() {
             path="/cadastro-equipe-venda"
             element={<CadastroEquipeDeVenda />}
           />
+          <Route
+            path="/cadastro-contatos"
+            element={<CadastroContatos />}
+          />
           <Route path="/agenda" element={<Agenda />} />
           <Route path="/menu" element={<Menu />} />
           {/* Redirect old cadastros/* routes to cadastro-* */}
@@ -158,6 +163,7 @@ function AppContent() {
           <Route path="/cadastros/tabelas-preco" element={<Navigate to="/cadastro-tabelas-preco" replace />} />
           <Route path="/cadastros/variantes" element={<Navigate to="/cadastro-variantes" replace />} />
           <Route path="/cadastros/equipe-venda" element={<Navigate to="/cadastro-equipe-venda" replace />} />
+          <Route path="/cadastros/contatos" element={<Navigate to="/cadastro-contatos" replace />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </PageTransition>

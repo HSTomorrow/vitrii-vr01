@@ -5,9 +5,13 @@ import { z } from "zod";
 // Schema para criar contato
 const ContatoCreateSchema = z.object({
   nome: z.string().min(3, "Nome deve ter pelo menos 3 caracteres"),
-  email: z.string().email("Email inválido").optional().nullable(),
+  celular: z.string().min(1, "Celular/WhatsApp é obrigatório"),
   telefone: z.string().optional().nullable(),
+  email: z.string().email("Email inválido").optional().nullable(),
+  status: z.enum(["ativo", "inativo", "analise"]).default("ativo"),
+  tipoContato: z.string().min(1, "Tipo de contato é obrigatório"),
   observacoes: z.string().optional().nullable(),
+  imagem: z.string().optional().nullable(),
   usuariosIds: z.array(z.number()).optional(),
 });
 
@@ -126,9 +130,13 @@ export const createContato: RequestHandler = async (req, res) => {
       data: {
         anuncianteId: parseInt(anuncianteId),
         nome: validatedData.nome,
-        email: validatedData.email || null,
+        celular: validatedData.celular,
         telefone: validatedData.telefone || null,
+        email: validatedData.email || null,
+        status: validatedData.status || "ativo",
+        tipoContato: validatedData.tipoContato,
         observacoes: validatedData.observacoes || null,
+        imagem: validatedData.imagem || null,
         usuarios:
           validatedData.usuariosIds && validatedData.usuariosIds.length > 0
             ? {
@@ -228,10 +236,14 @@ export const updateContato: RequestHandler = async (req, res) => {
     const updatedContato = await prisma.contatos.update({
       where: { id: parseInt(contatoId) },
       data: {
-        nome: validatedData.nome,
-        email: validatedData.email,
-        telefone: validatedData.telefone,
-        observacoes: validatedData.observacoes,
+        ...(validatedData.nome && { nome: validatedData.nome }),
+        ...(validatedData.celular && { celular: validatedData.celular }),
+        ...(validatedData.telefone !== undefined && { telefone: validatedData.telefone }),
+        ...(validatedData.email !== undefined && { email: validatedData.email }),
+        ...(validatedData.status && { status: validatedData.status }),
+        ...(validatedData.tipoContato && { tipoContato: validatedData.tipoContato }),
+        ...(validatedData.observacoes !== undefined && { observacoes: validatedData.observacoes }),
+        ...(validatedData.imagem !== undefined && { imagem: validatedData.imagem }),
       },
       include: {
         usuarios: {

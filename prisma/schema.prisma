@@ -719,9 +719,13 @@ model contatos {
   id               Int      @id @default(autoincrement())
   anuncianteId     Int
   nome             String   @db.VarChar(255)
-  email            String?  @db.VarChar(255)
+  celular          String   @db.VarChar(20)
   telefone         String?  @db.VarChar(20)
+  email            String?  @db.VarChar(255)
+  status           String   @default("ativo") @db.VarChar(20) // ativo, inativo, analise
+  tipoContato      String   @db.VarChar(100)
   observacoes      String?
+  imagem           String?  @db.VarChar(500)
   dataCriacao      DateTime @default(now())
   dataAtualizacao  DateTime @updatedAt
 

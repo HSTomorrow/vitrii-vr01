@@ -19,6 +19,7 @@ import {
   Users,
   Package,
   Calendar,
+  Phone,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
@@ -245,6 +246,16 @@ export default function Menu() {
                     <Users className="w-6 h-6 text-vitrii-blue" />
                     <span className="text-vitrii-text font-medium">
                       Equipes de Venda
+                    </span>
+                  </Link>
+
+                  <Link
+                    to="/cadastros/contatos"
+                    className="flex items-center gap-4 px-6 py-4 bg-vitrii-gray hover:bg-gray-200 rounded-lg transition-colors"
+                  >
+                    <Phone className="w-6 h-6 text-vitrii-blue" />
+                    <span className="text-vitrii-text font-medium">
+                      Cadastro de Contatos
                     </span>
                   </Link>
                 </div>
