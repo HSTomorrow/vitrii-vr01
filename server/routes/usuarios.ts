@@ -2,7 +2,7 @@ import { RequestHandler } from "express";
 import prisma from "../lib/prisma";
 import { z } from "zod";
 import bcryptjs from "bcryptjs";
-import { sendPasswordResetEmail, sendWelcomeEmail } from "../lib/emailService";
+import { sendPasswordResetEmail, sendWelcomeEmail, sendEmailVerificationEmail } from "../lib/emailService";
 import crypto from "crypto";
 
 // NOTE: This file handles usracessos (User Access) model operations
@@ -228,6 +228,7 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
         cpf: "",
         telefone: "",
         endereco: "",
+        emailVerificado: false,
         tipoUsuario: "comum",
         tassinatura: "Gratuito", // Always start as Gratuito
         dataAtualizacao: new Date(),
@@ -240,18 +241,33 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
         email: true,
         tipoUsuario: true,
         tassinatura: true,
+        emailVerificado: true,
         dataCriacao: true,
         dataVigenciaContrato: true,
       },
     });
 
-    // Send welcome email
-    await sendWelcomeEmail(usuario.email, usuario.nome);
+    // Generate email verification token (24 hours expiration)
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+    const expirationDate = new Date();
+    expirationDate.setHours(expirationDate.getHours() + 24);
+
+    await prisma.emailVerificationToken.create({
+      data: {
+        usuarioId: usuario.id,
+        token: verificationToken,
+        expiresAt: expirationDate,
+      },
+    });
+
+    // Send verification email
+    const verificationLink = `${process.env.APP_URL || "https://vitrii.com"}/verificar-email?token=${verificationToken}&email=${encodeURIComponent(usuario.email)}`;
+    await sendEmailVerificationEmail(usuario.email, usuario.nome, verificationLink);
 
     res.status(201).json({
       success: true,
       data: usuario,
-      message: "Conta criada com sucesso!",
+      message: "Conta criada com sucesso! Por favor, verifique seu e-mail para ativar a conta.",
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -852,6 +868,74 @@ export const validateResetToken: RequestHandler = async (req, res) => {
     res.status(500).json({
       success: false,
       error: "Erro ao validar token",
+    });
+  }
+};
+
+// VERIFY EMAIL - Confirm email verification token
+export const verifyEmail: RequestHandler = async (req, res) => {
+  try {
+    const { token, email } = req.query;
+
+    if (!token || !email) {
+      return res.status(400).json({
+        success: false,
+        error: "Token e email são obrigatórios",
+      });
+    }
+
+    // Find the verification token
+    const verificationTokenRecord = await prisma.emailVerificationToken.findUnique({
+      where: { token: token as string },
+      include: { usuario: true },
+    });
+
+    if (!verificationTokenRecord) {
+      return res.status(400).json({
+        success: false,
+        error: "Token de verificação inválido ou expirado",
+      });
+    }
+
+    // Check if token is expired
+    if (verificationTokenRecord.expiresAt < new Date()) {
+      return res.status(400).json({
+        success: false,
+        error: "Token de verificação expirou",
+      });
+    }
+
+    // Check if email matches
+    if (verificationTokenRecord.usuario.email !== email) {
+      return res.status(400).json({
+        success: false,
+        error: "Email não corresponde ao token",
+      });
+    }
+
+    // Mark email as verified
+    await prisma.usracessos.update({
+      where: { id: verificationTokenRecord.usuarioId },
+      data: { emailVerificado: true },
+    });
+
+    // Delete the token after use
+    await prisma.emailVerificationToken.delete({
+      where: { id: verificationTokenRecord.id },
+    });
+
+    // Send welcome email now that email is verified
+    await sendWelcomeEmail(verificationTokenRecord.usuario.email, verificationTokenRecord.usuario.nome);
+
+    res.status(200).json({
+      success: true,
+      message: "Email verificado com sucesso! Sua conta está ativada.",
+    });
+  } catch (error) {
+    console.error("Error verifying email:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao verificar email",
     });
   }
 };

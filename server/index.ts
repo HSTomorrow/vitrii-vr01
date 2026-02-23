@@ -65,6 +65,7 @@ import {
   forgotPassword,
   resetPassword,
   validateResetToken,
+  verifyEmail,
   getUsuariosComSenha,
   adminResetUserPassword,
   adminUpdateUserProfile,
@@ -312,6 +313,7 @@ export function createServer() {
   app.post("/api/auth/forgot-password", forgotPassword);
   app.post("/api/auth/reset-password", resetPassword);
   app.get("/api/auth/validate-reset-token", validateResetToken);
+  app.get("/api/auth/verify-email", verifyEmail);
 
   app.post("/api/usracessos", createUsuario);
   app.put("/api/usracessos/:id", updateUsuario);

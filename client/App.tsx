@@ -54,6 +54,7 @@ import HelpAndContact from "./pages/HelpAndContact";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfUse from "./pages/TermsOfUse";
 import Plans from "./pages/Plans";
+import VerifyEmail from "./pages/VerifyEmail";
 import BottomNavBar from "@/components/BottomNavBar";
 import PageTransition from "@/components/PageTransition";
 
@@ -83,6 +84,7 @@ function AppContent() {
           <Route path="/cadastrar" element={<SignUp />} />
           <Route path="/esqueci-senha" element={<ForgotPassword />} />
           <Route path="/reset-senha" element={<ResetPassword />} />
+          <Route path="/verificar-email" element={<VerifyEmail />} />
           <Route path="/favoritos" element={<Favoritos />} />
           <Route path="/lista-desejos" element={<ListaDesejos />} />
           <Route path="/meus-anuncios" element={<MeusAnuncios />} />

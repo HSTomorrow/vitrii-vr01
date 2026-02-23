@@ -213,6 +213,7 @@ model usracessos {
   whatsapp              String?                @db.VarChar(20)
   linkedin              String?                @db.VarChar(255)
   facebook              String?                @db.VarChar(255)
+  emailVerificado       Boolean                @default(false)
   tipoUsuario           String                 @default("common") @db.VarChar(20)
   tassinatura           String                 @default("Gratuito") @db.VarChar(20)
   dataCriacao           DateTime               @default(now())
@@ -225,6 +226,7 @@ model usracessos {
   usuarios_anunciantes  usuarios_anunciantes[]
   membros_equipe        membros_equipe[]
   passwordResetTokens   passwordResetToken[]
+  emailVerificationTokens emailVerificationToken[]
   anuncioVisualizados   anuncioVisualizados[]
   fotos_anuncio         fotos_anuncio[]
   grupos_produtos       grupos_produtos[]
@@ -246,6 +248,17 @@ model passwordResetToken {
   expiresAt DateTime
   createdAt DateTime  @default(now())
   usuario   usracessos @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@index([usuarioId])
+}
+
+model emailVerificationToken {
+  id        Int       @id @default(autoincrement())
+  usuarioId Int
+  token     String    @unique @db.VarChar(500)
+  expiresAt DateTime
+  createdAt DateTime  @default(now())
+  usuario   usracessos @relation(fields: [usuarioId], references: [id], onDelete: Cascade, name: "emailVerificationTokens")
 
   @@index([usuarioId])
 }
