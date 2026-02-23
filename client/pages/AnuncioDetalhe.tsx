@@ -125,6 +125,21 @@ export default function AnuncioDetalhe() {
 
   const canEdit = canEditData?.canEdit ?? false;
 
+  // Check if ad is favorited by current user
+  const { data: favoritoData } = useQuery({
+    queryKey: ["checkFavorito", id, user?.id],
+    queryFn: async () => {
+      const response = await fetch(
+        `/api/favoritos/check?usuarioId=${user?.id}&anuncioId=${id}`
+      );
+      if (!response.ok) throw new Error("Erro ao verificar favorito");
+      return response.json();
+    },
+    enabled: !!id && !!user?.id,
+  });
+
+  const isFavoritado = favoritoData?.isFavorited ?? false;
+
   // Fetch equipes do anunciante
   const { data: equipesData } = useQuery({
     queryKey: ["equipes-anunciante", data?.data?.anuncianteId],
@@ -648,6 +663,7 @@ export default function AnuncioDetalhe() {
                   </button>
                   <FavoritesButton
                     anuncioId={anuncio.id}
+                    isFavorited={isFavoritado}
                     variant="button"
                   />
                   <WishlistButton
@@ -1086,6 +1102,7 @@ export default function AnuncioDetalhe() {
           <div className="flex-shrink-0">
             <FavoritesButton
               anuncioId={anuncio.id}
+              isFavorited={isFavoritado}
               variant="icon"
             />
           </div>

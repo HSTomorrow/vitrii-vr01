@@ -78,6 +78,7 @@ model anuncios {
   agendas             agendas[]
   conversas           conversas[]
   pagamento           pagamentos?
+  favoritos           favorito[]
 }
 
 // Anuncio Visualizacoes - Log table to track ad views
@@ -238,6 +239,7 @@ model usracessos {
   reservas_evento         reservas_evento_agenda[]
   conversas               conversas[]
   mensagens               mensagens[]
+  favoritos               favorito[]
   localidadePadrao        localidades?                @relation(fields: [localidadePadraoId], references: [id], onDelete: SetNull)
 }
 
@@ -707,4 +709,19 @@ model anunciantes_x_localidades {
   @@unique([anuncianteId, localidadeId])
   @@index([anuncianteId])
   @@index([localidadeId])
+}
+
+// Favoritos - User's favorite ads
+model favorito {
+  id          Int      @id @default(autoincrement())
+  usuarioId   Int
+  anuncioId   Int
+  dataCriacao DateTime @default(now())
+
+  usuario usracessos @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  anuncio anuncios   @relation(fields: [anuncioId], references: [id], onDelete: Cascade)
+
+  @@unique([usuarioId, anuncioId])
+  @@index([usuarioId])
+  @@index([anuncioId])
 }
