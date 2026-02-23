@@ -9,26 +9,26 @@ datasource db {
 }
 
 model anunciantes {
-  id                   Int                    @id(map: "lojas_pkey") @default(autoincrement())
-  nome                 String                 @db.VarChar(255)
-  tipo                 String                 @default("Padrão") @db.VarChar(50)
+  id                   Int                         @id(map: "lojas_pkey") @default(autoincrement())
+  nome                 String                      @db.VarChar(255)
+  tipo                 String                      @default("Padrão") @db.VarChar(50)
   descricao            String?
-  cnpj                 String?                @db.VarChar(14)
-  telefone             String?                @db.VarChar(20)
-  email                String?                @db.VarChar(255)
-  endereco             String?                @db.VarChar(255)
-  cidade               String                 @db.VarChar(100)
-  estado               String                 @db.VarChar(2)
-  cep                  String?                @db.VarChar(8)
-  site                 String?                @db.VarChar(255)
-  instagram            String?                @db.VarChar(255)
-  facebook             String?                @db.VarChar(255)
-  whatsapp             String?                @db.VarChar(20)
-  fotoUrl              String?                @db.VarChar(500)
-  status               String                 @default("Ativo") @db.VarChar(50) // Ativo ou Desativado
-  temAgenda            Boolean                @default(false) // Se sim, mostra o botão de agenda nos anuncios
-  localidadeId         Int?                   // Default locality for filtering ads
-  dataCriacao          DateTime               @default(now())
+  cnpj                 String?                     @db.VarChar(14)
+  telefone             String?                     @db.VarChar(20)
+  email                String?                     @db.VarChar(255)
+  endereco             String?                     @db.VarChar(255)
+  cidade               String                      @db.VarChar(100)
+  estado               String                      @db.VarChar(2)
+  cep                  String?                     @db.VarChar(8)
+  site                 String?                     @db.VarChar(255)
+  instagram            String?                     @db.VarChar(255)
+  facebook             String?                     @db.VarChar(255)
+  whatsapp             String?                     @db.VarChar(20)
+  fotoUrl              String?                     @db.VarChar(500)
+  status               String                      @default("Ativo") @db.VarChar(50) // Ativo ou Desativado
+  temAgenda            Boolean                     @default(false) // Se sim, mostra o botão de agenda nos anuncios
+  localidadeId         Int? // Default locality for filtering ads
+  dataCriacao          DateTime                    @default(now())
   dataAtualizacao      DateTime
   anuncios             anuncios[]
   movimentos_estoque   movimentos_estoque[]
@@ -39,39 +39,39 @@ model anunciantes {
   wishlist_permissoes  listas_desejos_permissoes[]
   agendas              agendas[]
   eventos_agenda       eventos_agenda_anunciante[]
-  filas_espera         filas_espera_agenda[] @relation("filas_espera_anunciante")
+  filas_espera         filas_espera_agenda[]       @relation("filas_espera_anunciante")
   links_externos       links_produtos_externos[]
   conversas            conversas[]
   mensagens            mensagens[]
-  localidade           localidades?          @relation(fields: [localidadeId], references: [id], onDelete: SetNull)
+  localidade           localidades?                @relation(fields: [localidadeId], references: [id], onDelete: SetNull)
   localidades          anunciantes_x_localidades[]
 }
 
 model anuncios {
-  id                  Int                     @id @default(autoincrement())
+  id                  Int                    @id @default(autoincrement())
   usuarioId           Int
   anuncianteId        Int
-  titulo              String                  @db.VarChar(255)
+  titulo              String                 @db.VarChar(255)
   descricao           String
-  preco               Decimal?                @db.Decimal(10, 2)
-  categoria           String?                 @db.VarChar(100)
-  imagem              String?                 @db.VarChar(500)
-  link                String?                 @db.VarChar(500)
-  status              String                  @default("ativo") @db.VarChar(50)
-  tipo                String                  @default("produto") @db.VarChar(50)
-  isDoacao            Boolean                 @default(false) @map("isdoacao")
-  aCombinar           Boolean                 @default(false)
+  preco               Decimal?               @db.Decimal(10, 2)
+  categoria           String?                @db.VarChar(100)
+  imagem              String?                @db.VarChar(500)
+  link                String?                @db.VarChar(500)
+  status              String                 @default("ativo") @db.VarChar(50)
+  tipo                String                 @default("produto") @db.VarChar(50)
+  isDoacao            Boolean                @default(false) @map("isdoacao")
+  aCombinar           Boolean                @default(false)
   diasRestantes       Int?
-  statusPagamento     String?                 @default("pendente") @db.VarChar(50)
-  dataCriacao         DateTime                @default(now())
+  statusPagamento     String?                @default("pendente") @db.VarChar(50)
+  dataCriacao         DateTime               @default(now())
   dataAtualizacao     DateTime
-  cidade              String?                 @db.VarChar(100)
-  estado              String?                 @db.VarChar(2)
-  visualizacoes       Int                     @default(0)
-  destaque            Boolean                 @default(false)
-  ordem               Int                     @default(10)  // Admin can customize, default 10, sorted ascending + id descending
-  isActive            Boolean                 @default(true)
-  anunciantes         anunciantes             @relation(fields: [anuncianteId], references: [id], onDelete: Cascade, map: "anuncios_lojaId_fkey")
+  cidade              String?                @db.VarChar(100)
+  estado              String?                @db.VarChar(2)
+  visualizacoes       Int                    @default(0)
+  destaque            Boolean                @default(false)
+  ordem               Int                    @default(10) // Admin can customize, default 10, sorted ascending + id descending
+  isActive            Boolean                @default(true)
+  anunciantes         anunciantes            @relation(fields: [anuncianteId], references: [id], onDelete: Cascade, map: "anuncios_lojaId_fkey")
   anuncioVisualizados anuncioVisualizados[]
   fotos               fotos_anuncio[]
   wishlists_itens     listas_desejos_itens[]
@@ -82,12 +82,12 @@ model anuncios {
 
 // Anuncio Visualizacoes - Log table to track ad views
 model anuncioVisualizados {
-  id              Int       @id @default(autoincrement())
-  anuncioId       Int
-  usuarioId       Int?      // Nullable for anonymous/non-logged-in visitors
-  dataCriacao     DateTime  @default(now())
-  anuncio         anuncios  @relation(fields: [anuncioId], references: [id], onDelete: Cascade)
-  usuario         usracessos? @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+  id          Int         @id @default(autoincrement())
+  anuncioId   Int
+  usuarioId   Int? // Nullable for anonymous/non-logged-in visitors
+  dataCriacao DateTime    @default(now())
+  anuncio     anuncios    @relation(fields: [anuncioId], references: [id], onDelete: Cascade)
+  usuario     usracessos? @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
 
   @@index([anuncioId])
   @@index([usuarioId])
@@ -103,14 +103,14 @@ model fotos_grupos {
 }
 
 model grupos_produtos {
-  id              Int      @id @default(autoincrement())
+  id              Int         @id @default(autoincrement())
   usuarioId       Int?
   anuncianteId    Int
-  nome            String   @db.VarChar(255)
+  nome            String      @db.VarChar(255)
   descricao       String?
-  icone           String?  @db.VarChar(50)
-  dataCriacao     DateTime @default(now())
-  dataAtualizacao DateTime @default(now())
+  icone           String?     @db.VarChar(50)
+  dataCriacao     DateTime    @default(now())
+  dataAtualizacao DateTime    @default(now())
   usuario         usracessos? @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   anunciante      anunciantes @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
   productos       productos[]
@@ -133,16 +133,16 @@ model movimentos_estoque {
 }
 
 model productos {
-  id                  Int                   @id @default(autoincrement())
+  id                  Int                       @id @default(autoincrement())
   lojaId              Int
   grupoId             Int
-  nome                String                @db.VarChar(255)
+  nome                String                    @db.VarChar(255)
   descricao           String?
-  sku                 String?               @db.VarChar(100)
-  tipo                String                @default("produto") @db.VarChar(50)
-  dataCriacao         DateTime              @default(now())
+  sku                 String?                   @db.VarChar(100)
+  tipo                String                    @default("produto") @db.VarChar(50)
+  dataCriacao         DateTime                  @default(now())
   dataAtualizacao     DateTime
-  grupo               grupos_produtos       @relation(fields: [grupoId], references: [id], onDelete: Cascade)
+  grupo               grupos_produtos           @relation(fields: [grupoId], references: [id], onDelete: Cascade)
   movimentos_estoque  movimentos_estoque[]
   produtos_em_estoque produtos_em_estoque[]
   links_externos      links_produtos_externos[]
@@ -204,61 +204,61 @@ model tabelas_preco {
 }
 
 model usracessos {
-  id                    Int                    @id @default(autoincrement())
-  nome                  String                 @db.VarChar(255)
-  email                 String                 @unique @db.VarChar(255)
-  senha                 String                 @db.VarChar(255)
-  cpf                   String?                @db.VarChar(14) @unique
-  telefone              String?                @db.VarChar(20)
-  whatsapp              String?                @db.VarChar(20)
-  linkedin              String?                @db.VarChar(255)
-  facebook              String?                @db.VarChar(255)
-  emailVerificado       Boolean                @default(false)
-  tipoUsuario           String                 @default("common") @db.VarChar(20)
-  tassinatura           String                 @default("Gratuito") @db.VarChar(20)
-  dataCriacao           DateTime               @default(now())
-  dataAtualizacao       DateTime               @updatedAt
-  endereco              String?
-  dataVigenciaContrato  DateTime               @default(now())
-  numeroAnunciosAtivos  Int                    @default(0)
-  maxAnunciosAtivos     Int                    @default(10)
-  localidadePadraoId    Int?                   // Default locality for filtering ads
-  usuarios_anunciantes  usuarios_anunciantes[]
-  membros_equipe        membros_equipe[]
-  passwordResetTokens   passwordResetToken[]
+  id                      Int                         @id @default(autoincrement())
+  nome                    String                      @db.VarChar(255)
+  email                   String                      @unique @db.VarChar(255)
+  senha                   String                      @db.VarChar(255)
+  cpf                     String?                     @unique @db.VarChar(14)
+  telefone                String?                     @db.VarChar(20)
+  whatsapp                String?                     @db.VarChar(20)
+  linkedin                String?                     @db.VarChar(255)
+  facebook                String?                     @db.VarChar(255)
+  emailVerificado         Boolean                     @default(false)
+  tipoUsuario             String                      @default("common") @db.VarChar(20)
+  tassinatura             String                      @default("Gratuito") @db.VarChar(20)
+  dataCriacao             DateTime                    @default(now())
+  dataAtualizacao         DateTime                    @updatedAt
+  endereco                String?
+  dataVigenciaContrato    DateTime                    @default(now())
+  numeroAnunciosAtivos    Int                         @default(0)
+  maxAnunciosAtivos       Int                         @default(10)
+  localidadePadraoId      Int? // Default locality for filtering ads
+  usuarios_anunciantes    usuarios_anunciantes[]
+  membros_equipe          membros_equipe[]
+  passwordResetTokens     passwordResetToken[]
   emailVerificationTokens emailVerificationToken[]
-  anuncioVisualizados   anuncioVisualizados[]
-  fotos_anuncio         fotos_anuncio[]
-  grupos_produtos       grupos_produtos[]
-  listas_desejos        listas_desejos[]
-  reservas_agenda       reservas_agenda[]
-  lista_espera_agenda   lista_espera_agenda[]
-  filas_espera          filas_espera_agenda[] @relation("fila_espera_usuario")
-  eventos_permissoes    eventos_agenda_permissoes[]
-  reservas_evento       reservas_evento_agenda[]
-  conversas             conversas[]
-  mensagens             mensagens[]
-  localidadePadrao      localidades?          @relation(fields: [localidadePadraoId], references: [id], onDelete: SetNull)
+  anuncioVisualizados     anuncioVisualizados[]
+  fotos_anuncio           fotos_anuncio[]
+  grupos_produtos         grupos_produtos[]
+  listas_desejos          listas_desejos[]
+  reservas_agenda         reservas_agenda[]
+  lista_espera_agenda     lista_espera_agenda[]
+  filas_espera            filas_espera_agenda[]       @relation("fila_espera_usuario")
+  eventos_permissoes      eventos_agenda_permissoes[]
+  reservas_evento         reservas_evento_agenda[]
+  conversas               conversas[]
+  mensagens               mensagens[]
+  localidadePadrao        localidades?                @relation(fields: [localidadePadraoId], references: [id], onDelete: SetNull)
 }
 
 model passwordResetToken {
-  id        Int       @id @default(autoincrement())
+  id        Int        @id @default(autoincrement())
   usuarioId Int
-  token     String    @unique @db.VarChar(500)
+  token     String     @unique @db.VarChar(500)
   expiresAt DateTime
-  createdAt DateTime  @default(now())
+  createdAt DateTime   @default(now())
   usuario   usracessos @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
   @@index([usuarioId])
 }
 
 model emailVerificationToken {
-  id        Int       @id @default(autoincrement())
+  id        Int        @id @default(autoincrement())
   usuarioId Int
-  token     String    @unique @db.VarChar(500)
+  token     String     @unique @db.VarChar(500)
   expiresAt DateTime
-  createdAt DateTime  @default(now())
-  usuario   usracessos @relation(fields: [usuarioId], references: [id], onDelete: Cascade, name: "emailVerificationTokens")
+  createdAt DateTime   @default(now())
+  usuario   usracessos @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
   @@index([usuarioId])
 }
@@ -277,14 +277,14 @@ model usuarios_anunciantes {
 
 // Equipes de Venda (Sales Teams)
 model equipes_de_venda {
-  id              Int               @id @default(autoincrement())
+  id              Int              @id @default(autoincrement())
   anuncianteId    Int
-  nome            String            @db.VarChar(255)
-  descricao       String?           @db.Text
-  isActive        Boolean           @default(true)
-  dataCriacao     DateTime          @default(now())
-  dataAtualizacao DateTime          @updatedAt
-  anunciantes     anunciantes       @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
+  nome            String           @db.VarChar(255)
+  descricao       String?          @db.Text
+  isActive        Boolean          @default(true)
+  dataCriacao     DateTime         @default(now())
+  dataAtualizacao DateTime         @updatedAt
+  anunciantes     anunciantes      @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
   membros_equipe  membros_equipe[]
 
   @@map("equipes_de_venda")
@@ -292,17 +292,17 @@ model equipes_de_venda {
 
 // Membros da Equipe de Venda (Sales Team Members)
 model membros_equipe {
-  id              Int                @id @default(autoincrement())
+  id              Int              @id @default(autoincrement())
   equipeId        Int
   usuarioId       Int
-  nomeMembro      String             @db.VarChar(255)
-  email           String             @db.VarChar(255)
-  whatsapp        String?            @db.VarChar(20)
-  status          String             @default("disponivel")
-  dataCriacao     DateTime           @default(now())
-  dataAtualizacao DateTime           @updatedAt
-  equipe          equipes_de_venda   @relation(fields: [equipeId], references: [id], onDelete: Cascade)
-  usuario         usracessos         @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  nomeMembro      String           @db.VarChar(255)
+  email           String           @db.VarChar(255)
+  whatsapp        String?          @db.VarChar(20)
+  status          String           @default("disponivel")
+  dataCriacao     DateTime         @default(now())
+  dataAtualizacao DateTime         @updatedAt
+  equipe          equipes_de_venda @relation(fields: [equipeId], references: [id], onDelete: Cascade)
+  usuario         usracessos       @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
   @@unique([equipeId, email])
   @@map("membros_equipe")
@@ -310,32 +310,32 @@ model membros_equipe {
 
 // Banners - Admin managed promotional banners for homepage
 model banners {
-  id              Int       @id @default(autoincrement())
-  titulo          String    @db.VarChar(255)
-  descricao       String?   @db.Text
-  imagemUrl       String    @db.Text
-  link            String?   @db.VarChar(500)
-  ordem           Int       @default(0)
-  ativo           Boolean   @default(true)
-  corFonte        String    @default("amarelo") @db.VarChar(20) // "branco", "preto", "amarelo"
-  dataCriacao     DateTime  @default(now())
-  dataAtualizacao DateTime  @updatedAt
+  id              Int      @id @default(autoincrement())
+  titulo          String   @db.VarChar(255)
+  descricao       String?  @db.Text
+  imagemUrl       String   @db.Text
+  link            String?  @db.VarChar(500)
+  ordem           Int      @default(0)
+  ativo           Boolean  @default(true)
+  corFonte        String   @default("amarelo") @db.VarChar(20) // "branco", "preto", "amarelo"
+  dataCriacao     DateTime @default(now())
+  dataAtualizacao DateTime @updatedAt
 
   @@map("banners")
 }
 
 // Fotos de Anuncio - Multiple images per ad (up to 5)
 model fotos_anuncio {
-  id                Int       @id @default(autoincrement())
-  anuncio_id        Int
-  url               String    @db.VarChar(500)
-  ordem             Int       @default(1)
-  criado_por        Int
-  data_criacao      DateTime  @default(now())
-  data_atualizacao  DateTime  @default(now())
+  id               Int      @id @default(autoincrement())
+  anuncio_id       Int
+  url              String   @db.VarChar(500)
+  ordem            Int      @default(1)
+  criado_por       Int
+  data_criacao     DateTime @default(now())
+  data_atualizacao DateTime @default(now())
 
-  anuncio           anuncios  @relation(fields: [anuncio_id], references: [id], onDelete: Cascade)
-  usuario           usracessos @relation(fields: [criado_por], references: [id], onDelete: Restrict)
+  anuncio anuncios   @relation(fields: [anuncio_id], references: [id], onDelete: Cascade)
+  usuario usracessos @relation(fields: [criado_por], references: [id], onDelete: Restrict)
 
   @@index([anuncio_id])
   @@index([anuncio_id, ordem])
@@ -343,17 +343,17 @@ model fotos_anuncio {
 
 // Listas de Desejos (Wishlists)
 model listas_desejos {
-  id                    Int                              @id @default(autoincrement())
-  usuarioId             Int
-  titulo                String                           @db.VarChar(255)
-  descricao             String?
-  status                String                           @default("privado") @db.VarChar(20)
-  dataCriacao           DateTime                         @default(now())
-  dataAtualizacao       DateTime                         @updatedAt
+  id              Int      @id @default(autoincrement())
+  usuarioId       Int
+  titulo          String   @db.VarChar(255)
+  descricao       String?
+  status          String   @default("privado") @db.VarChar(20)
+  dataCriacao     DateTime @default(now())
+  dataAtualizacao DateTime @updatedAt
 
-  usuario               usracessos                       @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-  itens                 listas_desejos_itens[]
-  permissoes            listas_desejos_permissoes[]
+  usuario    usracessos                  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  itens      listas_desejos_itens[]
+  permissoes listas_desejos_permissoes[]
 
   @@index([usuarioId])
   @@index([status])
@@ -361,22 +361,22 @@ model listas_desejos {
 
 // Itens das Listas de Desejos
 model listas_desejos_itens {
-  id                    Int                    @id @default(autoincrement())
-  listaId               Int
-  tipo                  String                 @db.VarChar(50)
-  titulo                String                 @db.VarChar(255)
-  descricao             String?
-  preco                 Decimal?               @db.Decimal(10, 2)
-  preco_desejado        Decimal?               @db.Decimal(10, 2)
-  observacoes           String?
-  imagem                String?                @db.VarChar(500)
-  anuncioId             Int?
-  dados_copiados        Json?
-  dataCriacao           DateTime               @default(now())
-  dataAtualizacao       DateTime               @updatedAt
+  id              Int      @id @default(autoincrement())
+  listaId         Int
+  tipo            String   @db.VarChar(50)
+  titulo          String   @db.VarChar(255)
+  descricao       String?
+  preco           Decimal? @db.Decimal(10, 2)
+  preco_desejado  Decimal? @db.Decimal(10, 2)
+  observacoes     String?
+  imagem          String?  @db.VarChar(500)
+  anuncioId       Int?
+  dados_copiados  Json?
+  dataCriacao     DateTime @default(now())
+  dataAtualizacao DateTime @updatedAt
 
-  lista                 listas_desejos         @relation(fields: [listaId], references: [id], onDelete: Cascade)
-  anuncio               anuncios?              @relation(fields: [anuncioId], references: [id], onDelete: SetNull)
+  lista   listas_desejos @relation(fields: [listaId], references: [id], onDelete: Cascade)
+  anuncio anuncios?      @relation(fields: [anuncioId], references: [id], onDelete: SetNull)
 
   @@index([listaId])
   @@index([anuncioId])
@@ -384,37 +384,37 @@ model listas_desejos_itens {
 
 // Permissões de Listas Privadas
 model listas_desejos_permissoes {
-  id                    Int                    @id @default(autoincrement())
-  listaId               Int
-  anuncianteId          Int
-  dataCriacao           DateTime               @default(now())
+  id           Int      @id @default(autoincrement())
+  listaId      Int
+  anuncianteId Int
+  dataCriacao  DateTime @default(now())
 
-  lista                 listas_desejos         @relation(fields: [listaId], references: [id], onDelete: Cascade)
-  anunciante            anunciantes            @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
+  lista      listas_desejos @relation(fields: [listaId], references: [id], onDelete: Cascade)
+  anunciante anunciantes    @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
 
   @@unique([listaId, anuncianteId])
 }
 
 // Agendas para Aulas, Cursos e Serviços
 model agendas {
-  id                    Int                    @id @default(autoincrement())
-  anuncioId             Int
-  anuncianteId          Int
-  titulo                String                 @db.VarChar(255)
-  descricao             String?
-  tipo                  String                 @db.VarChar(50)
-  duracao_minutos       Int                    @default(60)
-  preco                 Decimal?               @db.Decimal(10, 2)
-  capacidade            Int                    @default(1)
-  status                String                 @default("ativo") @db.VarChar(20)
-  dataCriacao           DateTime               @default(now())
-  dataAtualizacao       DateTime               @updatedAt
+  id              Int      @id @default(autoincrement())
+  anuncioId       Int
+  anuncianteId    Int
+  titulo          String   @db.VarChar(255)
+  descricao       String?
+  tipo            String   @db.VarChar(50)
+  duracao_minutos Int      @default(60)
+  preco           Decimal? @db.Decimal(10, 2)
+  capacidade      Int      @default(1)
+  status          String   @default("ativo") @db.VarChar(20)
+  dataCriacao     DateTime @default(now())
+  dataAtualizacao DateTime @updatedAt
 
-  anuncio               anuncios               @relation(fields: [anuncioId], references: [id], onDelete: Cascade)
-  anunciante            anunciantes            @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
-  slots                 slots_agenda[]
-  reservas              reservas_agenda[]
-  lista_espera          lista_espera_agenda[]
+  anuncio      anuncios              @relation(fields: [anuncioId], references: [id], onDelete: Cascade)
+  anunciante   anunciantes           @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
+  slots        slots_agenda[]
+  reservas     reservas_agenda[]
+  lista_espera lista_espera_agenda[]
 
   @@index([anuncioId])
   @@index([anuncianteId])
@@ -423,20 +423,20 @@ model agendas {
 
 // Links de Produtos Externos (Mercado Livre, Shopee, etc)
 model links_produtos_externos {
-  id                    Int                    @id @default(autoincrement())
-  anuncianteId          Int
-  productId             Int?
-  marketplace           String                 @db.VarChar(50)
-  url                   String                 @db.VarChar(500)
-  preco                 Decimal?               @db.Decimal(10, 2)
-  titulo_externo        String?                @db.VarChar(255)
-  descricao_externa     String?
-  status                String                 @default("ativo") @db.VarChar(20)
-  dataCriacao           DateTime               @default(now())
-  dataAtualizacao       DateTime               @updatedAt
+  id                Int      @id @default(autoincrement())
+  anuncianteId      Int
+  productId         Int?
+  marketplace       String   @db.VarChar(50)
+  url               String   @db.VarChar(500)
+  preco             Decimal? @db.Decimal(10, 2)
+  titulo_externo    String?  @db.VarChar(255)
+  descricao_externa String?
+  status            String   @default("ativo") @db.VarChar(20)
+  dataCriacao       DateTime @default(now())
+  dataAtualizacao   DateTime @updatedAt
 
-  anunciante            anunciantes            @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
-  product               productos?             @relation(fields: [productId], references: [id], onDelete: SetNull)
+  anunciante anunciantes @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
+  product    productos?  @relation(fields: [productId], references: [id], onDelete: SetNull)
 
   @@index([anuncianteId])
   @@index([productId])
@@ -446,17 +446,17 @@ model links_produtos_externos {
 
 // Slots de Agenda (Horários Disponíveis)
 model slots_agenda {
-  id                    Int                    @id @default(autoincrement())
-  agendaId              Int
-  data_hora_inicio      DateTime
-  data_hora_fim         DateTime
-  vagas_disponiveis     Int
-  vagas_preenchidas     Int                    @default(0)
-  status                String                 @default("disponivel") @db.VarChar(20)
-  dataCriacao           DateTime               @default(now())
+  id                Int      @id @default(autoincrement())
+  agendaId          Int
+  data_hora_inicio  DateTime
+  data_hora_fim     DateTime
+  vagas_disponiveis Int
+  vagas_preenchidas Int      @default(0)
+  status            String   @default("disponivel") @db.VarChar(20)
+  dataCriacao       DateTime @default(now())
 
-  agenda                agendas                @relation(fields: [agendaId], references: [id], onDelete: Cascade)
-  reservas              reservas_agenda[]
+  agenda   agendas           @relation(fields: [agendaId], references: [id], onDelete: Cascade)
+  reservas reservas_agenda[]
 
   @@index([agendaId])
   @@index([data_hora_inicio])
@@ -465,17 +465,17 @@ model slots_agenda {
 
 // Reservas de Agenda
 model reservas_agenda {
-  id                    Int                    @id @default(autoincrement())
-  slotId                Int
-  usuarioId             Int
-  agendaId              Int
-  status                String                 @default("confirmado") @db.VarChar(20)
-  data_confirmacao      DateTime               @default(now())
-  dataCriacao           DateTime               @default(now())
+  id               Int      @id @default(autoincrement())
+  slotId           Int
+  usuarioId        Int
+  agendaId         Int
+  status           String   @default("confirmado") @db.VarChar(20)
+  data_confirmacao DateTime @default(now())
+  dataCriacao      DateTime @default(now())
 
-  slot                  slots_agenda           @relation(fields: [slotId], references: [id], onDelete: Cascade)
-  usuario               usracessos             @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-  agenda                agendas                @relation(fields: [agendaId], references: [id], onDelete: Cascade)
+  slot    slots_agenda @relation(fields: [slotId], references: [id], onDelete: Cascade)
+  usuario usracessos   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  agenda  agendas      @relation(fields: [agendaId], references: [id], onDelete: Cascade)
 
   @@unique([slotId, usuarioId])
   @@index([slotId])
@@ -486,17 +486,17 @@ model reservas_agenda {
 
 // Lista de Espera para Agendas
 model lista_espera_agenda {
-  id                    Int                    @id @default(autoincrement())
+  id                    Int       @id @default(autoincrement())
   agendaId              Int
   usuarioId             Int
   data_horario_desejada DateTime?
   posicao               Int
-  status                String                 @default("aguardando") @db.VarChar(20)
+  status                String    @default("aguardando") @db.VarChar(20)
   motivo_cancelamento   String?
-  dataCriacao           DateTime               @default(now())
+  dataCriacao           DateTime  @default(now())
 
-  agenda                agendas                @relation(fields: [agendaId], references: [id], onDelete: Cascade)
-  usuario               usracessos             @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  agenda  agendas    @relation(fields: [agendaId], references: [id], onDelete: Cascade)
+  usuario usracessos @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
   @@unique([agendaId, usuarioId])
   @@index([agendaId])
@@ -506,22 +506,22 @@ model lista_espera_agenda {
 
 // Eventos de Agenda do Anunciante (Compromissos, Horários, etc)
 model eventos_agenda_anunciante {
-  id                    Int                              @id @default(autoincrement())
-  anuncianteId          Int
-  titulo                String                           @db.VarChar(255)
-  descricao             String?
-  dataInicio            DateTime
-  dataFim               DateTime
-  privacidade           String                           @default("privado") @db.VarChar(20) // "publico", "privado_usuarios", "privado"
-  cor                   String?                          @default("#3B82F6") @db.VarChar(7)
-  status                String                           @default("pendente") @db.VarChar(30) // "pendente", "realizado", "pendente_pagamento", "substituicao"
-  dataCriacao           DateTime                         @default(now())
-  dataAtualizacao       DateTime                         @updatedAt
+  id              Int      @id @default(autoincrement())
+  anuncianteId    Int
+  titulo          String   @db.VarChar(255)
+  descricao       String?
+  dataInicio      DateTime
+  dataFim         DateTime
+  privacidade     String   @default("privado") @db.VarChar(20) // "publico", "privado_usuarios", "privado"
+  cor             String?  @default("#3B82F6") @db.VarChar(7)
+  status          String   @default("pendente") @db.VarChar(30) // "pendente", "realizado", "pendente_pagamento", "substituicao"
+  dataCriacao     DateTime @default(now())
+  dataAtualizacao DateTime @updatedAt
 
-  anunciante            anunciantes                      @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
-  permissoes            eventos_agenda_permissoes[]
-  reservas              reservas_evento_agenda[]
-  filasEspera           filas_espera_agenda[]
+  anunciante  anunciantes                 @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
+  permissoes  eventos_agenda_permissoes[]
+  reservas    reservas_evento_agenda[]
+  filasEspera filas_espera_agenda[]
 
   @@index([anuncianteId])
   @@index([dataInicio])
@@ -531,13 +531,13 @@ model eventos_agenda_anunciante {
 
 // Permissões para Eventos Privados com Usuários Específicos
 model eventos_agenda_permissoes {
-  id                    Int                              @id @default(autoincrement())
-  eventoId              Int
-  usuarioId             Int
-  dataCriacao           DateTime                         @default(now())
+  id          Int      @id @default(autoincrement())
+  eventoId    Int
+  usuarioId   Int
+  dataCriacao DateTime @default(now())
 
-  evento                eventos_agenda_anunciante        @relation(fields: [eventoId], references: [id], onDelete: Cascade)
-  usuario               usracessos                       @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  evento  eventos_agenda_anunciante @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+  usuario usracessos                @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
   @@unique([eventoId, usuarioId])
   @@index([eventoId])
@@ -546,24 +546,24 @@ model eventos_agenda_permissoes {
 
 // Reservas de Eventos da Agenda
 model reservas_evento_agenda {
-  id                    Int                              @id @default(autoincrement())
-  eventoId              Int
-  usuarioId             Int?                             // Pode ser null se for lista de espera de não-logado
-  emailSolicitante      String?                          @db.VarChar(255)
-  nomeSolicitante       String?                          @db.VarChar(255)
-  telefoneSolicitante   String?                          @db.VarChar(20)
-  tipo                  String                           @default("reserva") @db.VarChar(20) // "reserva" ou "lista_espera"
-  status                String                           @default("pendente") @db.VarChar(20) // "pendente", "confirmada", "rejeitada", "cancelada"
-  posicaoListaEspera    Int?                             // Posição na fila (para lista de espera)
-  motivo                String?                          // Motivo da rejeição
-  dataSolicitacao       DateTime                         @default(now())
-  dataConfirmacao       DateTime?
-  dataCancelamento      DateTime?
-  dataCriacao           DateTime                         @default(now())
-  dataAtualizacao       DateTime                         @updatedAt
+  id                  Int       @id @default(autoincrement())
+  eventoId            Int
+  usuarioId           Int? // Pode ser null se for lista de espera de não-logado
+  emailSolicitante    String?   @db.VarChar(255)
+  nomeSolicitante     String?   @db.VarChar(255)
+  telefoneSolicitante String?   @db.VarChar(20)
+  tipo                String    @default("reserva") @db.VarChar(20) // "reserva" ou "lista_espera"
+  status              String    @default("pendente") @db.VarChar(20) // "pendente", "confirmada", "rejeitada", "cancelada"
+  posicaoListaEspera  Int? // Posição na fila (para lista de espera)
+  motivo              String? // Motivo da rejeição
+  dataSolicitacao     DateTime  @default(now())
+  dataConfirmacao     DateTime?
+  dataCancelamento    DateTime?
+  dataCriacao         DateTime  @default(now())
+  dataAtualizacao     DateTime  @updatedAt
 
-  evento                eventos_agenda_anunciante        @relation(fields: [eventoId], references: [id], onDelete: Cascade)
-  usuario               usracessos?                      @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+  evento  eventos_agenda_anunciante @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+  usuario usracessos?               @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
 
   @@index([eventoId])
   @@index([usuarioId])
@@ -573,19 +573,19 @@ model reservas_evento_agenda {
 
 // Conversas (Chat Conversations)
 model conversas {
-  id                  Int         @id @default(autoincrement())
-  usuarioId           Int         @map("usuarioid")
-  anuncianteId        Int         @map("anuncianteid")
-  anuncioId           Int?        @map("anuncioid")
-  assunto             String      @db.VarChar(255)
-  tipo                String      @default("privada") @db.VarChar(50) // "privada" ou "publica"
-  dataCriacao         DateTime    @default(now()) @map("datacriacao")
-  dataAtualizacao     DateTime    @updatedAt @map("dataatualizacao")
+  id              Int      @id @default(autoincrement())
+  usuarioId       Int      @map("usuarioid")
+  anuncianteId    Int      @map("anuncianteid")
+  anuncioId       Int?     @map("anuncioid")
+  assunto         String   @db.VarChar(255)
+  tipo            String   @default("privada") @db.VarChar(50) // "privada" ou "publica"
+  dataCriacao     DateTime @default(now()) @map("datacriacao")
+  dataAtualizacao DateTime @updatedAt @map("dataatualizacao")
 
-  usuario             usracessos  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-  anunciante          anunciantes @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
-  anuncio             anuncios?   @relation(fields: [anuncioId], references: [id], onDelete: SetNull)
-  mensagens           mensagens[]
+  usuario    usracessos  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  anunciante anunciantes @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
+  anuncio    anuncios?   @relation(fields: [anuncioId], references: [id], onDelete: SetNull)
+  mensagens  mensagens[]
 
   @@index([usuarioId])
   @@index([anuncianteId])
@@ -596,19 +596,19 @@ model conversas {
 
 // Mensagens (Messages)
 model mensagens {
-  id                  Int       @id @default(autoincrement())
-  conversaId          Int       @map("conversaid")
-  usuarioId           Int?      @map("usuarioid")
-  anuncianteId        Int?      @map("anuncianteid")
-  conteudo            String    @db.Text
-  status              String    @default("nao_lida") @db.VarChar(50) // "nao_lida", "lida", "entregue"
-  excluido            Boolean   @default(false) // Soft delete flag
-  dataCriacao         DateTime  @default(now()) @map("datacriacao")
-  dataAtualizacao     DateTime  @updatedAt @map("dataatualizacao")
+  id              Int      @id @default(autoincrement())
+  conversaId      Int      @map("conversaid")
+  usuarioId       Int?     @map("usuarioid")
+  anuncianteId    Int?     @map("anuncianteid")
+  conteudo        String   @db.Text
+  status          String   @default("nao_lida") @db.VarChar(50) // "nao_lida", "lida", "entregue"
+  excluido        Boolean  @default(false) // Soft delete flag
+  dataCriacao     DateTime @default(now()) @map("datacriacao")
+  dataAtualizacao DateTime @updatedAt @map("dataatualizacao")
 
-  conversa            conversas @relation(fields: [conversaId], references: [id], onDelete: Cascade)
-  usuario             usracessos? @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
-  anunciante          anunciantes? @relation(fields: [anuncianteId], references: [id], onDelete: SetNull)
+  conversa   conversas    @relation(fields: [conversaId], references: [id], onDelete: Cascade)
+  usuario    usracessos?  @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+  anunciante anunciantes? @relation(fields: [anuncianteId], references: [id], onDelete: SetNull)
 
   @@index([conversaId])
   @@index([usuarioId])
@@ -620,21 +620,21 @@ model mensagens {
 
 // Pagamentos de Anúncios
 model pagamentos {
-  id                    Int       @id @default(autoincrement())
-  anuncioId             Int       @unique
-  anuncio               anuncios  @relation(fields: [anuncioId], references: [id], onDelete: Cascade)
+  id        Int      @id @default(autoincrement())
+  anuncioId Int      @unique
+  anuncio   anuncios @relation(fields: [anuncioId], references: [id], onDelete: Cascade)
 
-  valor                 Decimal   @db.Decimal(10, 2)
-  status                String    @default("pendente") @db.VarChar(50) // pendente, comprovante_enviado, aprovado, rejeitado
-  tipo                  String    @default("pix") @db.VarChar(50)
+  valor  Decimal @db.Decimal(10, 2)
+  status String  @default("pendente") @db.VarChar(50) // pendente, comprovante_enviado, aprovado, rejeitado
+  tipo   String  @default("pix") @db.VarChar(50)
 
   // Comprovante
-  comprovantePagamento  String?   @db.VarChar(500) // URL do comprovante (storage)
-  dataComprovante       DateTime?
+  comprovantePagamento String?   @db.VarChar(500) // URL do comprovante (storage)
+  dataComprovante      DateTime?
 
   // Controle
-  dataCriacao           DateTime  @default(now())
-  dataAtualizacao       DateTime  @updatedAt
+  dataCriacao     DateTime @default(now())
+  dataAtualizacao DateTime @updatedAt
 
   @@index([anuncioId])
   @@index([status])
@@ -644,26 +644,26 @@ model pagamentos {
 
 // Filas de Espera para Eventos de Agenda (Waiting Queues)
 model filas_espera_agenda {
-  id                      Int                               @id @default(autoincrement())
-  eventoId                Int                               @db.Integer
-  usuarioSolicitanteId    Int
-  anuncianteAlvoId        Int  // Anunciante cuja agenda está recebendo a solicitação
-  titulo                  String                            @db.VarChar(255)
-  descricao               String?
-  dataInicio              DateTime
-  dataFim                 DateTime
-  status                  String                            @default("pendente") @db.VarChar(30) // "pendente", "aprovada", "rejeitada", "cancelada"
-  motivo_rejeicao         String?  // Motivo da rejeição
-  dataSugestao            DateTime?  // Data sugerida pelo dono da agenda para resubmissão
-  horaSugestao            String?  @db.VarChar(5)  // Hora sugerida (HH:mm)
-  dataSolicitacao         DateTime                          @default(now())
-  dataResposta            DateTime?
-  dataCriacao             DateTime                          @default(now())
-  dataAtualizacao         DateTime                          @updatedAt
+  id                   Int       @id @default(autoincrement())
+  eventoId             Int       @db.Integer
+  usuarioSolicitanteId Int
+  anuncianteAlvoId     Int // Anunciante cuja agenda está recebendo a solicitação
+  titulo               String    @db.VarChar(255)
+  descricao            String?
+  dataInicio           DateTime
+  dataFim              DateTime
+  status               String    @default("pendente") @db.VarChar(30) // "pendente", "aprovada", "rejeitada", "cancelada"
+  motivo_rejeicao      String? // Motivo da rejeição
+  dataSugestao         DateTime? // Data sugerida pelo dono da agenda para resubmissão
+  horaSugestao         String?   @db.VarChar(5) // Hora sugerida (HH:mm)
+  dataSolicitacao      DateTime  @default(now())
+  dataResposta         DateTime?
+  dataCriacao          DateTime  @default(now())
+  dataAtualizacao      DateTime  @updatedAt
 
-  evento                  eventos_agenda_anunciante         @relation(fields: [eventoId], references: [id], onDelete: Cascade)
-  usuarioSolicitante      usracessos                        @relation("fila_espera_usuario", fields: [usuarioSolicitanteId], references: [id], onDelete: Cascade)
-  anuncianteAlvo          anunciantes                       @relation("filas_espera_anunciante", fields: [anuncianteAlvoId], references: [id], onDelete: Cascade)
+  evento             eventos_agenda_anunciante @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+  usuarioSolicitante usracessos                @relation("fila_espera_usuario", fields: [usuarioSolicitanteId], references: [id], onDelete: Cascade)
+  anuncianteAlvo     anunciantes               @relation("filas_espera_anunciante", fields: [anuncianteAlvoId], references: [id], onDelete: Cascade)
 
   @@index([eventoId])
   @@index([usuarioSolicitanteId])
@@ -674,35 +674,35 @@ model filas_espera_agenda {
 
 // Localidades/Localities for geographic filtering
 model localidades {
-  id                           Int                             @id @default(autoincrement())
-  codigo                       String                          @unique @db.VarChar(50)
-  municipio                    String                          @db.VarChar(255)
-  estado                       String                          @db.VarChar(2)
-  descricao                    String?
-  observacao                   String?
-  status                       String                          @default("ativo") @db.VarChar(20) // "ativo" ou "inativo"
-  dataCriacao                  DateTime                        @default(now())
-  dataAtualizacao              DateTime                        @updatedAt
+  id              Int      @id @default(autoincrement())
+  codigo          String   @unique @db.VarChar(50)
+  municipio       String   @db.VarChar(255)
+  estado          String   @db.VarChar(2)
+  descricao       String?
+  observacao      String?
+  status          String   @default("ativo") @db.VarChar(20) // "ativo" ou "inativo"
+  dataCriacao     DateTime @default(now())
+  dataAtualizacao DateTime @updatedAt
 
-  usuarios_padrao              usracessos[]
-  anunciantes_padrao           anunciantes[]
-  anunciantes                  anunciantes_x_localidades[]
+  usuarios_padrao    usracessos[]
+  anunciantes_padrao anunciantes[]
+  anunciantes        anunciantes_x_localidades[]
 
+  @@unique([municipio, estado])
   @@index([status])
   @@index([municipio])
   @@index([estado])
-  @@unique([municipio, estado])
 }
 
 // Junction table: Anunciantes x Localidades (M:N)
 model anunciantes_x_localidades {
-  id                Int         @id @default(autoincrement())
-  anuncianteId      Int
-  localidadeId      Int
-  dataCriacao       DateTime    @default(now())
+  id           Int      @id @default(autoincrement())
+  anuncianteId Int
+  localidadeId Int
+  dataCriacao  DateTime @default(now())
 
-  anunciante        anunciantes @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
-  localidade        localidades @relation(fields: [localidadeId], references: [id], onDelete: Cascade)
+  anunciante anunciantes @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
+  localidade localidades @relation(fields: [localidadeId], references: [id], onDelete: Cascade)
 
   @@unique([anuncianteId, localidadeId])
   @@index([anuncianteId])
