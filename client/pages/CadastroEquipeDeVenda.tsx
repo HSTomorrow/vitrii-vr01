@@ -446,19 +446,8 @@ export default function CadastroEquipeDeVenda() {
       return;
     }
 
-    // Check for duplicate email in the current team (only when adding new member, not updating)
-    if (!editingMemberId) {
-      const equipe = equipesFiltered.find(eq => eq.id === teamId);
-      if (equipe?.membros) {
-        const emailExists = equipe.membros.some(
-          m => m.email.toLowerCase() === memberFormData.email.toLowerCase()
-        );
-        if (emailExists) {
-          toast.error("⚠️ Este email já foi adicionado nesta equipe. Use um email diferente.");
-          return;
-        }
-      }
-    }
+    // NOTE: Removed duplicate email validation across teams
+    // Members can now be added to multiple different teams
 
     if (editingMemberId) {
       updateMemberMutation.mutate({
@@ -703,6 +692,9 @@ export default function CadastroEquipeDeVenda() {
                       <p className="text-xs text-gray-500 mt-2">
                         Anunciante: {equipe.anunciante?.nome || "N/A"} •{" "}
                         {equipe.membros?.length || 0} membro(s)
+                      </p>
+                      <p className="text-xs text-gray-400 mt-1 font-mono bg-gray-100 px-2 py-1 rounded inline-block">
+                        ID: {equipe.id}
                       </p>
                     </div>
 
