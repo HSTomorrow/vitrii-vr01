@@ -69,11 +69,11 @@ export default function BannerCarousel({
       <div className="absolute inset-0 bg-black/30 flex flex-col items-center justify-center p-2">
         {/* Content */}
         <div className="text-center text-white max-w-3xl px-2 sm:px-4">
-          <h2 className="text-base sm:text-xl md:text-2xl lg:text-3xl font-bold mb-0.5 sm:mb-1.5 line-clamp-2">
+          <h2 className="text-base sm:text-xl md:text-2xl lg:text-3xl font-bold mb-0.5 sm:mb-1.5 line-clamp-2 text-white border-2 border-vitrii-blue px-2 py-1 rounded">
             {currentBanner.titulo}
           </h2>
           {currentBanner.descricao && (
-            <p className="text-xs sm:text-sm md:text-base text-gray-100 mb-2 sm:mb-4 line-clamp-2">
+            <p className="text-xs sm:text-sm md:text-base text-white mb-2 sm:mb-4 line-clamp-2 border-2 border-vitrii-blue px-2 py-1 rounded">
               {currentBanner.descricao}
             </p>
           )}
