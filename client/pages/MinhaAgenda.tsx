@@ -309,7 +309,7 @@ export default function MinhaAgenda() {
   const handleSelectEvento = (evento: Evento) => {
     setSelectedEvento(evento);
     setShowReservasFor(evento.id);
-    setIsModalOpen(false);
+    setIsModalOpen(true); // Open modal to view/edit evento details
   };
 
   const handleSelectDate = (date: Date) => {
@@ -388,7 +388,7 @@ export default function MinhaAgenda() {
                       : "border-transparent text-gray-600 hover:text-gray-900"
                   }`}
                 >
-                  📅 Calendário
+                  📅 Minha Agenda
                 </button>
                 <button
                   onClick={() => setActiveTab("fila-espera")}

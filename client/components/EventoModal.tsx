@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { X, Users } from "lucide-react";
+import { X, Users, Clock } from "lucide-react";
 import { toast } from "sonner";
 import EventoUsuariosModal from "./EventoUsuariosModal";
+import FilaDeEsperaUsuariosModal from "./FilaDeEsperaUsuariosModal";
 
 interface Evento {
   id: number;
@@ -54,6 +55,7 @@ export default function EventoModal({
   isLoading = false,
 }: EventoModalProps) {
   const [showUsuariosModal, setShowUsuariosModal] = useState(false);
+  const [showFilaModal, setShowFilaModal] = useState(false);
   const [formData, setFormData] = useState({
     titulo: "",
     descricao: "",
@@ -315,14 +317,24 @@ export default function EventoModal({
 
           {/* Manage Users Button - only for existing eventos */}
           {evento && anuncianteId && (
-            <button
-              type="button"
-              onClick={() => setShowUsuariosModal(true)}
-              className="w-full px-4 py-2 border border-blue-300 text-vitrii-blue rounded-lg hover:bg-blue-50 transition-colors font-semibold flex items-center justify-center gap-2"
-            >
-              <Users className="w-4 h-4" />
-              Gerenciar Usuários
-            </button>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setShowUsuariosModal(true)}
+                className="px-4 py-2 border border-blue-300 text-vitrii-blue rounded-lg hover:bg-blue-50 transition-colors font-semibold flex items-center justify-center gap-2"
+              >
+                <Users className="w-4 h-4" />
+                Usuários
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowFilaModal(true)}
+                className="px-4 py-2 border border-orange-300 text-orange-600 rounded-lg hover:bg-orange-50 transition-colors font-semibold flex items-center justify-center gap-2"
+              >
+                <Clock className="w-4 h-4" />
+                Fila de Espera
+              </button>
+            </div>
           )}
 
           {/* Buttons */}
@@ -358,6 +370,17 @@ export default function EventoModal({
           <EventoUsuariosModal
             isOpen={showUsuariosModal}
             onClose={() => setShowUsuariosModal(false)}
+            eventoId={evento.id}
+            anuncianteId={anuncianteId}
+            isOwner={true}
+          />
+        )}
+
+        {/* Fila de Espera Modal */}
+        {evento && anuncianteId && (
+          <FilaDeEsperaUsuariosModal
+            isOpen={showFilaModal}
+            onClose={() => setShowFilaModal(false)}
             eventoId={evento.id}
             anuncianteId={anuncianteId}
             isOwner={true}
