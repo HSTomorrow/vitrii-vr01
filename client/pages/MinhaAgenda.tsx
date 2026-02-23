@@ -6,6 +6,7 @@ import { Trash2, Settings, Share2 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import EventosAgendaCalendar from "@/components/EventosAgendaCalendar";
+import ViewDiaEvento from "@/components/ViewDiaEvento";
 import EventoModal from "@/components/EventoModal";
 import ReservasEventoList from "@/components/ReservasEventoList";
 import FilaDeEsperaModal from "@/components/FilaDeEsperaModal";
@@ -55,7 +56,7 @@ export default function MinhaAgenda() {
   const [showFilaDeEsperaModal, setShowFilaDeEsperaModal] = useState(false);
   const [showEditorModal, setShowEditorModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
-  const [activeTab, setActiveTab] = useState<"calendar" | "fila-espera" | "status-agenda">("calendar");
+  const [activeTab, setActiveTab] = useState<"calendar" | "dia" | "fila-espera" | "status-agenda">("calendar");
   const reservasRef = useRef<HTMLDivElement>(null);
 
   // Fetch user's anunciantes
@@ -391,6 +392,16 @@ export default function MinhaAgenda() {
                   📅 Minha Agenda
                 </button>
                 <button
+                  onClick={() => setActiveTab("dia")}
+                  className={`px-4 py-3 font-semibold border-b-2 whitespace-nowrap transition-colors ${
+                    activeTab === "dia"
+                      ? "border-vitrii-blue text-vitrii-blue"
+                      : "border-transparent text-gray-600 hover:text-gray-900"
+                  }`}
+                >
+                  📆 Visualizar Dia
+                </button>
+                <button
                   onClick={() => setActiveTab("fila-espera")}
                   className={`px-4 py-3 font-semibold border-b-2 whitespace-nowrap transition-colors relative ${
                     activeTab === "fila-espera"
@@ -511,6 +522,32 @@ export default function MinhaAgenda() {
                   </div>
                 )}
               </>
+            )}
+
+            {/* Visualizar Dia Tab */}
+            {activeTab === "dia" && (
+              <div>
+                <div className="flex gap-3 mb-6">
+                  <button
+                    onClick={handleAddEvento}
+                    className="px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
+                  >
+                    + Adicionar Evento
+                  </button>
+                  <button
+                    onClick={() => setShowEditorModal(true)}
+                    className="px-4 py-2 bg-blue-400 text-white rounded-lg hover:bg-blue-500 transition-colors font-medium flex items-center gap-2"
+                  >
+                    <Settings className="w-4 h-4" />
+                    Editar Agenda
+                  </button>
+                </div>
+                <ViewDiaEvento
+                  eventos={eventos}
+                  onSelectEvento={handleSelectEvento}
+                  isEditable={true}
+                />
+              </div>
             )}
 
             {/* Fila de Espera Tab */}
