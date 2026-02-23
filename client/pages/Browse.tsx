@@ -500,7 +500,7 @@ export default function Browse() {
                           className="vitrii-card overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
                           onClick={() => navigate(`/anuncio/${anuncio.id}`)}
                         >
-                          <div className="w-full h-40 bg-gradient-to-br from-vitrii-blue to-vitrii-blue-dark flex items-center justify-center overflow-hidden">
+                          <div className="w-full h-52 bg-gradient-to-br from-vitrii-blue to-vitrii-blue-dark flex items-center justify-center overflow-hidden">
                             {anuncio.imagem || anuncio.anunciantes?.fotoUrl ? (
                               <img
                                 src={

@@ -121,14 +121,14 @@ export default function AnunciosCarousel({
   if (isLoading) {
     return (
       <div className="relative">
-        <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
+        <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
           {[1, 2, 3, 4, 5].map((item) => (
             <div
               key={item}
-              className="vitrii-card overflow-hidden animate-pulse flex-shrink-0 w-64"
+              className="vitrii-card overflow-hidden animate-pulse flex-shrink-0 w-52"
             >
-              <div className="w-full h-36 bg-gray-300" />
-              <div className="p-4 space-y-3">
+              <div className="w-full h-52 bg-gray-300" />
+              <div className="p-3 space-y-3">
                 <div className="h-4 bg-gray-300 rounded" />
                 <div className="h-3 bg-gray-300 rounded w-3/4" />
                 <div className="h-3 bg-gray-300 rounded w-1/2" />
@@ -183,10 +183,10 @@ export default function AnunciosCarousel({
           <div
             key={anuncio.id}
             onClick={() => navigate(`/anuncio/${anuncio.id}`)}
-            className="vitrii-card overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer relative flex-shrink-0 w-64"
+            className="vitrii-card overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer relative flex-shrink-0 w-52"
           >
             <div
-              className={`w-full h-64 bg-gradient-to-br flex items-center justify-center overflow-hidden relative group ${
+              className={`w-full h-52 bg-gradient-to-br flex items-center justify-center overflow-hidden relative group ${
                 color === "green"
                   ? "from-green-400 to-green-600"
                   : color === "purple"
