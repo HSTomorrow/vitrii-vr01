@@ -644,7 +644,7 @@ export default function AnuncioForm({
               </label>
               <div className="flex items-center gap-3">
                 <div className="flex items-center gap-2 flex-1">
-                  <span className="text-vitrii-text font-semibold text-lg">R$</span>
+                  <span className="text-vitrii-text font-semibold text-lg min-w-10">R$</span>
                   <input
                     type="number"
                     step="0.01"
@@ -798,10 +798,17 @@ export default function AnuncioForm({
                 onChange={(e) =>
                   handleInputChange("dataValidade", e.target.value)
                 }
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
+                disabled={user?.tipoUsuario !== "adm" && selectedAnunciante?.tipo !== "Profissional"}
+                className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent ${
+                  user?.tipoUsuario !== "adm" && selectedAnunciante?.tipo !== "Profissional"
+                    ? "bg-gray-100 cursor-not-allowed text-gray-500"
+                    : ""
+                }`}
               />
               <p className="mt-2 text-sm text-vitrii-text-secondary">
-                Padrão: 7 dias a partir da data de criação
+                {user?.tipoUsuario === "adm" || selectedAnunciante?.tipo === "Profissional"
+                  ? "Sem limite de dias"
+                  : "Padrão: 7 dias a partir da data de criação"}
               </p>
             </div>
 
@@ -1122,7 +1129,10 @@ export default function AnuncioForm({
                   <p className="font-semibold">Informações sobre Publicação</p>
                   <p className="mt-1 text-vitrii-text-secondary">
                     Você tem 3 anúncios gratuitos. Para anúncios adicionais,
-                    R$ 19,90 por mês ou solicitar o plano Anunciante Profissional.
+                    R$ 19,90 por mês ou solicitar o plano Anunciante Profissional.{" "}
+                    <Link to="/sell" className="text-vitrii-blue font-semibold hover:underline">
+                      Veja os planos
+                    </Link>
                   </p>
                 </div>
               </div>
