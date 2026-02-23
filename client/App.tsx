@@ -50,6 +50,7 @@ import MinhaAgenda from "./pages/MinhaAgenda";
 import AgendaAnunciante from "./pages/AgendaAnunciante";
 import AnuncianteProfile from "./pages/AnuncianteProfile";
 import BottomNavBar from "@/components/BottomNavBar";
+import PageTransition from "@/components/PageTransition";
 
 const queryClient = new QueryClient();
 
@@ -62,68 +63,70 @@ export default function App() {
             <Toaster />
             <BrowserRouter>
               <BottomNavBar />
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/browse" element={<Browse />} />
-                <Route path="/sell" element={<Sell />} />
-                <Route path="/qrcode" element={<QRCodePage />} />
-                <Route path="/auth/signin" element={<SignIn />} />
-                <Route path="/entrar" element={<SignIn />} />
-                <Route path="/auth/signup" element={<SignUp />} />
-                <Route path="/cadastrar" element={<SignUp />} />
-                <Route path="/esqueci-senha" element={<ForgotPassword />} />
-                <Route path="/reset-senha" element={<ResetPassword />} />
-                <Route path="/favoritos" element={<Favoritos />} />
-                <Route path="/lista-desejos" element={<ListaDesejos />} />
-                <Route path="/meus-anuncios" element={<MeusAnuncios />} />
-                <Route path="/minha-agenda" element={<MinhaAgenda />} />
-                <Route path="/agenda/:anuncianteId" element={<AgendaAnunciante />} />
-                <Route path="/perfil" element={<PerfilUsuario />} />
-                <Route path="/profile" element={<PerfilUsuario />} />
-                <Route path="/anuncio/criar" element={<CriarAnuncio />} />
-                <Route path="/anuncio/:id" element={<AnuncioDetalhe />} />
-                <Route path="/anuncio/:id/editar" element={<EditarAnuncio />} />
-                <Route path="/anunciante/:id" element={<AnuncianteProfile />} />
-                <Route
-                  path="/buscar"
-                  element={
-                    <ErrorBoundary>
-                      <SearchAnuncios />
-                    </ErrorBoundary>
-                  }
-                />
-                <Route
-                  path="/buscar-produtos"
-                  element={
-                    <ErrorBoundary>
-                      <SearchProdutos />
-                    </ErrorBoundary>
-                  }
-                />
-                <Route path="/cadastros/lojas" element={<CadastroLojas />} />
-                <Route path="/cadastros/grupos-productos" element={<CadastroGruposProductos />} />
-                <Route path="/cadastros/productos" element={<CadastroProdutos />} />
-                <Route path="/cadastros/tabelas-preco" element={<CadastroTabelasPreco />} />
-                <Route path="/cadastros/variantes" element={<CadastroVariantesLista />} />
-                <Route path="/cadastros/variantes/:productId" element={<CadastroVariantes />} />
-                <Route path="/cadastros/equipes-venda" element={<CadastroEquipeDeVenda />} />
-                <Route path="/agenda" element={<Agenda />} />
-                <Route path="/agenda/:anuncianteId" element={<Agenda />} />
-                <Route path="/checkout/:anuncioId" element={<Checkout />} />
-                <Route path="/checkout" element={<Checkout />} />
-                <Route path="/chat" element={<Chat />} />
-                <Route path="/menu" element={<Menu />} />
-                <Route path="/admin/dashboard" element={<AdminDashboard />} />
-                <Route path="/admin/anuncios" element={<AdminManageAds />} />
-                <Route path="/admin/usuarios" element={<AdminManageUsers />} />
-                <Route path="/admin/banners" element={<AdminBanners />} />
-                <Route path="/admin/anunciantes" element={<AdminAnunciantes />} />
-                <Route path="/admin/pagamentos" element={<AdminPagamentos />} />
-                <Route path="/admin/localidades" element={<AdminLocalidades />} />
-                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+              <PageTransition>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/browse" element={<Browse />} />
+                  <Route path="/sell" element={<Sell />} />
+                  <Route path="/qrcode" element={<QRCodePage />} />
+                  <Route path="/auth/signin" element={<SignIn />} />
+                  <Route path="/entrar" element={<SignIn />} />
+                  <Route path="/auth/signup" element={<SignUp />} />
+                  <Route path="/cadastrar" element={<SignUp />} />
+                  <Route path="/esqueci-senha" element={<ForgotPassword />} />
+                  <Route path="/reset-senha" element={<ResetPassword />} />
+                  <Route path="/favoritos" element={<Favoritos />} />
+                  <Route path="/lista-desejos" element={<ListaDesejos />} />
+                  <Route path="/meus-anuncios" element={<MeusAnuncios />} />
+                  <Route path="/minha-agenda" element={<MinhaAgenda />} />
+                  <Route path="/agenda/:anuncianteId" element={<AgendaAnunciante />} />
+                  <Route path="/perfil" element={<PerfilUsuario />} />
+                  <Route path="/profile" element={<PerfilUsuario />} />
+                  <Route path="/anuncio/criar" element={<CriarAnuncio />} />
+                  <Route path="/anuncio/:id" element={<AnuncioDetalhe />} />
+                  <Route path="/anuncio/:id/editar" element={<EditarAnuncio />} />
+                  <Route path="/anunciante/:id" element={<AnuncianteProfile />} />
+                  <Route
+                    path="/buscar"
+                    element={
+                      <ErrorBoundary>
+                        <SearchAnuncios />
+                      </ErrorBoundary>
+                    }
+                  />
+                  <Route
+                    path="/buscar-produtos"
+                    element={
+                      <ErrorBoundary>
+                        <SearchProdutos />
+                      </ErrorBoundary>
+                    }
+                  />
+                  <Route path="/cadastros/lojas" element={<CadastroLojas />} />
+                  <Route path="/cadastros/grupos-productos" element={<CadastroGruposProductos />} />
+                  <Route path="/cadastros/productos" element={<CadastroProdutos />} />
+                  <Route path="/cadastros/tabelas-preco" element={<CadastroTabelasPreco />} />
+                  <Route path="/cadastros/variantes" element={<CadastroVariantesLista />} />
+                  <Route path="/cadastros/variantes/:productId" element={<CadastroVariantes />} />
+                  <Route path="/cadastros/equipes-venda" element={<CadastroEquipeDeVenda />} />
+                  <Route path="/agenda" element={<Agenda />} />
+                  <Route path="/agenda/:anuncianteId" element={<Agenda />} />
+                  <Route path="/checkout/:anuncioId" element={<Checkout />} />
+                  <Route path="/checkout" element={<Checkout />} />
+                  <Route path="/chat" element={<Chat />} />
+                  <Route path="/menu" element={<Menu />} />
+                  <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                  <Route path="/admin/anuncios" element={<AdminManageAds />} />
+                  <Route path="/admin/usuarios" element={<AdminManageUsers />} />
+                  <Route path="/admin/banners" element={<AdminBanners />} />
+                  <Route path="/admin/anunciantes" element={<AdminAnunciantes />} />
+                  <Route path="/admin/pagamentos" element={<AdminPagamentos />} />
+                  <Route path="/admin/localidades" element={<AdminLocalidades />} />
+                  {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </PageTransition>
             </BrowserRouter>
           </TooltipProvider>
         </AuthProvider>
