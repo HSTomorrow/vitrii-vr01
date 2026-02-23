@@ -25,6 +25,7 @@ interface WishlistItem {
   descricao?: string;
   preco?: number;
   preco_desejado?: number;
+  prioridade?: number;
   observacoes?: string;
   imagem?: string;
   anuncioId?: number;
@@ -55,6 +56,7 @@ export default function ListaDesejosPage() {
   const [editingPrivacy, setEditingPrivacy] = useState<number | null>(null);
   const [editValues, setEditValues] = useState<{
     preco_desejado?: number;
+    prioridade?: number;
     observacoes?: string;
   }>({});
   const [privacyValue, setPrivacyValue] = useState<string>("");
@@ -431,6 +433,31 @@ export default function ListaDesejosPage() {
 
                                     <div>
                                       <p className="text-xs text-gray-600">
+                                        Prioridade (opcional)
+                                      </p>
+                                      <select
+                                        value={editValues.prioridade || ""}
+                                        onChange={(e) =>
+                                          setEditValues({
+                                            ...editValues,
+                                            prioridade: e.target.value
+                                              ? parseInt(e.target.value)
+                                              : undefined,
+                                          })
+                                        }
+                                        className="w-full px-2 py-1 border border-gray-300 rounded text-sm"
+                                      >
+                                        <option value="">Sem prioridade</option>
+                                        <option value="1">1 - Alto</option>
+                                        <option value="2">2 - Médio-Alto</option>
+                                        <option value="3">3 - Médio</option>
+                                        <option value="4">4 - Médio-Baixo</option>
+                                        <option value="5">5 - Baixo</option>
+                                      </select>
+                                    </div>
+
+                                    <div>
+                                      <p className="text-xs text-gray-600">
                                         Observações
                                       </p>
                                       <textarea
@@ -483,6 +510,41 @@ export default function ListaDesejosPage() {
                                       </div>
                                     )}
 
+                                    {item.prioridade && (
+                                      <div className="mb-2">
+                                        <p className="text-xs text-gray-600">
+                                          Prioridade
+                                        </p>
+                                        <div className="inline-block">
+                                          {item.prioridade === 1 && (
+                                            <span className="text-xs font-bold bg-red-100 text-red-800 px-2 py-1 rounded">
+                                              🔴 Alto
+                                            </span>
+                                          )}
+                                          {item.prioridade === 2 && (
+                                            <span className="text-xs font-bold bg-orange-100 text-orange-800 px-2 py-1 rounded">
+                                              🟠 Médio-Alto
+                                            </span>
+                                          )}
+                                          {item.prioridade === 3 && (
+                                            <span className="text-xs font-bold bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
+                                              🟡 Médio
+                                            </span>
+                                          )}
+                                          {item.prioridade === 4 && (
+                                            <span className="text-xs font-bold bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                                              🔵 Médio-Baixo
+                                            </span>
+                                          )}
+                                          {item.prioridade === 5 && (
+                                            <span className="text-xs font-bold bg-gray-100 text-gray-800 px-2 py-1 rounded">
+                                              ⚪ Baixo
+                                            </span>
+                                          )}
+                                        </div>
+                                      </div>
+                                    )}
+
                                     {item.observacoes && (
                                       <div className="bg-blue-50 border border-blue-200 rounded p-2 mb-2">
                                         <p className="text-xs text-blue-800">
@@ -502,6 +564,8 @@ export default function ListaDesejosPage() {
                                       setEditValues({
                                         preco_desejado:
                                           item.preco_desejado || undefined,
+                                        prioridade:
+                                          item.prioridade || undefined,
                                         observacoes:
                                           item.observacoes || undefined,
                                       });

@@ -373,6 +373,7 @@ model listas_desejos_itens {
   descricao       String?
   preco           Decimal? @db.Decimal(10, 2)
   preco_desejado  Decimal? @db.Decimal(10, 2)
+  prioridade      Int?     @db.SmallInt // 1: Alto, 2: Médio-Alto, 3: Médio, 4: Médio-Baixo, 5: Baixo
   observacoes     String?
   imagem          String?  @db.VarChar(500)
   anuncioId       Int?
