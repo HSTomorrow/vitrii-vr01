@@ -60,7 +60,7 @@ export default function AdminDashboard() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user } = useAuth();
-  const [activeTab, setActiveTab] = useState<"usuarios" | "funcionalidades">(
+  const [activeTab, setActiveTab] = useState<"usuarios">(
     "usuarios",
   );
   const [searchTerm, setSearchTerm] = useState("");
@@ -92,22 +92,24 @@ export default function AdminDashboard() {
     enabled: user?.tipoUsuario === "adm",
   });
 
-  // Fetch all funcionalidades
-  const { data: funcionalidadesData, isLoading: funcLoading } = useQuery({
-    queryKey: ["funcionalidades"],
-    queryFn: async () => {
-      const response = await fetch("/api/funcionalidades", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "x-user-id": user?.id?.toString() || "",
-        },
-      });
-      if (!response.ok) throw new Error("Erro ao buscar funcionalidades");
-      return response.json();
-    },
-    enabled: user?.tipoUsuario === "adm",
-  });
+  // Fetch all funcionalidades - DISABLED: Model not in database
+  // const { data: funcionalidadesData, isLoading: funcLoading } = useQuery({
+  //   queryKey: ["funcionalidades"],
+  //   queryFn: async () => {
+  //     const response = await fetch("/api/funcionalidades", {
+  //       method: "GET",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //         "x-user-id": user?.id?.toString() || "",
+  //       },
+  //     });
+  //     if (!response.ok) throw new Error("Erro ao buscar funcionalidades");
+  //     return response.json();
+  //   },
+  //   enabled: user?.tipoUsuario === "adm",
+  // });
+  const funcionalidadesData = null;
+  const funcLoading = false;
 
   // Fetch user funcionalidades
   const { data: usuarioFuncData } = useQuery({
@@ -455,19 +457,6 @@ export default function AdminDashboard() {
               Usuários
             </div>
           </button>
-          <button
-            onClick={() => setActiveTab("funcionalidades")}
-            className={`px-6 py-3 font-semibold border-b-2 transition ${
-              activeTab === "funcionalidades"
-                ? "text-vitrii-blue border-vitrii-blue"
-                : "text-vitrii-text-secondary border-transparent hover:text-vitrii-text"
-            }`}
-          >
-            <div className="flex items-center gap-2">
-              <Lock className="w-5 h-5" />
-              Funcionalidades
-            </div>
-          </button>
         </div>
 
         {/* Usuarios Tab */}
@@ -748,84 +737,6 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        {/* Funcionalidades Tab */}
-        {activeTab === "funcionalidades" && (
-          <div className="space-y-6">
-            {funcLoading ? (
-              <div className="text-center py-8">
-                <p className="text-vitrii-text-secondary">
-                  Carregando funcionalidades...
-                </p>
-              </div>
-            ) : funcionalidades.length === 0 ? (
-              <div className="text-center py-8">
-                <AlertCircle className="w-12 h-12 text-vitrii-text-secondary mx-auto mb-2" />
-                <p className="text-vitrii-text-secondary">
-                  Nenhuma funcionalidade encontrada
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {Array.from(
-                  new Map(
-                    funcionalidades.map((f: Funcionalidade) => [
-                      f.categoria,
-                      funcionalidades.filter(
-                        (func: Funcionalidade) =>
-                          func.categoria === f.categoria,
-                      ),
-                    ]),
-                  ),
-                ).map(([categoria, funcs]) => (
-                  <div key={categoria} className="space-y-3">
-                    <h3 className="text-lg font-semibold text-vitrii-text capitalize">
-                      {categoria === "users"
-                        ? "Gestão de Usuários"
-                        : categoria === "ads"
-                          ? "Gestão de Anúncios"
-                          : categoria === "stores"
-                            ? "Gestão de Lojas"
-                            : categoria === "chat"
-                              ? "Gestão de Chat"
-                              : categoria === "payments"
-                                ? "Gestão de Pagamentos"
-                                : "Relatórios"}
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                      {funcs.map((func: Funcionalidade) => (
-                        <div
-                          key={func.id}
-                          className="bg-white border border-gray-200 rounded-lg p-4"
-                        >
-                          <div className="flex items-start justify-between mb-2">
-                            <div>
-                              <h4 className="font-semibold text-vitrii-text">
-                                {func.nome}
-                              </h4>
-                              <p className="text-xs text-vitrii-text-secondary font-mono">
-                                {func.chave}
-                              </p>
-                            </div>
-                            {func.isActive ? (
-                              <CheckCircle2 className="w-5 h-5 text-green-600" />
-                            ) : (
-                              <XCircle className="w-5 h-5 text-gray-400" />
-                            )}
-                          </div>
-                          {func.descricao && (
-                            <p className="text-sm text-vitrii-text-secondary">
-                              {func.descricao}
-                            </p>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
 
         {/* Edit User Modal */}
         {editingUser && (
