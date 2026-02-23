@@ -157,18 +157,18 @@ export default function AdCard({
           }
           alt={anuncio.titulo}
           fallbackIcon={<Package className="w-12 h-12 text-white opacity-50" />}
-          containerClassName="w-full h-48"
+          containerClassName="w-full h-[9.6rem]"
           className="w-full h-full object-cover"
         />
       </div>
 
       {/* Content */}
-      <div className="p-4 flex flex-col h-full">
+      <div className="p-[0.95rem] flex flex-col h-full">
         <div>
-          <h4 className="font-semibold text-vitrii-text mb-2 line-clamp-2">
+          <h4 className="font-semibold text-vitrii-text mb-[0.475rem] line-clamp-2">
             {anuncio.titulo}
           </h4>
-          <p className="text-sm text-vitrii-text-secondary mb-3 line-clamp-2">
+          <p className="text-sm text-vitrii-text-secondary mb-[0.7125rem] line-clamp-2">
             {anuncio.descricao ||
               (isDonation
                 ? "Item disponível para doação"
@@ -176,7 +176,7 @@ export default function AdCard({
           </p>
 
           {/* Municipality */}
-          <div className="flex items-center gap-1 mb-3 text-xs text-vitrii-text-secondary">
+          <div className="flex items-center gap-1 mb-[0.7125rem] text-xs text-vitrii-text-secondary">
             <MapPin className="w-3 h-3" />
             <span className="truncate">
               {extractMunicipality(anuncio.anunciante?.endereco || "")}
@@ -184,7 +184,7 @@ export default function AdCard({
           </div>
         </div>
 
-        <div className="flex justify-between items-center mb-4 mt-auto">
+        <div className="flex justify-between items-center mb-[0.95rem] mt-auto">
           <span
             className={`text-2xl font-bold ${isDonation ? "text-green-600" : "text-vitrii-blue"}`}
           >
