@@ -40,7 +40,7 @@ export default function UserButton() {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="hidden sm:flex items-center space-x-2 px-4 py-2 bg-green-50 rounded-lg border border-green-200 hover:bg-green-100 transition-colors"
+        className="flex items-center space-x-2 px-4 py-2 bg-green-50 rounded-lg border border-green-200 hover:bg-green-100 transition-colors"
         title="Perfil do usuário"
       >
         <User className="w-4 h-4 text-green-600" />

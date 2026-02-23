@@ -120,7 +120,7 @@ export default function LocalidadeButton() {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="hidden sm:flex items-center gap-2 px-3 py-2 bg-cyan-50 rounded-lg border border-cyan-200 hover:bg-cyan-100 transition-colors"
+        className="flex items-center gap-2 px-3 py-2 bg-cyan-50 rounded-lg border border-cyan-200 hover:bg-cyan-100 transition-colors"
         title="Alterar localidade padrão"
       >
         <MapPin className="w-4 h-4 text-cyan-600" />
