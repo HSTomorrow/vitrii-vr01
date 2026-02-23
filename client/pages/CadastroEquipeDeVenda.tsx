@@ -219,7 +219,9 @@ export default function CadastroEquipeDeVenda() {
       return data;
     },
     onSuccess: () => {
-      toast.success("Membro adicionado com sucesso!");
+      toast.success("✅ Membro adicionado com sucesso!", {
+        description: "O membro foi adicionado à equipe",
+      });
       setMemberFormData({
         nomeMembro: "",
         email: "",
@@ -240,6 +242,8 @@ export default function CadastroEquipeDeVenda() {
         // Try to extract more detailed error info if available
         if (errorMessage.includes("Erro no campo")) {
           toast.error(errorMessage);
+        } else if (errorMessage.includes("já existe nesta equipe")) {
+          toast.error("⚠️ Este email já foi adicionado nesta equipe. Use um email diferente.");
         } else if (errorMessage.includes("já é membro")) {
           toast.error("Este membro já faz parte da equipe");
         } else if (errorMessage.includes("não encontrado")) {
@@ -292,7 +296,9 @@ export default function CadastroEquipeDeVenda() {
       return response.json();
     },
     onSuccess: () => {
-      toast.success("Membro atualizado com sucesso!");
+      toast.success("✅ Membro atualizado com sucesso!", {
+        description: "As alterações foram salvas",
+      });
       setEditingMemberId(null);
       setMemberFormData({
         nomeMembro: "",
@@ -308,10 +314,13 @@ export default function CadastroEquipeDeVenda() {
 
       if (error instanceof Error) {
         errorMessage = error.message;
+        console.error("[updateMemberMutation] Erro capturado:", errorMessage);
 
         // Try to extract more detailed error info if available
         if (errorMessage.includes("Erro no campo")) {
           toast.error(errorMessage);
+        } else if (errorMessage.includes("já existe nesta equipe")) {
+          toast.error("⚠️ Este email já foi adicionado nesta equipe. Use um email diferente.");
         } else if (errorMessage.includes("não encontrado")) {
           toast.error("Membro não encontrado");
         } else {
@@ -435,6 +444,20 @@ export default function CadastroEquipeDeVenda() {
     if (memberFormData.email.length > 255) {
       toast.error("Email não pode ter mais de 255 caracteres");
       return;
+    }
+
+    // Check for duplicate email in the current team (only when adding new member, not updating)
+    if (!editingMemberId) {
+      const equipe = equipesFiltered.find(eq => eq.id === teamId);
+      if (equipe?.membros) {
+        const emailExists = equipe.membros.some(
+          m => m.email.toLowerCase() === memberFormData.email.toLowerCase()
+        );
+        if (emailExists) {
+          toast.error("⚠️ Este email já foi adicionado nesta equipe. Use um email diferente.");
+          return;
+        }
+      }
     }
 
     if (editingMemberId) {
