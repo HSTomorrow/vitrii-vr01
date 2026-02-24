@@ -239,14 +239,9 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
         nome: validatedData.nome,
         email: validatedData.email,
         senha: senhaHash,
-        cpf: "",
-        telefone: "",
-        endereco: "",
         tipoUsuario: "comum",
         tassinatura: "Gratuito", // Always start as Gratuito
-        dataAtualizacao: new Date(),
         dataVigenciaContrato: contractExpireDate,
-        numeroAnunciosAtivos: 0,
       },
       select: {
         id: true,
