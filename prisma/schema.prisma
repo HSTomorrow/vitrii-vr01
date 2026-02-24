@@ -217,7 +217,6 @@ model usracessos {
   whatsapp                String?                     @db.VarChar(20)
   linkedin                String?                     @db.VarChar(255)
   facebook                String?                     @db.VarChar(255)
-  emailVerificado         Boolean                     @default(false)
   tipoUsuario             String                      @default("common") @db.VarChar(20)
   tassinatura             String                      @default("Gratuito") @db.VarChar(20)
   dataCriacao             DateTime                    @default(now())
