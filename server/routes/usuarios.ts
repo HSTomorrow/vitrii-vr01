@@ -242,7 +242,6 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
         cpf: "",
         telefone: "",
         endereco: "",
-        emailVerificado: false,
         tipoUsuario: "comum",
         tassinatura: "Gratuito", // Always start as Gratuito
         dataAtualizacao: new Date(),
@@ -255,7 +254,6 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
         email: true,
         tipoUsuario: true,
         tassinatura: true,
-        emailVerificado: true,
         dataCriacao: true,
         dataVigenciaContrato: true,
       },
@@ -944,11 +942,8 @@ export const verifyEmail: RequestHandler = async (req, res) => {
       });
     }
 
-    // Mark email as verified
-    await prisma.usracessos.update({
-      where: { id: verificationTokenRecord.usuarioId },
-      data: { emailVerificado: true },
-    });
+    // Note: emailVerificado field is not yet in the database schema
+    // We'll just delete the token as the verification is complete
 
     // Delete the token after use
     await prisma.emailVerificationToken.delete({
