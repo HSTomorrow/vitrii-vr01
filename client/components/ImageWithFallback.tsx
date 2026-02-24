@@ -55,14 +55,22 @@ export default function ImageWithFallback({
   const hasImage = src && !isBroken;
 
   const handleImageError = useCallback(() => {
-    console.warn(`[ImageWithFallback] Image failed to load: ${src}`);
+    console.warn(`[ImageWithFallback] ❌ Image failed to load:`, {
+      src,
+      alt,
+      hasImage,
+    });
     setIsBroken(true);
     setIsLoading(false);
-  }, [src]);
+  }, [src, alt]);
 
   const handleImageLoad = useCallback(() => {
+    console.log(`[ImageWithFallback] ✅ Image loaded successfully:`, {
+      src,
+      alt,
+    });
     setIsLoading(false);
-  }, []);
+  }, [src, alt]);
 
   return (
     <div

@@ -73,22 +73,34 @@ export default function BannerCarousel({
 
   const BannerContent = () => {
     const textColor = getTextColor(currentBanner.corFonte);
+    const normalizedUrl = normalizeImageUrl(currentBanner.imagemUrl);
+
+    console.log(`[BannerCarousel] Banner ${currentIndex + 1}:`, {
+      titulo: currentBanner.titulo,
+      originalUrl: currentBanner.imagemUrl?.substring(0, 100),
+      normalizedUrl: normalizedUrl?.substring(0, 100),
+      ativo: currentBanner.ativo,
+      hasNormalizedUrl: !!normalizedUrl,
+    });
+
+    if (!normalizedUrl) {
+      console.warn(`[BannerCarousel] ⚠️ No image URL for banner "${currentBanner.titulo}"`);
+    }
+
     return (
-    <div className="w-full h-full relative overflow-hidden rounded-lg">
+    <div className="w-full h-full relative overflow-hidden rounded-lg bg-gray-200">
       {/* Background Image with Fallback */}
-      <div className="absolute inset-0 -z-10">
-        <ImageWithFallback
-          src={normalizeImageUrl(currentBanner.imagemUrl)}
-          alt={currentBanner.titulo}
-          containerClassName="w-full h-full"
-          className="w-full h-full"
-          objectFit="cover"
-          fallbackText={currentBanner.titulo || "Banner"}
-        />
-      </div>
+      <ImageWithFallback
+        src={normalizedUrl}
+        alt={currentBanner.titulo}
+        containerClassName="absolute inset-0 w-full h-full"
+        className="w-full h-full"
+        objectFit="cover"
+        fallbackText={currentBanner.titulo || "Banner"}
+      />
 
       {/* Overlay */}
-      <div className="absolute inset-0 bg-black/30 flex flex-col items-center justify-center p-2">
+      <div className="absolute inset-0 bg-black/30 flex flex-col items-center justify-center p-2 z-10">
         {/* Content */}
         <div className="text-center text-white max-w-3xl px-2 sm:px-4">
           <h2 className={`text-base sm:text-xl md:text-2xl lg:text-3xl font-bold mb-0.5 sm:mb-1.5 line-clamp-2 ${textColor}`}>
