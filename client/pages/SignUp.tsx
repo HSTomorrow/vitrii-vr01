@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { AlertCircle, ArrowRight, CheckCircle, Mail, AlertTriangle } from "lucide-react";
+import { AlertCircle, ArrowRight, CheckCircle, Mail, AlertTriangle, Loader } from "lucide-react";
 import { PasswordInput } from "@/components/PasswordInput";
 
 export default function SignUp() {
@@ -17,18 +17,25 @@ export default function SignUp() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [agreeTerms, setAgreeTerms] = useState(false);
+  const [signupAttempted, setSignupAttempted] = useState(false);
+  const [signupSuccess, setSignupSuccess] = useState(false);
 
   // Signup mutation
   const signupMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
+      console.log("[SignUp] Iniciando requisição de cadastro para:", data.email);
+
       const response = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
 
+      console.log("[SignUp] Resposta recebida:", response.status, response.statusText);
+
       if (!response.ok) {
         const error = await response.json();
+        console.error("[SignUp] Erro na resposta:", error);
         if (error.details) {
           // Handle validation errors
           const newErrors: Record<string, string> = {};
@@ -40,16 +47,25 @@ export default function SignUp() {
         throw new Error(error.error || "Erro ao criar conta");
       }
 
-      return response.json();
+      const result = await response.json();
+      console.log("[SignUp] Cadastro bem-sucedido:", result);
+      return result;
     },
     onSuccess: (data) => {
+      setSignupAttempted(true);
+      setSignupSuccess(true);
       toast.success("Conta criada com sucesso! Bem-vindo ao Vitrii!");
+      console.log("[SignUp] ✅ Cadastro concluído, redirecionando...");
       setTimeout(() => {
         navigate("/");
-      }, 1500);
+      }, 2000);
     },
     onError: (error) => {
-      toast.error(error instanceof Error ? error.message : "Erro ao criar conta");
+      setSignupAttempted(true);
+      setSignupSuccess(false);
+      const errorMessage = error instanceof Error ? error.message : "Erro ao criar conta";
+      console.error("[SignUp] ❌ Erro:", errorMessage);
+      toast.error(errorMessage);
     },
   });
 
@@ -285,13 +301,29 @@ export default function SignUp() {
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={signupMutation.isPending}
-              className="w-full bg-vitrii-blue text-white py-3 rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              disabled={signupMutation.isPending || signupSuccess}
+              className={`w-full py-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition-all duration-300 ${
+                signupSuccess
+                  ? "bg-green-500 hover:bg-green-600 text-white"
+                  : signupAttempted && !signupSuccess && !signupMutation.isPending
+                    ? "bg-red-500 hover:bg-red-600 text-white"
+                    : "bg-vitrii-blue hover:bg-vitrii-blue-dark text-white disabled:opacity-50"
+              }`}
             >
               {signupMutation.isPending ? (
                 <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+                  <Loader className="w-5 h-5 animate-spin" />
                   Criando conta...
+                </>
+              ) : signupSuccess ? (
+                <>
+                  <CheckCircle className="w-5 h-5" />
+                  Conta Criada com Sucesso!
+                </>
+              ) : signupAttempted && !signupSuccess ? (
+                <>
+                  <AlertCircle className="w-5 h-5" />
+                  Erro ao Criar Conta
                 </>
               ) : (
                 <>

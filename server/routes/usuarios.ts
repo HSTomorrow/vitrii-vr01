@@ -199,7 +199,14 @@ export const signInUsuario: RequestHandler = async (req, res) => {
 // SIGNUP - Create new user with basic info
 export const signUpUsuario: RequestHandler = async (req, res) => {
   try {
+    console.log("[signUpUsuario] 📝 Iniciando cadastro com dados:", {
+      nome: req.body.nome,
+      email: req.body.email,
+      senhaLength: req.body.senha?.length,
+    });
+
     const validatedData = UsuarioSignUpSchema.parse(req.body);
+    console.log("[signUpUsuario] ✅ Validação de dados bem-sucedida");
 
     // Check if user already exists by email
     const existingUser = await prisma.usracessos.findUnique({
@@ -207,6 +214,7 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
     });
 
     if (existingUser) {
+      console.warn("[signUpUsuario] ⚠️ Email já cadastrado:", validatedData.email);
       return res.status(400).json({
         success: false,
         error: "Email já cadastrado",
@@ -247,6 +255,12 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
       },
     });
 
+    console.log("[signUpUsuario] ✅ Usuário criado com sucesso:", {
+      id: usuario.id,
+      nome: usuario.nome,
+      email: usuario.email,
+    });
+
     // Generate email verification token (24 hours expiration)
     const verificationToken = crypto.randomBytes(32).toString("hex");
     const expirationDate = new Date();
@@ -260,16 +274,19 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
       },
     });
 
+    console.log("[signUpUsuario] ✅ Token de verificação criado");
+
     // Send verification email
     const verificationLink = `${process.env.APP_URL || "https://app.vitrii.com.br"}/verificar-email?token=${verificationToken}&email=${encodeURIComponent(usuario.email)}`;
     const emailSent = await sendEmailVerificationEmail(usuario.email, usuario.nome, verificationLink);
 
     if (!emailSent) {
-      console.error(`❌ Falha ao enviar email de verificação para: ${usuario.email}`);
+      console.error(`[signUpUsuario] ❌ Falha ao enviar email de verificação para: ${usuario.email}`);
     } else {
-      console.log(`✅ Email de verificação enviado para: ${usuario.email}`);
+      console.log(`[signUpUsuario] ✅ Email de verificação enviado para: ${usuario.email}`);
     }
 
+    console.log("[signUpUsuario] 🎉 Cadastro concluído com sucesso");
     res.status(201).json({
       success: true,
       data: usuario,
@@ -277,6 +294,7 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
+      console.warn("[signUpUsuario] ⚠️ Erro de validação:", error.errors);
       return res.status(400).json({
         success: false,
         error: "Dados inválidos",
@@ -287,7 +305,7 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
       });
     }
 
-    console.error("Error signing up user:", error);
+    console.error("[signUpUsuario] 🔴 Erro no servidor:", error instanceof Error ? error.message : String(error));
     res.status(500).json({
       success: false,
       error: "Erro ao criar conta",
