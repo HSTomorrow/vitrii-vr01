@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { AlertCircle, ArrowRight, CheckCircle, Mail, AlertTriangle } from "lucide-react";
+import { PasswordInput } from "@/components/PasswordInput";
 
 export default function SignUp() {
   const navigate = useNavigate();
@@ -199,11 +200,12 @@ export default function SignUp() {
               <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Senha *
               </label>
-              <input
-                type="password"
+              <PasswordInput
                 value={formData.senha}
                 onChange={(e) => handleInputChange("senha", e.target.value)}
                 placeholder="Mínimo 6 caracteres"
+                error={errors.senha}
+                showErrorMessage={false}
                 className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-1 transition-colors ${
                   errors.senha
                     ? "border-red-500 focus:border-red-500 focus:ring-red-500 bg-red-50"
@@ -223,11 +225,12 @@ export default function SignUp() {
               <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Confirmar Senha *
               </label>
-              <input
-                type="password"
+              <PasswordInput
                 value={formData.confirmarSenha}
                 onChange={(e) => handleInputChange("confirmarSenha", e.target.value)}
                 placeholder="Digite a senha novamente"
+                error={errors.confirmarSenha}
+                showErrorMessage={false}
                 className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-1 transition-colors ${
                   errors.confirmarSenha
                     ? "border-red-500 focus:border-red-500 focus:ring-red-500 bg-red-50"

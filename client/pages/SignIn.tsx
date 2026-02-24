@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
 import { AlertCircle, ArrowRight, CheckCircle, Lock } from "lucide-react";
+import { PasswordInput } from "@/components/PasswordInput";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -242,11 +243,12 @@ export default function SignIn() {
               <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Senha *
               </label>
-              <input
-                type="password"
+              <PasswordInput
                 value={formData.senha}
                 onChange={(e) => handleInputChange("senha", e.target.value)}
                 placeholder="Digite sua senha"
+                error={errors.senha}
+                showErrorMessage={false}
                 className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-1 transition-colors ${
                   errors.senha
                     ? "border-red-500 focus:border-red-500 focus:ring-red-500 bg-red-50"

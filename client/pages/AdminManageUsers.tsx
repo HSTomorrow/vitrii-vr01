@@ -17,6 +17,7 @@ import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
 import Pagination from "@/components/Pagination";
 import AdminEditUserModal from "@/components/AdminEditUserModal";
+import { PasswordInput } from "@/components/PasswordInput";
 
 interface Usuario {
   id: number;
@@ -428,8 +429,7 @@ export default function AdminManageUsers() {
                 <label className="block text-sm font-medium text-vitrii-text mb-2">
                   Nova Senha
                 </label>
-                <input
-                  type="password"
+                <PasswordInput
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
                   placeholder="Digite a nova senha"
@@ -441,8 +441,7 @@ export default function AdminManageUsers() {
                 <label className="block text-sm font-medium text-vitrii-text mb-2">
                   Confirmar Senha
                 </label>
-                <input
-                  type="password"
+                <PasswordInput
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Confirme a nova senha"
