@@ -1,7 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import { sendTestEmail } from "./lib/emailService";
+import { sendTestEmail, testSmtpConnection } from "./lib/emailService";
 import {
   getAnuncios,
   getAnuncioById,
@@ -373,18 +373,52 @@ export function createServer() {
     }
   });
 
+  // SMTP Diagnostic endpoint
+  app.get("/api/smtp-diagnostic", async (_req, res) => {
+    try {
+      console.log("🧪 Iniciando diagnóstico SMTP...");
+
+      const config = {
+        host: process.env.SMTP_HOST,
+        port: process.env.SMTP_PORT,
+        secure: process.env.SMTP_SECURE,
+        user: process.env.SMTP_USER,
+        from: process.env.MAIL_FROM,
+        configured: !!(process.env.SMTP_HOST && process.env.SMTP_PORT),
+      };
+
+      const connectionTest = await testSmtpConnection();
+
+      res.status(200).json({
+        success: connectionTest,
+        message: connectionTest
+          ? "✅ SMTP conectado com sucesso!"
+          : "❌ Falha ao conectar ao SMTP",
+        configuration: config,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error("Erro no diagnóstico SMTP:", error);
+      res.status(500).json({
+        success: false,
+        error: "Erro ao executar diagnóstico SMTP",
+        details: error instanceof Error ? error.message : "Desconhecido",
+      });
+    }
+  });
+
   // Quick test email route - Daniel's test
   app.get("/api/send-test-email", async (_req, res) => {
     try {
       console.log("🧪 Iniciando teste rápido de email...");
-      const success = await sendTestEmail("daniel_pelegrinelli@hotmail.com", "contato@herestomorrow.com");
+      const success = await sendTestEmail("vitriimarketplace@gmail.com", "contato@herestomorrow.com");
 
       if (success) {
         res.status(200).json({
           success: true,
-          message: "✅ Email de teste enviado com sucesso para daniel_pelegrinelli@hotmail.com!",
+          message: "✅ Email de teste enviado com sucesso para vitriimarketplace@gmail.com!",
           from: "contato@herestomorrow.com",
-          to: "daniel_pelegrinelli@hotmail.com",
+          to: "vitriimarketplace@gmail.com",
           smtp: process.env.SMTP_HOST,
         });
       } else {
@@ -398,6 +432,48 @@ export function createServer() {
       res.status(500).json({
         success: false,
         error: "Erro ao processar teste de email",
+      });
+    }
+  });
+
+  // Send password reset email directly - for testing
+  app.get("/api/send-reset-email", async (_req, res) => {
+    try {
+      const crypto = require("crypto");
+      const { sendPasswordResetEmail } = await import("./lib/emailService");
+
+      console.log("🧪 Enviando email de reset de senha...");
+
+      // Generate a test token
+      const resetToken = crypto.randomBytes(32).toString("hex");
+      const resetLink = `${process.env.APP_URL}/reset-senha?token=${resetToken}&email=vitriimarketplace@gmail.com`;
+
+      const success = await sendPasswordResetEmail(
+        "vitriimarketplace@gmail.com",
+        resetLink,
+        "Administrador"
+      );
+
+      if (success) {
+        res.status(200).json({
+          success: true,
+          message: "✅ Email de reset de senha enviado com sucesso!",
+          to: "vitriimarketplace@gmail.com",
+          resetLink: resetLink,
+          token: resetToken,
+        });
+      } else {
+        res.status(500).json({
+          success: false,
+          error: "❌ Erro ao enviar email de reset.",
+        });
+      }
+    } catch (error) {
+      console.error("Erro ao enviar email de reset:", error);
+      res.status(500).json({
+        success: false,
+        error: "Erro ao processar envio de email",
+        details: error instanceof Error ? error.message : "Desconhecido",
       });
     }
   });

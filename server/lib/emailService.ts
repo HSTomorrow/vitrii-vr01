@@ -25,6 +25,11 @@ async function getTransporter() {
   if (process.env.SMTP_HOST && process.env.SMTP_PORT) {
     // Production: Use configured SMTP
     console.log("🔄 Inicializando transporter com configuração SMTP real");
+    console.log(`   - Host: ${process.env.SMTP_HOST}`);
+    console.log(`   - Port: ${process.env.SMTP_PORT}`);
+    console.log(`   - User: ${process.env.SMTP_USER}`);
+    console.log(`   - Secure: ${process.env.SMTP_SECURE}`);
+
     transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: parseInt(process.env.SMTP_PORT || "587"),
@@ -33,6 +38,8 @@ async function getTransporter() {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
+      logger: true,
+      debug: true,
     });
     lastSmtpConfig = currentConfig;
   } else {
@@ -52,6 +59,27 @@ async function getTransporter() {
   }
 
   return transporter;
+}
+
+// Test SMTP connection
+export async function testSmtpConnection(): Promise<boolean> {
+  try {
+    console.log("🧪 Testando conexão SMTP...");
+    const transporter = await getTransporter();
+
+    const verified = await transporter.verify();
+
+    if (verified) {
+      console.log("✅ Conexão SMTP verificada com sucesso!");
+      return true;
+    } else {
+      console.error("❌ Falha na verificação SMTP");
+      return false;
+    }
+  } catch (error) {
+    console.error("❌ Erro ao testar conexão SMTP:", error);
+    return false;
+  }
 }
 
 export async function sendPasswordResetEmail(

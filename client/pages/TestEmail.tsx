@@ -6,9 +6,53 @@ import Footer from "@/components/Footer";
 import { Mail, Send, AlertCircle, CheckCircle } from "lucide-react";
 
 export default function TestEmail() {
-  const [toEmail, setToEmail] = useState("daniel_pelegrinelli@hotmail.com");
+  const [toEmail, setToEmail] = useState("vitriimarketplace@gmail.com");
   const [fromEmail, setFromEmail] = useState("contato@herestomorrow.com");
   const [result, setResult] = useState<any>(null);
+  const [diagnosticResult, setDiagnosticResult] = useState<any>(null);
+  const [resetResult, setResetResult] = useState<any>(null);
+
+  // Diagnostic mutation
+  const diagnosticMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch("/api/smtp-diagnostic");
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Erro ao executar diagnóstico");
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      setDiagnosticResult(data);
+      toast.success(data.success ? "✅ SMTP conectado!" : "❌ Erro ao conectar");
+      console.log("Diagnóstico:", data);
+    },
+    onError: (error) => {
+      const errorMsg = error instanceof Error ? error.message : "Erro desconhecido";
+      toast.error(errorMsg);
+    },
+  });
+
+  // Reset email mutation
+  const resetEmailMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch("/api/send-reset-email");
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Erro ao enviar reset");
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      setResetResult(data);
+      toast.success("✅ Email de reset enviado!");
+      console.log("Reset email enviado:", data);
+    },
+    onError: (error) => {
+      const errorMsg = error instanceof Error ? error.message : "Erro desconhecido";
+      toast.error(errorMsg);
+    },
+  });
 
   const testEmailMutation = useMutation({
     mutationFn: async () => {
@@ -105,7 +149,7 @@ export default function TestEmail() {
                 placeholder="seu.email@exemplo.com"
               />
               <p className="text-xs text-vitrii-text-secondary mt-1">
-                Padrão: daniel_pelegrinelli@hotmail.com
+                Padrão: vitriimarketplace@gmail.com
               </p>
             </div>
 
@@ -185,6 +229,117 @@ export default function TestEmail() {
               </div>
             </div>
           )}
+
+          {/* Diagnostic Buttons */}
+          <div className="mt-8 space-y-4">
+            <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+              <h3 className="font-semibold text-vitrii-text mb-4">🔧 Ferramentas de Diagnóstico</h3>
+
+              <div className="space-y-3">
+                {/* Test SMTP Connection */}
+                <button
+                  onClick={() => diagnosticMutation.mutate()}
+                  disabled={diagnosticMutation.isPending}
+                  className={`w-full py-2 px-4 rounded-lg font-semibold flex items-center justify-center gap-2 transition-colors ${
+                    diagnosticMutation.isPending
+                      ? "bg-gray-300 text-white cursor-not-allowed"
+                      : "bg-vitrii-blue text-white hover:bg-vitrii-blue-dark"
+                  }`}
+                >
+                  {diagnosticMutation.isPending ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+                      Testando...
+                    </>
+                  ) : (
+                    "🔍 Testar Conexão SMTP"
+                  )}
+                </button>
+
+                {/* Send Reset Email */}
+                <button
+                  onClick={() => resetEmailMutation.mutate()}
+                  disabled={resetEmailMutation.isPending}
+                  className={`w-full py-2 px-4 rounded-lg font-semibold flex items-center justify-center gap-2 transition-colors ${
+                    resetEmailMutation.isPending
+                      ? "bg-gray-300 text-white cursor-not-allowed"
+                      : "bg-green-600 text-white hover:bg-green-700"
+                  }`}
+                >
+                  {resetEmailMutation.isPending ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+                      Enviando...
+                    </>
+                  ) : (
+                    "📧 Enviar Email de Reset para vitriimarketplace@gmail.com"
+                  )}
+                </button>
+              </div>
+
+              {/* Diagnostic Result */}
+              {diagnosticResult && (
+                <div
+                  className={`mt-4 p-4 rounded ${
+                    diagnosticResult.success
+                      ? "bg-green-50 border border-green-200"
+                      : "bg-red-50 border border-red-200"
+                  }`}
+                >
+                  <p
+                    className={`font-semibold mb-2 ${
+                      diagnosticResult.success ? "text-green-900" : "text-red-900"
+                    }`}
+                  >
+                    {diagnosticResult.message}
+                  </p>
+                  <div className="bg-white rounded p-2 text-sm space-y-1">
+                    <p>
+                      <strong>Host:</strong> {diagnosticResult.configuration?.host}
+                    </p>
+                    <p>
+                      <strong>Porta:</strong> {diagnosticResult.configuration?.port}
+                    </p>
+                    <p>
+                      <strong>Usuário:</strong> {diagnosticResult.configuration?.user}
+                    </p>
+                    <p>
+                      <strong>Seguro:</strong> {diagnosticResult.configuration?.secure}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Reset Email Result */}
+              {resetResult && (
+                <div className="mt-4 p-4 rounded bg-blue-50 border border-blue-200">
+                  <p className="font-semibold text-blue-900 mb-2">
+                    {resetResult.message}
+                  </p>
+                  <div className="bg-white rounded p-2 text-sm space-y-1 break-all">
+                    <p>
+                      <strong>Para:</strong> {resetResult.to}
+                    </p>
+                    <p>
+                      <strong>Token:</strong> {resetResult.token?.substring(0, 20)}...
+                    </p>
+                    <p className="mt-3">
+                      <strong>Link de Reset:</strong>
+                      <br />
+                      <a
+                        href={resetResult.resetLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-vitrii-blue hover:underline break-all"
+                      >
+                        {resetResult.resetLink}
+                      </a>
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
 
           {/* Info */}
           <div className="mt-8 pt-8 border-t border-gray-300 text-sm text-vitrii-text-secondary space-y-2">
