@@ -985,6 +985,18 @@ export function createServer() {
   app.post("/api/anunciantes/:anuncianteId/contatos/:contatoId/usuarios", extractUserId, addUsuarioToContato);
   app.delete("/api/anunciantes/:anuncianteId/contatos/:contatoId/usuarios/:usuarioId", extractUserId, removeUsuarioFromContato);
 
+  // Check APP_URL configuration
+  app.get("/api/check-app-url", (_req, res) => {
+    const appUrl = process.env.APP_URL || "https://app.vitrii.com.br";
+    res.json({
+      success: true,
+      appUrl,
+      appUrlFromEnv: process.env.APP_URL || "NOT SET",
+      fallback: "https://app.vitrii.com.br",
+      isLocalhost: appUrl.includes("localhost"),
+    });
+  });
+
   // Test endpoint for user creation
   app.post("/api/test-signup", async (req, res) => {
     try {

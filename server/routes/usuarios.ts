@@ -686,6 +686,13 @@ export const forgotPassword: RequestHandler = async (req, res) => {
     const appUrl = process.env.APP_URL || "https://app.vitrii.com.br";
     const resetLink = `${appUrl}/reset-senha?token=${resetToken}&email=${encodeURIComponent(email)}`;
 
+    console.log("[forgotPassword] 📧 Gerando link de reset de senha:", {
+      appUrl,
+      email,
+      linkPreview: resetLink.substring(0, 80) + "...",
+      hasAppUrl: !!process.env.APP_URL,
+    });
+
     // Send the password reset email
     const emailSent = await sendPasswordResetEmail(
       usuario.email,
