@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import crypto from "crypto";
 import { sendTestEmail, testSmtpConnection } from "./lib/emailService";
 import {
   getAnuncios,
@@ -436,10 +437,168 @@ export function createServer() {
     }
   });
 
+  // Diagnostic endpoint for SMTP configuration
+  app.get("/api/diagnostic-smtp", async (_req, res) => {
+    try {
+      console.log("\n🔍 ========== DIAGNOSTIC SMTP ==========");
+
+      const diagnostics = {
+        timestamp: new Date().toISOString(),
+        environment: {
+          node_env: process.env.NODE_ENV,
+          smtp_host: process.env.SMTP_HOST,
+          smtp_port: process.env.SMTP_PORT,
+          smtp_secure: process.env.SMTP_SECURE,
+          smtp_user: process.env.SMTP_USER,
+          mail_from: process.env.MAIL_FROM,
+          app_url: process.env.APP_URL,
+        },
+        tests: {} as any,
+      };
+
+      console.log("📋 Environment variables:");
+      console.log(`   SMTP_HOST: ${process.env.SMTP_HOST}`);
+      console.log(`   SMTP_PORT: ${process.env.SMTP_PORT}`);
+      console.log(`   SMTP_SECURE: ${process.env.SMTP_SECURE}`);
+      console.log(`   SMTP_USER: ${process.env.SMTP_USER ? "✅ Definido" : "❌ Não definido"}`);
+      console.log(`   SMTP_PASS: ${process.env.SMTP_PASS ? "✅ Definido" : "❌ Não definido"}`);
+
+      // Test 1: Check if all required env vars are set
+      console.log("\n📌 Test 1: Verificando variáveis de ambiente...");
+      const requiredVars = [
+        "SMTP_HOST",
+        "SMTP_PORT",
+        "SMTP_USER",
+        "SMTP_PASS",
+        "MAIL_FROM",
+      ];
+
+      const missingVars = requiredVars.filter(
+        (v) => !process.env[v as keyof typeof process.env]
+      );
+
+      if (missingVars.length === 0) {
+        diagnostics.tests.env_vars = { status: "✅ OK", message: "Todas as variáveis estão definidas" };
+        console.log("✅ Todas as variáveis de ambiente estão definidas");
+      } else {
+        diagnostics.tests.env_vars = {
+          status: "❌ FALHA",
+          missing: missingVars,
+        };
+        console.log(`❌ Variáveis faltantes: ${missingVars.join(", ")}`);
+      }
+
+      // Test 2: Test SMTP Connection
+      console.log("\n📌 Test 2: Testando conexão SMTP...");
+      try {
+        const { testSmtpConnection } = await import("./lib/emailService");
+        const connectionOk = await testSmtpConnection();
+
+        if (connectionOk) {
+          diagnostics.tests.smtp_connection = {
+            status: "✅ OK",
+            message: "Conexão SMTP verificada com sucesso",
+          };
+          console.log("✅ Conexão SMTP verificada com sucesso");
+        } else {
+          diagnostics.tests.smtp_connection = {
+            status: "❌ FALHA",
+            message: "Não foi possível verificar a conexão SMTP",
+          };
+          console.log("❌ Falha ao verificar conexão SMTP");
+        }
+      } catch (error) {
+        const errorMsg = error instanceof Error ? error.message : String(error);
+        diagnostics.tests.smtp_connection = {
+          status: "❌ ERRO",
+          error: errorMsg,
+        };
+        console.error(`❌ Erro ao testar SMTP: ${errorMsg}`);
+      }
+
+      // Test 3: Validate email format
+      console.log("\n📌 Test 3: Validando formato de emails...");
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const smtpUser = process.env.SMTP_USER || "";
+      const mailFrom = process.env.MAIL_FROM || "";
+
+      const validSmtpUser = emailRegex.test(smtpUser);
+      const validMailFrom = emailRegex.test(mailFrom);
+
+      if (validSmtpUser && validMailFrom) {
+        diagnostics.tests.email_format = {
+          status: "✅ OK",
+          smtp_user: { value: smtpUser, valid: validSmtpUser },
+          mail_from: { value: mailFrom, valid: validMailFrom },
+        };
+        console.log(`✅ SMTP_USER válido: ${smtpUser}`);
+        console.log(`✅ MAIL_FROM válido: ${mailFrom}`);
+      } else {
+        diagnostics.tests.email_format = {
+          status: "❌ FALHA",
+          smtp_user: { value: smtpUser, valid: validSmtpUser },
+          mail_from: { value: mailFrom, valid: validMailFrom },
+        };
+        if (!validSmtpUser) console.log(`❌ SMTP_USER inválido: ${smtpUser}`);
+        if (!validMailFrom) console.log(`❌ MAIL_FROM inválido: ${mailFrom}`);
+      }
+
+      // Test 4: DNS Resolution
+      console.log("\n📌 Test 4: Testando resolução DNS...");
+      try {
+        const { promises: dnsPromises } = await import("dns");
+        const smtpHost = process.env.SMTP_HOST;
+        const addresses = await dnsPromises.resolve4(smtpHost);
+        diagnostics.tests.dns_resolution = {
+          status: "✅ OK",
+          host: smtpHost,
+          resolved_ips: addresses,
+        };
+        console.log(`✅ DNS resolvido para ${smtpHost}:`);
+        addresses.forEach((ip) => console.log(`   - ${ip}`));
+      } catch (error) {
+        const errorMsg = error instanceof Error ? error.message : String(error);
+        diagnostics.tests.dns_resolution = {
+          status: "❌ FALHA",
+          error: errorMsg,
+        };
+        console.log(`❌ Erro ao resolver DNS: ${errorMsg}`);
+      }
+
+      // Test 5: Port connectivity (simple check)
+      console.log("\n📌 Test 5: Verificando port...");
+      const smtpPort = parseInt(process.env.SMTP_PORT || "465");
+      const smtpHost = process.env.SMTP_HOST || "";
+      diagnostics.tests.port_info = {
+        host: smtpHost,
+        port: smtpPort,
+        secure: process.env.SMTP_SECURE === "true" ? "SSL" : "TLS",
+        message: "Nota: Conexão real testada em Test 2",
+      };
+      console.log(`   Host: ${smtpHost}`);
+      console.log(`   Port: ${smtpPort}`);
+      console.log(`   Security: ${process.env.SMTP_SECURE === "true" ? "SSL" : "TLS"}`);
+
+      console.log("\n========== DIAGNOSTIC COMPLETO ==========\n");
+
+      res.json({
+        success: true,
+        diagnostics,
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error("Erro no diagnóstico SMTP:", error);
+      res.status(500).json({
+        success: false,
+        error: "Erro ao executar diagnóstico",
+        details: error instanceof Error ? error.message : "Desconhecido",
+      });
+    }
+  });
+
   // Send password reset email directly - for testing
   app.get("/api/send-reset-email", async (_req, res) => {
     try {
-      const crypto = require("crypto");
       const { sendPasswordResetEmail } = await import("./lib/emailService");
 
       console.log("🧪 Enviando email de reset de senha...");
