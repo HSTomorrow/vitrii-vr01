@@ -257,7 +257,7 @@ export default function EventosAgendaCalendar({
                           {evento.privacidade === "publico"
                             ? "🌍 Público"
                             : evento.privacidade === "privado_usuarios"
-                              ? "👥 Privado (Usuários)"
+                              ? "👥 Restrita"
                               : "🔒 Privado"}
                         </span>
                       </div>

@@ -49,7 +49,7 @@ export const getEventosByAnunciante: RequestHandler = async (req, res) => {
   }
 };
 
-// Get events visible to a user (public + user-specific private events)
+// Get events visible to a user (public + user-specific private events + masked restricted events)
 export const getEventosVisivelsPara: RequestHandler = async (req, res) => {
   try {
     const { anuncianteId } = req.params;
@@ -79,13 +79,41 @@ export const getEventosVisivelsPara: RequestHandler = async (req, res) => {
       },
     });
 
-    // If user is not logged in, return only public events
+    // If user is not logged in, return public + all restricted events (masked)
     if (!userId) {
-      return res.json({ data: publicEvents });
+      const restrictedEvents = await prisma.eventos_agenda_anunciante.findMany({
+        where: {
+          anuncianteId: anuncianteId_num,
+          privacidade: "privado_usuarios",
+        },
+        select: {
+          id: true,
+          dataInicio: true,
+          dataFim: true,
+          privacidade: true,
+          cor: true,
+        },
+        orderBy: {
+          dataInicio: "asc",
+        },
+      });
+
+      const maskedRestrictedEvents = restrictedEvents.map((e) => ({
+        ...e,
+        titulo: "Acesso Restrito",
+        descricao: undefined,
+      }));
+
+      const allVisibleEvents = [
+        ...publicEvents,
+        ...maskedRestrictedEvents,
+      ].sort((a, b) => new Date(a.dataInicio).getTime() - new Date(b.dataInicio).getTime());
+
+      return res.json({ data: allVisibleEvents });
     }
 
-    // Get private events where user has permission
-    const privateEventosComPermissao = await prisma.eventos_agenda_anunciante.findMany({
+    // Get restricted events where user has permission (full details)
+    const restrictedEventosComPermissao = await prisma.eventos_agenda_anunciante.findMany({
       where: {
         anuncianteId: anuncianteId_num,
         privacidade: "privado_usuarios",
@@ -109,9 +137,39 @@ export const getEventosVisivelsPara: RequestHandler = async (req, res) => {
       },
     });
 
+    // Get restricted events where user does NOT have permission (masked)
+    const restrictedEventosSemPermissao = await prisma.eventos_agenda_anunciante.findMany({
+      where: {
+        anuncianteId: anuncianteId_num,
+        privacidade: "privado_usuarios",
+        permissoes: {
+          none: {
+            usuarioId: userId,
+          },
+        },
+      },
+      select: {
+        id: true,
+        dataInicio: true,
+        dataFim: true,
+        privacidade: true,
+        cor: true,
+      },
+      orderBy: {
+        dataInicio: "asc",
+      },
+    });
+
+    const maskedRestrictedEvents = restrictedEventosSemPermissao.map((e) => ({
+      ...e,
+      titulo: "Acesso Restrito",
+      descricao: undefined,
+    }));
+
     const allVisibleEvents = [
       ...publicEvents,
-      ...privateEventosComPermissao,
+      ...restrictedEventosComPermissao,
+      ...maskedRestrictedEvents,
     ].sort((a, b) => new Date(a.dataInicio).getTime() - new Date(b.dataInicio).getTime());
 
     res.json({ data: allVisibleEvents });

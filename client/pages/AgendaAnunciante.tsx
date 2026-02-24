@@ -167,8 +167,7 @@ export default function AgendaAnunciante() {
         {/* Privacy Notice */}
         <div className="mt-8 p-4 bg-gray-100 rounded-lg text-sm text-gray-700">
           <p>
-            <strong>Legenda:</strong> 🌍 Evento Público • 👥 Compartilhado com
-            você • 🔒 Privado (não visível)
+            <strong>Legenda:</strong> 🌍 Público (visível) • 👥 Restrita (disponibilidade visível, detalhes apenas para autorizados) • 🔒 Privado (não visível)
           </p>
         </div>
       </main>

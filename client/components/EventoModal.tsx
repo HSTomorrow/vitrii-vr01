@@ -37,8 +37,8 @@ const PRIVACIDADES = [
   { value: "publico", label: "🌍 Público", desc: "Todos podem visualizar" },
   {
     value: "privado_usuarios",
-    label: "👥 Privado (Usuários)",
-    desc: "Apenas usuários selecionados",
+    label: "👥 Restrita",
+    desc: "Todos veem a disponibilidade, mas não o conteúdo",
   },
   { value: "privado", label: "🔒 Privado", desc: "Apenas você pode visualizar" },
 ];
