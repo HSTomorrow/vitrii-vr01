@@ -24,6 +24,7 @@ model anunciantes {
   instagram            String?                     @db.VarChar(255)
   facebook             String?                     @db.VarChar(255)
   whatsapp             String?                     @db.VarChar(20)
+  chavePix             String?                     @db.VarChar(32) // PIX key (máximo 32 caracteres)
   fotoUrl              String?                     @db.VarChar(500)
   iconColor            String                      @default("azul") @db.VarChar(20) // azul, verde, rosa, vermelho, laranja
   status               String                      @default("Ativo") @db.VarChar(50) // Ativo ou Desativado

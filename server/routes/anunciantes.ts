@@ -21,6 +21,7 @@ const AnuncianteCreateSchema = z.object({
   instagram: z.string().optional(),
   facebook: z.string().optional(),
   whatsapp: z.string().optional(),
+  chavePix: z.string().max(32, "Chave PIX deve ter no máximo 32 caracteres").optional(),
   fotoUrl: z.string().optional(),
   iconColor: z.enum(["azul", "verde", "rosa", "vermelho", "laranja"]).default("azul"),
 });
@@ -252,6 +253,7 @@ export const createAnunciante: RequestHandler = async (req, res) => {
         instagram: validatedData.instagram,
         facebook: validatedData.facebook,
         whatsapp: validatedData.whatsapp,
+        chavePix: validatedData.chavePix,
         fotoUrl: validatedData.fotoUrl,
         iconColor: validatedData.iconColor,
         dataCriacao: new Date(),
@@ -319,6 +321,7 @@ const AnuncianteUpdateSchema = z.object({
   instagram: z.string().optional(),
   facebook: z.string().optional(),
   whatsapp: z.string().optional(),
+  chavePix: z.string().max(32, "Chave PIX deve ter no máximo 32 caracteres").optional(),
   fotoUrl: z.string().optional(),
   iconColor: z.enum(["azul", "verde", "rosa", "vermelho", "laranja"]).optional(),
   localidadeId: z.number().int().nullable().optional(),
@@ -346,6 +349,7 @@ export const updateAnunciante: RequestHandler = async (req, res) => {
       "instagram",
       "facebook",
       "whatsapp",
+      "chavePix",
       "fotoUrl",
       "cep",
     ];

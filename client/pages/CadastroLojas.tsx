@@ -25,6 +25,7 @@ interface Anunciante {
   instagram?: string;
   facebook?: string;
   whatsapp?: string;
+  chavePix?: string;
   fotoUrl?: string;
   iconColor?: string;
   temAgenda?: boolean;
@@ -61,6 +62,7 @@ export default function CadastroAnunciantes() {
     instagram: "",
     facebook: "",
     whatsapp: "",
+    chavePix: "",
     fotoUrl: "",
     iconColor: "azul",
     temAgenda: false,
@@ -178,6 +180,7 @@ export default function CadastroAnunciantes() {
         instagram: "",
         facebook: "",
         whatsapp: "",
+        chavePix: "",
         fotoUrl: "",
         iconColor: "azul",
         temAgenda: false,
@@ -234,6 +237,7 @@ export default function CadastroAnunciantes() {
       instagram: loja.instagram || "",
       facebook: loja.facebook || "",
       whatsapp: loja.whatsapp || "",
+      chavePix: loja.chavePix || "",
       fotoUrl: loja.fotoUrl || "",
       iconColor: loja.iconColor || "azul",
       temAgenda: loja.temAgenda || false,
@@ -301,6 +305,7 @@ export default function CadastroAnunciantes() {
                 instagram: "",
                 facebook: "",
                 whatsapp: "",
+                chavePix: "",
                 fotoUrl: "",
                 iconColor: "azul",
                 temAgenda: false,
@@ -572,6 +577,28 @@ export default function CadastroAnunciantes() {
                   </div>
                   <p className="text-xs text-vitrii-text-secondary mt-1">
                     Digite apenas DDD e número (ex: 11 98765-4321)
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                    Chave PIX (Opcional)
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.chavePix}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value.length <= 32) {
+                        setFormData({ ...formData, chavePix: value });
+                      }
+                    }}
+                    placeholder="Email, CPF, Telefone ou chave aleatória"
+                    maxLength={32}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
+                  />
+                  <p className="text-xs text-vitrii-text-secondary mt-1">
+                    Máximo 32 caracteres
                   </p>
                 </div>
               </div>
