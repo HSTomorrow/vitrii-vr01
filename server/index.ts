@@ -985,6 +985,51 @@ export function createServer() {
   app.post("/api/anunciantes/:anuncianteId/contatos/:contatoId/usuarios", extractUserId, addUsuarioToContato);
   app.delete("/api/anunciantes/:anuncianteId/contatos/:contatoId/usuarios/:usuarioId", extractUserId, removeUsuarioFromContato);
 
+  // Test endpoint for user creation
+  app.post("/api/test-signup", async (req, res) => {
+    try {
+      console.log("\n🧪 ========== TEST SIGNUP ==========");
+      console.log("📝 Dados recebidos:", {
+        nome: req.body.nome,
+        email: req.body.email,
+        senhaLength: req.body.senha?.length,
+      });
+
+      // Try simple insert with just name, email, senha
+      const testUser = await prisma.usracessos.create({
+        data: {
+          nome: req.body.nome || "Test User",
+          email: req.body.email || `test-${Date.now()}@test.com`,
+          senha: "hash123",
+        },
+      });
+
+      console.log("✅ Usuário criado com sucesso:", testUser.id);
+
+      res.json({
+        success: true,
+        message: "Usuário de teste criado com sucesso",
+        userId: testUser.id,
+        email: testUser.email,
+      });
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : "";
+
+      console.error("❌ ERRO ao criar usuário de teste:");
+      console.error("Mensagem:", errorMsg);
+      console.error("Stack:", errorStack);
+      console.error("Objeto completo:", error);
+
+      res.status(500).json({
+        success: false,
+        error: "Erro ao criar usuário de teste",
+        message: errorMsg,
+        details: errorStack,
+      });
+    }
+  });
+
   // Global error handling middleware for this sub-app
   // Must be added AFTER all routes
   app.use((err: any, req: any, res: any, next: any) => {

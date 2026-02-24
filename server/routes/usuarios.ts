@@ -234,23 +234,17 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
     const contractExpireDate = new Date();
     contractExpireDate.setDate(contractExpireDate.getDate() + 30);
 
+    console.log("[signUpUsuario] 📊 Tentando criar usuário com dados:", {
+      nome: validatedData.nome,
+      email: validatedData.email,
+      senhaHash: senhaHash.substring(0, 20) + "...",
+    });
+
     const usuario = await prisma.usracessos.create({
       data: {
         nome: validatedData.nome,
         email: validatedData.email,
         senha: senhaHash,
-        tipoUsuario: "comum",
-        tassinatura: "Gratuito", // Always start as Gratuito
-        dataVigenciaContrato: contractExpireDate,
-      },
-      select: {
-        id: true,
-        nome: true,
-        email: true,
-        tipoUsuario: true,
-        tassinatura: true,
-        dataCriacao: true,
-        dataVigenciaContrato: true,
       },
     });
 
@@ -305,7 +299,13 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
     }
 
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error("[signUpUsuario] 🔴 Erro no servidor:", errorMessage);
+    const errorStack = error instanceof Error ? error.stack : "";
+
+    console.error("[signUpUsuario] 🔴 ERRO COMPLETO NO SERVIDOR:");
+    console.error("Mensagem:", errorMessage);
+    console.error("Stack trace:", errorStack);
+    console.error("Objeto erro:", error);
+
     res.status(500).json({
       success: false,
       error: `Erro ao criar conta: ${errorMessage}`,
