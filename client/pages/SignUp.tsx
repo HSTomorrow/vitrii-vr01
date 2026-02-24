@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -16,6 +17,7 @@ export default function SignUp() {
     confirmarSenha: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [generalError, setGeneralError] = useState<string>("");
   const [agreeTerms, setAgreeTerms] = useState(false);
   const [signupAttempted, setSignupAttempted] = useState(false);
   const [signupSuccess, setSignupSuccess] = useState(false);
@@ -24,6 +26,8 @@ export default function SignUp() {
   const signupMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
       console.log("[SignUp] Iniciando requisição de cadastro para:", data.email);
+      setGeneralError("");
+      setErrors({});
 
       const response = await fetch("/api/auth/signup", {
         method: "POST",
@@ -34,17 +38,25 @@ export default function SignUp() {
       console.log("[SignUp] Resposta recebida:", response.status, response.statusText);
 
       if (!response.ok) {
-        const error = await response.json();
-        console.error("[SignUp] Erro na resposta:", error);
-        if (error.details) {
-          // Handle validation errors
-          const newErrors: Record<string, string> = {};
-          error.details.forEach((detail: any) => {
-            newErrors[detail.field] = detail.message;
+        const errorData = await response.json();
+        console.error("[SignUp] Erro na resposta:", errorData);
+
+        // Extrair erros de validação específicos
+        const fieldErrors: Record<string, string> = {};
+        if (errorData.details && Array.isArray(errorData.details)) {
+          errorData.details.forEach((detail: any) => {
+            fieldErrors[detail.field] = detail.message;
           });
-          setErrors(newErrors);
+          setErrors(fieldErrors);
+          console.log("[SignUp] Erros de campo encontrados:", fieldErrors);
         }
-        throw new Error(error.error || "Erro ao criar conta");
+
+        // Definir mensagem de erro geral
+        const errorMessage = errorData.error || "Erro ao criar conta";
+        setGeneralError(errorMessage);
+        console.log("[SignUp] Erro geral:", errorMessage);
+        console.log("[SignUp] Campos com erro:", Object.keys(fieldErrors));
+        throw new Error(errorMessage);
       }
 
       const result = await response.json();
@@ -54,6 +66,8 @@ export default function SignUp() {
     onSuccess: (data) => {
       setSignupAttempted(true);
       setSignupSuccess(true);
+      setGeneralError("");
+      setErrors({});
       toast.success("Conta criada com sucesso! Bem-vindo ao Vitrii!");
       console.log("[SignUp] ✅ Cadastro concluído, redirecionando...");
       setTimeout(() => {
@@ -65,7 +79,7 @@ export default function SignUp() {
       setSignupSuccess(false);
       const errorMessage = error instanceof Error ? error.message : "Erro ao criar conta";
       console.error("[SignUp] ❌ Erro:", errorMessage);
-      toast.error(errorMessage);
+      setGeneralError(errorMessage);
     },
   });
 
@@ -81,6 +95,10 @@ export default function SignUp() {
         delete newErrors[field];
         return newErrors;
       });
+    }
+    // Clear general error when user starts typing again
+    if (generalError) {
+      setGeneralError("");
     }
   };
 
@@ -161,6 +179,17 @@ export default function SignUp() {
               </p>
             </div>
           </div>
+
+          {/* General Error Banner */}
+          {generalError && (
+            <div className="bg-red-50 border-l-4 border-red-500 rounded p-4 mb-6 flex gap-3">
+              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <h3 className="font-semibold text-red-900">Erro ao Criar Conta</h3>
+                <p className="text-sm text-red-800 mt-1">{generalError}</p>
+              </div>
+            </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Nome */}

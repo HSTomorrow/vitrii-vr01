@@ -217,7 +217,13 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
       console.warn("[signUpUsuario] ⚠️ Email já cadastrado:", validatedData.email);
       return res.status(400).json({
         success: false,
-        error: "Email já cadastrado",
+        error: `O email ${validatedData.email} já está cadastrado. Por favor, use outro email ou faça login se já possui uma conta.`,
+        details: [
+          {
+            field: "email",
+            message: `Este email já está registrado. Faça login ou use outro email.`
+          }
+        ]
       });
     }
 
