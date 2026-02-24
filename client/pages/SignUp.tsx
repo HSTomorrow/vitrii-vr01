@@ -28,39 +28,57 @@ export default function SignUp() {
       setGeneralError("");
       setErrors({});
 
-      const response = await fetch("/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
+      try {
+        const response = await fetch("/api/auth/signup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
 
-      console.log("[SignUp] Resposta recebida:", response.status, response.statusText);
+        console.log("[SignUp] Resposta recebida:", response.status, response.statusText);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("[SignUp] Erro na resposta:", errorData);
+        if (!response.ok) {
+          try {
+            const errorData = await response.json();
+            console.error("[SignUp] Erro na resposta:", errorData);
 
-        // Extrair erros de validação específicos
-        const fieldErrors: Record<string, string> = {};
-        if (errorData.details && Array.isArray(errorData.details)) {
-          errorData.details.forEach((detail: any) => {
-            fieldErrors[detail.field] = detail.message;
-          });
-          setErrors(fieldErrors);
-          console.log("[SignUp] Erros de campo encontrados:", fieldErrors);
+            // Extrair erros de validação específicos
+            const fieldErrors: Record<string, string> = {};
+            if (errorData.details && Array.isArray(errorData.details)) {
+              errorData.details.forEach((detail: any) => {
+                fieldErrors[detail.field] = detail.message;
+              });
+              setErrors(fieldErrors);
+              console.log("[SignUp] Erros de campo encontrados:", fieldErrors);
+            }
+
+            // Definir mensagem de erro geral
+            const errorMessage = errorData.error || `Erro ao criar conta (HTTP ${response.status})`;
+            setGeneralError(errorMessage);
+            console.log("[SignUp] Erro geral:", errorMessage);
+            console.log("[SignUp] Campos com erro:", Object.keys(fieldErrors));
+            throw new Error(errorMessage);
+          } catch (parseError) {
+            console.error("[SignUp] Erro ao parsear resposta:", parseError);
+            const errorMessage = `Erro no servidor (HTTP ${response.status}). Por favor, tente novamente.`;
+            setGeneralError(errorMessage);
+            throw new Error(errorMessage);
+          }
         }
 
-        // Definir mensagem de erro geral
-        const errorMessage = errorData.error || "Erro ao criar conta";
+        const result = await response.json();
+        console.log("[SignUp] Cadastro bem-sucedido:", result);
+        return result;
+      } catch (networkError) {
+        const message = networkError instanceof Error ? networkError.message : String(networkError);
+        if (message.includes("HTTP")) {
+          throw networkError;
+        }
+        const errorMessage = `Erro de conexão: ${message}. Verifique sua internet e tente novamente.`;
+        console.error("[SignUp] Erro de rede:", errorMessage);
         setGeneralError(errorMessage);
-        console.log("[SignUp] Erro geral:", errorMessage);
-        console.log("[SignUp] Campos com erro:", Object.keys(fieldErrors));
         throw new Error(errorMessage);
       }
-
-      const result = await response.json();
-      console.log("[SignUp] Cadastro bem-sucedido:", result);
-      return result;
     },
     onSuccess: (data) => {
       setSignupAttempted(true);
@@ -183,9 +201,22 @@ export default function SignUp() {
           {generalError && (
             <div className="bg-red-50 border-l-4 border-red-500 rounded p-4 mb-6 flex gap-3">
               <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
-              <div>
+              <div className="flex-1">
                 <h3 className="font-semibold text-red-900">Erro ao Criar Conta</h3>
                 <p className="text-sm text-red-800 mt-1">{generalError}</p>
+                {Object.keys(errors).length > 0 && (
+                  <div className="mt-3 pt-3 border-t border-red-200">
+                    <p className="text-xs font-semibold text-red-900 mb-2">Campos com erro:</p>
+                    <ul className="text-xs text-red-800 space-y-1">
+                      {Object.entries(errors).map(([field, message]) => (
+                        <li key={field} className="flex gap-2">
+                          <span className="text-red-600">•</span>
+                          <span><strong>{field === 'nome' ? 'Nome' : field === 'email' ? 'Email' : field === 'senha' ? 'Senha' : field === 'confirmarSenha' ? 'Confirmar Senha' : field}:</strong> {message}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
             </div>
           )}

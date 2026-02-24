@@ -303,7 +303,7 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
       console.warn("[signUpUsuario] ⚠️ Erro de validação:", error.errors);
       return res.status(400).json({
         success: false,
-        error: "Dados inválidos",
+        error: "Por favor, verifique os dados preenchidos e tente novamente.",
         details: error.errors.map((e) => ({
           field: e.path.join("."),
           message: e.message,
@@ -311,10 +311,11 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
       });
     }
 
-    console.error("[signUpUsuario] 🔴 Erro no servidor:", error instanceof Error ? error.message : String(error));
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("[signUpUsuario] 🔴 Erro no servidor:", errorMessage);
     res.status(500).json({
       success: false,
-      error: "Erro ao criar conta",
+      error: `Erro ao criar conta: ${errorMessage}`,
     });
   }
 };
