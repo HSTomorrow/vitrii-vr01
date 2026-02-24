@@ -32,20 +32,27 @@ export default function ForgotPassword() {
     onSuccess: (data: any) => {
       if (data.emailFound === false) {
         setEmailNotFound(true);
-        toast.error(data.message || "Este email não está cadastrado");
+        console.error(`❌ Email não encontrado: ${email}`);
+        toast.error("Email não cadastrado", {
+          description: `O email ${email} não está registrado em nossa base de dados.`,
+          duration: 5000,
+        });
       } else {
         setEmailSent(true);
-        toast.success(
-          "Email enviado com sucesso! Verifique sua caixa de entrada.",
-        );
+        console.log(`✅ Email de reset enviado para: ${email}`);
+        toast.success("Email enviado com sucesso!", {
+          description: `Link de redefinição de senha enviado para ${email}. Verifique sua caixa de entrada e pastas de spam.`,
+          duration: 5000,
+        });
       }
     },
     onError: (error) => {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "Erro ao processar solicitação",
-      );
+      const errorMessage = error instanceof Error ? error.message : "Erro ao processar solicitação";
+      console.error(`❌ Erro ao enviar email: ${errorMessage}`);
+      toast.error("Erro ao enviar email", {
+        description: errorMessage,
+        duration: 5000,
+      });
     },
   });
 
@@ -276,6 +283,19 @@ export default function ForgotPassword() {
             </div>
           </div>
 
+          {/* Status Messages */}
+          {forgotPasswordMutation.isPending && (
+            <div className="bg-blue-50 border-l-4 border-blue-500 rounded p-4 mb-6 flex gap-3 animate-pulse">
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <h3 className="font-semibold text-blue-900">Processando...</h3>
+                <p className="text-sm text-blue-800 mt-1">
+                  Enviando link de reset para <strong>{email}</strong>
+                </p>
+              </div>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Email */}
             <div>
@@ -305,12 +325,16 @@ export default function ForgotPassword() {
             <button
               type="submit"
               disabled={forgotPasswordMutation.isPending}
-              className="w-full bg-vitrii-blue text-white py-3 rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              className={`w-full py-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition-colors ${
+                forgotPasswordMutation.isPending
+                  ? "bg-gray-400 text-white cursor-not-allowed opacity-75"
+                  : "bg-vitrii-blue text-white hover:bg-vitrii-blue-dark"
+              }`}
             >
               {forgotPasswordMutation.isPending ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-                  Enviando...
+                  Processando...
                 </>
               ) : (
                 <>
