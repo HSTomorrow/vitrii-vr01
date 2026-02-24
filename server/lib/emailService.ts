@@ -402,3 +402,79 @@ export async function sendWelcomeEmail(
     return false;
   }
 }
+
+// TEST EMAIL - Simple test email function
+export async function sendTestEmail(
+  toEmail: string,
+  fromEmail?: string
+): Promise<boolean> {
+  try {
+    const transporter = await getTransporter();
+    const mailOptions = {
+      from: fromEmail || process.env.MAIL_FROM || "noreply@vitrii.com",
+      to: toEmail,
+      subject: "📧 Email de Teste - Vitrii",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f5f5f5;">
+          <div style="background-color: white; border-radius: 8px; padding: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <div style="text-align: center; margin-bottom: 30px;">
+              <h1 style="color: #0066cc; margin: 0;">✅ Vitrii</h1>
+              <p style="color: #666; font-size: 14px;">Teste de Email - Sistema de Notificações</p>
+            </div>
+
+            <h2 style="color: #333; font-size: 24px; margin: 0 0 20px 0;">Email de Teste</h2>
+
+            <div style="background-color: #f0f8ff; border-left: 4px solid #0066cc; padding: 15px; margin: 20px 0; border-radius: 4px;">
+              <p style="color: #333; font-size: 16px; margin: 0;">
+                <strong>✅ Sucesso!</strong> Você recebeu este email de teste com sucesso.
+              </p>
+            </div>
+
+            <p style="color: #666; font-size: 16px; line-height: 1.6; margin: 20px 0;">
+              <strong>Detalhes do Teste:</strong>
+            </p>
+            <ul style="color: #666; font-size: 14px; line-height: 1.8;">
+              <li><strong>Data/Hora:</strong> ${new Date().toLocaleString('pt-BR')}</li>
+              <li><strong>Servidor SMTP:</strong> ${process.env.SMTP_HOST}</li>
+              <li><strong>Remetente:</strong> ${fromEmail || process.env.MAIL_FROM}</li>
+              <li><strong>Destinatário:</strong> ${toEmail}</li>
+            </ul>
+
+            <div style="background-color: #fffbf0; border-left: 4px solid #ff9800; padding: 15px; margin: 20px 0; border-radius: 4px;">
+              <p style="color: #666; font-size: 14px; margin: 0;">
+                <strong>💡 Dica:</strong> Se você recebeu este email, significa que o sistema de notificações está funcionando corretamente!
+              </p>
+            </div>
+
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #eee;">
+              <p style="color: #999; font-size: 12px; margin: 0;">
+                Este é um email automático gerado pelo sistema Vitrii. Por favor, não responda a este email.
+              </p>
+            </div>
+          </div>
+        </div>
+      `,
+      text: `Email de Teste Vitrii\n\nVocê recebeu este email de teste com sucesso!\n\nData/Hora: ${new Date().toLocaleString('pt-BR')}\nServidor SMTP: ${process.env.SMTP_HOST}\nRemetente: ${fromEmail || process.env.MAIL_FROM}\nDestinatário: ${toEmail}`
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+
+    console.log("✅ Email de teste enviado com sucesso");
+    console.log("   - De:", fromEmail || process.env.MAIL_FROM);
+    console.log("   - Para:", toEmail);
+    console.log("   - Servidor:", process.env.SMTP_HOST);
+    console.log("   - Message ID:", info.messageId);
+
+    if (process.env.NODE_ENV !== "production") {
+      console.log("   - Preview URL:", nodemailer.getTestMessageUrl(info));
+    }
+
+    return true;
+  } catch (error) {
+    console.error("❌ Erro ao enviar email de teste:", error);
+    console.error("   - De:", fromEmail || process.env.MAIL_FROM);
+    console.error("   - Para:", toEmail);
+    console.error("   - Servidor:", process.env.SMTP_HOST);
+    return false;
+  }
+}

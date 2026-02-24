@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import { sendTestEmail } from "./lib/emailService";
 import {
   getAnuncios,
   getAnuncioById,
@@ -322,6 +323,84 @@ export function createServer() {
   app.post("/api/auth/reset-password", resetPassword);
   app.get("/api/auth/validate-reset-token", validateResetToken);
   app.get("/api/auth/verify-email", verifyEmail);
+
+  // Test email endpoint - for debugging/testing SMTP configuration
+  app.post("/api/test-email", async (req, res) => {
+    try {
+      const { toEmail, fromEmail } = req.body;
+
+      if (!toEmail) {
+        return res.status(400).json({
+          success: false,
+          error: "Email de destino (toEmail) é obrigatório",
+        });
+      }
+
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(toEmail)) {
+        return res.status(400).json({
+          success: false,
+          error: "Formato de email inválido",
+        });
+      }
+
+      const success = await sendTestEmail(toEmail, fromEmail);
+
+      if (!success) {
+        return res.status(500).json({
+          success: false,
+          error: "Erro ao enviar email de teste. Verifique as configurações SMTP.",
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        message: "Email de teste enviado com sucesso!",
+        details: {
+          from: fromEmail || process.env.MAIL_FROM,
+          to: toEmail,
+          smtp: process.env.SMTP_HOST,
+          timestamp: new Date().toISOString(),
+        },
+      });
+    } catch (error) {
+      console.error("Erro no endpoint de teste de email:", error);
+      res.status(500).json({
+        success: false,
+        error: "Erro ao processar solicitação de teste de email",
+      });
+    }
+  });
+
+  // Quick test email route - Daniel's test
+  app.get("/api/send-test-email", async (_req, res) => {
+    try {
+      console.log("🧪 Iniciando teste rápido de email...");
+      const success = await sendTestEmail("daniel_pelegrinelli@hotmail.com", "contato@herestomorrow.com");
+
+      if (success) {
+        res.status(200).json({
+          success: true,
+          message: "✅ Email de teste enviado com sucesso para daniel_pelegrinelli@hotmail.com!",
+          from: "contato@herestomorrow.com",
+          to: "daniel_pelegrinelli@hotmail.com",
+          smtp: process.env.SMTP_HOST,
+        });
+      } else {
+        res.status(500).json({
+          success: false,
+          error: "❌ Erro ao enviar email. Verifique as configurações SMTP.",
+        });
+      }
+    } catch (error) {
+      console.error("Erro no teste de email:", error);
+      res.status(500).json({
+        success: false,
+        error: "Erro ao processar teste de email",
+      });
+    }
+  });
 
   app.post("/api/usracessos", createUsuario);
   app.put("/api/usracessos/:id", updateUsuario);
