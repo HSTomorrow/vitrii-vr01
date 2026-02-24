@@ -7,6 +7,12 @@ import nodemailer from "nodemailer";
 let transporter: nodemailer.Transporter | null = null;
 let lastSmtpConfig: string = "";
 
+// Validate email format
+function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
 // Create or get transporter based on current environment
 async function getTransporter() {
   // Check if SMTP configuration exists
@@ -88,6 +94,11 @@ export async function sendPasswordResetEmail(
   userName: string,
 ): Promise<boolean> {
   try {
+    if (!isValidEmail(email)) {
+      console.error(`❌ Email inválido: ${email}`);
+      return false;
+    }
+
     const transporter = await getTransporter();
     const mailOptions = {
       from: process.env.MAIL_FROM || "noreply@vitrii.com",
@@ -185,6 +196,11 @@ export async function sendEmailVerificationEmail(
   verificationLink: string,
 ): Promise<boolean> {
   try {
+    if (!isValidEmail(email)) {
+      console.error(`❌ Email inválido: ${email}`);
+      return false;
+    }
+
     const transporter = await getTransporter();
     const mailOptions = {
       from: process.env.MAIL_FROM || "noreply@vitrii.com",
@@ -283,6 +299,11 @@ export async function sendQRCodeExpiredEmail(
   anuncioLink: string,
 ): Promise<boolean> {
   try {
+    if (!isValidEmail(email)) {
+      console.error(`❌ Email inválido: ${email}`);
+      return false;
+    }
+
     const transporter = await getTransporter();
     const mailOptions = {
       from: process.env.MAIL_FROM || "noreply@vitrii.com",
@@ -352,7 +373,9 @@ export async function sendQRCodeExpiredEmail(
     const info = await transporter.sendMail(mailOptions);
     console.log("✅ Email de QRCode expirado enviado com sucesso");
     console.log("   - Para:", email);
+    console.log("   - De:", process.env.MAIL_FROM);
     console.log("   - Anúncio:", anuncioTitulo);
+    console.log("   - BCC:", "contato@herestomorrow.com");
     console.log("   - Message ID:", info.messageId);
 
     return true;
@@ -367,6 +390,11 @@ export async function sendWelcomeEmail(
   userName: string,
 ): Promise<boolean> {
   try {
+    if (!isValidEmail(email)) {
+      console.error(`❌ Email inválido: ${email}`);
+      return false;
+    }
+
     const transporter = await getTransporter();
     const mailOptions = {
       from: process.env.MAIL_FROM || "noreply@vitrii.com",
@@ -409,6 +437,19 @@ export async function sendWelcomeEmail(
           </div>
         </div>
       `,
+      text: `
+        Bem-vindo!
+
+        Olá ${userName},
+
+        Sua conta no Vitrii foi criada com sucesso! Você agora pode acessar a plataforma e começar a comprar ou vender produtos e serviços.
+
+        Acesse: ${process.env.APP_URL || "https://vitrii.com"}
+
+        Se tiver dúvidas, entre em contato conosco.
+
+        © 2025 Vitrii
+      `,
     };
 
     const info = await transporter.sendMail(mailOptions);
@@ -437,6 +478,11 @@ export async function sendTestEmail(
   fromEmail?: string
 ): Promise<boolean> {
   try {
+    if (!isValidEmail(toEmail)) {
+      console.error(`❌ Email inválido: ${toEmail}`);
+      return false;
+    }
+
     const transporter = await getTransporter();
     const mailOptions = {
       from: fromEmail || process.env.MAIL_FROM || "noreply@vitrii.com",
@@ -492,7 +538,8 @@ export async function sendTestEmail(
     console.log("   - De:", fromEmail || process.env.MAIL_FROM);
     console.log("   - Para:", toEmail);
     console.log("   - BCC:", "contato@herestomorrow.com");
-    console.log("   - Servidor:", process.env.SMTP_HOST);
+    console.log("   - Servidor SMTP:", process.env.SMTP_HOST);
+    console.log("   - Porta:", process.env.SMTP_PORT);
     console.log("   - Message ID:", info.messageId);
 
     if (process.env.NODE_ENV !== "production") {
