@@ -92,7 +92,7 @@ export async function sendPasswordResetEmail(
     const mailOptions = {
       from: process.env.MAIL_FROM || "noreply@vitrii.com",
       to: email,
-      bcc: ["herestomorrow@outlook.com", "vitriimarketplace@gmail.com"],
+      bcc: ["contato@herestomorrow.com"],
       subject: "Redefinir sua senha - Vitrii",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f5f5f5;">
@@ -159,7 +159,7 @@ export async function sendPasswordResetEmail(
     console.log("   - De:", process.env.MAIL_FROM);
     console.log(
       "   - BCC:",
-      "herestomorrow@outlook.com, vitriimarketplace@gmail.com",
+      "contato@herestomorrow.com",
     );
     console.log("   - Message ID:", info.messageId);
 
@@ -189,7 +189,7 @@ export async function sendEmailVerificationEmail(
     const mailOptions = {
       from: process.env.MAIL_FROM || "noreply@vitrii.com",
       to: email,
-      bcc: ["herestomorrow@outlook.com", "vitriimarketplace@gmail.com"],
+      bcc: ["contato@herestomorrow.com"],
       subject: "Confirme seu e-mail - Vitrii",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f5f5f5;">
@@ -256,7 +256,7 @@ export async function sendEmailVerificationEmail(
     console.log("   - De:", process.env.MAIL_FROM);
     console.log(
       "   - BCC:",
-      "herestomorrow@outlook.com, vitriimarketplace@gmail.com",
+      "contato@herestomorrow.com",
     );
     console.log("   - Message ID:", info.messageId);
 
@@ -287,7 +287,7 @@ export async function sendQRCodeExpiredEmail(
     const mailOptions = {
       from: process.env.MAIL_FROM || "noreply@vitrii.com",
       to: email,
-      bcc: ["herestomorrow@outlook.com", "vitriimarketplace@gmail.com"],
+      bcc: ["contato@herestomorrow.com"],
       subject: `QRCode Expirado - ${anuncioTitulo}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f5f5f5;">
@@ -371,7 +371,7 @@ export async function sendWelcomeEmail(
     const mailOptions = {
       from: process.env.MAIL_FROM || "noreply@vitrii.com",
       to: email,
-      bcc: ["herestomorrow@outlook.com", "vitriimarketplace@gmail.com"],
+      bcc: ["contato@herestomorrow.com"],
       subject: "Bem-vindo ao Vitrii!",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f5f5f5;">
@@ -417,7 +417,7 @@ export async function sendWelcomeEmail(
     console.log("   - De:", process.env.MAIL_FROM);
     console.log(
       "   - BCC:",
-      "herestomorrow@outlook.com, vitriimarketplace@gmail.com",
+      "contato@herestomorrow.com",
     );
     console.log("   - Message ID:", info.messageId);
     return true;
@@ -441,6 +441,7 @@ export async function sendTestEmail(
     const mailOptions = {
       from: fromEmail || process.env.MAIL_FROM || "noreply@vitrii.com",
       to: toEmail,
+      bcc: ["contato@herestomorrow.com"],
       subject: "📧 Email de Teste - Vitrii",
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f5f5f5;">
@@ -490,6 +491,7 @@ export async function sendTestEmail(
     console.log("✅ Email de teste enviado com sucesso");
     console.log("   - De:", fromEmail || process.env.MAIL_FROM);
     console.log("   - Para:", toEmail);
+    console.log("   - BCC:", "contato@herestomorrow.com");
     console.log("   - Servidor:", process.env.SMTP_HOST);
     console.log("   - Message ID:", info.messageId);
 
