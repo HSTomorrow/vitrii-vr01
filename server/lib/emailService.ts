@@ -420,7 +420,7 @@ export async function sendWelcomeEmail(
             </p>
 
             <div style="text-align: center; margin: 30px 0;">
-              <a href="${process.env.APP_URL || "https://vitrii.com"}" style="display: inline-block; background-color: #0066cc; color: white; padding: 12px 30px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 16px;">
+              <a href="${process.env.APP_URL || "https://app.vitrii.com.br"}" style="display: inline-block; background-color: #0066cc; color: white; padding: 12px 30px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 16px;">
                 Acessar Vitrii
               </a>
             </div>
@@ -444,7 +444,7 @@ export async function sendWelcomeEmail(
 
         Sua conta no Vitrii foi criada com sucesso! Você agora pode acessar a plataforma e começar a comprar ou vender produtos e serviços.
 
-        Acesse: ${process.env.APP_URL || "https://vitrii.com"}
+        Acesse: ${process.env.APP_URL || "https://app.vitrii.com.br"}
 
         Se tiver dúvidas, entre em contato conosco.
 

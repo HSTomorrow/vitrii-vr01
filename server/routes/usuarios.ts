@@ -261,7 +261,7 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
     });
 
     // Send verification email
-    const verificationLink = `${process.env.APP_URL || "https://vitrii.com"}/verificar-email?token=${verificationToken}&email=${encodeURIComponent(usuario.email)}`;
+    const verificationLink = `${process.env.APP_URL || "https://app.vitrii.com.br"}/verificar-email?token=${verificationToken}&email=${encodeURIComponent(usuario.email)}`;
     const emailSent = await sendEmailVerificationEmail(usuario.email, usuario.nome, verificationLink);
 
     if (!emailSent) {
