@@ -254,7 +254,12 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
       email: usuario.email,
     });
 
-    // Generate email verification token (24 hours expiration)
+    // Note: Email verification token creation disabled - table doesn't exist yet
+    // TODO: Create emailVerificationToken table in database migration
+    console.log("[signUpUsuario] ⚠️ Verificação de email desativada (tabela não existe)");
+
+    // TODO: Uncomment when emailVerificationToken table is created
+    /*
     const verificationToken = crypto.randomBytes(32).toString("hex");
     const expirationDate = new Date();
     expirationDate.setHours(expirationDate.getHours() + 24);
@@ -267,23 +272,10 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
       },
     });
 
-    console.log("[signUpUsuario] ✅ Token de verificação criado");
-
-    // Send verification email
     const appUrl = process.env.APP_URL || "https://www.vitrii.com.br";
     const verificationLink = `${appUrl}/verificar-email?token=${verificationToken}&email=${encodeURIComponent(usuario.email)}`;
     const emailSent = await sendEmailVerificationEmail(usuario.email, usuario.nome, verificationLink);
-
-    console.log("[signUpUsuario] 📧 Link de verificação gerado:", {
-      appUrl,
-      linkPreview: verificationLink.substring(0, 80) + "...",
-    });
-
-    if (!emailSent) {
-      console.error(`[signUpUsuario] ❌ Falha ao enviar email de verificação para: ${usuario.email}`);
-    } else {
-      console.log(`[signUpUsuario] ✅ Email de verificação enviado para: ${usuario.email}`);
-    }
+    */
 
     console.log("[signUpUsuario] 🎉 Cadastro concluído com sucesso");
     res.status(201).json({
