@@ -270,8 +270,14 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
     console.log("[signUpUsuario] ✅ Token de verificação criado");
 
     // Send verification email
-    const verificationLink = `${process.env.APP_URL || "https://app.vitrii.com.br"}/verificar-email?token=${verificationToken}&email=${encodeURIComponent(usuario.email)}`;
+    const appUrl = process.env.APP_URL || "https://www.vitrii.com.br";
+    const verificationLink = `${appUrl}/verificar-email?token=${verificationToken}&email=${encodeURIComponent(usuario.email)}`;
     const emailSent = await sendEmailVerificationEmail(usuario.email, usuario.nome, verificationLink);
+
+    console.log("[signUpUsuario] 📧 Link de verificação gerado:", {
+      appUrl,
+      linkPreview: verificationLink.substring(0, 80) + "...",
+    });
 
     if (!emailSent) {
       console.error(`[signUpUsuario] ❌ Falha ao enviar email de verificação para: ${usuario.email}`);
@@ -683,7 +689,7 @@ export const forgotPassword: RequestHandler = async (req, res) => {
     });
 
     // Build the reset link with token and email as query parameters
-    const appUrl = process.env.APP_URL || "https://app.vitrii.com.br";
+    const appUrl = process.env.APP_URL || "https://www.vitrii.com.br";
     const resetLink = `${appUrl}/reset-senha?token=${resetToken}&email=${encodeURIComponent(email)}`;
 
     console.log("[forgotPassword] 📧 Gerando link de reset de senha:", {
@@ -691,6 +697,7 @@ export const forgotPassword: RequestHandler = async (req, res) => {
       email,
       linkPreview: resetLink.substring(0, 80) + "...",
       hasAppUrl: !!process.env.APP_URL,
+      env: process.env.NODE_ENV,
     });
 
     // Send the password reset email
