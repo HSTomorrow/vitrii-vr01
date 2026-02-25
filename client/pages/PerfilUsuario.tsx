@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -32,6 +33,7 @@ export default function PerfilUsuario() {
 
   // Initialize form with cached user data first
   const [formData, setFormData] = useState({
+    cpf: user?.cpf || "",
     telefone: user?.telefone || "",
     endereco: user?.endereco || "",
   });
@@ -61,6 +63,7 @@ export default function PerfilUsuario() {
   useEffect(() => {
     if (freshUserData) {
       setFormData({
+        cpf: freshUserData.cpf || "",
         telefone: freshUserData.telefone || "",
         endereco: freshUserData.endereco || "",
       });
@@ -146,6 +149,14 @@ export default function PerfilUsuario() {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
+    // CPF/CNPJ validation - must be 11 (CPF) or 14 (CNPJ) digits if provided
+    if (formData.cpf.trim()) {
+      const cpfDigits = formData.cpf.replace(/\D/g, "");
+      if (cpfDigits.length !== 11 && cpfDigits.length !== 14) {
+        newErrors.cpf = "CPF deve ter 11 dígitos ou CNPJ deve ter 14 dígitos";
+      }
+    }
+
     // Phone validation - only if provided
     if (
       formData.telefone.trim() &&
@@ -221,18 +232,47 @@ export default function PerfilUsuario() {
               </p>
             </div>
 
-            {/* CPF / CNPJ (Read-only) */}
+            {/* CPF / CNPJ - Editable if empty */}
             <div>
               <label className="block text-sm font-semibold text-vitrii-text mb-2">
-                CPF \ CNPJ
+                CPF \ CNPJ *
               </label>
-              <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-vitrii-text flex items-center gap-2">
-                <User className="w-5 h-5 text-vitrii-text-secondary flex-shrink-0" />
-                <span>{user?.cpf || "Não informado"}</span>
-              </div>
-              <p className="text-xs text-vitrii-text-secondary mt-2">
-                O CPF/CNPJ é um campo primário e não pode ser alterado. Para mudanças, entre em contato com o administrador.
-              </p>
+              {formData.cpf ? (
+                <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-vitrii-text flex items-center gap-2">
+                  <User className="w-5 h-5 text-vitrii-text-secondary flex-shrink-0" />
+                  <span>{formData.cpf}</span>
+                </div>
+              ) : (
+                <input
+                  type="text"
+                  value={formData.cpf}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "");
+                    handleInputChange("cpf", value);
+                  }}
+                  placeholder="Digite seu CPF ou CNPJ (apenas números)"
+                  className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-1 transition-colors ${
+                    errors.cpf
+                      ? "border-red-500 focus:border-red-500 focus:ring-red-500 bg-red-50"
+                      : "border-gray-300 focus:border-vitrii-blue focus:ring-vitrii-blue"
+                  }`}
+                />
+              )}
+              {formData.cpf ? (
+                <p className="text-xs text-vitrii-text-secondary mt-2">
+                  CPF/CNPJ registrado. Para alterações, entre em contato com o administrador.
+                </p>
+              ) : (
+                <p className="text-xs text-vitrii-text-secondary mt-2">
+                  Este campo é obrigatório para criar anúncios. Você pode preenchê-lo uma única vez.
+                </p>
+              )}
+              {errors.cpf && (
+                <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-4 h-4" />
+                  {errors.cpf}
+                </p>
+              )}
             </div>
 
             {/* Telefone */}

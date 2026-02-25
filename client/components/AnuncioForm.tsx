@@ -427,6 +427,23 @@ export default function AnuncioForm({
     console.log("[AnuncioForm] Form data:", formData);
     console.log("[AnuncioForm] Selected anunciante ID:", selectedAnuncianteId);
 
+    // Check if user has CPF/CNPJ filled
+    if (!user?.cpf) {
+      console.warn(
+        "[AnuncioForm] Validation failed: user missing CPF/CNPJ",
+      );
+      toast.error(
+        "Você precisa preencher seu CPF/CNPJ no perfil antes de criar anúncios. Acesse seu perfil para completar esta informação.",
+        {
+          action: {
+            label: "Ir para Perfil",
+            onClick: () => window.location.href = "/perfil",
+          },
+        }
+      );
+      return;
+    }
+
     // Basic required fields
     if (!selectedAnuncianteId || !formData.titulo) {
       console.warn(
