@@ -274,6 +274,23 @@ export default function CadastroAnunciantes() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Validate required fields
+    if (
+      !formData.nome ||
+      !formData.tipo ||
+      !formData.cnpj ||
+      !formData.endereco ||
+      !formData.cidade ||
+      !formData.estado ||
+      !formData.cep ||
+      !formData.email ||
+      !formData.localidadeId
+    ) {
+      toast.error("Preencha todos os campos obrigatórios marcados com *");
+      return;
+    }
+
     saveAnuncianteMutation.mutate(formData);
   };
 
@@ -429,10 +446,11 @@ export default function CadastroAnunciantes() {
 
                 <div>
                   <label className="block text-sm font-semibold text-vitrii-text mb-2">
-                    CEP (Opcional)
+                    CEP *
                   </label>
                   <input
                     type="text"
+                    required
                     value={formData.cep}
                     onChange={(e) => {
                       // Only allow digits and hyphen

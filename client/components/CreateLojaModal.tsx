@@ -31,19 +31,19 @@ export default function CreateAnuncianteModal({
     nome: "",
     tipo: "Padrão",
     cnpj: "",
+    endereco: "",
+    cidade: "",
+    estado: "RS",
+    cep: "",
+    localidadeId: null as number | null,
+    email: "",
     telefone: "",
     site: "",
     instagram: "",
     facebook: "",
     whatsapp: "",
     chavePix: "",
-    endereco: "",
-    cidade: "",
-    estado: "RS",
-    cep: "",
     descricao: "",
-    email: "",
-    localidadeId: null as number | null,
     status: "Ativo",
     temAgenda: false,
     fotoUrl: "",
@@ -202,14 +202,17 @@ export default function CreateAnuncianteModal({
 
     if (
       !formData.nome ||
+      !formData.tipo ||
       !formData.cnpj ||
       !formData.endereco ||
       !formData.cidade ||
       !formData.estado ||
+      !formData.cep ||
+      !formData.localidadeId ||
       !formData.email ||
-      !formData.localidadeId
+      !formData.status
     ) {
-      toast.error("Preencha todos os campos obrigatórios");
+      toast.error("Preencha todos os campos obrigatórios marcados com *");
       return;
     }
     mutation.mutate(formData);
@@ -242,131 +245,129 @@ export default function CreateAnuncianteModal({
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
-          {/* Nome */}
-          <div>
-            <label className="block text-sm font-semibold text-vitrii-text mb-2">
-              Nome do Anunciante *
-            </label>
-            <input
-              type="text"
-              value={formData.nome}
-              onChange={(e) => handleInputChange("nome", e.target.value)}
-              placeholder="Ex: Anunciante Central"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
-            />
-          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Nome */}
+            <div>
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                Nome da Anunciante *
+              </label>
+              <input
+                type="text"
+                required
+                value={formData.nome}
+                onChange={(e) => handleInputChange("nome", e.target.value)}
+                placeholder="Ex: Anunciante Central"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
+              />
+            </div>
 
-          {/* Tipo */}
-          <div>
-            <label className="block text-sm font-semibold text-vitrii-text mb-2">
-              Tipo de Anunciante *
-            </label>
-            <input
-              type="text"
-              value={formData.tipo}
-              onChange={(e) => handleInputChange("tipo", e.target.value)}
-              placeholder="Ex: Padrão"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
-            />
-          </div>
+            {/* Tipo */}
+            <div>
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                Tipo de Anunciante *
+              </label>
+              <select
+                required
+                value={formData.tipo}
+                onChange={(e) => handleInputChange("tipo", e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50 bg-white"
+              >
+                <option value="Padrão">Padrão</option>
+                <option value="Profissional">Profissional</option>
+              </select>
+            </div>
 
-          {/* CNPJ */}
-          <div>
-            <label className="block text-sm font-semibold text-vitrii-text mb-2">
-              CNPJ/CPF *
-            </label>
-            <input
-              type="text"
-              value={formData.cnpj}
-              onChange={(e) =>
-                handleInputChange("cnpj", e.target.value.replace(/\D/g, ""))
-              }
-              placeholder="Ex: 12345678901234"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
-            />
-          </div>
+            {/* CNPJ */}
+            <div>
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                CNPJ/CPF *
+              </label>
+              <input
+                type="text"
+                required
+                value={formData.cnpj}
+                onChange={(e) =>
+                  handleInputChange("cnpj", e.target.value.replace(/\D/g, ""))
+                }
+                placeholder="00000000000000"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
+              />
+            </div>
 
-          {/* Email */}
-          <div>
-            <label className="block text-sm font-semibold text-vitrii-text mb-2">
-              Email *
-            </label>
-            <input
-              type="email"
-              value={formData.email}
-              onChange={(e) => handleInputChange("email", e.target.value)}
-              placeholder="Ex: contato@anunciante.com"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
-            />
-          </div>
+            {/* Endereço */}
+            <div>
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                Endereço *
+              </label>
+              <input
+                type="text"
+                required
+                value={formData.endereco}
+                onChange={(e) => handleInputChange("endereco", e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
+              />
+            </div>
 
-          {/* Endereço */}
-          <div>
-            <label className="block text-sm font-semibold text-vitrii-text mb-2">
-              Endereço *
-            </label>
-            <input
-              type="text"
-              value={formData.endereco}
-              onChange={(e) => handleInputChange("endereco", e.target.value)}
-              placeholder="Ex: Rua Principal, 123"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
-            />
-          </div>
-
-          {/* Cidade and Estado */}
-          <div className="grid grid-cols-3 gap-4">
-            <div className="col-span-2">
+            {/* Cidade */}
+            <div>
               <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Cidade *
               </label>
               <input
                 type="text"
+                required
                 value={formData.cidade}
                 onChange={(e) => handleInputChange("cidade", e.target.value)}
                 placeholder="Ex: Montenegro"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
               />
             </div>
+
+            {/* Estado */}
             <div>
               <label className="block text-sm font-semibold text-vitrii-text mb-2">
-                Estado *
+                Estado (UF) *
               </label>
               <select
+                required
                 value={formData.estado}
                 onChange={(e) => handleInputChange("estado", e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent bg-white"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50 bg-white"
               >
                 {BRAZILIAN_STATES.map((state) => (
                   <option key={state.code} value={state.code}>
-                    {state.code}
+                    {state.code} - {state.name}
                   </option>
                 ))}
               </select>
             </div>
-          </div>
 
-          {/* CEP and Localidade */}
-          <div className="grid grid-cols-2 gap-4">
+            {/* CEP */}
             <div>
               <label className="block text-sm font-semibold text-vitrii-text mb-2">
-                CEP (Opcional)
+                CEP *
               </label>
               <input
                 type="text"
+                required
                 value={formData.cep}
-                onChange={(e) =>
-                  handleInputChange("cep", e.target.value.replace(/[^\d-]/g, ""))
-                }
+                onChange={(e) => {
+                  // Only allow digits and hyphen
+                  const cleanValue = e.target.value.replace(/[^\d-]/g, "");
+                  handleInputChange("cep", cleanValue);
+                }}
                 placeholder="00000-000"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
               />
             </div>
+
+            {/* Localidade */}
             <div>
               <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Localidade *
               </label>
               <select
+                required
                 value={formData.localidadeId || ""}
                 onChange={(e) =>
                   handleInputChange(
@@ -374,7 +375,7 @@ export default function CreateAnuncianteModal({
                     e.target.value ? parseInt(e.target.value) : null
                   )
                 }
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent bg-white"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50 bg-white"
               >
                 <option value="">Selecione uma localidade</option>
                 {localidades.map((localidade) => (
@@ -385,10 +386,22 @@ export default function CreateAnuncianteModal({
                 ))}
               </select>
             </div>
-          </div>
 
-          {/* Telefone and WhatsApp */}
-          <div className="grid grid-cols-2 gap-4">
+            {/* Email */}
+            <div>
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                Email *
+              </label>
+              <input
+                type="email"
+                required
+                value={formData.email}
+                onChange={(e) => handleInputChange("email", e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
+              />
+            </div>
+
+            {/* Telefone */}
             <div>
               <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Telefone (Opcional)
@@ -396,42 +409,20 @@ export default function CreateAnuncianteModal({
               <input
                 type="text"
                 value={formData.telefone}
-                onChange={(e) =>
-                  handleInputChange(
-                    "telefone",
-                    e.target.value.replace(/[^\d\s()()-]/g, "")
-                  )
-                }
-                placeholder="(51) 3333-3333"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-semibold text-vitrii-text mb-2">
-                WhatsApp (Opcional)
-              </label>
-              <input
-                type="text"
-                value={
-                  formData.whatsapp.startsWith("+55")
-                    ? formData.whatsapp.substring(3)
-                    : formData.whatsapp
-                }
                 onChange={(e) => {
+                  // Only allow digits, spaces, parentheses, and hyphens
                   const cleanValue = e.target.value.replace(
                     /[^\d\s()()-]/g,
                     ""
                   );
-                  handleInputChange("whatsapp", "+55" + cleanValue);
+                  handleInputChange("telefone", cleanValue);
                 }}
-                placeholder="(51) 98765-4321"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
+                placeholder="(51) 3333-3333"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
               />
             </div>
-          </div>
 
-          {/* Site and Instagram */}
-          <div className="grid grid-cols-2 gap-4">
+            {/* Site */}
             <div>
               <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Site (Opcional)
@@ -440,10 +431,12 @@ export default function CreateAnuncianteModal({
                 type="text"
                 value={formData.site}
                 onChange={(e) => handleInputChange("site", e.target.value)}
-                placeholder="https://www.anunciante.com"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
+                placeholder="https://example.com"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
               />
             </div>
+
+            {/* Instagram */}
             <div>
               <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Instagram (Opcional)
@@ -453,13 +446,11 @@ export default function CreateAnuncianteModal({
                 value={formData.instagram}
                 onChange={(e) => handleInputChange("instagram", e.target.value)}
                 placeholder="@usuario"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
               />
             </div>
-          </div>
 
-          {/* Facebook and Chave Pix */}
-          <div className="grid grid-cols-2 gap-4">
+            {/* Facebook */}
             <div>
               <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Facebook (Opcional)
@@ -469,9 +460,41 @@ export default function CreateAnuncianteModal({
                 value={formData.facebook}
                 onChange={(e) => handleInputChange("facebook", e.target.value)}
                 placeholder="nome-da-pagina"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
               />
             </div>
+
+            {/* WhatsApp */}
+            <div>
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                WhatsApp (Opcional)
+              </label>
+              <div className="flex items-center gap-0">
+                <input
+                  type="text"
+                  value={
+                    formData.whatsapp.startsWith("+55")
+                      ? formData.whatsapp.substring(3)
+                      : formData.whatsapp
+                  }
+                  onChange={(e) => {
+                    // Only allow digits, spaces, parentheses, and hyphens
+                    const cleanValue = e.target.value.replace(
+                      /[^\d\s()()-]/g,
+                      ""
+                    );
+                    handleInputChange("whatsapp", "+55" + cleanValue);
+                  }}
+                  placeholder="(51) 98765-4321"
+                  className="flex-1 px-4 py-2 border border-gray-300 rounded-r-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
+                />
+              </div>
+              <p className="text-xs text-vitrii-text-secondary mt-1">
+                Digite apenas DDD e número (ex: 11 98765-4321)
+              </p>
+            </div>
+
+            {/* Chave Pix */}
             <div>
               <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Chave PIX (Opcional)
@@ -485,61 +508,52 @@ export default function CreateAnuncianteModal({
                     handleInputChange("chavePix", value);
                   }
                 }}
-                placeholder="Email, CPF, Telefone ou aleatória"
+                placeholder="Email, CPF, Telefone ou chave aleatória"
                 maxLength={32}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
               />
+              <p className="text-xs text-vitrii-text-secondary mt-1">
+                Máximo 32 caracteres
+              </p>
             </div>
           </div>
 
-          {/* Descrição */}
-          <div>
-            <label className="block text-sm font-semibold text-vitrii-text mb-2">
-              Descrição (Opcional)
-            </label>
-            <textarea
-              value={formData.descricao}
-              onChange={(e) => handleInputChange("descricao", e.target.value)}
-              placeholder="Descreva sua loja..."
-              rows={2}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
-            />
-          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Descrição */}
+            <div>
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                Descrição (Opcional)
+              </label>
+              <textarea
+                value={formData.descricao}
+                onChange={(e) =>
+                  handleInputChange("descricao", e.target.value)
+                }
+                rows={3}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
+              />
+            </div>
 
-          {/* Status and Icon Color */}
-          <div className="grid grid-cols-2 gap-4">
+            {/* Status */}
             <div>
               <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Status *
               </label>
               <select
+                required
                 value={formData.status}
-                onChange={(e) => handleInputChange("status", e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent bg-white"
+                onChange={(e) =>
+                  handleInputChange("status", e.target.value)
+                }
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50 bg-white"
               >
                 <option value="Ativo">Ativo</option>
                 <option value="Desativado">Desativado</option>
               </select>
             </div>
-            <div>
-              <label className="block text-sm font-semibold text-vitrii-text mb-2">
-                Cor do Ícone (Opcional)
-              </label>
-              <select
-                value={formData.iconColor}
-                onChange={(e) => handleInputChange("iconColor", e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent bg-white"
-              >
-                <option value="azul">Azul</option>
-                <option value="verde">Verde</option>
-                <option value="rosa">Rosa</option>
-                <option value="vermelho">Vermelho</option>
-                <option value="laranja">Laranja</option>
-              </select>
-            </div>
           </div>
 
-          {/* Tem Agenda Checkbox */}
+          {/* Habilitar Agenda */}
           <div className="border-l-4 border-orange-500 bg-orange-50 p-4 rounded">
             <label className="flex items-center gap-3 cursor-pointer">
               <input
@@ -555,7 +569,7 @@ export default function CreateAnuncianteModal({
                   Habilitar Agenda
                 </span>
                 <p className="text-xs text-gray-600 mt-1">
-                  Se marcado, o botão "Agendar" aparecerá nos anúncios
+                  Se marcado, o botão "Agendar" aparecerá nos anúncios deste anunciante
                 </p>
               </div>
             </label>
@@ -571,18 +585,18 @@ export default function CreateAnuncianteModal({
                 <img
                   src={formData.fotoUrl}
                   alt="Foto da anunciante"
-                  className="w-full h-32 object-cover rounded-lg"
+                  className="w-full h-48 object-cover rounded-lg"
                 />
                 <button
                   type="button"
                   onClick={() => handleInputChange("fotoUrl", "")}
-                  className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                  className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
                 >
                   ✕
                 </button>
               </div>
             )}
-            <label className="flex items-center gap-2 px-4 py-3 border-2 border-dashed border-vitrii-blue rounded-lg cursor-pointer hover:bg-blue-50">
+            <label className="flex items-center gap-2 px-4 py-3 border-2 border-dashed border-vitrii-blue rounded-lg cursor-pointer hover:bg-blue-50 transition-colors">
               <Upload className="w-5 h-5 text-vitrii-blue" />
               <span className="text-sm font-semibold text-vitrii-blue">
                 {formData.fotoUrl ? "Alterar Foto" : "Adicionar Foto"}
