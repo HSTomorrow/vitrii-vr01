@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import Header from "@/components/Header";
@@ -34,8 +34,37 @@ const extractMunicipality = (endereco: string): string => {
 
 export default function Index() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
+  const queryClient = useQueryClient();
   const [favoritos, setFavoritos] = useState<Set<number>>(new Set());
+
+  // Validate user status on page load
+  useEffect(() => {
+    const validateUserStatus = async () => {
+      if (!user?.id) return;
+
+      try {
+        const response = await fetch(`/api/usracessos/${user.id}/validate-status`);
+
+        if (!response.ok) {
+          const errorData = await response.json();
+
+          // User is inactive or doesn't exist
+          if (response.status === 403 || response.status === 404) {
+            console.warn("[Index] User is inactive or not found, logging out...");
+            toast.error(errorData.error || "Sua conta foi desativada");
+            logout();
+            navigate("/auth/signin");
+            return;
+          }
+        }
+      } catch (error) {
+        console.error("[Index] Error validating user status:", error);
+      }
+    };
+
+    validateUserStatus();
+  }, [user?.id, logout, navigate]);
 
   // All paid ads are fetched and filtered on client side
 

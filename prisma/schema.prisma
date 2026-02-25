@@ -219,6 +219,7 @@ model usracessos {
   facebook                String?                     @db.VarChar(255)
   tipoUsuario             String                      @default("common") @db.VarChar(20)
   tassinatura             String                      @default("Gratuito") @db.VarChar(20)
+  status                  String                      @default("ativo") @db.VarChar(20) // "ativo" ou "inativo"
   dataCriacao             DateTime                    @default(now())
   dataAtualizacao         DateTime                    @updatedAt
   endereco                String?

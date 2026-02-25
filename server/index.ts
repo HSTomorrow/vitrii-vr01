@@ -59,6 +59,8 @@ import {
 import {
   getUsuarios,
   getUsuarioById,
+  validateUserStatus,
+  toggleUserStatus,
   signInUsuario,
   signUpUsuario,
   createUsuario,
@@ -318,6 +320,8 @@ export function createServer() {
   // Usracessos routes (User Access)
   app.get("/api/usracessos", getUsuarios);
   app.get("/api/usracessos/:id", getUsuarioById);
+  app.get("/api/usracessos/:id/validate-status", validateUserStatus);
+  app.patch("/api/usracessos/:id/status", toggleUserStatus);
   app.post("/api/auth/signin", signInUsuario);
   app.post("/api/auth/signup", signUpUsuario);
   app.post("/api/auth/forgot-password", forgotPassword);

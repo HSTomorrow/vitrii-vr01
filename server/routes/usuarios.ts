@@ -53,6 +53,7 @@ export const getUsuarios: RequestHandler = async (req, res) => {
         facebook: true,
         tipoUsuario: true,
         tassinatura: true,
+        status: true,
         dataCriacao: true,
         dataVigenciaContrato: true,
         numeroAnunciosAtivos: true,
@@ -95,6 +96,7 @@ export const getUsuarioById: RequestHandler = async (req, res) => {
         facebook: true,
         endereco: true,
         tipoUsuario: true,
+        status: true,
         dataCriacao: true,
         dataAtualizacao: true,
         numeroAnunciosAtivos: true,
@@ -107,6 +109,15 @@ export const getUsuarioById: RequestHandler = async (req, res) => {
       return res.status(404).json({
         success: false,
         error: "Usuário não encontrado",
+      });
+    }
+
+    // Check if user is inactive
+    if (usuario.status === "inativo") {
+      return res.status(403).json({
+        success: false,
+        error: "Usuário inativo",
+        inactive: true,
       });
     }
 
@@ -493,6 +504,7 @@ const UsuarioAdminUpdateSchema = z.object({
   facebook: z.string().optional().or(z.literal("")),
   endereco: z.string().optional().or(z.literal("")),
   tipoUsuario: z.enum(["adm", "comum"]).optional(),
+  status: z.enum(["ativo", "inativo"]).optional(),
   tassinatura: z.enum(["Gratuito", "Padrao", "Premium", "Master"]).optional(),
   dataVigenciaContrato: z
     .string()
@@ -564,6 +576,7 @@ export const updateUsuario: RequestHandler = async (req, res) => {
         localidadePadraoId: true,
         tipoUsuario: true,
         tassinatura: true,
+        status: true,
         dataCriacao: true,
         dataAtualizacao: true,
         numeroAnunciosAtivos: true,
@@ -594,18 +607,73 @@ export const updateUsuario: RequestHandler = async (req, res) => {
   }
 };
 
-// DELETE user
+// VALIDATE user status - Check if user is active
+// This endpoint is called by the frontend to validate user access
+export const validateUserStatus: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const usuario = await prisma.usracessos.findUnique({
+      where: { id: parseInt(id) },
+      select: {
+        id: true,
+        status: true,
+      },
+    });
+
+    if (!usuario) {
+      return res.status(404).json({
+        success: false,
+        error: "Usuário não encontrado",
+        isActive: false,
+      });
+    }
+
+    if (usuario.status !== "ativo") {
+      return res.status(403).json({
+        success: false,
+        error: "Sua conta foi desativada. Por favor, entre em contato com o suporte.",
+        isActive: false,
+      });
+    }
+
+    res.json({
+      success: true,
+      isActive: true,
+      message: "Usuário ativo",
+    });
+  } catch (error) {
+    console.error("Error validating user status:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao validar usuário",
+      isActive: false,
+    });
+  }
+};
+
+// DELETE user (soft delete - change status to inativo)
 export const deleteUsuario: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
-    await prisma.usracessos.delete({
+    // Soft delete: change status to inativo instead of actually deleting
+    const usuario = await prisma.usracessos.update({
       where: { id: parseInt(id) },
+      data: { status: "inativo" },
+      select: {
+        id: true,
+        email: true,
+        status: true,
+      },
     });
+
+    console.log(`[deleteUsuario] User ${id} (${usuario.email}) marked as inactive`);
 
     res.json({
       success: true,
       message: "Usuário deletado com sucesso",
+      data: usuario,
     });
   } catch (error) {
     console.error("Error deleting user:", error);
@@ -1373,6 +1441,49 @@ export const changePassword: RequestHandler = async (req, res) => {
     res.status(500).json({
       success: false,
       error: "Erro ao alterar senha",
+    });
+  }
+};
+
+// TOGGLE user status (Admin only) - Activate or deactivate a user
+export const toggleUserStatus: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    // Validate input
+    if (!status || !["ativo", "inativo"].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        error: 'Status deve ser "ativo" ou "inativo"',
+      });
+    }
+
+    const usuario = await prisma.usracessos.update({
+      where: { id: parseInt(id) },
+      data: { status },
+      select: {
+        id: true,
+        nome: true,
+        email: true,
+        status: true,
+      },
+    });
+
+    console.log(
+      `[toggleUserStatus] User ${id} (${usuario.email}) status changed to: ${status}`,
+    );
+
+    res.json({
+      success: true,
+      message: `Usuário ${status === "ativo" ? "ativado" : "desativado"} com sucesso`,
+      data: usuario,
+    });
+  } catch (error) {
+    console.error("[toggleUserStatus] Error:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao atualizar status do usuário",
     });
   }
 };
