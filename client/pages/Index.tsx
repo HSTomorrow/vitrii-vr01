@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
 import BannerCarousel from "@/components/BannerCarousel";
 import AnunciosCarousel from "@/components/AnunciosCarousel";
+import AnunciosGrid from "@/components/AnunciosGrid";
 import AnunciantesCarousel from "@/components/AnunciantesCarousel";
 import {
   Star,
@@ -231,14 +232,16 @@ export default function Index() {
             </Link>
           </div>
 
-          {/* Featured Cards Carousel */}
-          <AnunciosCarousel
+          {/* Featured Cards Grid with 3 rows and pagination */}
+          <AnunciosGrid
             anuncios={destacados}
             isLoading={allAnunciosLoading}
             isFavorited={(id) => favoritos.has(id)}
             onToggleFavorito={(id) => toggleFavoritoMutation.mutate(id)}
             emptyMessage="Nenhum anúncio em destaque publicado ainda"
             color="blue"
+            adsPerRow={15}
+            initialRows={3}
           />
 
           <div className="text-center mt-2">

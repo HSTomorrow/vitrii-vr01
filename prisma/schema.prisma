@@ -55,7 +55,7 @@ model anuncios {
   usuarioId           Int
   anuncianteId        Int
   titulo              String                 @db.VarChar(255)
-  descricao           String
+  descricao           String?
   preco               Decimal?               @db.Decimal(10, 2)
   categoria           String?                @db.VarChar(100)
   imagem              String?                @db.VarChar(500)
@@ -70,10 +70,15 @@ model anuncios {
   dataAtualizacao     DateTime
   cidade              String?                @db.VarChar(100)
   estado              String?                @db.VarChar(2)
+  endereco            String?                @db.VarChar(255)
   visualizacoes       Int                    @default(0)
   destaque            Boolean                @default(false)
   ordem               Int                    @default(10) // Admin can customize, default 10, sorted ascending + id descending
   isActive            Boolean                @default(true)
+  dataValidade        DateTime?
+  productId           Int?
+  tabelaDePrecoId     Int?
+  equipeDeVendaId     Int?
   anunciantes         anunciantes            @relation(fields: [anuncianteId], references: [id], onDelete: Cascade, map: "anuncios_lojaId_fkey")
   anuncioVisualizados anuncioVisualizados[]
   fotos               fotos_anuncio[]
