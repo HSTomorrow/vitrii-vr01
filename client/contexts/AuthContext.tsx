@@ -7,7 +7,11 @@ interface User {
   tipoUsuario: string;
   cpf?: string;
   telefone?: string;
+  whatsapp?: string;
+  linkedin?: string;
+  facebook?: string;
   endereco?: string;
+  localidadePadraoId?: number | null;
   dataCriacao: string;
 }
 

@@ -14,6 +14,10 @@ import {
   Phone,
   MapPin,
   Lock,
+  Globe,
+  MessageSquare,
+  Linkedin,
+  Facebook,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -34,7 +38,11 @@ export default function PerfilUsuario() {
   const [formData, setFormData] = useState({
     cpf: user?.cpf || "",
     telefone: user?.telefone || "",
+    whatsapp: user?.whatsapp || "",
+    linkedin: user?.linkedin || "",
+    facebook: user?.facebook || "",
     endereco: user?.endereco || "",
+    localidadePadraoId: user?.localidadePadraoId || null,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -58,13 +66,27 @@ export default function PerfilUsuario() {
     gcTime: 0,
   });
 
+  // Fetch localidades for dropdown
+  const { data: localidadesData } = useQuery({
+    queryKey: ["localidades-all"],
+    queryFn: async () => {
+      const response = await fetch("/api/localidades?limit=500&offset=0");
+      if (!response.ok) throw new Error("Erro ao buscar localidades");
+      return response.json();
+    },
+  });
+
   // Update form with fresh user data when available
   useEffect(() => {
     if (freshUserData) {
       setFormData({
         cpf: freshUserData.cpf || "",
         telefone: freshUserData.telefone || "",
+        whatsapp: freshUserData.whatsapp || "",
+        linkedin: freshUserData.linkedin || "",
+        facebook: freshUserData.facebook || "",
         endereco: freshUserData.endereco || "",
+        localidadePadraoId: freshUserData.localidadePadraoId || null,
       });
     }
   }, [freshUserData]);
@@ -131,7 +153,7 @@ export default function PerfilUsuario() {
     },
   });
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: any) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -171,7 +193,7 @@ export default function PerfilUsuario() {
       newErrors.telefone = "Telefone deve ter no mínimo 10 dígitos";
     }
 
-    // Address is optional
+    // All other fields (whatsapp, linkedin, facebook, endereco, localidadePadraoId) are optional
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -356,6 +378,88 @@ export default function PerfilUsuario() {
                   {errors.endereco}
                 </p>
               )}
+            </div>
+
+            {/* WhatsApp */}
+            <div>
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                WhatsApp (opcional)
+              </label>
+              <div className="flex items-center gap-2">
+                <MessageSquare className="w-5 h-5 text-vitrii-text-secondary flex-shrink-0" />
+                <input
+                  type="text"
+                  value={formData.whatsapp}
+                  onChange={(e) => {
+                    const tel = e.target.value.replace(/\D/g, "").slice(0, 20);
+                    handleInputChange("whatsapp", tel);
+                  }}
+                  placeholder="(51) 99999-9999"
+                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:border-vitrii-blue focus:ring-vitrii-blue transition-colors"
+                />
+              </div>
+            </div>
+
+            {/* LinkedIn */}
+            <div>
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                LinkedIn (opcional)
+              </label>
+              <div className="flex items-center gap-2">
+                <Linkedin className="w-5 h-5 text-vitrii-text-secondary flex-shrink-0" />
+                <input
+                  type="text"
+                  value={formData.linkedin}
+                  onChange={(e) => handleInputChange("linkedin", e.target.value)}
+                  placeholder="https://linkedin.com/in/seu-perfil"
+                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:border-vitrii-blue focus:ring-vitrii-blue transition-colors"
+                />
+              </div>
+            </div>
+
+            {/* Facebook */}
+            <div>
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                Facebook (opcional)
+              </label>
+              <div className="flex items-center gap-2">
+                <Facebook className="w-5 h-5 text-vitrii-text-secondary flex-shrink-0" />
+                <input
+                  type="text"
+                  value={formData.facebook}
+                  onChange={(e) => handleInputChange("facebook", e.target.value)}
+                  placeholder="https://facebook.com/seu-perfil"
+                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:border-vitrii-blue focus:ring-vitrii-blue transition-colors"
+                />
+              </div>
+            </div>
+
+            {/* Localidade Padrão */}
+            <div>
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                Localidade Padrão (opcional)
+              </label>
+              <div className="flex items-center gap-2">
+                <MapPin className="w-5 h-5 text-vitrii-text-secondary flex-shrink-0 mt-3" />
+                <select
+                  value={formData.localidadePadraoId || ""}
+                  onChange={(e) => {
+                    const value = e.target.value ? parseInt(e.target.value) : null;
+                    handleInputChange("localidadePadraoId", value as any);
+                  }}
+                  className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:border-vitrii-blue focus:ring-vitrii-blue transition-colors"
+                >
+                  <option value="">Selecione uma localidade</option>
+                  {localidadesData?.data?.map((localidade: any) => (
+                    <option key={localidade.id} value={localidade.id}>
+                      {localidade.municipio}, {localidade.estado}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <p className="text-xs text-vitrii-text-secondary mt-2">
+                💡 Selecione sua localidade padrão para filtrar anúncios por região.
+              </p>
             </div>
 
             {/* Info Box */}
