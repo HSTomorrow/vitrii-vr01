@@ -186,10 +186,17 @@ export const signInUsuario: RequestHandler = async (req, res) => {
       message: "Login realizado com sucesso",
     });
   } catch (error) {
-    console.error("[signInUsuario] 🔴 Erro no servidor:", error instanceof Error ? error.message : String(error));
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : "";
+
+    console.error("[signInUsuario] 🔴 ERRO COMPLETO:");
+    console.error("   Mensagem:", errorMessage);
+    console.error("   Stack:", errorStack);
+    console.error("   Objeto erro:", error);
+
     res.status(500).json({
       success: false,
-      error: "Erro ao fazer login",
+      error: errorMessage || "Erro desconhecido ao fazer login",
     });
   }
 };

@@ -31,20 +31,29 @@ export default function SignIn() {
   const signInMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
       try {
-        console.log("[SignIn] Iniciando autenticação...");
+        console.log("[SignIn] Iniciando autenticação com:", data.email);
         const response = await fetch("/api/auth/signin", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(data),
         });
 
-        console.log("[SignIn] Status da resposta:", response.status);
+        console.log("[SignIn] Status da resposta:", response.status, response.statusText);
 
         if (!response.ok) {
-          const errorData = await response.json();
-          console.error("[SignIn] Erro da API:", errorData);
-          console.error("[SignIn] Status:", response.status);
-          console.error("[SignIn] Error message:", errorData.error);
+          let errorData;
+          try {
+            errorData = await response.json();
+          } catch (parseError) {
+            console.error("[SignIn] Erro ao parsear resposta JSON:", parseError);
+            errorData = { error: "Erro ao processar resposta do servidor" };
+          }
+
+          console.error("[SignIn] Erro completo da API:", {
+            status: response.status,
+            statusText: response.statusText,
+            errorData: errorData,
+          });
 
           // Customize error messages based on status
           if (response.status === 401) {
@@ -52,20 +61,21 @@ export default function SignIn() {
           } else if (response.status === 403) {
             throw new Error(errorData.error || "Acesso negado. Verifique seu email ou entre em contato com o suporte.");
           } else if (response.status === 400) {
-            throw new Error("Por favor, preencha todos os campos obrigatórios.");
+            throw new Error(errorData.error || "Por favor, preencha todos os campos obrigatórios.");
           } else if (response.status === 500) {
-            console.error("[SignIn] Erro 500 completo:", errorData);
-            throw new Error(errorData.error || "Erro no servidor. Tente novamente mais tarde.");
+            const serverError = errorData.error || "Erro desconhecido no servidor";
+            console.error("[SignIn] ERRO 500 - Detalhes:", serverError);
+            throw new Error(`Erro no servidor: ${serverError}`);
           }
 
-          throw new Error(errorData.error || "Erro ao fazer login");
+          throw new Error(errorData.error || `Erro ao fazer login (HTTP ${response.status})`);
         }
 
         const result = await response.json();
-        console.log("[SignIn] Login bem-sucedido para usuário:", result.data?.id);
+        console.log("[SignIn] ✅ Login bem-sucedido para usuário:", result.data?.id);
         return result;
       } catch (error) {
-        console.error("[SignIn] Erro na autenticação:", error);
+        console.error("[SignIn] ❌ Erro na autenticação:", error instanceof Error ? error.message : error);
         throw error;
       }
     },
