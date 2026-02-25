@@ -26,6 +26,8 @@ export default function SignIn() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [rememberMe, setRememberMe] = useState(false);
   const [invalidCredentialsAlert, setInvalidCredentialsAlert] = useState(false);
+  const [accountBlocked, setAccountBlocked] = useState(false);
+  const [tentativasRestantes, setTentativasRestantes] = useState<number | null>(null);
 
   // Sign in mutation
   const signInMutation = useMutation({
@@ -50,25 +52,40 @@ export default function SignIn() {
           }
 
           console.error("[SignIn] Erro completo da API:", {
-            status: response.status,
-            statusText: response.statusText,
-            errorData: errorData,
-          });
+          status: response.status,
+          statusText: response.statusText,
+          errorData: errorData,
+          blocked: errorData.blocked,
+          tentativasRestantes: errorData.tentativasRestantes,
+        });
 
-          // Customize error messages based on status
-          if (response.status === 401) {
-            throw new Error("Email ou senha incorretos. Verifique suas credenciais.");
-          } else if (response.status === 403) {
-            throw new Error(errorData.error || "Acesso negado. Verifique seu email ou entre em contato com o suporte.");
-          } else if (response.status === 400) {
-            throw new Error(errorData.error || "Por favor, preencha todos os campos obrigatórios.");
-          } else if (response.status === 500) {
-            const serverError = errorData.error || "Erro desconhecido no servidor";
-            console.error("[SignIn] ERRO 500 - Detalhes:", serverError);
-            throw new Error(`Erro no servidor: ${serverError}`);
+        // Customize error messages based on status
+        if (response.status === 401) {
+          // Failed login attempt with remaining tries info
+          if (errorData.tentativasRestantes !== undefined) {
+            const error = new Error(errorData.error) as any;
+            error.tentativasRestantes = errorData.tentativasRestantes;
+            throw error;
           }
+          throw new Error("Email ou senha incorretos. Verifique suas credenciais.");
+        } else if (response.status === 403) {
+          // Account blocked
+          if (errorData.blocked) {
+            const error = new Error(errorData.error) as any;
+            error.blocked = true;
+            error.supportUrl = errorData.supportUrl;
+            throw error;
+          }
+          throw new Error(errorData.error || "Acesso negado. Verifique seu email ou entre em contato com o suporte.");
+        } else if (response.status === 400) {
+          throw new Error(errorData.error || "Por favor, preencha todos os campos obrigatórios.");
+        } else if (response.status === 500) {
+          const serverError = errorData.error || "Erro desconhecido no servidor";
+          console.error("[SignIn] ERRO 500 - Detalhes:", serverError);
+          throw new Error(`Erro no servidor: ${serverError}`);
+        }
 
-          throw new Error(errorData.error || `Erro ao fazer login (HTTP ${response.status})`);
+        throw new Error(errorData.error || `Erro ao fazer login (HTTP ${response.status})`);
         }
 
         const result = await response.json();
@@ -101,10 +118,29 @@ export default function SignIn() {
     },
     onError: (error) => {
       console.error("[SignIn] Erro no login:", error);
+      const errorObj = error as any;
       const errorMessage = error instanceof Error ? error.message : "Erro desconhecido ao fazer login";
 
-      // Check if it's an invalid credentials error (401)
-      if (errorMessage.includes("Email ou senha incorretos")) {
+      // Check if account is blocked
+      if (errorObj.blocked) {
+        console.warn("[SignIn] Conta bloqueada, redirecionando para suporte");
+        setAccountBlocked(true);
+        toast.error("Conta Bloqueada", {
+          description: errorMessage,
+          duration: 5000,
+        });
+        setTimeout(() => {
+          navigate("/ajuda-e-contato");
+        }, 2000);
+        return;
+      }
+
+      // Check if it's an invalid credentials error with remaining attempts
+      if (errorObj.tentativasRestantes !== undefined) {
+        console.warn("[SignIn] Tentativas restantes:", errorObj.tentativasRestantes);
+        setTentativasRestantes(errorObj.tentativasRestantes);
+        setInvalidCredentialsAlert(true);
+      } else if (errorMessage.includes("Email ou senha incorretos")) {
         setInvalidCredentialsAlert(true);
       } else {
         toast.error("Falha no login", {
@@ -195,6 +231,18 @@ export default function SignIn() {
             <p className="text-gray-600 mb-4">
               O email ou a senha que você inseriu está incorreto. Por favor, verifique suas credenciais e tente novamente.
             </p>
+
+            {tentativasRestantes !== null && tentativasRestantes > 0 && (
+              <div className="bg-yellow-50 border-l-4 border-yellow-500 p-3 mb-4">
+                <p className="text-sm font-semibold text-yellow-900">
+                  ⚠️ Aviso de Segurança
+                </p>
+                <p className="text-sm text-yellow-800 mt-1">
+                  Você tem <strong>{tentativasRestantes}</strong> tentativa(s) restante(s) antes de sua conta ser bloqueada por segurança.
+                </p>
+              </div>
+            )}
+
             <ul className="text-gray-600 text-sm space-y-2 ml-4">
               <li>✓ Verifique se o email está correto</li>
               <li>✓ Verifique se a senha está correta (maiúsculas importam)</li>

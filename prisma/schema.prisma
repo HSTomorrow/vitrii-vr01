@@ -219,7 +219,9 @@ model usracessos {
   facebook                String?                     @db.VarChar(255)
   tipoUsuario             String                      @default("common") @db.VarChar(20)
   tassinatura             String                      @default("Gratuito") @db.VarChar(20)
-  status                  String                      @default("ativo") @db.VarChar(20) // "ativo" ou "inativo"
+  status                  String                      @default("ativo") @db.VarChar(20) // "ativo", "inativo", ou "bloqueado"
+  tentativasLoginFalhadas Int                         @default(0) // Contador de tentativas de login falhadas
+  ultimaTentativaLogin    DateTime? // Timestamp da última tentativa de login
   dataCriacao             DateTime                    @default(now())
   dataAtualizacao         DateTime                    @updatedAt
   endereco                String?

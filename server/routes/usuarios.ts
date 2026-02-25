@@ -161,32 +161,100 @@ export const signInUsuario: RequestHandler = async (req, res) => {
       return res.status(401).json({
         success: false,
         error: "Email ou senha incorretos",
+        blocked: false,
       });
     }
 
-    // TODO: Check if email is verified (once emailVerificado column is created in DB)
-    // For now, skipping email verification check to allow login
-    // if (!usuario.emailVerificado) {
-    //   console.warn("[signInUsuario] ❌ Email não verificado:", email);
-    //   return res.status(403).json({
-    //     success: false,
-    //     error: "Por favor, verifique seu email antes de fazer login. Verifique sua caixa de entrada ou pasta de spam.",
-    //   });
-    // }
+    // Check if user is blocked due to too many login attempts
+    if (usuario.status === "bloqueado") {
+      console.warn("[signInUsuario] ⛔ Usuário bloqueado:", email);
+      return res.status(403).json({
+        success: false,
+        error: "Sua conta foi bloqueada por múltiplas tentativas de login. Por favor, entre em contato com o suporte.",
+        blocked: true,
+        supportUrl: "/ajuda-e-contato",
+      });
+    }
+
+    // Check if user is inactive
+    if (usuario.status === "inativo") {
+      console.warn("[signInUsuario] ⚠️ Usuário inativo:", email);
+      return res.status(403).json({
+        success: false,
+        error: "Sua conta foi desativada. Por favor, entre em contato com o suporte.",
+        blocked: false,
+      });
+    }
 
     // Compare password with bcrypt hash
     const isPasswordValid = await bcryptjs.compare(senha, usuario.senha);
 
     if (!isPasswordValid) {
       console.warn("[signInUsuario] ❌ Senha inválida para:", email);
+
+      // Increment failed login attempts
+      const novasTentativas = usuario.tentativasLoginFalhadas + 1;
+      const agora = new Date();
+
+      // Check if last attempt was more than 24 hours ago - if so, reset counter
+      const horasDesdeUltimaTentativa = usuario.ultimaTentativaLogin
+        ? (agora.getTime() - usuario.ultimaTentativaLogin.getTime()) / (1000 * 60 * 60)
+        : 0;
+
+      let tentativasParaBloquear = novasTentativas;
+
+      // Reset counter if last attempt was more than 24 hours ago
+      if (horasDesdeUltimaTentativa > 24) {
+        tentativasParaBloquear = 1;
+      }
+
+      // Update user with failed attempt
+      let statusAtualizado = usuario.status;
+      if (tentativasParaBloquear >= 5) {
+        statusAtualizado = "bloqueado";
+        console.warn("[signInUsuario] ⛔ Usuário bloqueado após 5 tentativas:", email);
+      }
+
+      await prisma.usracessos.update({
+        where: { id: usuario.id },
+        data: {
+          tentativasLoginFalhadas: tentativasParaBloquear >= 5 ? 0 : tentativasParaBloquear,
+          ultimaTentativaLogin: agora,
+          status: statusAtualizado,
+        },
+      });
+
+      // If user just got blocked, return specific error
+      if (statusAtualizado === "bloqueado") {
+        return res.status(403).json({
+          success: false,
+          error: "Sua conta foi bloqueada após múltiplas tentativas de login incorretas. Por favor, entre em contato com o suporte.",
+          blocked: true,
+          supportUrl: "/ajuda-e-contato",
+          tentativasRestantes: 0,
+        });
+      }
+
+      const tentativasRestantes = Math.max(0, 5 - tentativasParaBloquear);
       return res.status(401).json({
         success: false,
-        error: "Email ou senha incorretos",
+        error: `Email ou senha incorretos. ${tentativasRestantes > 0 ? `Você tem mais ${tentativasRestantes} tentativa(s) antes de sua conta ser bloqueada.` : ""}`,
+        blocked: false,
+        tentativasRestantes,
       });
     }
 
-    // Return user data (without password)
+    // Login successful - reset failed attempts counter
     const { senha: _, ...usuarioSemSenha } = usuario;
+
+    await prisma.usracessos.update({
+      where: { id: usuario.id },
+      data: {
+        tentativasLoginFalhadas: 0,
+        ultimaTentativaLogin: new Date(),
+      },
+    });
+
     console.log("[signInUsuario] ✅ Login bem-sucedido:", {
       id: usuarioSemSenha.id,
       nome: usuarioSemSenha.nome,
@@ -757,6 +825,7 @@ export const forgotPassword: RequestHandler = async (req, res) => {
         id: true,
         nome: true,
         email: true,
+        status: true,
       },
     });
 
@@ -769,6 +838,17 @@ export const forgotPassword: RequestHandler = async (req, res) => {
         success: true,
         emailFound: false,
         message: `Este email não está cadastrado em nossa base de dados. Verifique o email ou crie uma nova conta.`,
+      });
+    }
+
+    // Check if user is blocked - don't send reset email
+    if (usuario.status === "bloqueado") {
+      console.warn(`[forgotPassword] ⛔ Tentativa de reset para usuário bloqueado: ${email}`);
+      // Return success message to not leak information about blocked accounts
+      return res.status(200).json({
+        success: true,
+        emailFound: true,
+        message: `Se este email estiver registrado em nossa plataforma, você receberá um link para redefinir sua senha. Verifique sua caixa de entrada e pasta de spam.`,
       });
     }
 
@@ -1452,21 +1532,26 @@ export const toggleUserStatus: RequestHandler = async (req, res) => {
     const { status } = req.body;
 
     // Validate input
-    if (!status || !["ativo", "inativo"].includes(status)) {
+    if (!status || !["ativo", "inativo", "bloqueado"].includes(status)) {
       return res.status(400).json({
         success: false,
-        error: 'Status deve ser "ativo" ou "inativo"',
+        error: 'Status deve ser "ativo", "inativo" ou "bloqueado"',
       });
     }
 
     const usuario = await prisma.usracessos.update({
       where: { id: parseInt(id) },
-      data: { status },
+      data: {
+        status,
+        // Reset login attempts when unblocking
+        ...(status === "ativo" && { tentativasLoginFalhadas: 0 })
+      },
       select: {
         id: true,
         nome: true,
         email: true,
         status: true,
+        tentativasLoginFalhadas: true,
       },
     });
 
@@ -1476,7 +1561,11 @@ export const toggleUserStatus: RequestHandler = async (req, res) => {
 
     res.json({
       success: true,
-      message: `Usuário ${status === "ativo" ? "ativado" : "desativado"} com sucesso`,
+      message: `Usuário ${
+        status === "ativo" ? "ativado" :
+        status === "inativo" ? "desativado" :
+        "bloqueado"
+      } com sucesso`,
       data: usuario,
     });
   } catch (error) {
@@ -1484,6 +1573,45 @@ export const toggleUserStatus: RequestHandler = async (req, res) => {
     res.status(500).json({
       success: false,
       error: "Erro ao atualizar status do usuário",
+    });
+  }
+};
+
+// UNLOCK blocked user (Admin only) - Reset login attempts and unblock
+export const unlockUserAccount: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const usuario = await prisma.usracessos.update({
+      where: { id: parseInt(id) },
+      data: {
+        status: "ativo",
+        tentativasLoginFalhadas: 0,
+        ultimaTentativaLogin: null,
+      },
+      select: {
+        id: true,
+        nome: true,
+        email: true,
+        status: true,
+        tentativasLoginFalhadas: true,
+      },
+    });
+
+    console.log(
+      `[unlockUserAccount] User ${id} (${usuario.email}) account unlocked and attempts reset`,
+    );
+
+    res.json({
+      success: true,
+      message: "Conta de usuário desbloqueada com sucesso",
+      data: usuario,
+    });
+  } catch (error) {
+    console.error("[unlockUserAccount] Error:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao desbloquear conta do usuário",
     });
   }
 };

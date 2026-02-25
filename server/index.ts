@@ -61,6 +61,7 @@ import {
   getUsuarioById,
   validateUserStatus,
   toggleUserStatus,
+  unlockUserAccount,
   signInUsuario,
   signUpUsuario,
   createUsuario,
@@ -322,6 +323,7 @@ export function createServer() {
   app.get("/api/usracessos/:id", getUsuarioById);
   app.get("/api/usracessos/:id/validate-status", validateUserStatus);
   app.patch("/api/usracessos/:id/status", toggleUserStatus);
+  app.patch("/api/usracessos/:id/unlock", unlockUserAccount);
   app.post("/api/auth/signin", signInUsuario);
   app.post("/api/auth/signup", signUpUsuario);
   app.post("/api/auth/forgot-password", forgotPassword);
