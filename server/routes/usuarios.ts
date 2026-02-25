@@ -254,28 +254,32 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
       email: usuario.email,
     });
 
-    // Note: Email verification token creation disabled - table doesn't exist yet
-    // TODO: Create emailVerificationToken table in database migration
-    console.log("[signUpUsuario] ⚠️ Verificação de email desativada (tabela não existe)");
-
-    // TODO: Uncomment when emailVerificationToken table is created
-    /*
+    // Generate email verification token (24 hours expiration)
     const verificationToken = crypto.randomBytes(32).toString("hex");
     const expirationDate = new Date();
     expirationDate.setHours(expirationDate.getHours() + 24);
 
-    await prisma.emailVerificationToken.create({
-      data: {
-        usuarioId: usuario.id,
-        token: verificationToken,
-        expiresAt: expirationDate,
-      },
-    });
+    // Note: emailVerificationToken table creation disabled - table doesn't exist in database yet
+    // We'll send the email but skip storing the token in DB
+    console.log("[signUpUsuario] 📝 Token de verificação gerado (não será armazenado em DB)");
 
+    // Build verification link
     const appUrl = process.env.APP_URL || "https://www.vitrii.com.br";
     const verificationLink = `${appUrl}/verificar-email?token=${verificationToken}&email=${encodeURIComponent(usuario.email)}`;
+
+    // Send verification email
     const emailSent = await sendEmailVerificationEmail(usuario.email, usuario.nome, verificationLink);
-    */
+
+    console.log("[signUpUsuario] 📧 Link de verificação gerado:", {
+      appUrl,
+      linkPreview: verificationLink.substring(0, 80) + "...",
+    });
+
+    if (!emailSent) {
+      console.error(`[signUpUsuario] ❌ Falha ao enviar email de verificação para: ${usuario.email}`);
+    } else {
+      console.log(`[signUpUsuario] ✅ Email de verificação enviado para: ${usuario.email}`);
+    }
 
     console.log("[signUpUsuario] 🎉 Cadastro concluído com sucesso");
     res.status(201).json({
