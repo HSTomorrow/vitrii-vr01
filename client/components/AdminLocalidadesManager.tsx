@@ -74,6 +74,8 @@ export default function AdminLocalidadesManager() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["localidades"] });
+      queryClient.invalidateQueries({ queryKey: ["localidades-header"] });
+      queryClient.invalidateQueries({ queryKey: ["localidades-anunciantes"] });
       toast.success("Localidade criada com sucesso!");
       resetForm();
       setShowForm(false);
@@ -106,6 +108,8 @@ export default function AdminLocalidadesManager() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["localidades"] });
+      queryClient.invalidateQueries({ queryKey: ["localidades-header"] });
+      queryClient.invalidateQueries({ queryKey: ["localidades-anunciantes"] });
       toast.success("Localidade atualizada com sucesso!");
       resetForm();
       setShowForm(false);
@@ -134,6 +138,8 @@ export default function AdminLocalidadesManager() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["localidades"] });
+      queryClient.invalidateQueries({ queryKey: ["localidades-header"] });
+      queryClient.invalidateQueries({ queryKey: ["localidades-anunciantes"] });
       toast.success("Localidade deletada com sucesso!");
     },
     onError: (error) => {
