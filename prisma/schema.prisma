@@ -225,6 +225,7 @@ model usracessos {
   dataVigenciaContrato    DateTime                    @default(now())
   numeroAnunciosAtivos    Int                         @default(0)
   maxAnunciosAtivos       Int                         @default(10)
+  emailVerificado         Boolean                     @default(false) // Email verification status
   localidadePadraoId      Int? // Default locality for filtering ads
   usuarios_anunciantes    usuarios_anunciantes[]
   membros_equipe          membros_equipe[]

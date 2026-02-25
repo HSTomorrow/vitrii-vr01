@@ -144,6 +144,7 @@ export const signInUsuario: RequestHandler = async (req, res) => {
         nome: true,
         email: true,
         senha: true,
+        emailVerificado: true,
         tipoUsuario: true,
         tassinatura: true,
         cpf: true,
@@ -158,6 +159,15 @@ export const signInUsuario: RequestHandler = async (req, res) => {
       return res.status(401).json({
         success: false,
         error: "Email ou senha incorretos",
+      });
+    }
+
+    // Check if email is verified
+    if (!usuario.emailVerificado) {
+      console.warn("[signInUsuario] ❌ Email não verificado:", email);
+      return res.status(403).json({
+        success: false,
+        error: "Por favor, verifique seu email antes de fazer login. Verifique sua caixa de entrada ou pasta de spam.",
       });
     }
 
@@ -968,17 +978,28 @@ export const verifyEmail: RequestHandler = async (req, res) => {
       });
     }
 
-    // Note: emailVerificado field is not yet in the database schema
-    // We'll just delete the token as the verification is complete
+    console.log("[verifyEmail] ✅ Email válido, marcando como verificado:", email);
+
+    // Mark email as verified in the database
+    await prisma.usracessos.update({
+      where: { id: verificationTokenRecord.usuarioId },
+      data: { emailVerificado: true },
+    });
+
+    console.log("[verifyEmail] ✅ Email marcado como verificado no banco de dados");
 
     // Delete the token after use
     await prisma.emailVerificationToken.delete({
       where: { id: verificationTokenRecord.id },
     });
 
+    console.log("[verifyEmail] ✅ Token de verificação deletado");
+
     // Send welcome email now that email is verified
+    console.log("[verifyEmail] 📧 Enviando email de boas-vindas...");
     await sendWelcomeEmail(verificationTokenRecord.usuario.email, verificationTokenRecord.usuario.nome);
 
+    console.log("[verifyEmail] 🎉 Processo de verificação de email completo");
     res.status(200).json({
       success: true,
       message: "Email verificado com sucesso! Sua conta está ativada.",

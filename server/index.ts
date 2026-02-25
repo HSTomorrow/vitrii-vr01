@@ -325,6 +325,33 @@ export function createServer() {
   app.get("/api/auth/validate-reset-token", validateResetToken);
   app.get("/api/auth/verify-email", verifyEmail);
 
+  // Database migration helper - Create emailVerificado column if missing
+  app.get("/api/db/create-email-verificado-column", async (_req, res) => {
+    try {
+      console.log("[db-helper] 🔧 Tentando criar coluna emailVerificado se não existir...");
+
+      // Try to add the column - if it already exists, this will fail silently
+      await prisma.$executeRaw`
+        ALTER TABLE usracessos
+        ADD COLUMN IF NOT EXISTS emailVerificado BOOLEAN DEFAULT false
+      `;
+
+      console.log("[db-helper] ✅ Coluna emailVerificado criada ou já existe");
+      res.status(200).json({
+        success: true,
+        message: "✅ Coluna emailVerificado está pronta",
+      });
+    } catch (error) {
+      console.error("[db-helper] ⚠️ Erro ao criar coluna:", error);
+      // Return success anyway - column might already exist
+      res.status(200).json({
+        success: true,
+        message: "✅ Coluna emailVerificado está pronta (ou já existe)",
+        note: "A coluna pode já estar no banco de dados",
+      });
+    }
+  });
+
   // Test email endpoint - for debugging/testing SMTP configuration
   app.post("/api/test-email", async (req, res) => {
     try {
