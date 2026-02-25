@@ -1,297 +1,375 @@
-import prisma from "../server/lib/prisma";
+import { PrismaClient } from "@prisma/client";
+import { faker } from "@faker-js/faker";
 import bcrypt from "bcryptjs";
-import { Decimal } from "@prisma/client/runtime/library";
 
-const stores = [
-  {
-    nome: "Total Mais",
-    cnpjOuCpf: "12.345.678/0001-01",
-    endereco: "Rua Ramiro Barcelos, 2045",
-    cidade: "Montenegro",
-    estado: "RS",
-    descricao: "Atacadista de utilidades domésticas",
-    email: "totalmais@email.com",
-    telefone: "(49) 99941-0359",
-  },
-  {
-    nome: "Mega Lojao Do Bras Montenegro",
-    cnpjOuCpf: "12.345.678/0001-02",
-    endereco: "Rua Ramiro Barcelos, 1495",
-    cidade: "Montenegro",
-    estado: "RS",
-    descricao: "Loja de Roupa",
-    email: "megalojao@email.com",
-    telefone: "(51) 99560-3860",
-  },
-  {
-    nome: "Malibu Conceito",
-    cnpjOuCpf: "12.345.678/0001-03",
-    endereco: "Rua Ramiro Barcelos, 1989",
-    cidade: "Montenegro",
-    estado: "RS",
-    descricao: "Loja de Roupa",
-    email: "malibu@email.com",
-    telefone: "(51) 3654-4387",
-  },
-  {
-    nome: "Loja 7 MONTENEGRO",
-    cnpjOuCpf: "12.345.678/0001-04",
-    endereco: "Rua Ramiro Barcelos, 2655",
-    cidade: "Montenegro",
-    estado: "RS",
-    descricao: "Bazar",
-    email: "loja7@email.com",
-    telefone: "(51) 99717-8288",
-  },
-  {
-    nome: "Empório",
-    cnpjOuCpf: "12.345.678/0001-05",
-    endereco: "Rua Ramiro Barcelos, 1864",
-    cidade: "Montenegro",
-    estado: "RS",
-    descricao: "Loja de Roupa",
-    email: "emporio@email.com",
-    telefone: "(51) 3654-1234",
-  },
+const prisma = new PrismaClient();
+
+const BRAZILIAN_CITIES = [
+  "São Paulo",
+  "Rio de Janeiro",
+  "Belo Horizonte",
+  "Brasília",
+  "Salvador",
+  "Fortaleza",
+  "Manaus",
+  "Curitiba",
+  "Recife",
+  "Porto Alegre",
+  "Goiânia",
+  "Belém",
+  "Guarulhos",
+  "Campinas",
+  "São Gonçalo",
+  "Maceió",
+  "Natal",
+  "Santa Bárbara d'Oeste",
+  "Osasco",
+  "Teresina",
+  "Sorocaba",
+  "Ribeirão Preto",
+  "Santos",
+  "Uberlândia",
+  "Piracicaba",
+  "Palmas",
+  "Parauapebas",
+  "João Pessoa",
+  "Jaboatão dos Guararapes",
+  "Jundiaí",
 ];
 
-const productsByCategory = {
-  Roupa: [
-    "Camiseta Básica",
-    "Calça Jeans",
-    "Vestido Social",
-    "Blusa Feminina",
-    "Jaqueta de Couro",
-  ],
-  Bazar: ["Jogo de Toalhas", "Cortinas", "Almofadas", "Tapete"],
-  "Utilidades Domésticas": ["Vassoura", "Pá de Lixo", "Rodo", "Pano de Prato"],
-};
+const BRAZILIAN_STATES = [
+  "SP",
+  "RJ",
+  "MG",
+  "DF",
+  "BA",
+  "CE",
+  "AM",
+  "PR",
+  "PE",
+  "RS",
+  "GO",
+  "PA",
+  "ES",
+  "PB",
+  "RN",
+  "TO",
+  "MA",
+  "MT",
+  "MS",
+  "AC",
+  "AP",
+  "RO",
+  "RR",
+  "SC",
+];
+
+const PRODUCT_TYPES = ["produto", "servico", "evento", "agenda_recorrente", "oportunidade"];
+
+// Images from Unsplash API - Free to use
+const PRODUCT_IMAGES = [
+  "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop", // laptop
+  "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=300&fit=crop", // phone
+  "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop", // furniture
+  "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=300&fit=crop", // jewelry
+  "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=300&fit=crop", // shoes
+  "https://images.unsplash.com/photo-1495521821757-a1efb6729352?w=400&h=300&fit=crop", // clothes
+  "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=400&h=300&fit=crop", // device
+  "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400&h=300&fit=crop", // camera
+  "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=300&fit=crop", // watch
+  "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=400&h=300&fit=crop", // headphones
+  "https://images.unsplash.com/photo-1519167758993-c37df3a4e09f?w=400&h=300&fit=crop", // shirt
+  "https://images.unsplash.com/photo-1603561596411-07134e71a2a9?w=400&h=300&fit=crop", // bag
+  "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=300&fit=crop", // sunglasses
+  "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?w=400&h=300&fit=crop", // belt
+  "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&h=300&fit=crop", // accessory
+];
+
+const ANUNCIANTE_TYPES = ["Padrão", "Profissional"];
+
+const COLORS = ["azul", "verde", "rosa", "vermelho", "laranja"];
 
 async function main() {
-  console.log("🌱 Iniciando seed da base de dados...");
-
   try {
-    // Clear existing data in correct order (respecting foreign keys)
-    console.log("🗑️  Limpando dados existentes...");
-    await prisma.membros_equipe.deleteMany({});
-    await prisma.equipes_de_venda.deleteMany({});
-    await prisma.anuncios.deleteMany({});
-    await prisma.movimentos_estoque.deleteMany({});
-    await prisma.productos_visualizacoes.deleteMany({});
-    await prisma.produtos_em_estoque.deleteMany({});
-    await prisma.tabelas_preco.deleteMany({});
-    await prisma.usuarios_anunciantes.deleteMany({});
-    await prisma.fotos_grupos.deleteMany({});
-    await prisma.qrcodes_chamadas.deleteMany({});
-    await prisma.qrcodes.deleteMany({});
-    await prisma.productos.deleteMany({});
-    await prisma.grupos_produtos.deleteMany({});
-    await prisma.usracessos.deleteMany({});
-    await prisma.anunciantes.deleteMany({});
+    console.log("🚀 Starting database seed...");
+    console.log("⚙️  Clearing existing data...");
 
-    console.log("✅ Dados anteriores removidos");
+    // Clear existing data (in correct order due to foreign keys)
+    await prisma.anuncios.deleteMany();
+    await prisma.anunciantes.deleteMany();
+    await prisma.usracessos.deleteMany();
 
-    // Create admin user
-    const adminPassword = await bcrypt.hash("admin123", 10);
-    const adminUser = await prisma.usracessos.create({
-      data: {
-        nome: "Admin",
-        email: "admin@vitrii.com",
-        senha: adminPassword,
-        cpf: "00000000000",
-        telefone: "(51) 99999-9999",
-        tipoUsuario: "adm",
-        endereco: "Rua Ramiro Barcelos, Montenegro",
-        dataAtualizacao: new Date(),
-      },
-    });
+    console.log("✅ Existing data cleared");
 
-    console.log("✅ Usuário administrador criado");
+    // ============================================
+    // 1. CREATE 100 USERS
+    // ============================================
+    console.log("\n📝 Creating 100 users...");
+    const users = [];
+    const hashedPassword = await bcrypt.hash("senha123", 10);
 
-    // Create stores (Anunciantes) and associated users
-    const anunciantes = [];
-    for (const storeData of stores) {
-      // Create store
-      const anunciante = await prisma.anunciantes.create({
-        data: {
-          nome: storeData.nome,
-          cnpj: storeData.cnpjOuCpf.replace(/[^0-9]/g, "").substring(0, 14), // Remove formatting, keep only 14 digits
-          endereco: storeData.endereco,
-          cidade: storeData.cidade,
-          estado: storeData.estado,
-          descricao: storeData.descricao,
-          email: storeData.email,
-          telefone: storeData.telefone,
-          dataAtualizacao: new Date(),
-        },
-      });
-
-      // Create user for store
-      const userPassword = await bcrypt.hash("loja123", 10);
+    for (let i = 0; i < 100; i++) {
       const user = await prisma.usracessos.create({
         data: {
-          nome: storeData.nome,
-          email: storeData.email,
-          senha: userPassword,
-          cpf: `${String(anunciante.id).padStart(11, "0")}`,
-          telefone: storeData.telefone,
-          tipoUsuario: "comum",
-          endereco: storeData.endereco,
+          nome: faker.person.fullName().substring(0, 255),
+          email: `user${i + 1}@vitrii.com.br`,
+          senha: hashedPassword,
+          cpf: faker.string.numeric(11),
+          telefone: faker.string.numeric(11),
+          tipoUsuario: i === 0 ? "adm" : "common",
+          tassinatura: "Gratuito",
+          dataVigenciaContrato: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+          maxAnunciosAtivos: 50,
+          endereco: faker.location.streetAddress().substring(0, 255),
+        },
+      });
+      users.push(user);
+    }
+    console.log(`✅ Created ${users.length} users`);
+
+    // ============================================
+    // 2. CREATE 400 ANUNCIANTES
+    // ============================================
+    console.log("\n🏪 Creating 400 anunciantes...");
+    const anunciantes = [];
+
+    for (let i = 0; i < 400; i++) {
+      const usuario = users[Math.floor(Math.random() * users.length)];
+      const city = BRAZILIAN_CITIES[Math.floor(Math.random() * BRAZILIAN_CITIES.length)];
+      const state = BRAZILIAN_STATES[Math.floor(Math.random() * BRAZILIAN_STATES.length)];
+
+      const anunciante = await prisma.anunciantes.create({
+        data: {
+          nome: faker.company.name().substring(0, 255),
+          tipo: ANUNCIANTE_TYPES[Math.floor(Math.random() * ANUNCIANTE_TYPES.length)],
+          descricao: faker.company.catchPhrase().substring(0, 500),
+          cnpj: faker.string.numeric(14),
+          telefone: faker.string.numeric(11),
+          email: faker.internet.email(),
+          endereco: faker.location.streetAddress().substring(0, 255),
+          cidade: city,
+          estado: state,
+          cep: faker.string.numeric(8),
+          site: faker.internet.url().substring(0, 255),
+          instagram: faker.internet.username().substring(0, 255),
+          facebook: faker.internet.url().substring(0, 255),
+          whatsapp: faker.string.numeric(11),
+          chavePix: faker.string.alphanumeric(32),
+          fotoUrl: PRODUCT_IMAGES[Math.floor(Math.random() * PRODUCT_IMAGES.length)],
+          iconColor: COLORS[Math.floor(Math.random() * COLORS.length)],
+          status: "Ativo",
+          temAgenda: Math.random() > 0.7,
           dataAtualizacao: new Date(),
         },
       });
+      anunciantes.push(anunciante);
 
-      // Associate user with store
+      // Link user to anunciante
       await prisma.usuarios_anunciantes.create({
         data: {
-          usuarioId: user.id,
+          usuarioId: usuario.id,
           anuncianteId: anunciante.id,
-          papel: "administrador",
+          papel: "owner",
         },
       });
-
-      // Create sales team for store
-      const equipe = await prisma.equipes_de_venda.create({
-        data: {
-          anuncianteId: anunciante.id,
-          nome: `Equipe ${storeData.nome}`,
-          descricao: `Equipe de vendas para ${storeData.nome}`,
-          isActive: true,
-        },
-      });
-
-      // Create team members
-      const membros = [
-        {
-          nomeMembro: "João Silva",
-          email: `joao@${storeData.email.split("@")[1]}`,
-          whatsapp: "(51) 99111-1111",
-        },
-        {
-          nomeMembro: "Maria Santos",
-          email: `maria@${storeData.email.split("@")[1]}`,
-          whatsapp: "(51) 99222-2222",
-        },
-      ];
-
-      for (const membro of membros) {
-        await prisma.membros_equipe.create({
-          data: {
-            equipeId: equipe.id,
-            usuarioId: user.id,
-            nomeMembro: membro.nomeMembro,
-            email: membro.email,
-            whatsapp: membro.whatsapp,
-            status: "disponivel",
-          },
-        });
-      }
-
-      anunciantes.push({ store: anunciante, user });
-      console.log(`✅ Loja criada: ${anunciante.nome} com equipe de vendas`);
     }
+    console.log(`✅ Created ${anunciantes.length} anunciantes`);
 
-    console.log(`✅ ${anunciantes.length} lojas, usuários e equipes criados`);
+    // ============================================
+    // 3. CREATE 1000 ANÚNCIOS
+    // ============================================
+    console.log("\n📢 Creating 1000 ads...");
+    let anuncioCount = 0;
+    let destaquesCount = 0;
 
-    // Create products and announcements
-    let totalProducts = 0;
-    let totalAds = 0;
+    // Regular products/services (600 ads) + 400 highlights
+    for (let i = 0; i < 1000; i++) {
+      const anunciante = anunciantes[Math.floor(Math.random() * anunciantes.length)];
+      const tipo =
+        i < 560
+          ? "produto"
+          : i < 620
+            ? "servico"
+            : i < 649
+              ? "evento"
+              : i < 694
+                ? "agenda_recorrente"
+                : "oportunidade";
+      const isDestaque = i < 400; // First 400 are featured
 
-    for (const { store, user } of anunciantes) {
-      // Determine category based on store description
-      let category = Object.keys(productsByCategory).find((key) =>
-        store.descricao?.toLowerCase().includes(key.toLowerCase()),
-      );
-
-      if (!category) {
-        category = store.descricao?.includes("Roupa")
-          ? "Roupa"
-          : "Utilidades Domésticas";
-      }
-
-      // Create product group
-      const grupoDeProductos = await prisma.grupos_produtos.create({
+      const anuncio = await prisma.anuncios.create({
         data: {
-          lojaId: store.id,
-          nome: category,
-          descricao: `Produtos de ${category} da ${store.nome}`,
+          usuarioId: users[Math.floor(Math.random() * users.length)].id,
+          anuncianteId: anunciante.id,
+          titulo: faker.commerce.productName().substring(0, 100),
+          descricao: faker.commerce.productDescription().substring(0, 500),
+          imagem: PRODUCT_IMAGES[Math.floor(Math.random() * PRODUCT_IMAGES.length)],
+          preco:
+            tipo === "produto" || tipo === "servico"
+              ? parseFloat(faker.commerce.price({ min: 10, max: 1000 }))
+              : null,
+          status: "ativo",
+          tipo: tipo,
+          isDoacao: false,
+          aCombinar: Math.random() > 0.8,
+          destaque: isDestaque,
+          ordem: isDestaque ? Math.floor(Math.random() * 10) + 1 : 10,
+          statusPagamento: isDestaque || tipo === "produto" ? "aprovado" : "pendente",
+          cidade: anunciante.cidade,
+          estado: anunciante.estado,
           dataAtualizacao: new Date(),
         },
       });
 
-      // Get products for this category
-      const categoryProducts =
-        productsByCategory[category as keyof typeof productsByCategory] || [];
+      anuncioCount++;
+      if (isDestaque) destaquesCount++;
 
-      // Create products and announcements
-      for (let i = 0; i < 3; i++) {
-        const productName =
-          categoryProducts[i % categoryProducts.length] || `Produto ${i + 1}`;
-
-        const producto = await prisma.productos.create({
-          data: {
-            lojaId: store.id,
-            grupoId: grupoDeProductos.id,
-            nome: productName,
-            descricao: `${productName} de qualidade premium da ${store.nome}`,
-            dataAtualizacao: new Date(),
-          },
-        });
-
-        // Create price table for product
-        const preco = Math.random() * 200 + 20; // Random price between 20-220
-        await prisma.tabelas_preco.create({
-          data: {
-            productId: producto.id,
-            lojaId: store.id,
-            tamanho:
-              ["P", "M", "G", "GG"][Math.floor(Math.random() * 4)] || undefined,
-            preco: new Decimal(preco.toString()),
-            dataAtualizacao: new Date(),
-          },
-        });
-
-        // Create announcement
-        const anuncio = await prisma.anuncios.create({
-          data: {
-            usuarioId: user.id,
-            anuncianteId: store.id,
-            titulo: `${productName} - ${store.nome}`,
-            descricao: `Produto: ${productName}\nLoja: ${store.nome}\nCidade: ${store.cidade}\nTelefone: ${store.telefone}\n\nExcelente qualidade com melhor preço do mercado!`,
-            preco: new Decimal(preco.toString()),
-            categoria: category.toLowerCase().replace(/\s+/g, "-"),
-            status: "ativo",
-            cidade: store.cidade,
-            estado: store.estado,
-            dataAtualizacao: new Date(),
-          },
-        });
-
-        totalProducts++;
-        totalAds++;
-        console.log(
-          `  ✅ Produto criado: ${productName} - Anúncio ID: ${anuncio.id}`,
-        );
+      if ((i + 1) % 100 === 0) {
+        console.log(`  Progress: ${i + 1}/1000 ads created...`);
       }
     }
+    console.log(`✅ Created ${anuncioCount} ads (${destaquesCount} featured)`);
 
-    console.log("\n📊 Resumo do Seed:");
-    console.log(`✅ ${anunciantes.length} Lojas criadas`);
-    console.log(`✅ ${anunciantes.length} Usuários criados`);
-    console.log(`✅ ${anunciantes.length} Equipes de venda criadas`);
-    console.log(`✅ ${anunciantes.length * 2} Membros de equipe criados`);
-    console.log(`✅ ${totalProducts} Produtos criados`);
-    console.log(`✅ ${totalAds} Anúncios criados`);
-    console.log("\n🎉 Seed concluído com sucesso!");
+    // ============================================
+    // 4. CREATE 40 DOAÇÕES/BRINDES/SERVIÇOS GRATUITOS
+    // ============================================
+    console.log("\n🎁 Creating 40 donations/gifts/free services...");
+    for (let i = 0; i < 40; i++) {
+      const anunciante = anunciantes[Math.floor(Math.random() * anunciantes.length)];
+      const tipos = ["Doação", "Brinde", "Serviço Gratuito"];
+      const tipo = tipos[Math.floor(Math.random() * tipos.length)];
+
+      await prisma.anuncios.create({
+        data: {
+          usuarioId: users[Math.floor(Math.random() * users.length)].id,
+          anuncianteId: anunciante.id,
+          titulo: `${tipo}: ${faker.commerce.productName().substring(0, 35)}`,
+          descricao: faker.commerce.productDescription().substring(0, 500),
+          imagem: PRODUCT_IMAGES[Math.floor(Math.random() * PRODUCT_IMAGES.length)],
+          preco: 0,
+          status: "ativo",
+          tipo: "produto",
+          isDoacao: true,
+          destaque: true,
+          ordem: Math.floor(Math.random() * 5) + 1,
+          statusPagamento: "aprovado",
+          cidade: anunciante.cidade,
+          estado: anunciante.estado,
+          dataAtualizacao: new Date(),
+        },
+      });
+    }
+    console.log(`✅ Created 40 donations/gifts/free services`);
+
+    // ============================================
+    // 5. CREATE 29 EVENTOS
+    // ============================================
+    console.log("\n🎉 Creating 29 events...");
+    for (let i = 0; i < 29; i++) {
+      const anunciante = anunciantes[Math.floor(Math.random() * anunciantes.length)];
+      const eventTypes = [
+        "Workshop",
+        "Conferência",
+        "Meetup",
+        "Festa",
+        "Show",
+        "Lançamento",
+        "Seminário",
+      ];
+      const eventType = eventTypes[Math.floor(Math.random() * eventTypes.length)];
+
+      await prisma.anuncios.create({
+        data: {
+          usuarioId: users[Math.floor(Math.random() * users.length)].id,
+          anuncianteId: anunciante.id,
+          titulo: `${eventType}: ${faker.lorem.words(3).substring(0, 40)}`,
+          descricao: faker.lorem.paragraph().substring(0, 500),
+          imagem: PRODUCT_IMAGES[Math.floor(Math.random() * PRODUCT_IMAGES.length)],
+          preco: parseFloat(faker.commerce.price({ min: 50, max: 500 })),
+          status: "ativo",
+          tipo: "evento",
+          isDoacao: false,
+          destaque: true,
+          ordem: Math.floor(Math.random() * 5) + 1,
+          statusPagamento: "aprovado",
+          cidade: anunciante.cidade,
+          estado: anunciante.estado,
+          dataAtualizacao: new Date(),
+        },
+      });
+    }
+    console.log(`✅ Created 29 events`);
+
+    // ============================================
+    // 6. CREATE 45 AULAS E AGENDAS
+    // ============================================
+    console.log("\n📚 Creating 45 classes/schedules...");
+    for (let i = 0; i < 45; i++) {
+      const anunciante = anunciantes[Math.floor(Math.random() * anunciantes.length)];
+      const courseTypes = [
+        "Aula de",
+        "Curso de",
+        "Treinamento em",
+        "Oficina de",
+        "Palestra sobre",
+      ];
+      const subjects = [
+        "Programação",
+        "Design",
+        "Negócios",
+        "Idiomas",
+        "Fitness",
+        "Culinária",
+        "Música",
+        "Arte",
+        "Fotografia",
+        "Desenvolvimento Pessoal",
+      ];
+      const courseType = courseTypes[Math.floor(Math.random() * courseTypes.length)];
+      const subject = subjects[Math.floor(Math.random() * subjects.length)];
+
+      await prisma.anuncios.create({
+        data: {
+          usuarioId: users[Math.floor(Math.random() * users.length)].id,
+          anuncianteId: anunciante.id,
+          titulo: `${courseType} ${subject}`,
+          descricao: faker.lorem.paragraph().substring(0, 500),
+          imagem: PRODUCT_IMAGES[Math.floor(Math.random() * PRODUCT_IMAGES.length)],
+          preco: parseFloat(faker.commerce.price({ min: 50, max: 300 })),
+          status: "ativo",
+          tipo: "agenda_recorrente",
+          isDoacao: false,
+          destaque: true,
+          ordem: Math.floor(Math.random() * 5) + 1,
+          statusPagamento: "aprovado",
+          cidade: anunciante.cidade,
+          estado: anunciante.estado,
+          dataAtualizacao: new Date(),
+        },
+      });
+    }
+    console.log(`✅ Created 45 classes/schedules`);
+
+    // ============================================
+    // SUMMARY
+    // ============================================
+    console.log("\n✨ DATABASE SEED COMPLETED SUCCESSFULLY! ✨");
+    console.log("\n📊 Summary:");
+    console.log(`  • Users: 100 (1 admin + 99 regular)`);
+    console.log(`  • Anunciantes: 400`);
+    console.log(`  • Total Ads: 1000`);
+    console.log(`    - Featured: 400`);
+    console.log(`    - Donations/Gifts/Free: 40`);
+    console.log(`    - Events: 29`);
+    console.log(`    - Classes/Schedules: 45`);
+    console.log(`    - Regular Products/Services: 486`);
+    console.log(`\n✅ All data has been successfully inserted into the database!`);
   } catch (error) {
-    console.error("❌ Erro durante seed:", error);
-    throw error;
+    console.error("❌ Error during seed:", error);
+    process.exit(1);
   } finally {
     await prisma.$disconnect();
   }
 }
 
-main().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+main();
