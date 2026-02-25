@@ -38,11 +38,12 @@ export default function Index() {
   const queryClient = useQueryClient();
   const [favoritos, setFavoritos] = useState<Set<number>>(new Set());
 
-  // Validate user status on page load
+  // Validate user status on page load (only if user is logged in)
   useEffect(() => {
-    const validateUserStatus = async () => {
-      if (!user?.id) return;
+    // Only validate if we have a user
+    if (!user?.id) return;
 
+    const validateUserStatus = async () => {
       try {
         const response = await fetch(`/api/usracessos/${user.id}/validate-status`);
 
@@ -64,7 +65,7 @@ export default function Index() {
     };
 
     validateUserStatus();
-  }, [user?.id, logout, navigate]);
+  }, [user?.id]); // Only depend on user?.id, not logout/navigate
 
   // All paid ads are fetched and filtered on client side
 
@@ -114,6 +115,8 @@ export default function Index() {
       if (!response.ok) throw new Error("Erro ao buscar banners");
       return response.json();
     },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
   // Fetch user's default localidade
@@ -132,6 +135,8 @@ export default function Index() {
       return response.json();
     },
     enabled: !!user?.id,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
   const userLocalidadeId = userLocalidadeData?.data?.localidadePadraoId || null;
@@ -144,6 +149,8 @@ export default function Index() {
       if (!response.ok) throw new Error("Erro ao buscar anúncios");
       return response.json();
     },
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    gcTime: 5 * 60 * 1000, // 5 minutes
   });
 
   // Fetch all anunciantes
@@ -154,6 +161,8 @@ export default function Index() {
       if (!response.ok) throw new Error("Erro ao buscar anunciantes");
       return response.json();
     },
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
   const allAnuncios = allAnunciosData?.data || [];
