@@ -25,16 +25,20 @@ async function getTransporter() {
     lastSmtpConfig === currentConfig &&
     transporter
   ) {
+    console.log("[getTransporter] ✅ Usando transporter em cache");
     return transporter;
   }
 
   if (process.env.SMTP_HOST && process.env.SMTP_PORT) {
     // Production: Use configured SMTP
-    console.log("🔄 Inicializando transporter com configuração SMTP real");
-    console.log(`   - Host: ${process.env.SMTP_HOST}`);
-    console.log(`   - Port: ${process.env.SMTP_PORT}`);
-    console.log(`   - User: ${process.env.SMTP_USER}`);
-    console.log(`   - Secure: ${process.env.SMTP_SECURE}`);
+    console.log("[getTransporter] 🔄 Criando novo transporter com SMTP real");
+    console.log("[getTransporter] SMTP Config:", {
+      host: process.env.SMTP_HOST,
+      port: process.env.SMTP_PORT,
+      secure: process.env.SMTP_SECURE === "true",
+      user: process.env.SMTP_USER ? process.env.SMTP_USER.substring(0, 5) + "***" : "NOT SET",
+      pass: process.env.SMTP_PASS ? "SET" : "NOT SET",
+    });
 
     transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
@@ -48,9 +52,10 @@ async function getTransporter() {
       debug: true,
     });
     lastSmtpConfig = currentConfig;
+    console.log("[getTransporter] ✅ Transporter criado com sucesso");
   } else {
     // Development: Use Ethereal (fake SMTP service for testing)
-    console.log("🔄 Inicializando transporter com Ethereal (teste)");
+    console.log("[getTransporter] 🔄 SMTP não configurado, usando Ethereal para teste");
     const testAccount = await nodemailer.createTestAccount();
     transporter = nodemailer.createTransport({
       host: "smtp.ethereal.email",
@@ -62,6 +67,7 @@ async function getTransporter() {
       },
     });
     lastSmtpConfig = "";
+    console.log("[getTransporter] ✅ Transporter Ethereal criado para desenvolvimento");
   }
 
   return transporter;
@@ -196,12 +202,21 @@ export async function sendEmailVerificationEmail(
   verificationLink: string,
 ): Promise<boolean> {
   try {
+    console.log("[sendEmailVerificationEmail] 📧 Iniciando envio de email de verificação", {
+      destinatario: email,
+      usuario: userName,
+      linkPreview: verificationLink.substring(0, 60) + "...",
+    });
+
     if (!isValidEmail(email)) {
-      console.error(`❌ Email inválido: ${email}`);
+      console.error(`[sendEmailVerificationEmail] ❌ Email inválido: ${email}`);
       return false;
     }
 
+    console.log("[sendEmailVerificationEmail] ✅ Email válido, obtendo transporter...");
     const transporter = await getTransporter();
+    console.log("[sendEmailVerificationEmail] ✅ Transporter obtido com sucesso");
+
     const mailOptions = {
       from: process.env.MAIL_FROM || "noreply@vitrii.com",
       to: email,
@@ -266,28 +281,40 @@ export async function sendEmailVerificationEmail(
       `,
     };
 
+    console.log("[sendEmailVerificationEmail] 📨 Tentando enviar email via transporter...");
     const info = await transporter.sendMail(mailOptions);
-    console.log("✅ Email de verificação enviado com sucesso");
-    console.log("   - Para:", email);
-    console.log("   - De:", process.env.MAIL_FROM);
-    console.log(
-      "   - BCC:",
-      "contato@herestomorrow.com",
-    );
-    console.log("   - Message ID:", info.messageId);
+
+    console.log("[sendEmailVerificationEmail] ✅ Email de verificação enviado com sucesso!");
+    console.log("[sendEmailVerificationEmail] Detalhes:", {
+      destinatario: email,
+      de: process.env.MAIL_FROM,
+      bcc: "contato@herestomorrow.com",
+      messageId: info.messageId,
+      response: info.response,
+    });
 
     // In development, log preview URL
     if (process.env.NODE_ENV !== "production") {
-      console.log("   - Preview URL:", nodemailer.getTestMessageUrl(info));
+      console.log("[sendEmailVerificationEmail] Preview URL:", nodemailer.getTestMessageUrl(info));
     }
 
     return true;
   } catch (error) {
-    console.error("❌ Erro ao enviar email de verificação:", error);
-    console.error("   - Destinatário:", email);
-    console.error("   - SMTP Host:", process.env.SMTP_HOST);
-    console.error("   - SMTP Port:", process.env.SMTP_PORT);
-    console.error("   - SMTP User:", process.env.SMTP_USER);
+    console.error("[sendEmailVerificationEmail] 🔴 ERRO CRÍTICO ao enviar email de verificação");
+    console.error("[sendEmailVerificationEmail] Destinatário:", email);
+    console.error("[sendEmailVerificationEmail] Usuário:", userName);
+    console.error("[sendEmailVerificationEmail] SMTP Config:");
+    console.error("   - Host:", process.env.SMTP_HOST);
+    console.error("   - Port:", process.env.SMTP_PORT);
+    console.error("   - Secure:", process.env.SMTP_SECURE);
+    console.error("   - User:", process.env.SMTP_USER ? process.env.SMTP_USER.substring(0, 5) + "***" : "NOT SET");
+    console.error("   - Pass:", process.env.SMTP_PASS ? "SET" : "NOT SET");
+    console.error("[sendEmailVerificationEmail] Erro detalhado:", {
+      name: error instanceof Error ? error.name : "Unknown",
+      message: error instanceof Error ? error.message : String(error),
+      code: (error as any)?.code,
+      command: (error as any)?.command,
+    });
     return false;
   }
 }

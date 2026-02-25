@@ -268,19 +268,39 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
     const verificationLink = `${appUrl}/verificar-email?token=${verificationToken}&email=${encodeURIComponent(usuario.email)}`;
 
     // Send verification email
-    const emailSent = await sendEmailVerificationEmail(usuario.email, usuario.nome, verificationLink);
-
     console.log("[signUpUsuario] 📧 Link de verificação gerado:", {
       appUrl,
       linkPreview: verificationLink.substring(0, 80) + "...",
     });
 
+    console.log("[signUpUsuario] 📧 Tentando enviar email de verificação...");
+    console.log("[signUpUsuario] SMTP Config:", {
+      host: process.env.SMTP_HOST,
+      port: process.env.SMTP_PORT,
+      secure: process.env.SMTP_SECURE,
+      user: process.env.SMTP_USER ? process.env.SMTP_USER.substring(0, 5) + "***" : "NOT SET",
+      pass: process.env.SMTP_PASS ? "SET" : "NOT SET",
+      mail_from: process.env.MAIL_FROM,
+    });
+
+    const emailSent = await sendEmailVerificationEmail(usuario.email, usuario.nome, verificationLink);
+
     if (!emailSent) {
-      console.error(`[signUpUsuario] ❌ Falha ao enviar email de verificação para: ${usuario.email}`);
-    } else {
-      console.log(`[signUpUsuario] ✅ Email de verificação enviado para: ${usuario.email}`);
+      console.error(`[signUpUsuario] ❌ FALHA CRÍTICA: Falha ao enviar email de verificação para: ${usuario.email}`);
+      console.error("[signUpUsuario] ❌ Deletando usuário criado porque email falhou");
+
+      // Delete the user since email couldn't be sent
+      await prisma.usracessos.delete({
+        where: { id: usuario.id },
+      });
+
+      return res.status(500).json({
+        success: false,
+        error: "Falha ao enviar email de verificação. Por favor, tente novamente mais tarde.",
+      });
     }
 
+    console.log(`[signUpUsuario] ✅ Email de verificação enviado com sucesso para: ${usuario.email}`);
     console.log("[signUpUsuario] 🎉 Cadastro concluído com sucesso");
     res.status(201).json({
       success: true,
