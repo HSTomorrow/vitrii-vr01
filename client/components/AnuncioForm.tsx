@@ -396,15 +396,12 @@ export default function AnuncioForm({
         }
 
         setTimeout(() => {
-          // Donations go directly to ad detail (no payment needed)
-          // Regular ads go to checkout
-          if (result.data.isDoacao) {
-            console.log("[AnuncioForm] Navigating to ad detail (donation)");
-            navigate(`/anuncio/${result.data.id}`);
-          } else {
-            console.log("[AnuncioForm] Navigating to checkout");
-            navigate(`/checkout/${result.data.id}`);
-          }
+          // All ads now return to main page and refresh
+          console.log("[AnuncioForm] Navigating to main page after ad creation");
+          // Invalidate all related queries to refresh the main page
+          queryClient.invalidateQueries({ queryKey: ["anuncios-all"] });
+          queryClient.invalidateQueries({ queryKey: ["banners"] });
+          navigate("/");
         }, 500);
       } else if (anuncioId && onSuccess) {
         console.log("[AnuncioForm] Editing mode, calling onSuccess callback");
