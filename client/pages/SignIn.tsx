@@ -43,14 +43,19 @@ export default function SignIn() {
         if (!response.ok) {
           const errorData = await response.json();
           console.error("[SignIn] Erro da API:", errorData);
+          console.error("[SignIn] Status:", response.status);
+          console.error("[SignIn] Error message:", errorData.error);
 
           // Customize error messages based on status
           if (response.status === 401) {
             throw new Error("Email ou senha incorretos. Verifique suas credenciais.");
+          } else if (response.status === 403) {
+            throw new Error(errorData.error || "Acesso negado. Verifique seu email ou entre em contato com o suporte.");
           } else if (response.status === 400) {
             throw new Error("Por favor, preencha todos os campos obrigatórios.");
           } else if (response.status === 500) {
-            throw new Error("Erro no servidor. Tente novamente mais tarde.");
+            console.error("[SignIn] Erro 500 completo:", errorData);
+            throw new Error(errorData.error || "Erro no servidor. Tente novamente mais tarde.");
           }
 
           throw new Error(errorData.error || "Erro ao fazer login");
