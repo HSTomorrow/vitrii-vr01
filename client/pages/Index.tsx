@@ -7,7 +7,6 @@ import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
 import BannerCarousel from "@/components/BannerCarousel";
 import AnunciosCarousel from "@/components/AnunciosCarousel";
-import AnunciosGrid from "@/components/AnunciosGrid";
 import AnunciantesCarousel from "@/components/AnunciantesCarousel";
 import {
   Star,
@@ -149,8 +148,12 @@ export default function Index() {
         !isGratis(anuncio) &&
         ["produto", "servico"].includes(anuncio.tipo) &&
         matchesLocalidade(anuncio),
-    )
-    .slice(0, 600); // Increased slice to show more featured ads
+    );
+
+  // Split featured ads into 3 groups of 15 ads each
+  const destaquedosCarousel1 = destacados.slice(0, 15);
+  const destaquedosCarousel2 = destacados.slice(15, 30);
+  const destaquedosCarousel3 = destacados.slice(30, 45);
 
   const destaqueDoacoes = allAnuncios
     .filter(
@@ -216,7 +219,7 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Featured Listings Section */}
+      {/* Featured Listings Section - Carousel 1 */}
       <section className="py-2 md:py-3 bg-vitrii-gray-light">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-2">
@@ -237,16 +240,14 @@ export default function Index() {
             </Link>
           </div>
 
-          {/* Featured Cards Grid with 3 rows and pagination */}
-          <AnunciosGrid
-            anuncios={destacados}
+          {/* Featured Cards Carousel 1 */}
+          <AnunciosCarousel
+            anuncios={destaquedosCarousel1}
             isLoading={allAnunciosLoading}
             isFavorited={(id) => favoritos.has(id)}
             onToggleFavorito={(id) => toggleFavoritoMutation.mutate(id)}
             emptyMessage="Nenhum anúncio em destaque publicado ainda"
             color="blue"
-            adsPerRow={15}
-            initialRows={3}
           />
 
           <div className="text-center mt-2">
@@ -258,6 +259,36 @@ export default function Index() {
               <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* Featured Listings Section - Carousel 2 */}
+      <section className="py-2 md:py-3 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Featured Cards Carousel 2 */}
+          <AnunciosCarousel
+            anuncios={destaquedosCarousel2}
+            isLoading={allAnunciosLoading}
+            isFavorited={(id) => favoritos.has(id)}
+            onToggleFavorito={(id) => toggleFavoritoMutation.mutate(id)}
+            emptyMessage="Nenhum anúncio em destaque publicado ainda"
+            color="blue"
+          />
+        </div>
+      </section>
+
+      {/* Featured Listings Section - Carousel 3 */}
+      <section className="py-2 md:py-3 bg-vitrii-gray-light">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Featured Cards Carousel 3 */}
+          <AnunciosCarousel
+            anuncios={destaquedosCarousel3}
+            isLoading={allAnunciosLoading}
+            isFavorited={(id) => favoritos.has(id)}
+            onToggleFavorito={(id) => toggleFavoritoMutation.mutate(id)}
+            emptyMessage="Nenhum anúncio em destaque publicado ainda"
+            color="blue"
+          />
         </div>
       </section>
 
