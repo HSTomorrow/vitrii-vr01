@@ -112,7 +112,7 @@ export default function Index() {
   const { data: allAnunciosData, isLoading: allAnunciosLoading } = useQuery({
     queryKey: ["anuncios-all"],
     queryFn: async () => {
-      const response = await fetch("/api/anuncios");
+      const response = await fetch("/api/anuncios?limit=500&offset=0");
       if (!response.ok) throw new Error("Erro ao buscar anúncios");
       return response.json();
     },
@@ -145,46 +145,51 @@ export default function Index() {
   const destacados = allAnuncios
     .filter(
       (anuncio: any) =>
+        anuncio.destaque &&
         !isGratis(anuncio) &&
         ["produto", "servico"].includes(anuncio.tipo) &&
         matchesLocalidade(anuncio),
     )
-    .slice(0, 20);
+    .slice(0, 600); // Increased slice to show more featured ads
 
   const destaqueDoacoes = allAnuncios
     .filter(
       (anuncio: any) =>
+        anuncio.destaque &&
         isGratis(anuncio) &&
         matchesLocalidade(anuncio),
     )
-    .slice(0, 20);
+    .slice(0, 100);
 
   const destaqueEventos = allAnuncios
     .filter(
       (anuncio: any) =>
+        anuncio.destaque &&
         !isGratis(anuncio) &&
         anuncio.tipo === "evento" &&
         matchesLocalidade(anuncio),
     )
-    .slice(0, 20);
+    .slice(0, 100);
 
   const destaqueAgendas = allAnuncios
     .filter(
       (anuncio: any) =>
+        anuncio.destaque &&
         !isGratis(anuncio) &&
         anuncio.tipo === "agenda_recorrente" &&
         matchesLocalidade(anuncio),
     )
-    .slice(0, 20);
+    .slice(0, 100);
 
   const destaqueOportunidades = allAnuncios
     .filter(
       (anuncio: any) =>
+        anuncio.destaque &&
         !isGratis(anuncio) &&
         anuncio.tipo === "oportunidade" &&
         matchesLocalidade(anuncio),
     )
-    .slice(0, 20);
+    .slice(0, 100);
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
