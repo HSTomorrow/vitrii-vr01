@@ -149,8 +149,15 @@ export default function PerfilUsuario() {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    // CPF/CNPJ validation - must be 11 (CPF) or 14 (CNPJ) digits if provided
-    if (formData.cpf.trim()) {
+    // Email validation - required field
+    if (!user?.email) {
+      newErrors.email = "Email é obrigatório";
+    }
+
+    // CPF/CNPJ validation - required field
+    if (!formData.cpf || !formData.cpf.trim()) {
+      newErrors.cpf = "CPF/CNPJ é obrigatório";
+    } else {
       const cpfDigits = formData.cpf.replace(/\D/g, "");
       if (cpfDigits.length !== 11 && cpfDigits.length !== 14) {
         newErrors.cpf = "CPF deve ter 11 dígitos ou CNPJ deve ter 14 dígitos";
@@ -217,22 +224,43 @@ export default function PerfilUsuario() {
             </div>
           </div>
 
+          <div className="bg-yellow-50 border-l-4 border-yellow-500 rounded p-4 mb-8 flex gap-3">
+            <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="font-semibold text-yellow-900">Campos Obrigatórios</h3>
+              <p className="text-sm text-yellow-800 mt-1">
+                Os campos marcados com <strong>*</strong> são obrigatórios para criar anúncios.
+              </p>
+            </div>
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email (Read-only) */}
             <div>
               <label className="block text-sm font-semibold text-vitrii-text mb-2">
-                Email
+                Email *
               </label>
-              <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-vitrii-text flex items-center gap-2">
+              <div className={`w-full px-4 py-3 border rounded-lg flex items-center gap-2 ${
+                errors.email
+                  ? "border-red-500 bg-red-50"
+                  : "border-gray-300 bg-gray-50 text-vitrii-text"
+              }`}>
                 <Mail className="w-5 h-5 text-vitrii-text-secondary flex-shrink-0" />
                 <span>{user?.email}</span>
               </div>
-              <p className="text-xs text-vitrii-text-secondary mt-2">
-                Para alterar o email, entre em contato com o administrador.
-              </p>
+              {errors.email ? (
+                <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
+                  <AlertCircle className="w-4 h-4" />
+                  {errors.email}
+                </p>
+              ) : (
+                <p className="text-xs text-vitrii-text-secondary mt-2">
+                  Para alterar o email, entre em contato com o administrador.
+                </p>
+              )}
             </div>
 
-            {/* CPF / CNPJ - Editable if empty */}
+            {/* CPF / CNPJ - Editable if empty, Read-only if filled */}
             <div>
               <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 CPF \ CNPJ *
@@ -245,6 +273,7 @@ export default function PerfilUsuario() {
               ) : (
                 <input
                   type="text"
+                  required
                   value={formData.cpf}
                   onChange={(e) => {
                     const value = e.target.value.replace(/\D/g, "");
@@ -260,11 +289,11 @@ export default function PerfilUsuario() {
               )}
               {formData.cpf ? (
                 <p className="text-xs text-vitrii-text-secondary mt-2">
-                  CPF/CNPJ registrado. Para alterações, entre em contato com o administrador.
+                  ✓ CPF/CNPJ registrado. Para alterações, entre em contato com o administrador.
                 </p>
               ) : (
-                <p className="text-xs text-vitrii-text-secondary mt-2">
-                  Este campo é obrigatório para criar anúncios. Você pode preenchê-lo uma única vez.
+                <p className="text-xs text-vitrii-text mt-2 font-medium">
+                  📌 Campo obrigatório para criar anúncios. Você pode preenchê-lo uma única vez.
                 </p>
               )}
               {errors.cpf && (
