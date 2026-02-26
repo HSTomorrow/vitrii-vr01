@@ -73,14 +73,13 @@ export default function SignIn() {
           }
           throw new Error("Email ou senha incorretos. Verifique suas credenciais.");
         } else if (response.status === 403) {
-          // Account blocked
-          if (errorData.blocked) {
-            const error = new Error(errorData.error) as any;
-            error.blocked = true;
-            error.supportUrl = errorData.supportUrl;
-            throw error;
-          }
-          throw new Error(errorData.error || "Acesso negado. Verifique seu email ou entre em contato com o suporte.");
+          // Account blocked or inactive
+          const error = new Error(errorData.error) as any;
+          error.blocked = errorData.blocked === true; // Garantir que é boolean
+          error.supportUrl = errorData.supportUrl;
+          error.requiresEmailVerification = errorData.requiresEmailVerification === true;
+          console.log("[SignIn] 403 Error criado:", { blocked: error.blocked, requiresEmailVerification: error.requiresEmailVerification });
+          throw error;
         } else if (response.status === 400) {
           throw new Error(errorData.error || "Por favor, preencha todos os campos obrigatórios.");
         } else if (response.status === 500) {
@@ -125,9 +124,13 @@ export default function SignIn() {
       const errorObj = error as any;
       const errorMessage = error instanceof Error ? error.message : "Erro desconhecido ao fazer login";
 
+      console.log("[SignIn] onError - errorObj.blocked:", errorObj.blocked, "type:", typeof errorObj.blocked);
+      console.log("[SignIn] onError - errorMessage:", errorMessage);
+      console.log("[SignIn] onError - full errorObj:", errorObj);
+
       // Check if account is blocked
-      if (errorObj.blocked) {
-        console.warn("[SignIn] Conta bloqueada");
+      if (errorObj.blocked === true) {
+        console.warn("[SignIn] ✅ Conta bloqueada detectada - mostrando alerta");
         setAccountBlocked(true);
         setBlockedAlert(true);
         setBlockedEmail(formData.email);
