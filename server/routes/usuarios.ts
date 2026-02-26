@@ -165,22 +165,11 @@ export const signInUsuario: RequestHandler = async (req, res) => {
       });
     }
 
-    // Check if user is blocked due to too many login attempts
+    // Check if user is blocked
     if (usuario.status === "bloqueado") {
       console.warn("[signInUsuario] ⛔ Usuário bloqueado:", email);
-      return res.status(403).json({
-        success: false,
-        error: "Sua conta foi bloqueada por múltiplas tentativas de login. Por favor, entre em contato com o suporte.",
-        blocked: true,
-        supportUrl: "/ajuda-e-contato",
-      });
-    }
 
-    // Check if user is inactive
-    if (usuario.status === "inativo") {
-      console.warn("[signInUsuario] ⚠️ Usuário inativo:", email);
-
-      // Check if email is not verified (new user)
+      // If email is not verified, it's a new user waiting for email confirmation
       if (!usuario.emailVerificado) {
         return res.status(403).json({
           success: false,
@@ -190,7 +179,18 @@ export const signInUsuario: RequestHandler = async (req, res) => {
         });
       }
 
-      // Otherwise, account was deactivated by admin
+      // Otherwise, account was blocked due to too many failed login attempts
+      return res.status(403).json({
+        success: false,
+        error: "Sua conta foi bloqueada por múltiplas tentativas de login. Por favor, entre em contato com o suporte.",
+        blocked: true,
+        supportUrl: "/ajuda-e-contato",
+      });
+    }
+
+    // Check if user is inactive (deactivated by admin)
+    if (usuario.status === "inativo") {
+      console.warn("[signInUsuario] ⚠️ Usuário inativo:", email);
       return res.status(403).json({
         success: false,
         error: "Sua conta foi desativada. Por favor, entre em contato com o suporte.",
@@ -345,7 +345,7 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
         nome: validatedData.nome,
         email: validatedData.email,
         senha: senhaHash,
-        status: "inativo", // New users start as inactive until email is verified
+        status: "bloqueado", // New users start as blocked until email is verified
       },
     });
 
@@ -353,7 +353,7 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
       id: usuario.id,
       nome: usuario.nome,
       email: usuario.email,
-      status: "inativo",
+      status: "bloqueado",
     });
 
     // Generate email verification token (24 hours expiration)

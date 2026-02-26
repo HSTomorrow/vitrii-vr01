@@ -177,6 +177,12 @@ export default function SignUp() {
               <p className="text-vitrii-text-secondary mb-6 text-lg">
                 Sua conta foi criada com sucesso!
               </p>
+              <div className="bg-yellow-50 border-l-4 border-yellow-500 rounded p-4 mb-6 text-left">
+                <h3 className="font-semibold text-yellow-900 mb-2">⚠️ Conta Bloqueada Temporariamente</h3>
+                <p className="text-sm text-yellow-800">
+                  Sua conta está bloqueada até que você verifique seu endereço de email. Sem essa verificação, você não conseguirá fazer login.
+                </p>
+              </div>
               <div className="bg-blue-50 border-l-4 border-blue-500 rounded p-4 mb-6 text-left">
                 <h3 className="font-semibold text-blue-900 mb-2">Próximos passos:</h3>
                 <ol className="text-sm text-blue-800 space-y-2">
@@ -190,12 +196,12 @@ export default function SignUp() {
                   </li>
                   <li className="flex gap-2">
                     <span className="text-blue-600 font-bold">3.</span>
-                    <span>Sua conta será ativada e você poderá fazer login</span>
+                    <span>Sua conta será desbloqueada e você poderá fazer login</span>
                   </li>
                 </ol>
               </div>
               <p className="text-sm text-vitrii-text-secondary mb-6">
-                Você receberá um email em <strong>{formData.email}</strong> com as instruções para confirmar seu endereço de email.
+                Você receberá um email em <strong>{formData.email}</strong> com o link para confirmar seu endereço de email.
               </p>
               <Link
                 to="/auth/signin"
