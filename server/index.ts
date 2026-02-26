@@ -803,7 +803,7 @@ export function createServer() {
   );
   app.get("/api/anunciantes", extractUserId, getAnunciantes);
   app.get("/api/anunciantes/:id", getAnuncianteById);
-  app.post("/api/anunciantes", createAnunciante);
+  app.post("/api/anunciantes", extractUserId, createAnunciante);
   app.put("/api/anunciantes/:id", extractUserId, updateAnunciante);
   app.delete("/api/anunciantes/:id", deleteAnunciante);
   app.post("/api/anunciantes/:id/usuarios", adicionarUsuarioAnunciante);

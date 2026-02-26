@@ -233,7 +233,9 @@ export const createAnunciante: RequestHandler = async (req, res) => {
     });
 
     const validatedData = AnuncianteCreateSchema.parse(req.body);
-    const { usuarioId } = req.body; // Optional userId to link the creator
+    const usuarioId = req.userId; // Get userId from middleware (X-User-Id header)
+
+    console.log("[createAnunciante] 👤 usuarioId obtido:", usuarioId);
 
     // Check if CNPJ/CPF is registered to a user (cross-validation)
     // Only prevent if it's for a regular user, allow admin exception
@@ -320,17 +322,24 @@ export const createAnunciante: RequestHandler = async (req, res) => {
     // Link the creating user to this anunciante as admin/owner
     if (usuarioId) {
       try {
-        await prisma.usuarios_anunciantes.create({
+        const linkagem = await prisma.usuarios_anunciantes.create({
           data: {
             usuarioId: usuarioId,
             anuncianteId: anunciante.id,
             papel: "gerente",
           },
         });
+        console.log("[createAnunciante] 🔗 Usuário linkado ao anunciante:", {
+          usuarioId: usuarioId,
+          anuncianteId: anunciante.id,
+          linkageId: linkagem.id,
+        });
       } catch (err) {
         // If linking fails, still return success with the anunciante
-        console.error("Error linking user to anunciante:", err);
+        console.error("[createAnunciante] ❌ Erro ao linkar usuário ao anunciante:", err);
       }
+    } else {
+      console.warn("[createAnunciante] ⚠️ Nenhum usuarioId fornecido, anunciante criado sem linkagem");
     }
 
     console.log("[createAnunciante] ✅ Anunciante criado com sucesso:", {
