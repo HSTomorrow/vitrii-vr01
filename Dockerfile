@@ -30,15 +30,14 @@ WORKDIR /app
 # Install OpenSSL for Prisma runtime compatibility and pnpm
 RUN apk add --no-cache openssl libstdc++ && npm install -g pnpm
 
-# Copy node_modules with all Prisma binaries
+# Copy node_modules with all dependencies (includes Prisma binaries)
 COPY --from=builder /app/node_modules ./node_modules
 
-# Copy package files (needed for Prisma runtime)
+# Copy package files (needed for runtime)
 COPY package.json pnpm-lock.yaml ./
 
-# Copy Prisma schema and client (needed for Prisma runtime)
+# Copy Prisma schema (required for runtime)
 COPY prisma ./prisma
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
 # Copy built artifacts
 COPY --from=builder /app/dist ./dist
