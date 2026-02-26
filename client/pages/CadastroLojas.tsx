@@ -111,6 +111,12 @@ export default function CadastroAnunciantes() {
         : "/api/anunciantes";
       const method = editingId ? "PUT" : "POST";
 
+      console.log("[saveAnuncianteMutation] 🚀 Iniciando requisição HTTP:", {
+        url,
+        method,
+        userId: user?.id,
+      });
+
       const headers: Record<string, string> = {
         "Content-Type": "application/json",
       };
@@ -120,10 +126,20 @@ export default function CadastroAnunciantes() {
         headers["X-User-Id"] = user.id.toString();
       }
 
+      console.log("[saveAnuncianteMutation] 📤 Enviando dados:", {
+        ...data,
+        fotoUrl: data.fotoUrl ? "✓" : "✗",
+      });
+
       const response = await fetch(url, {
         method,
         headers,
         body: JSON.stringify(data),
+      });
+
+      console.log("[saveAnuncianteMutation] 📥 Resposta recebida:", {
+        status: response.status,
+        statusText: response.statusText,
       });
 
       if (!response.ok) {
@@ -160,6 +176,7 @@ export default function CadastroAnunciantes() {
       return response.json();
     },
     onSuccess: () => {
+      console.log("[saveAnuncianteMutation] ✅ Sucesso ao salvar anunciante!");
       toast.success(
         editingId
           ? "Anunciante atualizada com sucesso!"
@@ -194,6 +211,7 @@ export default function CadastroAnunciantes() {
     onError: (error) => {
       const errorMessage =
         error instanceof Error ? error.message : "Erro ao salvar loja";
+      console.error("[saveAnuncianteMutation] ❌ Erro ao salvar:", errorMessage);
       // Use toast.error with duration to ensure long error messages are visible
       toast.error(errorMessage, {
         duration: 5000,
@@ -275,22 +293,41 @@ export default function CadastroAnunciantes() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate required fields
-    if (
-      !formData.nome ||
-      !formData.tipo ||
-      !formData.cnpj ||
-      !formData.endereco ||
-      !formData.cidade ||
-      !formData.estado ||
-      !formData.cep ||
-      !formData.email ||
-      !formData.localidadeId
-    ) {
-      toast.error("Preencha todos os campos obrigatórios marcados com *");
+    // Log form data for debugging
+    console.log("[CadastroLojas] 📝 Tentando salvar anunciante com dados:", {
+      nome: formData.nome || "❌ VAZIO",
+      tipo: formData.tipo || "❌ VAZIO",
+      cnpj: formData.cnpj || "❌ VAZIO",
+      endereco: formData.endereco || "❌ VAZIO",
+      cidade: formData.cidade || "❌ VAZIO",
+      estado: formData.estado || "❌ VAZIO",
+      cep: formData.cep || "❌ VAZIO",
+      email: formData.email || "❌ VAZIO",
+      localidadeId: formData.localidadeId || "❌ VAZIO/NULL",
+      fotoUrl: formData.fotoUrl ? "✓ Foto" : "✗ Sem foto",
+    });
+
+    // Validate required fields with specific error messages
+    const errors: string[] = [];
+
+    if (!formData.nome) errors.push("Nome da Anunciante");
+    if (!formData.tipo) errors.push("Tipo de Anunciante");
+    if (!formData.cnpj) errors.push("CNPJ/CPF");
+    if (!formData.endereco) errors.push("Endereço");
+    if (!formData.cidade) errors.push("Cidade");
+    if (!formData.estado) errors.push("Estado");
+    if (!formData.cep) errors.push("CEP");
+    if (!formData.email) errors.push("Email");
+    if (!formData.localidadeId) errors.push("Localidade");
+
+    if (errors.length > 0) {
+      const errorMessage = `Preencha os campos obrigatórios:\n${errors.join(", ")}`;
+      console.warn("[CadastroLojas] ⚠️ Campos faltando:", errors);
+      toast.error(errorMessage, { duration: 5000 });
       return;
     }
 
+    console.log("[CadastroLojas] ✅ Validação passou, salvando...");
     saveAnuncianteMutation.mutate(formData);
   };
 
