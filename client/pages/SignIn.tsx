@@ -27,6 +27,8 @@ export default function SignIn() {
   const [rememberMe, setRememberMe] = useState(false);
   const [invalidCredentialsAlert, setInvalidCredentialsAlert] = useState(false);
   const [accountBlocked, setAccountBlocked] = useState(false);
+  const [blockedAlert, setBlockedAlert] = useState(false);
+  const [blockedErrorMessage, setBlockedErrorMessage] = useState("");
   const [tentativasRestantes, setTentativasRestantes] = useState<number | null>(null);
 
   // Sign in mutation
@@ -123,15 +125,10 @@ export default function SignIn() {
 
       // Check if account is blocked
       if (errorObj.blocked) {
-        console.warn("[SignIn] Conta bloqueada, redirecionando para suporte");
+        console.warn("[SignIn] Conta bloqueada");
         setAccountBlocked(true);
-        toast.error("Conta Bloqueada", {
-          description: errorMessage,
-          duration: 5000,
-        });
-        setTimeout(() => {
-          navigate("/ajuda-e-contato");
-        }, 2000);
+        setBlockedAlert(true);
+        setBlockedErrorMessage(errorMessage);
         return;
       }
 
@@ -210,6 +207,42 @@ export default function SignIn() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
+
+      {/* Alert Dialog for Blocked Account (Email not verified) */}
+      <AlertDialog open={blockedAlert} onOpenChange={setBlockedAlert}>
+        <AlertDialogContent className="max-w-sm">
+          <AlertDialogHeader>
+            <div className="flex items-center gap-3 mb-2">
+              <div className="bg-red-100 p-3 rounded-full">
+                <AlertCircle className="w-6 h-6 text-red-600" />
+              </div>
+              <AlertDialogTitle className="text-red-600 m-0">
+                Conta Bloqueada
+              </AlertDialogTitle>
+            </div>
+          </AlertDialogHeader>
+          <div className="text-base">
+            <p className="text-gray-700 mb-4">
+              {blockedErrorMessage}
+            </p>
+
+            <p className="text-sm text-gray-600 mb-6">
+              Acesse a página de suporte para mais informações:
+            </p>
+
+            <Link
+              to="/ajuda-e-contato"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors font-semibold w-full justify-center"
+            >
+              <span>Ir para Página de Suporte</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+          <AlertDialogAction className="bg-gray-200 hover:bg-gray-300 text-gray-800 mt-4">
+            Fechar
+          </AlertDialogAction>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Alert Dialog for Invalid Credentials */}
       <AlertDialog open={invalidCredentialsAlert} onOpenChange={setInvalidCredentialsAlert}>

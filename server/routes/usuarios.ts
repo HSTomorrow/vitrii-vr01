@@ -173,9 +173,10 @@ export const signInUsuario: RequestHandler = async (req, res) => {
       if (!usuario.emailVerificado) {
         return res.status(403).json({
           success: false,
-          error: "Sua conta não foi ativada ainda. Por favor, verifique seu e-mail para confirmar o endereço e ativar sua conta.",
-          blocked: false,
+          error: "Usuario bloqueado. Verifique sua caixa de entrada do e-mail ou spam para validar o seu cadastro. Em caso de duvidas, contactar a pagina de suporte.",
+          blocked: true,
           requiresEmailVerification: true,
+          supportUrl: "/ajuda-e-contato",
         });
       }
 
