@@ -8,15 +8,14 @@ const AnuncianteCreateSchema = z.object({
   tipo: z.enum(["Padrão", "Profissional"]).default("Padrão"),
   cnpj: z
     .string()
-    .regex(/^\d{11,14}$/, "CNPJ/CPF inválido")
-    .optional(),
-  endereco: z.string().min(1, "Endereço é obrigatório").optional(),
+    .regex(/^\d{11,14}$/, "CNPJ/CPF inválido"),
+  endereco: z.string().min(1, "Endereço é obrigatório"),
   cidade: z.string().min(1, "Cidade é obrigatória"),
   estado: z.string().length(2, "Estado deve ter 2 caracteres (ex: MG, SP, RJ)"),
+  cep: z.string().min(1, "CEP é obrigatório"),
+  email: z.string().email("Email inválido"),
   descricao: z.string().optional(),
-  email: z.string().email("Email inválido").optional(),
   telefone: z.string().optional(),
-  cep: z.string().optional(),
   site: z.string().optional(),
   instagram: z.string().optional(),
   facebook: z.string().optional(),
@@ -24,6 +23,9 @@ const AnuncianteCreateSchema = z.object({
   chavePix: z.string().max(32, "Chave PIX deve ter no máximo 32 caracteres").optional(),
   fotoUrl: z.string().optional(),
   iconColor: z.enum(["azul", "verde", "rosa", "vermelho", "laranja"]).default("azul"),
+  localidadeId: z.number().int().positive("Localidade inválida"),
+  status: z.enum(["Ativo", "Desativado"]).default("Ativo"),
+  temAgenda: z.boolean().default(false),
 });
 
 // GET all anunciantes (with pagination and user filtering)
@@ -200,6 +202,17 @@ export const getAnuncianteById: RequestHandler = async (req, res) => {
 // CREATE new anunciante
 export const createAnunciante: RequestHandler = async (req, res) => {
   try {
+    console.log("[createAnunciante] 📝 Iniciando criação de anunciante com dados:", {
+      nome: req.body.nome,
+      cidade: req.body.cidade,
+      estado: req.body.estado,
+      iconColor: req.body.iconColor,
+      localidadeId: req.body.localidadeId,
+      status: req.body.status,
+      temAgenda: req.body.temAgenda,
+      fotoUrl: req.body.fotoUrl ? "✓ Foto fornecida" : "✗ Sem foto",
+    });
+
     const validatedData = AnuncianteCreateSchema.parse(req.body);
     const { usuarioId } = req.body; // Optional userId to link the creator
 
@@ -256,6 +269,9 @@ export const createAnunciante: RequestHandler = async (req, res) => {
         chavePix: validatedData.chavePix,
         fotoUrl: validatedData.fotoUrl,
         iconColor: validatedData.iconColor,
+        localidadeId: validatedData.localidadeId,
+        status: validatedData.status,
+        temAgenda: validatedData.temAgenda,
         dataCriacao: new Date(),
         dataAtualizacao: new Date(),
       },
@@ -276,6 +292,15 @@ export const createAnunciante: RequestHandler = async (req, res) => {
         console.error("Error linking user to anunciante:", err);
       }
     }
+
+    console.log("[createAnunciante] ✅ Anunciante criado com sucesso:", {
+      id: anunciante.id,
+      nome: anunciante.nome,
+      iconColor: anunciante.iconColor,
+      status: anunciante.status,
+      fotoUrl: anunciante.fotoUrl ? "✓" : "✗",
+      localidadeId: anunciante.localidadeId,
+    });
 
     res.status(201).json({
       success: true,
