@@ -11,7 +11,7 @@ primary_region = "gru"
 
 # Process definitions
 [processes]
-  app = "node dist/server/production.mjs"
+  app = "node dist/server/node-build.mjs"
 
 # HTTP services configuration
 [[services]]

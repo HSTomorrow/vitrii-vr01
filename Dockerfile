@@ -53,4 +53,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
 
 # Start server using the built Node.js application
-CMD ["node", "dist/server/production.mjs"]
+CMD ["node", "dist/server/node-build.mjs"]
