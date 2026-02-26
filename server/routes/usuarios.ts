@@ -8,6 +8,22 @@ import crypto from "crypto";
 // NOTE: This file handles usracessos (User Access) model operations
 // Routes are registered as /api/usracessos in server/index.ts
 
+/**
+ * Helper function to get the APP_URL for email links
+ * Priority: APP_URL env var > request origin > default
+ */
+function getAppUrl(requestOrigin?: string): string {
+  if (process.env.APP_URL) {
+    return process.env.APP_URL;
+  }
+
+  if (requestOrigin) {
+    return requestOrigin;
+  }
+
+  return "https://www.vitrii.com.br";
+}
+
 // Schema validation for signup (basic info only)
 const UsuarioSignUpSchema = z
   .object({
@@ -373,13 +389,14 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
     console.log("[signUpUsuario] 📝 Token de verificação salvo no banco de dados (expiração: 10 minutos)");
 
     // Build verification link
-    const appUrl = process.env.APP_URL || "https://www.vitrii.com.br";
+    const requestOrigin = req.headers.origin || req.headers.referer?.split('/').slice(0, 3).join('/') || undefined;
+    const appUrl = getAppUrl(requestOrigin);
     const verificationLink = `${appUrl}/verificar-email?token=${verificationToken}&email=${encodeURIComponent(usuario.email)}`;
 
     // Send verification email
     console.log("[signUpUsuario] 📧 Link de verificação gerado:", {
       appUrl,
-      linkPreview: verificationLink.substring(0, 80) + "...",
+      linkPreview: verificationLink.substring(0, 100) + "...",
     });
 
     console.log("[signUpUsuario] 📧 Tentando enviar email de verificação...");
@@ -1850,7 +1867,8 @@ export const resendVerificationEmail: RequestHandler = async (req, res) => {
     console.log("[resendVerificationEmail] 📝 Novo token salvo com expiração de 10 minutos");
 
     // Build verification link
-    const appUrl = process.env.APP_URL || "https://www.vitrii.com.br";
+    const requestOrigin = req.headers.origin || req.headers.referer?.split('/').slice(0, 3).join('/') || undefined;
+    const appUrl = getAppUrl(requestOrigin);
     const verificationLink = `${appUrl}/verificar-email?token=${verificationToken}&email=${encodeURIComponent(usuario.email)}`;
 
     console.log("[resendVerificationEmail] 📧 Tentando enviar novo email de verificação...");
