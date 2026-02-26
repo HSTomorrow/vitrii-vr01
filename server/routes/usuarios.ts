@@ -179,6 +179,18 @@ export const signInUsuario: RequestHandler = async (req, res) => {
     // Check if user is inactive
     if (usuario.status === "inativo") {
       console.warn("[signInUsuario] ⚠️ Usuário inativo:", email);
+
+      // Check if email is not verified (new user)
+      if (!usuario.emailVerificado) {
+        return res.status(403).json({
+          success: false,
+          error: "Sua conta não foi ativada ainda. Por favor, verifique seu e-mail para confirmar o endereço e ativar sua conta.",
+          blocked: false,
+          requiresEmailVerification: true,
+        });
+      }
+
+      // Otherwise, account was deactivated by admin
       return res.status(403).json({
         success: false,
         error: "Sua conta foi desativada. Por favor, entre em contato com o suporte.",
@@ -333,6 +345,7 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
         nome: validatedData.nome,
         email: validatedData.email,
         senha: senhaHash,
+        status: "inativo", // New users start as inactive until email is verified
       },
     });
 
@@ -340,6 +353,7 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
       id: usuario.id,
       nome: usuario.nome,
       email: usuario.email,
+      status: "inativo",
     });
 
     // Generate email verification token (24 hours expiration)
@@ -347,9 +361,15 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
     const expirationDate = new Date();
     expirationDate.setHours(expirationDate.getHours() + 24);
 
-    // Note: emailVerificationToken table creation disabled - table doesn't exist in database yet
-    // We'll send the email but skip storing the token in DB
-    console.log("[signUpUsuario] 📝 Token de verificação gerado (não será armazenado em DB)");
+    // Save verification token to database
+    await prisma.emailVerificationToken.create({
+      data: {
+        usuarioId: usuario.id,
+        token: verificationToken,
+        expiresAt: expirationDate,
+      },
+    });
+    console.log("[signUpUsuario] 📝 Token de verificação salvo no banco de dados");
 
     // Build verification link
     const appUrl = process.env.APP_URL || "https://www.vitrii.com.br";
@@ -1133,14 +1153,16 @@ export const verifyEmail: RequestHandler = async (req, res) => {
 
     console.log("[verifyEmail] ✅ Email válido, processando verificação:", email);
 
-    // TODO: Mark email as verified in the database once emailVerificado column is created
-    // For now, just delete the token to confirm verification
-    // await prisma.usracessos.update({
-    //   where: { id: verificationTokenRecord.usuarioId },
-    //   data: { emailVerificado: true },
-    // });
+    // Mark email as verified and activate user account
+    await prisma.usracessos.update({
+      where: { id: verificationTokenRecord.usuarioId },
+      data: {
+        emailVerificado: true,
+        status: "ativo", // Activate user after email verification
+      },
+    });
 
-    console.log("[verifyEmail] ✅ Email verificado (será marcado no banco quando coluna existir)");
+    console.log("[verifyEmail] ✅ Email verificado e conta ativada");
 
     // Delete the token after use
     await prisma.emailVerificationToken.delete({
