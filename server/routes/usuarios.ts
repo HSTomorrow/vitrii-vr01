@@ -1154,10 +1154,14 @@ export const verifyEmail: RequestHandler = async (req, res) => {
       });
     }
 
-    console.log("[verifyEmail] ✅ Email válido, processando verificação:", email);
+    console.log("[verifyEmail] ✅ Email válido, processando verificação:", {
+      email,
+      token: (token as string).substring(0, 10) + "...",
+    });
 
     // Mark email as verified and activate user account
-    await prisma.usracessos.update({
+    console.log("[verifyEmail] 📝 Atualizando status do usuário para 'ativo'...");
+    const updatedUsuario = await prisma.usracessos.update({
       where: { id: verificationTokenRecord.usuarioId },
       data: {
         emailVerificado: true,
@@ -1165,29 +1169,47 @@ export const verifyEmail: RequestHandler = async (req, res) => {
       },
     });
 
-    console.log("[verifyEmail] ✅ Email verificado e conta ativada");
+    console.log("[verifyEmail] ✅ Email verificado e conta ativada", {
+      usuarioId: updatedUsuario.id,
+      email: updatedUsuario.email,
+      status: updatedUsuario.status,
+      emailVerificado: updatedUsuario.emailVerificado,
+    });
 
     // Delete the token after use
+    console.log("[verifyEmail] 🗑️ Deletando token de verificação...");
     await prisma.emailVerificationToken.delete({
       where: { id: verificationTokenRecord.id },
     });
 
     console.log("[verifyEmail] ✅ Token de verificação deletado");
 
-    // Send welcome email now that email is verified
-    console.log("[verifyEmail] 📧 Enviando email de boas-vindas...");
-    await sendWelcomeEmail(verificationTokenRecord.usuario.email, verificationTokenRecord.usuario.nome);
-
-    console.log("[verifyEmail] 🎉 Processo de verificação de email completo");
+    // Send success response before sending welcome email
     res.status(200).json({
       success: true,
       message: "Email verificado com sucesso! Sua conta está ativada.",
     });
+
+    // Send welcome email asynchronously (don't wait for it)
+    // If it fails, it won't affect the user's ability to log in
+    console.log("[verifyEmail] 📧 Enviando email de boas-vindas (assincronamente)...");
+    try {
+      await sendWelcomeEmail(verificationTokenRecord.usuario.email, verificationTokenRecord.usuario.nome);
+      console.log("[verifyEmail] 🎉 Email de boas-vindas enviado com sucesso");
+    } catch (emailError) {
+      console.warn("[verifyEmail] ⚠️ Erro ao enviar email de boas-vindas (não afeta verificação):", emailError);
+    }
   } catch (error) {
-    console.error("Error verifying email:", error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("[verifyEmail] 🔴 ERRO:", {
+      message: errorMessage,
+      email,
+      token: (token as string)?.substring(0, 10) + "...",
+    });
     res.status(500).json({
       success: false,
       error: "Erro ao verificar email",
+      details: process.env.NODE_ENV === "development" ? errorMessage : undefined,
     });
   }
 };
@@ -1198,11 +1220,14 @@ export const checkUserStatusByEmail: RequestHandler = async (req, res) => {
     const { email } = req.query;
 
     if (!email) {
+      console.warn("[checkUserStatusByEmail] ⚠️ Email not provided in query");
       return res.status(400).json({
         success: false,
         error: "Email é obrigatório",
       });
     }
+
+    console.log("[checkUserStatusByEmail] 🔍 Buscando status do usuário para:", email);
 
     const usuario = await prisma.usracessos.findUnique({
       where: { email: email as string },
@@ -1216,13 +1241,15 @@ export const checkUserStatusByEmail: RequestHandler = async (req, res) => {
     });
 
     if (!usuario) {
+      console.warn("[checkUserStatusByEmail] ⚠️ Usuário não encontrado:", email);
       return res.status(404).json({
         success: false,
         error: "Usuário não encontrado",
       });
     }
 
-    console.log("[checkUserStatusByEmail] Status for user:", {
+    console.log("[checkUserStatusByEmail] ✅ Status encontrado para usuário:", {
+      id: usuario.id,
       email: usuario.email,
       status: usuario.status,
       emailVerificado: usuario.emailVerificado,
@@ -1233,7 +1260,11 @@ export const checkUserStatusByEmail: RequestHandler = async (req, res) => {
       data: usuario,
     });
   } catch (error) {
-    console.error("Error checking user status by email:", error);
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("[checkUserStatusByEmail] 🔴 ERRO:", {
+      message: errorMessage,
+      email: (req.query.email as string)?.substring(0, 20),
+    });
     res.status(500).json({
       success: false,
       error: "Erro ao verificar status do usuário",

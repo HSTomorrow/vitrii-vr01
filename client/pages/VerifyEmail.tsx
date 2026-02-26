@@ -16,34 +16,56 @@ export default function VerifyEmail() {
         const token = searchParams.get("token");
         const email = searchParams.get("email");
 
+        console.log("[VerifyEmail] 📧 Iniciando verificação com parâmetros:", {
+          token: token ? token.substring(0, 10) + "..." : "NÃO FORNECIDO",
+          email: email || "NÃO FORNECIDO",
+        });
+
         if (!token || !email) {
+          console.error("[VerifyEmail] ❌ Parâmetros inválidos ou faltando");
           setStatus("error");
           setMessage("Link de verificação inválido");
           return;
         }
 
+        console.log("[VerifyEmail] 🔄 Chamando endpoint de verificação...");
         const response = await fetch(
           `/api/auth/verify-email?token=${token}&email=${encodeURIComponent(email)}`
         );
 
+        console.log("[VerifyEmail] 📬 Resposta recebida com status:", response.status);
+
         const data = await response.json();
 
+        console.log("[VerifyEmail] 📋 Dados da resposta:", {
+          success: data.success,
+          message: data.message,
+          error: data.error,
+        });
+
         if (data.success) {
+          console.log("[VerifyEmail] ✅ Email verificado com sucesso!");
           setStatus("success");
           setMessage(data.message || "Email verificado com sucesso!");
-          
+
           // Redirect to home page after 3 seconds
           setTimeout(() => {
+            console.log("[VerifyEmail] 🚀 Redirecionando para home page...");
             navigate("/");
           }, 3000);
         } else {
+          console.warn("[VerifyEmail] ⚠️ Erro na resposta:", data.error);
           setStatus("error");
           setMessage(data.error || "Erro ao verificar email");
         }
       } catch (error) {
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.error("[VerifyEmail] 🔴 ERRO ao processar verificação:", {
+          message: errorMessage,
+          error,
+        });
         setStatus("error");
         setMessage("Erro ao processar verificação de email");
-        console.error("Error verifying email:", error);
       }
     };
 
