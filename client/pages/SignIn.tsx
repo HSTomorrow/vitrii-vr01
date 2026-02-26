@@ -316,10 +316,10 @@ export default function SignIn() {
               </AlertDialogTitle>
             </div>
           </AlertDialogHeader>
+          <AlertDialogDescription className="text-gray-700 mb-4">
+            {blockedErrorMessage}
+          </AlertDialogDescription>
           <div className="text-base">
-            <p className="text-gray-700 mb-4">
-              {blockedErrorMessage}
-            </p>
 
             <div className="bg-blue-50 border-l-4 border-blue-500 p-3 mb-6 rounded">
               <p className="text-sm text-blue-900 font-semibold mb-2">
