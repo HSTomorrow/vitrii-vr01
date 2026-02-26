@@ -1159,15 +1159,41 @@ export const verifyEmail: RequestHandler = async (req, res) => {
 
     // Find the verification token
     console.log("[verifyEmail] 🔍 Procurando token de verificação no banco de dados...");
+    console.log("[verifyEmail] Token procurado:", (token as string).substring(0, 30) + "...");
+
     const verificationTokenRecord = await prisma.emailVerificationToken.findUnique({
       where: { token: token as string },
       include: { usuario: true },
     });
 
     console.log("[verifyEmail] Token encontrado?", !!verificationTokenRecord);
+
     if (!verificationTokenRecord) {
+      // Try to find any tokens for debugging
+      console.warn("[verifyEmail] ⚠️ Token específico não encontrado. Verificando todos os tokens no banco...");
+      const allTokens = await prisma.emailVerificationToken.findMany({
+        take: 10,
+        orderBy: { createdAt: "desc" },
+        select: {
+          id: true,
+          token: true,
+          expiresAt: true,
+          createdAt: true,
+          usuarioId: true,
+        },
+      });
+
+      console.log("[verifyEmail] 📋 Últimos tokens no banco:", allTokens.map(t => ({
+        id: t.id,
+        tokenPreview: t.token.substring(0, 20) + "...",
+        usuarioId: t.usuarioId,
+        expiresAt: t.expiresAt,
+        createdAt: t.createdAt,
+      })));
+
       console.error("[verifyEmail] ❌ Token não encontrado no banco:", {
-        token: (token as string).substring(0, 20) + "...",
+        tokenProcurado: (token as string).substring(0, 30) + "...",
+        email,
       });
       return res.status(400).json({
         success: false,
