@@ -13,14 +13,22 @@ import crypto from "crypto";
  * Priority: APP_URL env var > request origin > default
  */
 function getAppUrl(requestOrigin?: string): string {
+  console.log("[getAppUrl] 🔍 Determinando APP_URL:", {
+    APP_URL_env: process.env.APP_URL || "NOT SET",
+    requestOrigin: requestOrigin || "NOT PROVIDED",
+  });
+
   if (process.env.APP_URL) {
+    console.log("[getAppUrl] ✅ Usando APP_URL do ambiente:", process.env.APP_URL);
     return process.env.APP_URL;
   }
 
   if (requestOrigin) {
+    console.log("[getAppUrl] ✅ Usando requestOrigin:", requestOrigin);
     return requestOrigin;
   }
 
+  console.log("[getAppUrl] ⚠️ Usando default fallback: https://www.vitrii.com.br");
   return "https://www.vitrii.com.br";
 }
 
