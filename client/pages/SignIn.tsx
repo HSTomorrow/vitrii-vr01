@@ -139,7 +139,7 @@ export default function SignIn() {
         setBlockedAlert(true);
         setBlockedEmail(formData.email);
         setBlockedErrorMessage(errorMessage);
-        setResendCooldown(30);
+        setResendCooldown(60);
         return;
       }
 
@@ -192,8 +192,8 @@ export default function SignIn() {
         description: "Verifique sua caixa de entrada ou pasta de spam.",
         duration: 3000,
       });
-      // Start 30-second cooldown
-      setResendCooldown(30);
+      // Start 60-second cooldown
+      setResendCooldown(60);
     },
     onError: (error) => {
       const errorObj = error as any;

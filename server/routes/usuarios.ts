@@ -1725,12 +1725,12 @@ export const resendVerificationEmail: RequestHandler = async (req, res) => {
       });
     }
 
-    // Check rate limiting (30 second cooldown between requests)
+    // Check rate limiting (60 second cooldown between requests)
     const agora = new Date();
     if (usuario.ultimoEmailValidacao) {
       const segundosDesdeUltimo = (agora.getTime() - usuario.ultimoEmailValidacao.getTime()) / 1000;
-      if (segundosDesdeUltimo < 30) {
-        const segundosRestantes = Math.ceil(30 - segundosDesdeUltimo);
+      if (segundosDesdeUltimo < 60) {
+        const segundosRestantes = Math.ceil(60 - segundosDesdeUltimo);
         console.warn("[resendVerificationEmail] ⏱️ Rate limit atingido para:", email, `- ${segundosRestantes}s restantes`);
         return res.status(429).json({
           success: false,
