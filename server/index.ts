@@ -1046,6 +1046,8 @@ export function createServer() {
           nome: req.body.nome || "Test User",
           email: req.body.email || `test-${Date.now()}@test.com`,
           senha: "hash123",
+          status: "bloqueado",
+          emailVerificado: false,
         },
       });
 

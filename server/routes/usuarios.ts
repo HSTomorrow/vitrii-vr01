@@ -497,6 +497,8 @@ export const createUsuario: RequestHandler = async (req, res) => {
         endereco: validatedData.endereco || "",
         tipoUsuario: "comum",
         tassinatura: "Gratuito", // Always start as Gratuito
+        status: "bloqueado", // New users start as blocked until email is verified
+        emailVerificado: false,
         dataAtualizacao: new Date(),
         dataVigenciaContrato: contractExpireDate,
         numeroAnunciosAtivos: 0,
