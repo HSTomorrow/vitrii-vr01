@@ -221,6 +221,7 @@ model usracessos {
   tassinatura             String                      @default("Gratuito") @db.VarChar(20)
   status                  String                      @default("bloqueado") @db.VarChar(20) // "ativo", "inativo", ou "bloqueado" (new users start as "bloqueado" until email verification)
   emailVerificado         Boolean                     @default(false) // Email verification status
+  ultimoEmailValidacao    DateTime? // Timestamp do último email de validação enviado (rate limiting)
   tentativasLoginFalhadas Int                         @default(0) // Contador de tentativas de login falhadas
   ultimaTentativaLogin    DateTime? // Timestamp da última tentativa de login
   dataCriacao             DateTime                    @default(now())

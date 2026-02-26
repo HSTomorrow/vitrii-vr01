@@ -357,10 +357,10 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
       status: "bloqueado",
     });
 
-    // Generate email verification token (24 hours expiration)
+    // Generate email verification token (10 minutes expiration)
     const verificationToken = crypto.randomBytes(32).toString("hex");
     const expirationDate = new Date();
-    expirationDate.setHours(expirationDate.getHours() + 24);
+    expirationDate.setMinutes(expirationDate.getMinutes() + 10);
 
     // Save verification token to database
     await prisma.emailVerificationToken.create({
@@ -370,7 +370,7 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
         expiresAt: expirationDate,
       },
     });
-    console.log("[signUpUsuario] 📝 Token de verificação salvo no banco de dados");
+    console.log("[signUpUsuario] 📝 Token de verificação salvo no banco de dados (expiração: 10 minutos)");
 
     // Build verification link
     const appUrl = process.env.APP_URL || "https://www.vitrii.com.br";
@@ -1637,6 +1637,118 @@ export const unlockUserAccount: RequestHandler = async (req, res) => {
     res.status(500).json({
       success: false,
       error: "Erro ao desbloquear conta do usuário",
+    });
+  }
+};
+
+// RESEND verification email (Rate limited to 1 request per 30 seconds)
+export const resendVerificationEmail: RequestHandler = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        error: "Email é obrigatório",
+      });
+    }
+
+    console.log("[resendVerificationEmail] 📧 Tentando reenviar email para:", email);
+
+    // Find user by email
+    const usuario = await prisma.usracessos.findUnique({
+      where: { email },
+    });
+
+    if (!usuario) {
+      // Don't reveal if user exists (security)
+      return res.status(200).json({
+        success: true,
+        message: "Se este email estiver registrado, você receberá um email de verificação.",
+      });
+    }
+
+    // Check if user is already verified
+    if (usuario.emailVerificado) {
+      return res.status(400).json({
+        success: false,
+        error: "Este usuário já foi verificado.",
+      });
+    }
+
+    // Check rate limiting (30 second cooldown between requests)
+    const agora = new Date();
+    if (usuario.ultimoEmailValidacao) {
+      const segundosDesdeUltimo = (agora.getTime() - usuario.ultimoEmailValidacao.getTime()) / 1000;
+      if (segundosDesdeUltimo < 30) {
+        const segundosRestantes = Math.ceil(30 - segundosDesdeUltimo);
+        console.warn("[resendVerificationEmail] ⏱️ Rate limit atingido para:", email, `- ${segundosRestantes}s restantes`);
+        return res.status(429).json({
+          success: false,
+          error: `Aguarde ${segundosRestantes} segundo(s) antes de solicitar um novo email.`,
+          cooldownSeconds: segundosRestantes,
+        });
+      }
+    }
+
+    // Delete old verification tokens for this user
+    await prisma.emailVerificationToken.deleteMany({
+      where: { usuarioId: usuario.id },
+    });
+
+    // Generate new verification token (10 minutes expiration)
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+    const expirationDate = new Date();
+    expirationDate.setMinutes(expirationDate.getMinutes() + 10); // 10 minutes
+
+    // Save new verification token
+    await prisma.emailVerificationToken.create({
+      data: {
+        usuarioId: usuario.id,
+        token: verificationToken,
+        expiresAt: expirationDate,
+      },
+    });
+
+    console.log("[resendVerificationEmail] 📝 Novo token salvo com expiração de 10 minutos");
+
+    // Build verification link
+    const appUrl = process.env.APP_URL || "https://www.vitrii.com.br";
+    const verificationLink = `${appUrl}/verificar-email?token=${verificationToken}&email=${encodeURIComponent(usuario.email)}`;
+
+    console.log("[resendVerificationEmail] 📧 Tentando enviar novo email de verificação...");
+
+    // Send verification email
+    const emailSent = await sendEmailVerificationEmail(usuario.email, usuario.nome, verificationLink);
+
+    if (!emailSent) {
+      console.error("[resendVerificationEmail] ❌ Falha ao enviar email de verificação");
+      return res.status(500).json({
+        success: false,
+        error: "Falha ao enviar email de verificação. Por favor, tente novamente mais tarde.",
+      });
+    }
+
+    // Update last email sent timestamp
+    await prisma.usracessos.update({
+      where: { id: usuario.id },
+      data: {
+        ultimoEmailValidacao: agora,
+      },
+    });
+
+    console.log(`[resendVerificationEmail] ✅ Email de verificação reenviado com sucesso para: ${usuario.email}`);
+
+    res.json({
+      success: true,
+      message: "Email de verificação reenviado com sucesso. Por favor, verifique sua caixa de entrada ou pasta de spam.",
+    });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("[resendVerificationEmail] 🔴 ERRO:", errorMessage);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao reenviar email de verificação",
     });
   }
 };

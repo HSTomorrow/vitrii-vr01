@@ -77,6 +77,7 @@ import {
   updateMaxAnunciosAtivos,
   updateLocalidadePadrao,
   changePassword,
+  resendVerificationEmail,
 } from "./routes/usuarios";
 import {
   getEquipes,
@@ -330,6 +331,7 @@ export function createServer() {
   app.post("/api/auth/reset-password", resetPassword);
   app.get("/api/auth/validate-reset-token", validateResetToken);
   app.get("/api/auth/verify-email", verifyEmail);
+  app.post("/api/auth/resend-verification-email", resendVerificationEmail);
 
   // Database migration helper - Create emailVerificado column if missing
   app.get("/api/db/create-email-verificado-column", async (_req, res) => {

@@ -29,7 +29,9 @@ export default function SignIn() {
   const [accountBlocked, setAccountBlocked] = useState(false);
   const [blockedAlert, setBlockedAlert] = useState(false);
   const [blockedErrorMessage, setBlockedErrorMessage] = useState("");
+  const [blockedEmail, setBlockedEmail] = useState("");
   const [tentativasRestantes, setTentativasRestantes] = useState<number | null>(null);
+  const [resendCooldown, setResendCooldown] = useState(0); // Timer em segundos
 
   // Sign in mutation
   const signInMutation = useMutation({
@@ -128,7 +130,9 @@ export default function SignIn() {
         console.warn("[SignIn] Conta bloqueada");
         setAccountBlocked(true);
         setBlockedAlert(true);
+        setBlockedEmail(formData.email);
         setBlockedErrorMessage(errorMessage);
+        setResendCooldown(30); // Start with 30 second cooldown
         return;
       }
 
@@ -147,6 +151,70 @@ export default function SignIn() {
       }
     },
   });
+
+  // Resend verification email mutation
+  const resendEmailMutation = useMutation({
+    mutationFn: async (email: string) => {
+      console.log("[SignIn] Reenviando email de verificação para:", email);
+      const response = await fetch("/api/auth/resend-verification-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        const error = new Error(errorData.error) as any;
+        error.cooldownSeconds = errorData.cooldownSeconds;
+        throw error;
+      }
+
+      return response.json();
+    },
+    onSuccess: (data) => {
+      console.log("[SignIn] ✅ Email reenviado com sucesso");
+      toast.success("Email de verificação reenviado!", {
+        description: "Verifique sua caixa de entrada ou pasta de spam.",
+        duration: 3000,
+      });
+      // Start 30-second cooldown
+      setResendCooldown(30);
+    },
+    onError: (error) => {
+      const errorObj = error as any;
+      console.error("[SignIn] ❌ Erro ao reenviar email:", error);
+
+      if (errorObj.cooldownSeconds) {
+        toast.error(`Aguarde ${errorObj.cooldownSeconds} segundo(s)`, {
+          description: "Você está tentando reenviar muito rápido.",
+          duration: 3000,
+        });
+        setResendCooldown(errorObj.cooldownSeconds);
+      } else {
+        toast.error(errorObj.message || "Erro ao reenviar email", {
+          description: "Por favor, tente novamente mais tarde.",
+          duration: 3000,
+        });
+      }
+    },
+  });
+
+  // Timer para cooldown de 30 segundos
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+
+    const timer = setTimeout(() => {
+      setResendCooldown((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearTimeout(timer);
+  }, [resendCooldown]);
+
+  const handleResendEmail = () => {
+    if (blockedEmail) {
+      resendEmailMutation.mutate(blockedEmail);
+    }
+  };
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({
@@ -226,8 +294,31 @@ export default function SignIn() {
               {blockedErrorMessage}
             </p>
 
-            <p className="text-sm text-gray-600 mb-6">
-              Acesse a página de suporte para mais informações:
+            <div className="bg-blue-50 border-l-4 border-blue-500 p-3 mb-6 rounded">
+              <p className="text-sm text-blue-900 font-semibold mb-2">
+                💡 Você pode reenviar o email de verificação:
+              </p>
+              <button
+                onClick={handleResendEmail}
+                disabled={resendCooldown > 0 || resendEmailMutation.isPending}
+                className={`w-full py-2 px-4 rounded font-semibold text-sm transition-colors ${
+                  resendCooldown > 0 || resendEmailMutation.isPending
+                    ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                    : "bg-blue-600 text-white hover:bg-blue-700"
+                }`}
+              >
+                {resendEmailMutation.isPending ? (
+                  "Reenviando..."
+                ) : resendCooldown > 0 ? (
+                  `Aguarde ${resendCooldown}s`
+                ) : (
+                  "Reenviar Email de Verificação"
+                )}
+              </button>
+            </div>
+
+            <p className="text-sm text-gray-600 mb-4">
+              Ou acesse a página de suporte para mais informações:
             </p>
 
             <Link
