@@ -80,7 +80,10 @@ export default function AnunciosCarousel({
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const heartButtonRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
   const [animatingIds, setAnimatingIds] = useState<Set<number>>(new Set());
-  const colors = colorClasses[color];
+
+  // Ensure color is valid, default to "blue" if not
+  const validColor = (color as keyof typeof colorClasses) in colorClasses ? color : "blue";
+  const colors = colorClasses[validColor as keyof typeof colorClasses];
 
   // Trigger animation when favorite status changes
   useEffect(() => {
