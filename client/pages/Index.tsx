@@ -34,14 +34,24 @@ const extractMunicipality = (endereco: string): string => {
 
 export default function Index() {
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
+  const { user, logout, isLoading } = useAuth();
   const queryClient = useQueryClient();
   const [favoritos, setFavoritos] = useState<Set<number>>(new Set());
+
+  // Debug log on mount and when user changes
+  useEffect(() => {
+    console.log("[Index] Page loaded - isLoading:", isLoading, "user:", user?.email || "null");
+  }, [isLoading, user?.email]);
 
   // Validate user status on page load (only if user is logged in)
   useEffect(() => {
     // Only validate if we have a user
-    if (!user?.id) return;
+    if (!user?.id) {
+      console.log("[Index] No user logged in, skipping status validation");
+      return;
+    }
+
+    console.log("[Index] Validating user status for:", user.email);
 
     const validateUserStatus = async () => {
       try {
@@ -52,12 +62,14 @@ export default function Index() {
 
           // User is inactive or doesn't exist
           if (response.status === 403 || response.status === 404) {
-            console.warn("[Index] User is inactive or not found, logging out...");
+            console.warn("[Index] User is inactive or not found (status: " + response.status + "), logging out and redirecting...", errorData);
             toast.error(errorData.error || "Sua conta foi desativada");
             logout();
             navigate("/auth/signin");
             return;
           }
+
+          console.warn("[Index] Validation error but not 403/404:", response.status, errorData);
         }
       } catch (error) {
         console.error("[Index] Error validating user status:", error);
