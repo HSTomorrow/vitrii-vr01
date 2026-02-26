@@ -12,7 +12,7 @@ const AnuncianteCreateSchema = z.object({
   endereco: z.string().min(1, "Endereço é obrigatório"),
   cidade: z.string().min(1, "Cidade é obrigatória"),
   estado: z.string().length(2, "Estado deve ter 2 caracteres (ex: MG, SP, RJ)"),
-  cep: z.string().min(1, "CEP é obrigatório"),
+  cep: z.string().regex(/^\d{8}$/, "CEP deve conter 8 dígitos"),
   email: z.string().email("Email inválido"),
   descricao: z.string().optional(),
   telefone: z.string().optional(),
@@ -21,7 +21,7 @@ const AnuncianteCreateSchema = z.object({
   facebook: z.string().optional(),
   whatsapp: z.string().optional(),
   chavePix: z.string().max(32, "Chave PIX deve ter no máximo 32 caracteres").optional(),
-  fotoUrl: z.string().optional(),
+  fotoUrl: z.union([z.null(), z.string().max(500, "URL da foto muito longa")]).optional(),
   iconColor: z.enum(["azul", "verde", "rosa", "vermelho", "laranja"]).default("azul"),
   localidadeId: z.number().int().positive("Localidade inválida"),
   status: z.enum(["Ativo", "Desativado"]).default("Ativo"),
@@ -213,6 +213,21 @@ export const createAnunciante: RequestHandler = async (req, res) => {
       fotoUrl: req.body.fotoUrl ? "✓ Foto fornecida" : "✗ Sem foto",
     });
 
+    // Clean CEP - remove hyphen and spaces before validation
+    if (req.body.cep) {
+      req.body.cep = req.body.cep.replace(/[^\d]/g, '');
+    }
+
+    // Clean empty fotoUrl to null
+    if (!req.body.fotoUrl || (typeof req.body.fotoUrl === 'string' && req.body.fotoUrl.trim() === '')) {
+      req.body.fotoUrl = null;
+    }
+
+    console.log("[createAnunciante] 🧹 Dados após limpeza:", {
+      cep: req.body.cep,
+      fotoUrl: req.body.fotoUrl,
+    });
+
     const validatedData = AnuncianteCreateSchema.parse(req.body);
     const { usuarioId } = req.body; // Optional userId to link the creator
 
@@ -248,6 +263,27 @@ export const createAnunciante: RequestHandler = async (req, res) => {
 
     // Multiple anunciantes can have the same CNPJ (no restriction between anunciantes)
     // The restriction is only between user and anunciante
+
+    // Log field lengths before creating
+    console.log("[createAnunciante] 📏 Tamanho dos campos:", {
+      nome: validatedData.nome ? validatedData.nome.length : 0,
+      tipo: validatedData.tipo ? validatedData.tipo.length : 0,
+      cnpj: validatedData.cnpj ? validatedData.cnpj.length : 0,
+      endereco: validatedData.endereco ? validatedData.endereco.length : 0,
+      cidade: validatedData.cidade ? validatedData.cidade.length : 0,
+      estado: validatedData.estado ? validatedData.estado.length : 0,
+      cep: validatedData.cep ? validatedData.cep.length : 0,
+      email: validatedData.email ? validatedData.email.length : 0,
+      telefone: validatedData.telefone ? validatedData.telefone.length : 0,
+      site: validatedData.site ? validatedData.site.length : 0,
+      instagram: validatedData.instagram ? validatedData.instagram.length : 0,
+      facebook: validatedData.facebook ? validatedData.facebook.length : 0,
+      whatsapp: validatedData.whatsapp ? validatedData.whatsapp.length : 0,
+      chavePix: validatedData.chavePix ? validatedData.chavePix.length : 0,
+      fotoUrl: validatedData.fotoUrl ? validatedData.fotoUrl.length : 0,
+      iconColor: validatedData.iconColor ? validatedData.iconColor.length : 0,
+      descricao: validatedData.descricao ? validatedData.descricao.length : 0,
+    });
 
     // Create anunciante with required and optional fields
     const anunciante = await prisma.anunciantes.create({
