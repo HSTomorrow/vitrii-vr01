@@ -1192,6 +1192,55 @@ export const verifyEmail: RequestHandler = async (req, res) => {
   }
 };
 
+// CHECK USER STATUS BY EMAIL - For polling if user verified their email
+export const checkUserStatusByEmail: RequestHandler = async (req, res) => {
+  try {
+    const { email } = req.query;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        error: "Email é obrigatório",
+      });
+    }
+
+    const usuario = await prisma.usracessos.findUnique({
+      where: { email: email as string },
+      select: {
+        id: true,
+        nome: true,
+        email: true,
+        status: true,
+        emailVerificado: true,
+      },
+    });
+
+    if (!usuario) {
+      return res.status(404).json({
+        success: false,
+        error: "Usuário não encontrado",
+      });
+    }
+
+    console.log("[checkUserStatusByEmail] Status for user:", {
+      email: usuario.email,
+      status: usuario.status,
+      emailVerificado: usuario.emailVerificado,
+    });
+
+    res.status(200).json({
+      success: true,
+      data: usuario,
+    });
+  } catch (error) {
+    console.error("Error checking user status by email:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao verificar status do usuário",
+    });
+  }
+};
+
 // ADMIN: Get all users with passwords (only for ADM users)
 export const getUsuariosComSenha: RequestHandler = async (req, res) => {
   try {

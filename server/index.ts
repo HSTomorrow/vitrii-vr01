@@ -71,6 +71,7 @@ import {
   resetPassword,
   validateResetToken,
   verifyEmail,
+  checkUserStatusByEmail,
   getUsuariosComSenha,
   adminResetUserPassword,
   adminUpdateUserProfile,
@@ -341,6 +342,7 @@ export function createServer() {
   app.get("/api/usracessos", getUsuarios);
   app.get("/api/usracessos/:id", getUsuarioById);
   app.get("/api/usracessos/:id/validate-status", validateUserStatus);
+  app.get("/api/auth/check-status-by-email", checkUserStatusByEmail);
   app.patch("/api/usracessos/:id/status", toggleUserStatus);
   app.patch("/api/usracessos/:id/unlock", unlockUserAccount);
   app.post("/api/auth/signin", signInUsuario);
