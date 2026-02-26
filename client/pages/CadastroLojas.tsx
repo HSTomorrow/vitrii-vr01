@@ -370,7 +370,7 @@ export default function CadastroAnunciantes() {
             className="flex items-center gap-2 px-4 py-2 bg-vitrii-yellow text-vitrii-text rounded-lg hover:bg-vitrii-yellow-dark transition-colors font-semibold"
           >
             <Plus className="w-5 h-5" />
-            Nova Anunciante
+            Novo Anunciante
           </button>
         </div>
 
@@ -378,7 +378,7 @@ export default function CadastroAnunciantes() {
         {isFormOpen && (
           <div className="bg-white rounded-lg shadow-md p-6 mb-8">
             <h2 className="text-xl font-bold text-vitrii-text mb-6">
-              {editingId ? "Editar Anunciante" : "Criar Nova Anunciante"}
+              {editingId ? "Editar Anunciante" : "Novo Anunciante"}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

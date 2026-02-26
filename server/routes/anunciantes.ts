@@ -202,15 +202,19 @@ export const getAnuncianteById: RequestHandler = async (req, res) => {
 // CREATE new anunciante
 export const createAnunciante: RequestHandler = async (req, res) => {
   try {
-    console.log("[createAnunciante] 📝 Iniciando criação de anunciante com dados:", {
+    console.log("[createAnunciante] 📝 Dados brutos recebidos (raw):", {
       nome: req.body.nome,
-      cidade: req.body.cidade,
-      estado: req.body.estado,
-      iconColor: req.body.iconColor,
-      localidadeId: req.body.localidadeId,
-      status: req.body.status,
-      temAgenda: req.body.temAgenda,
-      fotoUrl: req.body.fotoUrl ? "✓ Foto fornecida" : "✗ Sem foto",
+      cnpj: req.body.cnpj,
+      endereco: req.body.endereco,
+      cep: req.body.cep,
+      telefone: req.body.telefone,
+      site: req.body.site,
+      instagram: req.body.instagram,
+      facebook: req.body.facebook,
+      whatsapp: req.body.whatsapp,
+      chavePix: req.body.chavePix,
+      fotoUrl: req.body.fotoUrl,
+      descricao: req.body.descricao,
     });
 
     // Clean CEP - remove hyphen and spaces before validation
