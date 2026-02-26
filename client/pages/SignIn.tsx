@@ -74,11 +74,16 @@ export default function SignIn() {
           throw new Error("Email ou senha incorretos. Verifique suas credenciais.");
         } else if (response.status === 403) {
           // Account blocked or inactive
+          console.log("[SignIn] 403 Response received - errorData:", errorData);
+          console.log("[SignIn] errorData.blocked:", errorData.blocked, "type:", typeof errorData.blocked);
+
           const error = new Error(errorData.error) as any;
           error.blocked = errorData.blocked === true; // Garantir que é boolean
           error.supportUrl = errorData.supportUrl;
           error.requiresEmailVerification = errorData.requiresEmailVerification === true;
-          console.log("[SignIn] 403 Error criado:", { blocked: error.blocked, requiresEmailVerification: error.requiresEmailVerification });
+
+          console.log("[SignIn] 403 Error criado - error.blocked:", error.blocked, "type:", typeof error.blocked);
+          console.log("[SignIn] 403 Error object:", { blocked: error.blocked, requiresEmailVerification: error.requiresEmailVerification, message: error.message });
           throw error;
         } else if (response.status === 400) {
           throw new Error(errorData.error || "Por favor, preencha todos os campos obrigatórios.");
@@ -127,17 +132,23 @@ export default function SignIn() {
       console.log("[SignIn] onError - errorObj.blocked:", errorObj.blocked, "type:", typeof errorObj.blocked);
       console.log("[SignIn] onError - errorMessage:", errorMessage);
       console.log("[SignIn] onError - full errorObj:", errorObj);
+      console.log("[SignIn] onError - formData.email:", formData.email);
 
       // Check if account is blocked
+      console.log("[SignIn] Verificando se blocked === true:", errorObj.blocked === true);
       if (errorObj.blocked === true) {
         console.warn("[SignIn] ✅ Conta bloqueada detectada - mostrando alerta");
+        console.log("[SignIn] Setando blockedAlert = true");
         setAccountBlocked(true);
         setBlockedAlert(true);
         setBlockedEmail(formData.email);
         setBlockedErrorMessage(errorMessage);
-        setResendCooldown(30); // Start with 30 second cooldown
+        setResendCooldown(30);
+        console.log("[SignIn] ✅ Estados atualizados - alerta deve aparecer");
         return;
       }
+
+      console.log("[SignIn] ⚠️ errorObj.blocked não é true, continuando com outras verificações");
 
       // Check if it's an invalid credentials error with remaining attempts
       if (errorObj.tentativasRestantes !== undefined) {
@@ -202,6 +213,13 @@ export default function SignIn() {
     },
   });
 
+  // Debug: Log when blockedAlert changes
+  useEffect(() => {
+    console.log("[SignIn] blockedAlert state changed:", blockedAlert);
+    console.log("[SignIn] blockedErrorMessage:", blockedErrorMessage);
+    console.log("[SignIn] blockedEmail:", blockedEmail);
+  }, [blockedAlert, blockedErrorMessage, blockedEmail]);
+
   // Timer para cooldown de 30 segundos
   useEffect(() => {
     if (resendCooldown <= 0) return;
@@ -214,8 +232,12 @@ export default function SignIn() {
   }, [resendCooldown]);
 
   const handleResendEmail = () => {
+    console.log("[SignIn] handleResendEmail called - blockedEmail:", blockedEmail);
     if (blockedEmail) {
+      console.log("[SignIn] Iniciando reenvio de email para:", blockedEmail);
       resendEmailMutation.mutate(blockedEmail);
+    } else {
+      console.warn("[SignIn] ⚠️ blockedEmail está vazio!");
     }
   };
 
@@ -274,6 +296,8 @@ export default function SignIn() {
       console.log("[SignIn] Validação falhou");
     }
   };
+
+  console.log("[SignIn] Rendering - blockedAlert state:", blockedAlert);
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
