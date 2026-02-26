@@ -380,6 +380,74 @@ export function createServer() {
     }
   });
 
+  // DEBUG endpoint - Check email verification tokens and user status
+  app.get("/api/debug/verify-email-status", async (req, res) => {
+    try {
+      const { email } = req.query;
+
+      if (!email) {
+        return res.status(400).json({
+          success: false,
+          error: "Email é obrigatório",
+        });
+      }
+
+      console.log("[debug/verify-email-status] 🔍 Verificando status de verificação para:", email);
+
+      // Get user
+      const usuario = await prisma.usracessos.findUnique({
+        where: { email: email as string },
+        select: {
+          id: true,
+          email: true,
+          status: true,
+          emailVerificado: true,
+          dataCriacao: true,
+        },
+      });
+
+      // Get verification tokens for this user
+      let verificacaoTokens: any[] = [];
+      if (usuario) {
+        verificacaoTokens = await prisma.emailVerificationToken.findMany({
+          where: { usuarioId: usuario.id },
+          select: {
+            id: true,
+            token: true,
+            expiresAt: true,
+            createdAt: true,
+          },
+        });
+      }
+
+      console.log("[debug/verify-email-status] Resultados:", {
+        usuarioEncontrado: !!usuario,
+        tokensEncontrados: verificacaoTokens.length,
+      });
+
+      res.status(200).json({
+        success: true,
+        data: {
+          usuario: usuario || { error: "Usuário não encontrado" },
+          verificacaoTokens: verificacaoTokens.map(t => ({
+            id: t.id,
+            tokenPreview: t.token.substring(0, 20) + "...",
+            expiresAt: t.expiresAt,
+            createdAt: t.createdAt,
+            expirado: t.expiresAt < new Date(),
+          })),
+        },
+      });
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error("[debug/verify-email-status] ❌ ERRO:", errorMessage);
+      res.status(500).json({
+        success: false,
+        error: errorMessage,
+      });
+    }
+  });
+
   // Test email endpoint - for debugging/testing SMTP configuration
   app.post("/api/test-email", async (req, res) => {
     try {

@@ -1118,7 +1118,14 @@ export const verifyEmail: RequestHandler = async (req, res) => {
   try {
     const { token, email } = req.query;
 
+    console.log("[verifyEmail] 🚀 INICIANDO VERIFICAÇÃO DE EMAIL");
+    console.log("[verifyEmail] Parâmetros recebidos:", {
+      token: token ? (token as string).substring(0, 20) + "..." : "NÃO FORNECIDO",
+      email: email || "NÃO FORNECIDO",
+    });
+
     if (!token || !email) {
+      console.error("[verifyEmail] ❌ Token ou email faltando");
       return res.status(400).json({
         success: false,
         error: "Token e email são obrigatórios",
@@ -1126,20 +1133,42 @@ export const verifyEmail: RequestHandler = async (req, res) => {
     }
 
     // Find the verification token
+    console.log("[verifyEmail] 🔍 Procurando token de verificação no banco de dados...");
     const verificationTokenRecord = await prisma.emailVerificationToken.findUnique({
       where: { token: token as string },
       include: { usuario: true },
     });
 
+    console.log("[verifyEmail] Token encontrado?", !!verificationTokenRecord);
     if (!verificationTokenRecord) {
+      console.error("[verifyEmail] ❌ Token não encontrado no banco:", {
+        token: (token as string).substring(0, 20) + "...",
+      });
       return res.status(400).json({
         success: false,
         error: "Token de verificação inválido ou expirado",
       });
     }
 
+    console.log("[verifyEmail] 📋 Dados do token encontrado:", {
+      id: verificationTokenRecord.id,
+      usuarioId: verificationTokenRecord.usuarioId,
+      tokenPrefix: verificationTokenRecord.token.substring(0, 20) + "...",
+      expiresAt: verificationTokenRecord.expiresAt,
+      usuarioEmail: verificationTokenRecord.usuario?.email,
+      usuarioStatus: verificationTokenRecord.usuario?.status,
+      usuarioEmailVerificado: verificationTokenRecord.usuario?.emailVerificado,
+    });
+
     // Check if token is expired
-    if (verificationTokenRecord.expiresAt < new Date()) {
+    const agora = new Date();
+    console.log("[verifyEmail] ⏰ Verificando expiração do token:");
+    console.log("   - Hora atual:", agora);
+    console.log("   - Token expira em:", verificationTokenRecord.expiresAt);
+    console.log("   - Token expirado?", verificationTokenRecord.expiresAt < agora);
+
+    if (verificationTokenRecord.expiresAt < agora) {
+      console.error("[verifyEmail] ❌ Token de verificação expirado");
       return res.status(400).json({
         success: false,
         error: "Token de verificação expirou",
@@ -1147,20 +1176,32 @@ export const verifyEmail: RequestHandler = async (req, res) => {
     }
 
     // Check if email matches
+    console.log("[verifyEmail] 📧 Verificando correspondência de email:");
+    console.log("   - Email do token:", verificationTokenRecord.usuario.email);
+    console.log("   - Email recebido:", email);
+    console.log("   - Correspondem?", verificationTokenRecord.usuario.email === email);
+
     if (verificationTokenRecord.usuario.email !== email) {
+      console.error("[verifyEmail] ❌ Email não corresponde ao token");
       return res.status(400).json({
         success: false,
         error: "Email não corresponde ao token",
       });
     }
 
-    console.log("[verifyEmail] ✅ Email válido, processando verificação:", {
+    console.log("[verifyEmail] ✅ Todas as validações passaram! Processando verificação...", {
       email,
-      token: (token as string).substring(0, 10) + "...",
+      usuarioId: verificationTokenRecord.usuarioId,
     });
 
     // Mark email as verified and activate user account
     console.log("[verifyEmail] 📝 Atualizando status do usuário para 'ativo'...");
+    console.log("[verifyEmail] Dados antes da atualização:", {
+      usuarioId: verificationTokenRecord.usuarioId,
+      novoStatus: "ativo",
+      novoEmailVerificado: true,
+    });
+
     const updatedUsuario = await prisma.usracessos.update({
       where: { id: verificationTokenRecord.usuarioId },
       data: {
@@ -1169,12 +1210,28 @@ export const verifyEmail: RequestHandler = async (req, res) => {
       },
     });
 
-    console.log("[verifyEmail] ✅ Email verificado e conta ativada", {
+    console.log("[verifyEmail] ✅ ATUALIZAÇÃO REALIZADA COM SUCESSO!", {
       usuarioId: updatedUsuario.id,
       email: updatedUsuario.email,
-      status: updatedUsuario.status,
-      emailVerificado: updatedUsuario.emailVerificado,
+      statusAnterior: verificationTokenRecord.usuario.status,
+      statusNovo: updatedUsuario.status,
+      emailVerificadoAnterior: verificationTokenRecord.usuario.emailVerificado,
+      emailVerificadoNovo: updatedUsuario.emailVerificado,
     });
+
+    // Verify the update actually happened by fetching the user again
+    console.log("[verifyEmail] 🔐 Verificando se a atualização foi persistida no banco...");
+    const usuarioVerificacao = await prisma.usracessos.findUnique({
+      where: { id: verificationTokenRecord.usuarioId },
+      select: {
+        id: true,
+        email: true,
+        status: true,
+        emailVerificado: true,
+      },
+    });
+
+    console.log("[verifyEmail] 📊 Estado final do usuário no banco:", usuarioVerificacao);
 
     // Delete the token after use
     console.log("[verifyEmail] 🗑️ Deletando token de verificação...");
