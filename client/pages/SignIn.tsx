@@ -34,63 +34,6 @@ export default function SignIn() {
   const [resendCooldown, setResendCooldown] = useState(0); // Timer em segundos
   const [isCheckingStatus, setIsCheckingStatus] = useState(false);
 
-  // Polling: Check if user email was verified and account activated
-  useEffect(() => {
-    if (!blockedAlert || !blockedEmail || isCheckingStatus) return;
-
-    const pollingInterval = setInterval(async () => {
-      try {
-        setIsCheckingStatus(true);
-        console.log("[SignIn] Checking if user was verified for:", blockedEmail);
-
-        const response = await fetch(`/api/auth/check-status-by-email?email=${encodeURIComponent(blockedEmail)}`, {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          const usuario = data.data;
-
-          if (usuario) {
-            console.log("[SignIn] User status check:", {
-              email: usuario.email,
-              status: usuario.status,
-              emailVerificado: usuario.emailVerificado,
-            });
-
-            // Check if user is now active (email verified)
-            if (usuario.status === "ativo" && usuario.emailVerificado) {
-              console.log("[SignIn] ✅ User email verified - Account activated!");
-              clearInterval(pollingInterval);
-              setBlockedAlert(false);
-              setIsCheckingStatus(false);
-
-              toast.success("Email verificado com sucesso! 🎉", {
-                description: "Sua conta está ativada. Faça login para continuar.",
-                duration: 3000,
-              });
-
-              // Auto-login the user after 2 seconds
-              setTimeout(() => {
-                console.log("[SignIn] Auto-attempting login for verified user");
-                signInMutation.mutate(formData);
-              }, 2000);
-
-              return;
-            }
-          }
-        }
-        setIsCheckingStatus(false);
-      } catch (error) {
-        console.log("[SignIn] Error checking user status:", error);
-        setIsCheckingStatus(false);
-      }
-    }, 5000); // Check every 5 seconds
-
-    return () => clearInterval(pollingInterval);
-  }, [blockedAlert, blockedEmail, isCheckingStatus, formData, signInMutation]);
-
   // Sign in mutation
   const signInMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
@@ -275,7 +218,63 @@ export default function SignIn() {
     },
   });
 
-  // Debug: Log when blockedAlert changes
+  // Polling: Check if user email was verified and account activated
+  useEffect(() => {
+    if (!blockedAlert || !blockedEmail || isCheckingStatus) return;
+
+    const pollingInterval = setInterval(async () => {
+      try {
+        setIsCheckingStatus(true);
+        console.log("[SignIn] Checking if user was verified for:", blockedEmail);
+
+        const response = await fetch(`/api/auth/check-status-by-email?email=${encodeURIComponent(blockedEmail)}`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const usuario = data.data;
+
+          if (usuario) {
+            console.log("[SignIn] User status check:", {
+              email: usuario.email,
+              status: usuario.status,
+              emailVerificado: usuario.emailVerificado,
+            });
+
+            // Check if user is now active (email verified)
+            if (usuario.status === "ativo" && usuario.emailVerificado) {
+              console.log("[SignIn] ✅ User email verified - Account activated!");
+              clearInterval(pollingInterval);
+              setBlockedAlert(false);
+              setIsCheckingStatus(false);
+
+              toast.success("Email verificado com sucesso! 🎉", {
+                description: "Sua conta está ativada. Faça login para continuar.",
+                duration: 3000,
+              });
+
+              // Auto-login the user after 2 seconds
+              setTimeout(() => {
+                console.log("[SignIn] Auto-attempting login for verified user");
+                signInMutation.mutate(formData);
+              }, 2000);
+
+              return;
+            }
+          }
+        }
+        setIsCheckingStatus(false);
+      } catch (error) {
+        console.log("[SignIn] Error checking user status:", error);
+        setIsCheckingStatus(false);
+      }
+    }, 5000); // Check every 5 seconds
+
+    return () => clearInterval(pollingInterval);
+  }, [blockedAlert, blockedEmail, isCheckingStatus, formData, signInMutation]);
+
   // Debug: Track when blocked alert state changes
   useEffect(() => {
     if (blockedAlert) {
