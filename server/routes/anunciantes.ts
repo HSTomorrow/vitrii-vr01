@@ -345,6 +345,7 @@ export const createAnunciante: RequestHandler = async (req, res) => {
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
+      console.error("[createAnunciante] ❌ Erro de validação Zod:", error.errors);
       return res.status(400).json({
         success: false,
         error: "Dados inválidos",
@@ -355,10 +356,33 @@ export const createAnunciante: RequestHandler = async (req, res) => {
       });
     }
 
-    console.error("Error creating anunciante:", error);
+    // Get detailed error message
+    let errorMessage = "Erro ao criar anunciante";
+    let errorDetails = {};
+
+    if (error instanceof Error) {
+      errorMessage = error.message;
+      console.error("[createAnunciante] ❌ Erro:", {
+        message: error.message,
+        name: error.name,
+        stack: error.stack,
+      });
+
+      // Check if it's a Prisma error
+      if ('code' in error) {
+        errorDetails = {
+          code: (error as any).code,
+          meta: (error as any).meta,
+        };
+      }
+    } else {
+      console.error("[createAnunciante] ❌ Erro desconhecido:", error);
+    }
+
     res.status(500).json({
       success: false,
-      error: "Erro ao criar anunciante",
+      error: errorMessage,
+      details: errorDetails,
     });
   }
 };
