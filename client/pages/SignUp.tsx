@@ -24,7 +24,7 @@ export default function SignUp() {
   // Signup mutation
   const signupMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      console.log("[SignUp] Iniciando requisição de cadastro para:", data.email);
+      console.log("[SignUp] Starting signup request for:", data.email);
       setGeneralError("");
       setErrors({});
 
@@ -35,12 +35,22 @@ export default function SignUp() {
           body: JSON.stringify(data),
         });
 
-        console.log("[SignUp] Resposta recebida:", response.status, response.statusText);
+        console.log("[SignUp] Response received:", {
+          status: response.status,
+          statusText: response.statusText,
+        });
 
         if (!response.ok) {
+          let errorData;
+          let errorMessage = `Erro ao criar conta (HTTP ${response.status})`;
+
           try {
-            const errorData = await response.json();
-            console.error("[SignUp] Erro na resposta:", errorData);
+            errorData = await response.json();
+            console.log("[SignUp] API Error Response:", {
+              status: response.status,
+              errorMessage: errorData.error,
+              hasDetails: !!errorData.details,
+            });
 
             // Extrair erros de validação específicos
             const fieldErrors: Record<string, string> = {};
@@ -49,33 +59,35 @@ export default function SignUp() {
                 fieldErrors[detail.field] = detail.message;
               });
               setErrors(fieldErrors);
-              console.log("[SignUp] Erros de campo encontrados:", fieldErrors);
+              console.log("[SignUp] Field validation errors:", Object.keys(fieldErrors));
             }
 
-            // Definir mensagem de erro geral
-            const errorMessage = errorData.error || `Erro ao criar conta (HTTP ${response.status})`;
+            // Use specific error message from server
+            errorMessage = errorData.error || errorMessage;
             setGeneralError(errorMessage);
-            console.log("[SignUp] Erro geral:", errorMessage);
-            console.log("[SignUp] Campos com erro:", Object.keys(fieldErrors));
-            throw new Error(errorMessage);
           } catch (parseError) {
-            console.error("[SignUp] Erro ao parsear resposta:", parseError);
-            const errorMessage = `Erro no servidor (HTTP ${response.status}). Por favor, tente novamente.`;
+            // If JSON parsing fails, use generic message
+            console.log("[SignUp] Could not parse error response, using generic message");
             setGeneralError(errorMessage);
-            throw new Error(errorMessage);
           }
+
+          throw new Error(errorMessage);
         }
 
         const result = await response.json();
-        console.log("[SignUp] Cadastro bem-sucedido:", result);
+        console.log("[SignUp] ✅ Signup successful - Verification email sent");
         return result;
       } catch (networkError) {
         const message = networkError instanceof Error ? networkError.message : String(networkError);
-        if (message.includes("HTTP")) {
+
+        // Re-throw HTTP errors (they already have the correct message)
+        if (message.includes("HTTP") || message.includes("Erro ao criar conta")) {
           throw networkError;
         }
+
+        // Handle network connectivity issues
         const errorMessage = `Erro de conexão: ${message}. Verifique sua internet e tente novamente.`;
-        console.error("[SignUp] Erro de rede:", errorMessage);
+        console.log("[SignUp] Network error:", errorMessage);
         setGeneralError(errorMessage);
         throw new Error(errorMessage);
       }
@@ -85,15 +97,18 @@ export default function SignUp() {
       setSignupSuccess(true);
       setGeneralError("");
       setErrors({});
-      console.log("[SignUp] ✅ Cadastro concluído, aguardando verificação de email...");
+      console.log("[SignUp] ✅ Signup completed - Awaiting email verification");
       // Don't redirect - show verification pending page instead
     },
     onError: (error) => {
       setSignupAttempted(true);
       setSignupSuccess(false);
       const errorMessage = error instanceof Error ? error.message : "Erro ao criar conta";
-      console.error("[SignUp] ❌ Erro:", errorMessage);
-      setGeneralError(errorMessage);
+      console.log("[SignUp] Signup error:", {
+        message: errorMessage,
+        isValidationError: errorMessage.includes("já está cadastrado"),
+      });
+      // Error message is already set in mutationFn
     },
   });
 
@@ -155,7 +170,10 @@ export default function SignUp() {
     e.preventDefault();
 
     if (validateForm()) {
+      console.log("[SignUp] Form validated - Submitting signup");
       signupMutation.mutate(formData);
+    } else {
+      console.log("[SignUp] Form validation failed");
     }
   };
 
