@@ -13,7 +13,6 @@ RUN npm install -g pnpm && pnpm install --frozen-lockfile
 COPY prisma ./prisma
 
 # Generate Prisma Client with explicit schema location
-# This ensures Prisma reads binaryTargets from schema.prisma
 RUN DATABASE_URL="postgresql://dummy:dummy@localhost/dummy" \
     npx prisma generate --schema ./prisma/schema.prisma
 
@@ -37,21 +36,22 @@ COPY --from=builder /app/node_modules ./node_modules
 # Copy package files (needed for Prisma runtime)
 COPY package.json pnpm-lock.yaml ./
 
-# Copy Prisma schema (needed for Prisma runtime)
+# Copy Prisma schema and client (needed for Prisma runtime)
 COPY prisma ./prisma
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 
 # Copy built artifacts
 COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/server ./server
-COPY server.js ./
 
-# Note: .env is in .gitignore, so it's not available here
-# Environment variables must be set via Fly secrets
+# Environment setup for Fly.io
+# Note: .env is in .gitignore - environment variables set via Fly.io secrets
+ENV NODE_ENV=production
 
 EXPOSE 3000
 
-# Note: Health check disabled - Fly.io will handle monitoring
-# Previously the health check was killing the container prematurely
+# Health check for Fly.io
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
 
-# Start server with pnpm
-CMD ["pnpm", "exec", "tsx", "server.js"]
+# Start server using the built Node.js application
+CMD ["node", "dist/server/production.mjs"]

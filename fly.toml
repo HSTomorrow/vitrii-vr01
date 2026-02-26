@@ -1,3 +1,4 @@
+# Fly.io Configuration for Vitrii Marketplace
 app = "vitrii"
 primary_region = "gru"
 
@@ -6,7 +7,9 @@ primary_region = "gru"
 
 [env]
   LOG_LEVEL = "info"
+  NODE_ENV = "production"
 
+# HTTP services configuration
 [[services]]
   internal_port = 3000
   protocol = "tcp"
@@ -14,11 +17,21 @@ primary_region = "gru"
   auto_start_machines = true
   min_machines_running = 1
 
+  # Connection concurrency limits
   [services.concurrency]
     type = "connections"
     hard_limit = 1000
     soft_limit = 100
 
+  # Health check configuration
+  [services.http_checks]
+    interval = "10s"
+    timeout = "5s"
+    grace_period = "5s"
+    method = "GET"
+    path = "/health"
+
+# Port configuration
 [[services.ports]]
   port = 80
   handlers = ["http"]
@@ -28,7 +41,12 @@ primary_region = "gru"
   port = 443
   handlers = ["tls", "http"]
 
+# VM configuration - adjusted for production
 [[vm]]
   size = "shared-cpu-1x"
   memory_mb = 1024
   processes = ["app"]
+
+# Graceful shutdown configuration
+[processes]
+  app = "node dist/server/production.mjs"

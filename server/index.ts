@@ -271,6 +271,24 @@ export function createServer() {
     });
   });
 
+  // Health check for Fly.io and monitoring
+  // This endpoint is lightweight for frequent polling
+  app.get("/health", async (_req, res) => {
+    try {
+      res.set("Content-Type", "application/json");
+      res.status(200).json({
+        status: "ok",
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error("[Health Check] Error:", error);
+      res.status(500).json({
+        status: "error",
+        timestamp: new Date().toISOString(),
+      });
+    }
+  });
+
   // Quick database test
   app.get("/api/db-test", async (_req, res) => {
     try {

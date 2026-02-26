@@ -1,7 +1,10 @@
 import { defineConfig } from "vite";
 import path from "path";
 
-// Server build configuration
+/**
+ * Server build configuration for Fly.io deployment
+ * Builds Express server for containerized environment
+ */
 export default defineConfig({
   build: {
     lib: {
