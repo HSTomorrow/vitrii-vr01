@@ -423,30 +423,27 @@ export default function AnuncioForm({
     console.log("[AnuncioForm] Form submission started");
     console.log("[AnuncioForm] Form data:", formData);
     console.log("[AnuncioForm] Selected anunciante ID:", selectedAnuncianteId);
+    console.log("[AnuncioForm] User info:", { id: user?.id, cpf: user?.cpf });
 
-    // Check if user has CPF/CNPJ filled
-    if (!user?.cpf) {
+    // Check if user is logged in
+    if (!user?.id) {
       console.warn(
-        "[AnuncioForm] Validation failed: user missing CPF/CNPJ",
+        "[AnuncioForm] Validation failed: user not logged in",
       );
-      toast.error(
-        "Você precisa preencher seu CPF/CNPJ no perfil antes de criar anúncios. Acesse seu perfil para completar esta informação.",
-        {
-          action: {
-            label: "Ir para Perfil",
-            onClick: () => window.location.href = "/perfil",
-          },
-        }
-      );
+      toast.error("Você precisa estar autenticado para criar anúncios");
       return;
     }
 
     // Basic required fields
-    if (!selectedAnuncianteId || !formData.titulo) {
-      console.warn(
-        "[AnuncioForm] Validation failed: missing anunciante or titulo",
-      );
-      toast.error("Anunciante e Título são obrigatórios");
+    if (!selectedAnuncianteId) {
+      console.warn("[AnuncioForm] Validation failed: missing anunciante");
+      toast.error("Selecione um Anunciante");
+      return;
+    }
+
+    if (!formData.titulo) {
+      console.warn("[AnuncioForm] Validation failed: missing titulo");
+      toast.error("Preencha o Título do anúncio");
       return;
     }
 
@@ -469,7 +466,8 @@ export default function AnuncioForm({
       return;
     }
 
-    console.log("[AnuncioForm] All validations passed, submitting mutation");
+    console.log("[AnuncioForm] ✅ All validations passed, calling mutation.mutate()");
+    console.log("[AnuncioForm] Mutation pending state:", mutation.isPending);
     mutation.mutate(formData);
   };
 
