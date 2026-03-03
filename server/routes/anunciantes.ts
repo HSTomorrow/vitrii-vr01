@@ -217,6 +217,11 @@ export const createAnunciante: RequestHandler = async (req, res) => {
       descricao: req.body.descricao,
     });
 
+    // Clean CNPJ/CPF - remove formatting characters before validation
+    if (req.body.cnpj) {
+      req.body.cnpj = req.body.cnpj.replace(/[^\d]/g, '');
+    }
+
     // Clean CEP - remove hyphen and spaces before validation
     if (req.body.cep) {
       req.body.cep = req.body.cep.replace(/[^\d]/g, '');
@@ -228,6 +233,7 @@ export const createAnunciante: RequestHandler = async (req, res) => {
     }
 
     console.log("[createAnunciante] 🧹 Dados após limpeza:", {
+      cnpj: req.body.cnpj,
       cep: req.body.cep,
       fotoUrl: req.body.fotoUrl,
     });
@@ -440,6 +446,16 @@ export const updateAnunciante: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
     const usuarioId = req.userId;
+
+    // Clean CNPJ/CPF - remove formatting characters before validation
+    if (req.body.cnpj) {
+      req.body.cnpj = req.body.cnpj.replace(/[^\d]/g, '');
+    }
+
+    // Clean CEP - remove formatting characters before validation
+    if (req.body.cep) {
+      req.body.cep = req.body.cep.replace(/[^\d]/g, '');
+    }
 
     // Validate input - only allow safe fields
     const validatedData = AnuncianteUpdateSchema.parse(req.body);

@@ -428,12 +428,17 @@ export default function CadastroAnunciantes() {
                     type="text"
                     required
                     value={formData.cnpj}
-                    onChange={(e) =>
-                      setFormData({ ...formData, cnpj: e.target.value })
-                    }
+                    onChange={(e) => {
+                      // Remove non-numeric characters for validation
+                      const cleanedCnpj = e.target.value.replace(/[^\d]/g, '');
+                      setFormData({ ...formData, cnpj: cleanedCnpj });
+                    }}
                     placeholder="00000000000000"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                   />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Apenas números (11 a 14 dígitos)
+                  </p>
                 </div>
 
                 <div>
@@ -496,13 +501,16 @@ export default function CadastroAnunciantes() {
                     required
                     value={formData.cep}
                     onChange={(e) => {
-                      // Only allow digits and hyphen
-                      const cleanValue = e.target.value.replace(/[^\d-]/g, "");
+                      // Only allow digits (remove all non-numeric)
+                      const cleanValue = e.target.value.replace(/[^\d]/g, "");
                       setFormData({ ...formData, cep: cleanValue });
                     }}
-                    placeholder="00000-000"
+                    placeholder="00000000"
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                   />
+                  <p className="text-xs text-gray-500 mt-1">
+                    Apenas números (8 dígitos)
+                  </p>
                 </div>
 
                 <div>
