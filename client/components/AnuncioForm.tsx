@@ -74,6 +74,16 @@ export default function AnuncioForm({
   );
   const [showCreateLoja, setShowCreateLoja] = useState(false);
   const [showCreateProducto, setShowCreateProducto] = useState(false);
+  // Normalize anuncioTipo: if it's 'doacao', use 'produto' and set isDoacao to true
+  const normalizeType = (typeParam: string | null | undefined) => {
+    if (typeParam === "doacao") {
+      return { tipo: "produto", isDoacao: true };
+    }
+    return { tipo: typeParam || "produto", isDoacao: false };
+  };
+
+  const { tipo: normalizedTipo, isDoacao: normalizedIsDoacao } = normalizeType(anuncioTipo);
+
   const [formData, setFormData] = useState({
     titulo: "",
     descricao: "",
@@ -87,13 +97,13 @@ export default function AnuncioForm({
     endereco: "",
     cidade: "",
     estado: "RS",
-    isDoacao: isDonation || false,
+    isDoacao: isDonation || normalizedIsDoacao,
     aCombinar: false,
     destaque: true,
     ordem: 10, // Default order for new ads (admin only)
     categoria: "" as string,
     dadosCategoria: "",
-    tipo: anuncioTipo || ("produto" as string),
+    tipo: normalizedTipo as string,
   });
   const [uploadedImages, setUploadedImages] = useState<
     Array<{ id?: string; url: string }>
