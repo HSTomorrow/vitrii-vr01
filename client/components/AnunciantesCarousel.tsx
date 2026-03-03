@@ -114,23 +114,6 @@ export default function AnunciantesCarousel({
 
             {/* Top Right Actions */}
             <div className="absolute top-2.5 right-2.5 z-10 flex gap-2 items-start">
-              {/* Badge de Tipo */}
-              {anunciante.tipo && (
-                <div
-                  className={`px-3 py-1 rounded-full text-xs font-bold text-white ${
-                    anunciante.tipo === "Profissional"
-                      ? "bg-blue-600"
-                      : anunciante.tipo === "Premium"
-                        ? "bg-purple-600"
-                        : anunciante.tipo === "Master"
-                          ? "bg-yellow-600"
-                          : "bg-gray-600"
-                  }`}
-                >
-                  {anunciante.tipo}
-                </div>
-              )}
-
               {/* Share Button */}
               <ShareButton
                 title={anunciante.nome}
