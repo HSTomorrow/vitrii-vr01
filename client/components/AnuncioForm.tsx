@@ -302,6 +302,15 @@ export default function AnuncioForm({
       const url = anuncioId ? `/api/anuncios/${anuncioId}` : "/api/anuncios";
       const method = anuncioId ? "PUT" : "POST";
 
+      // Normalize tipo: if it's 'doacao', convert to 'produto' with isDoacao: true
+      let normalizedTipo = data.tipo || "produto";
+      let normalizedIsDoacao = data.isDoacao || false;
+
+      if (normalizedTipo === "doacao") {
+        normalizedTipo = "produto";
+        normalizedIsDoacao = true;
+      }
+
       const payload = {
         usuarioId: user?.id,
         titulo: data.titulo,
@@ -319,8 +328,8 @@ export default function AnuncioForm({
         endereco: data.endereco || null,
         cidade: data.cidade || null,
         estado: data.estado || null,
-        tipo: data.tipo || "produto",
-        isDoacao: data.isDoacao,
+        tipo: normalizedTipo,
+        isDoacao: normalizedIsDoacao,
         aCombinar: data.aCombinar,
         destaque: data.destaque,
         categoria: data.categoria || null,
@@ -713,8 +722,8 @@ export default function AnuncioForm({
                 )}
             </div>
 
-            {/* "A Combinar" Checkbox - Only for Produtos and Serviços, not for Doações/Brindes */}
-            {formData.tipo !== "doacao" && (
+            {/* "A Combinar" Checkbox - Only for Produtos and Serviços, not for Eventos/Agendas/Oportunidades */}
+            {!["evento", "agenda_recorrente", "oportunidade"].includes(formData.tipo) && (
               <div className="flex items-center gap-3 p-4 border rounded-lg bg-yellow-50 border-yellow-200">
                 <input
                   type="checkbox"
