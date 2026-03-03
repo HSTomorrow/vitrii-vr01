@@ -3,6 +3,7 @@ import prisma from "../lib/prisma";
 import { z } from "zod";
 import bcryptjs from "bcryptjs";
 import { sendPasswordResetEmail, sendWelcomeEmail, sendEmailVerificationEmail } from "../lib/emailService";
+import { recalculateAdCounters } from "../lib/recalculateCounters";
 import crypto from "crypto";
 
 // NOTE: This file handles usracessos (User Access) model operations
@@ -291,6 +292,15 @@ export const signInUsuario: RequestHandler = async (req, res) => {
         ultimaTentativaLogin: new Date(),
       },
     });
+
+    // Recalculate ad counters on login to ensure they're always accurate
+    try {
+      await recalculateAdCounters(usuario.id);
+      console.log("[signInUsuario] ✅ Contadores de anúncios recalculados");
+    } catch (error) {
+      console.warn("[signInUsuario] ⚠️ Erro ao recalcular contadores:", error);
+      // Don't fail login if counter recalculation fails
+    }
 
     console.log("[signInUsuario] ✅ Login bem-sucedido:", {
       id: usuarioSemSenha.id,
@@ -1938,6 +1948,61 @@ export const resendVerificationEmail: RequestHandler = async (req, res) => {
     res.status(500).json({
       success: false,
       error: "Erro ao reenviar email de verificação",
+    });
+  }
+};
+
+// ADMIN: Recalculate ad counters for users
+export const recalculateAdCountersAdmin: RequestHandler = async (req, res) => {
+  try {
+    // Extract user ID from header (set by middleware)
+    const usuarioId = (req as any).userId;
+
+    // Check if user is admin
+    const user = await prisma.usracessos.findUnique({
+      where: { id: usuarioId },
+      select: { tipoUsuario: true },
+    });
+
+    if (!user || user.tipoUsuario !== "adm") {
+      return res.status(403).json({
+        success: false,
+        error: "Apenas administradores podem reprocessar contadores",
+      });
+    }
+
+    const { allUsers } = req.body;
+    let result;
+
+    if (allUsers) {
+      // Recalculate for all users
+      console.log("[recalculateAdCountersAdmin] 🔄 Iniciando reprocessamento para TODOS os usuários");
+      result = await recalculateAdCounters();
+    } else {
+      // Recalculate for specific user
+      const targetUserId = req.body.usuarioId;
+      if (!targetUserId) {
+        return res.status(400).json({
+          success: false,
+          error: "Forneça usuarioId ou defina allUsers como true",
+        });
+      }
+      console.log(`[recalculateAdCountersAdmin] 🔄 Reprocessando contadores para usuário ${targetUserId}`);
+      result = await recalculateAdCounters(targetUserId);
+    }
+
+    res.json({
+      success: result.success,
+      data: result,
+      message: result.message,
+    });
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("[recalculateAdCountersAdmin] 🔴 ERRO:", errorMessage);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao reprocessar contadores de anúncios",
+      details: errorMessage,
     });
   }
 };

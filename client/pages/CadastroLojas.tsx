@@ -400,14 +400,20 @@ export default function CadastroAnunciantes() {
                 <div>
                   <label className="block text-sm font-semibold text-vitrii-text mb-2">
                     Tipo de Anunciante *
+                    {user?.tipoUsuario !== "adm" && editingId && (
+                      <span className="text-xs text-gray-500 ml-2">(Apenas admin pode alterar)</span>
+                    )}
                   </label>
                   <select
                     required
                     value={formData.tipo}
                     onChange={(e) =>
-                      setFormData({ ...formData, tipo: e.target.value })
+                      user?.tipoUsuario === "adm" && setFormData({ ...formData, tipo: e.target.value })
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50 bg-white"
+                    disabled={user?.tipoUsuario !== "adm" && editingId !== null}
+                    className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50 bg-white ${
+                      user?.tipoUsuario !== "adm" && editingId !== null ? "opacity-60 cursor-not-allowed" : ""
+                    }`}
                   >
                     <option value="Padrão">Padrão</option>
                     <option value="Profissional">Profissional</option>

@@ -237,16 +237,25 @@ export const createAnunciante: RequestHandler = async (req, res) => {
 
     console.log("[createAnunciante] 👤 usuarioId obtido:", usuarioId);
 
+    // Get requesting user to determine admin status
+    const requestingUser = usuarioId
+      ? await prisma.usracessos.findUnique({
+          where: { id: usuarioId },
+          select: { tipoUsuario: true },
+        })
+      : null;
+
+    const isAdmin = requestingUser?.tipoUsuario === "adm";
+
+    // Force tipo to "Padrão" if not admin (only admins can set Profissional)
+    const tipoAnunciante = isAdmin ? validatedData.tipo : "Padrão";
+    console.log(`[createAnunciante] 📋 Tipo de anunciante: ${tipoAnunciante} (admin: ${isAdmin})`);
+
     // Check if CNPJ/CPF is registered to a user (cross-validation)
     // Only prevent if it's for a regular user, allow admin exception
     if (validatedData.cnpj && usuarioId) {
-      const requestingUser = await prisma.usracessos.findUnique({
-        where: { id: usuarioId },
-        select: { tipoUsuario: true },
-      });
-
       // If not admin, check if this CPF/CNPJ is already a user
-      if (requestingUser?.tipoUsuario !== "adm") {
+      if (!isAdmin) {
         const cpfAsUser = await prisma.usracessos.findFirst({
           where: { cpf: validatedData.cnpj },
         });
@@ -295,7 +304,7 @@ export const createAnunciante: RequestHandler = async (req, res) => {
     const anunciante = await prisma.anunciantes.create({
       data: {
         nome: validatedData.nome,
-        tipo: validatedData.tipo,
+        tipo: tipoAnunciante,
         cidade: validatedData.cidade,
         estado: validatedData.estado,
         cnpj: validatedData.cnpj,
@@ -482,14 +491,17 @@ export const updateAnunciante: RequestHandler = async (req, res) => {
     }
 
     // Check permissions - allow if user is admin or owner of the anunciante
+    let isAdmin = false;
     if (usuarioId) {
       const usuario = await prisma.usracessos.findUnique({
         where: { id: usuarioId },
         select: { tipoUsuario: true },
       });
 
+      isAdmin = usuario?.tipoUsuario === "adm";
+
       // If not admin, check if user is associated with this anunciante
-      if (usuario?.tipoUsuario !== "adm") {
+      if (!isAdmin) {
         const hasAccess = await prisma.usuarios_anunciantes.findFirst({
           where: {
             usuarioId: usuarioId,
@@ -504,6 +516,14 @@ export const updateAnunciante: RequestHandler = async (req, res) => {
           });
         }
       }
+    }
+
+    // Restrict tipo field - only admin can change it
+    if ("tipo" in cleanedData && !isAdmin) {
+      console.warn(
+        `[updateAnunciante] ⚠️ User ${usuarioId} attempted to change anunciante type without admin permission`
+      );
+      delete cleanedData.tipo;
     }
 
     const updatedAnunciante = await prisma.anunciantes.update({

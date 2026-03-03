@@ -79,6 +79,7 @@ import {
   updateLocalidadePadrao,
   changePassword,
   resendVerificationEmail,
+  recalculateAdCountersAdmin,
 } from "./routes/usuarios";
 import {
   getEquipes,
@@ -352,6 +353,7 @@ export function createServer() {
   app.get("/api/auth/validate-reset-token", validateResetToken);
   app.get("/api/auth/verify-email", verifyEmail);
   app.post("/api/auth/resend-verification-email", resendVerificationEmail);
+  app.post("/api/admin/recalculate-ad-counters", extractUserId, recalculateAdCountersAdmin);
 
   // Database migration helper - Create emailVerificado column if missing
   app.get("/api/db/create-email-verificado-column", async (_req, res) => {
