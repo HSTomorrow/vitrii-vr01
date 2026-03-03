@@ -89,7 +89,7 @@ export default function AnuncioForm({
     estado: "RS",
     isDoacao: isDonation || false,
     aCombinar: false,
-    destaque: false,
+    destaque: true,
     ordem: 10, // Default order for new ads (admin only)
     categoria: "" as string,
     dadosCategoria: "",
