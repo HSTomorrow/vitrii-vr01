@@ -447,21 +447,25 @@ export default function AnuncioForm({
       return;
     }
 
-    // Validate price: either precoAnuncio must be filled OR isDoacao must be true
+    // Validate price: either precoAnuncio must be filled OR isDoacao OR aCombinar must be true
     const hasPrice =
       formData.precoAnuncio && parseFloat(formData.precoAnuncio) > 0;
     const isFreeAd = formData.isDoacao;
+    const isPriceNegotiable = formData.aCombinar;
 
     console.log("[AnuncioForm] Price validation:", {
       hasPrice,
       isFreeAd,
+      isPriceNegotiable,
       precoAnuncio: formData.precoAnuncio,
+      aCombinar: formData.aCombinar,
+      isDoacao: formData.isDoacao,
     });
 
-    if (!hasPrice && !isFreeAd) {
-      console.warn("[AnuncioForm] Validation failed: no price or free ad");
+    if (!hasPrice && !isFreeAd && !isPriceNegotiable) {
+      console.warn("[AnuncioForm] Validation failed: no price, free ad, or negotiable price");
       toast.error(
-        "Você deve preencher o Valor do anúncio ou marcar como gratuito/doação",
+        "Você deve preencher o Valor do anúncio, marcar como gratuito/doação ou deixar a combinar",
       );
       return;
     }
