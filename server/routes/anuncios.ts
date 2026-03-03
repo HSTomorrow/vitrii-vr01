@@ -449,37 +449,64 @@ export const createAnuncio: RequestHandler = async (req, res) => {
     const isDoacao = validatedData.isDoacao || false;
     const precoAnuncio = isDoacao ? 0 : validatedData.precoAnuncio;
 
-    // Count current active ads from the user (excluding donations if applicable)
-    const anunciosAtivosCount = await prisma.anuncios.count({
+    // Get anunciante info to determine tier (Padrão or Profissional)
+    const anunciante = await prisma.anunciantes.findUnique({
+      where: { id: validatedData.anuncianteId },
+      select: { tipo: true },
+    });
+
+    if (!anunciante) {
+      return res.status(404).json({
+        success: false,
+        error: "Anunciante não encontrado",
+      });
+    }
+
+    // Determine free featured slots based on anunciante type
+    // Padrão: 3 free featured ads
+    // Profissional: 20 free featured ads
+    const freeDestaqueSlots = anunciante.tipo === "Profissional" ? 20 : 3;
+
+    // Count current active FEATURED ads from the user
+    const anunciosDestaqueCount = await prisma.anuncios.count({
       where: {
         usuarioId: validatedData.usuarioId,
         status: "ativo",
+        destaque: true,
       },
     });
 
-    console.log(`[createAnuncio] User ${validatedData.usuarioId} has ${anunciosAtivosCount} active ads`);
+    console.log(`[createAnuncio] User ${validatedData.usuarioId} (${anunciante.tipo}) has ${anunciosDestaqueCount}/${freeDestaqueSlots} free featured slots`);
 
-    // Determine status and payment based on number of active ads
-    // Rule: First 3 ads are automatically published, 4th+ requires payment
+    // Determine status and payment based on featured ads
+    // Rule: First N ads (destaque) are automatically published, subsequent paid ads don't count
     let status: string;
     let statusPagamento: string;
-    let destaque: boolean = false;
+    let destaque: boolean = validatedData.destaque || false; // Use user's destaque preference
 
     if (isDoacao) {
-      // Donations are always published automatically
+      // Donations are always published automatically with destaque
       status = "ativo";
       statusPagamento = "aprovado";
       destaque = true;
-    } else if (anunciosAtivosCount < 3) {
-      // First 3 ads are automatically published (no payment required)
-      console.log("[createAnuncio] Auto-publishing ad (free slots available)");
+    } else if (destaque) {
+      // User wants this ad to be featured (destaque)
+      if (anunciosDestaqueCount < freeDestaqueSlots) {
+        // Still has free featured slots
+        console.log("[createAnuncio] Auto-publishing featured ad (free slots available)");
+        status = "ativo";
+        statusPagamento = "aprovado";
+      } else {
+        // No more free featured slots, requires payment
+        console.log("[createAnuncio] Payment required for featured ad (free slots used)");
+        status = "aguardando_pagamento";
+        statusPagamento = "pendente";
+      }
+    } else {
+      // User doesn't want this ad featured (regular ad is always free)
+      console.log("[createAnuncio] Auto-publishing regular ad (non-featured ads are always free)");
       status = "ativo";
       statusPagamento = "aprovado";
-    } else {
-      // 4th+ ads require payment
-      console.log("[createAnuncio] Payment required for this ad (free slots used)");
-      status = "aguardando_pagamento";
-      statusPagamento = "pendente";
     }
 
     // Only admins can set custom ordem, otherwise default to 10
@@ -510,16 +537,30 @@ export const createAnuncio: RequestHandler = async (req, res) => {
       },
     });
 
-    // Increment active ads counter for the user
+    // Increment active ads counters for the user
     if (status === "ativo" || status === "pago") {
-      // Only count as active if donation (ativo) or paid (pago)
+      // Only count as active if published (ativo) or paid (pago)
+      const updateData: any = {
+        numeroAnunciosAtivos: {
+          increment: 1,
+        },
+      };
+
+      // Also increment featured counter if this ad is featured and active
+      if (destaque && (status === "ativo" || status === "pago")) {
+        updateData.numeroAnunciosAtivosDestaque = {
+          increment: 1,
+        };
+      }
+
       await prisma.usracessos.update({
         where: { id: validatedData.usuarioId },
-        data: {
-          numeroAnunciosAtivos: {
-            increment: 1,
-          },
-        },
+        data: updateData,
+      });
+
+      console.log("[createAnuncio] Counters updated:", {
+        numeroAnunciosAtivos: status === "ativo" || status === "pago",
+        numeroAnunciosAtivosDestaque: destaque && (status === "ativo" || status === "pago"),
       });
     }
 

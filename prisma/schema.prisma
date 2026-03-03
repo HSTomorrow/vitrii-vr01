@@ -229,6 +229,7 @@ model usracessos {
   endereco                String?
   dataVigenciaContrato    DateTime                    @default(now())
   numeroAnunciosAtivos    Int                         @default(0)
+  numeroAnunciosAtivosDestaque Int                    @default(0)
   maxAnunciosAtivos       Int                         @default(10)
   localidadePadraoId      Int? // Default locality for filtering ads
   usuarios_anunciantes    usuarios_anunciantes[]
