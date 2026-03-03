@@ -177,7 +177,65 @@ export default function Index() {
     gcTime: 10 * 60 * 1000, // 10 minutes
   });
 
+  // Debug: check anunciante 2 status
+  useEffect(() => {
+    if (anunciantesData?.data) {
+      const anunc2 = anunciantesData.data.find((a: any) => a.id === 2);
+      console.log("[Index] Anunciante 2:", anunc2);
+    }
+  }, [anunciantesData]);
+
   const allAnuncios = allAnunciosData?.data || [];
+
+  // Debug logging for all ads and specifically ads 5 and 6
+  useEffect(() => {
+    if (allAnuncios.length > 0) {
+      console.log("[Index] All fetched ads:", allAnuncios.map((a: any) => ({
+        id: a.id,
+        titulo: a.titulo,
+        anuncianteId: a.anuncianteId,
+        anuncianteStatus: a.anunciantes?.status,
+        destaque: a.destaque,
+        isDoacao: a.isDoacao,
+        status: a.status,
+      })));
+
+      const ad5 = allAnuncios.find((a: any) => a.id === 5);
+      const ad6 = allAnuncios.find((a: any) => a.id === 6);
+
+      console.log("[Index] Total ads fetched:", allAnuncios.length);
+
+      if (ad5) {
+        console.log("[Index] Ad 5 found:", {
+          titulo: ad5.titulo,
+          destaque: ad5.destaque,
+          isDoacao: ad5.isDoacao,
+          preco: ad5.preco,
+          status: ad5.status,
+          tipo: ad5.tipo,
+          anuncianteId: ad5.anuncianteId,
+          anuncianteStatus: ad5.anunciantes?.status,
+        });
+      } else {
+        console.log("[Index] Ad 5 NOT FOUND in allAnuncios");
+      }
+
+      if (ad6) {
+        console.log("[Index] Ad 6 found:", {
+          titulo: ad6.titulo,
+          destaque: ad6.destaque,
+          isDoacao: ad6.isDoacao,
+          preco: ad6.preco,
+          status: ad6.status,
+          tipo: ad6.tipo,
+          anuncianteId: ad6.anuncianteId,
+          anuncianteStatus: ad6.anunciantes?.status,
+        });
+      } else {
+        console.log("[Index] Ad 6 NOT FOUND in allAnuncios");
+      }
+    }
+  }, [allAnuncios]);
 
   // Filter anuncios by type and gratuito status
   // Helper to check if an anuncio is free (donation or price = 0)
@@ -209,10 +267,26 @@ export default function Index() {
 
   const destaqueDoacoes = allAnuncios
     .filter(
-      (anuncio: any) =>
-        anuncio.destaque &&
-        isGratis(anuncio) &&
-        matchesLocalidade(anuncio),
+      (anuncio: any) => {
+        const passDestaque = anuncio.destaque;
+        const passGratis = isGratis(anuncio);
+        const passLocalidade = matchesLocalidade(anuncio);
+        const passes = passDestaque && passGratis && passLocalidade;
+
+        if (anuncio.id === 5 || anuncio.id === 6) {
+          console.log(`[Index] Ad ${anuncio.id} filter check:`, {
+            titulo: anuncio.titulo,
+            destaque: passDestaque,
+            isDoacao: anuncio.isDoacao,
+            preco: anuncio.preco,
+            gratis: passGratis,
+            localidade: passLocalidade,
+            passes,
+          });
+        }
+
+        return passes;
+      },
     )
     .slice(0, 100);
 

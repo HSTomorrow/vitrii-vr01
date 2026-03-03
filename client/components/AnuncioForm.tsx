@@ -366,6 +366,7 @@ export default function AnuncioForm({
     onSuccess: async (result) => {
       console.log("[AnuncioForm] Mutation successful, invalidating queries");
       queryClient.invalidateQueries({ queryKey: ["anuncios"] });
+      queryClient.invalidateQueries({ queryKey: ["anuncios-all"] });
 
       const successMessage = anuncioId
         ? "Anúncio atualizado com sucesso!"
