@@ -1140,7 +1140,7 @@ export default function AnuncioForm({
                 <div className="text-sm text-vitrii-text">
                   <p className="font-semibold">Informações sobre Publicação</p>
                   <p className="mt-1 text-vitrii-text-secondary">
-                    Você tem 3 anúncios gratuitos. Para anúncios adicionais,
+                    Você possui até 3 anúncios em Destaque gratuitos. Para anúncios adicionais,
                     R$ 19,90 por mês ou solicitar o plano Anunciante Profissional.{" "}
                     <Link to="/sell" className="text-vitrii-blue font-semibold hover:underline">
                       Veja os planos
