@@ -219,12 +219,12 @@ export const createAnunciante: RequestHandler = async (req, res) => {
 
     // Clean CNPJ/CPF - remove formatting characters before validation
     if (req.body.cnpj) {
-      req.body.cnpj = req.body.cnpj.replace(/[^\d]/g, '');
+      req.body.cnpj = req.body.cnpj.trim().replace(/\D/g, '');
     }
 
     // Clean CEP - remove hyphen and spaces before validation
     if (req.body.cep) {
-      req.body.cep = req.body.cep.replace(/[^\d]/g, '');
+      req.body.cep = req.body.cep.trim().replace(/\D/g, '');
     }
 
     // Clean empty fotoUrl to null
@@ -449,12 +449,12 @@ export const updateAnunciante: RequestHandler = async (req, res) => {
 
     // Clean CNPJ/CPF - remove formatting characters before validation
     if (req.body.cnpj) {
-      req.body.cnpj = req.body.cnpj.replace(/[^\d]/g, '');
+      req.body.cnpj = req.body.cnpj.trim().replace(/\D/g, '');
     }
 
     // Clean CEP - remove formatting characters before validation
     if (req.body.cep) {
-      req.body.cep = req.body.cep.replace(/[^\d]/g, '');
+      req.body.cep = req.body.cep.trim().replace(/\D/g, '');
     }
 
     // Validate input - only allow safe fields

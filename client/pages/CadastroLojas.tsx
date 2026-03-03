@@ -328,7 +328,22 @@ export default function CadastroAnunciantes() {
     }
 
     console.log("[CadastroLojas] ✅ Validação passou, salvando...");
-    saveAnuncianteMutation.mutate(formData);
+
+    // Clean CNPJ and CEP one more time before sending (belt and suspenders)
+    const cleanedFormData = {
+      ...formData,
+      cnpj: formData.cnpj.trim().replace(/\D/g, ''),
+      cep: formData.cep.trim().replace(/\D/g, ''),
+    };
+
+    console.log("[CadastroLojas] 🧹 Dados finais antes de enviar:", {
+      cnpj: cleanedFormData.cnpj,
+      cnpjLength: cleanedFormData.cnpj.length,
+      cep: cleanedFormData.cep,
+      cepLength: cleanedFormData.cep.length,
+    });
+
+    saveAnuncianteMutation.mutate(cleanedFormData);
   };
 
   return (
@@ -429,15 +444,22 @@ export default function CadastroAnunciantes() {
                     required
                     value={formData.cnpj}
                     onChange={(e) => {
-                      // Remove non-numeric characters for validation
-                      const cleanedCnpj = e.target.value.replace(/[^\d]/g, '');
+                      // Remove all non-numeric characters (including spaces, unicode, etc)
+                      const rawValue = e.target.value.trim();
+                      const cleanedCnpj = rawValue.replace(/\D/g, '');
+                      console.log("[CadastroLojas] CNPJ input:", {
+                        rawValue,
+                        cleaned: cleanedCnpj,
+                        length: cleanedCnpj.length,
+                      });
                       setFormData({ ...formData, cnpj: cleanedCnpj });
                     }}
                     placeholder="00000000000000"
+                    maxLength={20}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                   />
                   <p className="text-xs text-gray-500 mt-1">
-                    Apenas números (11 a 14 dígitos)
+                    Apenas números (11 a 14 dígitos) - Comprimento atual: {formData.cnpj.length}
                   </p>
                 </div>
 
