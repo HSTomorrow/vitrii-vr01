@@ -187,6 +187,8 @@ export default function Index() {
   // Helper to filter by localidade if user has one selected
   const matchesLocalidade = (anuncio: any) => {
     if (!userLocalidadeId) return true; // Show all if no localidade selected
+    // If anunciante has no localidade set, show it in all localidades
+    if (!anuncio.anunciantes?.localidadeId) return true;
     return anuncio.anunciantes?.localidadeId === userLocalidadeId;
   };
 
