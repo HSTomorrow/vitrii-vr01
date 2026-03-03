@@ -448,9 +448,39 @@ export const createAnuncio: RequestHandler = async (req, res) => {
     // For free items: automatically set status to "ativo", set statusPagamento to "aprovado", and mark as featured
     const isDoacao = validatedData.isDoacao || false;
     const precoAnuncio = isDoacao ? 0 : validatedData.precoAnuncio;
-    const status = isDoacao ? "ativo" : "em_edicao";
-    const statusPagamento = isDoacao ? "aprovado" : "pendente";
-    const destaque = isDoacao ? true : false;
+
+    // Count current active ads from the user (excluding donations if applicable)
+    const anunciosAtivosCount = await prisma.anuncios.count({
+      where: {
+        usuarioId: validatedData.usuarioId,
+        status: "ativo",
+      },
+    });
+
+    console.log(`[createAnuncio] User ${validatedData.usuarioId} has ${anunciosAtivosCount} active ads`);
+
+    // Determine status and payment based on number of active ads
+    // Rule: First 3 ads are automatically published, 4th+ requires payment
+    let status: string;
+    let statusPagamento: string;
+    let destaque: boolean = false;
+
+    if (isDoacao) {
+      // Donations are always published automatically
+      status = "ativo";
+      statusPagamento = "aprovado";
+      destaque = true;
+    } else if (anunciosAtivosCount < 3) {
+      // First 3 ads are automatically published (no payment required)
+      console.log("[createAnuncio] Auto-publishing ad (free slots available)");
+      status = "ativo";
+      statusPagamento = "aprovado";
+    } else {
+      // 4th+ ads require payment
+      console.log("[createAnuncio] Payment required for this ad (free slots used)");
+      status = "aguardando_pagamento";
+      statusPagamento = "pendente";
+    }
 
     // Only admins can set custom ordem, otherwise default to 10
     const ordem = usuario.tipoUsuario === "adm" ? (validatedData.ordem || 10) : 10;
