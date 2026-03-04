@@ -572,21 +572,30 @@ export default function AnuncioDetalhe() {
             {/* Sidebar */}
             <div className="lg:col-span-1">
               {/* Price Card */}
-              <div className="bg-vitrii-blue text-white rounded-lg p-6 mb-6">
-                <p className="text-sm opacity-90 mb-1">Preço</p>
-                <div className="flex items-baseline">
-                  <span className="text-4xl font-bold">
-                    R$ {Number(anuncio.preco || 0).toFixed(2)}
-                  </span>
-                </div>
-                {anuncio.isDoacao && (
-                  <div className="mt-4 pt-4 border-t border-blue-400">
-                    <p className="text-sm font-semibold">
-                      Este item é gratuito/doação
-                    </p>
+              {anuncio.preco && anuncio.preco > 0 ? (
+                <div className="bg-vitrii-blue text-white rounded-lg p-6 mb-6">
+                  <p className="text-sm opacity-90 mb-1">Preço</p>
+                  <div className="flex items-baseline">
+                    <span className="text-4xl font-bold">
+                      R$ {Number(anuncio.preco).toFixed(2)}
+                    </span>
                   </div>
-                )}
-              </div>
+                </div>
+              ) : anuncio.aCombinar ? (
+                <div className="bg-vitrii-blue text-white rounded-lg p-6 mb-6">
+                  <p className="text-sm opacity-90 mb-1">Preço</p>
+                  <div className="flex items-baseline">
+                    <span className="text-4xl font-bold">A combinar</span>
+                  </div>
+                </div>
+              ) : anuncio.isDoacao ? (
+                <div className="bg-green-600 text-white rounded-lg p-6 mb-6">
+                  <p className="text-sm opacity-90 mb-1">Preço</p>
+                  <div className="flex items-baseline">
+                    <span className="text-4xl font-bold">Gratuito</span>
+                  </div>
+                </div>
+              ) : null}
 
               {/* Contact Actions */}
               <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6 space-y-3">
