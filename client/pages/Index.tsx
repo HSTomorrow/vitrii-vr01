@@ -272,12 +272,13 @@ export default function Index() {
   const destaquedosCarousel2 = destacados.slice(15, 30);
   const destaquedosCarousel3 = destacados.slice(30, 45);
 
-  // Free/donation ads - only show if destaque=true and status=ativo
+  // Free/donation ads - only show if isDoacao=true (primary rule for this section)
+  // Ads with value or "A Combinar" follow tipo-based classification
   const destaqueDoacoes = allAnuncios
     .filter(
       (anuncio: any) =>
         isMainPageEligible(anuncio) &&
-        isGratis(anuncio) &&
+        anuncio.isDoacao === true &&
         matchesLocalidade(anuncio),
     )
     .slice(0, 100);
