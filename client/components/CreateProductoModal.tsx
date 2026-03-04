@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { X, Plus } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import CreateGrupoModal from "./CreateGrupoModal";
+import { TIPO_ANUNCIO_OPTIONS, TIPO_ANUNCIO_DESCRIPTIONS } from "@/constants/anuncioTypes";
 
 interface CreateProductoModalProps {
   isOpen: boolean;
@@ -277,26 +278,17 @@ export default function CreateProductoModal({
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
               >
                 <option value="">Selecione um tipo</option>
-                <option value="produto">Produto</option>
-                <option value="servico">Serviço</option>
-                <option value="evento">Evento</option>
-                <option value="agenda_recorrente">
-                  Aulas, Cursos e Serviços Especializados
-                </option>
-                <option value="oportunidade">
-                  Oportunidade / Vaga de Emprego
-                </option>
+                {TIPO_ANUNCIO_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
               </select>
-              <p className="mt-2 text-sm text-vitrii-text-secondary">
-                {formData.tipo === "produto" && "Produtos físicos para venda"}
-                {formData.tipo === "servico" && "Serviços e consultorias"}
-                {formData.tipo === "evento" &&
-                  "Eventos, workshops, shows e experiências"}
-                {formData.tipo === "agenda_recorrente" &&
-                  "Agendas de Aulas, Cursos e Serviços Especializados"}
-                {formData.tipo === "oportunidade" &&
-                  "Oportunidades profissionais e vagas de emprego"}
-              </p>
+              {formData.tipo && (
+                <p className="mt-2 text-sm text-vitrii-text-secondary">
+                  {TIPO_ANUNCIO_DESCRIPTIONS[formData.tipo]}
+                </p>
+              )}
             </div>
 
             {/* Variantes/Tabelas de Preço - Only for produtos and servicos */}

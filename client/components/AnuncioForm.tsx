@@ -15,6 +15,7 @@ import CreateAnuncianteModal from "./CreateLojaModal";
 import CreateProductoModal from "./CreateProductoModal";
 import MultiImageUpload from "./MultiImageUpload";
 import { BRAZILIAN_STATES } from "@shared/brazilianStates";
+import { TIPO_ANUNCIO_OPTIONS, TIPO_ANUNCIO_DESCRIPTIONS } from "@/constants/anuncioTypes";
 
 interface AnuncioFormProps {
   anuncianteId?: number;
@@ -467,6 +468,12 @@ export default function AnuncioForm({
       return;
     }
 
+    if (!formData.tipo) {
+      console.warn("[AnuncioForm] Validation failed: missing tipo");
+      toast.error("Selecione um Tipo de Anúncio");
+      return;
+    }
+
     // Validate price: either precoAnuncio must be filled OR isDoacao OR aCombinar must be true
     const hasPrice =
       formData.precoAnuncio && parseFloat(formData.precoAnuncio) > 0;
@@ -639,6 +646,30 @@ export default function AnuncioForm({
                   </option>
                 ))}
               </select>
+            </div>
+
+            {/* Tipo de Anúncio */}
+            <div>
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                Tipo de Anúncio *
+              </label>
+              <select
+                value={formData.tipo}
+                onChange={(e) => handleInputChange("tipo", e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
+              >
+                <option value="">Selecione um tipo</option>
+                {TIPO_ANUNCIO_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+              {formData.tipo && (
+                <p className="mt-2 text-sm text-vitrii-text-secondary">
+                  {TIPO_ANUNCIO_DESCRIPTIONS[formData.tipo]}
+                </p>
+              )}
             </div>
 
             {/* Título */}
