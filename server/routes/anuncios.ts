@@ -623,9 +623,27 @@ export const createAnuncio: RequestHandler = async (req, res) => {
 export const updateAnuncio: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log("[updateAnuncio] Updating ad:", id, "with data:", req.body);
+    const adId = parseInt(id);
+    console.log("[updateAnuncio] Updating ad:", adId, "with data:", req.body);
     let updateData = AnuncioUpdateSchema.parse(req.body);
     console.log("[updateAnuncio] Validated data:", updateData);
+
+    // Get current ad to track counter changes
+    const currentAd = await prisma.anuncios.findUnique({
+      where: { id: adId },
+      select: {
+        status: true,
+        destaque: true,
+        usuarioId: true,
+      },
+    });
+
+    if (!currentAd) {
+      return res.status(404).json({
+        success: false,
+        error: "Anúncio não encontrado",
+      });
+    }
 
     // If updating to donation, automatically set status to "ativo", statusPagamento to "aprovado", and mark as featured
     if (updateData.isDoacao === true) {
@@ -663,7 +681,7 @@ export const updateAnuncio: RequestHandler = async (req, res) => {
     }
 
     const anuncio = await prisma.anuncios.update({
-      where: { id: parseInt(id) },
+      where: { id: adId },
       data: {
         ...mappedData,
         dataAtualizacao: new Date(),
@@ -672,6 +690,48 @@ export const updateAnuncio: RequestHandler = async (req, res) => {
         anunciantes: true,
       },
     });
+
+    // Handle counter updates when status or destaque changes
+    const newStatus = mappedData.status || currentAd.status;
+    const newDestaque = mappedData.destaque !== undefined ? mappedData.destaque : currentAd.destaque;
+    const wasActive = ["ativo", "pago"].includes(currentAd.status);
+    const isNowActive = ["ativo", "pago"].includes(newStatus);
+
+    if (wasActive !== isNowActive || (isNowActive && currentAd.destaque !== newDestaque)) {
+      const counterUpdates: any = {};
+
+      // Handle active status change
+      if (!wasActive && isNowActive) {
+        // Ad is now becoming active, increment counter
+        counterUpdates.numeroAnunciosAtivos = { increment: 1 };
+        if (newDestaque) {
+          counterUpdates.numeroAnunciosAtivosDestaque = { increment: 1 };
+        }
+      } else if (wasActive && !isNowActive) {
+        // Ad is no longer active, decrement counter
+        counterUpdates.numeroAnunciosAtivos = { decrement: 1 };
+        if (currentAd.destaque) {
+          counterUpdates.numeroAnunciosAtivosDestaque = { decrement: 1 };
+        }
+      } else if (isNowActive && currentAd.destaque !== newDestaque) {
+        // Destaque flag changed while active
+        if (newDestaque && !currentAd.destaque) {
+          // Changed from non-featured to featured
+          counterUpdates.numeroAnunciosAtivosDestaque = { increment: 1 };
+        } else if (!newDestaque && currentAd.destaque) {
+          // Changed from featured to non-featured
+          counterUpdates.numeroAnunciosAtivosDestaque = { decrement: 1 };
+        }
+      }
+
+      if (Object.keys(counterUpdates).length > 0) {
+        console.log("[updateAnuncio] Updating counters:", counterUpdates);
+        await prisma.usracessos.update({
+          where: { id: currentAd.usuarioId },
+          data: counterUpdates,
+        });
+      }
+    }
 
     console.log("[updateAnuncio] Ad updated successfully:", anuncio.id);
     res.json({
@@ -752,11 +812,12 @@ export const updateAnuncioStatus: RequestHandler = async (req, res) => {
     });
 
     // Update active ads counter if status is changing
-    const wasActive = currentAd.status === "pago";
-    const isNowActive = status === "pago";
+    const wasActive = ["ativo", "pago"].includes(currentAd.status);
+    const isNowActive = ["ativo", "pago"].includes(status);
 
     if (wasActive && !isNowActive) {
       // Transitioning from active to inactive
+      console.log(`[updateAnuncioStatus] Ad ${id} transitioning from active to inactive`);
       await prisma.usracessos.update({
         where: { id: currentAd.usuarioId },
         data: {
@@ -767,6 +828,7 @@ export const updateAnuncioStatus: RequestHandler = async (req, res) => {
       });
     } else if (!wasActive && isNowActive) {
       // Transitioning from inactive to active
+      console.log(`[updateAnuncioStatus] Ad ${id} transitioning from inactive to active`);
       await prisma.usracessos.update({
         where: { id: currentAd.usuarioId },
         data: {
@@ -905,7 +967,8 @@ export const deleteAnuncio: RequestHandler = async (req, res) => {
     });
 
     // Decrement active ads counter if ad was active
-    if (anuncio.status === "pago") {
+    if (["ativo", "pago"].includes(anuncio.status)) {
+      console.log(`[deleteAnuncio] Decrementing counter for deleted active ad ${id}`);
       await prisma.usracessos.update({
         where: { id: anuncio.usuarioId },
         data: {
@@ -939,6 +1002,7 @@ export const inactivateAnuncio: RequestHandler = async (req, res) => {
       where: { id: parseInt(id) },
       select: {
         status: true,
+        destaque: true,
         usuarioId: true,
       },
     });
@@ -959,14 +1023,21 @@ export const inactivateAnuncio: RequestHandler = async (req, res) => {
     });
 
     // Decrement active ads counter if ad was active
-    if (anuncio.status === "pago") {
+    if (["ativo", "pago"].includes(anuncio.status)) {
+      console.log(`[inactivateAnuncio] Decrementing counter for inactivated ad ${id}`);
+      const counterUpdates: any = {
+        numeroAnunciosAtivos: {
+          decrement: 1,
+        },
+      };
+      if (anuncio.destaque) {
+        counterUpdates.numeroAnunciosAtivosDestaque = {
+          decrement: 1,
+        };
+      }
       await prisma.usracessos.update({
         where: { id: anuncio.usuarioId },
-        data: {
-          numeroAnunciosAtivos: {
-            decrement: 1,
-          },
-        },
+        data: counterUpdates,
       });
     }
 
