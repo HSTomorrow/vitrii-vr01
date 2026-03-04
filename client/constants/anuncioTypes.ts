@@ -6,7 +6,7 @@ export const TIPO_ANUNCIO_OPTIONS = [
   { label: "Produto", value: "produto" },
   { label: "Serviço Especializado", value: "servico" },
   { label: "Evento", value: "evento" },
-  { label: "Aulas e Cursos", value: "agenda_recorrente" },
+  { label: "Aulas e Cursos", value: "aulas_cursos" },
   { label: "Vagas de Emprego", value: "oportunidade" },
 ] as const;
 
@@ -26,6 +26,6 @@ export const TIPO_ANUNCIO_DESCRIPTIONS: Record<string, string> = {
   produto: "Produtos físicos para venda",
   servico: "Serviços e consultorias especializadas",
   evento: "Eventos, workshops, shows e experiências",
-  agenda_recorrente: "Agendas de Aulas, Cursos e Serviços Especializados",
+  aulas_cursos: "Agendas de Aulas, Cursos e Serviços Especializados",
   oportunidade: "Oportunidades profissionais e vagas de emprego",
 };

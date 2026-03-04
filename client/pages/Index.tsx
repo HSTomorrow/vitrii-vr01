@@ -300,7 +300,7 @@ export default function Index() {
       (anuncio: any) =>
         isMainPageEligible(anuncio) &&
         !isGratis(anuncio) &&
-        anuncio.tipo === "agenda_recorrente" &&
+        anuncio.tipo === "aulas_cursos" &&
         matchesLocalidade(anuncio),
     )
     .slice(0, 100);
@@ -572,7 +572,7 @@ export default function Index() {
               </p>
             </div>
             <Link
-              to="/browse?filter=agenda_recorrente"
+              to="/browse?filter=aulas_cursos"
               className="hidden md:inline-flex items-center space-x-2 text-vitrii-blue font-semibold hover:space-x-3 transition-all"
             >
               <span>Ver Todas</span>
@@ -592,7 +592,7 @@ export default function Index() {
 
           <div className="text-center mt-2">
             <Link
-              to="/browse?filter=agenda_recorrente"
+              to="/browse?filter=aulas_cursos"
               className="inline-flex items-center space-x-2 text-vitrii-blue font-semibold hover:space-x-3 transition-all"
             >
               <span>Ver Todas as Agendas</span>

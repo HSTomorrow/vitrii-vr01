@@ -106,7 +106,7 @@ async function main() {
             : i % 7 === 0
               ? "evento"
               : i % 11 === 0
-                ? "agenda_recorrente"
+                ? "aulas_cursos"
                 : "produto";
 
         const preco =

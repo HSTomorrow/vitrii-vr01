@@ -29,7 +29,7 @@ interface Producto {
   id: number;
   nome: string;
   descricao?: string;
-  tipo?: string; // "produto", "servico", "evento", "agenda_recorrente"
+  tipo?: string; // "produto", "servico", "evento", "aulas_cursos"
   grupo?: { id: number; nome: string };
   grupoDeProductos?: { id: number; nome: string };
   tabelasDePreco: Array<{
@@ -320,6 +320,11 @@ export default function AnuncioForm({
       if (normalizedTipo === "doacao") {
         normalizedTipo = "produto";
         normalizedIsDoacao = true;
+      }
+
+      // Normalize 'agenda_recorrente' to 'aulas_cursos'
+      if (normalizedTipo === "agenda_recorrente") {
+        normalizedTipo = "aulas_cursos";
       }
 
       const payload = {
@@ -969,8 +974,8 @@ export default function AnuncioForm({
                     <p className="mt-2 text-sm text-vitrii-text-secondary">
                       Tipo:{" "}
                       <span className="font-semibold capitalize">
-                        {selectedProducto.tipo === "agenda_recorrente"
-                          ? "Agenda Recorrente"
+                        {selectedProducto.tipo === "aulas_cursos"
+                          ? "Aulas e Cursos"
                           : selectedProducto.tipo}
                       </span>
                     </p>

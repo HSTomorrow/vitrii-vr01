@@ -64,7 +64,7 @@ const BRAZILIAN_STATES = [
   "SC",
 ];
 
-const PRODUCT_TYPES = ["produto", "servico", "evento", "agenda_recorrente", "oportunidade"];
+const PRODUCT_TYPES = ["produto", "servico", "evento", "aulas_cursos", "oportunidade"];
 
 // Images from Unsplash API - Free to use
 const PRODUCT_IMAGES = [
@@ -193,7 +193,7 @@ async function main() {
             : i < 649
               ? "evento"
               : i < 694
-                ? "agenda_recorrente"
+                ? "aulas_cursos"
                 : "oportunidade";
       const isDestaque = i < 400; // First 400 are featured
 
@@ -337,7 +337,7 @@ async function main() {
           imagem: PRODUCT_IMAGES[Math.floor(Math.random() * PRODUCT_IMAGES.length)],
           preco: parseFloat(faker.commerce.price({ min: 50, max: 300 })),
           status: "ativo",
-          tipo: "agenda_recorrente",
+          tipo: "aulas_cursos",
           isDoacao: false,
           destaque: true,
           ordem: Math.floor(Math.random() * 5) + 1,

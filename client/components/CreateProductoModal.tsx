@@ -64,6 +64,12 @@ export default function CreateProductoModal({
 
   const mutation = useMutation({
     mutationFn: async (data: any) => {
+      // Normalize 'agenda_recorrente' to 'aulas_cursos'
+      let normalizedTipo = data.tipo || "anuncio_padrao";
+      if (normalizedTipo === "agenda_recorrente") {
+        normalizedTipo = "aulas_cursos";
+      }
+
       const response = await fetch("/api/productos", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -72,7 +78,7 @@ export default function CreateProductoModal({
           nome: data.nome,
           descricao: data.descricao,
           sku: data.sku,
-          tipo: data.tipo,
+          tipo: normalizedTipo,
         }),
       });
 

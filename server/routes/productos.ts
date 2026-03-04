@@ -9,7 +9,7 @@ const ProductoCreateSchema = z.object({
   descricao: z.string().optional(),
   sku: z.string().optional(),
   tipo: z
-    .enum(["anuncio_padrao", "produto", "servico", "evento", "agenda_recorrente", "oportunidade"])
+    .enum(["anuncio_padrao", "produto", "servico", "evento", "aulas_cursos", "oportunidade"])
     .optional()
     .default("anuncio_padrao"),
 });

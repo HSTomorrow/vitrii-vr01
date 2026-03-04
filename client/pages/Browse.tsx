@@ -21,7 +21,7 @@ const TYPES = [
   { value: "produto", label: "Produto" },
   { value: "servico", label: "Serviço" },
   { value: "evento", label: "Evento" },
-  { value: "agenda_recorrente", label: "Aula/Agenda" },
+  { value: "aulas_cursos", label: "Aula/Agenda" },
   { value: "oportunidade", label: "Oportunidade/Vaga de Emprego" },
 ];
 

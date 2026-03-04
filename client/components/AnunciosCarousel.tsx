@@ -222,7 +222,7 @@ export default function AnunciosCarousel({
                 </div>
               )}
 
-              {anuncio.tipo === "agenda_recorrente" && (
+              {anuncio.tipo === "aulas_cursos" && (
                 <div className="absolute top-3 right-3 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold z-10">
                   AGENDA
                 </div>

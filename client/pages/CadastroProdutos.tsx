@@ -313,7 +313,7 @@ export default function CadastroProdutos() {
                     <option value="produto">Produto</option>
                     <option value="servico">Serviço</option>
                     <option value="evento">Evento</option>
-                    <option value="agenda_recorrente">
+                    <option value="aulas_cursos">
                       Agendas de Aulas, Cursos e Serviços Especializados
                     </option>
                     <option value="oportunidade">
