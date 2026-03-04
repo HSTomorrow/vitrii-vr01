@@ -295,11 +295,11 @@ export default function Index() {
     .slice(0, 100);
 
   // Recurring schedules/courses - only show if destaque=true and status=ativo
+  // Note: No isGratis filter as aulas_cursos can have price=0 with "A combinar" or other pricing models
   const destaqueAgendas = allAnuncios
     .filter(
       (anuncio: any) =>
         isMainPageEligible(anuncio) &&
-        !isGratis(anuncio) &&
         anuncio.tipo === "aulas_cursos" &&
         matchesLocalidade(anuncio),
     )
