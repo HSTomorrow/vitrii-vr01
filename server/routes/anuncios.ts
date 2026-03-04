@@ -389,18 +389,8 @@ export const createAnuncio: RequestHandler = async (req, res) => {
       });
     }
 
-    // Check if user has reached the limit of active ads
-    // Admins are exempt from this limit
+    // Admins are exempt from ad limits
     const isAdmin = usuario.tipoUsuario === "adm";
-    const maxAnuncios = usuario.maxAnunciosAtivos || 10;
-    const anunciosAtivos = usuario.numeroAnunciosAtivos || 0;
-
-    if (!isAdmin && anunciosAtivos >= maxAnuncios) {
-      return res.status(403).json({
-        success: false,
-        error: `Limite de ${maxAnuncios} anúncios ativos atingido. Aguarde a expiração de anúncios antigos ou entre em contato com o suporte.`,
-      });
-    }
 
     // Only validate product if one is provided (product is optional)
     if (validatedData.productId && validatedData.productId > 0) {
@@ -464,24 +454,36 @@ export const createAnuncio: RequestHandler = async (req, res) => {
       });
     }
 
-    // Determine free featured slots based on anunciante type
-    // Padrão: 3 free featured ads
-    // Profissional: 20 free featured ads
-    const freeDestaqueSlots = anunciante.tipo === "Profissional" ? 20 : 3;
+    // Determine free ad limits based on anunciante type
+    // Padrão: 3 featured, 10 non-featured
+    // Profissional: 10 featured, 1000 non-featured
+    const isProfissional = anunciante.tipo === "Profissional";
+    const maxFeaturedSlots = isProfissional ? 10 : 3;
+    const maxNonFeaturedSlots = isProfissional ? 1000 : 10;
 
     // Count current active FEATURED ads from the user
     const anunciosDestaqueCount = await prisma.anuncios.count({
       where: {
         usuarioId: validatedData.usuarioId,
-        status: "ativo",
+        status: { in: ["ativo", "pago"] },
         destaque: true,
       },
     });
 
-    console.log(`[createAnuncio] User ${validatedData.usuarioId} (${anunciante.tipo}) has ${anunciosDestaqueCount}/${freeDestaqueSlots} free featured slots`);
+    // Count current active NON-FEATURED ads from the user
+    const anunciosNaoDestaqueCount = await prisma.anuncios.count({
+      where: {
+        usuarioId: validatedData.usuarioId,
+        status: { in: ["ativo", "pago"] },
+        destaque: false,
+      },
+    });
 
-    // Determine status and payment based on featured ads
-    // Rule: First N ads (destaque) are automatically published, subsequent paid ads don't count
+    console.log(`[createAnuncio] User ${validatedData.usuarioId} (${anunciante.tipo}) has:`);
+    console.log(`  Featured: ${anunciosDestaqueCount}/${maxFeaturedSlots}`);
+    console.log(`  Non-Featured: ${anunciosNaoDestaqueCount}/${maxNonFeaturedSlots}`);
+
+    // Determine status and payment based on ad type and limits
     let status: string;
     let statusPagamento: string;
     let destaque: boolean = validatedData.destaque || false; // Use user's destaque preference
@@ -493,22 +495,30 @@ export const createAnuncio: RequestHandler = async (req, res) => {
       destaque = true;
     } else if (destaque) {
       // User wants this ad to be featured (destaque)
-      if (anunciosDestaqueCount < freeDestaqueSlots) {
+      if (anunciosDestaqueCount < maxFeaturedSlots) {
         // Still has free featured slots
         console.log("[createAnuncio] Auto-publishing featured ad (free slots available)");
         status = "ativo";
         statusPagamento = "aprovado";
       } else {
         // No more free featured slots, requires payment
-        console.log("[createAnuncio] Payment required for featured ad (free slots used)");
+        console.log("[createAnuncio] Payment required for featured ad (free slots exhausted)");
         status = "aguardando_pagamento";
         statusPagamento = "pendente";
       }
     } else {
-      // User doesn't want this ad featured (regular ad is always free)
-      console.log("[createAnuncio] Auto-publishing regular ad (non-featured ads are always free)");
-      status = "ativo";
-      statusPagamento = "aprovado";
+      // User wants this ad as non-featured
+      if (anunciosNaoDestaqueCount < maxNonFeaturedSlots) {
+        // Still has free non-featured slots
+        console.log("[createAnuncio] Auto-publishing non-featured ad (free slots available)");
+        status = "ativo";
+        statusPagamento = "aprovado";
+      } else {
+        // No more free non-featured slots, requires payment
+        console.log("[createAnuncio] Payment required for non-featured ad (free slots exhausted)");
+        status = "aguardando_pagamento";
+        statusPagamento = "pendente";
+      }
     }
 
     // Only admins can set custom ordem, otherwise default to 10
