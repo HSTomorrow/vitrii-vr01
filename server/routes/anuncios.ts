@@ -80,14 +80,15 @@ const AnuncioBaseSchema = z.object({
 // Schema validation for creating ad (with refinement)
 const AnuncioCreateSchema = AnuncioBaseSchema.refine(
   (data) => {
-    // Either precoAnuncio must be provided OR isDoacao must be true
+    // Either precoAnuncio must be provided OR isDoacao must be true OR aCombinar must be true
     const hasPrice = data.precoAnuncio && data.precoAnuncio > 0;
     const isFree = data.isDoacao === true;
-    return hasPrice || isFree;
+    const isPriceNegotiable = data.aCombinar === true;
+    return hasPrice || isFree || isPriceNegotiable;
   },
   {
     message:
-      "Você deve preencher o Valor do anúncio ou marcar como gratuito/doação",
+      "Você deve preencher o Valor do anúncio, marcar como gratuito/doação ou deixar a combinar",
     path: ["precoAnuncio"], // Point to the field with the error
   },
 );
