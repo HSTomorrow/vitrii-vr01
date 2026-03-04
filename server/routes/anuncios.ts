@@ -531,6 +531,7 @@ export const createAnuncio: RequestHandler = async (req, res) => {
         destaque,
         ordem,
         isDoacao,
+        aCombinar: validatedData.aCombinar || false,
         tipo: anuncioTipo,
         dataAtualizacao: new Date(),
       },
@@ -640,6 +641,8 @@ export const updateAnuncio: RequestHandler = async (req, res) => {
     if (updateData.tipo !== undefined) mappedData.tipo = updateData.tipo;
     if (updateData.isDoacao !== undefined)
       mappedData.isDoacao = updateData.isDoacao;
+    if (updateData.aCombinar !== undefined)
+      mappedData.aCombinar = updateData.aCombinar;
     if (updateData.destaque !== undefined)
       mappedData.destaque = updateData.destaque;
 
