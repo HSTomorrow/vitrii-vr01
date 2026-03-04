@@ -565,10 +565,10 @@ export default function Index() {
           <div className="flex justify-between items-center mb-2">
             <div>
               <h2 className="text-h2 mb-0.5">
-                Agendas de Aulas, Cursos e Serviços Especializados
+                Aulas, Cursos e Atendimentos Agendados
               </h2>
               <p className="text-label">
-                Agendas de Aulas, Cursos e Serviços Especializados
+                Aulas, Cursos e Atendimentos Agendados
               </p>
             </div>
             <Link
