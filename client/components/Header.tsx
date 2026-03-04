@@ -83,7 +83,7 @@ export default function Header() {
                   </Link>
 
                   <Link
-                    to="/lista-de-desejos"
+                    to="/lista-desejos"
                     className="flex-shrink-0 p-2 hover:bg-vitrii-gray rounded-lg transition-colors"
                     title="Minha lista de desejos"
                   >
