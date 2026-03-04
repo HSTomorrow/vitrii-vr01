@@ -49,13 +49,15 @@ export default function BottomNavBar() {
       icon: Plus,
       route: user ? "/anuncio/criar" : "/signin",
       isActive: location.pathname.startsWith("/anuncio/criar"),
+      requiresAuth: true,
     },
     {
       id: "chat",
       label: "Chat",
       icon: MessageCircle,
-      route: user ? "/chat" : "/signin",
+      route: "/chat",
       isActive: location.pathname === "/chat",
+      requiresAuth: true,
     },
     {
       id: "profile",
@@ -63,8 +65,9 @@ export default function BottomNavBar() {
       icon: User,
       route: user ? "/perfil" : "/signin",
       isActive: location.pathname === "/perfil",
+      requiresAuth: true,
     },
-  ];
+  ].filter((item) => !item.requiresAuth || user);
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white border-t border-gray-200">
