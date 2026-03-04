@@ -45,13 +45,18 @@ export default function SearchAnuncios() {
     }
   }, [location.search]);
 
-  // Fetch all ads
+  // Fetch all ads with active or paid status
   const { data: anunciosData, isLoading } = useQuery({
     queryKey: ["anuncios", "search"],
     queryFn: async () => {
-      const response = await fetch("/api/anuncios?status=pago&limit=500");
+      const response = await fetch("/api/anuncios?limit=500");
       if (!response.ok) throw new Error("Erro ao buscar anúncios");
-      return response.json();
+      const data = await response.json();
+      // Filter to only show active or paid ads for search
+      const filteredData = data.data.filter(
+        (ad: any) => ad.status === "ativo" || ad.status === "pago"
+      );
+      return { ...data, data: filteredData };
     },
   });
 
@@ -68,6 +73,9 @@ export default function SearchAnuncios() {
   // Filter and sort ads
   const filteredAds = useMemo(() => {
     let ads = anunciosData?.data || [];
+
+    // Filter by status (only show active or paid ads)
+    ads = ads.filter((ad: any) => ad.status === "ativo" || ad.status === "pago");
 
     // Filter by search term
     if (searchTerm) {
