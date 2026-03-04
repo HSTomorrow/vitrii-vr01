@@ -784,7 +784,7 @@ export default function AnuncioForm({
             </div>
 
             {/* "A Combinar" Checkbox - For Produtos, Serviços, and Agendas (not for Eventos/Oportunidades) */}
-            {!["evento", "oportunidade"].includes(formData.tipo) && (
+            {!["evento", "oportunidade"].includes(formData.tipo || "") && (
               <div className="flex items-center gap-3 p-4 border rounded-lg bg-yellow-50 border-yellow-200">
                 <input
                   type="checkbox"
