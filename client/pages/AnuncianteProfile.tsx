@@ -41,6 +41,13 @@ interface Anunciante {
   instagram?: string;
   facebook?: string;
   whatsapp?: string;
+  cnpj?: string;
+  chavePix?: string;
+  localidadeId?: number;
+  localidade?: {
+    id: number;
+    descricao: string;
+  };
   dataCriacao?: string;
 }
 
@@ -430,7 +437,7 @@ export default function AnuncianteProfile() {
 
         {/* Social Media */}
         {(anunciante.instagram || anunciante.facebook) && (
-          <div className="bg-white rounded-lg p-6 md:p-8 border border-gray-200">
+          <div className="bg-white rounded-lg p-6 md:p-8 border border-gray-200 mb-8">
             <h2 className="text-2xl font-bold text-vitrii-text mb-6">
               Redes Sociais
             </h2>
@@ -458,6 +465,45 @@ export default function AnuncianteProfile() {
                   <Facebook className="w-5 h-5" />
                   Facebook
                 </a>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Additional Information */}
+        {(anunciante.id || anunciante.cnpj || anunciante.chavePix || anunciante.localidade) && (
+          <div className="bg-white rounded-lg p-6 md:p-8 border border-gray-200">
+            <h2 className="text-2xl font-bold text-vitrii-text mb-6">
+              Informações Adicionais
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {anunciante.id && (
+                <div className="p-4 bg-vitrii-gray-light rounded-lg">
+                  <p className="text-xs text-vitrii-text-secondary mb-1">ID</p>
+                  <p className="text-vitrii-text font-semibold">#{anunciante.id}</p>
+                </div>
+              )}
+
+              {anunciante.cnpj && (
+                <div className="p-4 bg-vitrii-gray-light rounded-lg">
+                  <p className="text-xs text-vitrii-text-secondary mb-1">CNPJ</p>
+                  <p className="text-vitrii-text font-semibold">{anunciante.cnpj}</p>
+                </div>
+              )}
+
+              {anunciante.chavePix && (
+                <div className="p-4 bg-vitrii-gray-light rounded-lg">
+                  <p className="text-xs text-vitrii-text-secondary mb-1">Chave PIX</p>
+                  <p className="text-vitrii-text font-semibold break-all">{anunciante.chavePix}</p>
+                </div>
+              )}
+
+              {anunciante.localidade && (
+                <div className="p-4 bg-vitrii-gray-light rounded-lg">
+                  <p className="text-xs text-vitrii-text-secondary mb-1">Localidade Padrão</p>
+                  <p className="text-vitrii-text font-semibold">{anunciante.localidade.descricao}</p>
+                </div>
               )}
             </div>
           </div>

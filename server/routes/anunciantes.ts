@@ -161,6 +161,14 @@ export const getAnuncianteById: RequestHandler = async (req, res) => {
         instagram: true,
         facebook: true,
         whatsapp: true,
+        chavePix: true,
+        localidadeId: true,
+        localidade: {
+          select: {
+            id: true,
+            descricao: true,
+          },
+        },
         status: true,
         dataCriacao: true,
         usuarios_anunciantes: {
