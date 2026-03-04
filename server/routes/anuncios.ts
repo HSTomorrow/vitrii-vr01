@@ -47,9 +47,9 @@ const AnuncioBaseSchema = z.object({
     .optional()
     .nullable(),
   tipo: z
-    .enum(["produto", "servico", "evento", "agenda_recorrente", "oportunidade"])
+    .enum(["anuncio_padrao", "produto", "servico", "evento", "agenda_recorrente", "oportunidade"])
     .optional()
-    .default("produto"),
+    .default("anuncio_padrao"),
   isDoacao: z.boolean().optional().default(false),
   aCombinar: z.boolean().optional().default(false),
   destaque: z.boolean().optional().default(false),

@@ -33,7 +33,7 @@ export default function CreateProductoModal({
     nome: "",
     descricao: "",
     sku: "",
-    tipo: "produto",
+    tipo: "anuncio_padrao",
   });
   const [tabelas, setTabelas] = useState<TabelaDePreco[]>([
     { tamanho: "", cor: "", preco: "" },
@@ -128,7 +128,7 @@ export default function CreateProductoModal({
       nome: "",
       descricao: "",
       sku: "",
-      tipo: "produto",
+      tipo: "anuncio_padrao",
     });
     setTabelas([{ tamanho: "", cor: "", preco: "" }]);
   };

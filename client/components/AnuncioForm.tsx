@@ -104,7 +104,7 @@ export default function AnuncioForm({
     ordem: 10, // Default order for new ads (admin only)
     categoria: "" as string,
     dadosCategoria: "",
-    tipo: normalizedTipo as string,
+    tipo: normalizedTipo || "anuncio_padrao",
   });
   const [uploadedImages, setUploadedImages] = useState<
     Array<{ id?: string; url: string }>

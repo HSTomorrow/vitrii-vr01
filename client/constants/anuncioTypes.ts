@@ -2,6 +2,7 @@
  * Tipos de Anúncio com opções amigáveis e valores internos
  */
 export const TIPO_ANUNCIO_OPTIONS = [
+  { label: "Anuncio Padrão", value: "anuncio_padrao" },
   { label: "Produto", value: "produto" },
   { label: "Serviço Especializado", value: "servico" },
   { label: "Evento", value: "evento" },
@@ -21,6 +22,7 @@ export const getTipoAnuncioLabel = (tipo: string): string => {
  * Descrições de cada tipo de anúncio
  */
 export const TIPO_ANUNCIO_DESCRIPTIONS: Record<string, string> = {
+  anuncio_padrao: "Anúncio padrão com opções flexíveis de preço e formato",
   produto: "Produtos físicos para venda",
   servico: "Serviços e consultorias especializadas",
   evento: "Eventos, workshops, shows e experiências",
