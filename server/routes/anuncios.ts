@@ -51,6 +51,7 @@ const AnuncioBaseSchema = z.object({
     .optional()
     .default("produto"),
   isDoacao: z.boolean().optional().default(false),
+  aCombinar: z.boolean().optional().default(false),
   destaque: z.boolean().optional().default(false),
   ordem: z.number().int().positive().optional().default(10), // Default 10 for new ads (admin only)
   isActive: z.boolean().optional().default(true),
