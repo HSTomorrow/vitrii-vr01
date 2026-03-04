@@ -165,6 +165,7 @@ function AppContent() {
           <Route path="/cadastros/tabelas-preco" element={<Navigate to="/cadastro-tabelas-preco" replace />} />
           <Route path="/cadastros/variantes" element={<Navigate to="/cadastro-variantes" replace />} />
           <Route path="/cadastros/equipe-venda" element={<Navigate to="/cadastro-equipe-venda" replace />} />
+          <Route path="/cadastros/equipes-venda" element={<Navigate to="/cadastro-equipe-venda" replace />} />
           <Route path="/cadastros/contatos" element={<Navigate to="/cadastro-contatos" replace />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

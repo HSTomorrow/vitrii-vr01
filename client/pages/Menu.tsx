@@ -240,7 +240,7 @@ export default function Menu() {
                   </Link>
 
                   <Link
-                    to="/cadastros/equipes-venda"
+                    to="/cadastro-equipe-venda"
                     className="flex items-center gap-4 px-6 py-4 bg-vitrii-gray hover:bg-gray-200 rounded-lg transition-colors"
                   >
                     <Users className="w-6 h-6 text-vitrii-blue" />
