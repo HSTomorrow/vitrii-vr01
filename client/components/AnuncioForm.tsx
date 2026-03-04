@@ -241,12 +241,22 @@ export default function AnuncioForm({
     }
   }, [anunciantes, anuncioId]);
 
+  // Force tipo to "anuncio_padrao" for Padrão anunciantes
+  useEffect(() => {
+    if (selectedAnunciante && selectedAnunciante.tipo === "Padrão") {
+      setFormData((prev) => ({
+        ...prev,
+        tipo: "anuncio_padrao",
+      }));
+    }
+  }, [selectedAnunciante?.id, selectedAnunciante?.tipo]);
+
   // Update tipo when product is selected
   useEffect(() => {
     if (selectedProducto && selectedProducto.tipo) {
       setFormData((prev) => ({
         ...prev,
-        tipo: selectedProducto.tipo || "produto",
+        tipo: selectedProducto.tipo || "anuncio_padrao",
       }));
     }
   }, [selectedProducto?.id]);
@@ -535,6 +545,12 @@ export default function AnuncioForm({
       return;
     }
 
+    // Prevent Padrão anunciantes from changing tipo
+    if (field === "tipo" && selectedAnunciante?.tipo === "Padrão") {
+      console.warn("[AnuncioForm] Padrão anunciante cannot change tipo");
+      return;
+    }
+
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -652,11 +668,19 @@ export default function AnuncioForm({
             <div>
               <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Tipo de Anúncio *
+                {selectedAnunciante?.tipo === "Padrão" && (
+                  <span className="text-xs text-gray-500 ml-2">(Anunciantes Padrão usam Anuncio Padrão)</span>
+                )}
               </label>
               <select
                 value={formData.tipo}
                 onChange={(e) => handleInputChange("tipo", e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
+                disabled={selectedAnunciante?.tipo === "Padrão"}
+                className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent ${
+                  selectedAnunciante?.tipo === "Padrão"
+                    ? "bg-gray-100 cursor-not-allowed opacity-75"
+                    : ""
+                }`}
               >
                 <option value="">Selecione um tipo</option>
                 {TIPO_ANUNCIO_OPTIONS.map((option) => (
@@ -1248,6 +1272,7 @@ export default function AnuncioForm({
         isOpen={showCreateProducto}
         onClose={() => setShowCreateProducto(false)}
         anuncianteId={selectedAnuncianteId}
+        anuncianteTipo={selectedAnunciante?.tipo}
         onSuccess={handleProductoCreated}
       />
     </div>

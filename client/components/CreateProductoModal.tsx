@@ -10,6 +10,7 @@ interface CreateProductoModalProps {
   isOpen: boolean;
   onClose: () => void;
   anuncianteId: number;
+  anuncianteTipo?: string;
   onSuccess?: (productoId: number) => void;
 }
 
@@ -23,6 +24,7 @@ export default function CreateProductoModal({
   isOpen,
   onClose,
   anuncianteId,
+  anuncianteTipo,
   onSuccess,
 }: CreateProductoModalProps) {
   const { user } = useAuth();
@@ -145,6 +147,12 @@ export default function CreateProductoModal({
   };
 
   const handleInputChange = (field: string, value: string) => {
+    // Prevent Padrão anunciantes from changing tipo
+    if (field === "tipo" && anuncianteTipo === "Padrão") {
+      console.warn("[CreateProductoModal] Padrão anunciante cannot change tipo");
+      return;
+    }
+
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -174,6 +182,16 @@ export default function CreateProductoModal({
       grupoId,
     }));
   };
+
+  // Force tipo to "anuncio_padrao" for Padrão anunciantes
+  useEffect(() => {
+    if (anuncianteTipo === "Padrão" && formData.tipo !== "anuncio_padrao") {
+      setFormData((prev) => ({
+        ...prev,
+        tipo: "anuncio_padrao",
+      }));
+    }
+  }, [anuncianteTipo]);
 
   if (!isOpen) return null;
 
@@ -271,11 +289,19 @@ export default function CreateProductoModal({
             <div>
               <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Tipo de Produto/Serviço *
+                {anuncianteTipo === "Padrão" && (
+                  <span className="text-xs text-gray-500 ml-2">(Anunciantes Padrão usam Anuncio Padrão)</span>
+                )}
               </label>
               <select
                 value={formData.tipo}
                 onChange={(e) => handleInputChange("tipo", e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
+                disabled={anuncianteTipo === "Padrão"}
+                className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent ${
+                  anuncianteTipo === "Padrão"
+                    ? "bg-gray-100 cursor-not-allowed opacity-75"
+                    : ""
+                }`}
               >
                 <option value="">Selecione um tipo</option>
                 {TIPO_ANUNCIO_OPTIONS.map((option) => (
