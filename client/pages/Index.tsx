@@ -250,13 +250,20 @@ export default function Index() {
     return anuncio.anunciantes?.localidadeId === userLocalidadeId;
   };
 
-  // Show featured ads first, fallback to all active ads if no featured ads exist
+  // Helper to check if ad should be featured (must have destaque=true and status=ativo)
+  const isMainPageEligible = (anuncio: any) => {
+    return anuncio.destaque && anuncio.status === "ativo";
+  };
+
+  // Show featured ads first
+  // "Anuncio Padrão", "Produto", and "Serviço Especializado" go here
+  // Only show if destaque=true and status=ativo
   const destacados = allAnuncios
     .filter(
       (anuncio: any) =>
-        anuncio.destaque &&
+        isMainPageEligible(anuncio) &&
         !isGratis(anuncio) &&
-        ["produto", "servico"].includes(anuncio.tipo) &&
+        ["anuncio_padrao", "produto", "servico"].includes(anuncio.tipo) &&
         matchesLocalidade(anuncio),
     );
 
@@ -265,55 +272,43 @@ export default function Index() {
   const destaquedosCarousel2 = destacados.slice(15, 30);
   const destaquedosCarousel3 = destacados.slice(30, 45);
 
+  // Free/donation ads - only show if destaque=true and status=ativo
   const destaqueDoacoes = allAnuncios
     .filter(
-      (anuncio: any) => {
-        const passDestaque = anuncio.destaque;
-        const passGratis = isGratis(anuncio);
-        const passLocalidade = matchesLocalidade(anuncio);
-        const passes = passDestaque && passGratis && passLocalidade;
-
-        if (anuncio.id === 5 || anuncio.id === 6) {
-          console.log(`[Index] Ad ${anuncio.id} filter check:`, {
-            titulo: anuncio.titulo,
-            destaque: passDestaque,
-            isDoacao: anuncio.isDoacao,
-            preco: anuncio.preco,
-            gratis: passGratis,
-            localidade: passLocalidade,
-            passes,
-          });
-        }
-
-        return passes;
-      },
+      (anuncio: any) =>
+        isMainPageEligible(anuncio) &&
+        isGratis(anuncio) &&
+        matchesLocalidade(anuncio),
     )
     .slice(0, 100);
 
+  // Events - only show if destaque=true and status=ativo
   const destaqueEventos = allAnuncios
     .filter(
       (anuncio: any) =>
-        anuncio.destaque &&
+        isMainPageEligible(anuncio) &&
         !isGratis(anuncio) &&
         anuncio.tipo === "evento" &&
         matchesLocalidade(anuncio),
     )
     .slice(0, 100);
 
+  // Recurring schedules/courses - only show if destaque=true and status=ativo
   const destaqueAgendas = allAnuncios
     .filter(
       (anuncio: any) =>
-        anuncio.destaque &&
+        isMainPageEligible(anuncio) &&
         !isGratis(anuncio) &&
         anuncio.tipo === "agenda_recorrente" &&
         matchesLocalidade(anuncio),
     )
     .slice(0, 100);
 
+  // Job opportunities - only show if destaque=true and status=ativo
   const destaqueOportunidades = allAnuncios
     .filter(
       (anuncio: any) =>
-        anuncio.destaque &&
+        isMainPageEligible(anuncio) &&
         !isGratis(anuncio) &&
         anuncio.tipo === "oportunidade" &&
         matchesLocalidade(anuncio),
