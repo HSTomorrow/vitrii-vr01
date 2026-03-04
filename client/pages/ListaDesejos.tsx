@@ -504,7 +504,7 @@ export default function ListaDesejosPage() {
                                         </p>
                                         <p className="text-lg font-bold text-green-600">
                                           R${" "}
-                                          {item.preco_desejado.toFixed(2)}
+                                          {parseFloat(item.preco_desejado.toString()).toFixed(2)}
                                         </p>
                                       </div>
                                     )}
