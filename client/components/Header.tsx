@@ -64,16 +64,16 @@ export default function Header() {
 
             {/* Right side - Auth and actions */}
             <div className="flex items-center space-x-2 sm:space-x-4">
-              <Link
-                to="/chat"
-                className="flex-shrink-0 p-2 hover:bg-vitrii-gray rounded-lg transition-colors"
-                title="Minhas mensagens"
-              >
-                <MessageSquare className="w-5 h-5 text-vitrii-text" />
-              </Link>
-
               {user && (
                 <>
+                  <Link
+                    to="/chat"
+                    className="flex-shrink-0 p-2 hover:bg-vitrii-gray rounded-lg transition-colors"
+                    title="Minhas mensagens"
+                  >
+                    <MessageSquare className="w-5 h-5 text-vitrii-text" />
+                  </Link>
+
                   <Link
                     to="/favoritos"
                     className="flex-shrink-0 p-2 hover:bg-vitrii-gray rounded-lg transition-colors"
