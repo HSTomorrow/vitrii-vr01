@@ -391,6 +391,45 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
       status: "bloqueado",
     });
 
+    // Create default anunciante for new user
+    try {
+      const anunciante = await prisma.anunciantes.create({
+        data: {
+          nome: usuario.nome,
+          tipo: "Padrão",
+          email: usuario.email,
+          telefone: usuario.telefone || "",
+          endereco: usuario.endereco || "",
+          cidade: "",
+          estado: "RS",
+          cep: "",
+          descricao: "",
+          status: "Ativo",
+        },
+      });
+
+      console.log("[signUpUsuario] ✅ Anunciante padrão criado com sucesso:", {
+        id: anunciante.id,
+        nome: anunciante.nome,
+        tipo: anunciante.tipo,
+      });
+
+      // Link user to anunciante
+      await prisma.usuarios_anunciantes.create({
+        data: {
+          usuarioId: usuario.id,
+          anuncianteId: anunciante.id,
+          papel: "owner",
+        },
+      });
+
+      console.log("[signUpUsuario] ✅ Usuário vinculado ao anunciante com sucesso");
+    } catch (anuncianteError) {
+      console.error("[signUpUsuario] ⚠️ Erro ao criar anunciante padrão:", anuncianteError);
+      // Don't fail signup if anunciante creation fails, just log the error
+      // User can create/manage anunciantes later
+    }
+
     // Generate email verification token (10 minutes expiration)
     const verificationToken = crypto.randomBytes(32).toString("hex");
     const expirationDate = new Date();
