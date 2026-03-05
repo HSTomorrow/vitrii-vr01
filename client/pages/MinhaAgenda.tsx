@@ -60,16 +60,30 @@ export default function MinhaAgenda() {
   const reservasRef = useRef<HTMLDivElement>(null);
 
   // Fetch user's anunciantes
-  const { data: anunciantes = [] } = useQuery<Anunciante[]>({
+  const {
+    data: anunciantes = [],
+    isLoading: isLoadingAnunciantes,
+    error: anunciantesError
+  } = useQuery<Anunciante[]>({
     queryKey: ["anunciantes", user?.id],
     queryFn: async () => {
-      if (!user?.id) return [];
+      if (!user?.id) {
+        console.log("[MinhaAgenda] User ID not available");
+        return [];
+      }
+      console.log("[MinhaAgenda] Fetching anunciantes for user:", user.id);
       const headers: Record<string, string> = {
         "x-user-id": user.id.toString(),
       };
       const response = await fetch("/api/anunciantes/do-usuario/listar", { headers });
-      if (!response.ok) throw new Error("Erro ao buscar anunciantes");
+      console.log("[MinhaAgenda] Anunciantes response status:", response.status);
+      if (!response.ok) {
+        const error = await response.json();
+        console.error("[MinhaAgenda] Anunciantes error:", error);
+        throw new Error(error.error || "Erro ao buscar anunciantes");
+      }
       const result = await response.json();
+      console.log("[MinhaAgenda] Anunciantes fetched:", result.data);
       return result.data || [];
     },
     enabled: !!user?.id,
@@ -94,10 +108,19 @@ export default function MinhaAgenda() {
   }, [showReservasFor]);
 
   // Fetch eventos for selected anunciante
-  const { data: eventos = [], refetch: refetchEventos, isLoading: isLoadingEventos } = useQuery<Evento[]>({
+  const {
+    data: eventos = [],
+    refetch: refetchEventos,
+    isLoading: isLoadingEventos,
+    error: eventosError
+  } = useQuery<Evento[]>({
     queryKey: ["eventos-agenda", selectedAnuncianteId],
     queryFn: async () => {
-      if (!selectedAnuncianteId) return [];
+      if (!selectedAnuncianteId) {
+        console.log("[MinhaAgenda] No anunciante selected");
+        return [];
+      }
+      console.log("[MinhaAgenda] Fetching eventos for anunciante:", selectedAnuncianteId, "user:", user?.id);
       const headers: Record<string, string> = {
         "x-user-id": user?.id?.toString() || "",
       };
@@ -105,8 +128,14 @@ export default function MinhaAgenda() {
         `/api/eventos-agenda/anunciante/${selectedAnuncianteId}`,
         { headers },
       );
-      if (!response.ok) throw new Error("Erro ao buscar eventos");
+      console.log("[MinhaAgenda] Eventos response status:", response.status);
+      if (!response.ok) {
+        const error = await response.json();
+        console.error("[MinhaAgenda] Eventos error:", error);
+        throw new Error(error.error || "Erro ao buscar eventos");
+      }
       const result = await response.json();
+      console.log("[MinhaAgenda] Eventos fetched:", result.data);
       return result.data || [];
     },
     enabled: !!selectedAnuncianteId && !!user?.id,
@@ -345,6 +374,26 @@ export default function MinhaAgenda() {
             Minha Agenda
           </h1>
 
+          {/* Error Messages */}
+          {anunciantesError && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+              <p className="text-red-800 font-semibold">Erro ao carregar anunciantes</p>
+              <p className="text-red-700 text-sm mt-1">
+                {anunciantesError instanceof Error ? anunciantesError.message : "Erro desconhecido"}
+              </p>
+            </div>
+          )}
+
+          {/* Loading State */}
+          {isLoadingAnunciantes && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+              <div className="flex items-center gap-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                <p className="text-blue-800">Carregando seus anunciantes...</p>
+              </div>
+            </div>
+          )}
+
           {/* Anunciante Selector */}
           {anunciantes.length > 0 && (
             <div className="mb-6">
@@ -366,7 +415,7 @@ export default function MinhaAgenda() {
             </div>
           )}
 
-          {anunciantes.length === 0 && (
+          {anunciantes.length === 0 && !isLoadingAnunciantes && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
               <p className="text-blue-800">
                 Você ainda não tem nenhum anunciante. Crie um anunciante para começar a
@@ -375,6 +424,16 @@ export default function MinhaAgenda() {
             </div>
           )}
         </div>
+
+        {/* Error Messages for Eventos */}
+        {selectedAnuncianteId && eventosError && (
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+            <p className="text-red-800 font-semibold">Erro ao carregar eventos</p>
+            <p className="text-red-700 text-sm mt-1">
+              {eventosError instanceof Error ? eventosError.message : "Erro desconhecido"}
+            </p>
+          </div>
+        )}
 
         {/* Tab Navigation */}
         {selectedAnuncianteId && (
