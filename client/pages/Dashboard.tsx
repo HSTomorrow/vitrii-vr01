@@ -1,6 +1,6 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { MessageCircle, Calendar, Clock, Loader } from "lucide-react";
@@ -13,7 +13,6 @@ interface DashboardStats {
 
 export default function Dashboard() {
   const { user } = useAuth();
-  const navigate = useNavigate();
 
   // Fetch unread messages count
   const { data: messagesData, isLoading: messagesLoading } = useQuery<{ data: { unreadCount: number } }>({
@@ -81,7 +80,7 @@ export default function Dashboard() {
 
           {/* Main CTA Button - Go to Home */}
           <button
-            onClick={() => navigate("/")}
+            onClick={() => window.location.href = "/"}
             className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-white text-vitrii-text border-2 border-vitrii-yellow rounded-lg hover:bg-gray-50 transition-all font-bold text-lg shadow-md hover:shadow-lg transform hover:scale-105"
           >
             <img
