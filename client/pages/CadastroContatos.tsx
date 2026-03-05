@@ -119,7 +119,8 @@ export default function CadastroContatos() {
         { headers }
       );
       if (!response.ok) throw new Error("Erro ao buscar contatos");
-      return response.json();
+      const result = await response.json();
+      return result.data || [];
     },
     enabled: !!user && selectedAnuncianteId !== null,
   });
