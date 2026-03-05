@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { X, AlertCircle, Phone } from "lucide-react";
+import { useState, useEffect } from "react";
+import { X, AlertCircle, Phone, Loader } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -20,12 +20,51 @@ export default function AdicionarFilaCompartilhadaModal({
   const { user } = useAuth();
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isCheckingContact, setIsCheckingContact] = useState(false);
+  const [existingContactId, setExistingContactId] = useState<number | null>(null);
   const [formData, setFormData] = useState({
     descricao: "",
     celular: user?.celular || "",
     telefone: "",
     nomeSolicitante: user?.nome || "",
   });
+
+  // Auto-check if contact exists when modal opens or user celular changes
+  useEffect(() => {
+    if (isOpen && user?.celular && !isCheckingContact) {
+      checkContatoExistente();
+    }
+  }, [isOpen, user?.celular]);
+
+  const checkContatoExistente = async () => {
+    if (!user?.celular) return;
+
+    setIsCheckingContact(true);
+    try {
+      const response = await fetch("/api/contatos/check-duplicates", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-User-Id": user.id.toString(),
+        },
+        body: JSON.stringify({
+          celular: user.celular,
+          telefone: user.telefone || null,
+        }),
+      });
+
+      const data = await response.json();
+      if (data.existe) {
+        setExistingContactId(data.id);
+      } else {
+        setExistingContactId(null);
+      }
+    } catch (error) {
+      console.error("Erro ao verificar contato:", error);
+    } finally {
+      setIsCheckingContact(false);
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -91,27 +130,31 @@ export default function AdicionarFilaCompartilhadaModal({
     setIsSubmitting(true);
     try {
       // First, create/get contact if it doesn't exist
-      let contatoId: number | null = null;
+      let contatoId: number | null = existingContactId;
 
-      // Check if contact with same phone exists
-      const checkContactResponse = await fetch("/api/contatos/check-duplicates", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-User-Id": user.id.toString(),
-        },
-        body: JSON.stringify({
-          celular: formData.celular,
-          telefone: formData.telefone || null,
-        }),
-      });
+      // If no existing contact found, try to create/find one
+      if (!contatoId) {
+        const checkContactResponse = await fetch("/api/contatos/check-duplicates", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-User-Id": user.id.toString(),
+          },
+          body: JSON.stringify({
+            celular: formData.celular,
+            telefone: formData.telefone || null,
+          }),
+        });
 
-      const checkData = await checkContactResponse.json();
+        const checkData = await checkContactResponse.json();
 
-      if (checkData.existe) {
-        // Contact exists
-        contatoId = checkData.id;
-      } else {
+        if (checkData.existe) {
+          // Contact exists
+          contatoId = checkData.id;
+        }
+      }
+
+      if (!contatoId) {
         // Create new contact
         const createContactResponse = await fetch("/api/contatos", {
           method: "POST",
@@ -224,9 +267,22 @@ export default function AdicionarFilaCompartilhadaModal({
 
           {/* Contact Info */}
           <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-            <p className="text-sm font-semibold text-blue-900 mb-3">
-              Informações de Contato
-            </p>
+            <div className="flex items-start justify-between mb-3">
+              <p className="text-sm font-semibold text-blue-900">
+                Informações de Contato
+              </p>
+              {isCheckingContact && (
+                <div className="flex items-center gap-2 text-xs text-blue-600">
+                  <Loader className="w-3 h-3 animate-spin" />
+                  Verificando...
+                </div>
+              )}
+              {!isCheckingContact && existingContactId && (
+                <div className="text-xs text-green-600 font-semibold">
+                  ✓ Contato detectado
+                </div>
+              )}
+            </div>
 
             <div className="space-y-3">
               <div>

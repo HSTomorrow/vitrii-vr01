@@ -170,6 +170,23 @@ export default function AnuncioDetalhe() {
     enabled: !!selectedEquipeId,
   });
 
+  // Check if announcer has agenda control
+  const { data: agendaData } = useQuery({
+    queryKey: ["anunciante-agenda", data?.data?.anuncianteId],
+    queryFn: async () => {
+      const anuncianteId = data?.data?.anuncianteId;
+      if (!anuncianteId) throw new Error("Anunciante não encontrado");
+      const response = await fetch(
+        `/api/agendas?anuncianteId=${anuncianteId}`,
+      );
+      if (!response.ok) throw new Error("Erro ao buscar agenda");
+      return response.json();
+    },
+    enabled: !!data?.data?.anuncianteId,
+  });
+
+  const temAgendaAtiva = agendaData?.data && agendaData.data.length > 0;
+
   // Fetch photos for the ad
   const { data: fotosData } = useQuery({
     queryKey: ["anuncio-fotos", id],
@@ -643,6 +660,17 @@ export default function AnuncioDetalhe() {
                       <MessageCircle className="w-4 h-4" />
                       WhatsApp
                     </a>
+                  )}
+
+                  {/* Agenda Button */}
+                  {temAgendaAtiva && (
+                    <button
+                      onClick={() => navigate(`/agenda/anunciante/${anuncio.anuncianteId}`)}
+                      className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors flex items-center justify-center gap-2 text-sm"
+                    >
+                      <Calendar className="w-4 h-4" />
+                      Ver Agenda
+                    </button>
                   )}
                 </div>
 
