@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { X, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 
@@ -28,6 +29,7 @@ interface EventoModalProps {
   evento?: Evento | null;
   defaultDate?: Date;
   anuncianteId?: number;
+  userId?: number;
   onClose: () => void;
   onSave: (evento: Partial<Evento> & { contatosPermitidos?: number[] }) => void;
   isLoading?: boolean;
@@ -59,6 +61,7 @@ export default function EventoModal({
   evento,
   defaultDate,
   anuncianteId,
+  userId,
   onClose,
   onSave,
   isLoading = false,
@@ -87,7 +90,7 @@ export default function EventoModal({
         // Fetch user's contacts (optionally filtered by announcer)
         const response = await fetch("/api/contatos", {
           headers: {
-            "X-User-Id": (window as any).userId?.toString() || "",
+            "X-User-Id": userId?.toString() || "",
           },
         });
         if (response.ok) {
@@ -118,7 +121,7 @@ export default function EventoModal({
     };
 
     fetchContatos();
-  }, [isOpen, anuncianteId]);
+  }, [isOpen, anuncianteId, userId]);
 
   useEffect(() => {
     if (evento) {
