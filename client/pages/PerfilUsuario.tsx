@@ -46,6 +46,7 @@ export default function PerfilUsuario() {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [cpfSaved, setCpfSaved] = useState(!!user?.cpf); // Track if CPF was saved
+  const [showValidationAlert, setShowValidationAlert] = useState(false); // Track if validation failed
 
   // Fetch fresh user data to show current profile info
   const { data: freshUserData } = useQuery({
@@ -129,6 +130,8 @@ export default function PerfilUsuario() {
         queryClient.invalidateQueries({ queryKey: ["user", user.id] });
       }
       toast.success("Perfil atualizado com sucesso!");
+      // Dismiss validation alert
+      setShowValidationAlert(false);
       // Mark CPF as saved if it was just filled
       if (data.cpf) {
         setCpfSaved(true);
@@ -167,6 +170,8 @@ export default function PerfilUsuario() {
       ...prev,
       [field]: value,
     }));
+    // Dismiss validation alert when user makes changes
+    setShowValidationAlert(false);
     if (errors[field]) {
       setErrors((prev) => {
         const newErrors = { ...prev };
@@ -214,7 +219,13 @@ export default function PerfilUsuario() {
     e.preventDefault();
 
     if (validateForm()) {
+      setShowValidationAlert(false);
       updateMutation.mutate(formData);
+    } else {
+      // Show validation alert when there are errors
+      setShowValidationAlert(true);
+      // Scroll to top to show alert
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
@@ -255,6 +266,26 @@ export default function PerfilUsuario() {
               </p>
             </div>
           </div>
+
+          {/* Validation Error Alert */}
+          {showValidationAlert && Object.keys(errors).length > 0 && (
+            <div className="bg-red-50 border-l-4 border-red-600 rounded p-4 mb-8 flex gap-3 animate-pulse">
+              <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <div>
+                <h3 className="font-semibold text-red-900">Informações Inconsistentes ou Faltantes</h3>
+                <p className="text-sm text-red-800 mt-1">
+                  Por favor, corrija os seguintes erros antes de continuar:
+                </p>
+                <ul className="text-sm text-red-800 mt-2 list-disc list-inside">
+                  {Object.entries(errors).map(([field, errorMessage]) => (
+                    <li key={field}>
+                      <strong>{field === "cpf" ? "CPF/CNPJ" : field === "telefone" ? "Telefone" : field === "email" ? "Email" : field}:</strong> {errorMessage}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          )}
 
           <div className="bg-yellow-50 border-l-4 border-yellow-500 rounded p-4 mb-8 flex gap-3">
             <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
