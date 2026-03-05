@@ -195,6 +195,27 @@ export default function MinhaAgenda() {
     gcTime: 600000, // 10 minutes
   });
 
+  // Fetch all contacts for filter dropdown (only when needed)
+  const { data: todosContatos = [] } = useQuery({
+    queryKey: ["contatos-for-filters", selectedAnuncianteId],
+    queryFn: async () => {
+      if (!selectedAnuncianteId) return [];
+      const response = await fetch("/api/contatos", {
+        headers: {
+          "X-User-Id": user?.id?.toString() || "",
+        },
+      });
+      if (!response.ok) return [];
+      const result = await response.json();
+      return (result.data || []).filter((contato: any) => {
+        return !contato.anuncianteId || contato.anuncianteId === selectedAnuncianteId;
+      });
+    },
+    enabled: !!selectedAnuncianteId && !!user?.id,
+    staleTime: 600000,
+    gcTime: 600000,
+  });
+
   // Apply filters to eventos
   const filteredEventos = useMemo(() => {
     return (eventos || []).filter((evento) => {
@@ -231,27 +252,6 @@ export default function MinhaAgenda() {
       return true;
     });
   }, [eventos, filterContatoId, filterContatoNome, filterDescricao, anunciantes, todosContatos]);
-
-  // Fetch all contacts for filter dropdown (only when needed)
-  const { data: todosContatos = [] } = useQuery({
-    queryKey: ["contatos-for-filters", selectedAnuncianteId],
-    queryFn: async () => {
-      if (!selectedAnuncianteId) return [];
-      const response = await fetch("/api/contatos", {
-        headers: {
-          "X-User-Id": user?.id?.toString() || "",
-        },
-      });
-      if (!response.ok) return [];
-      const result = await response.json();
-      return (result.data || []).filter((contato: any) => {
-        return !contato.anuncianteId || contato.anuncianteId === selectedAnuncianteId;
-      });
-    },
-    enabled: !!selectedAnuncianteId && !!user?.id,
-    staleTime: 600000,
-    gcTime: 600000,
-  });
 
   // Get unique contact types for filter
   const tiposContatoUnicos = useMemo(() => {
