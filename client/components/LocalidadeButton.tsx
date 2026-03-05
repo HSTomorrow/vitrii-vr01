@@ -68,11 +68,17 @@ export default function LocalidadeButton() {
       if (!user?.id) return;
 
       try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
         const response = await fetch(`/api/usracessos/${user.id}`, {
           headers: {
             "x-user-id": user.id.toString(),
           },
+          signal: controller.signal,
         });
+
+        clearTimeout(timeoutId);
 
         if (response.ok) {
           const userData = await response.json();
@@ -86,7 +92,14 @@ export default function LocalidadeButton() {
           }
         }
       } catch (error) {
-        console.error("Error fetching user default localidade:", error);
+        // Silently handle network errors - they're expected in some contexts (e.g., iframes, offline)
+        if (error instanceof Error) {
+          if (error.name === 'AbortError') {
+            console.debug("[LocalidadeButton] Fetch timeout");
+          } else if (error.message === 'Failed to fetch') {
+            console.debug("[LocalidadeButton] Network error - retrying may help");
+          }
+        }
       }
     };
 
