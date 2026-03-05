@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { X, Plus, Trash2, Search } from "lucide-react";
+import { X, Plus, Trash2 } from "lucide-react";
 
-interface Usuario {
-  id: number;
-  nome: string;
-  email: string;
+interface ScheduleItem {
+  diaSemana: number; // 0=Sunday, 1=Monday, ..., 6=Saturday
+  horaInicio: string; // HH:mm format
+  horaFim: string; // HH:mm format
+  ativo: boolean;
 }
 
 interface AgendaEditorModalProps {
@@ -16,6 +17,26 @@ interface AgendaEditorModalProps {
   onSaved?: () => void;
 }
 
+const DIAS_SEMANA = [
+  "Domingo",
+  "Segunda-feira",
+  "Terça-feira",
+  "Quarta-feira",
+  "Quinta-feira",
+  "Sexta-feira",
+  "Sábado",
+];
+
+// Default schedule: Monday to Saturday, 09:00 to 18:00
+const DEFAULT_SCHEDULE: ScheduleItem[] = [
+  { diaSemana: 1, horaInicio: "09:00", horaFim: "18:00", ativo: true }, // Monday
+  { diaSemana: 2, horaInicio: "09:00", horaFim: "18:00", ativo: true }, // Tuesday
+  { diaSemana: 3, horaInicio: "09:00", horaFim: "18:00", ativo: true }, // Wednesday
+  { diaSemana: 4, horaInicio: "09:00", horaFim: "18:00", ativo: true }, // Thursday
+  { diaSemana: 5, horaInicio: "09:00", horaFim: "18:00", ativo: true }, // Friday
+  { diaSemana: 6, horaInicio: "09:00", horaFim: "18:00", ativo: true }, // Saturday
+];
+
 export default function AgendaEditorModal({
   isOpen,
   onClose,
@@ -23,69 +44,40 @@ export default function AgendaEditorModal({
   anuncianteNome,
   onSaved,
 }: AgendaEditorModalProps) {
-  const [activeTab, setActiveTab] = useState<"info" | "permissoes">("info");
+  const [activeTab, setActiveTab] = useState<"info" | "horarios">("info");
   const [nomeAgenda, setNomeAgenda] = useState("");
   const [descricaoAgenda, setDescricaoAgenda] = useState("");
   const [isLoadingInfo, setIsLoadingInfo] = useState(false);
-  const [isLoadingPermissoes, setIsLoadingPermissoes] = useState(false);
-  const [usuariosAutorizados, setUsuariosAutorizados] = useState<Usuario[]>([]);
-  const [usuariosDisponiveis, setUsuariosDisponiveis] = useState<Usuario[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [isSearching, setIsSearching] = useState(false);
+  const [isLoadingHorarios, setIsLoadingHorarios] = useState(false);
+  const [schedule, setSchedule] = useState<ScheduleItem[]>([]);
+  const [isLoadingSchedule, setIsLoadingSchedule] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       // Load agenda info from announcer
       setNomeAgenda(anuncianteNome);
-      loadPermissoes();
+      loadSchedule();
     }
   }, [isOpen, anuncianteId]);
 
-  const loadPermissoes = async () => {
-    setIsLoadingPermissoes(true);
+  const loadSchedule = async () => {
+    setIsLoadingSchedule(true);
     try {
-      // You'll need to create this endpoint to fetch current permissions
-      // For now, we'll leave this as a placeholder
-      setUsuariosAutorizados([]);
+      const response = await fetch(
+        `/api/agendas-horarios?anuncianteId=${anuncianteId}`
+      );
+      if (response.ok) {
+        const data = await response.json();
+        setSchedule(data.data && data.data.length > 0 ? data.data : DEFAULT_SCHEDULE);
+      } else {
+        setSchedule(DEFAULT_SCHEDULE);
+      }
     } catch (error) {
-      console.error("Erro ao carregar permissões:", error);
+      console.error("Erro ao carregar horários:", error);
+      setSchedule(DEFAULT_SCHEDULE);
     } finally {
-      setIsLoadingPermissoes(false);
+      setIsLoadingSchedule(false);
     }
-  };
-
-  const handleSearchUsuarios = async () => {
-    if (!searchQuery.trim()) {
-      toast.error("Digite um nome ou email para buscar");
-      return;
-    }
-
-    setIsSearching(true);
-    try {
-      // This would call an API to search for users
-      // Placeholder for now
-      toast.info("Funcionalidade de busca em desenvolvimento");
-    } catch (error) {
-      toast.error("Erro ao buscar usuários");
-    } finally {
-      setIsSearching(false);
-    }
-  };
-
-  const handleAddUsuario = (usuario: Usuario) => {
-    if (usuariosAutorizados.find((u) => u.id === usuario.id)) {
-      toast.error("Usuário já autorizado");
-      return;
-    }
-    setUsuariosAutorizados([...usuariosAutorizados, usuario]);
-    setSearchQuery("");
-    setUsuariosDisponiveis([]);
-  };
-
-  const handleRemoveUsuario = (usuarioId: number) => {
-    setUsuariosAutorizados(
-      usuariosAutorizados.filter((u) => u.id !== usuarioId)
-    );
   };
 
   const handleSaveInfo = async () => {
@@ -109,20 +101,66 @@ export default function AgendaEditorModal({
     }
   };
 
-  const handleSavePermissoes = async () => {
-    setIsLoadingPermissoes(true);
+  const handleSaveHorarios = async () => {
+    setIsLoadingHorarios(true);
     try {
-      // Call API to update permissions
-      // For now, just show success
-      toast.success("Permissões atualizadas com sucesso!");
+      const response = await fetch("/api/agendas-horarios", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          anuncianteId,
+          horarios: schedule.filter((s) => s.ativo),
+        }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(
+          error.error || "Erro ao salvar horários"
+        );
+      }
+
+      toast.success("Horários da agenda atualizados com sucesso!");
       onSaved?.();
     } catch (error) {
       toast.error(
-        error instanceof Error ? error.message : "Erro ao salvar permissões"
+        error instanceof Error ? error.message : "Erro ao salvar horários"
       );
     } finally {
-      setIsLoadingPermissoes(false);
+      setIsLoadingHorarios(false);
     }
+  };
+
+  const handleToggleDia = (diaSemana: number) => {
+    const existing = schedule.find((s) => s.diaSemana === diaSemana);
+    if (existing) {
+      setSchedule(
+        schedule.map((s) =>
+          s.diaSemana === diaSemana ? { ...s, ativo: !s.ativo } : s
+        )
+      );
+    } else {
+      const defaultItem = DEFAULT_SCHEDULE.find(
+        (d) => d.diaSemana === diaSemana
+      );
+      if (defaultItem) {
+        setSchedule([...schedule, { ...defaultItem, ativo: true }]);
+      }
+    }
+  };
+
+  const handleChangeHora = (
+    diaSemana: number,
+    field: "horaInicio" | "horaFim",
+    value: string
+  ) => {
+    setSchedule(
+      schedule.map((s) =>
+        s.diaSemana === diaSemana ? { ...s, [field]: value } : s
+      )
+    );
   };
 
   if (!isOpen) return null;
@@ -160,14 +198,14 @@ export default function AgendaEditorModal({
               📋 Informações
             </button>
             <button
-              onClick={() => setActiveTab("permissoes")}
+              onClick={() => setActiveTab("horarios")}
               className={`py-4 font-semibold border-b-2 transition-colors ${
-                activeTab === "permissoes"
+                activeTab === "horarios"
                   ? "border-vitrii-blue text-vitrii-blue"
                   : "border-transparent text-gray-600 hover:text-gray-900"
               }`}
             >
-              👥 Permissões
+              🕐 Horários
             </button>
           </div>
         </div>
@@ -206,8 +244,9 @@ export default function AgendaEditorModal({
 
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <p className="text-sm text-blue-800">
-                  <strong>Nota:</strong> Os eventos aprovados na fila de espera serão
-                  criados como privados, visíveis apenas para você e quem solicitou.
+                  <strong>Nota:</strong> Todos os usuários podem visualizar a
+                  tela da agenda. As restrições de acesso são controladas
+                  individualmente em cada evento.
                 </p>
               </div>
 
@@ -230,113 +269,118 @@ export default function AgendaEditorModal({
             </div>
           )}
 
-          {/* Permissões Tab */}
-          {activeTab === "permissoes" && (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-semibold text-vitrii-text mb-3">
-                  Adicionar Usuário para Visualizar
-                </label>
-                <div className="flex gap-2 mb-4">
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Nome ou email do usuário"
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
-                  />
-                  <button
-                    onClick={handleSearchUsuarios}
-                    disabled={isSearching}
-                    className="px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 font-medium flex items-center gap-2"
-                  >
-                    <Search className="w-4 h-4" />
-                    {isSearching ? "Buscando..." : "Buscar"}
-                  </button>
-                </div>
-
-                {/* Search Results */}
-                {usuariosDisponiveis.length > 0 && (
-                  <div className="bg-gray-50 rounded-lg p-4 mb-4 space-y-2 max-h-48 overflow-y-auto">
-                    {usuariosDisponiveis.map((usuario) => (
-                      <div
-                        key={usuario.id}
-                        className="flex items-center justify-between bg-white p-3 rounded border border-gray-200"
-                      >
-                        <div>
-                          <p className="font-medium text-vitrii-text">
-                            {usuario.nome}
-                          </p>
-                          <p className="text-xs text-gray-600">
-                            {usuario.email}
-                          </p>
-                        </div>
-                        <button
-                          onClick={() => handleAddUsuario(usuario)}
-                          className="p-2 bg-green-500 text-white rounded hover:bg-green-600 transition-colors"
-                        >
-                          <Plus className="w-4 h-4" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
+          {/* Horários Tab */}
+          {activeTab === "horarios" && (
+            <div className="space-y-6">
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                <p className="text-sm text-amber-800">
+                  <strong>📌 Configurar Horários:</strong> Selecione os dias e horários
+                  disponíveis para a inclusão de eventos. Eventos fora deste
+                  horário aparecerão como "Fora do Horario" na agenda.
+                </p>
               </div>
 
-              {/* Usuários Autorizados */}
-              <div>
-                <label className="block text-sm font-semibold text-vitrii-text mb-3">
-                  Usuários Autorizados ({usuariosAutorizados.length})
-                </label>
-                {usuariosAutorizados.length === 0 ? (
-                  <div className="bg-gray-50 rounded-lg p-8 text-center">
-                    <p className="text-gray-600">
-                      Nenhum usuário autorizado ainda. Busque e adicione usuários para que
-                      eles possam visualizar suas agendas privadas.
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {usuariosAutorizados.map((usuario) => (
+              {isLoadingSchedule ? (
+                <div className="text-center py-8">
+                  <p className="text-gray-600">Carregando horários...</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {DIAS_SEMANA.map((dia, index) => {
+                    const scheduled = schedule.find((s) => s.diaSemana === index);
+                    const isActive = scheduled?.ativo ?? false;
+
+                    return (
                       <div
-                        key={usuario.id}
-                        className="flex items-center justify-between bg-white p-4 rounded border border-gray-200 hover:shadow-md transition-shadow"
+                        key={index}
+                        className={`border rounded-lg p-4 transition-colors ${
+                          isActive
+                            ? "border-vitrii-blue bg-blue-50"
+                            : "border-gray-300 bg-gray-50"
+                        }`}
                       >
-                        <div>
-                          <p className="font-medium text-vitrii-text">
-                            {usuario.nome}
-                          </p>
-                          <p className="text-sm text-gray-600">
-                            {usuario.email}
-                          </p>
+                        <div className="flex items-center gap-4">
+                          {/* Checkbox */}
+                          <input
+                            type="checkbox"
+                            checked={isActive}
+                            onChange={() => handleToggleDia(index)}
+                            disabled={isLoadingHorarios}
+                            className="w-5 h-5 rounded border-gray-300 text-vitrii-blue cursor-pointer"
+                          />
+
+                          {/* Dia da Semana */}
+                          <div className="flex-1 min-w-0">
+                            <label className="block text-sm font-semibold text-vitrii-text">
+                              {dia}
+                            </label>
+                          </div>
+
+                          {/* Horários */}
+                          {isActive && scheduled && (
+                            <div className="flex items-center gap-3">
+                              <div className="flex items-center gap-2">
+                                <input
+                                  type="time"
+                                  value={scheduled.horaInicio}
+                                  onChange={(e) =>
+                                    handleChangeHora(
+                                      index,
+                                      "horaInicio",
+                                      e.target.value
+                                    )
+                                  }
+                                  disabled={isLoadingHorarios}
+                                  className="px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+                                />
+                                <span className="text-gray-600 text-sm">
+                                  até
+                                </span>
+                                <input
+                                  type="time"
+                                  value={scheduled.horaFim}
+                                  onChange={(e) =>
+                                    handleChangeHora(index, "horaFim", e.target.value)
+                                  }
+                                  disabled={isLoadingHorarios}
+                                  className="px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+                                />
+                              </div>
+                            </div>
+                          )}
+
+                          {!isActive && (
+                            <span className="text-sm text-gray-500 italic">
+                              Desativado
+                            </span>
+                          )}
                         </div>
-                        <button
-                          onClick={() => handleRemoveUsuario(usuario.id)}
-                          disabled={isLoadingPermissoes}
-                          className="p-2 text-red-500 hover:bg-red-50 rounded transition-colors disabled:opacity-50"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
                       </div>
-                    ))}
-                  </div>
-                )}
+                    );
+                  })}
+                </div>
+              )}
+
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <p className="text-sm text-green-800">
+                  <strong>✓ Padrão:</strong> Segunda a Sábado, 09:00 às 18:00
+                </p>
               </div>
 
               <div className="flex gap-3 pt-4">
                 <button
                   onClick={onClose}
-                  disabled={isLoadingPermissoes}
+                  disabled={isLoadingHorarios}
                   className="flex-1 px-4 py-2 border border-gray-300 text-vitrii-text rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 font-medium"
                 >
                   Cancelar
                 </button>
                 <button
-                  onClick={handleSavePermissoes}
-                  disabled={isLoadingPermissoes}
+                  onClick={handleSaveHorarios}
+                  disabled={isLoadingHorarios}
                   className="flex-1 px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-blue-600 transition-colors disabled:opacity-50 font-medium"
                 >
-                  {isLoadingPermissoes ? "Salvando..." : "Salvar Permissões"}
+                  {isLoadingHorarios ? "Salvando..." : "Salvar Horários"}
                 </button>
               </div>
             </div>

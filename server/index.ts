@@ -164,6 +164,11 @@ import {
   getPendingAppointmentsCount,
 } from "./routes/reservas-evento-agenda";
 import {
+  getHorariosAgenda,
+  saveHorariosAgenda,
+  isTimeWithinSchedule,
+} from "./routes/agendas-horarios";
+import {
   getPagamentoByAnuncioId,
   createPagamento,
   updatePagamentoStatus,
@@ -1027,6 +1032,11 @@ export function createServer() {
 
   // Agenda deletion route
   app.delete("/api/agenda/:anuncianteId", extractUserId, deletarAgenda);
+
+  // Agendas Horários routes (schedule management)
+  app.get("/api/agendas-horarios", getHorariosAgenda);
+  app.post("/api/agendas-horarios", saveHorariosAgenda);
+  app.get("/api/agendas-horarios/check-time", isTimeWithinSchedule);
 
   // Reservas de Evento routes
   app.post("/api/reservas-evento", criarReservaOuListaEspera);

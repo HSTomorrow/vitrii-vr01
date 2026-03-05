@@ -2,6 +2,32 @@ import { RequestHandler } from "express";
 import prisma from "../lib/prisma";
 import { createConversationForLinkedUsuarios } from "../lib/create-conversation";
 
+// Helper function to check if event time is within the announcer's schedule
+async function isEventWithinSchedule(anuncianteId: number, dataInicio: Date): Promise<boolean> {
+  try {
+    const diaSemana = dataInicio.getDay(); // 0=Sunday, 1=Monday, ..., 6=Saturday
+    const hora = `${String(dataInicio.getHours()).padStart(2, "0")}:${String(dataInicio.getMinutes()).padStart(2, "0")}`;
+
+    const horario = await prisma.agendas_horarios.findFirst({
+      where: {
+        anuncianteId: anuncianteId,
+        diaSemana: diaSemana,
+        ativo: true,
+      },
+    });
+
+    if (!horario) {
+      return false;
+    }
+
+    const isWithin = hora >= horario.horaInicio && hora < horario.horaFim;
+    return isWithin;
+  } catch (error) {
+    console.error("[isEventWithinSchedule]", error);
+    return false;
+  }
+}
+
 // Get all events for an announcer (only for the announcer)
 export const getEventosByAnunciante: RequestHandler = async (req, res) => {
   try {
@@ -48,7 +74,25 @@ export const getEventosByAnunciante: RequestHandler = async (req, res) => {
       },
     });
 
-    res.json({ data: eventos });
+    // Add dynamic status for out-of-schedule events
+    const eventosComStatus = await Promise.all(
+      eventos.map(async (evento) => {
+        const isWithinSchedule = await isEventWithinSchedule(
+          anuncianteId_num,
+          evento.dataInicio
+        );
+
+        // If event is outside schedule, mark as "Fora do Horario"
+        const status = !isWithinSchedule ? "Fora do Horario" : evento.status;
+
+        return {
+          ...evento,
+          status,
+        };
+      })
+    );
+
+    res.json({ data: eventosComStatus });
   } catch (error) {
     console.error("[getEventosByAnunciante]", error);
     res.status(500).json({ error: "Erro ao buscar eventos da agenda" });
@@ -115,7 +159,25 @@ export const getEventosVisivelsPara: RequestHandler = async (req, res) => {
         ...maskedRestrictedEvents,
       ].sort((a, b) => new Date(a.dataInicio).getTime() - new Date(b.dataInicio).getTime());
 
-      return res.json({ data: allVisibleEvents });
+      // Add dynamic status for out-of-schedule events
+      const eventosComStatus = await Promise.all(
+        allVisibleEvents.map(async (evento) => {
+          const isWithinSchedule = await isEventWithinSchedule(
+            anuncianteId_num,
+            evento.dataInicio
+          );
+
+          // If event is outside schedule, add "Fora do Horario" status indicator
+          const calculatedStatus = !isWithinSchedule ? "Fora do Horario" : "Disponivel";
+
+          return {
+            ...evento,
+            statusCalculado: calculatedStatus,
+          };
+        })
+      );
+
+      return res.json({ data: eventosComStatus });
     }
 
     // Get restricted events where user has permission (full details)
@@ -178,7 +240,25 @@ export const getEventosVisivelsPara: RequestHandler = async (req, res) => {
       ...maskedRestrictedEvents,
     ].sort((a, b) => new Date(a.dataInicio).getTime() - new Date(b.dataInicio).getTime());
 
-    res.json({ data: allVisibleEvents });
+    // Add dynamic status for out-of-schedule events
+    const eventosComStatus = await Promise.all(
+      allVisibleEvents.map(async (evento) => {
+        const isWithinSchedule = await isEventWithinSchedule(
+          anuncianteId_num,
+          evento.dataInicio
+        );
+
+        // If event is outside schedule, add "Fora do Horario" status indicator
+        const calculatedStatus = !isWithinSchedule ? "Fora do Horario" : "Disponivel";
+
+        return {
+          ...evento,
+          statusCalculado: calculatedStatus,
+        };
+      })
+    );
+
+    res.json({ data: eventosComStatus });
   } catch (error) {
     console.error("[getEventosVisivelsPara]", error);
     res.status(500).json({ error: "Erro ao buscar eventos visíveis" });
