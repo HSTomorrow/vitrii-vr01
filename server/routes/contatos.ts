@@ -90,11 +90,20 @@ export const getContatosByUsuario: RequestHandler = async (req, res) => {
 export const createContato: RequestHandler = async (req, res) => {
   try {
     const usuarioId = parseInt(req.headers["x-user-id"] as string || "0");
-    console.log("[createContato] Iniciando criação de contato, usuarioId:", usuarioId);
-    console.log("[createContato] Request body:", req.body);
+    console.log("[createContato] ========== INICIANDO CRIAÇÃO DE CONTATO ==========");
+    console.log("[createContato] usuarioId:", usuarioId);
+    console.log("[createContato] Request headers:", req.headers);
+    console.log("[createContato] Request body:", JSON.stringify(req.body, null, 2));
 
-    const validatedData = ContatoCreateSchema.parse(req.body);
-    console.log("[createContato] Dados validados:", validatedData);
+    console.log("[createContato] Iniciando validação com Zod...");
+    let validatedData;
+    try {
+      validatedData = ContatoCreateSchema.parse(req.body);
+      console.log("[createContato] ✅ Dados validados com sucesso:", JSON.stringify(validatedData, null, 2));
+    } catch (validationError) {
+      console.error("[createContato] ❌ ERRO DE VALIDAÇÃO:", validationError);
+      throw validationError;
+    }
 
     if (!usuarioId) {
       console.warn("[createContato] Usuário não autenticado");
@@ -186,15 +195,44 @@ export const createContato: RequestHandler = async (req, res) => {
       });
     }
 
-    console.error("[createContato] Erro ao criar contato:", error);
-    console.error("[createContato] Error stack:", (error as any)?.stack);
+    const errorObj = error as any;
+    console.error("[createContato] ❌ ERRO AO CRIAR CONTATO:");
+    console.error("[createContato] Error type:", errorObj?.constructor?.name);
+    console.error("[createContato] Error message:", errorObj?.message);
+    console.error("[createContato] Error code:", errorObj?.code);
+    console.error("[createContato] Error meta:", errorObj?.meta);
+    console.error("[createContato] Error stack:", errorObj?.stack);
+    console.error("[createContato] Full error object:", JSON.stringify(errorObj, null, 2));
 
-    // Return detailed error info
-    res.status(500).json({
+    // Build detailed error response
+    let errorResponse: any = {
       success: false,
       error: "Erro ao criar contato",
-      details: (error as any)?.message || "Erro desconhecido",
-    });
+    };
+
+    // Handle Prisma errors
+    if (errorObj?.code) {
+      // Prisma error
+      errorResponse.error = `Erro no banco de dados (${errorObj.code})`;
+      errorResponse.details = {
+        code: errorObj.code,
+        message: errorObj.message,
+        meta: errorObj.meta,
+      };
+    } else if (errorObj?.message) {
+      errorResponse.error = errorObj.message;
+      errorResponse.details = {
+        message: errorObj.message,
+        stack: errorObj.stack,
+      };
+    } else {
+      errorResponse.error = "Erro desconhecido ao criar contato";
+      errorResponse.details = JSON.stringify(errorObj);
+    }
+
+    console.error("[createContato] Resposta de erro:", JSON.stringify(errorResponse, null, 2));
+
+    res.status(500).json(errorResponse);
   }
 };
 

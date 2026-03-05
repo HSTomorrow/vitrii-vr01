@@ -206,21 +206,46 @@ export default function CadastroContatos() {
 
       if (!response.ok) {
         let errorData: any = {};
+        let responseText = "";
+
         try {
-          errorData = await response.json();
+          responseText = await response.text();
+          console.log("[CadastroContatos] Response text (raw):", responseText);
+
+          if (responseText) {
+            errorData = JSON.parse(responseText);
+          }
         } catch (e) {
-          errorData = { error: "Erro ao fazer parse da resposta" };
+          console.error("[CadastroContatos] Erro ao fazer parse da resposta:", e);
+          errorData = { error: `Erro ao fazer parse da resposta: ${responseText}` };
         }
 
-        console.error("[CadastroContatos] Erro na resposta:", {
+        console.error("[CadastroContatos] Erro na resposta DETALHADO:", {
           status: response.status,
           statusText: response.statusText,
+          responseText: responseText,
           errorData: errorData,
-          errorMessage: errorData.error,
-          errorDetails: errorData.details,
+          errorMessage: errorData?.error,
+          errorDetails: errorData?.details,
+          fullError: JSON.stringify(errorData, null, 2),
         });
 
-        const errorMessage = errorData.error || errorData.message || `Erro ao salvar contato (HTTP ${response.status})`;
+        // Build detailed error message
+        let errorMessage = `Erro ao salvar contato (HTTP ${response.status})`;
+
+        if (errorData?.error) {
+          errorMessage = errorData.error;
+        } else if (errorData?.message) {
+          errorMessage = errorData.message;
+        } else if (errorData?.details) {
+          if (Array.isArray(errorData.details)) {
+            errorMessage = errorData.details.map((d: any) => d.message || JSON.stringify(d)).join(", ");
+          } else {
+            errorMessage = JSON.stringify(errorData.details);
+          }
+        }
+
+        console.error("[CadastroContatos] Lançando erro com mensagem:", errorMessage);
         throw new Error(errorMessage);
       }
 
@@ -239,11 +264,14 @@ export default function CadastroContatos() {
       refetchContatos();
     },
     onError: (error) => {
-      console.error("[CadastroContatos] onError callback disparado:", error);
+      console.error("[CadastroContatos] ❌ ERRO NA MUTAÇÃO:");
+      console.error("[CadastroContatos] Error type:", error?.constructor?.name);
       console.error("[CadastroContatos] Error message:", error instanceof Error ? error.message : "");
       console.error("[CadastroContatos] Error stack:", error instanceof Error ? error.stack : "");
+      console.error("[CadastroContatos] Full error:", error);
 
       const errorMessage = error instanceof Error ? error.message : "Erro desconhecido ao salvar contato";
+      console.error(`[CadastroContatos] Exibindo toast com mensagem: ${errorMessage}`);
       toast.error(`❌ ${errorMessage}`);
     },
   });
