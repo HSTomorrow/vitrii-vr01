@@ -11,13 +11,30 @@ export interface UsePWAReturn {
   installPrompt: PWAInstallPrompt | null;
   install: () => Promise<void>;
   isInstalled: boolean;
+  isIOS: boolean;
+  isAndroid: boolean;
+  isSafari: boolean;
 }
+
+const detectOS = () => {
+  if (typeof navigator === 'undefined') {
+    return { isIOS: false, isAndroid: false, isSafari: false };
+  }
+
+  const ua = navigator.userAgent.toLowerCase();
+  const isIOS = /iphone|ipad|ipod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const isAndroid = /android/.test(ua);
+  const isSafari = /safari/.test(ua) && !/chrome/.test(ua);
+
+  return { isIOS, isAndroid, isSafari };
+};
 
 export const usePWA = (): UsePWAReturn => {
   const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
   const [isInstallable, setIsInstallable] = useState(false);
   const [installPrompt, setInstallPrompt] = useState<PWAInstallPrompt | null>(null);
   const [isInstalled, setIsInstalled] = useState(false);
+  const [osInfo, setOsInfo] = useState(() => detectOS());
 
   useEffect(() => {
     // Register service worker
@@ -111,5 +128,8 @@ export const usePWA = (): UsePWAReturn => {
     installPrompt,
     install,
     isInstalled,
+    isIOS: osInfo.isIOS,
+    isAndroid: osInfo.isAndroid,
+    isSafari: osInfo.isSafari,
   };
 };
