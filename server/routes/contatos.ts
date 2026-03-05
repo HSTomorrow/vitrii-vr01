@@ -453,6 +453,79 @@ export const deleteContato: RequestHandler = async (req, res) => {
   }
 };
 
+// CHECK for duplicate contacts by email or phone
+export const checkDuplicateContato: RequestHandler = async (req, res) => {
+  try {
+    const usuarioId = parseInt(req.headers["x-user-id"] as string || "0");
+    const { email, celular } = req.body;
+
+    if (!usuarioId) {
+      return res.status(401).json({
+        error: "Usuário não autenticado",
+      });
+    }
+
+    let field: "email" | "celular" | null = null;
+    const where: any = { usuarioId };
+
+    // Check by email if provided
+    if (email) {
+      const existingByEmail = await prisma.contatos.findFirst({
+        where: {
+          ...where,
+          email,
+        },
+        select: {
+          id: true,
+          nome: true,
+        },
+      });
+
+      if (existingByEmail) {
+        return res.json({
+          duplicate: true,
+          contatoId: existingByEmail.id,
+          contatoNome: existingByEmail.nome,
+          field: "email",
+        });
+      }
+    }
+
+    // Check by celular if provided
+    if (celular) {
+      const existingByCelular = await prisma.contatos.findFirst({
+        where: {
+          ...where,
+          celular,
+        },
+        select: {
+          id: true,
+          nome: true,
+        },
+      });
+
+      if (existingByCelular) {
+        return res.json({
+          duplicate: true,
+          contatoId: existingByCelular.id,
+          contatoNome: existingByCelular.nome,
+          field: "celular",
+        });
+      }
+    }
+
+    // No duplicates found
+    res.json({
+      duplicate: false,
+    });
+  } catch (error) {
+    console.error("Error checking duplicate contato:", error);
+    res.status(500).json({
+      error: "Erro ao verificar duplicatas",
+    });
+  }
+};
+
 // For backwards compatibility: GET contatos by announcer (now calls getContatosByUsuario)
 export const getContatosByAnunciante: RequestHandler = async (req, res) => {
   // This route is deprecated, but kept for backwards compatibility

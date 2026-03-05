@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { X } from "lucide-react";
+import { X, Plus } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+import ContatoSelectorModal from "./ContatoSelectorModal";
 
 interface Contato {
   id: number;
@@ -50,6 +51,7 @@ export default function FilaDeEsperaModal({
   const [contatos, setContatos] = useState<Contato[]>([]);
   const [isLoadingContatos, setIsLoadingContatos] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [showContatoSelector, setShowContatoSelector] = useState(false);
 
   // Fetch contatos when modal opens
   useEffect(() => {
@@ -327,69 +329,63 @@ export default function FilaDeEsperaModal({
             </div>
           </div>
 
-          {/* Permissões - Restrita */}
-          {privacidade === "privado_usuarios" && (
-            <div className="border border-blue-200 bg-blue-50 rounded-lg p-4 space-y-3">
-              <div>
-                <label className="block text-sm font-semibold text-vitrii-text mb-2">
-                  Quem pode visualizar esta fila de espera?
-                </label>
-                <p className="text-xs text-gray-600 mb-3">
-                  Selecione os contatos que poderão visualizar as informações completas desta fila
-                </p>
-              </div>
-
-              {isLoadingContatos ? (
-                <p className="text-sm text-gray-600">Carregando contatos...</p>
-              ) : contatos.length === 0 ? (
-                <p className="text-sm text-gray-600 italic">
-                  Nenhum contato cadastrado para este anunciante. <a href="/cadastro-contatos" className="text-vitrii-blue hover:underline">Cadastre contatos</a>.
-                </p>
-              ) : (
-                <div className="space-y-2 max-h-60 overflow-y-auto">
-                  {contatos.map((contato) => (
-                    <label
-                      key={contato.id}
-                      className="flex items-center gap-2 p-2 rounded hover:bg-blue-100 cursor-pointer"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={contatosPermitidos.includes(contato.id)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setContatosPermitidos([
-                              ...contatosPermitidos,
-                              contato.id,
-                            ]);
-                          } else {
-                            setContatosPermitidos(
-                              contatosPermitidos.filter(
-                                (id) => id !== contato.id,
-                              ),
-                            );
-                          }
-                        }}
-                        className="w-4 h-4"
-                      />
-                      <div className="text-sm flex-1">
-                        <div className="font-medium text-vitrii-text">{contato.nome}</div>
-                        <div className="text-xs text-gray-600">
-                          {contato.tipoContato}
-                          {contato.email && ` • ${contato.email}`}
-                        </div>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              )}
-
-              {contatosPermitidos.length > 0 && (
-                <div className="text-xs text-blue-700 bg-white rounded p-2">
-                  <strong>{contatosPermitidos.length}</strong> contato(s) selecionado(s)
-                </div>
-              )}
+          {/* Contatos - Available for all privacy levels */}
+          <div className="border border-blue-200 bg-blue-50 rounded-lg p-4 space-y-3">
+            <div>
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                Contatos para esta Fila de Espera
+              </label>
+              <p className="text-xs text-gray-600 mb-3">
+                Selecione os contatos associados a esta fila de espera
+              </p>
             </div>
-          )}
+
+            {/* Selected Contacts List */}
+            {contatosPermitidos.length > 0 ? (
+              <div className="bg-white rounded-lg p-3 space-y-2 max-h-48 overflow-y-auto">
+                {contatosPermitidos.map((contatoId) => {
+                  const contato = contatos.find((c) => c.id === contatoId);
+                  if (!contato) return null;
+                  return (
+                    <div
+                      key={contatoId}
+                      className="flex items-center justify-between p-2 bg-blue-50 rounded border border-blue-200"
+                    >
+                      <div className="text-sm">
+                        <div className="font-medium text-vitrii-text">{contato.nome}</div>
+                        <div className="text-xs text-gray-600">{contato.tipoContato}</div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setContatosPermitidos(
+                            contatosPermitidos.filter(
+                              (id) => id !== contatoId
+                            ),
+                          );
+                        }}
+                        className="text-xs px-2 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200 transition-colors"
+                      >
+                        Remover
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-sm text-gray-600 italic">Nenhum contato selecionado</p>
+            )}
+
+            {/* Add Button */}
+            <button
+              type="button"
+              onClick={() => setShowContatoSelector(true)}
+              className="w-full px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-blue-600 transition-colors font-medium flex items-center justify-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              Adicionar Contato
+            </button>
+          </div>
 
           {/* Info message */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -418,6 +414,20 @@ export default function FilaDeEsperaModal({
           </div>
         </form>
       </div>
+
+      {/* Contato Selector Modal */}
+      <ContatoSelectorModal
+        isOpen={showContatoSelector}
+        onClose={() => setShowContatoSelector(false)}
+        onSelect={(contatoId) => {
+          if (!contatosPermitidos.includes(contatoId)) {
+            setContatosPermitidos([...contatosPermitidos, contatoId]);
+          }
+        }}
+        selectedContatoIds={contatosPermitidos}
+        anuncianteId={anuncianteAlvoId}
+        userId={user?.id}
+      />
     </div>
   );
 }

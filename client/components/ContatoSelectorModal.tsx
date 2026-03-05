@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { X, Search, ChevronLeft, ChevronRight, Check } from "lucide-react";
+import { X, Search, ChevronLeft, ChevronRight, Check, Plus } from "lucide-react";
 import { toast } from "sonner";
+import NewContatoModal from "./NewContatoModal";
 
 interface Contato {
   id: number;
@@ -34,6 +35,7 @@ export default function ContatoSelectorModal({
   const [contatos, setContatos] = useState<Contato[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [showNewContatoModal, setShowNewContatoModal] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -83,6 +85,16 @@ export default function ContatoSelectorModal({
 
   const handleSelectContato = (contatoId: number) => {
     onSelect(contatoId);
+  };
+
+  const handleNewContatoSuccess = (novoContato: Contato) => {
+    // Add the new contact to the list
+    setContatos([...contatos, novoContato]);
+    setShowNewContatoModal(false);
+    setCurrentPage(1);
+    setSearchTerm("");
+    // Optionally auto-select the newly created contact
+    onSelect(novoContato.id);
   };
 
   if (!isOpen) return null;
@@ -200,7 +212,14 @@ export default function ContatoSelectorModal({
         )}
 
         {/* Footer */}
-        <div className="border-t border-gray-200 p-4 flex-shrink-0">
+        <div className="border-t border-gray-200 p-4 flex-shrink-0 space-y-3">
+          <button
+            onClick={() => setShowNewContatoModal(true)}
+            className="w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold flex items-center justify-center gap-2"
+          >
+            <Plus className="w-4 h-4" />
+            Novo Contato
+          </button>
           <button
             onClick={onClose}
             className="w-full px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-blue-600 transition-colors font-semibold"
@@ -208,6 +227,14 @@ export default function ContatoSelectorModal({
             Fechar
           </button>
         </div>
+
+        {/* New Contact Modal */}
+        <NewContatoModal
+          isOpen={showNewContatoModal}
+          onClose={() => setShowNewContatoModal(false)}
+          onSuccess={handleNewContatoSuccess}
+          existingContatos={contatos}
+        />
       </div>
     </div>
   );

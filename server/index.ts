@@ -226,6 +226,7 @@ import {
   createContato,
   updateContato,
   deleteContato,
+  checkDuplicateContato,
 } from "./routes/contatos";
 
 export function createServer() {
@@ -1109,6 +1110,7 @@ export function createServer() {
   // Contatos routes (user-based contacts, shared across announcers)
   app.get("/api/contatos", extractUserId, getContatosByAnunciante); // Returns user's contacts (or all if admin)
   app.post("/api/contatos", extractUserId, createContato);
+  app.post("/api/contatos/check-duplicates", extractUserId, checkDuplicateContato);
   app.put("/api/contatos/:contatoId", extractUserId, updateContato);
   app.delete("/api/contatos/:contatoId", extractUserId, deleteContato);
 
