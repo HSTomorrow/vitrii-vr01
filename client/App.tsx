@@ -104,6 +104,7 @@ function AppContent() {
           <Route path="/meus-anuncios" element={<MeusAnuncios />} />
           <Route path="/minha-agenda" element={<MinhaAgenda />} />
           <Route path="/agenda/:anuncianteId" element={<AgendaAnunciante />} />
+          <Route path="/agenda/anunciante/:anuncianteId" element={<AgendaAnunciante />} />
           <Route path="/perfil" element={<PerfilUsuario />} />
           <Route path="/perfil/:id" element={<PerfilUsuario />} />
           <Route path="/profile" element={<PerfilUsuario />} />
