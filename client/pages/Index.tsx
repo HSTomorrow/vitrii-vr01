@@ -43,6 +43,31 @@ export default function Index() {
     console.log("[Index] Page loaded - isLoading:", isLoading, "user:", user?.email || "null");
   }, [isLoading, user?.email]);
 
+  // Load user's favorites when page loads
+  useEffect(() => {
+    if (!user?.id) {
+      setFavoritos(new Set());
+      return;
+    }
+
+    const loadFavoritos = async () => {
+      try {
+        const response = await fetch(`/api/favoritos?usuarioId=${user.id}`);
+        if (!response.ok) throw new Error("Erro ao buscar favoritos");
+
+        const data = await response.json();
+        const favoritoIds = data.data?.map((anuncio: any) => anuncio.id) || [];
+
+        console.log("[Index] Loaded favorites:", favoritoIds);
+        setFavoritos(new Set(favoritoIds));
+      } catch (error) {
+        console.error("[Index] Error loading favorites:", error);
+      }
+    };
+
+    loadFavoritos();
+  }, [user?.id]);
+
   // Validate user status on page load (only if user is logged in)
   useEffect(() => {
     // Only validate if we have a user
