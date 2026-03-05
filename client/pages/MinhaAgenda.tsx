@@ -17,6 +17,7 @@ import ShareAgendaModal from "@/components/ShareAgendaModal";
 
 interface Evento {
   id: number;
+  anuncianteId: number;
   titulo: string;
   descricao?: string;
   dataInicio: string;
@@ -24,6 +25,7 @@ interface Evento {
   privacidade: string;
   cor: string;
   status?: string;
+  contatos?: Array<{ contatoId: number }>;
 }
 
 interface Anunciante {
