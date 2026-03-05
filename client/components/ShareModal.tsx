@@ -48,8 +48,22 @@ export default function ShareModal({
   };
 
   const handleShareWhatsApp = () => {
-    // Open WhatsApp main page
-    window.open("https://wa.me", "_blank");
+    // Detectar se é mobile/app
+    const isMobileApp = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const messageText = `${whatsappMessage}\n\n${url}`;
+    const encodedMessage = encodeURIComponent(messageText);
+
+    if (isMobileApp && whatsappPhone) {
+      // Mobile: usar protocolo whatsapp:// direto
+      const phoneNumber = whatsappPhone.replace(/\D/g, "");
+      window.location.href = `whatsapp://send?phone=${phoneNumber}&text=${encodedMessage}`;
+    } else if (whatsappPhone) {
+      // Desktop com telefone: abrir chat direto
+      window.open(`https://wa.me/${whatsappPhone.replace(/\D/g, "")}?text=${encodedMessage}`, "_blank");
+    } else {
+      // Web/Desktop sem telefone: abrir WhatsApp Web com mensagem pré-preenchida
+      window.open(`https://wa.me/?text=${encodedMessage}`, "_blank");
+    }
   };
 
   return (
@@ -113,7 +127,11 @@ export default function ShareModal({
             </div>
             <div className="text-left">
               <p className="font-semibold text-sm">Abrir WhatsApp</p>
-              <p className="text-xs opacity-75">WhatsApp Web</p>
+              <p className="text-xs opacity-75">
+                {/Android|iPhone|iPad|iPod/i.test(navigator.userAgent) && whatsappPhone
+                  ? "App WhatsApp"
+                  : "WhatsApp Web"}
+              </p>
             </div>
           </button>
 

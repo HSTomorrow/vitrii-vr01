@@ -7,8 +7,13 @@ export default function InstallAppSection() {
   const { isInstallable, install, isIOS, isSafari } = usePWA();
   const [copied, setCopied] = useState(false);
   const appUrl = typeof window !== 'undefined' ? window.location.href : '';
-  const whatsappMessage = encodeURIComponent('🏪 Conheça a Vitrii! Um marketplace seguro com tecnologia QR Code. Instale agora: ' + appUrl);
-  const whatsappLink = `https://wa.me/?text=${whatsappMessage}`;
+  const messageText = '🏪 Conheça a Vitrii! Um marketplace seguro com tecnologia QR Code. Instale agora: ' + appUrl;
+
+  // Detectar se é mobile/app
+  const isMobileApp = typeof navigator !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  const whatsappLink = isMobileApp
+    ? `whatsapp://send?text=${encodeURIComponent(messageText)}`
+    : `https://wa.me/?text=${encodeURIComponent(messageText)}`;
 
   // Mostrar para iOS Safari
   if (isIOS && isSafari) {
@@ -66,15 +71,19 @@ export default function InstallAppSection() {
                 <Share2 className="w-4 h-4" />
                 {copied ? 'URL Copiada!' : 'Compartilhar'}
               </button>
-              <a
-                href={whatsappLink}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={() => {
+                  if (isMobileApp) {
+                    window.location.href = whatsappLink;
+                  } else {
+                    window.open(whatsappLink, "_blank");
+                  }
+                }}
                 className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold text-sm"
               >
                 <MessageCircle className="w-4 h-4" />
                 WhatsApp
-              </a>
+              </button>
             </div>
           </div>
         </div>
@@ -124,15 +133,19 @@ export default function InstallAppSection() {
                 <Download className="w-4 h-4" />
                 Instalar Agora
               </button>
-              <a
-                href={whatsappLink}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={() => {
+                  if (isMobileApp) {
+                    window.location.href = whatsappLink;
+                  } else {
+                    window.open(whatsappLink, "_blank");
+                  }
+                }}
                 className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold text-sm"
               >
                 <MessageCircle className="w-4 h-4" />
                 Compartilhar
-              </a>
+              </button>
             </div>
           </div>
         </div>
@@ -173,15 +186,19 @@ export default function InstallAppSection() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-3">
-              <a
-                href={whatsappLink}
-                target="_blank"
-                rel="noopener noreferrer"
+              <button
+                onClick={() => {
+                  if (isMobileApp) {
+                    window.location.href = whatsappLink;
+                  } else {
+                    window.open(whatsappLink, "_blank");
+                  }
+                }}
                 className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold text-sm"
               >
                 <MessageCircle className="w-4 h-4" />
                 Compartilhar no WhatsApp
-              </a>
+              </button>
             </div>
           </div>
         </div>
@@ -216,15 +233,19 @@ export default function InstallAppSection() {
               </div>
             </div>
 
-            <a
-              href={whatsappLink}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={() => {
+                if (isMobileApp) {
+                  window.location.href = whatsappLink;
+                } else {
+                  window.open(whatsappLink, "_blank");
+                }
+              }}
               className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold text-sm"
             >
               <MessageCircle className="w-4 h-4" />
               Compartilhar no WhatsApp
-            </a>
+            </button>
           </div>
         </div>
       </div>
