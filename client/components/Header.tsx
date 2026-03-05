@@ -10,6 +10,7 @@ import {
   Star,
   Gift,
   MapPin,
+  Calendar,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import LocalidadeButton from "./LocalidadeButton";
@@ -88,6 +89,14 @@ export default function Header() {
                     title="Minha lista de desejos"
                   >
                     <Gift className="w-5 h-5 text-vitrii-text" />
+                  </Link>
+
+                  <Link
+                    to="/minha-agenda"
+                    className="flex-shrink-0 p-2 hover:bg-vitrii-gray rounded-lg transition-colors"
+                    title="Minha agenda"
+                  >
+                    <Calendar className="w-5 h-5 text-vitrii-text" />
                   </Link>
                 </>
               )}
