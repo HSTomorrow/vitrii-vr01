@@ -9,7 +9,7 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Logo URL (pode ser substituído depois)
-const LOGO_URL = 'https://cdn.builder.io/api/v1/image/assets%2Ff2e9e91d4cc44d4bae5b9dac3bb6abe8%2F4f9f90c2ca714384b9d14f4f1b8ee68a?format=webp&width=800&height=1200';
+const LOGO_URL = 'https://cdn.builder.io/api/v1/image/assets%2Ff2e9e91d4cc44d4bae5b9dac3bb6abe8%2F5911ae833cfb4acdb2924dd31bd78fa4?format=webp&width=800&height=1200';
 const TEMP_LOGO = path.join(__dirname, 'temp-logo.webp');
 const OUTPUT_DIR = path.join(__dirname, 'public/icons');
 
