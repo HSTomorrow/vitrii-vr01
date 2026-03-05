@@ -31,6 +31,17 @@ interface FilaDeEsperaModalProps {
   anuncianteAlvoNome: string;
 }
 
+const CORES = [
+  "#3B82F6", // Blue
+  "#EF4444", // Red
+  "#10B981", // Green
+  "#F59E0B", // Amber
+  "#8B5CF6", // Purple
+  "#EC4899", // Pink
+  "#06B6D4", // Cyan
+  "#F97316", // Orange
+];
+
 const PRIVACIDADES = [
   { value: "publico", label: "🌍 Público", desc: "Todos podem visualizar" },
   {
@@ -56,6 +67,8 @@ export default function FilaDeEsperaModal({
   const [dataFim, setDataFim] = useState("");
   const [horaFim, setHoraFim] = useState("11:00");
   const [privacidade, setPrivacidade] = useState("privado");
+  const [cor, setCor] = useState("#3B82F6"); // Color field
+  const [valor, setValor] = useState(""); // Price field
   const [contatosPermitidos, setContatosPermitidos] = useState<number[]>([]);
   const [contatos, setContatos] = useState<Contato[]>([]);
   const [isLoadingContatos, setIsLoadingContatos] = useState(false);
@@ -156,6 +169,8 @@ export default function FilaDeEsperaModal({
           dataInicio: dataInícioCompleta.toISOString(),
           dataFim: dataFimCompleta.toISOString(),
           privacidade: privacidade,
+          cor: cor,
+          valor: valor ? parseFloat(valor) : null,
           contatosPermitidos: privacidade === "privado_usuarios" ? contatosPermitidos : undefined,
         }),
       });
@@ -172,6 +187,8 @@ export default function FilaDeEsperaModal({
       setDataFim("");
       setHoraInicio("10:00");
       setHoraFim("11:00");
+      setCor("#3B82F6");
+      setValor("");
       onClose();
       onSuccess();
     } catch (error) {
@@ -192,6 +209,8 @@ export default function FilaDeEsperaModal({
       setHoraInicio("10:00");
       setHoraFim("11:00");
       setPrivacidade("privado");
+      setCor("#3B82F6");
+      setValor("");
       setContatosPermitidos([]);
       onClose();
     }
@@ -338,6 +357,55 @@ export default function FilaDeEsperaModal({
                 </label>
               ))}
             </div>
+          </div>
+
+          {/* Color Selection */}
+          <div>
+            <label className="block text-sm font-semibold text-vitrii-text mb-2">
+              Cor da Fila
+            </label>
+            <div className="flex gap-2 flex-wrap">
+              {CORES.map((corOption) => (
+                <button
+                  key={corOption}
+                  type="button"
+                  onClick={() => setCor(corOption)}
+                  className={`w-8 h-8 rounded-full border-2 transition-all ${
+                    cor === corOption
+                      ? "border-vitrii-text scale-110"
+                      : "border-gray-300"
+                  }`}
+                  style={{ backgroundColor: corOption }}
+                  title={`Selecionar cor ${corOption}`}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Valor (Price) */}
+          <div>
+            <label className="block text-sm font-semibold text-vitrii-text mb-2">
+              Valor (Opcional)
+            </label>
+            <div className="relative">
+              <span className="absolute left-3 top-2.5 text-gray-600 font-medium">
+                R$
+              </span>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="0,00"
+                value={valor}
+                onChange={(e) => setValor(e.target.value)}
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue text-sm"
+              />
+            </div>
+            {privacidade !== "publico" && (
+              <p className="text-xs text-amber-600 mt-2">
+                💡 O valor será ocultado para usuários não autorizados em filas restritas ou privadas.
+              </p>
+            )}
           </div>
 
           {/* Contatos - Available for all privacy levels */}

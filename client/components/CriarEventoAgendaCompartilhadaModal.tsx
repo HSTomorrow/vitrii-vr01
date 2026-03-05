@@ -94,57 +94,6 @@ export default function CriarEventoAgendaCompartilhadaModal({
 
   if (!isOpen) return null;
 
-  // If not logged in, show login message
-  if (!user) {
-    return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-        <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
-          <div className="flex items-center justify-between p-6 border-b border-gray-200">
-            <h2 className="text-xl font-bold text-vitrii-text">Criar Evento</h2>
-            <button onClick={onClose} className="p-1 hover:bg-gray-100 rounded">
-              <X className="w-5 h-5" />
-            </button>
-          </div>
-
-          <div className="p-6">
-            <div className="flex items-center gap-4 mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <AlertCircle className="w-6 h-6 text-blue-600 flex-shrink-0" />
-              <div>
-                <p className="font-semibold text-blue-900 mb-1">
-                  Autenticação Necessária
-                </p>
-                <p className="text-sm text-blue-800">
-                  Você precisa estar logado para criar eventos na agenda.
-                </p>
-              </div>
-            </div>
-
-            <div className="flex flex-col gap-3">
-              <button
-                onClick={() => navigate("/auth/signin")}
-                className="w-full py-3 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
-              >
-                Entrar na Conta
-              </button>
-              <button
-                onClick={() => navigate("/auth/signup")}
-                className="w-full py-3 bg-gray-200 text-gray-800 rounded-lg font-semibold hover:bg-gray-300 transition-colors"
-              >
-                Criar Nova Conta
-              </button>
-              <button
-                onClick={onClose}
-                className="w-full py-3 bg-gray-100 text-gray-700 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
-              >
-                Cancelar
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -169,8 +118,8 @@ export default function CriarEventoAgendaCompartilhadaModal({
       // First, create/get contact if it doesn't exist
       let contatoId: number | null = existingContactId;
 
-      // If no existing contact found, try to create/find one
-      if (!contatoId) {
+      // If user is logged in, check for existing contact
+      if (!contatoId && user) {
         const checkContactResponse = await fetch("/api/contatos/check-duplicates", {
           method: "POST",
           headers: {
@@ -191,8 +140,8 @@ export default function CriarEventoAgendaCompartilhadaModal({
         }
       }
 
-      if (!contatoId) {
-        // Create new contact
+      if (!contatoId && user) {
+        // Create new contact (only if user is logged in)
         const createContactResponse = await fetch("/api/contatos", {
           method: "POST",
           headers: {
@@ -220,12 +169,18 @@ export default function CriarEventoAgendaCompartilhadaModal({
       }
 
       // Create event as "pendente" (pending) using visitor endpoint
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+
+      // Add X-User-Id header only if user is logged in
+      if (user?.id) {
+        headers["X-User-Id"] = user.id.toString();
+      }
+
       const createEventResponse = await fetch("/api/eventos-agenda/visitante/criar", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-User-Id": user.id.toString(),
-        },
+        headers,
         body: JSON.stringify({
           anuncianteId: anuncianteId,
           titulo: formData.titulo.trim(),
@@ -234,7 +189,7 @@ export default function CriarEventoAgendaCompartilhadaModal({
           dataFim: formData.dataFim
             ? new Date(formData.dataFim).toISOString()
             : new Date(formData.dataInicio).toISOString(),
-          contatoIds: [contatoId],
+          contatoIds: contatoId ? [contatoId] : [],
         }),
       });
 
@@ -251,9 +206,9 @@ export default function CriarEventoAgendaCompartilhadaModal({
         descricao: "",
         dataInicio: "",
         dataFim: "",
-        celular: user.celular || "",
+        celular: user?.celular || "",
         telefone: "",
-        nomeSolicitante: user.nome,
+        nomeSolicitante: user?.nome || "",
       });
 
       onClose();

@@ -1006,7 +1006,7 @@ export function createServer() {
   app.get("/api/eventos-agenda/:anuncianteId/is-announcer", extractUserId, isUserAnunciante);
   app.get("/api/eventos-agenda/:eventoId/can-edit", extractUserId, canUserEditEvento);
   app.post("/api/eventos-agenda", extractUserId, createEvento);
-  app.post("/api/eventos-agenda/visitante/criar", extractUserId, createEventoVisitante);
+  app.post("/api/eventos-agenda/visitante/criar", createEventoVisitante); // No extractUserId - allows guests
   app.put("/api/eventos-agenda/:id", extractUserId, updateEvento);
   app.delete("/api/eventos-agenda/:id", extractUserId, deleteEvento);
   app.post("/api/eventos-agenda/:id/permissoes", extractUserId, addPermissao);

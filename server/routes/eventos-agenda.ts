@@ -835,10 +835,10 @@ export const addUserToEvento: RequestHandler = async (req, res) => {
   }
 };
 
-// Create a pending event from a visitor/external user
+// Create a pending event from a visitor/external user (no authentication required)
 export const createEventoVisitante: RequestHandler = async (req, res) => {
   try {
-    const userId = (req as any).userId;
+    const userId = (req as any).userId; // Optional - may be null for guests
     const {
       anuncianteId,
       titulo,
@@ -847,11 +847,6 @@ export const createEventoVisitante: RequestHandler = async (req, res) => {
       dataFim,
       contatoIds,
     } = req.body;
-
-    // Validate authentication
-    if (!userId) {
-      return res.status(401).json({ error: "Usuário não autenticado" });
-    }
 
     // Validate required fields
     if (!titulo || !dataInicio || !dataFim || !anuncianteId) {
@@ -899,20 +894,22 @@ export const createEventoVisitante: RequestHandler = async (req, res) => {
       },
     });
 
-    // Add creator permission so they can see their own event
-    await prisma.eventos_permissoes.upsert({
-      where: {
-        eventoId_usuarioId: {
+    // Add creator permission if user is logged in
+    if (userId) {
+      await prisma.eventos_permissoes.upsert({
+        where: {
+          eventoId_usuarioId: {
+            eventoId: evento.id,
+            usuarioId: userId,
+          },
+        },
+        update: {},
+        create: {
           eventoId: evento.id,
           usuarioId: userId,
         },
-      },
-      update: {},
-      create: {
-        eventoId: evento.id,
-        usuarioId: userId,
-      },
-    });
+      });
+    }
 
     // Associate contacts if provided
     if (contatoIds && Array.isArray(contatoIds) && contatoIds.length > 0) {
