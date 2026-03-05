@@ -194,12 +194,14 @@ export default function PerfilUsuario() {
       }
     }
 
-    // Phone validation - only if provided
-    if (
-      formData.telefone.trim() &&
-      formData.telefone.replace(/\D/g, "").length < 10
-    ) {
-      newErrors.telefone = "Telefone deve ter no mínimo 10 dígitos";
+    // Phone validation - required field
+    if (!formData.telefone || !formData.telefone.trim()) {
+      newErrors.telefone = "Telefone é obrigatório";
+    } else {
+      const phoneDigits = formData.telefone.replace(/\D/g, "");
+      if (phoneDigits.length < 10) {
+        newErrors.telefone = "Telefone deve ter no mínimo 10 dígitos";
+      }
     }
 
     // All other fields (whatsapp, linkedin, facebook, endereco, localidadePadraoId) are optional
@@ -337,10 +339,11 @@ export default function PerfilUsuario() {
             {/* Telefone */}
             <div>
               <label className="block text-sm font-semibold text-vitrii-text mb-2">
-                Telefone (opcional)
+                Telefone *
               </label>
               <input
                 type="tel"
+                required
                 value={formData.telefone}
                 onChange={(e) => {
                   const tel = e.target.value.replace(/\D/g, "").slice(0, 11);
