@@ -407,6 +407,14 @@ export default function CadastroContatos() {
     });
     setEditingId(contato.id);
     setIsFormOpen(true);
+
+    // Scroll to top of form with smooth animation
+    setTimeout(() => {
+      const formSection = document.querySelector('[data-form-section]');
+      if (formSection) {
+        formSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }, 0);
   };
 
   const handleCancel = () => {
@@ -487,7 +495,7 @@ export default function CadastroContatos() {
         {/* Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           {/* Form Section */}
-          <div className="mb-8 bg-vitrii-gray rounded-lg p-6 border border-gray-200">
+          <div className="mb-8 bg-vitrii-gray rounded-lg p-6 border border-gray-200" data-form-section>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-vitrii-text">
                 {editingId ? "Editar Contato" : "Novo Contato"}
