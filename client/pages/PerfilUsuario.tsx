@@ -45,6 +45,7 @@ export default function PerfilUsuario() {
     localidadePadraoId: user?.localidadePadraoId || null,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [cpfSaved, setCpfSaved] = useState(!!user?.cpf); // Track if CPF was saved
 
   // Fetch fresh user data to show current profile info
   const { data: freshUserData } = useQuery({
@@ -88,6 +89,10 @@ export default function PerfilUsuario() {
         endereco: freshUserData.endereco || "",
         localidadePadraoId: freshUserData.localidadePadraoId || null,
       });
+      // Mark CPF as saved if it exists
+      if (freshUserData.cpf) {
+        setCpfSaved(true);
+      }
     }
   }, [freshUserData]);
 
@@ -124,6 +129,10 @@ export default function PerfilUsuario() {
         queryClient.invalidateQueries({ queryKey: ["user", user.id] });
       }
       toast.success("Perfil atualizado com sucesso!");
+      // Mark CPF as saved if it was just filled
+      if (data.cpf) {
+        setCpfSaved(true);
+      }
       setTimeout(() => {
         // Navigate to ad editing page after profile update
         navigate("/anuncio/criar");
@@ -281,12 +290,12 @@ export default function PerfilUsuario() {
               )}
             </div>
 
-            {/* CPF / CNPJ - Editable if empty, Read-only if filled */}
+            {/* CPF / CNPJ - Editable until saved, Read-only after successful save */}
             <div>
               <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 CPF \ CNPJ *
               </label>
-              {formData.cpf ? (
+              {cpfSaved && formData.cpf ? (
                 <div className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-vitrii-text flex items-center gap-2">
                   <User className="w-5 h-5 text-vitrii-text-secondary flex-shrink-0" />
                   <span>{formData.cpf}</span>
@@ -308,7 +317,7 @@ export default function PerfilUsuario() {
                   }`}
                 />
               )}
-              {formData.cpf ? (
+              {cpfSaved && formData.cpf ? (
                 <p className="text-xs text-vitrii-text-secondary mt-2">
                   ✓ CPF/CNPJ registrado. Para alterações, entre em contato com o administrador.
                 </p>
