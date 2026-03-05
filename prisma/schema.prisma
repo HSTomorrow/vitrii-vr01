@@ -244,6 +244,7 @@ model usracessos {
   lista_espera_agenda     lista_espera_agenda[]
   filas_espera            filas_espera_agenda[]       @relation("fila_espera_usuario")
   eventos_permissoes      eventos_agenda_permissoes[]
+  filas_espera_permissoes filas_espera_permissoes[]
   reservas_evento         reservas_evento_agenda[]
   conversas               conversas[]
   mensagens               mensagens[]
@@ -664,6 +665,7 @@ model filas_espera_agenda {
   descricao            String?
   dataInicio           DateTime
   dataFim              DateTime
+  privacidade          String    @default("privado") @db.VarChar(20) // "publico", "privado_usuarios", "privado"
   status               String    @default("pendente") @db.VarChar(30) // "pendente", "aprovada", "rejeitada", "cancelada"
   motivo_rejeicao      String? // Motivo da rejeição
   dataSugestao         DateTime? // Data sugerida pelo dono da agenda para resubmissão
@@ -676,12 +678,29 @@ model filas_espera_agenda {
   evento             eventos_agenda_anunciante @relation(fields: [eventoId], references: [id], onDelete: Cascade)
   usuarioSolicitante usracessos                @relation("fila_espera_usuario", fields: [usuarioSolicitanteId], references: [id], onDelete: Cascade)
   anuncianteAlvo     anunciantes               @relation("filas_espera_anunciante", fields: [anuncianteAlvoId], references: [id], onDelete: Cascade)
+  permissoes         filas_espera_permissoes[]
 
   @@index([eventoId])
   @@index([usuarioSolicitanteId])
   @@index([anuncianteAlvoId])
   @@index([status])
+  @@index([privacidade])
   @@index([dataSolicitacao])
+}
+
+// Permissões para Filas de Espera Privadas com Usuários Específicos
+model filas_espera_permissoes {
+  id          Int       @id @default(autoincrement())
+  filaId      Int
+  usuarioId   Int
+  dataCriacao DateTime  @default(now())
+
+  fila   filas_espera_agenda @relation(fields: [filaId], references: [id], onDelete: Cascade)
+  usuario usracessos         @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@unique([filaId, usuarioId])
+  @@index([filaId])
+  @@index([usuarioId])
 }
 
 // Localidades/Localities for geographic filtering

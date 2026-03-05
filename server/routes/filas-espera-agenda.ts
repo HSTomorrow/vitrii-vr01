@@ -508,3 +508,240 @@ export const deletarAgenda: RequestHandler = async (req, res) => {
     res.status(500).json({ error: "Erro ao deletar agenda" });
   }
 };
+
+// Get waiting queues visible to a user (public + user-specific private queues + masked restricted queues)
+export const getFilasEsperaVisivelsPara: RequestHandler = async (req, res) => {
+  try {
+    const { anuncianteId } = req.params;
+    const userId = (req as any).userId;
+
+    const anuncianteId_num = parseInt(anuncianteId);
+    if (isNaN(anuncianteId_num)) {
+      return res.status(400).json({ error: "Invalid announcer ID" });
+    }
+
+    // Get public waiting queues
+    const publicQueues = await prisma.filas_espera_agenda.findMany({
+      where: {
+        anuncianteAlvoId: anuncianteId_num,
+        privacidade: "publico",
+      },
+      select: {
+        id: true,
+        titulo: true,
+        dataInicio: true,
+        dataFim: true,
+        privacidade: true,
+      },
+      orderBy: {
+        dataSolicitacao: "desc",
+      },
+    });
+
+    // If user is not logged in, return public + all restricted queues (masked)
+    if (!userId) {
+      const restrictedQueues = await prisma.filas_espera_agenda.findMany({
+        where: {
+          anuncianteAlvoId: anuncianteId_num,
+          privacidade: "privado_usuarios",
+        },
+        select: {
+          id: true,
+          dataInicio: true,
+          dataFim: true,
+          privacidade: true,
+        },
+        orderBy: {
+          dataSolicitacao: "desc",
+        },
+      });
+
+      const maskedRestrictedQueues = restrictedQueues.map((q) => ({
+        ...q,
+        titulo: "Acesso Restrito",
+      }));
+
+      const allVisibleQueues = [
+        ...publicQueues,
+        ...maskedRestrictedQueues,
+      ].sort((a, b) => new Date(a.dataInicio).getTime() - new Date(b.dataInicio).getTime());
+
+      return res.json({ data: allVisibleQueues });
+    }
+
+    // Get restricted queues where user has permission (full details)
+    const restrictedQueuesComPermissao = await prisma.filas_espera_agenda.findMany({
+      where: {
+        anuncianteAlvoId: anuncianteId_num,
+        privacidade: "privado_usuarios",
+        permissoes: {
+          some: {
+            usuarioId: userId,
+          },
+        },
+      },
+      select: {
+        id: true,
+        titulo: true,
+        dataInicio: true,
+        dataFim: true,
+        privacidade: true,
+      },
+      orderBy: {
+        dataSolicitacao: "desc",
+      },
+    });
+
+    // Get restricted queues where user does NOT have permission (masked)
+    const restrictedQueuesSemPermissao = await prisma.filas_espera_agenda.findMany({
+      where: {
+        anuncianteAlvoId: anuncianteId_num,
+        privacidade: "privado_usuarios",
+        permissoes: {
+          none: {
+            usuarioId: userId,
+          },
+        },
+      },
+      select: {
+        id: true,
+        dataInicio: true,
+        dataFim: true,
+        privacidade: true,
+      },
+      orderBy: {
+        dataSolicitacao: "desc",
+      },
+    });
+
+    const maskedRestrictedQueues = restrictedQueuesSemPermissao.map((q) => ({
+      ...q,
+      titulo: "Acesso Restrito",
+    }));
+
+    const allVisibleQueues = [
+      ...publicQueues,
+      ...restrictedQueuesComPermissao,
+      ...maskedRestrictedQueues,
+    ].sort((a, b) => new Date(a.dataInicio).getTime() - new Date(b.dataInicio).getTime());
+
+    res.json({ data: allVisibleQueues });
+  } catch (error) {
+    console.error("[getFilasEsperaVisivelsPara]", error);
+    res.status(500).json({ error: "Erro ao buscar filas de espera visíveis" });
+  }
+};
+
+// Add permission for a user to see a private waiting queue
+export const addFilaPermissao: RequestHandler = async (req, res) => {
+  try {
+    const { filaId, usuarioId } = req.body;
+    const authUserId = (req as any).userId;
+
+    if (!filaId || !usuarioId) {
+      return res.status(400).json({ error: "filaId e usuarioId são obrigatórios" });
+    }
+
+    // Get the queue to check ownership
+    const fila = await prisma.filas_espera_agenda.findUnique({
+      where: { id: filaId },
+      select: { anuncianteAlvoId: true },
+    });
+
+    if (!fila) {
+      return res.status(404).json({ error: "Fila não encontrada" });
+    }
+
+    // Check if user is the announcer
+    const usuarioAnunciante = await prisma.usuarios_anunciantes.findFirst({
+      where: {
+        usuarioId: authUserId,
+        anuncianteId: fila.anuncianteAlvoId,
+      },
+    });
+
+    if (!usuarioAnunciante) {
+      return res
+        .status(403)
+        .json({ error: "Acesso negado. Você não é responsável por este anunciante." });
+    }
+
+    try {
+      const permissao = await prisma.filas_espera_permissoes.create({
+        data: {
+          filaId,
+          usuarioId,
+        },
+      });
+
+      res.json({
+        success: true,
+        message: "Permissão adicionada com sucesso",
+        data: permissao,
+      });
+    } catch (error: any) {
+      if (error.code === "P2002") {
+        // Unique constraint error - permission already exists
+        return res
+          .status(400)
+          .json({ error: "Este usuário já tem acesso a esta fila" });
+      }
+      throw error;
+    }
+  } catch (error) {
+    console.error("[addFilaPermissao]", error);
+    res.status(500).json({ error: "Erro ao adicionar permissão" });
+  }
+};
+
+// Remove permission for a user
+export const removeFilaPermissao: RequestHandler = async (req, res) => {
+  try {
+    const { filaId, usuarioId } = req.body;
+    const authUserId = (req as any).userId;
+
+    if (!filaId || !usuarioId) {
+      return res.status(400).json({ error: "filaId e usuarioId são obrigatórios" });
+    }
+
+    // Get the queue to check ownership
+    const fila = await prisma.filas_espera_agenda.findUnique({
+      where: { id: filaId },
+      select: { anuncianteAlvoId: true },
+    });
+
+    if (!fila) {
+      return res.status(404).json({ error: "Fila não encontrada" });
+    }
+
+    // Check if user is the announcer
+    const usuarioAnunciante = await prisma.usuarios_anunciantes.findFirst({
+      where: {
+        usuarioId: authUserId,
+        anuncianteId: fila.anuncianteAlvoId,
+      },
+    });
+
+    if (!usuarioAnunciante) {
+      return res
+        .status(403)
+        .json({ error: "Acesso negado. Você não é responsável por este anunciante." });
+    }
+
+    // Delete permission
+    await prisma.filas_espera_permissoes.deleteMany({
+      where: {
+        filaId,
+        usuarioId,
+      },
+    });
+
+    res.json({
+      success: true,
+      message: "Permissão removida com sucesso",
+    });
+  } catch (error) {
+    console.error("[removeFilaPermissao]", error);
+    res.status(500).json({ error: "Erro ao remover permissão" });
+  }
+};
