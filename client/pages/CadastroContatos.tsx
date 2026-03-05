@@ -22,6 +22,15 @@ import { useNavigate } from "react-router-dom";
 import ImageWithFallback from "@/components/ImageWithFallback";
 import { getUserInitials } from "@/utils/imageFallback";
 
+interface UsuarioVinculado {
+  id: number;
+  usuario: {
+    id: number;
+    nome: string;
+    email: string;
+  };
+}
+
 interface Contato {
   id: number;
   anuncianteId: number;
@@ -35,6 +44,7 @@ interface Contato {
   imagem?: string;
   dataCriacao: string;
   dataAtualizacao: string;
+  usuarios?: UsuarioVinculado[];
 }
 
 interface Anunciante {
@@ -576,73 +586,96 @@ export default function CadastroContatos() {
                         {filteredContatos.map((contato: Contato) => (
                           <div
                             key={contato.id}
-                            className="bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow flex gap-0"
+                            className="bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow flex flex-col"
                           >
-                            {/* Contact Image */}
-                            <div className="w-24 h-24 flex-shrink-0 overflow-hidden rounded-l-lg">
-                              <ImageWithFallback
-                                src={contato.imagem || null}
-                                alt={contato.nome}
-                                fallbackIcon={
-                                  <User className="w-12 h-12 text-vitrii-blue" />
-                                }
-                                containerClassName="w-full h-full bg-vitrii-gray-light"
-                                className="w-full h-full object-cover"
-                                fallbackInitials={getUserInitials(contato)}
-                              />
+                            <div className="flex gap-0">
+                              {/* Contact Image */}
+                              <div className="w-24 h-24 flex-shrink-0 overflow-hidden rounded-l-lg">
+                                <ImageWithFallback
+                                  src={contato.imagem || null}
+                                  alt={contato.nome}
+                                  fallbackIcon={
+                                    <User className="w-12 h-12 text-vitrii-blue" />
+                                  }
+                                  containerClassName="w-full h-full bg-vitrii-gray-light"
+                                  className="w-full h-full object-cover"
+                                  fallbackInitials={getUserInitials(contato)}
+                                />
+                              </div>
+
+                              {/* Contact Info */}
+                              <div className="flex-1 p-4">
+                                <div className="flex items-start justify-between mb-3">
+                                <div className="flex-1">
+                                  <h3 className="text-lg font-semibold text-vitrii-text">
+                                    {contato.nome}
+                                  </h3>
+                                  <p className="text-sm text-vitrii-text-secondary">
+                                    {contato.tipoContato}
+                                  </p>
+                                </div>
+                                <span
+                                  className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
+                                    contato.status
+                                  )}`}
+                                >
+                                  {getStatusLabel(contato.status)}
+                                </span>
+                              </div>
+
+                                <div className="space-y-2 mb-4 text-sm">
+                                <div className="flex items-center gap-2 text-vitrii-text">
+                                  <Phone className="w-4 h-4 text-vitrii-blue" />
+                                  <span>{contato.celular}</span>
+                                </div>
+
+                                {contato.telefone && (
+                                  <div className="flex items-center gap-2 text-vitrii-text">
+                                    <Phone className="w-4 h-4 text-gray-400" />
+                                    <span>{contato.telefone}</span>
+                                  </div>
+                                )}
+
+                                {contato.email && (
+                                  <div className="flex items-center gap-2 text-vitrii-text">
+                                    <Mail className="w-4 h-4 text-vitrii-blue" />
+                                    <span>{contato.email}</span>
+                                  </div>
+                                )}
+
+                                {contato.observacoes && (
+                                  <div className="flex items-start gap-2 text-vitrii-text">
+                                    <MessageSquare className="w-4 h-4 text-vitrii-blue flex-shrink-0 mt-0.5" />
+                                    <span className="line-clamp-2">
+                                      {contato.observacoes}
+                                    </span>
+                                  </div>
+                                )}
+                                </div>
+                              </div>
                             </div>
 
-                            {/* Contact Info */}
-                            <div className="flex-1 p-4">
-                              <div className="flex items-start justify-between mb-3">
-                              <div className="flex-1">
-                                <h3 className="text-lg font-semibold text-vitrii-text">
-                                  {contato.nome}
-                                </h3>
-                                <p className="text-sm text-vitrii-text-secondary">
-                                  {contato.tipoContato}
+                            {/* Linked Users Section (visible to admin) */}
+                            {user?.tipoUsuario === "adm" && contato.usuarios && contato.usuarios.length > 0 && (
+                              <div className="px-4 py-2 bg-vitrii-gray border-t border-gray-100">
+                                <p className="text-xs font-medium text-vitrii-text-secondary mb-2">
+                                  Vinculado a:
                                 </p>
-                              </div>
-                              <span
-                                className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
-                                  contato.status
-                                )}`}
-                              >
-                                {getStatusLabel(contato.status)}
-                              </span>
-                            </div>
-
-                              <div className="space-y-2 mb-4 text-sm">
-                              <div className="flex items-center gap-2 text-vitrii-text">
-                                <Phone className="w-4 h-4 text-vitrii-blue" />
-                                <span>{contato.celular}</span>
-                              </div>
-
-                              {contato.telefone && (
-                                <div className="flex items-center gap-2 text-vitrii-text">
-                                  <Phone className="w-4 h-4 text-gray-400" />
-                                  <span>{contato.telefone}</span>
+                                <div className="flex flex-wrap gap-2">
+                                  {contato.usuarios.map((vu) => (
+                                    <span
+                                      key={vu.usuario.id}
+                                      className="inline-block px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium"
+                                    >
+                                      {vu.usuario.nome}
+                                    </span>
+                                  ))}
                                 </div>
-                              )}
-
-                              {contato.email && (
-                                <div className="flex items-center gap-2 text-vitrii-text">
-                                  <Mail className="w-4 h-4 text-vitrii-blue" />
-                                  <span>{contato.email}</span>
-                                </div>
-                              )}
-
-                              {contato.observacoes && (
-                                <div className="flex items-start gap-2 text-vitrii-text">
-                                  <MessageSquare className="w-4 h-4 text-vitrii-blue flex-shrink-0 mt-0.5" />
-                                  <span className="line-clamp-2">
-                                    {contato.observacoes}
-                                  </span>
-                                </div>
-                              )}
                               </div>
+                            )}
 
-                              <div className="flex gap-2 pt-3 border-t border-gray-100">
+                            {/* Action Buttons */}
+                            <div className="flex gap-2 p-4 border-t border-gray-100">
                               <button
                                 onClick={() => handleEdit(contato)}
                                 className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 text-vitrii-blue rounded-lg hover:bg-blue-100 transition-colors"
@@ -658,7 +691,6 @@ export default function CadastroContatos() {
                                 <Trash2 className="w-4 h-4" />
                                 Deletar
                               </button>
-                              </div>
                             </div>
                           </div>
                         ))}

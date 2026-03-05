@@ -18,7 +18,7 @@ const ContatoCreateSchema = z.object({
 // Schema para atualizar contato
 const ContatoUpdateSchema = ContatoCreateSchema.partial();
 
-// GET all contatos for an announcer (only the announcer can see)
+// GET all contatos for an announcer (admin sees all, users see only their own)
 export const getContatosByAnunciante: RequestHandler = async (req, res) => {
   try {
     const { anuncianteId } = req.params;
@@ -49,20 +49,38 @@ export const getContatosByAnunciante: RequestHandler = async (req, res) => {
       (ua) => ua.usuarioId === usuarioId
     );
 
-    if (!isOwner && usuarioId !== 1) {
-      // Assuming user ID 1 is admin
+    if (!isOwner) {
       return res.status(403).json({
         success: false,
         error: "Acesso negado",
       });
     }
 
+    // Check if user is admin
+    const usuario = await prisma.usracessos.findUnique({
+      where: { id: usuarioId },
+      select: { tipoUsuario: true },
+    });
+
+    const isAdmin = usuario?.tipoUsuario === "adm";
+
+    // Build filter: admin sees all, regular users see only their own
+    const contatosFilter: any = { anuncianteId: parseInt(anuncianteId) };
+
+    if (!isAdmin) {
+      // Regular users only see contacts they're linked to
+      contatosFilter.usuarios = {
+        some: {
+          usuarioId: usuarioId,
+        },
+      };
+    }
+
     const contatos = await prisma.contatos.findMany({
-      where: { anuncianteId: parseInt(anuncianteId) },
+      where: contatosFilter,
       include: {
         usuarios: {
-          select: {
-            id: true,
+          include: {
             usuario: {
               select: {
                 id: true,
