@@ -18,6 +18,8 @@ interface StatusAgendaProps {
   eventos: Evento[];
   onStatusChange: () => void;
   isLoading?: boolean;
+  anuncianteId?: number;
+  onDeleteAgenda?: () => void;
 }
 
 const STATUS_OPTIONS = [
@@ -55,12 +57,14 @@ export default function StatusAgenda({
   eventos,
   onStatusChange,
   isLoading = false,
+  anuncianteId,
+  onDeleteAgenda,
 }: StatusAgendaProps) {
   const { user } = useAuth();
   const [expandedEventoId, setExpandedEventoId] = useState<number | null>(null);
   const [updatingEventoId, setUpdatingEventoId] = useState<number | null>(null);
   const [selectedStatuses, setSelectedStatuses] = useState<Set<string>>(
-    new Set(["pendente", "pendente_pagamento"])
+    new Set(["pendente", "pendente_pagamento", "realizado", "substituicao"])
   );
   const [selectedEventoIds, setSelectedEventoIds] = useState<Set<number>>(new Set());
 
@@ -241,16 +245,32 @@ export default function StatusAgenda({
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
         <h3 className="text-lg font-bold text-vitrii-text">
           Status da Agenda ({filteredEventos.length})
         </h3>
+        {onDeleteAgenda && (
+          <button
+            onClick={() => {
+              if (
+                confirm(
+                  "Tem certeza que deseja deletar toda a agenda? Todos os eventos serão removidos e esta ação é irreversível."
+                )
+              ) {
+                onDeleteAgenda();
+              }
+            }}
+            className="w-full sm:w-auto px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-lg hover:bg-red-700 transition-colors"
+          >
+            🗑️ Deletar Agenda
+          </button>
+        )}
       </div>
 
       {/* Filters */}
       <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200">
         <p className="text-sm font-semibold text-vitrii-text mb-3">Filtrar por Status:</p>
-        <div className="flex flex-wrap gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2">
           {STATUS_OPTIONS.map((option) => {
             const isSelected = selectedStatuses.has(option.value);
             const Icon = option.icon;
@@ -258,14 +278,14 @@ export default function StatusAgenda({
               <button
                 key={option.value}
                 onClick={() => toggleStatusFilter(option.value)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                className={`flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${
                   isSelected
                     ? `${option.color} ring-2 ring-offset-1`
                     : "border border-gray-300 text-gray-700 hover:border-gray-400 bg-white"
                 }`}
               >
                 <Icon className="w-4 h-4" />
-                {option.label}
+                <span className="text-center sm:text-left">{option.label}</span>
               </button>
             );
           })}
@@ -274,11 +294,11 @@ export default function StatusAgenda({
 
       {/* Bulk Actions Toolbar */}
       {filteredEventos.length > 0 && selectedEventoIds.size > 0 && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center justify-between gap-3">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <div className="text-sm font-medium text-blue-800">
             {selectedEventoIds.size} evento(s) selecionado(s)
           </div>
-          <div className="flex gap-2">
+          <div className="w-full sm:w-auto flex flex-col sm:flex-row gap-2">
             <select
               onChange={(e) => {
                 if (e.target.value) {
@@ -286,7 +306,7 @@ export default function StatusAgenda({
                   e.target.value = "";
                 }
               }}
-              className="px-3 py-2 text-sm border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+              className="w-full sm:w-auto px-3 py-2 text-sm border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
             >
               <option value="">Alterar status para...</option>
               {STATUS_OPTIONS.map((option) => (
@@ -297,7 +317,7 @@ export default function StatusAgenda({
             </select>
             <button
               onClick={handleBulkDelete}
-              className="px-3 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              className="w-full sm:w-auto px-3 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
             >
               Deletar
             </button>
@@ -370,20 +390,20 @@ export default function StatusAgenda({
               <div className="border-t-2 border-inherit p-4 bg-gray-50 space-y-4">
                 {/* Evento Info */}
                 {evento.descricao && (
-                  <div>
+                  <div className="min-w-0">
                     <p className="text-sm font-semibold text-gray-600 mb-1">
                       Descrição:
                     </p>
-                    <p className="text-sm text-gray-700">{evento.descricao}</p>
+                    <p className="text-sm text-gray-700 break-words">{evento.descricao}</p>
                   </div>
                 )}
 
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  <div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm">
+                  <div className="min-w-0">
                     <p className="font-semibold text-gray-600 mb-1">
                       Data/Hora de Início:
                     </p>
-                    <p className="text-gray-700">
+                    <p className="text-gray-700 break-words">
                       {new Date(evento.dataInicio).toLocaleDateString("pt-BR")}{" "}
                       às{" "}
                       {new Date(evento.dataInicio).toLocaleTimeString("pt-BR", {
@@ -392,11 +412,11 @@ export default function StatusAgenda({
                       })}
                     </p>
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="font-semibold text-gray-600 mb-1">
                       Data/Hora de Fim:
                     </p>
-                    <p className="text-gray-700">
+                    <p className="text-gray-700 break-words">
                       {new Date(evento.dataFim).toLocaleDateString("pt-BR")} às{" "}
                       {new Date(evento.dataFim).toLocaleTimeString("pt-BR", {
                         hour: "2-digit",
@@ -411,7 +431,7 @@ export default function StatusAgenda({
                   <p className="text-sm font-semibold text-gray-600 mb-2">
                     Alterar Status:
                   </p>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
                     {STATUS_OPTIONS.map((option) => {
                       const Icon = option.icon;
                       return (
@@ -423,14 +443,14 @@ export default function StatusAgenda({
                           disabled={
                             isUpdating || evento.status === option.value
                           }
-                          className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                          className={`flex flex-col items-center gap-1 px-2 sm:px-3 py-2 rounded-lg text-xs sm:text-sm font-medium transition-all ${
                             evento.status === option.value
                               ? `${option.color} ring-2 ring-offset-2`
                               : "border border-gray-300 hover:border-gray-400 text-gray-700 hover:bg-gray-100"
                           } disabled:opacity-50`}
                         >
                           <Icon className="w-4 h-4" />
-                          <span>{option.label}</span>
+                          <span className="text-center">{option.label}</span>
                         </button>
                       );
                     })}

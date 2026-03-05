@@ -705,12 +705,12 @@ export default function MinhaAgenda() {
                 ) : (
                   <>
                     {/* Filters Section */}
-                    <div className="mb-6 p-4 bg-white rounded-lg border border-gray-200">
+                    <div className="mb-6 p-3 sm:p-4 bg-white rounded-lg border border-gray-200">
                       <h3 className="font-semibold text-vitrii-text mb-3">Filtros</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
                         {/* Filter by Contact */}
-                        <div>
-                          <label className="block text-sm font-medium text-vitrii-text mb-1">
+                        <div className="min-w-0">
+                          <label className="block text-xs sm:text-sm font-medium text-vitrii-text mb-1">
                             Contato
                           </label>
                           <input
@@ -718,33 +718,33 @@ export default function MinhaAgenda() {
                             placeholder="Buscar contato..."
                             value={filterContatoNome}
                             onChange={(e) => setFilterContatoNome(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+                            className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
                           />
                         </div>
 
                         {/* Filter by Agenda Description */}
-                        <div>
-                          <label className="block text-sm font-medium text-vitrii-text mb-1">
-                            Descrição da Agenda
+                        <div className="min-w-0">
+                          <label className="block text-xs sm:text-sm font-medium text-vitrii-text mb-1">
+                            Descrição
                           </label>
                           <input
                             type="text"
                             placeholder="Buscar..."
                             value={filterDescricao}
                             onChange={(e) => setFilterDescricao(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+                            className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
                           />
                         </div>
 
                         {/* Filter by Contact Type */}
-                        <div>
-                          <label className="block text-sm font-medium text-vitrii-text mb-1">
+                        <div className="min-w-0">
+                          <label className="block text-xs sm:text-sm font-medium text-vitrii-text mb-1">
                             Tipo de Contato
                           </label>
                           <select
                             value={filterTipoContato}
                             onChange={(e) => setFilterTipoContato(e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+                            className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
                           >
                             <option value="">Todos os tipos</option>
                             {tiposContatoUnicos.map((tipo) => (
@@ -763,53 +763,53 @@ export default function MinhaAgenda() {
                             setFilterDescricao("");
                             setFilterTipoContato("");
                           }}
-                          className="mt-2 text-sm text-vitrii-blue hover:underline"
+                          className="mt-2 text-xs sm:text-sm text-vitrii-blue hover:underline"
                         >
                           Limpar filtros
                         </button>
                       )}
                     </div>
 
-                    <div className="flex gap-3 mb-6 flex-wrap">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mb-6">
                       <button
                         onClick={handleAddEvento}
-                        className="px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
+                        className="px-3 sm:px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-blue-600 transition-colors font-medium text-sm sm:text-base"
                       >
-                        + Adicionar Evento
+                        + Evento
                       </button>
                       <button
                         onClick={() => setShowRecurrenceModal(true)}
-                        className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium"
+                        className="px-3 sm:px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium text-sm sm:text-base"
                       >
                         🔄 Recorrência
                       </button>
                       <button
                         onClick={() => setShowFilaDeEsperaModal(true)}
-                        className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium"
+                        className="px-3 sm:px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium text-sm sm:text-base"
                       >
-                        + Fila de Espera
+                        ⏳ Fila
                       </button>
                       <button
                         onClick={() => setShowEditorModal(true)}
-                        className="px-4 py-2 bg-blue-400 text-white rounded-lg hover:bg-blue-500 transition-colors font-medium flex items-center gap-2"
+                        className="px-3 sm:px-4 py-2 bg-blue-400 text-white rounded-lg hover:bg-blue-500 transition-colors font-medium text-sm sm:text-base flex items-center justify-center gap-2"
                       >
                         <Settings className="w-4 h-4" />
-                        Editar Agenda
+                        <span className="hidden sm:inline">Editar</span>
                       </button>
                       <button
                         onClick={() => setShowShareModal(true)}
-                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center gap-2"
+                        className="px-3 sm:px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium text-sm sm:text-base flex items-center justify-center gap-2"
                       >
                         <Share2 className="w-4 h-4" />
-                        Compartilhar
+                        <span className="hidden sm:inline">Compartilhar</span>
                       </button>
                       <button
                         onClick={() => setShowDeleteFilterModal(true)}
                         disabled={bulkDeleteEventosMutation.isPending || eventos.length === 0}
-                        className="ml-auto px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium disabled:opacity-50 flex items-center gap-2"
+                        className="px-3 sm:px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium text-sm sm:text-base disabled:opacity-50 flex items-center justify-center gap-2"
                       >
                         <Trash2 className="w-4 h-4" />
-                        Deletar Agenda
+                        <span className="hidden sm:inline">Deletar</span>
                       </button>
                     </div>
 
@@ -906,6 +906,16 @@ export default function MinhaAgenda() {
                   eventos={filteredEventos}
                   onStatusChange={refetchEventos}
                   isLoading={false}
+                  anuncianteId={selectedAnuncianteId || undefined}
+                  onDeleteAgenda={() => {
+                    if (
+                      confirm(
+                        "Tem certeza que deseja deletar toda a agenda? Todos os eventos serão removidos."
+                      )
+                    ) {
+                      deleteAgendaMutation.mutate();
+                    }
+                  }}
                 />
               </div>
             )}
