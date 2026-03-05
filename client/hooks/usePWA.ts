@@ -76,9 +76,19 @@ export const usePWA = (): UsePWAReturn => {
   useEffect(() => {
     // Check if app is installed
     if ('getInstalledRelatedApps' in navigator) {
-      (navigator as any).getInstalledRelatedApps?.().then((apps: any[]) => {
-        setIsInstalled(apps.length > 0);
-      });
+      try {
+        (navigator as any).getInstalledRelatedApps?.().then((apps: any[]) => {
+          setIsInstalled(apps.length > 0);
+        }).catch((error: any) => {
+          // This API only works in top-level browsing contexts, not in iframes
+          console.debug('[PWA] getInstalledRelatedApps not available:', error.message);
+          setIsInstalled(false);
+        });
+      } catch (error) {
+        // Handle sync errors
+        console.debug('[PWA] Error checking installed apps:', error);
+        setIsInstalled(false);
+      }
     }
 
     // Check for install prompt
