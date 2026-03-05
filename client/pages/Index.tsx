@@ -306,12 +306,14 @@ export default function Index() {
     .slice(0, 100);
 
   // Job opportunities - only show if destaque=true and status=ativo
+  // Allow price > 0 or "A Combinar" (aCombinar=true), but reject donations
   const destaqueOportunidades = allAnuncios
     .filter(
       (anuncio: any) =>
         isMainPageEligible(anuncio) &&
-        !isGratis(anuncio) &&
+        !anuncio.isDoacao &&
         anuncio.tipo === "oportunidade" &&
+        (anuncio.preco > 0 || anuncio.aCombinar) &&
         matchesLocalidade(anuncio),
     )
     .slice(0, 100);
