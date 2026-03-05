@@ -16,6 +16,7 @@ import {
   Tag,
   Briefcase,
   User,
+  Send,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -88,6 +89,11 @@ const CONTACT_TYPES = [
   "Consultor",
   "Outro",
 ];
+
+// Helper function to format phone number for WhatsApp (remove special characters)
+const formatWhatsAppPhone = (phone: string): string => {
+  return phone.replace(/\D/g, "");
+};
 
 // Helper function to format date to Brazilian format (DD/MM/YYYY HH:MM:SS)
 const formatarData = (data: string | undefined): string => {
@@ -887,10 +893,32 @@ export default function CadastroContatos() {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex gap-2 p-4 border-t border-gray-100">
+                    <div className="flex gap-2 p-4 border-t border-gray-100 flex-wrap">
+                      {contato.email && (
+                        <a
+                          href={`mailto:${contato.email}`}
+                          className="flex-1 min-w-[120px] flex items-center justify-center gap-2 px-3 py-2 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 transition-colors"
+                          title={`Enviar e-mail para ${contato.email}`}
+                        >
+                          <Mail className="w-4 h-4" />
+                          E-mail
+                        </a>
+                      )}
+                      {contato.celular && (
+                        <a
+                          href={`https://wa.me/${formatWhatsAppPhone(contato.celular)}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex-1 min-w-[120px] flex items-center justify-center gap-2 px-3 py-2 bg-green-50 text-green-600 rounded-lg hover:bg-green-100 transition-colors"
+                          title={`Enviar WhatsApp para ${contato.celular}`}
+                        >
+                          <Send className="w-4 h-4" />
+                          WhatsApp
+                        </a>
+                      )}
                       <button
                         onClick={() => handleEdit(contato)}
-                        className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 text-vitrii-blue rounded-lg hover:bg-blue-100 transition-colors"
+                        className="flex-1 min-w-[120px] flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 text-vitrii-blue rounded-lg hover:bg-blue-100 transition-colors"
                       >
                         <Edit2 className="w-4 h-4" />
                         Editar
@@ -898,7 +926,7 @@ export default function CadastroContatos() {
                       <button
                         onClick={() => handleDelete(contato.id)}
                         disabled={deleteContatoMutation.isPending}
-                        className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 disabled:bg-gray-100 transition-colors"
+                        className="flex-1 min-w-[120px] flex items-center justify-center gap-2 px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 disabled:bg-gray-100 transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
                         Deletar
