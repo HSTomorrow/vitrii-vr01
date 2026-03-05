@@ -1,0 +1,68 @@
+{
+  "expo": {
+    "name": "Vitrii",
+    "slug": "vitrii",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#025CB6"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTabletMode": true,
+      "bundleIdentifier": "com.herestomorrow.vitrii",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Vitrii precisa de sua localização para mostrar anúncios próximos a você",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "Vitrii precisa de sua localização para mostrar anúncios próximos a você",
+        "NSCameraUsageDescription": "Vitrii usa a câmera para scannear QR codes e publicar fotos",
+        "NSPhotoLibraryUsageDescription": "Vitrii acessa sua galeria para publicar fotos"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#025CB6"
+      },
+      "package": "com.herestomorrow.vitrii",
+      "versionCode": 1,
+      "permissions": [
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Vitrii precisa de sua localização"
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Vitrii acessa sua galeria para publicar fotos",
+          "cameraPermission": "Vitrii usa a câmera para publicar fotos"
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "YOUR_EAS_PROJECT_ID"
+      }
+    },
+    "owner": "herestomorrow"
+  }
+}
