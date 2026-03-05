@@ -1,15 +1,10 @@
 import { Link } from "react-router-dom";
 import { Facebook, Instagram, Twitter, Mail } from "lucide-react";
-import InstallAppSection from "./InstallAppSection";
 
 export default function Footer() {
   return (
     <footer className="bg-vitrii-text text-white mt-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Install App Section */}
-        <div className="mb-12">
-          <InstallAppSection />
-        </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
           {/* About */}
           <div>
