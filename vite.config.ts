@@ -11,13 +11,7 @@ export default defineConfig(({ mode }) => ({
       allow: [".", "./client", "./shared"],
       deny: [".env", ".env.*", "*.{crt,pem}", "**/.git/**"],
     },
-    middlewareMode: false,
-    hmr: {
-      protocol: 'ws',
-      host: 'localhost',
-      port: 8080,
-      timeout: 10000,
-    },
+    middlewareMode: true,
   },
   build: {
     outDir: "dist/spa",
