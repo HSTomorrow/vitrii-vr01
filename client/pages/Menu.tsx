@@ -20,6 +20,8 @@ import {
   Package,
   Calendar,
   Phone,
+  Star,
+  Gift,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
@@ -145,7 +147,7 @@ export default function Menu() {
                     to="/favoritos"
                     className="flex items-center gap-4 px-6 py-4 bg-vitrii-gray hover:bg-gray-200 rounded-lg transition-colors"
                   >
-                    <Heart className="w-6 h-6 text-red-500" />
+                    <Star className="w-6 h-6 fill-yellow-400 text-yellow-400" />
                     <span className="text-vitrii-text font-medium">
                       Meus Favoritos
                     </span>
@@ -155,7 +157,7 @@ export default function Menu() {
                     to="/lista-desejos"
                     className="flex items-center gap-4 px-6 py-4 bg-vitrii-gray hover:bg-gray-200 rounded-lg transition-colors"
                   >
-                    <Heart className="w-6 h-6 text-pink-500" />
+                    <Gift className="w-6 h-6 text-vitrii-blue" />
                     <span className="text-vitrii-text font-medium">
                       Lista de Desejos
                     </span>
