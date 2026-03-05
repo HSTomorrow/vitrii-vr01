@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useState, useEffect } from "react";
 import { X, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 
