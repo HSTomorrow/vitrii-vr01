@@ -318,15 +318,6 @@ export default function AnunciosCarousel({
                         ? "Gratuito"
                         : "A Combinar"}
                 </span>
-                <div className="flex items-center space-x-0.5 hover:scale-110 transition-transform duration-300 origin-right">
-                  <svg
-                    className="w-3 h-3 fill-vitrii-yellow text-vitrii-yellow"
-                    viewBox="0 0 24 24"
-                  >
-                    <polygon points="12 2 15.09 10.26 24 10.26 17.55 15.74 19.64 24 12 19.52 4.36 24 6.45 15.74 0 10.26 8.91 10.26" />
-                  </svg>
-                  <span className="text-xs font-semibold">5.0</span>
-                </div>
               </div>
             </div>
           </div>

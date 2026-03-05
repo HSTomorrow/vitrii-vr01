@@ -215,10 +215,6 @@ export default function AdCard({
               ? "Grátis"
               : `R$ ${anuncio.tabelaDePreco?.preco ? Number(anuncio.tabelaDePreco.preco).toFixed(2) : "0.00"}`}
           </span>
-          <div className="flex items-center space-x-1">
-            <Star className="w-4 h-4 fill-vitrii-yellow text-vitrii-yellow" />
-            <span className="text-sm font-semibold">5.0</span>
-          </div>
         </div>
 
         {(anunciante?.temAgenda || anuncio.anunciante?.temAgenda) ? (

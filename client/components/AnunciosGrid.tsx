@@ -279,7 +279,7 @@ export default function AnunciosGrid({
                 </div>
               </div>
 
-              <div className="flex justify-between items-center mb-3 mt-auto">
+              <div className="mb-3 mt-auto">
                 <span
                   className={`text-lg font-bold transition-all duration-300 hover:scale-110 origin-left ${
                     color === "green"
@@ -295,15 +295,6 @@ export default function AnunciosGrid({
                     ? "Grátis"
                     : `R$ ${anuncio.preco ? Number(anuncio.preco).toFixed(2) : "0.00"}`}
                 </span>
-                <div className="flex items-center space-x-1 hover:scale-110 transition-transform duration-300 origin-right">
-                  <svg
-                    className="w-3.5 h-3.5 fill-vitrii-yellow text-vitrii-yellow"
-                    viewBox="0 0 24 24"
-                  >
-                    <polygon points="12 2 15.09 10.26 24 10.26 17.55 15.74 19.64 24 12 19.52 4.36 24 6.45 15.74 0 10.26 8.91 10.26" />
-                  </svg>
-                  <span className="text-xs font-semibold">5.0</span>
-                </div>
               </div>
 
               {anuncio.anunciantes?.temAgenda ? (
