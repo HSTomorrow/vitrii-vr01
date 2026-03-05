@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Facebook, Instagram, Twitter, Mail } from "lucide-react";
+import { Facebook, Instagram, Twitter, Mail, Download } from "lucide-react";
 
 export default function Footer() {
   return (
@@ -91,6 +91,40 @@ export default function Footer() {
                   className="hover:text-vitrii-blue transition-colors"
                 >
                   Termos de Uso
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Instalar */}
+          <div>
+            <h4 className="font-semibold mb-4 text-vitrii-yellow flex items-center gap-2">
+              <Download className="w-5 h-5" />
+              Instalar App
+            </h4>
+            <ul className="space-y-2 text-sm text-white">
+              <li>
+                <Link
+                  to="/install-ios"
+                  className="hover:text-vitrii-blue transition-colors"
+                >
+                  Instalar no iOS
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/install-android"
+                  className="hover:text-vitrii-blue transition-colors"
+                >
+                  Instalar no Android
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/menu"
+                  className="hover:text-vitrii-blue transition-colors"
+                >
+                  Menu
                 </Link>
               </li>
             </ul>
