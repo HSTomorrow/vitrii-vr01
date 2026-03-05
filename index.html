@@ -50,6 +50,15 @@
       const isIOS = /iphone|ipad|ipod/.test(ua);
       const isSafariIOS = isSafari && isIOS;
 
+      // Log current route and browser info
+      console.log('[Init]', {
+        pathname: window.location.pathname,
+        href: window.location.href,
+        isSafari,
+        isIOS,
+        isSafariIOS,
+      });
+
       if (isSafariIOS) {
         document.documentElement.setAttribute('data-browser', 'safari-ios');
         console.log('[compat] Safari iOS detected - applying compatibility patches');

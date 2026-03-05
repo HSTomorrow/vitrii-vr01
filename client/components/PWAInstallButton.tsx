@@ -1,15 +1,22 @@
 import { useState, useEffect } from 'react';
 import { Download, X, Smartphone } from 'lucide-react';
 import { usePWA } from '@/hooks/usePWA';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 export default function PWAInstallButton() {
   const { isInstallable, install, isOnline, isIOS, isSafari } = usePWA();
+  const navigate = useNavigate();
   const [showPrompt, setShowPrompt] = useState(false);
   const [dismissed, setDismissed] = useState(false);
 
-  // Load dismissal state from localStorage
+  // Load dismissal state from localStorage (only on non-Safari to avoid issues)
   useEffect(() => {
+    // Don't use localStorage dismissal on Safari to avoid cache issues
+    if (isSafari) {
+      return;
+    }
+
     try {
       const isDismissed = localStorage.getItem('pwa-install-dismissed');
       if (isDismissed) {
@@ -18,7 +25,7 @@ export default function PWAInstallButton() {
     } catch (e) {
       // localStorage might not be available
     }
-  }, []);
+  }, [isSafari]);
 
   // Show button for:
   // 1. Chrome/Android when beforeinstallprompt is available
@@ -73,7 +80,10 @@ export default function PWAInstallButton() {
           {isIOS && isSafari ? (
             <>
               <button
-                onClick={() => window.location.href = '/install-ios'}
+                onClick={() => {
+                  setShowPrompt(false);
+                  navigate('/install-ios');
+                }}
                 className="w-full bg-vitrii-blue text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-semibold flex items-center justify-center gap-2"
               >
                 <Smartphone className="w-4 h-4" />
