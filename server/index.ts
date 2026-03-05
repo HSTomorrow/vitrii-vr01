@@ -127,6 +127,7 @@ import {
   getEventosByAnunciante,
   getEventosVisivelsPara,
   createEvento,
+  createEventoVisitante,
   updateEvento,
   deleteEvento,
   addPermissao,
@@ -993,6 +994,7 @@ export function createServer() {
   app.get("/api/eventos-agenda/anunciante/:anuncianteId", extractUserId, getEventosByAnunciante);
   app.get("/api/eventos-agenda/visiveis/:anuncianteId", getEventosVisivelsPara);
   app.post("/api/eventos-agenda", extractUserId, createEvento);
+  app.post("/api/eventos-agenda/visitante/criar", extractUserId, createEventoVisitante);
   app.put("/api/eventos-agenda/:id", extractUserId, updateEvento);
   app.delete("/api/eventos-agenda/:id", extractUserId, deleteEvento);
   app.post("/api/eventos-agenda/:id/permissoes", extractUserId, addPermissao);

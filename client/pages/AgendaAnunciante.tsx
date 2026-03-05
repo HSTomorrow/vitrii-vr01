@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import Header from "@/components/Header";
@@ -8,7 +8,9 @@ import Footer from "@/components/Footer";
 import EventosAgendaCalendar from "@/components/EventosAgendaCalendar";
 import ReservaEventoModal from "@/components/ReservaEventoModal";
 import ShareAgendaModal from "@/components/ShareAgendaModal";
-import { Loader, Share2, Lock, Store } from "lucide-react";
+import CriarEventoAgendaCompartilhadaModal from "@/components/CriarEventoAgendaCompartilhadaModal";
+import AdicionarFilaCompartilhadaModal from "@/components/AdicionarFilaCompartilhadaModal";
+import { Loader, Share2, Lock, Store, Plus, Clock } from "lucide-react";
 import ImageWithFallback from "@/components/ImageWithFallback";
 import { getAnuncianteInitials } from "@/utils/imageFallback";
 
@@ -31,10 +33,13 @@ interface Anunciante {
 export default function AgendaAnunciante() {
   const { anuncianteId } = useParams<{ anuncianteId: string }>();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const userIdStr = user?.id?.toString() || "";
   const [selectedEvento, setSelectedEvento] = useState<Evento | null>(null);
   const [isReservaModalOpen, setIsReservaModalOpen] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [isCreateEventoModalOpen, setIsCreateEventoModalOpen] = useState(false);
+  const [isCreateFilaModalOpen, setIsCreateFilaModalOpen] = useState(false);
 
   // Fetch announcer info
   const { data: anunciante, isLoading: isLoadingAnunciante } =
@@ -81,6 +86,13 @@ export default function AgendaAnunciante() {
     }
     setSelectedEvento(evento);
     setIsReservaModalOpen(true);
+  };
+
+  const handleEventoSuccess = () => {
+    // Refetch events
+    queryClient.invalidateQueries({
+      queryKey: ["eventos-visiveis", anuncianteId, user?.id],
+    });
   };
 
   if (isLoading) {
@@ -138,14 +150,36 @@ export default function AgendaAnunciante() {
             </div>
           </div>
 
-          {/* Share Button */}
-          <button
-            onClick={() => setShowShareModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-blue-600 transition-colors font-semibold"
-          >
-            <Share2 className="w-5 h-5" />
-            Compartilhar Agenda
-          </button>
+          {/* Action Buttons */}
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setShowShareModal(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-blue-600 transition-colors font-semibold"
+            >
+              <Share2 className="w-5 h-5" />
+              Compartilhar Agenda
+            </button>
+
+            {anuncianteId && (
+              <>
+                <button
+                  onClick={() => setIsCreateEventoModalOpen(true)}
+                  className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
+                >
+                  <Plus className="w-5 h-5" />
+                  + Evento
+                </button>
+
+                <button
+                  onClick={() => setIsCreateFilaModalOpen(true)}
+                  className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-semibold"
+                >
+                  <Clock className="w-5 h-5" />
+                  Fila de Espera
+                </button>
+              </>
+            )}
+          </div>
         </div>
 
         {/* Calendar */}
@@ -191,6 +225,26 @@ export default function AgendaAnunciante() {
           onClose={() => setShowShareModal(false)}
           anuncianteId={parseInt(anuncianteId)}
           anuncianteNome={anunciante?.nome || ""}
+        />
+      )}
+
+      {/* Create Evento Modal */}
+      {anuncianteId && (
+        <CriarEventoAgendaCompartilhadaModal
+          isOpen={isCreateEventoModalOpen}
+          anuncianteId={parseInt(anuncianteId)}
+          onClose={() => setIsCreateEventoModalOpen(false)}
+          onSuccess={handleEventoSuccess}
+        />
+      )}
+
+      {/* Create Fila Modal */}
+      {anuncianteId && (
+        <AdicionarFilaCompartilhadaModal
+          isOpen={isCreateFilaModalOpen}
+          anuncianteId={parseInt(anuncianteId)}
+          onClose={() => setIsCreateFilaModalOpen(false)}
+          onSuccess={handleEventoSuccess}
         />
       )}
     </div>

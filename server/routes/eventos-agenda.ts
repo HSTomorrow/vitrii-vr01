@@ -734,3 +734,120 @@ export const addUserToEvento: RequestHandler = async (req, res) => {
     res.status(500).json({ error: "Erro ao adicionar usuário ao evento" });
   }
 };
+
+// Create a pending event from a visitor/external user
+export const createEventoVisitante: RequestHandler = async (req, res) => {
+  try {
+    const userId = (req as any).userId;
+    const {
+      anuncianteId,
+      titulo,
+      descricao,
+      dataInicio,
+      dataFim,
+      contatoIds,
+    } = req.body;
+
+    // Validate authentication
+    if (!userId) {
+      return res.status(401).json({ error: "Usuário não autenticado" });
+    }
+
+    // Validate required fields
+    if (!titulo || !dataInicio || !dataFim || !anuncianteId) {
+      return res.status(400).json({
+        error: "Título, data início, fim e anunciante são obrigatórios",
+      });
+    }
+
+    // Validate dates
+    const inicio = new Date(dataInicio);
+    const fim = new Date(dataFim);
+    if (inicio >= fim) {
+      return res.status(400).json({
+        error: "Data de início deve ser antes da data de fim",
+      });
+    }
+
+    // Check if announcer exists
+    const anunciante = await prisma.anunciantes.findUnique({
+      where: { id: parseInt(anuncianteId) },
+    });
+
+    if (!anunciante) {
+      return res.status(404).json({ error: "Anunciante não encontrado" });
+    }
+
+    // Create event as "pendente" (pending)
+    const evento = await prisma.eventos_agenda_anunciante.create({
+      data: {
+        anuncianteId: parseInt(anuncianteId),
+        titulo,
+        descricao: descricao || null,
+        dataInicio: inicio,
+        dataFim: fim,
+        privacidade: "privado_usuarios", // Restrict to creator, admin, and announcer
+        cor: "#3B82F6",
+        status: "pendente", // External users create pending events
+      },
+      include: {
+        permissoes: {
+          select: {
+            usuarioId: true,
+          },
+        },
+      },
+    });
+
+    // Add creator permission so they can see their own event
+    await prisma.eventos_permissoes.upsert({
+      where: {
+        eventoId_usuarioId: {
+          eventoId: evento.id,
+          usuarioId: userId,
+        },
+      },
+      update: {},
+      create: {
+        eventoId: evento.id,
+        usuarioId: userId,
+      },
+    });
+
+    // Associate contacts if provided
+    if (contatoIds && Array.isArray(contatoIds) && contatoIds.length > 0) {
+      await prisma.eventos_contatos.createMany({
+        data: contatoIds.map(contatoId => ({
+          eventoId: evento.id,
+          contatoId: parseInt(contatoId),
+        })),
+        skipDuplicates: true,
+      });
+    }
+
+    // Refetch with updated contacts
+    const eventoAtualizado = await prisma.eventos_agenda_anunciante.findUnique({
+      where: { id: evento.id },
+      include: {
+        contatos: {
+          select: {
+            contatoId: true,
+          },
+        },
+        permissoes: {
+          select: {
+            usuarioId: true,
+          },
+        },
+      },
+    });
+
+    res.status(201).json({
+      data: eventoAtualizado,
+      message: "Evento pendente criado com sucesso. Aguardando aprovação do anunciante.",
+    });
+  } catch (error) {
+    console.error("[createEventoVisitante]", error);
+    res.status(500).json({ error: "Erro ao criar evento" });
+  }
+};
