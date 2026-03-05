@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { X, Search, ChevronLeft, ChevronRight, Check, Plus } from "lucide-react";
+import { X, Search, ChevronLeft, ChevronRight, Check, Plus, Info } from "lucide-react";
 import { toast } from "sonner";
 import NewContatoModal from "./NewContatoModal";
+import ContactDetailsModal from "./ContactDetailsModal";
 
 interface Contato {
   id: number;
@@ -10,6 +11,15 @@ interface Contato {
   telefone?: string;
   email?: string;
   tipoContato: string;
+  status?: "ativo" | "inativo" | "analise";
+  observacoes?: string;
+  imagem?: string;
+  dataCriacao?: string;
+  dataAtualizacao?: string;
+  usuarioId?: number;
+  anuncianteId?: number | null;
+  usuario?: { id: number; nome: string; email: string };
+  anunciante?: { id: number; nome: string } | null;
 }
 
 interface ContatoSelectorModalProps {
@@ -36,6 +46,8 @@ export default function ContatoSelectorModal({
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [showNewContatoModal, setShowNewContatoModal] = useState(false);
+  const [showContactDetails, setShowContactDetails] = useState(false);
+  const [selectedContatoForDetails, setSelectedContatoForDetails] = useState<Contato | null>(null);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -151,35 +163,46 @@ export default function ContatoSelectorModal({
               {contatosExibidos.map((contato) => {
                 const isSelected = selectedContatoIds.includes(contato.id);
                 return (
-                  <button
+                  <div
                     key={contato.id}
-                    onClick={() => handleSelectContato(contato.id)}
-                    className={`w-full text-left p-3 rounded-lg border transition-colors ${
+                    className={`w-full text-left p-3 rounded-lg border transition-colors flex items-start gap-2 ${
                       isSelected
                         ? "border-vitrii-blue bg-blue-50"
                         : "border-gray-200 bg-white hover:bg-gray-50"
                     }`}
                   >
-                    <div className="flex items-start gap-3">
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <h3 className="font-semibold text-vitrii-text truncate">
-                            {contato.nome}
-                          </h3>
-                          {isSelected && (
-                            <Check className="w-5 h-5 text-vitrii-blue flex-shrink-0" />
-                          )}
-                        </div>
-                        <div className="text-xs text-gray-600 space-y-1 mt-1">
-                          <p>{contato.celular}</p>
-                          {contato.email && <p>{contato.email}</p>}
-                          <p className="text-vitrii-blue font-medium">
-                            {contato.tipoContato}
-                          </p>
-                        </div>
+                    <button
+                      onClick={() => handleSelectContato(contato.id)}
+                      className="flex-1 text-left"
+                    >
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-semibold text-vitrii-text truncate">
+                          {contato.nome}
+                        </h3>
+                        {isSelected && (
+                          <Check className="w-5 h-5 text-vitrii-blue flex-shrink-0" />
+                        )}
                       </div>
-                    </div>
-                  </button>
+                      <div className="text-xs text-gray-600 space-y-1 mt-1">
+                        <p>{contato.celular}</p>
+                        {contato.email && <p>{contato.email}</p>}
+                        <p className="text-vitrii-blue font-medium">
+                          {contato.tipoContato}
+                        </p>
+                      </div>
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedContatoForDetails(contato);
+                        setShowContactDetails(true);
+                      }}
+                      className="p-2 text-gray-600 hover:text-vitrii-blue hover:bg-blue-50 rounded transition-colors flex-shrink-0"
+                      title="Ver detalhes"
+                    >
+                      <Info className="w-5 h-5" />
+                    </button>
+                  </div>
                 );
               })}
             </div>
@@ -234,6 +257,16 @@ export default function ContatoSelectorModal({
           onClose={() => setShowNewContatoModal(false)}
           onSuccess={handleNewContatoSuccess}
           existingContatos={contatos}
+        />
+
+        {/* Contact Details Modal */}
+        <ContactDetailsModal
+          isOpen={showContactDetails}
+          contato={selectedContatoForDetails}
+          onClose={() => {
+            setShowContactDetails(false);
+            setSelectedContatoForDetails(null);
+          }}
         />
       </div>
     </div>

@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { X, ChevronDown, Plus } from "lucide-react";
+import { X, ChevronDown, Plus, Info } from "lucide-react";
 import { toast } from "sonner";
 import ContatoSelectorModal from "./ContatoSelectorModal";
+import ContactDetailsModal from "./ContactDetailsModal";
 
 interface Evento {
   id: number;
@@ -22,6 +23,14 @@ interface Contato {
   email?: string;
   tipoContato: string;
   imagem?: string;
+  status?: "ativo" | "inativo" | "analise";
+  observacoes?: string;
+  dataCriacao?: string;
+  dataAtualizacao?: string;
+  usuarioId?: number;
+  anuncianteId?: number | null;
+  usuario?: { id: number; nome: string; email: string };
+  anunciante?: { id: number; nome: string } | null;
 }
 
 interface EventoModalProps {
@@ -80,6 +89,8 @@ export default function EventoModal({
   const [contatos, setContatos] = useState<Contato[]>([]);
   const [isLoadingContatos, setIsLoadingContatos] = useState(false);
   const [showContatoSelector, setShowContatoSelector] = useState(false);
+  const [showContactDetails, setShowContactDetails] = useState(false);
+  const [selectedContatoForDetails, setSelectedContatoForDetails] = useState<Contato | null>(null);
 
   // Fetch contatos when modal opens
   useEffect(() => {
@@ -415,26 +426,39 @@ export default function EventoModal({
                   return (
                     <div
                       key={contatoId}
-                      className="flex items-center justify-between p-2 bg-blue-50 rounded border border-blue-200"
+                      className="flex items-center justify-between gap-2 p-2 bg-blue-50 rounded border border-blue-200"
                     >
-                      <div className="text-sm">
+                      <div className="text-sm flex-1">
                         <div className="font-medium text-vitrii-text">{contato.nome}</div>
                         <div className="text-xs text-gray-600">{contato.tipoContato}</div>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setFormData({
-                            ...formData,
-                            contatosPermitidos: formData.contatosPermitidos.filter(
-                              (id) => id !== contatoId
-                            ),
-                          });
-                        }}
-                        className="text-xs px-2 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200 transition-colors"
-                      >
-                        Remover
-                      </button>
+                      <div className="flex gap-1 flex-shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setSelectedContatoForDetails(contato);
+                            setShowContactDetails(true);
+                          }}
+                          className="p-1 text-gray-600 hover:text-vitrii-blue hover:bg-blue-100 rounded transition-colors"
+                          title="Ver detalhes"
+                        >
+                          <Info className="w-4 h-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setFormData({
+                              ...formData,
+                              contatosPermitidos: formData.contatosPermitidos.filter(
+                                (id) => id !== contatoId
+                              ),
+                            });
+                          }}
+                          className="text-xs px-2 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200 transition-colors"
+                        >
+                          Remover
+                        </button>
+                      </div>
                     </div>
                   );
                 })}
@@ -498,6 +522,16 @@ export default function EventoModal({
         selectedContatoIds={formData.contatosPermitidos}
         anuncianteId={anuncianteId}
         userId={userId}
+      />
+
+      {/* Contact Details Modal */}
+      <ContactDetailsModal
+        isOpen={showContactDetails}
+        contato={selectedContatoForDetails}
+        onClose={() => {
+          setShowContactDetails(false);
+          setSelectedContatoForDetails(null);
+        }}
       />
     </div>
   );

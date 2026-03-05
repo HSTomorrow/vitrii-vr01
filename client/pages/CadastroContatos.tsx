@@ -22,6 +22,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import ImageWithFallback from "@/components/ImageWithFallback";
 import { getUserInitials } from "@/utils/imageFallback";
+import ContactDetailsModal from "@/components/ContactDetailsModal";
 
 interface Contato {
   id: number;
@@ -129,6 +130,8 @@ export default function CadastroContatos() {
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM_DATA);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [showContactDetails, setShowContactDetails] = useState(false);
+  const [selectedContatoForDetails, setSelectedContatoForDetails] = useState<Contato | null>(null);
   const ITEMS_PER_PAGE = 20;
 
   // Reset to page 1 when search term changes
@@ -427,6 +430,11 @@ export default function CadastroContatos() {
     if (confirm("Tem certeza que deseja deletar este contato?")) {
       deleteContatoMutation.mutate(contatoId);
     }
+  };
+
+  const handleShowDetails = (contato: Contato) => {
+    setSelectedContatoForDetails(contato);
+    setShowContactDetails(true);
   };
 
   const filteredContatos =
@@ -902,6 +910,13 @@ export default function CadastroContatos() {
 
                     {/* Action Buttons */}
                     <div className="flex gap-2 p-4 border-t border-gray-100 flex-wrap">
+                      <button
+                        onClick={() => handleShowDetails(contato)}
+                        className="flex-1 min-w-[120px] flex items-center justify-center gap-2 px-3 py-2 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition-colors"
+                      >
+                        <MessageSquare className="w-4 h-4" />
+                        Ver Detalhes
+                      </button>
                       {contato.email && (
                         <a
                           href={`mailto:${contato.email}`}
@@ -973,6 +988,15 @@ export default function CadastroContatos() {
           </div>
         </div>
       </main>
+
+      <ContactDetailsModal
+        isOpen={showContactDetails}
+        contato={selectedContatoForDetails}
+        onClose={() => {
+          setShowContactDetails(false);
+          setSelectedContatoForDetails(null);
+        }}
+      />
 
       <Footer />
     </div>
