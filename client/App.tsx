@@ -51,6 +51,8 @@ import AdminLocalidades from "./pages/AdminLocalidades";
 import Menu from "./pages/Menu";
 import MeusAnuncios from "./pages/MeusAnuncios";
 import MinhaAgenda from "./pages/MinhaAgenda";
+import InstallIOS from "./pages/InstallIOS";
+import InstallAndroid from "./pages/InstallAndroid";
 import AgendaAnunciante from "./pages/AgendaAnunciante";
 import AnuncianteProfile from "./pages/AnuncianteProfile";
 import HelpAndContact from "./pages/HelpAndContact";
@@ -191,6 +193,8 @@ function AppContent() {
           />
           <Route path="/agenda" element={<Agenda />} />
           <Route path="/menu" element={<Menu />} />
+          <Route path="/install-ios" element={<InstallIOS />} />
+          <Route path="/install-android" element={<InstallAndroid />} />
           {/* Redirect old cadastros/* routes to cadastro-* */}
           <Route path="/cadastros/lojas" element={<Navigate to="/cadastro-lojas" replace />} />
           <Route path="/cadastros/productos" element={<Navigate to="/cadastro-productos" replace />} />
