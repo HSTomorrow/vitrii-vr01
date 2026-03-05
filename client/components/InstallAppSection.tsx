@@ -102,7 +102,7 @@ export default function InstallAppSection() {
             <div className="mb-6 flex items-center justify-center bg-white p-3 rounded-lg border border-green-300">
               <div className="text-center">
                 <p className="text-xs text-green-700 font-semibold mb-2">Escaneie o QR Code</p>
-                <QRCode
+                <QRCodeSVG
                   value={appUrl}
                   size={120}
                   level="H"
@@ -205,7 +205,7 @@ export default function InstallAppSection() {
             <div className="mb-6 flex items-center justify-center bg-white p-3 rounded-lg border border-green-300">
               <div className="text-center">
                 <p className="text-xs text-green-700 font-semibold mb-2">Escaneie o QR Code</p>
-                <QRCode
+                <QRCodeSVG
                   value={appUrl}
                   size={120}
                   level="H"
