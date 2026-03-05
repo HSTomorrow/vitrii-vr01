@@ -126,6 +126,10 @@ export const createContato: RequestHandler = async (req, res) => {
       });
     }
 
+    // Create contact with auto-linked creator user
+    const usuariosParaAdicionar = new Set(validatedData.usuariosIds || []);
+    usuariosParaAdicionar.add(usuarioId); // Auto-add creator
+
     const contato = await prisma.contatos.create({
       data: {
         anuncianteId: parseInt(anuncianteId),
@@ -138,10 +142,10 @@ export const createContato: RequestHandler = async (req, res) => {
         observacoes: validatedData.observacoes || null,
         imagem: validatedData.imagem || null,
         usuarios:
-          validatedData.usuariosIds && validatedData.usuariosIds.length > 0
+          usuariosParaAdicionar.size > 0
             ? {
-                create: validatedData.usuariosIds.map((usuarioId) => ({
-                  usuarioId,
+                create: Array.from(usuariosParaAdicionar).map((id) => ({
+                  usuarioId: id,
                 })),
               }
             : undefined,
@@ -191,7 +195,30 @@ export const updateContato: RequestHandler = async (req, res) => {
     const usuarioId = parseInt(req.headers["x-user-id"] as string || "0");
     const validatedData = ContatoUpdateSchema.parse(req.body);
 
-    // Verify user is the announcer
+    // Get user info to check if admin
+    const usuario = await prisma.usracessos.findUnique({
+      where: { id: usuarioId },
+      select: { tipoUsuario: true },
+    });
+
+    if (!usuario) {
+      return res.status(401).json({
+        success: false,
+        error: "Usuário não encontrado",
+      });
+    }
+
+    // Only admins can edit contacts
+    const isAdmin = usuario.tipoUsuario === "adm";
+
+    if (!isAdmin) {
+      return res.status(403).json({
+        success: false,
+        error: "Apenas administradores podem editar contatos",
+      });
+    }
+
+    // Verify announcer exists
     const anunciante = await prisma.anunciantes.findUnique({
       where: { id: parseInt(anuncianteId) },
       select: {
@@ -207,17 +234,6 @@ export const updateContato: RequestHandler = async (req, res) => {
       return res.status(404).json({
         success: false,
         error: "Anunciante não encontrado",
-      });
-    }
-
-    const isOwner = anunciante.usuarios_anunciantes.some(
-      (ua) => ua.usuarioId === usuarioId
-    );
-
-    if (!isOwner) {
-      return res.status(403).json({
-        success: false,
-        error: "Apenas o anunciante pode editar contatos",
       });
     }
 
@@ -289,7 +305,30 @@ export const deleteContato: RequestHandler = async (req, res) => {
     const { anuncianteId, contatoId } = req.params;
     const usuarioId = parseInt(req.headers["x-user-id"] as string || "0");
 
-    // Verify user is the announcer
+    // Get user info to check if admin
+    const usuario = await prisma.usracessos.findUnique({
+      where: { id: usuarioId },
+      select: { tipoUsuario: true },
+    });
+
+    if (!usuario) {
+      return res.status(401).json({
+        success: false,
+        error: "Usuário não encontrado",
+      });
+    }
+
+    // Only admins can delete contacts
+    const isAdmin = usuario.tipoUsuario === "adm";
+
+    if (!isAdmin) {
+      return res.status(403).json({
+        success: false,
+        error: "Apenas administradores podem deletar contatos",
+      });
+    }
+
+    // Verify announcer exists
     const anunciante = await prisma.anunciantes.findUnique({
       where: { id: parseInt(anuncianteId) },
       select: {
@@ -305,17 +344,6 @@ export const deleteContato: RequestHandler = async (req, res) => {
       return res.status(404).json({
         success: false,
         error: "Anunciante não encontrado",
-      });
-    }
-
-    const isOwner = anunciante.usuarios_anunciantes.some(
-      (ua) => ua.usuarioId === usuarioId
-    );
-
-    if (!isOwner) {
-      return res.status(403).json({
-        success: false,
-        error: "Apenas o anunciante pode deletar contatos",
       });
     }
 
@@ -355,7 +383,30 @@ export const addUsuarioToContato: RequestHandler = async (req, res) => {
     const { usuarioId } = req.body;
     const userId = parseInt(req.headers["x-user-id"] as string || "0");
 
-    // Verify user is the announcer
+    // Get user info to check if admin
+    const usuario = await prisma.usracessos.findUnique({
+      where: { id: userId },
+      select: { tipoUsuario: true },
+    });
+
+    if (!usuario) {
+      return res.status(401).json({
+        success: false,
+        error: "Usuário não encontrado",
+      });
+    }
+
+    // Only admins can modify contact users
+    const isAdmin = usuario.tipoUsuario === "adm";
+
+    if (!isAdmin) {
+      return res.status(403).json({
+        success: false,
+        error: "Apenas administradores podem adicionar usuários a contatos",
+      });
+    }
+
+    // Verify announcer exists
     const anunciante = await prisma.anunciantes.findUnique({
       where: { id: parseInt(anuncianteId) },
       select: {
@@ -371,17 +422,6 @@ export const addUsuarioToContato: RequestHandler = async (req, res) => {
       return res.status(404).json({
         success: false,
         error: "Anunciante não encontrado",
-      });
-    }
-
-    const isOwner = anunciante.usuarios_anunciantes.some(
-      (ua) => ua.usuarioId === userId
-    );
-
-    if (!isOwner) {
-      return res.status(403).json({
-        success: false,
-        error: "Apenas o anunciante pode adicionar usuários",
       });
     }
 
@@ -439,7 +479,30 @@ export const removeUsuarioFromContato: RequestHandler = async (req, res) => {
     const { anuncianteId, contatoId, usuarioId } = req.params;
     const userId = parseInt(req.headers["x-user-id"] as string || "0");
 
-    // Verify user is the announcer
+    // Get user info to check if admin
+    const usuario = await prisma.usracessos.findUnique({
+      where: { id: userId },
+      select: { tipoUsuario: true },
+    });
+
+    if (!usuario) {
+      return res.status(401).json({
+        success: false,
+        error: "Usuário não encontrado",
+      });
+    }
+
+    // Only admins can modify contact users
+    const isAdmin = usuario.tipoUsuario === "adm";
+
+    if (!isAdmin) {
+      return res.status(403).json({
+        success: false,
+        error: "Apenas administradores podem remover usuários de contatos",
+      });
+    }
+
+    // Verify announcer exists
     const anunciante = await prisma.anunciantes.findUnique({
       where: { id: parseInt(anuncianteId) },
       select: {
@@ -455,17 +518,6 @@ export const removeUsuarioFromContato: RequestHandler = async (req, res) => {
       return res.status(404).json({
         success: false,
         error: "Anunciante não encontrado",
-      });
-    }
-
-    const isOwner = anunciante.usuarios_anunciantes.some(
-      (ua) => ua.usuarioId === userId
-    );
-
-    if (!isOwner) {
-      return res.status(403).json({
-        success: false,
-        error: "Apenas o anunciante pode remover usuários",
       });
     }
 
