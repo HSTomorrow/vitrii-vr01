@@ -94,7 +94,7 @@ export default function MinhaAgenda() {
   }, [showReservasFor]);
 
   // Fetch eventos for selected anunciante
-  const { data: eventos = [], refetch: refetchEventos } = useQuery<Evento[]>({
+  const { data: eventos = [], refetch: refetchEventos, isLoading: isLoadingEventos } = useQuery<Evento[]>({
     queryKey: ["eventos-agenda", selectedAnuncianteId],
     queryFn: async () => {
       if (!selectedAnuncianteId) return [];
@@ -432,58 +432,71 @@ export default function MinhaAgenda() {
             {/* Tab Content */}
             {activeTab === "calendar" && (
               <>
-                <div className="flex gap-3 mb-6 flex-wrap">
-                  <button
-                    onClick={handleAddEvento}
-                    className="px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
-                  >
-                    + Adicionar Evento
-                  </button>
-                  <button
-                    onClick={() => setShowFilaDeEsperaModal(true)}
-                    className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium"
-                  >
-                    + Fila de Espera
-                  </button>
-                  <button
-                    onClick={() => setShowEditorModal(true)}
-                    className="px-4 py-2 bg-blue-400 text-white rounded-lg hover:bg-blue-500 transition-colors font-medium flex items-center gap-2"
-                  >
-                    <Settings className="w-4 h-4" />
-                    Editar Agenda
-                  </button>
-                  <button
-                    onClick={() => setShowShareModal(true)}
-                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center gap-2"
-                  >
-                    <Share2 className="w-4 h-4" />
-                    Compartilhar
-                  </button>
-                  <button
-                    onClick={() => {
-                      if (
-                        confirm(
-                          "Tem certeza que deseja deletar esta agenda? Todos os eventos serão removidos."
-                        )
-                      ) {
-                        deleteAgendaMutation.mutate();
-                      }
-                    }}
-                    disabled={deleteAgendaMutation.isPending}
-                    className="ml-auto px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium disabled:opacity-50 flex items-center gap-2"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                    Deletar Agenda
-                  </button>
-                </div>
+                {isLoadingEventos ? (
+                  <div className="w-full bg-white rounded-lg shadow-md p-6">
+                    <div className="text-center py-12">
+                      <div className="inline-block">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-vitrii-blue"></div>
+                      </div>
+                      <p className="text-vitrii-text-secondary mt-4">Carregando agenda...</p>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex gap-3 mb-6 flex-wrap">
+                      <button
+                        onClick={handleAddEvento}
+                        className="px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-blue-600 transition-colors font-medium"
+                      >
+                        + Adicionar Evento
+                      </button>
+                      <button
+                        onClick={() => setShowFilaDeEsperaModal(true)}
+                        className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium"
+                      >
+                        + Fila de Espera
+                      </button>
+                      <button
+                        onClick={() => setShowEditorModal(true)}
+                        className="px-4 py-2 bg-blue-400 text-white rounded-lg hover:bg-blue-500 transition-colors font-medium flex items-center gap-2"
+                      >
+                        <Settings className="w-4 h-4" />
+                        Editar Agenda
+                      </button>
+                      <button
+                        onClick={() => setShowShareModal(true)}
+                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium flex items-center gap-2"
+                      >
+                        <Share2 className="w-4 h-4" />
+                        Compartilhar
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (
+                            confirm(
+                              "Tem certeza que deseja deletar esta agenda? Todos os eventos serão removidos."
+                            )
+                          ) {
+                            deleteAgendaMutation.mutate();
+                          }
+                        }}
+                        disabled={deleteAgendaMutation.isPending}
+                        className="ml-auto px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium disabled:opacity-50 flex items-center gap-2"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Deletar Agenda
+                      </button>
+                    </div>
 
-                <EventosAgendaCalendar
-                  eventos={eventos}
-                  onSelectDate={handleSelectDate}
-                  onSelectEvento={handleSelectEvento}
-                  onAddEvento={handleAddEvento}
-                  isEditable={true}
-                />
+                    <EventosAgendaCalendar
+                      eventos={eventos}
+                      onSelectDate={handleSelectDate}
+                      onSelectEvento={handleSelectEvento}
+                      onAddEvento={handleAddEvento}
+                      isEditable={true}
+                    />
+                  </>
+                )}
 
                 {/* Quick add for selected date */}
                 {selectedDate && (
