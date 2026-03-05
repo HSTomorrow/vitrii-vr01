@@ -62,6 +62,7 @@ export default function StatusAgenda({
   const [selectedStatuses, setSelectedStatuses] = useState<Set<string>>(
     new Set(["pendente", "pendente_pagamento"])
   );
+  const [selectedEventoIds, setSelectedEventoIds] = useState<Set<number>>(new Set());
 
   const sortedEventos = useMemo(() => {
     return [...eventos].sort(
@@ -98,6 +99,87 @@ export default function StatusAgenda({
       newStatuses.add(status);
     }
     setSelectedStatuses(newStatuses);
+  };
+
+  const toggleEventoSelection = (eventoId: number) => {
+    const newSelected = new Set(selectedEventoIds);
+    if (newSelected.has(eventoId)) {
+      newSelected.delete(eventoId);
+    } else {
+      newSelected.add(eventoId);
+    }
+    setSelectedEventoIds(newSelected);
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedEventoIds.size === filteredEventos.length) {
+      setSelectedEventoIds(new Set());
+    } else {
+      setSelectedEventoIds(new Set(filteredEventos.map((e) => e.id)));
+    }
+  };
+
+  const handleBulkStatusChange = async (newStatus: string) => {
+    if (selectedEventoIds.size === 0) {
+      toast.error("Selecione pelo menos um evento");
+      return;
+    }
+
+    try {
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (user?.id) {
+        headers["x-user-id"] = user.id.toString();
+      }
+
+      for (const eventoId of selectedEventoIds) {
+        await fetch(`/api/eventos-agenda/${eventoId}/status`, {
+          method: "PATCH",
+          headers,
+          body: JSON.stringify({ status: newStatus }),
+        });
+      }
+
+      toast.success(`Status de ${selectedEventoIds.size} evento(s) alterado(s)`);
+      setSelectedEventoIds(new Set());
+      onStatusChange();
+    } catch (error) {
+      toast.error("Erro ao alterar status em lote");
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedEventoIds.size === 0) {
+      toast.error("Selecione pelo menos um evento");
+      return;
+    }
+
+    if (!confirm(`Tem certeza que deseja deletar ${selectedEventoIds.size} evento(s)?`)) {
+      return;
+    }
+
+    try {
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (user?.id) {
+        headers["x-user-id"] = user.id.toString();
+      }
+
+      for (const eventoId of selectedEventoIds) {
+        await fetch(`/api/eventos-agenda/${eventoId}`, {
+          method: "DELETE",
+          headers,
+        });
+      }
+
+      toast.success(`${selectedEventoIds.size} evento(s) deletado(s)`);
+      setSelectedEventoIds(new Set());
+      onStatusChange();
+    } catch (error) {
+      toast.error("Erro ao deletar eventos em lote");
+    }
   };
 
   const filteredEventos = useMemo(() => {
@@ -190,6 +272,39 @@ export default function StatusAgenda({
         </div>
       </div>
 
+      {/* Bulk Actions Toolbar */}
+      {filteredEventos.length > 0 && selectedEventoIds.size > 0 && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-center justify-between gap-3">
+          <div className="text-sm font-medium text-blue-800">
+            {selectedEventoIds.size} evento(s) selecionado(s)
+          </div>
+          <div className="flex gap-2">
+            <select
+              onChange={(e) => {
+                if (e.target.value) {
+                  handleBulkStatusChange(e.target.value);
+                  e.target.value = "";
+                }
+              }}
+              className="px-3 py-2 text-sm border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+            >
+              <option value="">Alterar status para...</option>
+              {STATUS_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <button
+              onClick={handleBulkDelete}
+              className="px-3 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+            >
+              Deletar
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Events List */}
       {filteredEventos.length === 0 ? (
         <div className="bg-white rounded-lg shadow-md p-8 text-center border border-gray-200">
@@ -211,26 +326,32 @@ export default function StatusAgenda({
             )}`}
           >
             {/* Header */}
-            <button
-              onClick={() =>
-                setExpandedEventoId(isExpanded ? null : evento.id)
-              }
-              className={`w-full p-4 flex items-center justify-between hover:opacity-90 transition-opacity ${getStatusColor(
-                evento.status
-              )}`}
-            >
-              <div className="flex items-center gap-3 flex-1 text-left">
-                <StatusIcon className="w-5 h-5 flex-shrink-0" />
-                <div>
-                  <h4 className="font-bold text-base">{evento.titulo}</h4>
-                  <p className="text-xs opacity-75">
-                    {new Date(evento.dataInicio).toLocaleDateString("pt-BR")} às{" "}
-                    {new Date(evento.dataInicio).toLocaleTimeString("pt-BR", {
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
-                  </p>
-                </div>
+            <div className={`w-full p-4 flex items-center justify-between hover:opacity-90 transition-opacity ${getStatusColor(evento.status)}`}>
+              <div className="flex items-center gap-3 flex-1">
+                <input
+                  type="checkbox"
+                  checked={selectedEventoIds.has(evento.id)}
+                  onChange={() => toggleEventoSelection(evento.id)}
+                  className="w-4 h-4 rounded cursor-pointer"
+                />
+                <button
+                  onClick={() =>
+                    setExpandedEventoId(isExpanded ? null : evento.id)
+                  }
+                  className="flex items-center gap-3 flex-1 text-left hover:opacity-75"
+                >
+                  <StatusIcon className="w-5 h-5 flex-shrink-0" />
+                  <div>
+                    <h4 className="font-bold text-base">{evento.titulo}</h4>
+                    <p className="text-xs opacity-75">
+                      {new Date(evento.dataInicio).toLocaleDateString("pt-BR")} às{" "}
+                      {new Date(evento.dataInicio).toLocaleTimeString("pt-BR", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </p>
+                  </div>
+                </button>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs font-semibold px-2 py-1 rounded bg-white bg-opacity-30">
@@ -242,7 +363,7 @@ export default function StatusAgenda({
                   <ChevronDown className="w-5 h-5" />
                 )}
               </div>
-            </button>
+            </div>
 
             {/* Details */}
             {isExpanded && (

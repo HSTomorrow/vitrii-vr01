@@ -36,6 +36,11 @@ export const getEventosByAnunciante: RequestHandler = async (req, res) => {
             usuarioId: true,
           },
         },
+        contatos: {
+          select: {
+            contatoId: true,
+          },
+        },
       },
       orderBy: {
         dataInicio: "asc",
@@ -240,50 +245,31 @@ export const createEvento: RequestHandler = async (req, res) => {
       },
     });
 
-    // Add permissions if privado_usuarios and contatosPermitidos provided
-    if (privacidade === "privado_usuarios" && contatosPermitidos && Array.isArray(contatosPermitidos) && contatosPermitidos.length > 0) {
-      // Get all users associated with the selected contacts
-      const usuariosAssociados = await prisma.contato_usuarios.findMany({
-        where: {
-          contatoId: {
-            in: contatosPermitidos.map(id => parseInt(id)),
-          },
-        },
-        select: {
-          usuarioId: true,
-        },
+    // Add event-contact associations if contatosPermitidos provided
+    if (contatosPermitidos && Array.isArray(contatosPermitidos) && contatosPermitidos.length > 0) {
+      // Batch insert event-contact relationships
+      await prisma.eventos_contatos.createMany({
+        data: contatosPermitidos.map(contatoId => ({
+          eventoId: evento.id,
+          contatoId: parseInt(contatoId),
+        })),
+        skipDuplicates: true,
       });
-
-      // Extract unique user IDs
-      const usuariosIds = [...new Set(usuariosAssociados.map(ua => ua.usuarioId))];
-
-      // Batch insert permissions
-      if (usuariosIds.length > 0) {
-        await prisma.eventos_agenda_permissoes.createMany({
-          data: usuariosIds.map(usuarioId => ({
-            eventoId: evento.id,
-            usuarioId,
-          })),
-          skipDuplicates: true,
-        });
-      }
-
-      // Refetch evento with updated permissions
-      const eventoAtualizado = await prisma.eventos_agenda_anunciante.findUnique({
-        where: { id: evento.id },
-        include: {
-          permissoes: {
-            select: {
-              usuarioId: true,
-            },
-          },
-        },
-      });
-
-      return res.status(201).json({ data: eventoAtualizado });
     }
 
-    res.status(201).json({ data: evento });
+    // Refetch evento with updated contacts
+    const eventoAtualizado = await prisma.eventos_agenda_anunciante.findUnique({
+      where: { id: evento.id },
+      include: {
+        contatos: {
+          select: {
+            contatoId: true,
+          },
+        },
+      },
+    });
+
+    res.status(201).json({ data: eventoAtualizado });
   } catch (error) {
     console.error("[createEvento]", error);
     res.status(500).json({ error: "Erro ao criar evento" });
@@ -362,54 +348,36 @@ export const updateEvento: RequestHandler = async (req, res) => {
       },
     });
 
-    // Update permissions if privado_usuarios and contatosPermitidos provided
-    if (privacidade === "privado_usuarios" && contatosPermitidos && Array.isArray(contatosPermitidos) && contatosPermitidos.length > 0) {
-      // Delete old permissions
-      await prisma.eventos_agenda_permissoes.deleteMany({
-        where: { eventoId: eventoId },
+    // Update event-contact associations if contatosPermitidos provided
+    // Delete old event-contact relationships
+    await prisma.eventos_contatos.deleteMany({
+      where: { eventoId: eventoId },
+    });
+
+    // Add new event-contact associations if provided
+    if (contatosPermitidos && Array.isArray(contatosPermitidos) && contatosPermitidos.length > 0) {
+      await prisma.eventos_contatos.createMany({
+        data: contatosPermitidos.map(contatoId => ({
+          eventoId: eventoId,
+          contatoId: parseInt(contatoId),
+        })),
+        skipDuplicates: true,
       });
-
-      // Get all users associated with the selected contacts
-      const usuariosAssociados = await prisma.contato_usuarios.findMany({
-        where: {
-          contatoId: {
-            in: contatosPermitidos.map(id => parseInt(id)),
-          },
-        },
-        select: {
-          usuarioId: true,
-        },
-      });
-
-      // Extract unique user IDs
-      const usuariosIds = [...new Set(usuariosAssociados.map(ua => ua.usuarioId))];
-
-      // Batch insert new permissions
-      if (usuariosIds.length > 0) {
-        await prisma.eventos_agenda_permissoes.createMany({
-          data: usuariosIds.map(usuarioId => ({
-            eventoId: eventoId,
-            usuarioId,
-          })),
-        });
-      }
-
-      // Refetch evento with updated permissions
-      const eventoFinal = await prisma.eventos_agenda_anunciante.findUnique({
-        where: { id: eventoId },
-        include: {
-          permissoes: {
-            select: {
-              usuarioId: true,
-            },
-          },
-        },
-      });
-
-      return res.json({ data: eventoFinal });
     }
 
-    res.json({ data: eventoAtualizado });
+    // Refetch evento with updated contacts
+    const eventoFinal = await prisma.eventos_agenda_anunciante.findUnique({
+      where: { id: eventoId },
+      include: {
+        contatos: {
+          select: {
+            contatoId: true,
+          },
+        },
+      },
+    });
+
+    res.json({ data: eventoFinal });
   } catch (error) {
     console.error("[updateEvento]", error);
     res.status(500).json({ error: "Erro ao atualizar evento" });

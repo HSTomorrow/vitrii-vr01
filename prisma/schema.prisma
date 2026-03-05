@@ -535,11 +535,27 @@ model eventos_agenda_anunciante {
   permissoes  eventos_agenda_permissoes[]
   reservas    reservas_evento_agenda[]
   filasEspera filas_espera_agenda[]
+  contatos    eventos_contatos[]
 
   @@index([anuncianteId])
   @@index([dataInicio])
   @@index([privacidade])
   @@index([status])
+}
+
+// Junction table for n-to-n relationship between eventos and contatos
+model eventos_contatos {
+  id        Int      @id @default(autoincrement())
+  eventoId  Int
+  contatoId Int
+  dataCriacao DateTime @default(now())
+
+  evento  eventos_agenda_anunciante @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+  contato contatos                  @relation(fields: [contatoId], references: [id], onDelete: Cascade)
+
+  @@unique([eventoId, contatoId])
+  @@index([eventoId])
+  @@index([contatoId])
 }
 
 // Permissões para Eventos Privados com Usuários Específicos
@@ -758,6 +774,7 @@ model contatos {
 
   usuario          usracessos  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   anunciante       anunciantes? @relation(fields: [anuncianteId], references: [id], onDelete: SetNull)
+  eventos          eventos_contatos[]
 
   @@index([usuarioId])
   @@index([anuncianteId])

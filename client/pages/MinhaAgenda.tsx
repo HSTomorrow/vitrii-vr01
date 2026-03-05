@@ -57,6 +57,9 @@ export default function MinhaAgenda() {
   const [showEditorModal, setShowEditorModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
   const [activeTab, setActiveTab] = useState<"calendar" | "dia" | "fila-espera" | "status-agenda">("calendar");
+  const [filterContatoId, setFilterContatoId] = useState<number | null>(null);
+  const [filterDescricao, setFilterDescricao] = useState("");
+  const [filterTipoContato, setFilterTipoContato] = useState("");
   const reservasRef = useRef<HTMLDivElement>(null);
 
   // Fetch user's anunciantes
@@ -188,6 +191,60 @@ export default function MinhaAgenda() {
     staleTime: 600000, // 10 minutes
     gcTime: 600000, // 10 minutes
   });
+
+  // Apply filters to eventos
+  const filteredEventos = useMemo(() => {
+    return (eventos || []).filter((evento) => {
+      // Filter by contato (if contato is selected in the event)
+      if (filterContatoId) {
+        const hasContato = (evento.contatos || []).some(
+          (c: any) => c.contatoId === filterContatoId
+        );
+        if (!hasContato) return false;
+      }
+
+      // Filter by agenda description
+      if (filterDescricao) {
+        const agendaInfo = anunciantes.find((a) => a.id === evento.anuncianteId);
+        if (
+          !agendaInfo?.nome
+            .toLowerCase()
+            .includes(filterDescricao.toLowerCase())
+        ) {
+          return false;
+        }
+      }
+
+      return true;
+    });
+  }, [eventos, filterContatoId, filterDescricao, anunciantes]);
+
+  // Fetch all contacts for filter dropdown (only when needed)
+  const { data: todosContatos = [] } = useQuery({
+    queryKey: ["contatos-for-filters", selectedAnuncianteId],
+    queryFn: async () => {
+      if (!selectedAnuncianteId) return [];
+      const response = await fetch("/api/contatos", {
+        headers: {
+          "X-User-Id": user?.id?.toString() || "",
+        },
+      });
+      if (!response.ok) return [];
+      const result = await response.json();
+      return (result.data || []).filter((contato: any) => {
+        return !contato.anuncianteId || contato.anuncianteId === selectedAnuncianteId;
+      });
+    },
+    enabled: !!selectedAnuncianteId && !!user?.id,
+    staleTime: 600000,
+    gcTime: 600000,
+  });
+
+  // Get unique contact types for filter
+  const tiposContatoUnicos = useMemo(() => {
+    const tipos = new Set(todosContatos.map((c: any) => c.tipoContato));
+    return Array.from(tipos).sort();
+  }, [todosContatos]);
 
   // Create evento mutation
   const createEventoMutation = useMutation({
@@ -502,6 +559,80 @@ export default function MinhaAgenda() {
                   </div>
                 ) : (
                   <>
+                    {/* Filters Section */}
+                    <div className="mb-6 p-4 bg-white rounded-lg border border-gray-200">
+                      <h3 className="font-semibold text-vitrii-text mb-3">Filtros</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        {/* Filter by Contact */}
+                        <div>
+                          <label className="block text-sm font-medium text-vitrii-text mb-1">
+                            Contato
+                          </label>
+                          <select
+                            value={filterContatoId || ""}
+                            onChange={(e) =>
+                              setFilterContatoId(
+                                e.target.value ? parseInt(e.target.value) : null
+                              )
+                            }
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+                          >
+                            <option value="">Todos os contatos</option>
+                            {todosContatos.map((contato: any) => (
+                              <option key={contato.id} value={contato.id}>
+                                {contato.nome}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* Filter by Agenda Description */}
+                        <div>
+                          <label className="block text-sm font-medium text-vitrii-text mb-1">
+                            Descrição da Agenda
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="Buscar..."
+                            value={filterDescricao}
+                            onChange={(e) => setFilterDescricao(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+                          />
+                        </div>
+
+                        {/* Filter by Contact Type */}
+                        <div>
+                          <label className="block text-sm font-medium text-vitrii-text mb-1">
+                            Tipo de Contato
+                          </label>
+                          <select
+                            value={filterTipoContato}
+                            onChange={(e) => setFilterTipoContato(e.target.value)}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+                          >
+                            <option value="">Todos os tipos</option>
+                            {tiposContatoUnicos.map((tipo) => (
+                              <option key={tipo} value={tipo}>
+                                {tipo}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                      {(filterContatoId || filterDescricao || filterTipoContato) && (
+                        <button
+                          onClick={() => {
+                            setFilterContatoId(null);
+                            setFilterDescricao("");
+                            setFilterTipoContato("");
+                          }}
+                          className="mt-2 text-sm text-vitrii-blue hover:underline"
+                        >
+                          Limpar filtros
+                        </button>
+                      )}
+                    </div>
+
                     <div className="flex gap-3 mb-6 flex-wrap">
                       <button
                         onClick={handleAddEvento}
@@ -548,7 +679,7 @@ export default function MinhaAgenda() {
                     </div>
 
                     <EventosAgendaCalendar
-                      eventos={eventos}
+                      eventos={filteredEventos}
                       onSelectDate={handleSelectDate}
                       onSelectEvento={handleSelectEvento}
                       onAddEvento={handleAddEvento}
@@ -615,7 +746,7 @@ export default function MinhaAgenda() {
                   </button>
                 </div>
                 <ViewDiaEvento
-                  eventos={eventos}
+                  eventos={filteredEventos}
                   onSelectEvento={handleSelectEvento}
                   isEditable={true}
                 />
@@ -637,7 +768,7 @@ export default function MinhaAgenda() {
             {activeTab === "status-agenda" && (
               <div className="bg-white rounded-lg shadow-md p-6">
                 <StatusAgenda
-                  eventos={eventos}
+                  eventos={filteredEventos}
                   onStatusChange={refetchEventos}
                   isLoading={false}
                 />
