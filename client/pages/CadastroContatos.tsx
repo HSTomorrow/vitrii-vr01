@@ -85,9 +85,6 @@ export default function CadastroContatos() {
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM_DATA);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Check if user is admin
-  const isAdmin = user?.tipoUsuario === "adm";
-
   // Fetch anunciantes
   const { data: anunciantesData } = useQuery({
     queryKey: ["anunciantes", user?.id],
@@ -308,40 +305,20 @@ export default function CadastroContatos() {
         {/* Header Section */}
         <div className="sticky top-16 bg-white border-b border-gray-200 z-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-            <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={() => navigate(-1)}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                  aria-label="Voltar"
-                >
-                  <ArrowLeft className="w-6 h-6 text-vitrii-text" />
-                </button>
-                <h1 className="text-2xl font-bold text-vitrii-text">
-                  Cadastro de Contatos
-                </h1>
-              </div>
-              <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-                isAdmin
-                  ? "bg-green-100 text-green-800"
-                  : "bg-blue-100 text-blue-800"
-              }`}>
-                {isAdmin ? "👨‍💼 Administrador" : "👤 Usuário"}
-              </div>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => navigate(-1)}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                aria-label="Voltar"
+              >
+                <ArrowLeft className="w-6 h-6 text-vitrii-text" />
+              </button>
+              <h1 className="text-2xl font-bold text-vitrii-text">
+                Cadastro de Contatos
+              </h1>
             </div>
           </div>
         </div>
-
-        {/* Permission Banner */}
-        {!isAdmin && (
-          <div className="bg-blue-50 border-b border-blue-200">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
-              <p className="text-sm text-blue-800">
-                <strong>ℹ️ Informação:</strong> Você pode visualizar contatos, mas apenas administradores podem criar, editar ou deletar contatos.
-              </p>
-            </div>
-          </div>
-        )}
 
         {/* Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -394,13 +371,7 @@ export default function CadastroContatos() {
                     {!isFormOpen ? (
                       <button
                         onClick={() => setIsFormOpen(true)}
-                        disabled={!isAdmin}
-                        title={!isAdmin ? "Apenas administradores podem criar contatos" : ""}
-                        className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                          isAdmin
-                            ? "bg-vitrii-blue text-white hover:bg-blue-700"
-                            : "bg-gray-300 text-gray-600 cursor-not-allowed"
-                        }`}
+                        className="flex items-center gap-2 px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-blue-700 transition-colors"
                       >
                         <Plus className="w-5 h-5" />
                         Novo Contato
@@ -674,26 +645,15 @@ export default function CadastroContatos() {
                               <div className="flex gap-2 pt-3 border-t border-gray-100">
                               <button
                                 onClick={() => handleEdit(contato)}
-                                disabled={!isAdmin}
-                                title={!isAdmin ? "Apenas administradores podem editar contatos" : ""}
-                                className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-                                  isAdmin
-                                    ? "bg-blue-50 text-vitrii-blue hover:bg-blue-100"
-                                    : "bg-gray-50 text-gray-400 cursor-not-allowed"
-                                }`}
+                                className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 text-vitrii-blue rounded-lg hover:bg-blue-100 transition-colors"
                               >
                                 <Edit2 className="w-4 h-4" />
                                 Editar
                               </button>
                               <button
                                 onClick={() => handleDelete(contato.id)}
-                                disabled={!isAdmin || deleteContatoMutation.isPending}
-                                title={!isAdmin ? "Apenas administradores podem deletar contatos" : ""}
-                                className={`flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-                                  isAdmin
-                                    ? "bg-red-50 text-red-600 hover:bg-red-100"
-                                    : "bg-gray-50 text-gray-400 cursor-not-allowed"
-                                }`}
+                                disabled={deleteContatoMutation.isPending}
+                                className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 disabled:bg-gray-100 transition-colors"
                               >
                                 <Trash2 className="w-4 h-4" />
                                 Deletar
