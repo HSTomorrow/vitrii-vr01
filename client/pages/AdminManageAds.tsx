@@ -30,6 +30,7 @@ interface Anuncio {
   destaque: boolean;
   isActive: boolean;
   status: string;
+  statusPagamento?: string;
   dataCriacao: string;
   tipo: string;
   anunciantes?: { nome: string };
@@ -194,6 +195,40 @@ export default function AdminManageAds() {
     onError: (error) => {
       toast.error(
         error instanceof Error ? error.message : "Erro ao alterar status",
+      );
+    },
+  });
+
+  // Mutation to update statusPagamento (ADM only)
+  const updateStatusPagamentoMutation = useMutation({
+    mutationFn: async ({
+      anuncioId,
+      statusPagamento,
+    }: {
+      anuncioId: number;
+      statusPagamento: string;
+    }) => {
+      const response = await fetch(`/api/anuncios/${anuncioId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": user?.id ? String(user.id) : "",
+        },
+        body: JSON.stringify({ statusPagamento }),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Erro ao alterar status de pagamento");
+      }
+      return response.json();
+    },
+    onSuccess: (_, variables) => {
+      toast.success(`Status de pagamento alterado para "${variables.statusPagamento}" com sucesso`);
+      queryClient.invalidateQueries({ queryKey: ["admin-anuncios"] });
+    },
+    onError: (error) => {
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao alterar status de pagamento",
       );
     },
   });
@@ -387,7 +422,7 @@ export default function AdminManageAds() {
                         Anunciante: {anuncio.anunciantes?.nome || "N/A"} •
                         Tipo: {anuncio.tipo}
                       </p>
-                      <div className="flex items-center gap-2 mt-2">
+                      <div className="flex items-center gap-2 mt-2 flex-wrap">
                         <span
                           className={`text-xs px-2 py-1 rounded ${
                             anuncio.isActive
@@ -399,6 +434,21 @@ export default function AdminManageAds() {
                         </span>
                         <span className="text-xs px-2 py-1 bg-blue-100 text-blue-700 rounded">
                           {anuncio.status}
+                        </span>
+                        <span
+                          className={`text-xs px-2 py-1 rounded ${
+                            anuncio.statusPagamento === "aprovado"
+                              ? "bg-green-100 text-green-700"
+                              : anuncio.statusPagamento === "recusado"
+                                ? "bg-red-100 text-red-700"
+                                : "bg-yellow-100 text-yellow-700"
+                          }`}
+                        >
+                          {anuncio.statusPagamento === "aprovado"
+                            ? "Pagamento Aprovado"
+                            : anuncio.statusPagamento === "recusado"
+                              ? "Pagamento Recusado"
+                              : "Pagamento Pendente"}
                         </span>
                         {anuncio.isDoacao && (
                           <span className="text-xs px-2 py-1 bg-green-100 text-green-700 rounded">
@@ -491,6 +541,36 @@ export default function AdminManageAds() {
                       <p className="text-xs text-vitrii-text-secondary mt-1">
                         Status atual:{" "}
                         <span className="font-semibold">{anuncio.status}</span>
+                      </p>
+                    </div>
+
+                    {/* Status Pagamento Control */}
+                    <div className="mb-4">
+                      <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                        Status de Pagamento
+                      </label>
+                      <div className="flex gap-2 flex-wrap">
+                        <select
+                          value={anuncio.statusPagamento || "pendente"}
+                          onChange={(e) =>
+                            updateStatusPagamentoMutation.mutate({
+                              anuncioId: anuncio.id,
+                              statusPagamento: e.target.value,
+                            })
+                          }
+                          disabled={updateStatusPagamentoMutation.isPending}
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue text-sm"
+                        >
+                          <option value="pendente">Pendente</option>
+                          <option value="aprovado">Aprovado</option>
+                          <option value="recusado">Recusado</option>
+                        </select>
+                      </div>
+                      <p className="text-xs text-vitrii-text-secondary mt-1">
+                        Status atual:{" "}
+                        <span className="font-semibold">
+                          {anuncio.statusPagamento || "pendente"}
+                        </span>
                       </p>
                     </div>
 

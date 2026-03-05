@@ -56,7 +56,10 @@ const AnuncioBaseSchema = z.object({
   ordem: z.number().int().positive().optional().default(10), // Default 10 for new ads (admin only)
   isActive: z.boolean().optional().default(true),
   status: z
-    .enum(["em_edicao", "aguardando_pagamento", "pago", "historico"])
+    .enum(["em_edicao", "aguardando_pagamento", "pago", "historico", "ativo"])
+    .optional(),
+  statusPagamento: z
+    .enum(["pendente", "aprovado", "recusado"])
     .optional(),
   categoria: z.enum(["roupas", "carros", "imoveis"]).optional().nullable(),
   dadosCategoria: z.string().optional().nullable(), // JSON string
@@ -666,6 +669,8 @@ export const updateAnuncio: RequestHandler = async (req, res) => {
     if (updateData.cidade !== undefined) mappedData.cidade = updateData.cidade;
     if (updateData.estado !== undefined) mappedData.estado = updateData.estado;
     if (updateData.status !== undefined) mappedData.status = updateData.status;
+    if (updateData.statusPagamento !== undefined)
+      mappedData.statusPagamento = updateData.statusPagamento;
     if (updateData.tipo !== undefined) mappedData.tipo = updateData.tipo;
     if (updateData.isDoacao !== undefined)
       mappedData.isDoacao = updateData.isDoacao;
