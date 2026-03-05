@@ -122,6 +122,13 @@ export default function CadastroContatos() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM_DATA);
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 20;
+
+  // Reset to page 1 when search term changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
 
   // Debug: Log when user changes
   useEffect(() => {
@@ -400,6 +407,12 @@ export default function CadastroContatos() {
         contato.celular.includes(searchTerm) ||
         (contato.email?.toLowerCase().includes(searchTerm.toLowerCase()) || false)
     ) || [];
+
+  // Pagination logic
+  const totalPages = Math.ceil(filteredContatos.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const contatosPaginados = filteredContatos.slice(startIndex, endIndex);
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -775,8 +788,9 @@ export default function CadastroContatos() {
                 </p>
               </div>
             ) : (
+              <>
               <div className="grid grid-cols-1 gap-4">
-                {filteredContatos.map((contato: Contato) => (
+                {contatosPaginados.map((contato: Contato) => (
                   <div
                     key={contato.id}
                     className="bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow flex flex-col"
@@ -878,6 +892,32 @@ export default function CadastroContatos() {
                   </div>
                 ))}
               </div>
+
+              {/* Pagination Controls */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between mt-6 p-4 bg-white rounded-lg border border-gray-200">
+                  <div className="text-sm text-gray-600">
+                    Página {currentPage} de {totalPages} ({filteredContatos.length} contatos)
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                      disabled={currentPage === 1}
+                      className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                    >
+                      ← Anterior
+                    </button>
+                    <button
+                      onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                      disabled={currentPage === totalPages}
+                      className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                    >
+                      Próximo →
+                    </button>
+                  </div>
+                </div>
+              )}
+              </>
             )}
           </div>
         </div>
