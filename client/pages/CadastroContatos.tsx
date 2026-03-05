@@ -22,18 +22,10 @@ import { useNavigate } from "react-router-dom";
 import ImageWithFallback from "@/components/ImageWithFallback";
 import { getUserInitials } from "@/utils/imageFallback";
 
-interface UsuarioVinculado {
-  id: number;
-  usuario: {
-    id: number;
-    nome: string;
-    email: string;
-  };
-}
-
 interface Contato {
   id: number;
-  anuncianteId: number;
+  usuarioId: number;
+  anuncianteId?: number | null;
   nome: string;
   celular: string;
   telefone?: string;
@@ -44,7 +36,15 @@ interface Contato {
   imagem?: string;
   dataCriacao: string;
   dataAtualizacao: string;
-  usuarios?: UsuarioVinculado[];
+  usuario?: {
+    id: number;
+    nome: string;
+    email: string;
+  };
+  anunciante?: {
+    id: number;
+    nome: string;
+  } | null;
 }
 
 interface Anunciante {
@@ -61,6 +61,7 @@ interface FormData {
   tipoContato: string;
   observacoes: string;
   imagem: string;
+  anuncianteId?: number | null;
 }
 
 const INITIAL_FORM_DATA: FormData = {
@@ -72,6 +73,7 @@ const INITIAL_FORM_DATA: FormData = {
   tipoContato: "",
   observacoes: "",
   imagem: "",
+  anuncianteId: null,
 };
 
 const CONTACT_TYPES = [
@@ -87,16 +89,13 @@ export default function CadastroContatos() {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [selectedAnuncianteId, setSelectedAnuncianteId] = useState<
-    number | null
-  >(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM_DATA);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Fetch anunciantes
-  const { data: anunciantesData } = useQuery({
+  // Fetch anunciantes for the optional field
+  const { data: anunciantesData = [] } = useQuery({
     queryKey: ["anunciantes", user?.id],
     queryFn: async () => {
       const headers: Record<string, string> = {};
@@ -108,41 +107,35 @@ export default function CadastroContatos() {
         headers,
       });
       if (!response.ok) throw new Error("Erro ao buscar anunciantes");
-      return response.json();
+      const result = await response.json();
+      return result.data || [];
     },
     enabled: !!user,
   });
 
-  // Fetch contatos
+  // Fetch contatos for current user
   const { data: contatosData, refetch: refetchContatos } = useQuery({
-    queryKey: ["contatos", selectedAnuncianteId],
+    queryKey: ["contatos", user?.id],
     queryFn: async () => {
-      if (!selectedAnuncianteId) return [];
+      if (!user?.id) return [];
 
       const headers: Record<string, string> = {};
       if (user?.id) {
         headers["X-User-Id"] = user.id.toString();
       }
 
-      const response = await fetch(
-        `/api/anunciantes/${selectedAnuncianteId}/contatos`,
-        { headers }
-      );
+      const response = await fetch("/api/contatos", { headers });
       if (!response.ok) throw new Error("Erro ao buscar contatos");
       const result = await response.json();
       return result.data || [];
     },
-    enabled: !!user && selectedAnuncianteId !== null,
+    enabled: !!user,
   });
 
   // Create/update contato mutation
   const saveContatoMutation = useMutation({
     mutationFn: async (data: FormData) => {
-      if (!selectedAnuncianteId) throw new Error("Selecione um anunciante");
-
-      const url = editingId
-        ? `/api/anunciantes/${selectedAnuncianteId}/contatos/${editingId}`
-        : `/api/anunciantes/${selectedAnuncianteId}/contatos`;
+      const url = editingId ? `/api/contatos/${editingId}` : "/api/contatos";
       const method = editingId ? "PUT" : "POST";
 
       const headers: Record<string, string> = {
@@ -162,6 +155,7 @@ export default function CadastroContatos() {
         tipoContato: data.tipoContato,
         observacoes: data.observacoes || null,
         imagem: data.imagem || null,
+        anuncianteId: data.anuncianteId || null,
       };
 
       const response = await fetch(url, {
@@ -194,20 +188,15 @@ export default function CadastroContatos() {
   // Delete contato mutation
   const deleteContatoMutation = useMutation({
     mutationFn: async (contatoId: number) => {
-      if (!selectedAnuncianteId) throw new Error("Selecione um anunciante");
-
       const headers: Record<string, string> = {};
       if (user?.id) {
         headers["X-User-Id"] = user.id.toString();
       }
 
-      const response = await fetch(
-        `/api/anunciantes/${selectedAnuncianteId}/contatos/${contatoId}`,
-        {
-          method: "DELETE",
-          headers,
-        }
-      );
+      const response = await fetch(`/api/contatos/${contatoId}`, {
+        method: "DELETE",
+        headers,
+      });
 
       if (!response.ok) {
         const error = await response.json();
@@ -256,6 +245,7 @@ export default function CadastroContatos() {
       tipoContato: contato.tipoContato,
       observacoes: contato.observacoes || "",
       imagem: contato.imagem || "",
+      anuncianteId: contato.anuncianteId || null,
     });
     setEditingId(contato.id);
     setIsFormOpen(true);
@@ -332,385 +322,361 @@ export default function CadastroContatos() {
 
         {/* Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Announcer Selection */}
-          {anunciantesData && anunciantesData.length > 0 ? (
-            <>
-              <div className="mb-8">
-                <label className="block text-sm font-semibold text-vitrii-text mb-3">
-                  Selecione um Anunciante:
-                </label>
-                <select
-                  value={selectedAnuncianteId || ""}
-                  onChange={(e) => {
-                    const id = e.target.value ? parseInt(e.target.value) : null;
-                    setSelectedAnuncianteId(id);
-                    setFormData(INITIAL_FORM_DATA);
-                    setEditingId(null);
-                    setIsFormOpen(false);
-                  }}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+          {/* Form Section */}
+          <div className="mb-8 bg-vitrii-gray rounded-lg p-6 border border-gray-200">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-vitrii-text">
+                {editingId ? "Editar Contato" : "Novo Contato"}
+              </h2>
+              {isFormOpen && (
+                <button
+                  onClick={handleCancel}
+                  className="p-2 hover:bg-gray-300 rounded-lg transition-colors"
+                  aria-label="Fechar"
                 >
-                  <option value="">-- Escolha um anunciante --</option>
-                  {anunciantesData.map((anunciante: Anunciante) => (
-                    <option key={anunciante.id} value={anunciante.id}>
-                      {anunciante.nome}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {selectedAnuncianteId && (
-                <>
-                  {/* Form Section */}
-                  <div className="mb-8 bg-vitrii-gray rounded-lg p-6 border border-gray-200">
-                    <div className="flex items-center justify-between mb-4">
-                      <h2 className="text-lg font-semibold text-vitrii-text">
-                        {editingId ? "Editar Contato" : "Novo Contato"}
-                      </h2>
-                      {isFormOpen && (
-                        <button
-                          onClick={handleCancel}
-                          className="p-2 hover:bg-gray-300 rounded-lg transition-colors"
-                          aria-label="Fechar"
-                        >
-                          <X className="w-5 h-5 text-vitrii-text" />
-                        </button>
-                      )}
-                    </div>
-
-                    {!isFormOpen ? (
-                      <button
-                        onClick={() => setIsFormOpen(true)}
-                        className="flex items-center gap-2 px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-blue-700 transition-colors"
-                      >
-                        <Plus className="w-5 h-5" />
-                        Novo Contato
-                      </button>
-                    ) : (
-                      <form onSubmit={handleSubmit} className="space-y-4">
-                        {/* Nome */}
-                        <div>
-                          <label className="block text-sm font-medium text-vitrii-text mb-1">
-                            Nome *
-                          </label>
-                          <input
-                            type="text"
-                            value={formData.nome}
-                            onChange={(e) =>
-                              setFormData({ ...formData, nome: e.target.value })
-                            }
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
-                            placeholder="Nome do contato"
-                          />
-                        </div>
-
-                        {/* Celular/WhatsApp */}
-                        <div>
-                          <label className="block text-sm font-medium text-vitrii-text mb-1">
-                            Celular/WhatsApp *
-                          </label>
-                          <input
-                            type="text"
-                            value={formData.celular}
-                            onChange={(e) =>
-                              setFormData({ ...formData, celular: e.target.value })
-                            }
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
-                            placeholder="(11) 99999-9999"
-                          />
-                        </div>
-
-                        {/* Telefone */}
-                        <div>
-                          <label className="block text-sm font-medium text-vitrii-text mb-1">
-                            Telefone (opcional)
-                          </label>
-                          <input
-                            type="text"
-                            value={formData.telefone}
-                            onChange={(e) =>
-                              setFormData({ ...formData, telefone: e.target.value })
-                            }
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
-                            placeholder="(11) 3333-3333"
-                          />
-                        </div>
-
-                        {/* Email */}
-                        <div>
-                          <label className="block text-sm font-medium text-vitrii-text mb-1">
-                            Email (opcional)
-                          </label>
-                          <input
-                            type="email"
-                            value={formData.email}
-                            onChange={(e) =>
-                              setFormData({ ...formData, email: e.target.value })
-                            }
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
-                            placeholder="contato@example.com"
-                          />
-                        </div>
-
-                        {/* Status */}
-                        <div>
-                          <label className="block text-sm font-medium text-vitrii-text mb-1">
-                            Status *
-                          </label>
-                          <select
-                            value={formData.status}
-                            onChange={(e) =>
-                              setFormData({
-                                ...formData,
-                                status: e.target.value as
-                                  | "ativo"
-                                  | "inativo"
-                                  | "analise",
-                              })
-                            }
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
-                          >
-                            <option value="ativo">Ativo</option>
-                            <option value="inativo">Inativo</option>
-                            <option value="analise">Análise</option>
-                          </select>
-                        </div>
-
-                        {/* Tipo de Contato */}
-                        <div>
-                          <label className="block text-sm font-medium text-vitrii-text mb-1">
-                            Tipo de Contato *
-                          </label>
-                          <select
-                            value={formData.tipoContato}
-                            onChange={(e) =>
-                              setFormData({
-                                ...formData,
-                                tipoContato: e.target.value,
-                              })
-                            }
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
-                          >
-                            <option value="">-- Selecione um tipo --</option>
-                            {CONTACT_TYPES.map((type) => (
-                              <option key={type} value={type}>
-                                {type}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-
-                        {/* Observações */}
-                        <div>
-                          <label className="block text-sm font-medium text-vitrii-text mb-1">
-                            Observações (opcional)
-                          </label>
-                          <textarea
-                            value={formData.observacoes}
-                            onChange={(e) =>
-                              setFormData({
-                                ...formData,
-                                observacoes: e.target.value,
-                              })
-                            }
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue resize-none"
-                            placeholder="Notas adicionais..."
-                            rows={3}
-                          />
-                        </div>
-
-                        {/* Imagem */}
-                        <div>
-                          <label className="block text-sm font-medium text-vitrii-text mb-1">
-                            Imagem (opcional - URL)
-                          </label>
-                          <input
-                            type="url"
-                            value={formData.imagem}
-                            onChange={(e) =>
-                              setFormData({ ...formData, imagem: e.target.value })
-                            }
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
-                            placeholder="https://example.com/image.jpg"
-                          />
-                        </div>
-
-                        {/* Actions */}
-                        <div className="flex gap-2 pt-4">
-                          <button
-                            type="submit"
-                            disabled={saveContatoMutation.isPending}
-                            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
-                          >
-                            <Save className="w-5 h-5" />
-                            {saveContatoMutation.isPending ? "Salvando..." : "Salvar"}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={handleCancel}
-                            className="flex-1 px-4 py-2 bg-gray-300 text-vitrii-text rounded-lg hover:bg-gray-400 transition-colors"
-                          >
-                            Cancelar
-                          </button>
-                        </div>
-                      </form>
-                    )}
-                  </div>
-
-                  {/* Contatos List */}
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h2 className="text-lg font-semibold text-vitrii-text">
-                        Contatos ({filteredContatos.length})
-                      </h2>
-                      <input
-                        type="text"
-                        placeholder="Buscar por nome, celular ou email..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
-                      />
-                    </div>
-
-                    {filteredContatos.length === 0 ? (
-                      <div className="text-center py-8 bg-vitrii-gray rounded-lg border border-gray-200">
-                        <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-2" />
-                        <p className="text-vitrii-text-secondary">
-                          {contatosData?.length === 0
-                            ? "Nenhum contato cadastrado. Crie um novo contato!"
-                            : "Nenhum contato encontrado com os critérios de busca."}
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="grid grid-cols-1 gap-4">
-                        {filteredContatos.map((contato: Contato) => (
-                          <div
-                            key={contato.id}
-                            className="bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow flex flex-col"
-                          >
-                            <div className="flex gap-0">
-                              {/* Contact Image */}
-                              <div className="w-24 h-24 flex-shrink-0 overflow-hidden rounded-l-lg">
-                                <ImageWithFallback
-                                  src={contato.imagem || null}
-                                  alt={contato.nome}
-                                  fallbackIcon={
-                                    <User className="w-12 h-12 text-vitrii-blue" />
-                                  }
-                                  containerClassName="w-full h-full bg-vitrii-gray-light"
-                                  className="w-full h-full object-cover"
-                                  fallbackInitials={getUserInitials(contato)}
-                                />
-                              </div>
-
-                              {/* Contact Info */}
-                              <div className="flex-1 p-4">
-                                <div className="flex items-start justify-between mb-3">
-                                <div className="flex-1">
-                                  <h3 className="text-lg font-semibold text-vitrii-text">
-                                    {contato.nome}
-                                  </h3>
-                                  <p className="text-sm text-vitrii-text-secondary">
-                                    {contato.tipoContato}
-                                  </p>
-                                </div>
-                                <span
-                                  className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
-                                    contato.status
-                                  )}`}
-                                >
-                                  {getStatusLabel(contato.status)}
-                                </span>
-                              </div>
-
-                                <div className="space-y-2 mb-4 text-sm">
-                                <div className="flex items-center gap-2 text-vitrii-text">
-                                  <Phone className="w-4 h-4 text-vitrii-blue" />
-                                  <span>{contato.celular}</span>
-                                </div>
-
-                                {contato.telefone && (
-                                  <div className="flex items-center gap-2 text-vitrii-text">
-                                    <Phone className="w-4 h-4 text-gray-400" />
-                                    <span>{contato.telefone}</span>
-                                  </div>
-                                )}
-
-                                {contato.email && (
-                                  <div className="flex items-center gap-2 text-vitrii-text">
-                                    <Mail className="w-4 h-4 text-vitrii-blue" />
-                                    <span>{contato.email}</span>
-                                  </div>
-                                )}
-
-                                {contato.observacoes && (
-                                  <div className="flex items-start gap-2 text-vitrii-text">
-                                    <MessageSquare className="w-4 h-4 text-vitrii-blue flex-shrink-0 mt-0.5" />
-                                    <span className="line-clamp-2">
-                                      {contato.observacoes}
-                                    </span>
-                                  </div>
-                                )}
-                                </div>
-                              </div>
-                            </div>
-
-                            {/* Linked Users Section (visible to admin) */}
-                            {user?.tipoUsuario === "adm" && contato.usuarios && contato.usuarios.length > 0 && (
-                              <div className="px-4 py-2 bg-vitrii-gray border-t border-gray-100">
-                                <p className="text-xs font-medium text-vitrii-text-secondary mb-2">
-                                  Vinculado a:
-                                </p>
-                                <div className="flex flex-wrap gap-2">
-                                  {contato.usuarios.map((vu) => (
-                                    <span
-                                      key={vu.usuario.id}
-                                      className="inline-block px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs font-medium"
-                                    >
-                                      {vu.usuario.nome}
-                                    </span>
-                                  ))}
-                                </div>
-                              </div>
-                            )}
-
-                            {/* Action Buttons */}
-                            <div className="flex gap-2 p-4 border-t border-gray-100">
-                              <button
-                                onClick={() => handleEdit(contato)}
-                                className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 text-vitrii-blue rounded-lg hover:bg-blue-100 transition-colors"
-                              >
-                                <Edit2 className="w-4 h-4" />
-                                Editar
-                              </button>
-                              <button
-                                onClick={() => handleDelete(contato.id)}
-                                disabled={deleteContatoMutation.isPending}
-                                className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 disabled:bg-gray-100 transition-colors"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                                Deletar
-                              </button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </>
+                  <X className="w-5 h-5 text-vitrii-text" />
+                </button>
               )}
-            </>
-          ) : (
-            <div className="text-center py-12 bg-vitrii-gray rounded-lg border border-gray-200">
-              <Briefcase className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-vitrii-text-secondary mb-2">
-                Nenhum anunciante encontrado.
-              </p>
-              <p className="text-sm text-vitrii-text-secondary">
-                Você precisa cadastrar um anunciante para gerenciar contatos.
-              </p>
             </div>
-          )}
+
+            {!isFormOpen ? (
+              <button
+                onClick={() => setIsFormOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                <Plus className="w-5 h-5" />
+                Novo Contato
+              </button>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-4">
+                {/* Nome */}
+                <div>
+                  <label className="block text-sm font-medium text-vitrii-text mb-1">
+                    Nome *
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.nome}
+                    onChange={(e) =>
+                      setFormData({ ...formData, nome: e.target.value })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+                    placeholder="Nome do contato"
+                  />
+                </div>
+
+                {/* Celular/WhatsApp */}
+                <div>
+                  <label className="block text-sm font-medium text-vitrii-text mb-1">
+                    Celular/WhatsApp *
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.celular}
+                    onChange={(e) =>
+                      setFormData({ ...formData, celular: e.target.value })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+                    placeholder="(11) 99999-9999"
+                  />
+                </div>
+
+                {/* Telefone */}
+                <div>
+                  <label className="block text-sm font-medium text-vitrii-text mb-1">
+                    Telefone (opcional)
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.telefone}
+                    onChange={(e) =>
+                      setFormData({ ...formData, telefone: e.target.value })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+                    placeholder="(11) 3333-3333"
+                  />
+                </div>
+
+                {/* Email */}
+                <div>
+                  <label className="block text-sm font-medium text-vitrii-text mb-1">
+                    Email (opcional)
+                  </label>
+                  <input
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) =>
+                      setFormData({ ...formData, email: e.target.value })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+                    placeholder="contato@example.com"
+                  />
+                </div>
+
+                {/* Tipo de Contato */}
+                <div>
+                  <label className="block text-sm font-medium text-vitrii-text mb-1">
+                    Tipo de Contato *
+                  </label>
+                  <select
+                    value={formData.tipoContato}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        tipoContato: e.target.value,
+                      })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+                  >
+                    <option value="">-- Selecione um tipo --</option>
+                    {CONTACT_TYPES.map((type) => (
+                      <option key={type} value={type}>
+                        {type}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Status */}
+                <div>
+                  <label className="block text-sm font-medium text-vitrii-text mb-1">
+                    Status *
+                  </label>
+                  <select
+                    value={formData.status}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        status: e.target.value as
+                          | "ativo"
+                          | "inativo"
+                          | "analise",
+                      })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+                  >
+                    <option value="ativo">Ativo</option>
+                    <option value="inativo">Inativo</option>
+                    <option value="analise">Análise</option>
+                  </select>
+                </div>
+
+                {/* Anunciante (optional) */}
+                {anunciantesData && anunciantesData.length > 0 && (
+                  <div>
+                    <label className="block text-sm font-medium text-vitrii-text mb-1">
+                      Usar para Anunciante (opcional)
+                    </label>
+                    <select
+                      value={formData.anuncianteId || ""}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          anuncianteId: e.target.value ? parseInt(e.target.value) : null,
+                        })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+                    >
+                      <option value="">-- Todos os meus anunciantes --</option>
+                      {anunciantesData.map((anunciante: Anunciante) => (
+                        <option key={anunciante.id} value={anunciante.id}>
+                          {anunciante.nome}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-xs text-vitrii-text-secondary mt-1">
+                      Deixe em branco para usar este contato em todos os seus anunciantes
+                    </p>
+                  </div>
+                )}
+
+                {/* Observações */}
+                <div>
+                  <label className="block text-sm font-medium text-vitrii-text mb-1">
+                    Observações (opcional)
+                  </label>
+                  <textarea
+                    value={formData.observacoes}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        observacoes: e.target.value,
+                      })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue resize-none"
+                    placeholder="Notas adicionais..."
+                    rows={3}
+                  />
+                </div>
+
+                {/* Imagem */}
+                <div>
+                  <label className="block text-sm font-medium text-vitrii-text mb-1">
+                    Imagem (opcional - URL)
+                  </label>
+                  <input
+                    type="url"
+                    value={formData.imagem}
+                    onChange={(e) =>
+                      setFormData({ ...formData, imagem: e.target.value })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+                    placeholder="https://example.com/image.jpg"
+                  />
+                </div>
+
+                {/* Actions */}
+                <div className="flex gap-2 pt-4">
+                  <button
+                    type="submit"
+                    disabled={saveContatoMutation.isPending}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-colors"
+                  >
+                    <Save className="w-5 h-5" />
+                    {saveContatoMutation.isPending ? "Salvando..." : "Salvar"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleCancel}
+                    className="flex-1 px-4 py-2 bg-gray-300 text-vitrii-text rounded-lg hover:bg-gray-400 transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+
+          {/* Contatos List */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold text-vitrii-text">
+                Meus Contatos ({filteredContatos.length})
+              </h2>
+              <input
+                type="text"
+                placeholder="Buscar por nome, celular ou email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+              />
+            </div>
+
+            {filteredContatos.length === 0 ? (
+              <div className="text-center py-8 bg-vitrii-gray rounded-lg border border-gray-200">
+                <MessageSquare className="w-12 h-12 text-gray-300 mx-auto mb-2" />
+                <p className="text-vitrii-text-secondary">
+                  {contatosData?.length === 0
+                    ? "Nenhum contato cadastrado. Crie um novo contato!"
+                    : "Nenhum contato encontrado com os critérios de busca."}
+                </p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 gap-4">
+                {filteredContatos.map((contato: Contato) => (
+                  <div
+                    key={contato.id}
+                    className="bg-white border border-gray-200 rounded-lg hover:shadow-md transition-shadow flex flex-col"
+                  >
+                    <div className="flex gap-0">
+                      {/* Contact Image */}
+                      <div className="w-24 h-24 flex-shrink-0 overflow-hidden rounded-l-lg">
+                        <ImageWithFallback
+                          src={contato.imagem || null}
+                          alt={contato.nome}
+                          fallbackIcon={
+                            <User className="w-12 h-12 text-vitrii-blue" />
+                          }
+                          containerClassName="w-full h-full bg-vitrii-gray-light"
+                          className="w-full h-full object-cover"
+                          fallbackInitials={getUserInitials(contato)}
+                        />
+                      </div>
+
+                      {/* Contact Info */}
+                      <div className="flex-1 p-4">
+                        <div className="flex items-start justify-between mb-3">
+                          <div className="flex-1">
+                            <h3 className="text-lg font-semibold text-vitrii-text">
+                              {contato.nome}
+                            </h3>
+                            <p className="text-sm text-vitrii-text-secondary">
+                              {contato.tipoContato}
+                            </p>
+                          </div>
+                          <span
+                            className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
+                              contato.status
+                            )}`}
+                          >
+                            {getStatusLabel(contato.status)}
+                          </span>
+                        </div>
+
+                        <div className="space-y-2 mb-4 text-sm">
+                          <div className="flex items-center gap-2 text-vitrii-text">
+                            <Phone className="w-4 h-4 text-vitrii-blue" />
+                            <span>{contato.celular}</span>
+                          </div>
+
+                          {contato.telefone && (
+                            <div className="flex items-center gap-2 text-vitrii-text">
+                              <Phone className="w-4 h-4 text-gray-400" />
+                              <span>{contato.telefone}</span>
+                            </div>
+                          )}
+
+                          {contato.email && (
+                            <div className="flex items-center gap-2 text-vitrii-text">
+                              <Mail className="w-4 h-4 text-vitrii-blue" />
+                              <span>{contato.email}</span>
+                            </div>
+                          )}
+
+                          {contato.observacoes && (
+                            <div className="flex items-start gap-2 text-vitrii-text">
+                              <MessageSquare className="w-4 h-4 text-vitrii-blue flex-shrink-0 mt-0.5" />
+                              <span className="line-clamp-2">
+                                {contato.observacoes}
+                              </span>
+                            </div>
+                          )}
+
+                          {contato.anunciante && (
+                            <div className="flex items-center gap-2">
+                              <Tag className="w-4 h-4 text-vitrii-blue" />
+                              <span className="text-vitrii-text text-xs bg-blue-50 px-2 py-1 rounded">
+                                {contato.anunciante.nome}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-2 p-4 border-t border-gray-100">
+                      <button
+                        onClick={() => handleEdit(contato)}
+                        className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-blue-50 text-vitrii-blue rounded-lg hover:bg-blue-100 transition-colors"
+                      >
+                        <Edit2 className="w-4 h-4" />
+                        Editar
+                      </button>
+                      <button
+                        onClick={() => handleDelete(contato.id)}
+                        disabled={deleteContatoMutation.isPending}
+                        className="flex-1 flex items-center justify-center gap-2 px-3 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 disabled:bg-gray-100 transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Deletar
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </main>
 

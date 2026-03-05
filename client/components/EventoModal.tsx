@@ -80,22 +80,34 @@ export default function EventoModal({
   // Fetch contatos when modal opens
   useEffect(() => {
     const fetchContatos = async () => {
-      if (!isOpen || !anuncianteId) return;
+      if (!isOpen) return;
 
       setIsLoadingContatos(true);
       try {
-        const response = await fetch(`/api/anunciantes/${anuncianteId}/contatos`);
+        // Fetch user's contacts (optionally filtered by announcer)
+        const response = await fetch("/api/contatos", {
+          headers: {
+            "X-User-Id": (window as any).userId?.toString() || "",
+          },
+        });
         if (response.ok) {
           const data = await response.json();
-          const contatosList = data.data?.map((contato: any) => ({
-            id: contato.id,
-            nome: contato.nome,
-            celular: contato.celular,
-            telefone: contato.telefone,
-            email: contato.email,
-            tipoContato: contato.tipoContato,
-            imagem: contato.imagem,
-          })) || [];
+          // Filter contacts: if anuncianteId is provided, show those OR contacts without a specific announcer
+          const contatosList = (data.data || [])
+            .filter((contato: any) => {
+              if (!anuncianteId) return true; // Show all if no announcer selected
+              // Show contacts for this announcer or contacts for all announcers
+              return !contato.anuncianteId || contato.anuncianteId === anuncianteId;
+            })
+            .map((contato: any) => ({
+              id: contato.id,
+              nome: contato.nome,
+              celular: contato.celular,
+              telefone: contato.telefone,
+              email: contato.email,
+              tipoContato: contato.tipoContato,
+              imagem: contato.imagem,
+            })) || [];
           setContatos(contatosList);
         }
       } catch (error) {

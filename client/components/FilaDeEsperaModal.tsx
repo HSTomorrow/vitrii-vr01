@@ -54,22 +54,34 @@ export default function FilaDeEsperaModal({
   // Fetch contatos when modal opens
   useEffect(() => {
     const fetchContatos = async () => {
-      if (!isOpen || !anuncianteAlvoId) return;
+      if (!isOpen) return;
 
       setIsLoadingContatos(true);
       try {
-        const response = await fetch(`/api/anunciantes/${anuncianteAlvoId}/contatos`);
+        // Fetch user's contacts (optionally filtered by announcer)
+        const response = await fetch("/api/contatos", {
+          headers: {
+            "X-User-Id": user?.id?.toString() || "",
+          },
+        });
         if (response.ok) {
           const data = await response.json();
-          const contatosList = data.data?.map((contato: any) => ({
-            id: contato.id,
-            nome: contato.nome,
-            celular: contato.celular,
-            telefone: contato.telefone,
-            email: contato.email,
-            tipoContato: contato.tipoContato,
-            imagem: contato.imagem,
-          })) || [];
+          // Filter contacts: if anuncianteAlvoId is provided, show those OR contacts without a specific announcer
+          const contatosList = (data.data || [])
+            .filter((contato: any) => {
+              if (!anuncianteAlvoId) return true; // Show all if no announcer selected
+              // Show contacts for this announcer or contacts for all announcers
+              return !contato.anuncianteId || contato.anuncianteId === anuncianteAlvoId;
+            })
+            .map((contato: any) => ({
+              id: contato.id,
+              nome: contato.nome,
+              celular: contato.celular,
+              telefone: contato.telefone,
+              email: contato.email,
+              tipoContato: contato.tipoContato,
+              imagem: contato.imagem,
+            })) || [];
           setContatos(contatosList);
         }
       } catch (error) {
@@ -80,7 +92,7 @@ export default function FilaDeEsperaModal({
     };
 
     fetchContatos();
-  }, [isOpen, anuncianteAlvoId]);
+  }, [isOpen, anuncianteAlvoId, user?.id]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

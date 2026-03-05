@@ -249,7 +249,7 @@ model usracessos {
   conversas               conversas[]
   mensagens               mensagens[]
   favoritos               favorito[]
-  contatos                contato_usuarios[]
+  contatos                contatos[]
   localidadePadrao        localidades?                @relation(fields: [localidadePadraoId], references: [id], onDelete: SetNull)
 }
 
@@ -740,10 +740,11 @@ model anunciantes_x_localidades {
   @@index([localidadeId])
 }
 
-// Contatos - Contact list for announcer (only visible to the announcer who created)
+// Contatos - Contact list by user (shared across their announcers, optionally limited to specific announcer)
 model contatos {
   id               Int      @id @default(autoincrement())
-  anuncianteId     Int
+  usuarioId        Int      // Who created this contact
+  anuncianteId     Int?     // Optional: if set, contact is specific to this announcer; if null, can be used by all user's announcers
   nome             String   @db.VarChar(255)
   celular          String   @db.VarChar(20)
   telefone         String?  @db.VarChar(20)
@@ -755,27 +756,12 @@ model contatos {
   dataCriacao      DateTime @default(now())
   dataAtualizacao  DateTime @updatedAt
 
-  anunciante       anunciantes            @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
-  usuarios         contato_usuarios[]
+  usuario          usracessos  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  anunciante       anunciantes? @relation(fields: [anuncianteId], references: [id], onDelete: SetNull)
 
+  @@index([usuarioId])
   @@index([anuncianteId])
   @@map("contatos")
-}
-
-// Junction table: Contatos x Usuarios (N:N)
-model contato_usuarios {
-  id         Int      @id @default(autoincrement())
-  contatoId  Int
-  usuarioId  Int
-  dataCriacao DateTime @default(now())
-
-  contato  contatos   @relation(fields: [contatoId], references: [id], onDelete: Cascade)
-  usuario  usracessos @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-
-  @@unique([contatoId, usuarioId])
-  @@index([contatoId])
-  @@index([usuarioId])
-  @@map("contato_usuarios")
 }
 
 // Favoritos - User's favorite ads

@@ -226,8 +226,6 @@ import {
   createContato,
   updateContato,
   deleteContato,
-  addUsuarioToContato,
-  removeUsuarioFromContato,
 } from "./routes/contatos";
 
 export function createServer() {
@@ -1108,13 +1106,17 @@ export function createServer() {
   app.post("/api/localidades/:id/anunciantes", extractUserId, requireAdmin, addAnuncianteToLocalidade);
   app.delete("/api/localidades/:id/anunciantes/:anuncianteId", extractUserId, requireAdmin, removeAnuncianteFromLocalidade);
 
-  // Contatos routes (only announcer can manage)
+  // Contatos routes (user-based contacts, shared across announcers)
+  app.get("/api/contatos", extractUserId, getContatosByAnunciante); // Returns user's contacts (or all if admin)
+  app.post("/api/contatos", extractUserId, createContato);
+  app.put("/api/contatos/:contatoId", extractUserId, updateContato);
+  app.delete("/api/contatos/:contatoId", extractUserId, deleteContato);
+
+  // Backwards compatibility: old announcer-based routes redirect to new user-based routes
   app.get("/api/anunciantes/:anuncianteId/contatos", extractUserId, getContatosByAnunciante);
   app.post("/api/anunciantes/:anuncianteId/contatos", extractUserId, createContato);
   app.put("/api/anunciantes/:anuncianteId/contatos/:contatoId", extractUserId, updateContato);
   app.delete("/api/anunciantes/:anuncianteId/contatos/:contatoId", extractUserId, deleteContato);
-  app.post("/api/anunciantes/:anuncianteId/contatos/:contatoId/usuarios", extractUserId, addUsuarioToContato);
-  app.delete("/api/anunciantes/:anuncianteId/contatos/:contatoId/usuarios/:usuarioId", extractUserId, removeUsuarioFromContato);
 
   // Check APP_URL configuration
   app.get("/api/check-app-url", (_req, res) => {

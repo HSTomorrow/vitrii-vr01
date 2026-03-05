@@ -12,47 +12,21 @@ const ContatoCreateSchema = z.object({
   tipoContato: z.string().min(1, "Tipo de contato é obrigatório"),
   observacoes: z.string().optional().nullable(),
   imagem: z.string().optional().nullable(),
-  usuariosIds: z.array(z.number()).optional(),
+  anuncianteId: z.number().optional().nullable(), // Optional: specific announcer or null for all
 });
 
 // Schema para atualizar contato
 const ContatoUpdateSchema = ContatoCreateSchema.partial();
 
-// GET all contatos for an announcer (admin sees all, users see only their own)
-export const getContatosByAnunciante: RequestHandler = async (req, res) => {
+// GET all contatos for a user (admin sees all, users see only their own)
+export const getContatosByUsuario: RequestHandler = async (req, res) => {
   try {
-    const { anuncianteId } = req.params;
     const usuarioId = parseInt(req.headers["x-user-id"] as string || "0");
 
-    // Verify user is the announcer
-    const anunciante = await prisma.anunciantes.findUnique({
-      where: { id: parseInt(anuncianteId) },
-      select: {
-        id: true,
-        usuarios_anunciantes: {
-          select: {
-            usuarioId: true,
-          },
-        },
-      },
-    });
-
-    if (!anunciante) {
-      return res.status(404).json({
+    if (!usuarioId) {
+      return res.status(401).json({
         success: false,
-        error: "Anunciante não encontrado",
-      });
-    }
-
-    // Check if user is linked to this announcer or is admin
-    const isOwner = anunciante.usuarios_anunciantes.some(
-      (ua) => ua.usuarioId === usuarioId
-    );
-
-    if (!isOwner) {
-      return res.status(403).json({
-        success: false,
-        error: "Acesso negado",
+        error: "Usuário não autenticado",
       });
     }
 
@@ -62,32 +36,37 @@ export const getContatosByAnunciante: RequestHandler = async (req, res) => {
       select: { tipoUsuario: true },
     });
 
-    const isAdmin = usuario?.tipoUsuario === "adm";
+    if (!usuario) {
+      return res.status(404).json({
+        success: false,
+        error: "Usuário não encontrado",
+      });
+    }
+
+    const isAdmin = usuario.tipoUsuario === "adm";
 
     // Build filter: admin sees all, regular users see only their own
-    const contatosFilter: any = { anuncianteId: parseInt(anuncianteId) };
+    const contatosFilter: any = {};
 
     if (!isAdmin) {
-      // Regular users only see contacts they're linked to
-      contatosFilter.usuarios = {
-        some: {
-          usuarioId: usuarioId,
-        },
-      };
+      // Regular users only see contacts they created
+      contatosFilter.usuarioId = usuarioId;
     }
 
     const contatos = await prisma.contatos.findMany({
       where: contatosFilter,
       include: {
-        usuarios: {
-          include: {
-            usuario: {
-              select: {
-                id: true,
-                nome: true,
-                email: true,
-              },
-            },
+        usuario: {
+          select: {
+            id: true,
+            nome: true,
+            email: true,
+          },
+        },
+        anunciante: {
+          select: {
+            id: true,
+            nome: true,
           },
         },
       },
@@ -110,47 +89,49 @@ export const getContatosByAnunciante: RequestHandler = async (req, res) => {
 // CREATE new contato
 export const createContato: RequestHandler = async (req, res) => {
   try {
-    const { anuncianteId } = req.params;
     const usuarioId = parseInt(req.headers["x-user-id"] as string || "0");
     const validatedData = ContatoCreateSchema.parse(req.body);
 
-    // Verify user is the announcer
-    const anunciante = await prisma.anunciantes.findUnique({
-      where: { id: parseInt(anuncianteId) },
-      select: {
-        usuarios_anunciantes: {
-          select: {
-            usuarioId: true,
-          },
-        },
-      },
+    if (!usuarioId) {
+      return res.status(401).json({
+        success: false,
+        error: "Usuário não autenticado",
+      });
+    }
+
+    // Verify user exists
+    const usuario = await prisma.usracessos.findUnique({
+      where: { id: usuarioId },
+      select: { id: true },
     });
 
-    if (!anunciante) {
+    if (!usuario) {
       return res.status(404).json({
         success: false,
-        error: "Anunciante não encontrado",
+        error: "Usuário não encontrado",
       });
     }
 
-    const isOwner = anunciante.usuarios_anunciantes.some(
-      (ua) => ua.usuarioId === usuarioId
-    );
-
-    if (!isOwner) {
-      return res.status(403).json({
-        success: false,
-        error: "Apenas o anunciante pode criar contatos",
+    // If anuncianteId is provided, verify it exists
+    if (validatedData.anuncianteId) {
+      const anunciante = await prisma.anunciantes.findUnique({
+        where: { id: validatedData.anuncianteId },
+        select: { id: true },
       });
+
+      if (!anunciante) {
+        return res.status(404).json({
+          success: false,
+          error: "Anunciante não encontrado",
+        });
+      }
     }
 
-    // Create contact with auto-linked creator user
-    const usuariosParaAdicionar = new Set(validatedData.usuariosIds || []);
-    usuariosParaAdicionar.add(usuarioId); // Auto-add creator
-
+    // Create contact
     const contato = await prisma.contatos.create({
       data: {
-        anuncianteId: parseInt(anuncianteId),
+        usuarioId,
+        anuncianteId: validatedData.anuncianteId || null,
         nome: validatedData.nome,
         celular: validatedData.celular,
         telefone: validatedData.telefone || null,
@@ -159,26 +140,19 @@ export const createContato: RequestHandler = async (req, res) => {
         tipoContato: validatedData.tipoContato,
         observacoes: validatedData.observacoes || null,
         imagem: validatedData.imagem || null,
-        usuarios:
-          usuariosParaAdicionar.size > 0
-            ? {
-                create: Array.from(usuariosParaAdicionar).map((id) => ({
-                  usuarioId: id,
-                })),
-              }
-            : undefined,
       },
       include: {
-        usuarios: {
+        usuario: {
           select: {
             id: true,
-            usuario: {
-              select: {
-                id: true,
-                nome: true,
-                email: true,
-              },
-            },
+            nome: true,
+            email: true,
+          },
+        },
+        anunciante: {
+          select: {
+            id: true,
+            nome: true,
           },
         },
       },
@@ -209,52 +183,62 @@ export const createContato: RequestHandler = async (req, res) => {
 // UPDATE contato
 export const updateContato: RequestHandler = async (req, res) => {
   try {
-    const { anuncianteId, contatoId } = req.params;
+    const { contatoId } = req.params;
     const usuarioId = parseInt(req.headers["x-user-id"] as string || "0");
     const validatedData = ContatoUpdateSchema.parse(req.body);
 
-    // Verify announcer exists and user is owner
-    const anunciante = await prisma.anunciantes.findUnique({
-      where: { id: parseInt(anuncianteId) },
+    if (!usuarioId) {
+      return res.status(401).json({
+        success: false,
+        error: "Usuário não autenticado",
+      });
+    }
+
+    // Get the contact to verify ownership
+    const contato = await prisma.contatos.findUnique({
+      where: { id: parseInt(contatoId) },
       select: {
-        id: true,
-        usuarios_anunciantes: {
-          select: {
-            usuarioId: true,
-          },
-        },
+        usuarioId: true,
+        anuncianteId: true,
       },
     });
 
-    if (!anunciante) {
-      return res.status(404).json({
-        success: false,
-        error: "Anunciante não encontrado",
-      });
-    }
-
-    // Check if user is owner of this announcer
-    const isOwner = anunciante.usuarios_anunciantes.some(
-      (ua) => ua.usuarioId === usuarioId
-    );
-
-    if (!isOwner) {
-      return res.status(403).json({
-        success: false,
-        error: "Você não é proprietário deste anunciante",
-      });
-    }
-
-    // Verify contato belongs to this announcer
-    const contato = await prisma.contatos.findUnique({
-      where: { id: parseInt(contatoId) },
-    });
-
-    if (!contato || contato.anuncianteId !== parseInt(anuncianteId)) {
+    if (!contato) {
       return res.status(404).json({
         success: false,
         error: "Contato não encontrado",
       });
+    }
+
+    // Check if user is the creator or admin
+    const usuario = await prisma.usracessos.findUnique({
+      where: { id: usuarioId },
+      select: { tipoUsuario: true },
+    });
+
+    const isAdmin = usuario?.tipoUsuario === "adm";
+    const isOwner = contato.usuarioId === usuarioId;
+
+    if (!isOwner && !isAdmin) {
+      return res.status(403).json({
+        success: false,
+        error: "Você não tem permissão para editar este contato",
+      });
+    }
+
+    // If anuncianteId is provided, verify it exists
+    if (validatedData.anuncianteId) {
+      const anunciante = await prisma.anunciantes.findUnique({
+        where: { id: validatedData.anuncianteId },
+        select: { id: true },
+      });
+
+      if (!anunciante) {
+        return res.status(404).json({
+          success: false,
+          error: "Anunciante não encontrado",
+        });
+      }
     }
 
     const updatedContato = await prisma.contatos.update({
@@ -262,24 +246,32 @@ export const updateContato: RequestHandler = async (req, res) => {
       data: {
         ...(validatedData.nome && { nome: validatedData.nome }),
         ...(validatedData.celular && { celular: validatedData.celular }),
-        ...(validatedData.telefone !== undefined && { telefone: validatedData.telefone }),
+        ...(validatedData.telefone !== undefined && {
+          telefone: validatedData.telefone,
+        }),
         ...(validatedData.email !== undefined && { email: validatedData.email }),
         ...(validatedData.status && { status: validatedData.status }),
         ...(validatedData.tipoContato && { tipoContato: validatedData.tipoContato }),
-        ...(validatedData.observacoes !== undefined && { observacoes: validatedData.observacoes }),
+        ...(validatedData.observacoes !== undefined && {
+          observacoes: validatedData.observacoes,
+        }),
         ...(validatedData.imagem !== undefined && { imagem: validatedData.imagem }),
+        ...(validatedData.anuncianteId !== undefined && {
+          anuncianteId: validatedData.anuncianteId,
+        }),
       },
       include: {
-        usuarios: {
+        usuario: {
           select: {
             id: true,
-            usuario: {
-              select: {
-                id: true,
-                nome: true,
-                email: true,
-              },
-            },
+            nome: true,
+            email: true,
+          },
+        },
+        anunciante: {
+          select: {
+            id: true,
+            nome: true,
           },
         },
       },
@@ -310,50 +302,44 @@ export const updateContato: RequestHandler = async (req, res) => {
 // DELETE contato
 export const deleteContato: RequestHandler = async (req, res) => {
   try {
-    const { anuncianteId, contatoId } = req.params;
+    const { contatoId } = req.params;
     const usuarioId = parseInt(req.headers["x-user-id"] as string || "0");
 
-    // Verify announcer exists and user is owner
-    const anunciante = await prisma.anunciantes.findUnique({
-      where: { id: parseInt(anuncianteId) },
+    if (!usuarioId) {
+      return res.status(401).json({
+        success: false,
+        error: "Usuário não autenticado",
+      });
+    }
+
+    // Get the contact to verify ownership
+    const contato = await prisma.contatos.findUnique({
+      where: { id: parseInt(contatoId) },
       select: {
-        id: true,
-        usuarios_anunciantes: {
-          select: {
-            usuarioId: true,
-          },
-        },
+        usuarioId: true,
       },
     });
 
-    if (!anunciante) {
-      return res.status(404).json({
-        success: false,
-        error: "Anunciante não encontrado",
-      });
-    }
-
-    // Check if user is owner of this announcer
-    const isOwner = anunciante.usuarios_anunciantes.some(
-      (ua) => ua.usuarioId === usuarioId
-    );
-
-    if (!isOwner) {
-      return res.status(403).json({
-        success: false,
-        error: "Você não é proprietário deste anunciante",
-      });
-    }
-
-    // Verify contato belongs to this announcer
-    const contato = await prisma.contatos.findUnique({
-      where: { id: parseInt(contatoId) },
-    });
-
-    if (!contato || contato.anuncianteId !== parseInt(anuncianteId)) {
+    if (!contato) {
       return res.status(404).json({
         success: false,
         error: "Contato não encontrado",
+      });
+    }
+
+    // Check if user is the creator or admin
+    const usuario = await prisma.usracessos.findUnique({
+      where: { id: usuarioId },
+      select: { tipoUsuario: true },
+    });
+
+    const isAdmin = usuario?.tipoUsuario === "adm";
+    const isOwner = contato.usuarioId === usuarioId;
+
+    if (!isOwner && !isAdmin) {
+      return res.status(403).json({
+        success: false,
+        error: "Você não tem permissão para deletar este contato",
       });
     }
 
@@ -374,178 +360,9 @@ export const deleteContato: RequestHandler = async (req, res) => {
   }
 };
 
-// ADD usuario to contato
-export const addUsuarioToContato: RequestHandler = async (req, res) => {
-  try {
-    const { anuncianteId, contatoId } = req.params;
-    const { usuarioId } = req.body;
-    const userId = parseInt(req.headers["x-user-id"] as string || "0");
-
-    // Get user info to check if admin
-    const usuario = await prisma.usracessos.findUnique({
-      where: { id: userId },
-      select: { tipoUsuario: true },
-    });
-
-    if (!usuario) {
-      return res.status(401).json({
-        success: false,
-        error: "Usuário não encontrado",
-      });
-    }
-
-    // Only admins can modify contact users
-    const isAdmin = usuario.tipoUsuario === "adm";
-
-    if (!isAdmin) {
-      return res.status(403).json({
-        success: false,
-        error: "Apenas administradores podem adicionar usuários a contatos",
-      });
-    }
-
-    // Verify announcer exists
-    const anunciante = await prisma.anunciantes.findUnique({
-      where: { id: parseInt(anuncianteId) },
-      select: {
-        usuarios_anunciantes: {
-          select: {
-            usuarioId: true,
-          },
-        },
-      },
-    });
-
-    if (!anunciante) {
-      return res.status(404).json({
-        success: false,
-        error: "Anunciante não encontrado",
-      });
-    }
-
-    const contato = await prisma.contatos.findUnique({
-      where: { id: parseInt(contatoId) },
-    });
-
-    if (!contato || contato.anuncianteId !== parseInt(anuncianteId)) {
-      return res.status(404).json({
-        success: false,
-        error: "Contato não encontrado",
-      });
-    }
-
-    const contatoUsuario = await prisma.contato_usuarios.create({
-      data: {
-        contatoId: parseInt(contatoId),
-        usuarioId,
-      },
-      include: {
-        usuario: {
-          select: {
-            id: true,
-            nome: true,
-            email: true,
-          },
-        },
-      },
-    });
-
-    res.status(201).json({
-      success: true,
-      data: contatoUsuario,
-      message: "Usuário adicionado com sucesso",
-    });
-  } catch (error: any) {
-    if (error.code === "P2002") {
-      return res.status(400).json({
-        success: false,
-        error: "Este usuário já está vinculado a este contato",
-      });
-    }
-
-    console.error("Error adding usuario to contato:", error);
-    res.status(500).json({
-      success: false,
-      error: "Erro ao adicionar usuário",
-    });
-  }
-};
-
-// REMOVE usuario from contato
-export const removeUsuarioFromContato: RequestHandler = async (req, res) => {
-  try {
-    const { anuncianteId, contatoId, usuarioId } = req.params;
-    const userId = parseInt(req.headers["x-user-id"] as string || "0");
-
-    // Get user info to check if admin
-    const usuario = await prisma.usracessos.findUnique({
-      where: { id: userId },
-      select: { tipoUsuario: true },
-    });
-
-    if (!usuario) {
-      return res.status(401).json({
-        success: false,
-        error: "Usuário não encontrado",
-      });
-    }
-
-    // Only admins can modify contact users
-    const isAdmin = usuario.tipoUsuario === "adm";
-
-    if (!isAdmin) {
-      return res.status(403).json({
-        success: false,
-        error: "Apenas administradores podem remover usuários de contatos",
-      });
-    }
-
-    // Verify announcer exists
-    const anunciante = await prisma.anunciantes.findUnique({
-      where: { id: parseInt(anuncianteId) },
-      select: {
-        usuarios_anunciantes: {
-          select: {
-            usuarioId: true,
-          },
-        },
-      },
-    });
-
-    if (!anunciante) {
-      return res.status(404).json({
-        success: false,
-        error: "Anunciante não encontrado",
-      });
-    }
-
-    const contato = await prisma.contatos.findUnique({
-      where: { id: parseInt(contatoId) },
-    });
-
-    if (!contato || contato.anuncianteId !== parseInt(anuncianteId)) {
-      return res.status(404).json({
-        success: false,
-        error: "Contato não encontrado",
-      });
-    }
-
-    await prisma.contato_usuarios.deleteMany({
-      where: {
-        contatoId: parseInt(contatoId),
-        usuarioId: parseInt(usuarioId),
-      },
-    });
-
-    res.json({
-      success: true,
-      message: "Usuário removido com sucesso",
-    });
-  } catch (error) {
-    console.error("Error removing usuario from contato:", error);
-    res.status(500).json({
-      success: false,
-      error: "Erro ao remover usuário",
-    });
-  }
+// For backwards compatibility: GET contatos by announcer (now calls getContatosByUsuario)
+export const getContatosByAnunciante: RequestHandler = async (req, res) => {
+  // This route is deprecated, but kept for backwards compatibility
+  // Just calls the user-based endpoint
+  return getContatosByUsuario(req, res);
 };
