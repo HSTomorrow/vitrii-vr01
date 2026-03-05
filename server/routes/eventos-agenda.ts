@@ -1114,45 +1114,11 @@ export const getAgendaPrivacyStatus: RequestHandler = async (req, res) => {
       agendaPrivacy = "restrita";
     }
 
-    // Determine if user can view agenda
-    let canViewAgenda = true;
-    let canEditAgenda = isAnunciante || isAdmin;
-
-    if (agendaPrivacy === "privada" && !isAnunciante && !isAdmin) {
-      canViewAgenda = false;
-    }
-
-    // If restrita, check if user is in any contact permissions
-    if (agendaPrivacy === "restrita" && !isAnunciante && !isAdmin && userId) {
-      const hasPermission = await prisma.eventos_permissoes
-        .findFirst({
-          where: {
-            evento: {
-              anuncianteId: anuncianteId_num,
-            },
-            usuarioId: userId,
-          },
-        })
-        .then((p) => !!p);
-
-      if (!hasPermission) {
-        // Check fila permissions
-        const hasFilaPermission = await prisma.filas_espera_permissoes
-          .findFirst({
-            where: {
-              fila: {
-                anuncianteAlvoId: anuncianteId_num,
-              },
-              usuarioId: userId,
-            },
-          })
-          .then((p) => !!p);
-
-        if (!hasFilaPermission) {
-          canViewAgenda = false;
-        }
-      }
-    }
+    // Determine if user can view/edit agenda
+    // NOTE: The AGENDA (calendar view) is ALWAYS PUBLIC
+    // Privacy restrictions are on INDIVIDUAL EVENTS (handled by getEventosVisivelsPara)
+    let canViewAgenda = true; // Always true - agenda calendar is public
+    let canEditAgenda = isAnunciante || isAdmin; // Only announcer/admin can edit
 
     res.json({
       data: {

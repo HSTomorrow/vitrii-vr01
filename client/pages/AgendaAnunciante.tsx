@@ -142,32 +142,8 @@ export default function AgendaAnunciante() {
     );
   }
 
-  // Check if user can view agenda
+  // Get privacy status for display purposes
   const privacyStatus = privacyData?.data;
-  const canViewAgenda = privacyStatus?.canViewAgenda ?? true;
-
-  if (privacyStatus && !canViewAgenda) {
-    return (
-      <div className="min-h-screen flex flex-col bg-gray-50">
-        <Header />
-        <main className="flex-1 flex items-center justify-center">
-          <div className="max-w-md mx-auto text-center">
-            <Lock className="w-16 h-16 text-red-500 mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-vitrii-text mb-2">
-              Acesso Negado
-            </h2>
-            <p className="text-gray-600 mb-6">
-              Esta agenda é privada e você não tem permissão para acessá-la.
-            </p>
-            <p className="text-sm text-gray-500">
-              Entre em contato com o anunciante para obter acesso.
-            </p>
-          </div>
-        </main>
-        <Footer />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
@@ -192,7 +168,7 @@ export default function AgendaAnunciante() {
                 {anunciante.nome}
               </h1>
               <div className="flex items-center gap-3 mt-1">
-                <p className="text-gray-600">Agenda e Disponibilidade</p>
+                <p className="text-gray-600">Agenda e Disponibilidade (Pública)</p>
                 {privacyStatus && (
                   <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
                     privacyStatus.agendaPrivacy === "privada"
@@ -202,10 +178,10 @@ export default function AgendaAnunciante() {
                         : "bg-green-100 text-green-700"
                   }`}>
                     {privacyStatus.agendaPrivacy === "privada"
-                      ? "🔒 Privada"
+                      ? "Eventos 🔒 Privados"
                       : privacyStatus.agendaPrivacy === "restrita"
-                        ? "👥 Restrita"
-                        : "🌍 Pública"}
+                        ? "Eventos 👥 Restritos"
+                        : "Eventos 🌍 Públicos"}
                   </span>
                 )}
               </div>
@@ -261,10 +237,17 @@ export default function AgendaAnunciante() {
         )}
 
         {/* Privacy Notice */}
-        <div className="mt-8 p-4 bg-gray-100 rounded-lg text-sm text-gray-700">
-          <p>
-            <strong>Legenda:</strong> 🌍 Público (visível) • 👥 Restrita (disponibilidade visível, detalhes apenas para autorizados) • 🔒 Privado (não visível)
-          </p>
+        <div className="mt-8 space-y-4">
+          <div className="p-4 bg-green-50 border border-green-200 rounded-lg text-sm text-green-800">
+            <p>
+              <strong>✓ Calendário Público:</strong> Esta agenda é sempre pública e visível para todos. O que é restrito são os detalhes dentro de cada evento.
+            </p>
+          </div>
+          <div className="p-4 bg-gray-100 rounded-lg text-sm text-gray-700">
+            <p>
+              <strong>Privacidade dos Eventos:</strong> 🌍 Público (detalhes visíveis) • 👥 Restrito (apenas para contatos autorizados) • 🔒 Privado (oculto)
+            </p>
+          </div>
         </div>
       </main>
 
