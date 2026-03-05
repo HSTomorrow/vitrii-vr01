@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { shouldRegisterServiceWorker } from '@/utils/safariCompat';
 
 interface PWAInstallPrompt extends Event {
   prompt: () => Promise<void>;
@@ -37,21 +38,26 @@ export const usePWA = (): UsePWAReturn => {
   const [osInfo, setOsInfo] = useState(() => detectOS());
 
   useEffect(() => {
-    // Register service worker
-    if ('serviceWorker' in navigator) {
+    // Register service worker only if browser supports it and is not Safari iOS
+    if ('serviceWorker' in navigator && shouldRegisterServiceWorker()) {
       navigator.serviceWorker
         .register('/sw.js')
         .then((registration) => {
           console.log('[PWA] Service Worker registered:', registration);
-          
+
           // Check for updates periodically
-          setInterval(() => {
+          const updateInterval = setInterval(() => {
             registration.update();
           }, 60000); // Check every minute
+
+          return () => clearInterval(updateInterval);
         })
         .catch((error) => {
           console.error('[PWA] Service Worker registration failed:', error);
+          // Service Worker is optional - app still works without it
         });
+    } else if (!shouldRegisterServiceWorker()) {
+      console.log('[PWA] Service Worker registration skipped (Safari iOS or unsupported)');
     }
 
     // Listen for online/offline changes
