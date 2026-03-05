@@ -93,9 +93,28 @@ export const shouldRegisterServiceWorker = (): boolean => {
   return !isSafariIOS();
 };
 
+/**
+ * Unregister all existing Service Workers
+ * Useful for clearing stale SW registrations
+ */
+export const unregisterAllServiceWorkers = async (): Promise<void> => {
+  if (!('serviceWorker' in navigator)) return;
+
+  try {
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    for (const registration of registrations) {
+      await registration.unregister();
+      console.log('[SafariCompat] Unregistered Service Worker:', registration.scope);
+    }
+  } catch (error) {
+    console.warn('[SafariCompat] Failed to unregister Service Workers:', error);
+  }
+};
+
 export default {
   isSafariIOS,
   safeLocalStorage,
   safeSessionStorage,
   shouldRegisterServiceWorker,
+  unregisterAllServiceWorkers,
 };

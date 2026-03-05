@@ -74,6 +74,11 @@
 
       // Handle unhandled promise rejections
       window.addEventListener('unhandledrejection', (event) => {
+        // Suppress WebSocket errors from Vite dev client - they don't affect functionality
+        if (event.reason && event.reason.message && event.reason.message.includes('WebSocket')) {
+          console.log('[Dev] WebSocket reconnection attempt...');
+          return; // Don't log/throw WebSocket errors
+        }
         console.error('[UnhandledRejection]', event.reason);
       });
 

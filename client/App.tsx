@@ -1,5 +1,6 @@
 import "./global.css";
 
+import React, { useEffect } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -77,6 +78,33 @@ const queryClient = new QueryClient({
 
 // Separate component to use the hook
 function AppContent() {
+  // Cleanup stale service workers on mount
+  useEffect(() => {
+    const cleanupSW = async () => {
+      if (!('serviceWorker' in navigator)) return;
+
+      try {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        // Only cleanup if we have multiple registrations (indicates stale ones exist)
+        if (registrations.length > 1) {
+          console.log(`[App] Cleaning up ${registrations.length - 1} stale Service Worker(s)`);
+          // Keep the most recent one, unregister older ones
+          for (let i = 0; i < registrations.length - 1; i++) {
+            try {
+              await registrations[i].unregister();
+            } catch (err) {
+              console.warn('[App] Failed to unregister SW:', err);
+            }
+          }
+        }
+      } catch (error) {
+        console.warn('[App] Could not cleanup Service Workers:', error);
+      }
+    };
+
+    cleanupSW();
+  }, []);
+
   useAutoUpdate();
 
   return (
