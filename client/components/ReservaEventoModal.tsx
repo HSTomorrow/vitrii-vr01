@@ -30,6 +30,7 @@ export default function ReservaEventoModal({
   const navigate = useNavigate();
   const [step, setStep] = useState<"tipo" | "dados">("tipo");
   const [tipo, setTipo] = useState<"reserva" | "lista_espera">("reserva");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     nomeSolicitante: "",
     emailSolicitante: "",
@@ -71,6 +72,7 @@ export default function ReservaEventoModal({
       body.telefoneSolicitante = formData.telefoneSolicitante || undefined;
     }
 
+    setIsSubmitting(true);
     try {
       const response = await fetch("/api/reservas-evento", {
         method: "POST",
@@ -101,9 +103,12 @@ export default function ReservaEventoModal({
       onSuccess?.();
       onClose();
     } catch (error) {
+      console.error("Erro ao criar reserva:", error);
       toast.error(
         error instanceof Error ? error.message : "Erro ao criar reserva",
       );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -287,11 +292,11 @@ export default function ReservaEventoModal({
         <div className="p-6 space-y-3">
           <button
             onClick={() => handleSelectType("reserva")}
-            disabled={isLoading}
+            disabled={isLoading || isSubmitting}
             className="w-full p-4 border-2 border-vitrii-blue rounded-lg hover:bg-blue-50 transition-colors text-left disabled:opacity-50"
           >
             <h4 className="font-semibold text-vitrii-text">
-              ✓ Fazer Reserva
+              {isSubmitting ? "Processando..." : "✓ Fazer Reserva"}
             </h4>
             <p className="text-sm text-gray-600 mt-1">
               Reserve este horário. O anunciante confirmará sua reserva.
@@ -300,11 +305,11 @@ export default function ReservaEventoModal({
 
           <button
             onClick={() => handleSelectType("lista_espera")}
-            disabled={isLoading}
+            disabled={isLoading || isSubmitting}
             className="w-full p-4 border-2 border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-left disabled:opacity-50"
           >
             <h4 className="font-semibold text-vitrii-text">
-              ⏳ Entrar na Lista de Espera
+              {isSubmitting ? "Processando..." : "⏳ Entrar na Lista de Espera"}
             </h4>
             <p className="text-sm text-gray-600 mt-1">
               Se o horário não estiver disponível, entre na fila.

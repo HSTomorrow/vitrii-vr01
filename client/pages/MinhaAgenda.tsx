@@ -14,6 +14,8 @@ import FilaDeEsperaList from "@/components/FilaDeEsperaList";
 import StatusAgenda from "@/components/StatusAgenda";
 import AgendaEditorModal from "@/components/AgendaEditorModal";
 import ShareAgendaModal from "@/components/ShareAgendaModal";
+import RecurrenceModal, { RecurrenceData } from "@/components/RecurrenceModal";
+import DeleteFilterModal from "@/components/DeleteFilterModal";
 
 interface Evento {
   id: number;
@@ -58,6 +60,8 @@ export default function MinhaAgenda() {
   const [showFilaDeEsperaModal, setShowFilaDeEsperaModal] = useState(false);
   const [showEditorModal, setShowEditorModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [showRecurrenceModal, setShowRecurrenceModal] = useState(false);
+  const [showDeleteFilterModal, setShowDeleteFilterModal] = useState(false);
   const [activeTab, setActiveTab] = useState<"calendar" | "dia" | "fila-espera" | "status-agenda">("calendar");
   const [filterContatoId, setFilterContatoId] = useState<number | null>(null);
   const [filterContatoNome, setFilterContatoNome] = useState("");
@@ -391,6 +395,134 @@ export default function MinhaAgenda() {
     },
   });
 
+  // Generate occurrences based on recurrence pattern
+  const generateOccurrences = (data: RecurrenceData): Array<{ dataInicio: Date; dataFim: Date }> => {
+    const occurrences: Array<{ dataInicio: Date; dataFim: Date }> = [];
+    const startDate = new Date(data.recorrenciaDataInicio);
+    const endDate = new Date(data.recorrenciaDataFim);
+    const [horaInicioH, horaInicioM] = data.horaInicio.split(":").map(Number);
+    const [horaFimH, horaFimM] = data.horaFim.split(":").map(Number);
+
+    let currentDate = new Date(startDate);
+
+    while (currentDate <= endDate) {
+      let shouldInclude = false;
+
+      if (data.recorrenciaType === "semanal") {
+        // Check if current day is in diasSemana
+        shouldInclude = data.diasSemana?.includes(currentDate.getDay()) || false;
+      } else if (data.recorrenciaType === "mensal") {
+        // Check if current date matches diaDoMes
+        shouldInclude = currentDate.getDate() === data.diaDoMes;
+      }
+
+      if (shouldInclude) {
+        const dataInicioOccurrence = new Date(currentDate);
+        dataInicioOccurrence.setHours(horaInicioH, horaInicioM, 0, 0);
+
+        const dataFimOccurrence = new Date(currentDate);
+        dataFimOccurrence.setHours(horaFimH, horaFimM, 0, 0);
+
+        occurrences.push({
+          dataInicio: dataInicioOccurrence,
+          dataFim: dataFimOccurrence,
+        });
+      }
+
+      // Move to next day
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return occurrences;
+  };
+
+  // Create recurrence mutation
+  const createRecurrenceMutation = useMutation({
+    mutationFn: async (data: RecurrenceData) => {
+      const occurrences = generateOccurrences(data);
+
+      if (occurrences.length === 0) {
+        throw new Error("Nenhuma ocorrência encontrada para o padrão de recorrência");
+      }
+
+      // Create all events
+      const eventPromises = occurrences.map((occurrence) =>
+        fetch("/api/eventos-agenda", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "x-user-id": user?.id?.toString() || "",
+          },
+          body: JSON.stringify({
+            titulo: data.titulo,
+            descricao: data.descricao,
+            dataInicio: occurrence.dataInicio.toISOString(),
+            dataFim: occurrence.dataFim.toISOString(),
+            privacidade: data.privacidade,
+            cor: data.cor,
+            anuncianteId: selectedAnuncianteId,
+          }),
+        })
+      );
+
+      const responses = await Promise.all(eventPromises);
+
+      for (const response of responses) {
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || "Erro ao criar eventos recorrentes");
+        }
+      }
+
+      return { createdCount: occurrences.length };
+    },
+    onSuccess: (result) => {
+      toast.success(`${result.createdCount} evento(s) criado(s) com sucesso!`);
+      setShowRecurrenceModal(false);
+      refetchEventos();
+    },
+    onError: (error) => {
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao criar recorrência",
+      );
+    },
+  });
+
+  // Bulk delete events mutation
+  const bulkDeleteEventosMutation = useMutation({
+    mutationFn: async (eventoIds: number[]) => {
+      const deletePromises = eventoIds.map((id) =>
+        fetch(`/api/eventos-agenda/${id}`, {
+          method: "DELETE",
+          headers: {
+            "x-user-id": user?.id?.toString() || "",
+          },
+        })
+      );
+
+      const responses = await Promise.all(deletePromises);
+
+      for (const response of responses) {
+        if (!response.ok) {
+          const error = await response.json();
+          throw new Error(error.error || "Erro ao deletar evento");
+        }
+      }
+
+      return { deletedCount: eventoIds.length };
+    },
+    onSuccess: (result) => {
+      toast.success(`${result.deletedCount} evento(s) deletado(s) com sucesso!`);
+      setShowDeleteFilterModal(false);
+      refetchEventos();
+    },
+    onError: (error) => {
+      toast.error(
+        error instanceof Error ? error.message : "Erro ao deletar eventos",
+      );
+    },
+  });
+
   const handleSaveEvento = (
     data: Partial<Evento> & { contatosPermitidos?: number[] },
   ) => {
@@ -646,6 +778,12 @@ export default function MinhaAgenda() {
                         + Adicionar Evento
                       </button>
                       <button
+                        onClick={() => setShowRecurrenceModal(true)}
+                        className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium"
+                      >
+                        🔄 Recorrência
+                      </button>
+                      <button
                         onClick={() => setShowFilaDeEsperaModal(true)}
                         className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium"
                       >
@@ -666,16 +804,8 @@ export default function MinhaAgenda() {
                         Compartilhar
                       </button>
                       <button
-                        onClick={() => {
-                          if (
-                            confirm(
-                              "Tem certeza que deseja deletar esta agenda? Todos os eventos serão removidos."
-                            )
-                          ) {
-                            deleteAgendaMutation.mutate();
-                          }
-                        }}
-                        disabled={deleteAgendaMutation.isPending}
+                        onClick={() => setShowDeleteFilterModal(true)}
+                        disabled={bulkDeleteEventosMutation.isPending || eventos.length === 0}
                         className="ml-auto px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-medium disabled:opacity-50 flex items-center gap-2"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -831,6 +961,22 @@ export default function MinhaAgenda() {
             anuncianteNome={
               anunciantes.find((a) => a.id === selectedAnuncianteId)?.nome || ""
             }
+          />
+
+          <RecurrenceModal
+            isOpen={showRecurrenceModal}
+            onClose={() => setShowRecurrenceModal(false)}
+            onCreateRecurrence={createRecurrenceMutation.mutateAsync}
+            isLoading={createRecurrenceMutation.isPending}
+          />
+
+          <DeleteFilterModal
+            isOpen={showDeleteFilterModal}
+            onClose={() => setShowDeleteFilterModal(false)}
+            onDelete={bulkDeleteEventosMutation.mutateAsync}
+            eventos={eventos}
+            contatos={todosContatos}
+            isLoading={bulkDeleteEventosMutation.isPending}
           />
         </>
       )}
