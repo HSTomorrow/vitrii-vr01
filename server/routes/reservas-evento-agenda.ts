@@ -381,3 +381,31 @@ export const getReservaCount: RequestHandler = async (req, res) => {
     res.status(500).json({ error: "Erro ao contar reservas" });
   }
 };
+
+// Get pending appointments count for current user
+export const getPendingAppointmentsCount: RequestHandler = async (req, res) => {
+  try {
+    const userId = (req as any).userId;
+
+    if (!userId) {
+      return res.status(401).json({ error: "Usuário não autenticado" });
+    }
+
+    // Count reservations/appointments where user is the creator and status is pending or pending_pagamento
+    const count = await prisma.reservas_evento_agenda.count({
+      where: {
+        usuarioId: userId,
+        status: { in: ["pendente", "pendente_pagamento"] },
+      },
+    });
+
+    res.json({
+      data: {
+        count,
+      },
+    });
+  } catch (error) {
+    console.error("[getPendingAppointmentsCount]", error);
+    res.status(500).json({ error: "Erro ao contar agendamentos pendentes" });
+  }
+};

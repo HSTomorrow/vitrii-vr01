@@ -22,6 +22,7 @@ interface DuplicateWarning {
   exists: boolean;
   contatoId?: number;
   contatoNome?: string;
+  usuarioId?: number;
   field: "email" | "celular" | null;
 }
 
@@ -200,7 +201,10 @@ export default function NewContatoModal({
                   :
                 </p>
                 <p className="text-sm text-orange-700 font-semibold mt-1">
-                  {duplicateWarning.contatoNome} (ID: {duplicateWarning.contatoId})
+                  {duplicateWarning.contatoNome}
+                </p>
+                <p className="text-xs text-orange-600 mt-1">
+                  ID Contato: {duplicateWarning.contatoId} • ID Usuário: {duplicateWarning.usuarioId}
                 </p>
                 <p className="text-xs text-orange-600 mt-2">
                   Cancele e edite o contato existente, ou continue para criar um novo.

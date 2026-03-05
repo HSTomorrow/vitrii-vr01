@@ -201,3 +201,34 @@ export async function deleteMensagem(req: Request, res: Response) {
     res.status(500).json({ error: "Erro ao deletar mensagem" });
   }
 }
+
+// Get unread messages count for current user
+export async function getUnreadMessagesCount(req: Request, res: Response) {
+  try {
+    const userId = (req as any).userId;
+
+    if (!userId) {
+      return res.status(401).json({ error: "Usuário não autenticado" });
+    }
+
+    // Count messages where user is the recipient and status is not "lida"
+    const unreadCount = await prisma.mensagens.count({
+      where: {
+        conversa: {
+          usuarioId: userId,
+        },
+        status: "nao_lida",
+        excluido: false,
+      },
+    });
+
+    res.json({
+      data: {
+        unreadCount,
+      },
+    });
+  } catch (error) {
+    console.error("[getUnreadMessagesCount] Error:", error);
+    res.status(500).json({ error: "Erro ao contar mensagens não lidas" });
+  }
+}

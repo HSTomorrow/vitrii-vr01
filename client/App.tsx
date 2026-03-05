@@ -11,6 +11,7 @@ import { useAutoUpdate } from "@/hooks/useAutoUpdate";
 
 // Import all pages eagerly to avoid lazy loading issues with useState
 import Index from "./pages/Index";
+import Dashboard from "./pages/Dashboard";
 import About from "./pages/About";
 import Browse from "./pages/Browse";
 import Sell from "./pages/Sell";
@@ -83,6 +84,7 @@ function AppContent() {
       <PageTransition>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/about" element={<About />} />
           <Route path="/ajuda-e-contato" element={<HelpAndContact />} />
           <Route path="/privacidade" element={<PrivacyPolicy />} />

@@ -147,6 +147,7 @@ import {
   getFilasEsperaVisivelsPara,
   addFilaPermissao,
   removeFilaPermissao,
+  getWaitingListCount,
 } from "./routes/filas-espera-agenda";
 import {
   criarReservaOuListaEspera,
@@ -155,6 +156,7 @@ import {
   rejeitarReserva,
   cancelarReserva,
   getReservaCount,
+  getPendingAppointmentsCount,
 } from "./routes/reservas-evento-agenda";
 import {
   getPagamentoByAnuncioId,
@@ -183,6 +185,7 @@ import {
   markConversaAsRead,
   getUnreadCount,
   deleteMensagem,
+  getUnreadMessagesCount,
 } from "./routes/mensagens";
 import {
   getFuncionalidades,
@@ -1055,6 +1058,11 @@ export function createServer() {
   app.patch("/api/conversas/:conversaId/read", markConversaAsRead);
   app.get("/api/usuarios/:usuarioId/mensagens/unread", getUnreadCount);
   app.delete("/api/mensagens/:id", deleteMensagem);
+  app.get("/api/mensagens/unread-count", extractUserId, getUnreadMessagesCount);
+
+  // Dashboard endpoints - Get stats for user dashboard
+  app.get("/api/reservas-evento/pending-count", extractUserId, getPendingAppointmentsCount);
+  app.get("/api/filas-espera/user-count", extractUserId, getWaitingListCount);
 
   // Funcionalidades (Features/Permissions) routes
   app.get("/api/funcionalidades", getFuncionalidades);

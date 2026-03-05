@@ -38,6 +38,13 @@ export default function Index() {
   const queryClient = useQueryClient();
   const [favoritos, setFavoritos] = useState<Set<number>>(new Set());
 
+  // Redirect to Dashboard if user is logged in
+  useEffect(() => {
+    if (!isLoading && user?.id) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [user?.id, isLoading, navigate]);
+
   // Debug log on mount and when user changes
   useEffect(() => {
     console.log("[Index] Page loaded - isLoading:", isLoading, "user:", user?.email || "null");

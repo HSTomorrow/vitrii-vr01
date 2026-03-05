@@ -829,3 +829,31 @@ export const removeFilaPermissao: RequestHandler = async (req, res) => {
     res.status(500).json({ error: "Erro ao remover permissão" });
   }
 };
+
+// Get waiting list count for current user
+export const getWaitingListCount: RequestHandler = async (req, res) => {
+  try {
+    const userId = (req as any).userId;
+
+    if (!userId) {
+      return res.status(401).json({ error: "Usuário não autenticado" });
+    }
+
+    // Count waiting list entries where user is the requester
+    const count = await prisma.filas_espera_agenda.count({
+      where: {
+        usuarioSolicitanteId: userId,
+        status: { in: ["pendente", "aprovada"] },
+      },
+    });
+
+    res.json({
+      data: {
+        count,
+      },
+    });
+  } catch (error) {
+    console.error("[getWaitingListCount]", error);
+    res.status(500).json({ error: "Erro ao contar filas de espera" });
+  }
+};
