@@ -319,7 +319,7 @@ export const updateEvento: RequestHandler = async (req, res) => {
       return res.status(404).json({ error: "Evento não encontrado" });
     }
 
-    // Check if user is the announcer
+    // Check if user is the announcer or admin
     const usuarioAnunciante = await prisma.usuarios_anunciantes.findFirst({
       where: {
         usuarioId: userId,
@@ -327,7 +327,15 @@ export const updateEvento: RequestHandler = async (req, res) => {
       },
     });
 
-    if (!usuarioAnunciante) {
+    const usuarioAdmin = await prisma.usracessos.findUnique({
+      where: { id: userId },
+      select: { tipoUsuario: true },
+    });
+
+    const isAnunciante = !!usuarioAnunciante;
+    const isAdmin = usuarioAdmin?.tipoUsuario === "adm";
+
+    if (!isAnunciante && !isAdmin) {
       return res
         .status(403)
         .json({ error: "Acesso negado. Você não pode editar este evento." });
@@ -418,7 +426,7 @@ export const deleteEvento: RequestHandler = async (req, res) => {
       return res.status(404).json({ error: "Evento não encontrado" });
     }
 
-    // Check if user is the announcer
+    // Check if user is the announcer or admin
     const usuarioAnunciante = await prisma.usuarios_anunciantes.findFirst({
       where: {
         usuarioId: userId,
@@ -426,7 +434,15 @@ export const deleteEvento: RequestHandler = async (req, res) => {
       },
     });
 
-    if (!usuarioAnunciante) {
+    const usuarioAdmin = await prisma.usracessos.findUnique({
+      where: { id: userId },
+      select: { tipoUsuario: true },
+    });
+
+    const isAnunciante = !!usuarioAnunciante;
+    const isAdmin = usuarioAdmin?.tipoUsuario === "adm";
+
+    if (!isAnunciante && !isAdmin) {
       return res
         .status(403)
         .json({ error: "Acesso negado. Você não pode deletar este evento." });
@@ -849,6 +865,60 @@ export const createEventoVisitante: RequestHandler = async (req, res) => {
   } catch (error) {
     console.error("[createEventoVisitante]", error);
     res.status(500).json({ error: "Erro ao criar evento" });
+  }
+};
+
+// Check if user can edit/delete an event
+export const canUserEditEvento: RequestHandler = async (req, res) => {
+  try {
+    const userId = (req as any).userId;
+    const { eventoId } = req.params;
+
+    if (!userId) {
+      return res.status(401).json({ error: "Não autenticado" });
+    }
+
+    const eventoId_num = parseInt(eventoId);
+    if (isNaN(eventoId_num)) {
+      return res.status(400).json({ error: "Invalid event ID" });
+    }
+
+    // Get event
+    const evento = await prisma.eventos_agenda_anunciante.findUnique({
+      where: { id: eventoId_num },
+    });
+
+    if (!evento) {
+      return res.status(404).json({ error: "Evento não encontrado" });
+    }
+
+    // Check if user is the announcer or admin
+    const usuarioAnunciante = await prisma.usuarios_anunciantes.findFirst({
+      where: {
+        usuarioId: userId,
+        anuncianteId: evento.anuncianteId,
+      },
+    });
+
+    const usuarioAdmin = await prisma.usracessos.findUnique({
+      where: { id: userId },
+      select: { tipoUsuario: true },
+    });
+
+    const isAnunciante = !!usuarioAnunciante;
+    const isAdmin = usuarioAdmin?.tipoUsuario === "adm";
+    const canEdit = isAnunciante || isAdmin;
+
+    res.json({
+      data: {
+        canEdit,
+        isAnunciante,
+        isAdmin,
+      },
+    });
+  } catch (error) {
+    console.error("[canUserEditEvento]", error);
+    res.status(500).json({ error: "Erro ao verificar permissões" });
   }
 };
 

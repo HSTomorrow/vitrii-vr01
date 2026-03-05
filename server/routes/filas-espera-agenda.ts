@@ -283,7 +283,7 @@ export const aprovarFilaEspera: RequestHandler = async (req, res) => {
       return res.status(404).json({ error: "Fila de espera não encontrada" });
     }
 
-    // Check if user is the target announcer
+    // Check if user is the target announcer or admin
     const usuarioAnunciante = await prisma.usuarios_anunciantes.findFirst({
       where: {
         usuarioId: userId,
@@ -291,7 +291,15 @@ export const aprovarFilaEspera: RequestHandler = async (req, res) => {
       },
     });
 
-    if (!usuarioAnunciante) {
+    const usuarioAdmin = await prisma.usracessos.findUnique({
+      where: { id: userId },
+      select: { tipoUsuario: true },
+    });
+
+    const isAnunciante = !!usuarioAnunciante;
+    const isAdmin = usuarioAdmin?.tipoUsuario === "adm";
+
+    if (!isAnunciante && !isAdmin) {
       return res
         .status(403)
         .json({ error: "Acesso negado. Você não pode aprovar esta fila." });
@@ -384,7 +392,7 @@ export const rejeitarFilaEspera: RequestHandler = async (req, res) => {
       return res.status(404).json({ error: "Fila de espera não encontrada" });
     }
 
-    // Check if user is the target announcer
+    // Check if user is the target announcer or admin
     const usuarioAnunciante = await prisma.usuarios_anunciantes.findFirst({
       where: {
         usuarioId: userId,
@@ -392,7 +400,15 @@ export const rejeitarFilaEspera: RequestHandler = async (req, res) => {
       },
     });
 
-    if (!usuarioAnunciante) {
+    const usuarioAdmin = await prisma.usracessos.findUnique({
+      where: { id: userId },
+      select: { tipoUsuario: true },
+    });
+
+    const isAnunciante = !!usuarioAnunciante;
+    const isAdmin = usuarioAdmin?.tipoUsuario === "adm";
+
+    if (!isAnunciante && !isAdmin) {
       return res
         .status(403)
         .json({ error: "Acesso negado. Você não pode rejeitar esta fila." });
@@ -450,7 +466,7 @@ export const cancelarFilaEspera: RequestHandler = async (req, res) => {
       return res.status(404).json({ error: "Fila de espera não encontrada" });
     }
 
-    // Check if user is the requester or the target announcer
+    // Check if user is the requester, target announcer, or admin
     const isRequester = fila.usuarioSolicitanteId === userId;
     const usuarioAnunciante = await prisma.usuarios_anunciantes.findFirst({
       where: {
@@ -459,7 +475,15 @@ export const cancelarFilaEspera: RequestHandler = async (req, res) => {
       },
     });
 
-    if (!isRequester && !usuarioAnunciante) {
+    const usuarioAdmin = await prisma.usracessos.findUnique({
+      where: { id: userId },
+      select: { tipoUsuario: true },
+    });
+
+    const isAnunciante = !!usuarioAnunciante;
+    const isAdmin = usuarioAdmin?.tipoUsuario === "adm";
+
+    if (!isRequester && !isAnunciante && !isAdmin) {
       return res
         .status(403)
         .json({ error: "Acesso negado. Você não pode cancelar esta fila." });
@@ -827,6 +851,62 @@ export const removeFilaPermissao: RequestHandler = async (req, res) => {
   } catch (error) {
     console.error("[removeFilaPermissao]", error);
     res.status(500).json({ error: "Erro ao remover permissão" });
+  }
+};
+
+// Check if user can edit/delete a waiting queue entry
+export const canUserEditFila: RequestHandler = async (req, res) => {
+  try {
+    const userId = (req as any).userId;
+    const { filaId } = req.params;
+
+    if (!userId) {
+      return res.status(401).json({ error: "Não autenticado" });
+    }
+
+    const filaId_num = parseInt(filaId);
+    if (isNaN(filaId_num)) {
+      return res.status(400).json({ error: "Invalid waiting queue ID" });
+    }
+
+    // Get waiting queue entry
+    const fila = await prisma.filas_espera_agenda.findUnique({
+      where: { id: filaId_num },
+    });
+
+    if (!fila) {
+      return res.status(404).json({ error: "Fila de espera não encontrada" });
+    }
+
+    // Check if user is requester, announcer, or admin
+    const isRequester = fila.usuarioSolicitanteId === userId;
+    const usuarioAnunciante = await prisma.usuarios_anunciantes.findFirst({
+      where: {
+        usuarioId: userId,
+        anuncianteId: fila.anuncianteAlvoId,
+      },
+    });
+
+    const usuarioAdmin = await prisma.usracessos.findUnique({
+      where: { id: userId },
+      select: { tipoUsuario: true },
+    });
+
+    const isAnunciante = !!usuarioAnunciante;
+    const isAdmin = usuarioAdmin?.tipoUsuario === "adm";
+    const canEdit = isRequester || isAnunciante || isAdmin;
+
+    res.json({
+      data: {
+        canEdit,
+        isRequester,
+        isAnunciante,
+        isAdmin,
+      },
+    });
+  } catch (error) {
+    console.error("[canUserEditFila]", error);
+    res.status(500).json({ error: "Erro ao verificar permissões" });
   }
 };
 

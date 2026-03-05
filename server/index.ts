@@ -136,6 +136,7 @@ import {
   searchUsers,
   addUserToEvento,
   getAgendaPrivacyStatus,
+  canUserEditEvento,
 } from "./routes/eventos-agenda";
 import {
   getFilasEsperaParaAnunciante,
@@ -150,6 +151,7 @@ import {
   addFilaPermissao,
   removeFilaPermissao,
   getWaitingListCount,
+  canUserEditFila,
 } from "./routes/filas-espera-agenda";
 import {
   criarReservaOuListaEspera,
@@ -995,6 +997,7 @@ export function createServer() {
   app.get("/api/eventos-agenda/anunciante/:anuncianteId", extractUserId, getEventosByAnunciante);
   app.get("/api/eventos-agenda/visiveis/:anuncianteId", getEventosVisivelsPara);
   app.get("/api/eventos-agenda/:anuncianteId/privacy-status", extractUserId, getAgendaPrivacyStatus);
+  app.get("/api/eventos-agenda/:eventoId/can-edit", extractUserId, canUserEditEvento);
   app.post("/api/eventos-agenda", extractUserId, createEvento);
   app.post("/api/eventos-agenda/visitante/criar", extractUserId, createEventoVisitante);
   app.put("/api/eventos-agenda/:id", extractUserId, updateEvento);
@@ -1012,6 +1015,7 @@ export function createServer() {
   app.get("/api/filas-espera/anunciante/:anuncianteId", extractUserId, getFilasEsperaParaAnunciante);
   app.get("/api/filas-espera/usuario", extractUserId, getFilasEsperaPorUsuario);
   app.get("/api/filas-espera/visiveis/:anuncianteId", extractUserId, getFilasEsperaVisivelsPara);
+  app.get("/api/filas-espera/:filaId/can-edit", extractUserId, canUserEditFila);
   app.post("/api/filas-espera", extractUserId, createFilaEspera);
   app.post("/api/filas-espera/:filaId/aprovar", extractUserId, aprovarFilaEspera);
   app.post("/api/filas-espera/:filaId/rejeitar", extractUserId, rejeitarFilaEspera);
