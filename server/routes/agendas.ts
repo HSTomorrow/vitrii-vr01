@@ -34,7 +34,7 @@ export const getAgendas: RequestHandler = async (req, res) => {
       if (dataFim) where.dataHora.lte = new Date(dataFim as string);
     }
 
-    const agendas = await prisma.agenda.findMany({
+    const agendas = await prisma.agendas.findMany({
       where,
       include: {
         anunciante: {
@@ -81,7 +81,7 @@ export const getAgendaById: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const agenda = await prisma.agenda.findUnique({
+    const agenda = await prisma.agendas.findUnique({
       where: { id: parseInt(id) },
       include: {
         anunciante: {
@@ -134,7 +134,7 @@ export const createAgenda: RequestHandler = async (req, res) => {
     const validatedData = AgendaCreateSchema.parse(req.body);
 
     // Check if the time slot is already occupied
-    const existingAgenda = await prisma.agenda.findFirst({
+    const existingAgenda = await prisma.agendas.findFirst({
       where: {
         anuncianteId: validatedData.anuncianteId,
         productId: validatedData.productId,
@@ -151,7 +151,7 @@ export const createAgenda: RequestHandler = async (req, res) => {
       });
     }
 
-    const agenda = await prisma.agenda.create({
+    const agenda = await prisma.agendas.create({
       data: {
         anuncianteId: validatedData.anuncianteId,
         productId: validatedData.productId,
@@ -224,7 +224,7 @@ export const updateAgendaStatus: RequestHandler = async (req, res) => {
       });
     }
 
-    const agenda = await prisma.agenda.update({
+    const agenda = await prisma.agendas.update({
       where: { id: parseInt(id) },
       data: {
         status,
@@ -272,7 +272,7 @@ export const deleteAgenda: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const agenda = await prisma.agenda.update({
+    const agenda = await prisma.agendas.update({
       where: { id: parseInt(id) },
       data: { isActive: false },
       include: {
@@ -323,7 +323,7 @@ export const addToWaitlist: RequestHandler = async (req, res) => {
     const validatedData = WaitlistEntrySchema.parse(req.body);
 
     // Get the occupied agenda
-    const agendaOcupada = await prisma.agenda.findUnique({
+    const agendaOcupada = await prisma.agendas.findUnique({
       where: { id: validatedData.agendaOcupadaId },
     });
 
@@ -335,7 +335,7 @@ export const addToWaitlist: RequestHandler = async (req, res) => {
     }
 
     // Check if user is already in waitlist for this slot
-    const existingWaitlist = await prisma.agenda.findFirst({
+    const existingWaitlist = await prisma.agendas.findFirst({
       where: {
         anuncianteId: agendaOcupada.anuncianteId,
         productId: agendaOcupada.productId,
@@ -354,7 +354,7 @@ export const addToWaitlist: RequestHandler = async (req, res) => {
     }
 
     // Create waitlist entry using Agenda model
-    const waitlistEntry = await prisma.agenda.create({
+    const waitlistEntry = await prisma.agendas.create({
       data: {
         anuncianteId: agendaOcupada.anuncianteId,
         productId: agendaOcupada.productId,
@@ -407,7 +407,7 @@ export const getWaitlist: RequestHandler = async (req, res) => {
   try {
     const { agendaId } = req.params;
 
-    const agenda = await prisma.agenda.findUnique({
+    const agenda = await prisma.agendas.findUnique({
       where: { id: parseInt(agendaId) },
     });
 
@@ -419,7 +419,7 @@ export const getWaitlist: RequestHandler = async (req, res) => {
     }
 
     // Get all waitlist entries for this occupied slot
-    const waitlist = await prisma.agenda.findMany({
+    const waitlist = await prisma.agendas.findMany({
       where: {
         anuncianteId: agenda.anuncianteId,
         productId: agenda.productId,
@@ -459,7 +459,7 @@ export const removeFromWaitlist: RequestHandler = async (req, res) => {
   try {
     const { waitlistId } = req.params;
 
-    const waitlistEntry = await prisma.agenda.update({
+    const waitlistEntry = await prisma.agendas.update({
       where: { id: parseInt(waitlistId) },
       data: { isActive: false },
       include: {
@@ -492,7 +492,7 @@ export const promoteFromWaitlist: RequestHandler = async (req, res) => {
   try {
     const { agendaId } = req.params;
 
-    const agenda = await prisma.agenda.findUnique({
+    const agenda = await prisma.agendas.findUnique({
       where: { id: parseInt(agendaId) },
     });
 
@@ -504,7 +504,7 @@ export const promoteFromWaitlist: RequestHandler = async (req, res) => {
     }
 
     // Get first person in waitlist
-    const firstInWaitlist = await prisma.agenda.findFirst({
+    const firstInWaitlist = await prisma.agendas.findFirst({
       where: {
         anuncianteId: agenda.anuncianteId,
         productId: agenda.productId,
@@ -533,7 +533,7 @@ export const promoteFromWaitlist: RequestHandler = async (req, res) => {
     }
 
     // Update the original agenda to available
-    const updatedAgenda = await prisma.agenda.update({
+    const updatedAgenda = await prisma.agendas.update({
       where: { id: parseInt(agendaId) },
       data: {
         status: "disponivel",
@@ -542,7 +542,7 @@ export const promoteFromWaitlist: RequestHandler = async (req, res) => {
     });
 
     // Remove the promoted person from waitlist
-    await prisma.agenda.update({
+    await prisma.agendas.update({
       where: { id: firstInWaitlist.id },
       data: { isActive: false },
     });

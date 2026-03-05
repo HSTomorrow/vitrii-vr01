@@ -1646,12 +1646,15 @@ export const deleteAnuncioFoto: RequestHandler = async (req, res) => {
       select: { id: true },
     });
 
-    // Update ordem for each remaining photo
-    for (let i = 0; i < remainingFotos.length; i++) {
-      await prisma.fotos_anuncio.update({
-        where: { id: remainingFotos[i].id },
-        data: { ordem: i + 1 },
-      });
+    // Update ordem for remaining photos in parallel (performance optimization)
+    if (remainingFotos.length > 0) {
+      const updatePromises = remainingFotos.map((foto, index) =>
+        prisma.fotos_anuncio.update({
+          where: { id: foto.id },
+          data: { ordem: index + 1 },
+        })
+      );
+      await Promise.all(updatePromises);
     }
 
     res.json({

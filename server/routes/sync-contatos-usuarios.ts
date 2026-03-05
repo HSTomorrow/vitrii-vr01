@@ -26,40 +26,58 @@ export const syncContatosUsuarios: RequestHandler = async (req, res) => {
 
     let linkedCount = 0;
 
-    // For each contato, try to find matching usuarios
+    // Extract all emails and celulares from contatos
+    const emails = contatos.map(c => c.email).filter((e): e is string => e !== null);
+    const celulares = contatos.map(c => c.celular).filter((c): c is string => c !== null);
+
+    // Performance optimization: Single query for all matching usuarios instead of per-contact queries (prevents N+1)
+    const matchingUsuarios = await prisma.usracessos.findMany({
+      where: {
+        OR: [
+          { email: { in: emails } },
+          { telefone: { in: celulares } }
+        ]
+      },
+      select: { id: true, email: true, telefone: true }
+    });
+
+    console.log(`[syncContatosUsuarios] Found ${matchingUsuarios.length} usuarios to potentially link`);
+
+    // Create a map for faster lookups
+    const usuariosMap = new Map(matchingUsuarios.map(u => [u.email || u.telefone, u]));
+
+    // Process each contato and find matches in memory
     for (const contato of contatos) {
-      // Build OR conditions for matching
-      const matchConditions: any[] = [];
-      
-      if (contato.email) {
-        matchConditions.push({ email: contato.email });
+      const matchingUserIds = new Set<number>();
+
+      // Check email match
+      if (contato.email && usuariosMap.has(contato.email)) {
+        const usuario = usuariosMap.get(contato.email);
+        if (usuario && usuario.id !== contato.usuarioId) {
+          matchingUserIds.add(usuario.id);
+        }
       }
-      if (contato.celular) {
-        matchConditions.push({ telefone: contato.celular });
+
+      // Check celular match
+      if (contato.celular && usuariosMap.has(contato.celular)) {
+        const usuario = usuariosMap.get(contato.celular);
+        if (usuario && usuario.id !== contato.usuarioId) {
+          matchingUserIds.add(usuario.id);
+        }
       }
 
-      if (matchConditions.length === 0) continue;
+      if (matchingUserIds.size === 0) continue;
 
-      // Find matching usuarios
-      const matchingUsuarios = await prisma.usracessos.findMany({
-        where: {
-          OR: matchConditions,
-          // Don't link to the creator
-          id: { not: contato.usuarioId }
-        },
-        select: { id: true }
-      });
+      console.log(`[syncContatosUsuarios] Contato ${contato.id} matches ${matchingUserIds.size} usuarios`);
 
-      console.log(`[syncContatosUsuarios] Contato ${contato.id} matches ${matchingUsuarios.length} usuarios`);
-
-      // Create or update links
-      for (const usuario of matchingUsuarios) {
-        try {
-          await prisma.contatos_usuarios_links.upsert({
+      // Batch upsert links for this contato (avoid sequential updates)
+      try {
+        const upsertPromises = Array.from(matchingUserIds).map(usuarioId =>
+          prisma.contatos_usuarios_links.upsert({
             where: {
               contato_id_usuario_id: {
                 contato_id: contato.id,
-                usuario_id: usuario.id
+                usuario_id: usuarioId
               }
             },
             update: {
@@ -68,16 +86,17 @@ export const syncContatosUsuarios: RequestHandler = async (req, res) => {
             },
             create: {
               contato_id: contato.id,
-              usuario_id: usuario.id,
+              usuario_id: usuarioId,
               email: contato.email || null,
               celular: contato.celular || null,
               ativo: true
             }
-          });
-          linkedCount++;
-        } catch (error) {
-          console.error(`[syncContatosUsuarios] Error linking contato ${contato.id} to usuario ${usuario.id}:`, error);
-        }
+          })
+        );
+        await Promise.all(upsertPromises);
+        linkedCount += matchingUserIds.size;
+      } catch (error) {
+        console.error(`[syncContatosUsuarios] Error linking contato ${contato.id}:`, error);
       }
     }
 
