@@ -8,6 +8,11 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
+// Dispatch a custom event to notify the MinhaAgenda page to add an evento
+const dispatchAddEventoEvent = () => {
+  window.dispatchEvent(new CustomEvent("addEvento"));
+};
+
 export default function BottomNavBar() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -28,6 +33,9 @@ export default function BottomNavBar() {
 
   if (isHidden) return null;
 
+  // Check if we're on the MinhaAgenda page (calendar view)
+  const isOnMinhaAgenda = location.pathname === "/minha-agenda";
+
   const navItems = [
     {
       id: "home",
@@ -45,11 +53,12 @@ export default function BottomNavBar() {
     },
     {
       id: "publish",
-      label: "Publicar",
+      label: isOnMinhaAgenda ? "Evento" : "Publicar",
       icon: Plus,
-      route: user ? "/anuncio/criar" : "/signin",
-      isActive: location.pathname.startsWith("/anuncio/criar"),
+      route: isOnMinhaAgenda ? "#" : user ? "/anuncio/criar" : "/signin",
+      isActive: isOnMinhaAgenda ? false : location.pathname.startsWith("/anuncio/criar"),
       requiresAuth: true,
+      onClick: isOnMinhaAgenda ? dispatchAddEventoEvent : undefined,
     },
     {
       id: "chat",
@@ -72,14 +81,20 @@ export default function BottomNavBar() {
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-white border-t border-gray-200">
       <div className="flex justify-around items-center h-16">
-        {navItems.map((item) => {
+        {navItems.map((item: any) => {
           const Icon = item.icon;
           const isActive = item.isActive;
 
           return (
             <button
               key={item.id}
-              onClick={() => navigate(item.route)}
+              onClick={() => {
+                if (item.onClick) {
+                  item.onClick();
+                } else {
+                  navigate(item.route);
+                }
+              }}
               className={`flex flex-col items-center justify-center w-full h-full gap-1 transition-all duration-150 ${
                 item.id === "publish"
                   ? "bg-vitrii-yellow text-vitrii-text relative -top-4"

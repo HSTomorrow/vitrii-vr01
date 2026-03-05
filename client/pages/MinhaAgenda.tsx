@@ -539,6 +539,18 @@ export default function MinhaAgenda() {
     setIsModalOpen(true);
   };
 
+  // Listen for custom event from BottomNavBar when "+" button is clicked on MinhaAgenda
+  useEffect(() => {
+    const handleAddEventoEvent = () => {
+      handleAddEvento();
+    };
+
+    window.addEventListener("addEvento", handleAddEventoEvent);
+    return () => {
+      window.removeEventListener("addEvento", handleAddEventoEvent);
+    };
+  }, []);
+
   const handleSelectEvento = (evento: Evento) => {
     setSelectedEvento(evento);
     setShowReservasFor(evento.id);

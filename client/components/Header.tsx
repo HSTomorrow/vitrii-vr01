@@ -64,12 +64,21 @@ export default function Header() {
             <nav className="hidden lg:flex items-center space-x-6"></nav>
 
             {/* Right side - Auth and actions */}
-            <div className="flex items-center space-x-2 sm:space-x-4">
+            <div className="flex items-center space-x-2 sm:space-x-4 ml-auto">
+              {/* Mobile menu button - Always first for visibility on mobile */}
+              <Link
+                to="/menu"
+                className="md:hidden flex-shrink-0 p-2 hover:bg-vitrii-gray rounded-lg mobile-menu-button"
+                aria-label="Menu de navegação"
+              >
+                <Menu className="w-5 h-5" />
+              </Link>
+
               {user && (
                 <>
                   <Link
                     to="/chat"
-                    className="flex-shrink-0 p-2 hover:bg-vitrii-gray rounded-lg transition-colors"
+                    className="hidden sm:flex flex-shrink-0 p-2 hover:bg-vitrii-gray rounded-lg transition-colors"
                     title="Minhas mensagens"
                   >
                     <MessageSquare className="w-5 h-5 text-vitrii-text" />
@@ -77,7 +86,7 @@ export default function Header() {
 
                   <Link
                     to="/favoritos"
-                    className="flex-shrink-0 p-2 hover:bg-vitrii-gray rounded-lg transition-colors"
+                    className="hidden sm:flex flex-shrink-0 p-2 hover:bg-vitrii-gray rounded-lg transition-colors"
                     title="Meus favoritos"
                   >
                     <Star className="w-5 h-5 text-vitrii-text" />
@@ -85,7 +94,7 @@ export default function Header() {
 
                   <Link
                     to="/lista-desejos"
-                    className="flex-shrink-0 p-2 hover:bg-vitrii-gray rounded-lg transition-colors"
+                    className="hidden sm:flex flex-shrink-0 p-2 hover:bg-vitrii-gray rounded-lg transition-colors"
                     title="Minha lista de desejos"
                   >
                     <Gift className="w-5 h-5 text-vitrii-text" />
@@ -93,7 +102,7 @@ export default function Header() {
 
                   <Link
                     to="/minha-agenda"
-                    className="flex-shrink-0 p-2 hover:bg-vitrii-gray rounded-lg transition-colors"
+                    className="hidden sm:flex flex-shrink-0 p-2 hover:bg-vitrii-gray rounded-lg transition-colors"
                     title="Minha agenda"
                   >
                     <Calendar className="w-5 h-5 text-vitrii-text" />
@@ -170,15 +179,6 @@ export default function Header() {
                   </Link>
                 </>
               )}
-
-              {/* Mobile menu button */}
-              <Link
-                to="/menu"
-                className="flex-shrink-0 p-2 hover:bg-vitrii-gray rounded-lg mobile-menu-button"
-                aria-label="Menu de navegação"
-              >
-                <Menu className="w-5 h-5" />
-              </Link>
             </div>
           </div>
 
