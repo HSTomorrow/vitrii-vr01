@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { X } from "lucide-react";
+import { X, ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 
 interface Evento {
@@ -10,6 +10,20 @@ interface Evento {
   dataFim: string;
   privacidade: string;
   cor: string;
+  permissoes?: { usuarioId: number }[];
+}
+
+interface Contato {
+  id: number;
+  nome: string;
+  usuarios: {
+    id: number;
+    usuario: {
+      id: number;
+      nome: string;
+      email: string;
+    };
+  }[];
 }
 
 interface EventoModalProps {
@@ -63,6 +77,31 @@ export default function EventoModal({
     cor: "#3B82F6",
     usuariosPermitidos: [] as number[],
   });
+  const [contatos, setContatos] = useState<Contato[]>([]);
+  const [isLoadingContatos, setIsLoadingContatos] = useState(false);
+  const [showPermissionsList, setShowPermissionsList] = useState(false);
+
+  // Fetch contatos when modal opens
+  useEffect(() => {
+    const fetchContatos = async () => {
+      if (!isOpen || !anuncianteId) return;
+
+      setIsLoadingContatos(true);
+      try {
+        const response = await fetch(`/api/contatos/${anuncianteId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setContatos(data.data || []);
+        }
+      } catch (error) {
+        console.error("Erro ao carregar contatos:", error);
+      } finally {
+        setIsLoadingContatos(false);
+      }
+    };
+
+    fetchContatos();
+  }, [isOpen, anuncianteId]);
 
   useEffect(() => {
     if (evento) {
@@ -86,7 +125,7 @@ export default function EventoModal({
         }),
         privacidade: (evento.privacidade || "privado") as const,
         cor: evento.cor || "#3B82F6",
-        usuariosPermitidos: [],
+        usuariosPermitidos: evento.permissoes?.map((p) => p.usuarioId) || [],
       });
     } else if (defaultDate) {
       const dateStr = defaultDate.toISOString().split("T")[0];
@@ -311,6 +350,75 @@ export default function EventoModal({
             </div>
           </div>
 
+          {/* Permissões - Restrita */}
+          {formData.privacidade === "privado_usuarios" && (
+            <div className="border border-blue-200 bg-blue-50 rounded-lg p-4 space-y-3">
+              <div>
+                <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                  Quem pode visualizar este evento?
+                </label>
+                <p className="text-xs text-gray-600 mb-3">
+                  Selecione os contatos que poderão visualizar as informações completas deste evento
+                </p>
+              </div>
+
+              {isLoadingContatos ? (
+                <p className="text-sm text-gray-600">Carregando contatos...</p>
+              ) : contatos.length === 0 ? (
+                <p className="text-sm text-gray-600 italic">
+                  Nenhum contato cadastrado para este anunciante
+                </p>
+              ) : (
+                <div className="space-y-2 max-h-60 overflow-y-auto">
+                  {contatos.map((contato) => (
+                    <div key={contato.id} className="space-y-1">
+                      <div className="font-medium text-sm text-gray-700">{contato.nome}</div>
+                      {contato.usuarios.map((cu) => (
+                        <label
+                          key={cu.usuario.id}
+                          className="flex items-center gap-2 ml-2 p-2 rounded hover:bg-blue-100 cursor-pointer"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={formData.usuariosPermitidos.includes(cu.usuario.id)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setFormData({
+                                  ...formData,
+                                  usuariosPermitidos: [
+                                    ...formData.usuariosPermitidos,
+                                    cu.usuario.id,
+                                  ],
+                                });
+                              } else {
+                                setFormData({
+                                  ...formData,
+                                  usuariosPermitidos: formData.usuariosPermitidos.filter(
+                                    (id) => id !== cu.usuario.id,
+                                  ),
+                                });
+                              }
+                            }}
+                            className="w-4 h-4"
+                          />
+                          <div className="text-sm">
+                            <div className="font-medium">{cu.usuario.nome}</div>
+                            <div className="text-xs text-gray-500">{cu.usuario.email}</div>
+                          </div>
+                        </label>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {formData.usuariosPermitidos.length > 0 && (
+                <div className="text-xs text-blue-700 bg-white rounded p-2">
+                  <strong>{formData.usuariosPermitidos.length}</strong> usuário(s) selecionado(s)
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Buttons */}
           <div className="flex gap-2 pt-4">

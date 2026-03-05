@@ -1,7 +1,20 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
+
+interface Contato {
+  id: number;
+  nome: string;
+  usuarios: {
+    id: number;
+    usuario: {
+      id: number;
+      nome: string;
+      email: string;
+    };
+  }[];
+}
 
 interface FilaDeEsperaModalProps {
   isOpen: boolean;
@@ -10,6 +23,16 @@ interface FilaDeEsperaModalProps {
   anuncianteAlvoId: number;
   anuncianteAlvoNome: string;
 }
+
+const PRIVACIDADES = [
+  { value: "publico", label: "🌍 Público", desc: "Todos podem visualizar" },
+  {
+    value: "privado_usuarios",
+    label: "👥 Restrita",
+    desc: "Todos veem a disponibilidade, mas não o conteúdo",
+  },
+  { value: "privado", label: "🔒 Privado", desc: "Apenas você pode visualizar" },
+];
 
 export default function FilaDeEsperaModal({
   isOpen,
@@ -25,7 +48,33 @@ export default function FilaDeEsperaModal({
   const [horaInicio, setHoraInicio] = useState("10:00");
   const [dataFim, setDataFim] = useState("");
   const [horaFim, setHoraFim] = useState("11:00");
+  const [privacidade, setPrivacidade] = useState("privado");
+  const [usuariosPermitidos, setUsuariosPermitidos] = useState<number[]>([]);
+  const [contatos, setContatos] = useState<Contato[]>([]);
+  const [isLoadingContatos, setIsLoadingContatos] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  // Fetch contatos when modal opens
+  useEffect(() => {
+    const fetchContatos = async () => {
+      if (!isOpen || !anuncianteAlvoId) return;
+
+      setIsLoadingContatos(true);
+      try {
+        const response = await fetch(`/api/contatos/${anuncianteAlvoId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setContatos(data.data || []);
+        }
+      } catch (error) {
+        console.error("Erro ao carregar contatos:", error);
+      } finally {
+        setIsLoadingContatos(false);
+      }
+    };
+
+    fetchContatos();
+  }, [isOpen, anuncianteAlvoId]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,6 +124,8 @@ export default function FilaDeEsperaModal({
           descricao: descricao.trim() || null,
           dataInicio: dataInícioCompleta.toISOString(),
           dataFim: dataFimCompleta.toISOString(),
+          privacidade: privacidade,
+          usuariosPermitidos: privacidade === "privado_usuarios" ? usuariosPermitidos : undefined,
         }),
       });
 
@@ -109,6 +160,8 @@ export default function FilaDeEsperaModal({
       setDataFim("");
       setHoraInicio("10:00");
       setHoraFim("11:00");
+      setPrivacidade("privado");
+      setUsuariosPermitidos([]);
       onClose();
     }
   };
@@ -224,6 +277,103 @@ export default function FilaDeEsperaModal({
               />
             </div>
           </div>
+
+          {/* Privacidade */}
+          <div>
+            <label className="block text-sm font-semibold text-vitrii-text mb-2">
+              Privacidade
+            </label>
+            <div className="space-y-2">
+              {PRIVACIDADES.map((priv) => (
+                <label
+                  key={priv.value}
+                  className="flex items-start gap-3 p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+                  onClick={() => setPrivacidade(priv.value)}
+                >
+                  <input
+                    type="radio"
+                    name="privacidade"
+                    value={priv.value}
+                    checked={privacidade === priv.value}
+                    onChange={() => setPrivacidade(priv.value)}
+                    className="mt-1"
+                  />
+                  <div>
+                    <div className="font-semibold text-vitrii-text">
+                      {priv.label}
+                    </div>
+                    <div className="text-xs text-gray-600">{priv.desc}</div>
+                  </div>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Permissões - Restrita */}
+          {privacidade === "privado_usuarios" && (
+            <div className="border border-blue-200 bg-blue-50 rounded-lg p-4 space-y-3">
+              <div>
+                <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                  Quem pode visualizar esta fila de espera?
+                </label>
+                <p className="text-xs text-gray-600 mb-3">
+                  Selecione os contatos que poderão visualizar as informações completas desta fila
+                </p>
+              </div>
+
+              {isLoadingContatos ? (
+                <p className="text-sm text-gray-600">Carregando contatos...</p>
+              ) : contatos.length === 0 ? (
+                <p className="text-sm text-gray-600 italic">
+                  Nenhum contato cadastrado para este anunciante
+                </p>
+              ) : (
+                <div className="space-y-2 max-h-60 overflow-y-auto">
+                  {contatos.map((contato) => (
+                    <div key={contato.id} className="space-y-1">
+                      <div className="font-medium text-sm text-gray-700">{contato.nome}</div>
+                      {contato.usuarios.map((cu) => (
+                        <label
+                          key={cu.usuario.id}
+                          className="flex items-center gap-2 ml-2 p-2 rounded hover:bg-blue-100 cursor-pointer"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={usuariosPermitidos.includes(cu.usuario.id)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setUsuariosPermitidos([
+                                  ...usuariosPermitidos,
+                                  cu.usuario.id,
+                                ]);
+                              } else {
+                                setUsuariosPermitidos(
+                                  usuariosPermitidos.filter(
+                                    (id) => id !== cu.usuario.id,
+                                  ),
+                                );
+                              }
+                            }}
+                            className="w-4 h-4"
+                          />
+                          <div className="text-sm">
+                            <div className="font-medium">{cu.usuario.nome}</div>
+                            <div className="text-xs text-gray-500">{cu.usuario.email}</div>
+                          </div>
+                        </label>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {usuariosPermitidos.length > 0 && (
+                <div className="text-xs text-blue-700 bg-white rounded p-2">
+                  <strong>{usuariosPermitidos.length}</strong> usuário(s) selecionado(s)
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Info message */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">

@@ -114,6 +114,8 @@ export const createFilaEspera: RequestHandler = async (req, res) => {
       descricao,
       dataInicio,
       dataFim,
+      privacidade,
+      usuariosPermitidos,
     } = req.body;
 
     if (!userId) {
@@ -156,6 +158,7 @@ export const createFilaEspera: RequestHandler = async (req, res) => {
         dataInicio: inicio,
         dataFim: fim,
         status: "pendente",
+        privacidade: privacidade || "privado",
       },
       include: {
         usuarioSolicitante: {
@@ -166,8 +169,45 @@ export const createFilaEspera: RequestHandler = async (req, res) => {
             telefone: true,
           },
         },
+        permissoes: {
+          select: {
+            usuarioId: true,
+          },
+        },
       },
     });
+
+    // Add permissions if privado_usuarios
+    if (privacidade === "privado_usuarios" && usuariosPermitidos && Array.isArray(usuariosPermitidos)) {
+      await prisma.filas_espera_permissoes.createMany({
+        data: usuariosPermitidos.map(usuarioId => ({
+          filaId: fila.id,
+          usuarioId: parseInt(usuarioId),
+        })),
+      });
+
+      // Refetch fila with updated permissions
+      const filaAtualizada = await prisma.filas_espera_agenda.findUnique({
+        where: { id: fila.id },
+        include: {
+          usuarioSolicitante: {
+            select: {
+              id: true,
+              nome: true,
+              email: true,
+              telefone: true,
+            },
+          },
+          permissoes: {
+            select: {
+              usuarioId: true,
+            },
+          },
+        },
+      });
+
+      return res.status(201).json({ data: filaAtualizada });
+    }
 
     res.status(201).json({ data: fila });
   } catch (error) {
