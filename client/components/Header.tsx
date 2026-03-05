@@ -33,7 +33,8 @@ export default function Header() {
               <img
                 src="https://cdn.builder.io/api/v1/image/assets%2Ff2e9e91d4cc44d4bae5b9dac3bb6abe8%2F9b0468b30c2f492b9eac618e9410fecf?format=webp&width=800"
                 alt="Vitrii Logo"
-                className="h-12 w-auto"
+                className="h-11 w-auto"
+                style={{ transform: 'translateX(3px)' }}
               />
             </Link>
 
