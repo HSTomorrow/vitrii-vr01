@@ -1,44 +1,16 @@
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Download, Copy, Check, MessageCircle, Smartphone } from "lucide-react";
-import { useState } from "react";
+import { ArrowLeft, Download, Smartphone } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { toast } from "sonner";
 
 export default function InstallIOS() {
   const navigate = useNavigate();
-  const [copied, setCopied] = useState(false);
   const appUrl = typeof window !== 'undefined' ? window.location.origin : '';
-  const messageText = '🏪 Conheça a Vitrii! Um marketplace seguro com tecnologia QR Code. Instale agora: ' + appUrl;
-  const whatsappLink = `https://wa.me/?text=${encodeURIComponent(messageText)}`;
-
-  const handleCopyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(appUrl);
-      setCopied(true);
-      toast.success('✓ Link copiado!');
-      setTimeout(() => setCopied(false), 2000);
-    } catch (error) {
-      toast.error('Erro ao copiar link');
-    }
-  };
 
   const handleInstallClick = () => {
-    // No iOS, adiciona à tela inicial manualmente
-    if (navigator.share) {
-      navigator.share({
-        title: 'Vitrii',
-        text: 'Instale a Vitrii como um app!',
-        url: appUrl,
-      }).catch(() => {
-        // Fallback
-        handleCopyLink();
-      });
-    } else {
-      // Se não tiver share API, copia o link
-      handleCopyLink();
-    }
+    // Abre a página no navegador para permitir adicionar à tela inicial
+    window.location.href = appUrl;
   };
 
   return (
@@ -96,28 +68,14 @@ export default function InstallIOS() {
                   </div>
                 </div>
 
-                {/* Action Buttons */}
-                <div className="space-y-3 mb-8">
+                {/* Action Button */}
+                <div className="mb-8">
                   <button
                     onClick={handleInstallClick}
                     className="w-full inline-flex items-center justify-center gap-3 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold"
                   >
                     <Download className="w-5 h-5" />
                     Instalar Agora
-                  </button>
-                  <button
-                    onClick={handleCopyLink}
-                    className="w-full inline-flex items-center justify-center gap-3 px-6 py-3 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors font-semibold border border-blue-300"
-                  >
-                    {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
-                    {copied ? 'Link Copiado!' : 'Copiar Link'}
-                  </button>
-                  <button
-                    onClick={() => window.open(whatsappLink, "_blank")}
-                    className="w-full inline-flex items-center justify-center gap-3 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
-                  >
-                    <MessageCircle className="w-5 h-5" />
-                    Compartilhar via WhatsApp
                   </button>
                 </div>
 

@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Download, Copy, Check, MessageCircle } from "lucide-react";
-import { useState } from "react";
+import { ArrowLeft, Download } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import { usePWA } from "@/hooks/usePWA";
 import Header from "@/components/Header";
@@ -10,21 +9,7 @@ import { toast } from "sonner";
 export default function InstallAndroid() {
   const navigate = useNavigate();
   const { isInstallable, install } = usePWA();
-  const [copied, setCopied] = useState(false);
   const appUrl = typeof window !== 'undefined' ? window.location.origin : '';
-  const messageText = '🏪 Conheça a Vitrii! Um marketplace seguro com tecnologia QR Code. Instale agora: ' + appUrl;
-  const whatsappLink = `https://wa.me/?text=${encodeURIComponent(messageText)}`;
-
-  const handleCopyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(appUrl);
-      setCopied(true);
-      toast.success('✓ Link copiado!');
-      setTimeout(() => setCopied(false), 2000);
-    } catch (error) {
-      toast.error('Erro ao copiar link');
-    }
-  };
 
   const handleInstall = async () => {
     try {
@@ -90,8 +75,8 @@ export default function InstallAndroid() {
                   </div>
                 </div>
 
-                {/* Action Buttons */}
-                <div className="space-y-3 mb-8">
+                {/* Action Button */}
+                <div className="mb-8">
                   {isInstallable ? (
                     <button
                       onClick={handleInstall}
@@ -106,20 +91,6 @@ export default function InstallAndroid() {
                       App já instalado ou não disponível
                     </div>
                   )}
-                  <button
-                    onClick={handleCopyLink}
-                    className="w-full inline-flex items-center justify-center gap-3 px-6 py-3 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors font-semibold border border-green-300"
-                  >
-                    {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
-                    {copied ? 'Link Copiado!' : 'Copiar Link'}
-                  </button>
-                  <button
-                    onClick={() => window.open(whatsappLink, "_blank")}
-                    className="w-full inline-flex items-center justify-center gap-3 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-semibold"
-                  >
-                    <MessageCircle className="w-5 h-5" />
-                    Compartilhar via WhatsApp
-                  </button>
                 </div>
 
                 {/* Info Box */}
