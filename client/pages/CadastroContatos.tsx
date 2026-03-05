@@ -210,17 +210,17 @@ export default function CadastroContatos() {
 
         try {
           responseText = await response.text();
-          console.log("[CadastroContatos] Response text (raw):", responseText);
+          console.log("[CadastroContatos] 📥 Response text (raw):", responseText);
 
           if (responseText) {
             errorData = JSON.parse(responseText);
           }
         } catch (e) {
-          console.error("[CadastroContatos] Erro ao fazer parse da resposta:", e);
+          console.error("[CadastroContatos] ❌ Erro ao fazer parse da resposta:", e);
           errorData = { error: `Erro ao fazer parse da resposta: ${responseText}` };
         }
 
-        console.error("[CadastroContatos] Erro na resposta DETALHADO:", {
+        console.error("[CadastroContatos] 🔍 Erro na resposta DETALHADO:", {
           status: response.status,
           statusText: response.statusText,
           responseText: responseText,
@@ -239,13 +239,29 @@ export default function CadastroContatos() {
           errorMessage = errorData.message;
         } else if (errorData?.details) {
           if (Array.isArray(errorData.details)) {
-            errorMessage = errorData.details.map((d: any) => d.message || JSON.stringify(d)).join(", ");
+            errorMessage = errorData.details
+              .map((d: any) => {
+                if (typeof d === 'string') return d;
+                return d.message || d.error || JSON.stringify(d);
+              })
+              .filter(Boolean)
+              .join(", ");
+          } else if (typeof errorData.details === 'object') {
+            // Extract helpful info from Prisma error details
+            const details = errorData.details as any;
+            if (details.code === "P2022" && details.meta?.column_name) {
+              errorMessage = `Campo "${details.meta.column_name}" muito longo (máximo de caracteres excedido)`;
+            } else if (details.prismaMessage) {
+              errorMessage = details.prismaMessage;
+            } else {
+              errorMessage = JSON.stringify(errorData.details);
+            }
           } else {
-            errorMessage = JSON.stringify(errorData.details);
+            errorMessage = String(errorData.details);
           }
         }
 
-        console.error("[CadastroContatos] Lançando erro com mensagem:", errorMessage);
+        console.error("[CadastroContatos] ⚠️ Lançando erro com mensagem:", errorMessage);
         throw new Error(errorMessage);
       }
 
@@ -466,33 +482,47 @@ export default function CadastroContatos() {
                 {/* Nome */}
                 <div>
                   <label className="block text-sm font-medium text-vitrii-text mb-1">
-                    Nome *
+                    Nome * (máx. 255 caracteres)
                   </label>
                   <input
                     type="text"
                     value={formData.nome}
-                    onChange={(e) =>
-                      setFormData({ ...formData, nome: e.target.value })
-                    }
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value.length <= 255) {
+                        setFormData({ ...formData, nome: value });
+                      }
+                    }}
+                    maxLength={255}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
                     placeholder="Nome do contato"
                   />
+                  <p className="text-xs text-vitrii-text-secondary mt-1">
+                    {formData.nome.length}/255 caracteres
+                  </p>
                 </div>
 
                 {/* Celular/WhatsApp */}
                 <div>
                   <label className="block text-sm font-medium text-vitrii-text mb-1">
-                    Celular/WhatsApp *
+                    Celular/WhatsApp * (máx. 20 caracteres)
                   </label>
                   <input
                     type="text"
                     value={formData.celular}
-                    onChange={(e) =>
-                      setFormData({ ...formData, celular: e.target.value })
-                    }
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value.length <= 20) {
+                        setFormData({ ...formData, celular: value });
+                      }
+                    }}
+                    maxLength={20}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
                     placeholder="(11) 99999-9999"
                   />
+                  <p className="text-xs text-vitrii-text-secondary mt-1">
+                    {formData.celular.length}/20 caracteres
+                  </p>
                 </div>
 
                 {/* Telefone */}
@@ -514,17 +544,24 @@ export default function CadastroContatos() {
                 {/* Email */}
                 <div>
                   <label className="block text-sm font-medium text-vitrii-text mb-1">
-                    Email (opcional)
+                    Email (opcional - máx. 255 caracteres)
                   </label>
                   <input
                     type="email"
                     value={formData.email}
-                    onChange={(e) =>
-                      setFormData({ ...formData, email: e.target.value })
-                    }
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value.length <= 255) {
+                        setFormData({ ...formData, email: value });
+                      }
+                    }}
+                    maxLength={255}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
                     placeholder="contato@example.com"
                   />
+                  <p className="text-xs text-vitrii-text-secondary mt-1">
+                    {formData.email.length}/255 caracteres
+                  </p>
                 </div>
 
                 {/* Tipo de Contato */}
@@ -607,36 +644,50 @@ export default function CadastroContatos() {
                 {/* Observações */}
                 <div>
                   <label className="block text-sm font-medium text-vitrii-text mb-1">
-                    Observações (opcional)
+                    Observações (opcional - máx. 1000 caracteres)
                   </label>
                   <textarea
                     value={formData.observacoes}
-                    onChange={(e) =>
-                      setFormData({
-                        ...formData,
-                        observacoes: e.target.value,
-                      })
-                    }
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value.length <= 1000) {
+                        setFormData({
+                          ...formData,
+                          observacoes: value,
+                        });
+                      }
+                    }}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue resize-none"
-                    placeholder="Notas adicionais..."
+                    placeholder="Notas adicionais (máximo 1000 caracteres)..."
                     rows={3}
+                    maxLength={1000}
                   />
+                  <p className="text-xs text-vitrii-text-secondary mt-1">
+                    {formData.observacoes.length}/1000 caracteres
+                  </p>
                 </div>
 
                 {/* Imagem */}
                 <div>
                   <label className="block text-sm font-medium text-vitrii-text mb-1">
-                    Imagem (opcional - URL)
+                    Imagem (opcional - URL máx. 500 caracteres)
                   </label>
                   <input
                     type="url"
                     value={formData.imagem}
-                    onChange={(e) =>
-                      setFormData({ ...formData, imagem: e.target.value })
-                    }
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value.length <= 500) {
+                        setFormData({ ...formData, imagem: value });
+                      }
+                    }}
+                    maxLength={500}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
                     placeholder="https://example.com/image.jpg"
                   />
+                  <p className="text-xs text-vitrii-text-secondary mt-1">
+                    {formData.imagem.length}/500 caracteres
+                  </p>
                 </div>
 
                 {/* Data de Criação */}

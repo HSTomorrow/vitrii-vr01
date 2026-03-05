@@ -4,14 +4,35 @@ import { z } from "zod";
 
 // Schema para criar contato
 const ContatoCreateSchema = z.object({
-  nome: z.string().min(3, "Nome deve ter pelo menos 3 caracteres"),
-  celular: z.string().min(1, "Celular/WhatsApp é obrigatório"),
-  telefone: z.string().optional().nullable(),
-  email: z.string().email("Email inválido").optional().nullable(),
-  status: z.enum(["ativo", "inativo", "analise"]).default("ativo"),
-  tipoContato: z.string().min(1, "Tipo de contato é obrigatório"),
-  observacoes: z.string().optional().nullable(),
-  imagem: z.string().optional().nullable(),
+  nome: z.string()
+    .min(3, "Nome deve ter pelo menos 3 caracteres")
+    .max(255, "Nome não pode ter mais de 255 caracteres"),
+  celular: z.string()
+    .min(1, "Celular/WhatsApp é obrigatório")
+    .max(20, "Celular não pode ter mais de 20 caracteres"),
+  telefone: z.string()
+    .max(20, "Telefone não pode ter mais de 20 caracteres")
+    .optional()
+    .nullable(),
+  email: z.string()
+    .email("Email inválido")
+    .max(255, "Email não pode ter mais de 255 caracteres")
+    .optional()
+    .nullable(),
+  status: z.enum(["ativo", "inativo", "analise"])
+    .default("ativo"),
+  tipoContato: z.string()
+    .min(1, "Tipo de contato é obrigatório")
+    .max(100, "Tipo de contato não pode ter mais de 100 caracteres"),
+  observacoes: z.string()
+    .max(1000, "Observações não podem ter mais de 1000 caracteres")
+    .optional()
+    .nullable(),
+  imagem: z.string()
+    .url("URL da imagem inválida")
+    .max(500, "URL da imagem não pode ter mais de 500 caracteres")
+    .optional()
+    .nullable(),
   anuncianteId: z.number().optional().nullable(), // Optional: specific announcer or null for all
 });
 
@@ -200,7 +221,7 @@ export const createContato: RequestHandler = async (req, res) => {
     console.error("[createContato] Error type:", errorObj?.constructor?.name);
     console.error("[createContato] Error message:", errorObj?.message);
     console.error("[createContato] Error code:", errorObj?.code);
-    console.error("[createContato] Error meta:", errorObj?.meta);
+    console.error("[createContato] Error meta:", JSON.stringify(errorObj?.meta, null, 2));
     console.error("[createContato] Error stack:", errorObj?.stack);
     console.error("[createContato] Full error object:", JSON.stringify(errorObj, null, 2));
 
@@ -212,12 +233,28 @@ export const createContato: RequestHandler = async (req, res) => {
 
     // Handle Prisma errors
     if (errorObj?.code) {
-      // Prisma error
-      errorResponse.error = `Erro no banco de dados (${errorObj.code})`;
+      // Prisma error codes
+      const prismaErrorMap: Record<string, string> = {
+        "P2002": "Campo duplicado ou violação de constraint único",
+        "P2022": "Valor muito longo para o campo (excedeu o limite de caracteres)",
+        "P2025": "Registro não encontrado",
+        "P2003": "Referência estrangeira inválida",
+      };
+
+      const prismaMessage = prismaErrorMap[errorObj.code] || errorObj.message;
+      errorResponse.error = `${prismaMessage} (${errorObj.code})`;
+
+      // For P2022, provide field information
+      if (errorObj.code === "P2022" && errorObj.meta?.column_name) {
+        errorResponse.error += ` - Campo: ${errorObj.meta.column_name}`;
+        console.error(`[createContato] ⚠️  Campo com problema: ${errorObj.meta.column_name}`);
+      }
+
       errorResponse.details = {
         code: errorObj.code,
         message: errorObj.message,
         meta: errorObj.meta,
+        prismaMessage: prismaMessage,
       };
     } else if (errorObj?.message) {
       errorResponse.error = errorObj.message;
