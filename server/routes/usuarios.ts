@@ -558,6 +558,20 @@ export const createUsuario: RequestHandler = async (req, res) => {
       }
     }
 
+    // Check if phone number is already in use by another user
+    if (validatedData.telefone && validatedData.telefone.trim()) {
+      const existingPhone = await prisma.usracessos.findFirst({
+        where: { telefone: validatedData.telefone },
+      });
+
+      if (existingPhone) {
+        return res.status(400).json({
+          success: false,
+          error: "Telefone já cadastrado para outro usuário",
+        });
+      }
+    }
+
     // Calculate contract expiration date (30 days from now)
     const contractExpireDate = new Date();
     contractExpireDate.setDate(contractExpireDate.getDate() + 30);
@@ -568,7 +582,7 @@ export const createUsuario: RequestHandler = async (req, res) => {
         email: validatedData.email,
         senha: senhaHash,
         cpf: normalizedCpf,
-        telefone: validatedData.telefone || "",
+        telefone: validatedData.telefone || null,
         endereco: validatedData.endereco || "",
         tipoUsuario: "comum",
         tassinatura: "Gratuito", // Always start as Gratuito
@@ -719,6 +733,29 @@ export const updateUsuario: RequestHandler = async (req, res) => {
             {
               path: ["cpf"],
               message: "CPF \ CNPJ já cadastrado",
+            },
+          ],
+        });
+      }
+    }
+
+    // Check if phone number already exists for a different user
+    if (validatedData.telefone && validatedData.telefone.trim()) {
+      const existingPhone = await prisma.usracessos.findFirst({
+        where: {
+          telefone: validatedData.telefone,
+          id: { not: userId }, // Exclude current user
+        },
+      });
+
+      if (existingPhone) {
+        return res.status(400).json({
+          success: false,
+          error: "Dados inválidos",
+          details: [
+            {
+              path: ["telefone"],
+              message: "Telefone já cadastrado",
             },
           ],
         });
@@ -1587,6 +1624,23 @@ export const adminUpdateUserProfile: RequestHandler = async (req, res) => {
       }
 
       validatedData.cpf = digitsOnly;
+    }
+
+    // Check if phone number already exists for a different user
+    if (validatedData.telefone && validatedData.telefone.trim()) {
+      const existingPhone = await prisma.usracessos.findFirst({
+        where: {
+          telefone: validatedData.telefone,
+          id: { not: userId },
+        },
+      });
+
+      if (existingPhone) {
+        return res.status(400).json({
+          success: false,
+          error: "Telefone já cadastrado para outro usuário",
+        });
+      }
     }
 
     // Remove empty strings for optional fields

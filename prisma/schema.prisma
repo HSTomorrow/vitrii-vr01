@@ -213,7 +213,7 @@ model usracessos {
   email                   String                      @unique @db.VarChar(255)
   senha                   String                      @db.VarChar(255)
   cpf                     String?                     @unique @db.VarChar(14)
-  telefone                String?                     @db.VarChar(20)
+  telefone                String?                     @unique @db.VarChar(20)
   whatsapp                String?                     @db.VarChar(20)
   linkedin                String?                     @db.VarChar(255)
   facebook                String?                     @db.VarChar(255)
