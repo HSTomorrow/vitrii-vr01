@@ -759,8 +759,7 @@ export default function Index() {
             Pronto para crescer seu negócio?
           </h2>
           <p className="text-sm md:text-base text-blue-100 mb-6 max-w-2xl mx-auto">
-            Junte-se a milhares de vendedores que já estão transformando seus
-            negócios com Vitrii.
+            Transforme seus negócios com Vitrii
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
