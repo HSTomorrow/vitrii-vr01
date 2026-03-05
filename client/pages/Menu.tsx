@@ -75,6 +75,18 @@ export default function Menu() {
                 </span>
               </Link>
 
+              {user && (
+                <Link
+                  to="/dashboard"
+                  className="flex items-center gap-4 px-6 py-4 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors border border-blue-200"
+                >
+                  <ShoppingBag className="w-6 h-6 text-vitrii-blue" />
+                  <span className="text-vitrii-text font-medium">
+                    Dashboard
+                  </span>
+                </Link>
+              )}
+
               <Link
                 to="/browse"
                 className="flex items-center gap-4 px-6 py-4 bg-vitrii-gray hover:bg-gray-200 rounded-lg transition-colors"
