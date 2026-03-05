@@ -62,6 +62,8 @@ interface FormData {
   observacoes: string;
   imagem: string;
   anuncianteId?: number | null;
+  dataCriacao?: string;
+  dataAtualizacao?: string;
 }
 
 const INITIAL_FORM_DATA: FormData = {
@@ -74,6 +76,8 @@ const INITIAL_FORM_DATA: FormData = {
   observacoes: "",
   imagem: "",
   anuncianteId: null,
+  dataCriacao: undefined,
+  dataAtualizacao: undefined,
 };
 
 const CONTACT_TYPES = [
@@ -84,6 +88,31 @@ const CONTACT_TYPES = [
   "Consultor",
   "Outro",
 ];
+
+// Helper function to format date to Brazilian format (DD/MM/YYYY HH:MM:SS)
+const formatarData = (data: string | undefined): string => {
+  if (!data) return "-";
+
+  try {
+    const date = new Date(data);
+
+    // Check if date is valid
+    if (isNaN(date.getTime())) {
+      return "-";
+    }
+
+    const dia = String(date.getDate()).padStart(2, "0");
+    const mes = String(date.getMonth() + 1).padStart(2, "0");
+    const ano = date.getFullYear();
+    const hora = String(date.getHours()).padStart(2, "0");
+    const minuto = String(date.getMinutes()).padStart(2, "0");
+    const segundo = String(date.getSeconds()).padStart(2, "0");
+
+    return `${dia}/${mes}/${ano} ${hora}:${minuto}:${segundo}`;
+  } catch {
+    return "-";
+  }
+};
 
 export default function CadastroContatos() {
   const queryClient = useQueryClient();
@@ -301,6 +330,8 @@ export default function CadastroContatos() {
       observacoes: contato.observacoes || "",
       imagem: contato.imagem || "",
       anuncianteId: contato.anuncianteId || null,
+      dataCriacao: contato.dataCriacao,
+      dataAtualizacao: contato.dataAtualizacao,
     });
     setEditingId(contato.id);
     setIsFormOpen(true);
@@ -579,6 +610,44 @@ export default function CadastroContatos() {
                     placeholder="https://example.com/image.jpg"
                   />
                 </div>
+
+                {/* Data de Criação */}
+                {formData.dataCriacao && (
+                  <div>
+                    <label className="block text-sm font-medium text-vitrii-text mb-1">
+                      Data de Criação
+                    </label>
+                    <input
+                      type="text"
+                      value={formatarData(formData.dataCriacao)}
+                      readOnly
+                      disabled
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-700 cursor-not-allowed"
+                    />
+                    <p className="text-xs text-vitrii-text-secondary mt-1">
+                      Campo automático (não editável)
+                    </p>
+                  </div>
+                )}
+
+                {/* Data de Alteração */}
+                {formData.dataAtualizacao && (
+                  <div>
+                    <label className="block text-sm font-medium text-vitrii-text mb-1">
+                      Data de Alteração
+                    </label>
+                    <input
+                      type="text"
+                      value={formatarData(formData.dataAtualizacao)}
+                      readOnly
+                      disabled
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-700 cursor-not-allowed"
+                    />
+                    <p className="text-xs text-vitrii-text-secondary mt-1">
+                      Campo automático (não editável)
+                    </p>
+                  </div>
+                )}
 
                 {/* Actions */}
                 <div className="flex gap-2 pt-4">
