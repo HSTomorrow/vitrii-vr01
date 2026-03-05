@@ -60,6 +60,7 @@ export default function MinhaAgenda() {
   const [showShareModal, setShowShareModal] = useState(false);
   const [activeTab, setActiveTab] = useState<"calendar" | "dia" | "fila-espera" | "status-agenda">("calendar");
   const [filterContatoId, setFilterContatoId] = useState<number | null>(null);
+  const [filterContatoNome, setFilterContatoNome] = useState("");
   const [filterDescricao, setFilterDescricao] = useState("");
   const [filterTipoContato, setFilterTipoContato] = useState("");
   const reservasRef = useRef<HTMLDivElement>(null);
@@ -205,6 +206,16 @@ export default function MinhaAgenda() {
         if (!hasContato) return false;
       }
 
+      // Filter by contato name (search by typing)
+      if (filterContatoNome) {
+        const contatosNoEvento = (evento.contatos || []);
+        const hasContatoByName = contatosNoEvento.some((c: any) => {
+          const contato = todosContatos.find((tc: any) => tc.id === c.contatoId);
+          return contato?.nome.toLowerCase().includes(filterContatoNome.toLowerCase());
+        });
+        if (!hasContatoByName) return false;
+      }
+
       // Filter by agenda description
       if (filterDescricao) {
         const agendaInfo = anunciantes.find((a) => a.id === evento.anuncianteId);
@@ -219,7 +230,7 @@ export default function MinhaAgenda() {
 
       return true;
     });
-  }, [eventos, filterContatoId, filterDescricao, anunciantes]);
+  }, [eventos, filterContatoId, filterContatoNome, filterDescricao, anunciantes, todosContatos]);
 
   // Fetch all contacts for filter dropdown (only when needed)
   const { data: todosContatos = [] } = useQuery({
@@ -570,22 +581,13 @@ export default function MinhaAgenda() {
                           <label className="block text-sm font-medium text-vitrii-text mb-1">
                             Contato
                           </label>
-                          <select
-                            value={filterContatoId || ""}
-                            onChange={(e) =>
-                              setFilterContatoId(
-                                e.target.value ? parseInt(e.target.value) : null
-                              )
-                            }
+                          <input
+                            type="text"
+                            placeholder="Buscar contato..."
+                            value={filterContatoNome}
+                            onChange={(e) => setFilterContatoNome(e.target.value)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
-                          >
-                            <option value="">Todos os contatos</option>
-                            {todosContatos.map((contato: any) => (
-                              <option key={contato.id} value={contato.id}>
-                                {contato.nome}
-                              </option>
-                            ))}
-                          </select>
+                          />
                         </div>
 
                         {/* Filter by Agenda Description */}
@@ -621,10 +623,11 @@ export default function MinhaAgenda() {
                           </select>
                         </div>
                       </div>
-                      {(filterContatoId || filterDescricao || filterTipoContato) && (
+                      {(filterContatoId || filterContatoNome || filterDescricao || filterTipoContato) && (
                         <button
                           onClick={() => {
                             setFilterContatoId(null);
+                            setFilterContatoNome("");
                             setFilterDescricao("");
                             setFilterTipoContato("");
                           }}
