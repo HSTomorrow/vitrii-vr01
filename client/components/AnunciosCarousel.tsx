@@ -14,6 +14,7 @@ interface Anuncio {
   link?: string;
   preco?: number;
   isDoacao?: boolean;
+  aCombinar?: boolean;
   tipo: string;
   anuncianteId: number;
   anunciantes?: {
@@ -309,9 +310,13 @@ export default function AnunciosCarousel({
                           : "text-vitrii-blue"
                   }`}
                 >
-                  {anuncio.isDoacao
-                    ? "Grátis"
-                    : `R$ ${anuncio.preco ? Number(anuncio.preco).toFixed(2) : "0.00"}`}
+                  {anuncio.preco && anuncio.preco > 0
+                    ? `R$ ${Number(anuncio.preco).toFixed(2)}`
+                    : anuncio.aCombinar
+                      ? "A Combinar"
+                      : anuncio.isDoacao
+                        ? "Gratuito"
+                        : "A Combinar"}
                 </span>
                 <div className="flex items-center space-x-0.5 hover:scale-110 transition-transform duration-300 origin-right">
                   <svg
