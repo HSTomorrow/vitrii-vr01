@@ -29,6 +29,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import InstallAppSection from "@/components/InstallAppSection";
+import InstallAppMenuItem from "@/components/InstallAppMenuItem";
 
 export default function Menu() {
   const { user, logout } = useAuth();
@@ -103,6 +104,9 @@ export default function Menu() {
               Navegação
             </h2>
             <div className="space-y-2">
+              {/* Install App Menu Item */}
+              <InstallAppMenuItem />
+
               <Link
                 to="/"
                 className="flex items-center gap-4 px-6 py-4 bg-vitrii-gray hover:bg-gray-200 rounded-lg transition-colors"
