@@ -90,9 +90,14 @@ export const getContatosByUsuario: RequestHandler = async (req, res) => {
 export const createContato: RequestHandler = async (req, res) => {
   try {
     const usuarioId = parseInt(req.headers["x-user-id"] as string || "0");
+    console.log("[createContato] Iniciando criação de contato, usuarioId:", usuarioId);
+    console.log("[createContato] Request body:", req.body);
+
     const validatedData = ContatoCreateSchema.parse(req.body);
+    console.log("[createContato] Dados validados:", validatedData);
 
     if (!usuarioId) {
+      console.warn("[createContato] Usuário não autenticado");
       return res.status(401).json({
         success: false,
         error: "Usuário não autenticado",
@@ -106,28 +111,35 @@ export const createContato: RequestHandler = async (req, res) => {
     });
 
     if (!usuario) {
+      console.warn("[createContato] Usuário não encontrado, id:", usuarioId);
       return res.status(404).json({
         success: false,
         error: "Usuário não encontrado",
       });
     }
 
+    console.log("[createContato] Usuário encontrado:", usuario.id);
+
     // If anuncianteId is provided, verify it exists
     if (validatedData.anuncianteId) {
+      console.log("[createContato] Verificando anunciante:", validatedData.anuncianteId);
       const anunciante = await prisma.anunciantes.findUnique({
         where: { id: validatedData.anuncianteId },
         select: { id: true },
       });
 
       if (!anunciante) {
+        console.warn("[createContato] Anunciante não encontrado, id:", validatedData.anuncianteId);
         return res.status(404).json({
           success: false,
           error: "Anunciante não encontrado",
         });
       }
+      console.log("[createContato] Anunciante encontrado:", anunciante.id);
     }
 
     // Create contact
+    console.log("[createContato] Criando contato no banco de dados...");
     const contato = await prisma.contatos.create({
       data: {
         usuarioId,
@@ -158,6 +170,7 @@ export const createContato: RequestHandler = async (req, res) => {
       },
     });
 
+    console.log("[createContato] Contato criado com sucesso:", contato.id);
     res.status(201).json({
       success: true,
       data: contato,
@@ -165,6 +178,7 @@ export const createContato: RequestHandler = async (req, res) => {
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
+      console.error("[createContato] Erro de validação:", error.errors);
       return res.status(400).json({
         success: false,
         error: "Dados inválidos",
@@ -172,10 +186,14 @@ export const createContato: RequestHandler = async (req, res) => {
       });
     }
 
-    console.error("Error creating contato:", error);
+    console.error("[createContato] Erro ao criar contato:", error);
+    console.error("[createContato] Error stack:", (error as any)?.stack);
+
+    // Return detailed error info
     res.status(500).json({
       success: false,
       error: "Erro ao criar contato",
+      details: (error as any)?.message || "Erro desconhecido",
     });
   }
 };

@@ -176,9 +176,23 @@ export default function CadastroContatos() {
       console.log("[CadastroContatos] Response status:", response.status);
 
       if (!response.ok) {
-        const error = await response.json();
-        console.error("[CadastroContatos] Erro na resposta:", error);
-        throw new Error(error.error || `Erro ao salvar contato (HTTP ${response.status})`);
+        let errorData: any = {};
+        try {
+          errorData = await response.json();
+        } catch (e) {
+          errorData = { error: "Erro ao fazer parse da resposta" };
+        }
+
+        console.error("[CadastroContatos] Erro na resposta:", {
+          status: response.status,
+          statusText: response.statusText,
+          errorData: errorData,
+          errorMessage: errorData.error,
+          errorDetails: errorData.details,
+        });
+
+        const errorMessage = errorData.error || errorData.message || `Erro ao salvar contato (HTTP ${response.status})`;
+        throw new Error(errorMessage);
       }
 
       const result = await response.json();
@@ -197,7 +211,11 @@ export default function CadastroContatos() {
     },
     onError: (error) => {
       console.error("[CadastroContatos] onError callback disparado:", error);
-      toast.error(error instanceof Error ? error.message : "Erro ao salvar contato");
+      console.error("[CadastroContatos] Error message:", error instanceof Error ? error.message : "");
+      console.error("[CadastroContatos] Error stack:", error instanceof Error ? error.stack : "");
+
+      const errorMessage = error instanceof Error ? error.message : "Erro desconhecido ao salvar contato";
+      toast.error(`❌ ${errorMessage}`);
     },
   });
 
