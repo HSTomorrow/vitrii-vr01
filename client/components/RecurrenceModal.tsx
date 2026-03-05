@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useState, useEffect } from "react";
 import { X, Plus, Trash2, Info } from "lucide-react";
 import { toast } from "sonner";
