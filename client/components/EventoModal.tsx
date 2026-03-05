@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
-import { X, ChevronDown } from "lucide-react";
+import { X, ChevronDown, Plus } from "lucide-react";
 import { toast } from "sonner";
+import ContatoSelectorModal from "./ContatoSelectorModal";
 
 interface Evento {
   id: number;
@@ -78,6 +79,7 @@ export default function EventoModal({
   });
   const [contatos, setContatos] = useState<Contato[]>([]);
   const [isLoadingContatos, setIsLoadingContatos] = useState(false);
+  const [showContatoSelector, setShowContatoSelector] = useState(false);
 
   // Fetch contatos when modal opens
   useEffect(() => {
@@ -404,59 +406,52 @@ export default function EventoModal({
               </p>
             </div>
 
-            {isLoadingContatos ? (
-              <p className="text-sm text-gray-600">Carregando contatos...</p>
-            ) : contatos.length === 0 ? (
-              <p className="text-sm text-gray-600 italic">
-                Nenhum contato cadastrado para este anunciante. <a href="/cadastro-contatos" className="text-vitrii-blue hover:underline">Cadastre contatos</a>.
-              </p>
-            ) : (
-              <div className="space-y-2 max-h-60 overflow-y-auto">
-                {contatos.map((contato) => (
-                  <label
-                    key={contato.id}
-                    className="flex items-center gap-2 p-2 rounded hover:bg-blue-100 cursor-pointer"
-                  >
-                    <input
-                      type="checkbox"
-                      checked={formData.contatosPermitidos.includes(contato.id)}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setFormData({
-                            ...formData,
-                            contatosPermitidos: [
-                              ...formData.contatosPermitidos,
-                              contato.id,
-                            ],
-                          });
-                        } else {
+            {/* Selected Contacts List */}
+            {formData.contatosPermitidos.length > 0 ? (
+              <div className="bg-white rounded-lg p-3 space-y-2 max-h-48 overflow-y-auto">
+                {formData.contatosPermitidos.map((contatoId) => {
+                  const contato = contatos.find((c) => c.id === contatoId);
+                  if (!contato) return null;
+                  return (
+                    <div
+                      key={contatoId}
+                      className="flex items-center justify-between p-2 bg-blue-50 rounded border border-blue-200"
+                    >
+                      <div className="text-sm">
+                        <div className="font-medium text-vitrii-text">{contato.nome}</div>
+                        <div className="text-xs text-gray-600">{contato.tipoContato}</div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
                           setFormData({
                             ...formData,
                             contatosPermitidos: formData.contatosPermitidos.filter(
-                              (id) => id !== contato.id,
+                              (id) => id !== contatoId
                             ),
                           });
-                        }
-                      }}
-                      className="w-4 h-4"
-                    />
-                    <div className="text-sm flex-1">
-                      <div className="font-medium text-vitrii-text">{contato.nome}</div>
-                      <div className="text-xs text-gray-600">
-                        {contato.tipoContato}
-                        {contato.email && ` • ${contato.email}`}
-                      </div>
+                        }}
+                        className="text-xs px-2 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200 transition-colors"
+                      >
+                        Remover
+                      </button>
                     </div>
-                  </label>
-                ))}
+                  );
+                })}
               </div>
+            ) : (
+              <p className="text-sm text-gray-600 italic">Nenhum contato selecionado</p>
             )}
 
-            {formData.contatosPermitidos.length > 0 && (
-              <div className="text-xs text-blue-700 bg-white rounded p-2">
-                <strong>{formData.contatosPermitidos.length}</strong> contato(s) selecionado(s)
-              </div>
-            )}
+            {/* Add Button */}
+            <button
+              type="button"
+              onClick={() => setShowContatoSelector(true)}
+              className="w-full px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-blue-600 transition-colors font-medium flex items-center justify-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              Adicionar Contato
+            </button>
           </div>
 
           {/* Buttons */}
@@ -487,6 +482,23 @@ export default function EventoModal({
           )}
         </form>
       </div>
+
+      {/* Contato Selector Modal */}
+      <ContatoSelectorModal
+        isOpen={showContatoSelector}
+        onClose={() => setShowContatoSelector(false)}
+        onSelect={(contatoId) => {
+          if (!formData.contatosPermitidos.includes(contatoId)) {
+            setFormData({
+              ...formData,
+              contatosPermitidos: [...formData.contatosPermitidos, contatoId],
+            });
+          }
+        }}
+        selectedContatoIds={formData.contatosPermitidos}
+        anuncianteId={anuncianteId}
+        userId={userId}
+      />
     </div>
   );
 }
