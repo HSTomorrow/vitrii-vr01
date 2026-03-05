@@ -134,8 +134,8 @@ export default function PerfilUsuario() {
         setCpfSaved(true);
       }
       setTimeout(() => {
-        // Navigate to ad editing page after profile update
-        navigate("/anuncio/criar");
+        // Navigate to home page after profile update
+        navigate("/");
       }, 1500);
     },
     onError: (error: any) => {
