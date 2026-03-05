@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import Header from "@/components/Header";
@@ -94,6 +94,11 @@ export default function CadastroContatos() {
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM_DATA);
   const [searchTerm, setSearchTerm] = useState("");
 
+  // Debug: Log when user changes
+  useEffect(() => {
+    console.log("[CadastroContatos] User state changed:", { userId: user?.id, userName: user?.nome });
+  }, [user]);
+
   // Fetch anunciantes for the optional field
   const { data: anunciantesData = [] } = useQuery({
     queryKey: ["anunciantes", user?.id],
@@ -138,6 +143,8 @@ export default function CadastroContatos() {
       const url = editingId ? `/api/contatos/${editingId}` : "/api/contatos";
       const method = editingId ? "PUT" : "POST";
 
+      console.log("[CadastroContatos] Iniciando requisição:", { method, url, userId: user?.id });
+
       const headers: Record<string, string> = {
         "Content-Type": "application/json",
       };
@@ -158,20 +165,28 @@ export default function CadastroContatos() {
         anuncianteId: data.anuncianteId || null,
       };
 
+      console.log("[CadastroContatos] Payload:", payload);
+
       const response = await fetch(url, {
         method,
         headers,
         body: JSON.stringify(payload),
       });
 
+      console.log("[CadastroContatos] Response status:", response.status);
+
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(error.error || "Erro ao salvar contato");
+        console.error("[CadastroContatos] Erro na resposta:", error);
+        throw new Error(error.error || `Erro ao salvar contato (HTTP ${response.status})`);
       }
 
-      return response.json();
+      const result = await response.json();
+      console.log("[CadastroContatos] Sucesso na requisição:", result);
+      return result;
     },
     onSuccess: () => {
+      console.log("[CadastroContatos] onSuccess callback disparado");
       toast.success(
         editingId ? "Contato atualizado com sucesso!" : "Contato criado com sucesso!"
       );
@@ -181,6 +196,7 @@ export default function CadastroContatos() {
       refetchContatos();
     },
     onError: (error) => {
+      console.error("[CadastroContatos] onError callback disparado:", error);
       toast.error(error instanceof Error ? error.message : "Erro ao salvar contato");
     },
   });
@@ -216,23 +232,44 @@ export default function CadastroContatos() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    console.log("[CadastroContatos] handleSubmit chamado, formData:", formData);
 
-    if (!formData.nome.trim()) {
-      toast.error("Nome é obrigatório");
+    // Validar nome
+    if (!formData.nome || !formData.nome.trim()) {
+      console.warn("[CadastroContatos] Nome é obrigatório");
+      toast.error("❌ Nome é obrigatório");
       return;
     }
 
-    if (!formData.celular.trim()) {
-      toast.error("Celular/WhatsApp é obrigatório");
+    // Validar celular
+    if (!formData.celular || !formData.celular.trim()) {
+      console.warn("[CadastroContatos] Celular é obrigatório");
+      toast.error("❌ Celular/WhatsApp é obrigatório");
       return;
     }
 
-    if (!formData.tipoContato) {
-      toast.error("Tipo de contato é obrigatório");
+    // Validar tipo de contato
+    if (!formData.tipoContato || formData.tipoContato === "") {
+      console.warn("[CadastroContatos] Tipo de contato é obrigatório");
+      toast.error("❌ Tipo de contato é obrigatório");
       return;
     }
 
-    await saveContatoMutation.mutateAsync(formData);
+    // Validar usuário autenticado
+    if (!user?.id) {
+      console.error("[CadastroContatos] Usuário não autenticado");
+      toast.error("❌ Você precisa estar logado para salvar contatos");
+      return;
+    }
+
+    console.log("[CadastroContatos] Validação passou, disparando mutação");
+
+    try {
+      await saveContatoMutation.mutateAsync(formData);
+      console.log("[CadastroContatos] Mutação completada com sucesso");
+    } catch (error) {
+      console.error("[CadastroContatos] Erro ao salvar:", error);
+    }
   };
 
   const handleEdit = (contato: Contato) => {
