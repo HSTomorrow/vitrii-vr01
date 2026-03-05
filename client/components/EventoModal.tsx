@@ -150,9 +150,32 @@ export default function EventoModal({
         ...prev,
         dataInicio: dateStr,
         dataFimData: dateStr,
+        horaInicio: "09:00",
+        horaFim: "10:00",
       }));
     }
   }, [evento, defaultDate, isOpen]);
+
+  // Helper function to calculate end time (+1 hour from start time)
+  const calculateEndTime = (startHora: string, startData: string) => {
+    if (!startHora) return { horaFim: "10:00", dataFimData: startData };
+
+    const [hours, minutes] = startHora.split(':').map(Number);
+    let endHours = hours + 1;
+    let endMinutes = minutes;
+    let endDateStr = startData;
+
+    // If end time goes past 24:00, move to next day
+    if (endHours >= 24) {
+      endHours = endHours % 24;
+      const nextDate = new Date(startData);
+      nextDate.setDate(nextDate.getDate() + 1);
+      endDateStr = nextDate.toISOString().split('T')[0];
+    }
+
+    const horaFim = `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}`;
+    return { horaFim, dataFimData: endDateStr };
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -186,10 +209,7 @@ export default function EventoModal({
       dataFim: dataFim.toISOString(),
       privacidade: formData.privacidade,
       cor: formData.cor,
-      contatosPermitidos:
-        formData.privacidade === "privado_usuarios"
-          ? formData.contatosPermitidos
-          : undefined,
+      contatosPermitidos: formData.contatosPermitidos.length > 0 ? formData.contatosPermitidos : undefined,
     });
   };
 
@@ -255,9 +275,11 @@ export default function EventoModal({
               type="date"
               required
               value={formData.dataInicio}
-              onChange={(e) =>
-                setFormData({ ...formData, dataInicio: e.target.value })
-              }
+              onChange={(e) => {
+                const newDataInicio = e.target.value;
+                const { horaFim, dataFimData } = calculateEndTime(formData.horaInicio, newDataInicio);
+                setFormData({ ...formData, dataInicio: newDataInicio, horaFim, dataFimData });
+              }}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
             />
           </div>
@@ -271,9 +293,11 @@ export default function EventoModal({
               type="time"
               required
               value={formData.horaInicio}
-              onChange={(e) =>
-                setFormData({ ...formData, horaInicio: e.target.value })
-              }
+              onChange={(e) => {
+                const newHoraInicio = e.target.value;
+                const { horaFim, dataFimData } = calculateEndTime(newHoraInicio, formData.dataInicio);
+                setFormData({ ...formData, horaInicio: newHoraInicio, horaFim, dataFimData });
+              }}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
             />
           </div>
@@ -367,73 +391,71 @@ export default function EventoModal({
             </div>
           </div>
 
-          {/* Permissões - Restrita */}
-          {formData.privacidade === "privado_usuarios" && (
-            <div className="border border-blue-200 bg-blue-50 rounded-lg p-4 space-y-3">
-              <div>
-                <label className="block text-sm font-semibold text-vitrii-text mb-2">
-                  Quem pode visualizar este evento?
-                </label>
-                <p className="text-xs text-gray-600 mb-3">
-                  Selecione os contatos que poderão visualizar as informações completas deste evento
-                </p>
-              </div>
-
-              {isLoadingContatos ? (
-                <p className="text-sm text-gray-600">Carregando contatos...</p>
-              ) : contatos.length === 0 ? (
-                <p className="text-sm text-gray-600 italic">
-                  Nenhum contato cadastrado para este anunciante. <a href="/cadastro-contatos" className="text-vitrii-blue hover:underline">Cadastre contatos</a>.
-                </p>
-              ) : (
-                <div className="space-y-2 max-h-60 overflow-y-auto">
-                  {contatos.map((contato) => (
-                    <label
-                      key={contato.id}
-                      className="flex items-center gap-2 p-2 rounded hover:bg-blue-100 cursor-pointer"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={formData.contatosPermitidos.includes(contato.id)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setFormData({
-                              ...formData,
-                              contatosPermitidos: [
-                                ...formData.contatosPermitidos,
-                                contato.id,
-                              ],
-                            });
-                          } else {
-                            setFormData({
-                              ...formData,
-                              contatosPermitidos: formData.contatosPermitidos.filter(
-                                (id) => id !== contato.id,
-                              ),
-                            });
-                          }
-                        }}
-                        className="w-4 h-4"
-                      />
-                      <div className="text-sm flex-1">
-                        <div className="font-medium text-vitrii-text">{contato.nome}</div>
-                        <div className="text-xs text-gray-600">
-                          {contato.tipoContato}
-                          {contato.email && ` • ${contato.email}`}
-                        </div>
-                      </div>
-                    </label>
-                  ))}
-                </div>
-              )}
-
-              {formData.contatosPermitidos.length > 0 && (
-                <div className="text-xs text-blue-700 bg-white rounded p-2">
-                  <strong>{formData.contatosPermitidos.length}</strong> contato(s) selecionado(s)
-                </div>
-              )}
+          {/* Contatos - Available for all privacy levels */}
+          <div className="border border-blue-200 bg-blue-50 rounded-lg p-4 space-y-3">
+            <div>
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                Contatos para este Evento
+              </label>
+              <p className="text-xs text-gray-600 mb-3">
+                Selecione os contatos associados a este evento
+              </p>
             </div>
-          )}
+
+            {isLoadingContatos ? (
+              <p className="text-sm text-gray-600">Carregando contatos...</p>
+            ) : contatos.length === 0 ? (
+              <p className="text-sm text-gray-600 italic">
+                Nenhum contato cadastrado para este anunciante. <a href="/cadastro-contatos" className="text-vitrii-blue hover:underline">Cadastre contatos</a>.
+              </p>
+            ) : (
+              <div className="space-y-2 max-h-60 overflow-y-auto">
+                {contatos.map((contato) => (
+                  <label
+                    key={contato.id}
+                    className="flex items-center gap-2 p-2 rounded hover:bg-blue-100 cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={formData.contatosPermitidos.includes(contato.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setFormData({
+                            ...formData,
+                            contatosPermitidos: [
+                              ...formData.contatosPermitidos,
+                              contato.id,
+                            ],
+                          });
+                        } else {
+                          setFormData({
+                            ...formData,
+                            contatosPermitidos: formData.contatosPermitidos.filter(
+                              (id) => id !== contato.id,
+                            ),
+                          });
+                        }
+                      }}
+                      className="w-4 h-4"
+                    />
+                    <div className="text-sm flex-1">
+                      <div className="font-medium text-vitrii-text">{contato.nome}</div>
+                      <div className="text-xs text-gray-600">
+                        {contato.tipoContato}
+                        {contato.email && ` • ${contato.email}`}
+                      </div>
+                    </div>
+                  </label>
+                ))}
+              </div>
+            )}
+
+            {formData.contatosPermitidos.length > 0 && (
+              <div className="text-xs text-blue-700 bg-white rounded p-2">
+                <strong>{formData.contatosPermitidos.length}</strong> contato(s) selecionado(s)
+              </div>
+            )}
+          </div>
 
           {/* Buttons */}
           <div className="flex gap-2 pt-4">
