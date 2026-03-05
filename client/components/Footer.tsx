@@ -26,45 +26,6 @@ export default function Footer() {
             </p>
           </div>
 
-          {/* Comprador */}
-          <div>
-            <h4 className="font-semibold mb-4 text-vitrii-yellow">Para Compradores</h4>
-            <ul className="space-y-2 text-sm text-white">
-              <li>
-                <Link
-                  to="/browse"
-                  className="hover:text-vitrii-blue transition-colors"
-                >
-                  Buscar Produtos
-                </Link>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="hover:text-vitrii-blue transition-colors"
-                >
-                  Categorias
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="hover:text-vitrii-blue transition-colors"
-                >
-                  Ofertas
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="hover:text-vitrii-blue transition-colors"
-                >
-                  Histórico de Compras
-                </a>
-              </li>
-            </ul>
-          </div>
-
           {/* Vendedor */}
           <div>
             <h4 className="font-semibold mb-4 text-vitrii-yellow">Para Vendedores</h4>
@@ -76,22 +37,6 @@ export default function Footer() {
                 >
                   Começar a Vender
                 </Link>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="hover:text-vitrii-blue transition-colors"
-                >
-                  Gerenciar Lojas
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="hover:text-vitrii-blue transition-colors"
-                >
-                  Gerenciar Anúncios
-                </a>
               </li>
               <li>
                 <Link
