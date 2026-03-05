@@ -788,9 +788,7 @@ export default function Index() {
               Informação Importante
             </h3>
             <p className="text-vitrii-text-secondary text-xs">
-              Vitrii é um marketplace seguro com autenticação via Google ou
-              Usuário/Senha. Suas transações são protegidas e dados
-              criptografados.
+              Vitrii é um marketplace seguro com autenticação via Usuário/Senha. Suas transações são protegidas e dados criptografados.
             </p>
           </div>
         </div>
