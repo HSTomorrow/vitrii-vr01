@@ -12,7 +12,7 @@ console.log(
 console.log("[Prisma] NODE_ENV:", process.env.NODE_ENV);
 console.log(
   "[Prisma] Platform:",
-  process.env.NETLIFY_FUNCTION_NAME ? "Netlify" : "Standalone",
+  "Standalone (Fly.io)",
 );
 
 if (!process.env.DATABASE_URL) {
