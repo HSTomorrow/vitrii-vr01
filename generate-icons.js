@@ -1,13 +1,17 @@
 #!/usr/bin/env node
 
-const https = require('https');
-const fs = require('fs');
-const path = require('path');
+import https from 'https';
+import fs from 'fs';
+import path from 'path';
+import sharp from 'sharp';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Logo URL (pode ser substituído depois)
 const LOGO_URL = 'https://cdn.builder.io/api/v1/image/assets%2Ff2e9e91d4cc44d4bae5b9dac3bb6abe8%2F4f9f90c2ca714384b9d14f4f1b8ee68a?format=webp&width=800&height=1200';
-const TEMP_LOGO = './temp-logo.webp';
-const OUTPUT_DIR = './public/icons';
+const TEMP_LOGO = path.join(__dirname, 'temp-logo.webp');
+const OUTPUT_DIR = path.join(__dirname, 'public/icons');
 
 // Criar diretório de output se não existir
 if (!fs.existsSync(OUTPUT_DIR)) {
@@ -45,9 +49,6 @@ https.get(LOGO_URL, (response) => {
 
 async function generateIcons() {
   try {
-    // Importar sharp dinamicamente
-    const sharp = require('sharp');
-
     console.log('\n🎨 Gerando ícones...\n');
 
     // Gerar ícones normais
@@ -69,9 +70,10 @@ async function generateIcons() {
     console.log('\n🎯 Gerando maskable icons...\n');
     for (const size of MASKABLE_SIZES) {
       const filename = `icon-maskable-${size}x${size}.png`;
-      
+      const maskSize = Math.round(size * 0.8);
+
       await sharp(TEMP_LOGO)
-        .resize(size * 0.8, size * 0.8, { fit: 'contain' })
+        .resize(maskSize, maskSize, { fit: 'contain' })
         .png()
         .toFile(path.join(OUTPUT_DIR, filename));
       
