@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
-import { User, LogOut, Settings, FileText, Heart, Shield, Calendar } from "lucide-react";
+import { User, LogOut, Settings, FileText, Star, Shield, Calendar, Gift, MessageCircle } from "lucide-react";
 
 export default function UserButton() {
   const { user, logout } = useAuth();
@@ -89,8 +89,24 @@ export default function UserButton() {
               onClick={() => handleNavigate("/favoritos")}
               className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
             >
-              <Heart className="w-4 h-4" />
+              <Star className="w-4 h-4" />
               <span>Favoritos</span>
+            </button>
+
+            <button
+              onClick={() => handleNavigate("/lista-desejos")}
+              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
+            >
+              <Gift className="w-4 h-4" />
+              <span>Lista de Desejos</span>
+            </button>
+
+            <button
+              onClick={() => handleNavigate("/chat")}
+              className="w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-3 transition-colors"
+            >
+              <MessageCircle className="w-4 h-4" />
+              <span>Mensagens</span>
             </button>
 
             <button
