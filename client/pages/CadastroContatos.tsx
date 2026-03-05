@@ -996,6 +996,11 @@ export default function CadastroContatos() {
           setShowContactDetails(false);
           setSelectedContatoForDetails(null);
         }}
+        onEdit={(contato) => {
+          handleEdit(contato);
+          setShowContactDetails(false);
+          setSelectedContatoForDetails(null);
+        }}
       />
 
       <Footer />

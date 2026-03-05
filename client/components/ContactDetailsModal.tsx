@@ -9,6 +9,7 @@ import {
   Send,
   Calendar,
   Briefcase,
+  Edit,
 } from "lucide-react";
 import ImageWithFallback from "@/components/ImageWithFallback";
 import { getUserInitials } from "@/utils/imageFallback";
@@ -42,6 +43,7 @@ interface ContactDetailsModalProps {
   isOpen: boolean;
   contato: Contato | null;
   onClose: () => void;
+  onEdit?: (contato: Contato) => void;
 }
 
 const getStatusColor = (status: string) => {
@@ -101,6 +103,7 @@ export default function ContactDetailsModal({
   isOpen,
   contato,
   onClose,
+  onEdit,
 }: ContactDetailsModalProps) {
   if (!isOpen || !contato) return null;
 
@@ -288,10 +291,19 @@ export default function ContactDetailsModal({
         </div>
 
         {/* Footer - Action Buttons */}
-        <div className="sticky bottom-0 border-t border-gray-200 p-4 sm:p-6 bg-white">
+        <div className="sticky bottom-0 border-t border-gray-200 p-4 sm:p-6 bg-white space-y-3">
+          {onEdit && contato && (
+            <button
+              onClick={() => onEdit(contato)}
+              className="w-full px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center justify-center gap-2"
+            >
+              <Edit className="w-4 h-4" />
+              Alterar
+            </button>
+          )}
           <button
             onClick={onClose}
-            className="w-full px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+            className="w-full px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium"
           >
             Fechar
           </button>
