@@ -59,6 +59,9 @@ export default function StatusAgenda({
   const { user } = useAuth();
   const [expandedEventoId, setExpandedEventoId] = useState<number | null>(null);
   const [updatingEventoId, setUpdatingEventoId] = useState<number | null>(null);
+  const [selectedStatuses, setSelectedStatuses] = useState<Set<string>>(
+    new Set(["pendente", "pendente_pagamento"])
+  );
 
   const sortedEventos = useMemo(() => {
     return [...eventos].sort(
@@ -86,6 +89,22 @@ export default function StatusAgenda({
     const option = STATUS_OPTIONS.find((s) => s.value === status);
     return option?.label || status;
   };
+
+  const toggleStatusFilter = (status: string) => {
+    const newStatuses = new Set(selectedStatuses);
+    if (newStatuses.has(status)) {
+      newStatuses.delete(status);
+    } else {
+      newStatuses.add(status);
+    }
+    setSelectedStatuses(newStatuses);
+  };
+
+  const filteredEventos = useMemo(() => {
+    return sortedEventos.filter((evento) =>
+      selectedStatuses.has(evento.status)
+    );
+  }, [sortedEventos, selectedStatuses]);
 
   const handleStatusChange = async (eventoId: number, newStatus: string) => {
     setUpdatingEventoId(eventoId);
@@ -138,14 +157,48 @@ export default function StatusAgenda({
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
+      {/* Header */}
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-lg font-bold text-vitrii-text">
-          Status da Agenda ({eventos.length})
+          Status da Agenda ({filteredEventos.length})
         </h3>
       </div>
 
-      {sortedEventos.map((evento) => {
+      {/* Filters */}
+      <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200">
+        <p className="text-sm font-semibold text-vitrii-text mb-3">Filtrar por Status:</p>
+        <div className="flex flex-wrap gap-2">
+          {STATUS_OPTIONS.map((option) => {
+            const isSelected = selectedStatuses.has(option.value);
+            const Icon = option.icon;
+            return (
+              <button
+                key={option.value}
+                onClick={() => toggleStatusFilter(option.value)}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                  isSelected
+                    ? `${option.color} ring-2 ring-offset-1`
+                    : "border border-gray-300 text-gray-700 hover:border-gray-400 bg-white"
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                {option.label}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Events List */}
+      {filteredEventos.length === 0 ? (
+        <div className="bg-white rounded-lg shadow-md p-8 text-center border border-gray-200">
+          <Clock className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+          <p className="text-gray-500 text-lg">Nenhum evento com os filtros selecionados</p>
+        </div>
+      ) : (
+        <div className="space-y-3">
+          {filteredEventos.map((evento) => {
         const isExpanded = expandedEventoId === evento.id;
         const isUpdating = updatingEventoId === evento.id;
         const StatusIcon = getStatusIcon(evento.status);
@@ -273,6 +326,8 @@ export default function StatusAgenda({
           </div>
         );
       })}
+        </div>
+      )}
     </div>
   );
 }
