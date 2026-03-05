@@ -65,7 +65,7 @@ export default function Header() {
             <nav className="hidden lg:flex items-center space-x-6"></nav>
 
             {/* Right side - Auth and actions */}
-            <div className="flex items-center space-x-2 sm:space-x-4 ml-auto">
+            <div className="flex items-center space-x-1 sm:space-x-2 lg:space-x-4 ml-auto">
               {/* Mobile menu button - Always first for visibility on mobile */}
               <Link
                 to="/menu"
@@ -79,7 +79,7 @@ export default function Header() {
                 <>
                   <Link
                     to="/chat"
-                    className="hidden sm:flex flex-shrink-0 p-2 hover:bg-vitrii-gray rounded-lg transition-colors"
+                    className="hidden lg:flex flex-shrink-0 p-2 hover:bg-vitrii-gray rounded-lg transition-colors"
                     title="Minhas mensagens"
                   >
                     <MessageSquare className="w-5 h-5 text-vitrii-text" />
@@ -87,7 +87,7 @@ export default function Header() {
 
                   <Link
                     to="/favoritos"
-                    className="hidden sm:flex flex-shrink-0 p-2 hover:bg-vitrii-gray rounded-lg transition-colors"
+                    className="hidden lg:flex flex-shrink-0 p-2 hover:bg-vitrii-gray rounded-lg transition-colors"
                     title="Meus favoritos"
                   >
                     <Star className="w-5 h-5 text-vitrii-text" />
@@ -95,7 +95,7 @@ export default function Header() {
 
                   <Link
                     to="/lista-desejos"
-                    className="hidden sm:flex flex-shrink-0 p-2 hover:bg-vitrii-gray rounded-lg transition-colors"
+                    className="hidden lg:flex flex-shrink-0 p-2 hover:bg-vitrii-gray rounded-lg transition-colors"
                     title="Minha lista de desejos"
                   >
                     <Gift className="w-5 h-5 text-vitrii-text" />
@@ -103,7 +103,7 @@ export default function Header() {
 
                   <Link
                     to="/minha-agenda"
-                    className="hidden sm:flex flex-shrink-0 p-2 hover:bg-vitrii-gray rounded-lg transition-colors"
+                    className="hidden lg:flex flex-shrink-0 p-2 hover:bg-vitrii-gray rounded-lg transition-colors"
                     title="Minha agenda"
                   >
                     <Calendar className="w-5 h-5 text-vitrii-text" />

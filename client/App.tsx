@@ -64,6 +64,7 @@ import TestEmail from "./pages/TestEmail";
 import BottomNavBar from "@/components/BottomNavBar";
 import PageTransition from "@/components/PageTransition";
 import PWAInstallButton from "@/components/PWAInstallButton";
+import PublishButton from "@/components/PublishButton";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -113,6 +114,7 @@ function AppContent() {
     <BrowserRouter>
       <BottomNavBar />
       <PWAInstallButton />
+      <PublishButton />
       <PageTransition>
         <Routes>
           <Route path="/" element={<Index />} />
