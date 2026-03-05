@@ -267,6 +267,10 @@ export default function ContatoSelectorModal({
             setShowContactDetails(false);
             setSelectedContatoForDetails(null);
           }}
+          onEdit={(contato) => {
+            setShowContactDetails(false);
+            setSelectedContatoForDetails(null);
+          }}
         />
       </div>
     </div>
