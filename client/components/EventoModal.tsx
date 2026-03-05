@@ -12,6 +12,7 @@ interface Evento {
   dataFim: string;
   privacidade: string;
   cor: string;
+  valor?: number;
   contatos?: { contatoId: number }[];
 }
 
@@ -84,6 +85,7 @@ export default function EventoModal({
     horaFim: "10:00",
     privacidade: "privado" as const,
     cor: "#3B82F6",
+    valor: "",
     contatosPermitidos: [] as number[],
   });
   const [contatos, setContatos] = useState<Contato[]>([]);
@@ -157,6 +159,7 @@ export default function EventoModal({
         }),
         privacidade: (evento.privacidade || "privado") as const,
         cor: evento.cor || "#3B82F6",
+        valor: evento.valor ? evento.valor.toString() : "",
         contatosPermitidos: evento.contatos?.map((c) => c.contatoId) || [],
       });
     } else if (defaultDate) {
@@ -224,6 +227,7 @@ export default function EventoModal({
       dataFim: dataFim.toISOString(),
       privacidade: formData.privacidade,
       cor: formData.cor,
+      valor: formData.valor ? parseFloat(formData.valor) : undefined,
       contatosPermitidos: formData.contatosPermitidos.length > 0 ? formData.contatosPermitidos : undefined,
     });
   };
@@ -404,6 +408,34 @@ export default function EventoModal({
                 </label>
               ))}
             </div>
+          </div>
+
+          {/* Valor (Price) - Optional */}
+          <div>
+            <label className="block text-sm font-semibold text-vitrii-text mb-2">
+              Valor (Opcional)
+            </label>
+            <div className="relative">
+              <span className="absolute left-3 top-2.5 text-gray-600 font-medium">
+                R$
+              </span>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                placeholder="0,00"
+                value={formData.valor}
+                onChange={(e) =>
+                  setFormData({ ...formData, valor: e.target.value })
+                }
+                className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue text-sm"
+              />
+            </div>
+            {formData.privacidade !== "publico" && (
+              <p className="text-xs text-amber-600 mt-2">
+                💡 O valor será ocultado para usuários não autorizados em agendas restritas ou privadas.
+              </p>
+            )}
           </div>
 
           {/* Contatos - Available for all privacy levels */}

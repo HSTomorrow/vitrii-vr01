@@ -197,6 +197,7 @@ export const createEvento: RequestHandler = async (req, res) => {
       dataFim,
       privacidade,
       cor,
+      valor,
       contatosPermitidos,
     } = req.body;
 
@@ -236,6 +237,7 @@ export const createEvento: RequestHandler = async (req, res) => {
         dataFim: fim,
         privacidade: privacidade || "privado",
         cor: cor || "#3B82F6",
+        valor: valor ? parseFloat(valor) : null,
       },
       include: {
         permissoes: {
@@ -302,6 +304,7 @@ export const updateEvento: RequestHandler = async (req, res) => {
       dataFim,
       privacidade,
       cor,
+      valor,
       contatosPermitidos,
     } = req.body;
 
@@ -360,6 +363,7 @@ export const updateEvento: RequestHandler = async (req, res) => {
         dataFim: dataFim ? new Date(dataFim) : evento.dataFim,
         privacidade: privacidade || evento.privacidade,
         cor: cor || evento.cor,
+        valor: valor !== undefined ? (valor ? parseFloat(valor) : null) : evento.valor,
       },
       include: {
         permissoes: {

@@ -1,6 +1,9 @@
 import { useState } from "react";
-import { X, Plus, Trash2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { X, Plus, Trash2, Info } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
+import ContatoSelectorModal from "./ContatoSelectorModal";
 
 interface RecurrenceModalProps {
   isOpen: boolean;
@@ -24,6 +27,16 @@ export interface RecurrenceData {
   recorrenciaDataFim: Date;
   privacidade: string;
   cor: string;
+  contatosPermitidos?: number[];
+}
+
+interface Contato {
+  id: number;
+  nome: string;
+  celular: string;
+  telefone?: string;
+  email?: string;
+  tipoContato: string;
 }
 
 const DIAS_SEMANA = [
@@ -43,6 +56,7 @@ export default function RecurrenceModal({
   isLoading = false,
   defaultStartDate,
 }: RecurrenceModalProps) {
+  const { user } = useAuth();
   const [step, setStep] = useState<"basic" | "recurrence">("basic");
   const [titulo, setTitulo] = useState("");
   const [descricao, setDescricao] = useState("");
@@ -53,6 +67,12 @@ export default function RecurrenceModal({
   const [horaFim, setHoraFim] = useState("10:00");
   const [privacidade, setPrivacidade] = useState("privado");
   const [cor, setCor] = useState("#3B82F6");
+
+  // Contacts
+  const [contatos, setContatos] = useState<Contato[]>([]);
+  const [contatosPermitidos, setContatosPermitidos] = useState<number[]>([]);
+  const [isLoadingContatos, setIsLoadingContatos] = useState(false);
+  const [showContatoSelector, setShowContatoSelector] = useState(false);
 
   // Recurrence settings
   const [recorrenciaType, setRecorrenciaType] = useState<"semanal" | "mensal">(
@@ -66,6 +86,33 @@ export default function RecurrenceModal({
   const [recorrenciaDataFim, setRecorrenciaDataFim] = useState(
     new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0]
   );
+
+  // Fetch contatos when modal opens
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const fetchContatos = async () => {
+      setIsLoadingContatos(true);
+      try {
+        const response = await fetch("/api/contatos", {
+          headers: {
+            "X-User-Id": user?.id?.toString() || "",
+          },
+        });
+        if (response.ok) {
+          const data = await response.json();
+          setContatos(data.data || []);
+        }
+      } catch (error) {
+        console.error("Erro ao carregar contatos:", error);
+        toast.error("Erro ao carregar contatos");
+      } finally {
+        setIsLoadingContatos(false);
+      }
+    };
+
+    fetchContatos();
+  }, [isOpen, user?.id]);
 
   if (!isOpen) return null;
 
@@ -121,6 +168,7 @@ export default function RecurrenceModal({
         recorrenciaDataFim: endDate,
         privacidade,
         cor,
+        contatosPermitidos: contatosPermitidos.length > 0 ? contatosPermitidos : undefined,
       };
 
       await onCreateRecurrence(data);
@@ -134,6 +182,7 @@ export default function RecurrenceModal({
       setHoraFim("10:00");
       setPrivacidade("privado");
       setCor("#3B82F6");
+      setContatosPermitidos([]);
       setDiasSemana([1, 2, 3, 4, 5]);
       setDiaDoMes(1);
 
@@ -264,6 +313,62 @@ export default function RecurrenceModal({
                     <span className="text-sm text-gray-600">{cor}</span>
                   </div>
                 </div>
+              </div>
+
+              {/* Contatos */}
+              <div className="border border-blue-200 bg-blue-50 rounded-lg p-4 space-y-3">
+                <div>
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                    Contatos (Opcional)
+                  </label>
+                  <p className="text-xs text-gray-600 mb-3">
+                    Selecione os contatos associados a estes eventos recorrentes
+                  </p>
+                </div>
+
+                {/* Selected Contacts List */}
+                {contatosPermitidos.length > 0 ? (
+                  <div className="bg-white rounded-lg p-3 space-y-2 max-h-48 overflow-y-auto">
+                    {contatosPermitidos.map((contatoId) => {
+                      const contato = contatos.find((c) => c.id === contatoId);
+                      if (!contato) return null;
+                      return (
+                        <div
+                          key={contatoId}
+                          className="flex items-center justify-between p-2 bg-blue-50 rounded border border-blue-200"
+                        >
+                          <div className="text-sm flex-1">
+                            <div className="font-medium text-vitrii-text">{contato.nome}</div>
+                            <div className="text-xs text-gray-600">{contato.tipoContato}</div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setContatosPermitidos(
+                                contatosPermitidos.filter((id) => id !== contatoId)
+                              );
+                            }}
+                            className="text-xs px-2 py-1 bg-red-100 text-red-600 rounded hover:bg-red-200 transition-colors"
+                          >
+                            Remover
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-sm text-gray-600 italic">Nenhum contato selecionado</p>
+                )}
+
+                {/* Add Button */}
+                <button
+                  type="button"
+                  onClick={() => setShowContatoSelector(true)}
+                  className="w-full px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-blue-600 transition-colors font-medium flex items-center justify-center gap-2 text-sm"
+                >
+                  <Plus className="w-4 h-4" />
+                  Adicionar Contato
+                </button>
               </div>
             </div>
           ) : (
@@ -445,6 +550,19 @@ export default function RecurrenceModal({
           )}
         </div>
       </div>
+
+      {/* Contato Selector Modal */}
+      <ContatoSelectorModal
+        isOpen={showContatoSelector}
+        onClose={() => setShowContatoSelector(false)}
+        onSelect={(contatoId) => {
+          if (!contatosPermitidos.includes(contatoId)) {
+            setContatosPermitidos([...contatosPermitidos, contatoId]);
+          }
+        }}
+        selectedContatoIds={contatosPermitidos}
+        userId={user?.id}
+      />
     </div>
   );
 }

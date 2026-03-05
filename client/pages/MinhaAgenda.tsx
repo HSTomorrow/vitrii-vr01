@@ -460,6 +460,7 @@ export default function MinhaAgenda() {
             dataFim: occurrence.dataFim.toISOString(),
             privacidade: data.privacidade,
             cor: data.cor,
+            contatosPermitidos: data.contatosPermitidos && data.contatosPermitidos.length > 0 ? data.contatosPermitidos : undefined,
             anuncianteId: selectedAnuncianteId,
           }),
         })
@@ -770,7 +771,15 @@ export default function MinhaAgenda() {
                       )}
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mb-6">
+                    <EventosAgendaCalendar
+                      eventos={filteredEventos}
+                      onSelectDate={handleSelectDate}
+                      onSelectEvento={handleSelectEvento}
+                      onAddEvento={handleAddEvento}
+                      isEditable={true}
+                    />
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 mt-6 mb-6">
                       <button
                         onClick={handleAddEvento}
                         className="px-3 sm:px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-blue-600 transition-colors font-medium text-sm sm:text-base"
@@ -812,14 +821,6 @@ export default function MinhaAgenda() {
                         <span className="hidden sm:inline">Deletar</span>
                       </button>
                     </div>
-
-                    <EventosAgendaCalendar
-                      eventos={filteredEventos}
-                      onSelectDate={handleSelectDate}
-                      onSelectEvento={handleSelectEvento}
-                      onAddEvento={handleAddEvento}
-                      isEditable={true}
-                    />
                   </>
                 )}
 

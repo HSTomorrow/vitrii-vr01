@@ -12,6 +12,8 @@ interface Evento {
   status: string;
   cor?: string;
   dataCriacao: string;
+  privacidade?: string;
+  contatos?: Array<{ contatoId: number }>;
 }
 
 interface Contato {
@@ -543,6 +545,65 @@ export default function StatusAgenda({
                     </p>
                   </div>
                 </div>
+
+                {/* Color and Privacidade */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm">
+                  <div className="min-w-0">
+                    <p className="font-semibold text-gray-600 mb-1">Cor:</p>
+                    <div className="flex items-center gap-2">
+                      <div
+                        className="w-6 h-6 rounded-full border border-gray-300"
+                        style={{ backgroundColor: evento.cor || "#3B82F6" }}
+                        title={evento.cor || "#3B82F6"}
+                      />
+                      <p className="text-gray-700">{evento.cor || "#3B82F6"}</p>
+                    </div>
+                  </div>
+                  {evento.privacidade && (
+                    <div className="min-w-0">
+                      <p className="font-semibold text-gray-600 mb-1">
+                        Privacidade:
+                      </p>
+                      <p className="text-gray-700 break-words">
+                        {evento.privacidade === "publico"
+                          ? "🌍 Público"
+                          : evento.privacidade === "privado_usuarios"
+                            ? "👥 Restrito"
+                            : "🔒 Privado"}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Contatos Associated */}
+                {evento.contatos && evento.contatos.length > 0 && (
+                  <div className="min-w-0">
+                    <p className="font-semibold text-gray-600 mb-2">
+                      Contatos ({evento.contatos.length}):
+                    </p>
+                    <div className="bg-white rounded-lg p-3 border border-gray-200 space-y-2 max-h-48 overflow-y-auto">
+                      {evento.contatos.map((contato: any, index: number) => (
+                        <div
+                          key={`${contato.contatoId}-${index}`}
+                          className="flex items-center justify-between p-2 bg-blue-50 rounded border border-blue-100"
+                        >
+                          <div className="text-sm">
+                            <p className="font-medium text-vitrii-text">
+                              ID: {contato.contatoId}
+                            </p>
+                          </div>
+                          <a
+                            href={`/cadastros/contatos#contato-${contato.contatoId}`}
+                            className="text-xs px-2 py-1 bg-vitrii-blue text-white rounded hover:bg-blue-600 transition-colors"
+                            title="Ver contato"
+                          >
+                            Ver
+                          </a>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Status Change Options */}
                 <div>
