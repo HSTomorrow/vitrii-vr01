@@ -868,6 +868,51 @@ export const createEventoVisitante: RequestHandler = async (req, res) => {
   }
 };
 
+// Check if user is announcer of a specific announcer
+export const isUserAnunciante: RequestHandler = async (req, res) => {
+  try {
+    const userId = (req as any).userId;
+    const { anuncianteId } = req.params;
+
+    if (!userId) {
+      return res.status(401).json({ error: "Não autenticado" });
+    }
+
+    const anuncianteId_num = parseInt(anuncianteId);
+    if (isNaN(anuncianteId_num)) {
+      return res.status(400).json({ error: "Invalid announcer ID" });
+    }
+
+    // Check if user is the announcer
+    const usuarioAnunciante = await prisma.usuarios_anunciantes.findFirst({
+      where: {
+        usuarioId: userId,
+        anuncianteId: anuncianteId_num,
+      },
+    });
+
+    // Check if user is admin
+    const usuarioAdmin = await prisma.usracessos.findUnique({
+      where: { id: userId },
+      select: { tipoUsuario: true },
+    });
+
+    const isAnunciante = !!usuarioAnunciante;
+    const isAdmin = usuarioAdmin?.tipoUsuario === "adm";
+
+    res.json({
+      data: {
+        isAnunciante,
+        isAdmin,
+        canCreateContacts: isAnunciante || isAdmin,
+      },
+    });
+  } catch (error) {
+    console.error("[isUserAnunciante]", error);
+    res.status(500).json({ error: "Erro ao verificar permissões" });
+  }
+};
+
 // Check if user can edit/delete an event
 export const canUserEditEvento: RequestHandler = async (req, res) => {
   try {

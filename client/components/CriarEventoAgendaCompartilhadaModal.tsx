@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { X, AlertCircle, Calendar, Clock, Phone, Loader } from "lucide-react";
+import { X, AlertCircle, Calendar, Clock, Phone, Loader, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 
 interface CriarEventoAgendaCompartilhadaModalProps {
   isOpen: boolean;
@@ -31,6 +32,28 @@ export default function CriarEventoAgendaCompartilhadaModal({
     telefone: "",
     nomeSolicitante: user?.nome || "",
   });
+
+  // Check if user is announcer
+  const { data: anuncianteStatusData } = useQuery({
+    queryKey: ["is-user-announcer", anuncianteId, user?.id],
+    queryFn: async () => {
+      if (!user?.id) return null;
+      const response = await fetch(
+        `/api/eventos-agenda/${anuncianteId}/is-announcer`,
+        {
+          headers: {
+            "X-User-Id": user.id.toString(),
+          },
+        }
+      );
+      if (!response.ok) throw new Error("Erro ao verificar status");
+      return response.json();
+    },
+    enabled: !!anuncianteId && !!user?.id,
+  });
+
+  const isAnunciante = anuncianteStatusData?.data?.isAnunciante ?? false;
+  const canCreateContacts = anuncianteStatusData?.data?.canCreateContacts ?? false;
 
   // Auto-check if contact exists when modal opens or user celular changes
   useEffect(() => {
@@ -400,6 +423,20 @@ export default function CriarEventoAgendaCompartilhadaModal({
               ℹ️ O contato será salvo automaticamente para futuras interações.
             </p>
           </div>
+
+          {/* Permission Warning - Non-Announcer */}
+          {!canCreateContacts && (
+            <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-200 flex gap-3">
+              <Lock className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
+              <div className="text-sm text-yellow-800">
+                <p className="font-semibold mb-1">Restrição: Sem Permissão para Criar Contatos</p>
+                <p>
+                  Apenas anunciantes podem criar novos contatos. Se seu contato não está na lista,
+                  entre em contato com o anunciante para ser adicionado.
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Info Box */}
           <div className="p-4 bg-amber-50 rounded-lg border border-amber-200 flex gap-3">
