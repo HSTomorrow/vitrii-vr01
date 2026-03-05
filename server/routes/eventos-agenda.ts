@@ -74,13 +74,28 @@ export const getEventosByAnunciante: RequestHandler = async (req, res) => {
       },
     });
 
+    // Batch fetch all horarios for this announcer to avoid N+1 queries
+    const horarios = await prisma.agendas_horarios.findMany({
+      where: {
+        anuncianteId: anuncianteId_num,
+        ativo: true,
+      },
+    });
+
+    // Create a map of day -> horario for quick lookups
+    const horarioMap = new Map();
+    horarios.forEach((h) => {
+      horarioMap.set(h.diaSemana, h);
+    });
+
     // Add dynamic status for out-of-schedule events
-    const eventosComStatus = await Promise.all(
-      eventos.map(async (evento) => {
-        const isWithinSchedule = await isEventWithinSchedule(
-          anuncianteId_num,
-          evento.dataInicio
-        );
+    const eventosComStatus = eventos.map((evento) => {
+      try {
+        const diaSemana = evento.dataInicio.getDay();
+        const hora = `${String(evento.dataInicio.getHours()).padStart(2, "0")}:${String(evento.dataInicio.getMinutes()).padStart(2, "0")}`;
+
+        const horario = horarioMap.get(diaSemana);
+        const isWithinSchedule = horario && hora >= horario.horaInicio && hora < horario.horaFim;
 
         // If event is outside schedule, mark as "Fora do Horario"
         const status = !isWithinSchedule ? "Fora do Horario" : evento.status;
@@ -89,8 +104,12 @@ export const getEventosByAnunciante: RequestHandler = async (req, res) => {
           ...evento,
           status,
         };
-      })
-    );
+      } catch (error) {
+        console.error("[getEventosByAnunciante] Error processing evento:", error);
+        // Return evento with original status if processing fails
+        return evento;
+      }
+    });
 
     res.json({ data: eventosComStatus });
   } catch (error) {

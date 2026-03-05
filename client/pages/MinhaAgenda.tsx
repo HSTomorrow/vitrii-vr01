@@ -134,23 +134,41 @@ export default function MinhaAgenda() {
       const headers: Record<string, string> = {
         "x-user-id": user?.id?.toString() || "",
       };
-      const response = await fetch(
-        `/api/eventos-agenda/anunciante/${selectedAnuncianteId}`,
-        { headers },
-      );
-      console.log("[MinhaAgenda] Eventos response status:", response.status);
-      if (!response.ok) {
-        const error = await response.json();
-        console.error("[MinhaAgenda] Eventos error:", error);
-        throw new Error(error.error || "Erro ao buscar eventos");
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout for mobile
+
+      try {
+        const response = await fetch(
+          `/api/eventos-agenda/anunciante/${selectedAnuncianteId}`,
+          { headers, signal: controller.signal },
+        );
+        clearTimeout(timeoutId);
+
+        console.log("[MinhaAgenda] Eventos response status:", response.status);
+        if (!response.ok) {
+          const error = await response.json();
+          console.error("[MinhaAgenda] Eventos error:", error);
+          throw new Error(error.error || "Erro ao buscar eventos");
+        }
+        const result = await response.json();
+        console.log("[MinhaAgenda] Eventos fetched:", result.data);
+        return result.data || [];
+      } catch (error) {
+        clearTimeout(timeoutId);
+        if (error instanceof Error) {
+          if (error.name === 'AbortError') {
+            throw new Error("Tempo limite de requisição excedido. Tente novamente.");
+          }
+        }
+        throw error;
       }
-      const result = await response.json();
-      console.log("[MinhaAgenda] Eventos fetched:", result.data);
-      return result.data || [];
     },
     enabled: !!selectedAnuncianteId && !!user?.id,
     staleTime: 600000, // 10 minutes
     gcTime: 600000, // 10 minutes
+    retry: 2, // Retry up to 2 times on failure
+    retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000), // Exponential backoff
   });
 
   // Fetch reservas for selected evento
