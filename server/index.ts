@@ -135,6 +135,7 @@ import {
   getEventoUsers,
   searchUsers,
   addUserToEvento,
+  getAgendaPrivacyStatus,
 } from "./routes/eventos-agenda";
 import {
   getFilasEsperaParaAnunciante,
@@ -993,6 +994,7 @@ export function createServer() {
   // Eventos de Agenda do Anunciante routes
   app.get("/api/eventos-agenda/anunciante/:anuncianteId", extractUserId, getEventosByAnunciante);
   app.get("/api/eventos-agenda/visiveis/:anuncianteId", getEventosVisivelsPara);
+  app.get("/api/eventos-agenda/:anuncianteId/privacy-status", extractUserId, getAgendaPrivacyStatus);
   app.post("/api/eventos-agenda", extractUserId, createEvento);
   app.post("/api/eventos-agenda/visitante/criar", extractUserId, createEventoVisitante);
   app.put("/api/eventos-agenda/:id", extractUserId, updateEvento);

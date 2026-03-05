@@ -851,3 +851,121 @@ export const createEventoVisitante: RequestHandler = async (req, res) => {
     res.status(500).json({ error: "Erro ao criar evento" });
   }
 };
+
+// Get agenda privacy status and visibility info for a user
+export const getAgendaPrivacyStatus: RequestHandler = async (req, res) => {
+  try {
+    const { anuncianteId } = req.params;
+    const userId = (req as any).userId;
+
+    const anuncianteId_num = parseInt(anuncianteId);
+    if (isNaN(anuncianteId_num)) {
+      return res.status(400).json({ error: "Invalid announcer ID" });
+    }
+
+    // Check if user is the announcer
+    const isAnunciante = userId
+      ? !!(await prisma.usuarios_anunciantes.findFirst({
+          where: {
+            usuarioId: userId,
+            anuncianteId: anuncianteId_num,
+          },
+        }))
+      : false;
+
+    // Check if user is admin
+    const isAdmin = userId
+      ? !!(await prisma.usracessos.findUnique({
+          where: { id: userId },
+          select: { tipoUsuario: true },
+        }).then((u) => u?.tipoUsuario === "adm"))
+      : false;
+
+    // Determine agenda privacy status based on events
+    const eventos = await prisma.eventos_agenda_anunciante.findMany({
+      where: { anuncianteId: anuncianteId_num },
+      select: {
+        privacidade: true,
+        status: true,
+      },
+    });
+
+    // Get filas status
+    const filas = await prisma.filas_espera_agenda.findMany({
+      where: { anuncianteAlvoId: anuncianteId_num },
+      select: {
+        privacidade: true,
+        status: true,
+      },
+    });
+
+    // Determine privacy level
+    // Rule: If any PRIVADO event exists → PRIVADA
+    //       Else if any RESTRITO event exists → RESTRITA
+    //       Else → PÚBLICA
+    const hasPrivadoEvents = eventos.some((e) => e.privacidade === "privado");
+    const hasPrivadoFilas = filas.some((f) => f.privacidade === "privado");
+    const hasRestritosEvents = eventos.some((e) => e.privacidade === "privado_usuarios");
+    const hasRestritosFilas = filas.some((f) => f.privacidade === "privado_usuarios");
+
+    let agendaPrivacy = "publica";
+    if (hasPrivadoEvents || hasPrivadoFilas) {
+      agendaPrivacy = "privada";
+    } else if (hasRestritosEvents || hasRestritosFilas) {
+      agendaPrivacy = "restrita";
+    }
+
+    // Determine if user can view agenda
+    let canViewAgenda = true;
+    let canEditAgenda = isAnunciante || isAdmin;
+
+    if (agendaPrivacy === "privada" && !isAnunciante && !isAdmin) {
+      canViewAgenda = false;
+    }
+
+    // If restrita, check if user is in any contact permissions
+    if (agendaPrivacy === "restrita" && !isAnunciante && !isAdmin && userId) {
+      const hasPermission = await prisma.eventos_permissoes
+        .findFirst({
+          where: {
+            evento: {
+              anuncianteId: anuncianteId_num,
+            },
+            usuarioId: userId,
+          },
+        })
+        .then((p) => !!p);
+
+      if (!hasPermission) {
+        // Check fila permissions
+        const hasFilaPermission = await prisma.filas_espera_permissoes
+          .findFirst({
+            where: {
+              fila: {
+                anuncianteAlvoId: anuncianteId_num,
+              },
+              usuarioId: userId,
+            },
+          })
+          .then((p) => !!p);
+
+        if (!hasFilaPermission) {
+          canViewAgenda = false;
+        }
+      }
+    }
+
+    res.json({
+      data: {
+        agendaPrivacy, // "publica" | "restrita" | "privada"
+        canViewAgenda,
+        canEditAgenda,
+        isAnunciante,
+        isAdmin,
+      },
+    });
+  } catch (error) {
+    console.error("[getAgendaPrivacyStatus]", error);
+    res.status(500).json({ error: "Erro ao verificar privacidade da agenda" });
+  }
+};

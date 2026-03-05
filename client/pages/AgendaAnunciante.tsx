@@ -10,7 +10,7 @@ import ReservaEventoModal from "@/components/ReservaEventoModal";
 import ShareAgendaModal from "@/components/ShareAgendaModal";
 import CriarEventoAgendaCompartilhadaModal from "@/components/CriarEventoAgendaCompartilhadaModal";
 import AdicionarFilaCompartilhadaModal from "@/components/AdicionarFilaCompartilhadaModal";
-import { Loader, Share2, Lock, Store, Plus, Clock } from "lucide-react";
+import { Loader, Share2, Lock, Store, Plus, Clock, AlertCircle } from "lucide-react";
 import ImageWithFallback from "@/components/ImageWithFallback";
 import { getAnuncianteInitials } from "@/utils/imageFallback";
 
@@ -53,6 +53,24 @@ export default function AgendaAnunciante() {
       },
       enabled: !!anuncianteId,
     });
+
+  // Fetch agenda privacy status
+  const { data: privacyData } = useQuery({
+    queryKey: ["agenda-privacy", anuncianteId, user?.id],
+    queryFn: async () => {
+      const headers: Record<string, string> = {};
+      if (user?.id) {
+        headers["x-user-id"] = user.id.toString();
+      }
+      const response = await fetch(
+        `/api/eventos-agenda/${anuncianteId}/privacy-status`,
+        { headers },
+      );
+      if (!response.ok) throw new Error("Erro ao buscar status de privacidade");
+      return response.json();
+    },
+    enabled: !!anuncianteId,
+  });
 
   // Fetch visible events for this announcer
   const { data: eventosData, isLoading: isLoadingEventos } = useQuery<
@@ -124,6 +142,33 @@ export default function AgendaAnunciante() {
     );
   }
 
+  // Check if user can view agenda
+  const privacyStatus = privacyData?.data;
+  const canViewAgenda = privacyStatus?.canViewAgenda ?? true;
+
+  if (privacyStatus && !canViewAgenda) {
+    return (
+      <div className="min-h-screen flex flex-col bg-gray-50">
+        <Header />
+        <main className="flex-1 flex items-center justify-center">
+          <div className="max-w-md mx-auto text-center">
+            <Lock className="w-16 h-16 text-red-500 mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-vitrii-text mb-2">
+              Acesso Negado
+            </h2>
+            <p className="text-gray-600 mb-6">
+              Esta agenda é privada e você não tem permissão para acessá-la.
+            </p>
+            <p className="text-sm text-gray-500">
+              Entre em contato com o anunciante para obter acesso.
+            </p>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Header />
@@ -142,11 +187,28 @@ export default function AgendaAnunciante() {
                 fallbackInitials={getAnuncianteInitials(anunciante)}
               />
             </div>
-            <div>
+            <div className="flex-1">
               <h1 className="text-3xl font-bold text-vitrii-text">
                 {anunciante.nome}
               </h1>
-              <p className="text-gray-600">Agenda e Disponibilidade</p>
+              <div className="flex items-center gap-3 mt-1">
+                <p className="text-gray-600">Agenda e Disponibilidade</p>
+                {privacyStatus && (
+                  <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
+                    privacyStatus.agendaPrivacy === "privada"
+                      ? "bg-red-100 text-red-700"
+                      : privacyStatus.agendaPrivacy === "restrita"
+                        ? "bg-yellow-100 text-yellow-700"
+                        : "bg-green-100 text-green-700"
+                  }`}>
+                    {privacyStatus.agendaPrivacy === "privada"
+                      ? "🔒 Privada"
+                      : privacyStatus.agendaPrivacy === "restrita"
+                        ? "👥 Restrita"
+                        : "🌍 Pública"}
+                  </span>
+                )}
+              </div>
             </div>
           </div>
 
