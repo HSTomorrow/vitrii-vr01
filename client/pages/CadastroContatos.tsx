@@ -132,7 +132,16 @@ export default function CadastroContatos() {
 
   // Debug: Log when user changes
   useEffect(() => {
-    console.log("[CadastroContatos] User state changed:", { userId: user?.id, userName: user?.nome });
+    console.log("[CadastroContatos] ⚠️ USUÁRIO AUTENTICADO:", {
+      userId: user?.id,
+      userName: user?.nome,
+      isLoggedIn: !!user
+    });
+    if (user?.id) {
+      console.log(`[CadastroContatos] 👤 User ID ${user.id} (${user.nome}) está logado`);
+    } else {
+      console.warn("[CadastroContatos] ❌ Nenhum usuário logado!");
+    }
   }, [user]);
 
   // Fetch anunciantes for the optional field
@@ -158,16 +167,22 @@ export default function CadastroContatos() {
   const { data: contatosData, refetch: refetchContatos } = useQuery({
     queryKey: ["contatos", user?.id],
     queryFn: async () => {
-      if (!user?.id) return [];
+      console.log("[CadastroContatos] User info:", { userId: user?.id, userName: user?.nome });
+      if (!user?.id) {
+        console.warn("[CadastroContatos] User ID not available");
+        return [];
+      }
 
       const headers: Record<string, string> = {};
       if (user?.id) {
         headers["X-User-Id"] = user.id.toString();
       }
 
+      console.log("[CadastroContatos] Fetching contatos with headers:", headers);
       const response = await fetch("/api/contatos", { headers });
       if (!response.ok) throw new Error("Erro ao buscar contatos");
       const result = await response.json();
+      console.log("[CadastroContatos] Contatos received:", result.data?.length || 0, "contatos");
       return result.data || [];
     },
     enabled: !!user,
