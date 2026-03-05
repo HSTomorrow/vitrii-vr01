@@ -1,6 +1,6 @@
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { MessageCircle, Calendar, Clock, Loader } from "lucide-react";
@@ -13,6 +13,7 @@ interface DashboardStats {
 
 export default function Dashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   // Fetch unread messages count
   const { data: messagesData, isLoading: messagesLoading } = useQuery<{ data: { unreadCount: number } }>({
@@ -79,8 +80,8 @@ export default function Dashboard() {
           </h1>
 
           {/* Main CTA Button - Go to Home */}
-          <Link
-            to="/"
+          <button
+            onClick={() => navigate("/")}
             className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-white text-vitrii-text border-2 border-vitrii-yellow rounded-lg hover:bg-gray-50 transition-all font-bold text-lg shadow-md hover:shadow-lg transform hover:scale-105"
           >
             <img
@@ -92,7 +93,7 @@ export default function Dashboard() {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
-          </Link>
+          </button>
         </div>
 
         {/* Compact Stats Indicators */}
