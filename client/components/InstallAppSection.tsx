@@ -1,7 +1,7 @@
 import { usePWA } from '@/hooks/usePWA';
 import { Download, Share2, Copy, Check, MessageCircle } from 'lucide-react';
 import { useState } from 'react';
-import QRCode from 'qrcode.react';
+import { QRCodeSVG } from 'qrcode.react';
 
 export default function InstallAppSection() {
   const { isInstallable, install, isIOS, isSafari } = usePWA();
@@ -36,7 +36,7 @@ export default function InstallAppSection() {
             <div className="mb-6 flex items-center justify-center bg-white p-3 rounded-lg border border-blue-300">
               <div className="text-center">
                 <p className="text-xs text-blue-700 font-semibold mb-2">Escaneie o QR Code</p>
-                <QRCode
+                <QRCodeSVG
                   value={appUrl}
                   size={120}
                   level="H"
@@ -161,7 +161,7 @@ export default function InstallAppSection() {
             <div className="mb-6 flex items-center justify-center bg-white p-3 rounded-lg border border-blue-300">
               <div className="text-center">
                 <p className="text-xs text-blue-700 font-semibold mb-2">Escaneie o QR Code</p>
-                <QRCode
+                <QRCodeSVG
                   value={appUrl}
                   size={120}
                   level="H"
