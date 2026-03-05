@@ -21,7 +21,7 @@ export const getPagamentoByAnuncioId: RequestHandler = async (req, res) => {
   try {
     const { anuncioId } = req.params;
 
-    const pagamento = await prisma.pagamento.findUnique({
+    const pagamento = await prisma.pagamentos.findUnique({
       where: { anuncioId: parseInt(anuncioId) },
       include: {
         anuncio: true,
@@ -66,7 +66,7 @@ export const createPagamento: RequestHandler = async (req, res) => {
     }
 
     // Check if payment already exists
-    const existingPagamento = await prisma.pagamento.findUnique({
+    const existingPagamento = await prisma.pagamentos.findUnique({
       where: { anuncioId: validatedData.anuncioId },
     });
 
@@ -84,7 +84,7 @@ export const createPagamento: RequestHandler = async (req, res) => {
     const expirationTime = new Date();
     expirationTime.setMinutes(expirationTime.getMinutes() + 30); // 30 minute expiration
 
-    const pagamento = await prisma.pagamento.create({
+    const pagamento = await prisma.pagamentos.create({
       data: {
         anuncioId: validatedData.anuncioId,
         valor: new Decimal(validatedData.valor.toString()),
@@ -134,7 +134,7 @@ export const updatePagamentoStatus: RequestHandler = async (req, res) => {
     const { id } = req.params;
     const validatedData = PagamentoStatusUpdateSchema.parse(req.body);
 
-    const pagamento = await prisma.pagamento.update({
+    const pagamento = await prisma.pagamentos.update({
       where: { id: parseInt(id) },
       data: {
         status: validatedData.status,
@@ -195,7 +195,7 @@ export const getPagamentoStatus: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const pagamento = await prisma.pagamento.findUnique({
+    const pagamento = await prisma.pagamentos.findUnique({
       where: { id: parseInt(id) },
     });
 
@@ -210,7 +210,7 @@ export const getPagamentoStatus: RequestHandler = async (req, res) => {
     if (pagamento.status === "pendente" && pagamento.dataExpiracao) {
       if (new Date() > pagamento.dataExpiracao) {
         // Mark as expired
-        await prisma.pagamento.update({
+        await prisma.pagamentos.update({
           where: { id: parseInt(id) },
           data: { status: "expirado" },
         });
@@ -247,7 +247,7 @@ export const handlePaymentWebhook: RequestHandler = async (req, res) => {
       const { id: externalId, status, transaction_id } = data;
 
       // Find pagamento by external ID
-      const pagamento = await prisma.pagamento.findFirst({
+      const pagamento = await prisma.pagamentos.findFirst({
         where: { idExterno: externalId },
       });
 
@@ -292,7 +292,7 @@ export const cancelPagamento: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const pagamento = await prisma.pagamento.update({
+    const pagamento = await prisma.pagamentos.update({
       where: { id: parseInt(id) },
       data: {
         status: "cancelado",
@@ -452,7 +452,7 @@ export const getPagamentos: RequestHandler = async (req, res) => {
       where.status = status;
     }
 
-    const pagamentos = await prisma.pagamento.findMany({
+    const pagamentos = await prisma.pagamentos.findMany({
       where,
       include: {
         anuncio: {
@@ -486,7 +486,7 @@ export const confirmarPagamento: RequestHandler = async (req, res) => {
     const { id } = req.params;
 
     // Find the payment
-    const pagamento = await prisma.pagamento.findUnique({
+    const pagamento = await prisma.pagamentos.findUnique({
       where: { id: parseInt(id) },
       include: { anuncio: true },
     });

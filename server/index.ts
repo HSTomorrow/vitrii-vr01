@@ -375,33 +375,6 @@ export function createServer() {
   app.post("/api/auth/resend-verification-email", resendVerificationEmail);
   app.post("/api/admin/recalculate-ad-counters", extractUserId, recalculateAdCountersAdmin);
 
-  // Database migration helper - Create emailVerificado column if missing
-  app.get("/api/db/create-email-verificado-column", async (_req, res) => {
-    try {
-      console.log("[db-helper] 🔧 Tentando criar coluna emailVerificado se não existir...");
-
-      // Try to add the column - if it already exists, this will fail silently
-      await prisma.$executeRaw`
-        ALTER TABLE usracessos
-        ADD COLUMN IF NOT EXISTS emailVerificado BOOLEAN DEFAULT false
-      `;
-
-      console.log("[db-helper] ✅ Coluna emailVerificado criada ou já existe");
-      res.status(200).json({
-        success: true,
-        message: "✅ Coluna emailVerificado está pronta",
-      });
-    } catch (error) {
-      console.error("[db-helper] ⚠️ Erro ao criar coluna:", error);
-      // Return success anyway - column might already exist
-      res.status(200).json({
-        success: true,
-        message: "✅ Coluna emailVerificado está pronta (ou já existe)",
-        note: "A coluna pode já estar no banco de dados",
-      });
-    }
-  });
-
   // DEBUG endpoint - Check email verification tokens and user status
   app.get("/api/debug/verify-email-status", async (req, res) => {
     try {
@@ -549,35 +522,6 @@ export function createServer() {
         success: false,
         error: "Erro ao executar diagnóstico SMTP",
         details: error instanceof Error ? error.message : "Desconhecido",
-      });
-    }
-  });
-
-  // Quick test email route - Daniel's test
-  app.get("/api/send-test-email", async (_req, res) => {
-    try {
-      console.log("🧪 Iniciando teste rápido de email...");
-      const success = await sendTestEmail("vitriimarketplace@gmail.com", "contato@herestomorrow.com");
-
-      if (success) {
-        res.status(200).json({
-          success: true,
-          message: "✅ Email de teste enviado com sucesso para vitriimarketplace@gmail.com!",
-          from: "contato@herestomorrow.com",
-          to: "vitriimarketplace@gmail.com",
-          smtp: process.env.SMTP_HOST,
-        });
-      } else {
-        res.status(500).json({
-          success: false,
-          error: "❌ Erro ao enviar email. Verifique as configurações SMTP.",
-        });
-      }
-    } catch (error) {
-      console.error("Erro no teste de email:", error);
-      res.status(500).json({
-        success: false,
-        error: "Erro ao processar teste de email",
       });
     }
   });
@@ -1168,53 +1112,6 @@ export function createServer() {
       fallback: "https://app.vitrii.com.br",
       isLocalhost: appUrl.includes("localhost"),
     });
-  });
-
-  // Test endpoint for user creation
-  app.post("/api/test-signup", async (req, res) => {
-    try {
-      console.log("\n🧪 ========== TEST SIGNUP ==========");
-      console.log("📝 Dados recebidos:", {
-        nome: req.body.nome,
-        email: req.body.email,
-        senhaLength: req.body.senha?.length,
-      });
-
-      // Try simple insert with just name, email, senha
-      const testUser = await prisma.usracessos.create({
-        data: {
-          nome: req.body.nome || "Test User",
-          email: req.body.email || `test-${Date.now()}@test.com`,
-          senha: "hash123",
-          status: "bloqueado",
-          emailVerificado: false,
-        },
-      });
-
-      console.log("✅ Usuário criado com sucesso:", testUser.id);
-
-      res.json({
-        success: true,
-        message: "Usuário de teste criado com sucesso",
-        userId: testUser.id,
-        email: testUser.email,
-      });
-    } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : String(error);
-      const errorStack = error instanceof Error ? error.stack : "";
-
-      console.error("❌ ERRO ao criar usuário de teste:");
-      console.error("Mensagem:", errorMsg);
-      console.error("Stack:", errorStack);
-      console.error("Objeto completo:", error);
-
-      res.status(500).json({
-        success: false,
-        error: "Erro ao criar usuário de teste",
-        message: errorMsg,
-        details: errorStack,
-      });
-    }
   });
 
   // Global error handling middleware for this sub-app

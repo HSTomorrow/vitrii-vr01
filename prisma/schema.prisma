@@ -83,6 +83,11 @@ model anuncios {
   conversas           conversas[]
   pagamento           pagamentos?
   favoritos           favorito[]
+
+  @@index([anuncianteId])
+  @@index([usuarioId])
+  @@index([status])
+  @@index([ordem, id])
 }
 
 // Anuncio Visualizacoes - Log table to track ad views
