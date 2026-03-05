@@ -115,7 +115,7 @@ export const createFilaEspera: RequestHandler = async (req, res) => {
       dataInicio,
       dataFim,
       privacidade,
-      usuariosPermitidos,
+      contatosPermitidos,
     } = req.body;
 
     if (!userId) {
@@ -177,14 +177,33 @@ export const createFilaEspera: RequestHandler = async (req, res) => {
       },
     });
 
-    // Add permissions if privado_usuarios
-    if (privacidade === "privado_usuarios" && usuariosPermitidos && Array.isArray(usuariosPermitidos)) {
-      await prisma.filas_espera_permissoes.createMany({
-        data: usuariosPermitidos.map(usuarioId => ({
-          filaId: fila.id,
-          usuarioId: parseInt(usuarioId),
-        })),
+    // Add permissions if privado_usuarios and contatosPermitidos provided
+    if (privacidade === "privado_usuarios" && contatosPermitidos && Array.isArray(contatosPermitidos) && contatosPermitidos.length > 0) {
+      // Get all users associated with the selected contacts
+      const usuariosAssociados = await prisma.contato_usuarios.findMany({
+        where: {
+          contatoId: {
+            in: contatosPermitidos.map(id => parseInt(id)),
+          },
+        },
+        select: {
+          usuarioId: true,
+        },
       });
+
+      // Extract unique user IDs
+      const usuariosIds = [...new Set(usuariosAssociados.map(ua => ua.usuarioId))];
+
+      // Batch insert permissions
+      if (usuariosIds.length > 0) {
+        await prisma.filas_espera_permissoes.createMany({
+          data: usuariosIds.map(usuarioId => ({
+            filaId: fila.id,
+            usuarioId,
+          })),
+          skipDuplicates: true,
+        });
+      }
 
       // Refetch fila with updated permissions
       const filaAtualizada = await prisma.filas_espera_agenda.findUnique({

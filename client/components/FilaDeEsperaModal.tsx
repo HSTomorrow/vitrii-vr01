@@ -6,14 +6,11 @@ import { useAuth } from "@/contexts/AuthContext";
 interface Contato {
   id: number;
   nome: string;
-  usuarios: {
-    id: number;
-    usuario: {
-      id: number;
-      nome: string;
-      email: string;
-    };
-  }[];
+  celular: string;
+  telefone?: string;
+  email?: string;
+  tipoContato: string;
+  imagem?: string;
 }
 
 interface FilaDeEsperaModalProps {
@@ -49,7 +46,7 @@ export default function FilaDeEsperaModal({
   const [dataFim, setDataFim] = useState("");
   const [horaFim, setHoraFim] = useState("11:00");
   const [privacidade, setPrivacidade] = useState("privado");
-  const [usuariosPermitidos, setUsuariosPermitidos] = useState<number[]>([]);
+  const [contatosPermitidos, setContatosPermitidos] = useState<number[]>([]);
   const [contatos, setContatos] = useState<Contato[]>([]);
   const [isLoadingContatos, setIsLoadingContatos] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -61,10 +58,19 @@ export default function FilaDeEsperaModal({
 
       setIsLoadingContatos(true);
       try {
-        const response = await fetch(`/api/contatos/${anuncianteAlvoId}`);
+        const response = await fetch(`/api/anunciantes/${anuncianteAlvoId}/contatos`);
         if (response.ok) {
           const data = await response.json();
-          setContatos(data.data || []);
+          const contatosList = data.data?.map((contato: any) => ({
+            id: contato.id,
+            nome: contato.nome,
+            celular: contato.celular,
+            telefone: contato.telefone,
+            email: contato.email,
+            tipoContato: contato.tipoContato,
+            imagem: contato.imagem,
+          })) || [];
+          setContatos(contatosList);
         }
       } catch (error) {
         console.error("Erro ao carregar contatos:", error);
@@ -125,7 +131,7 @@ export default function FilaDeEsperaModal({
           dataInicio: dataInícioCompleta.toISOString(),
           dataFim: dataFimCompleta.toISOString(),
           privacidade: privacidade,
-          usuariosPermitidos: privacidade === "privado_usuarios" ? usuariosPermitidos : undefined,
+          contatosPermitidos: privacidade === "privado_usuarios" ? contatosPermitidos : undefined,
         }),
       });
 
@@ -161,7 +167,7 @@ export default function FilaDeEsperaModal({
       setHoraInicio("10:00");
       setHoraFim("11:00");
       setPrivacidade("privado");
-      setUsuariosPermitidos([]);
+      setContatosPermitidos([]);
       onClose();
     }
   };
@@ -325,51 +331,49 @@ export default function FilaDeEsperaModal({
                 <p className="text-sm text-gray-600">Carregando contatos...</p>
               ) : contatos.length === 0 ? (
                 <p className="text-sm text-gray-600 italic">
-                  Nenhum contato cadastrado para este anunciante
+                  Nenhum contato cadastrado para este anunciante. <a href="/cadastro-contatos" className="text-vitrii-blue hover:underline">Cadastre contatos</a>.
                 </p>
               ) : (
                 <div className="space-y-2 max-h-60 overflow-y-auto">
                   {contatos.map((contato) => (
-                    <div key={contato.id} className="space-y-1">
-                      <div className="font-medium text-sm text-gray-700">{contato.nome}</div>
-                      {contato.usuarios.map((cu) => (
-                        <label
-                          key={cu.usuario.id}
-                          className="flex items-center gap-2 ml-2 p-2 rounded hover:bg-blue-100 cursor-pointer"
-                        >
-                          <input
-                            type="checkbox"
-                            checked={usuariosPermitidos.includes(cu.usuario.id)}
-                            onChange={(e) => {
-                              if (e.target.checked) {
-                                setUsuariosPermitidos([
-                                  ...usuariosPermitidos,
-                                  cu.usuario.id,
-                                ]);
-                              } else {
-                                setUsuariosPermitidos(
-                                  usuariosPermitidos.filter(
-                                    (id) => id !== cu.usuario.id,
-                                  ),
-                                );
-                              }
-                            }}
-                            className="w-4 h-4"
-                          />
-                          <div className="text-sm">
-                            <div className="font-medium">{cu.usuario.nome}</div>
-                            <div className="text-xs text-gray-500">{cu.usuario.email}</div>
-                          </div>
-                        </label>
-                      ))}
-                    </div>
+                    <label
+                      key={contato.id}
+                      className="flex items-center gap-2 p-2 rounded hover:bg-blue-100 cursor-pointer"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={contatosPermitidos.includes(contato.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setContatosPermitidos([
+                              ...contatosPermitidos,
+                              contato.id,
+                            ]);
+                          } else {
+                            setContatosPermitidos(
+                              contatosPermitidos.filter(
+                                (id) => id !== contato.id,
+                              ),
+                            );
+                          }
+                        }}
+                        className="w-4 h-4"
+                      />
+                      <div className="text-sm flex-1">
+                        <div className="font-medium text-vitrii-text">{contato.nome}</div>
+                        <div className="text-xs text-gray-600">
+                          {contato.tipoContato}
+                          {contato.email && ` • ${contato.email}`}
+                        </div>
+                      </div>
+                    </label>
                   ))}
                 </div>
               )}
 
-              {usuariosPermitidos.length > 0 && (
+              {contatosPermitidos.length > 0 && (
                 <div className="text-xs text-blue-700 bg-white rounded p-2">
-                  <strong>{usuariosPermitidos.length}</strong> usuário(s) selecionado(s)
+                  <strong>{contatosPermitidos.length}</strong> contato(s) selecionado(s)
                 </div>
               )}
             </div>

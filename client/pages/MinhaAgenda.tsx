@@ -163,7 +163,7 @@ export default function MinhaAgenda() {
   // Create evento mutation
   const createEventoMutation = useMutation({
     mutationFn: async (
-      data: Partial<Evento> & { usuariosPermitidos?: number[] },
+      data: Partial<Evento> & { contatosPermitidos?: number[] },
     ) => {
       const response = await fetch("/api/eventos-agenda", {
         method: "POST",
@@ -201,7 +201,7 @@ export default function MinhaAgenda() {
   // Update evento mutation
   const updateEventoMutation = useMutation({
     mutationFn: async (
-      data: Partial<Evento> & { usuariosPermitidos?: number[] },
+      data: Partial<Evento> & { contatosPermitidos?: number[] },
     ) => {
       const response = await fetch(`/api/eventos-agenda/${selectedEvento?.id}`, {
         method: "PUT",
@@ -293,7 +293,7 @@ export default function MinhaAgenda() {
   });
 
   const handleSaveEvento = (
-    data: Partial<Evento> & { usuariosPermitidos?: number[] },
+    data: Partial<Evento> & { contatosPermitidos?: number[] },
   ) => {
     if (selectedEvento) {
       updateEventoMutation.mutate(data);

@@ -191,7 +191,7 @@ export const createEvento: RequestHandler = async (req, res) => {
       dataFim,
       privacidade,
       cor,
-      usuariosPermitidos,
+      contatosPermitidos,
     } = req.body;
 
     // Validate required fields
@@ -240,15 +240,33 @@ export const createEvento: RequestHandler = async (req, res) => {
       },
     });
 
-    // Add permissions if privado_usuarios
-    if (privacidade === "privado_usuarios" && usuariosPermitidos && Array.isArray(usuariosPermitidos)) {
-      // Batch insert permissions instead of looping (fixes N+1 query issue)
-      await prisma.eventos_agenda_permissoes.createMany({
-        data: usuariosPermitidos.map(usuarioId => ({
-          eventoId: evento.id,
-          usuarioId: parseInt(usuarioId),
-        })),
+    // Add permissions if privado_usuarios and contatosPermitidos provided
+    if (privacidade === "privado_usuarios" && contatosPermitidos && Array.isArray(contatosPermitidos) && contatosPermitidos.length > 0) {
+      // Get all users associated with the selected contacts
+      const usuariosAssociados = await prisma.contato_usuarios.findMany({
+        where: {
+          contatoId: {
+            in: contatosPermitidos.map(id => parseInt(id)),
+          },
+        },
+        select: {
+          usuarioId: true,
+        },
       });
+
+      // Extract unique user IDs
+      const usuariosIds = [...new Set(usuariosAssociados.map(ua => ua.usuarioId))];
+
+      // Batch insert permissions
+      if (usuariosIds.length > 0) {
+        await prisma.eventos_agenda_permissoes.createMany({
+          data: usuariosIds.map(usuarioId => ({
+            eventoId: evento.id,
+            usuarioId,
+          })),
+          skipDuplicates: true,
+        });
+      }
 
       // Refetch evento with updated permissions
       const eventoAtualizado = await prisma.eventos_agenda_anunciante.findUnique({
@@ -284,7 +302,7 @@ export const updateEvento: RequestHandler = async (req, res) => {
       dataFim,
       privacidade,
       cor,
-      usuariosPermitidos,
+      contatosPermitidos,
     } = req.body;
 
     const eventoId = parseInt(id);
@@ -344,20 +362,37 @@ export const updateEvento: RequestHandler = async (req, res) => {
       },
     });
 
-    // Update permissions if privado_usuarios
-    if (privacidade === "privado_usuarios" && usuariosPermitidos && Array.isArray(usuariosPermitidos)) {
+    // Update permissions if privado_usuarios and contatosPermitidos provided
+    if (privacidade === "privado_usuarios" && contatosPermitidos && Array.isArray(contatosPermitidos) && contatosPermitidos.length > 0) {
       // Delete old permissions
       await prisma.eventos_agenda_permissoes.deleteMany({
         where: { eventoId: eventoId },
       });
 
-      // Batch insert new permissions instead of looping (fixes N+1 query issue)
-      await prisma.eventos_agenda_permissoes.createMany({
-        data: usuariosPermitidos.map(usuarioId => ({
-          eventoId: eventoId,
-          usuarioId: parseInt(usuarioId),
-        })),
+      // Get all users associated with the selected contacts
+      const usuariosAssociados = await prisma.contato_usuarios.findMany({
+        where: {
+          contatoId: {
+            in: contatosPermitidos.map(id => parseInt(id)),
+          },
+        },
+        select: {
+          usuarioId: true,
+        },
       });
+
+      // Extract unique user IDs
+      const usuariosIds = [...new Set(usuariosAssociados.map(ua => ua.usuarioId))];
+
+      // Batch insert new permissions
+      if (usuariosIds.length > 0) {
+        await prisma.eventos_agenda_permissoes.createMany({
+          data: usuariosIds.map(usuarioId => ({
+            eventoId: eventoId,
+            usuarioId,
+          })),
+        });
+      }
 
       // Refetch evento with updated permissions
       const eventoFinal = await prisma.eventos_agenda_anunciante.findUnique({
