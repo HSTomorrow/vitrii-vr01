@@ -1,5 +1,6 @@
 import { RequestHandler } from "express";
 import prisma from "../lib/prisma";
+import { createConversationForLinkedUsuarios } from "../lib/create-conversation";
 
 // Get all waiting queues for a user's agenda (for the announcer to manage)
 export const getFilasEsperaParaAnunciante: RequestHandler = async (req, res) => {
@@ -225,8 +226,32 @@ export const createFilaEspera: RequestHandler = async (req, res) => {
         },
       });
 
+      // Create conversations for linked usuarios (async, don't wait)
+      if (contatosPermitidos && Array.isArray(contatosPermitidos) && contatosPermitidos.length > 0) {
+        createConversationForLinkedUsuarios({
+          usuarioId: userId,
+          anuncianteId: parseInt(anuncianteAlvoId),
+          evento_titulo: titulo,
+          evento_data: inicio,
+          tipo: "fila_espera"
+        }).catch(error => {
+          console.error("[createFilaEspera] Error creating conversations:", error);
+        });
+      }
+
       return res.status(201).json({ data: filaAtualizada });
     }
+
+    // Create conversations for linked usuarios even without permissions (async, don't wait)
+    createConversationForLinkedUsuarios({
+      usuarioId: userId,
+      anuncianteId: parseInt(anuncianteAlvoId),
+      evento_titulo: titulo,
+      evento_data: inicio,
+      tipo: "fila_espera"
+    }).catch(error => {
+      console.error("[createFilaEspera] Error creating conversations:", error);
+    });
 
     res.status(201).json({ data: fila });
   } catch (error) {

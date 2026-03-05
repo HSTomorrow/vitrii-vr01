@@ -907,6 +907,7 @@ export default function MinhaAgenda() {
                   onStatusChange={refetchEventos}
                   isLoading={false}
                   anuncianteId={selectedAnuncianteId || undefined}
+                  contatos={todosContatos}
                   onDeleteAgenda={() => {
                     if (
                       confirm(

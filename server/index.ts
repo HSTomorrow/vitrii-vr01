@@ -228,6 +228,11 @@ import {
   deleteContato,
   checkDuplicateContato,
 } from "./routes/contatos";
+import {
+  syncContatosUsuarios,
+  getLinkedUsuariosForContato,
+  getLinkedContatosForUsuario,
+} from "./routes/sync-contatos-usuarios";
 
 export function createServer() {
   const app = express();
@@ -1119,6 +1124,11 @@ export function createServer() {
   app.post("/api/anunciantes/:anuncianteId/contatos", extractUserId, createContato);
   app.put("/api/anunciantes/:anuncianteId/contatos/:contatoId", extractUserId, updateContato);
   app.delete("/api/anunciantes/:anuncianteId/contatos/:contatoId", extractUserId, deleteContato);
+
+  // Sync contatos-usuarios (hourly synchronization)
+  app.post("/api/sync/contatos-usuarios", syncContatosUsuarios);
+  app.get("/api/contatos/:contatoId/usuarios", extractUserId, getLinkedUsuariosForContato);
+  app.get("/api/usuarios/contatos-linked", extractUserId, getLinkedContatosForUsuario);
 
   // Check APP_URL configuration
   app.get("/api/check-app-url", (_req, res) => {

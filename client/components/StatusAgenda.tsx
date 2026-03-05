@@ -14,12 +14,18 @@ interface Evento {
   dataCriacao: string;
 }
 
+interface Contato {
+  id: number;
+  nome: string;
+}
+
 interface StatusAgendaProps {
   eventos: Evento[];
   onStatusChange: () => void;
   isLoading?: boolean;
   anuncianteId?: number;
   onDeleteAgenda?: () => void;
+  contatos?: Contato[];
 }
 
 const STATUS_OPTIONS = [
@@ -59,6 +65,7 @@ export default function StatusAgenda({
   isLoading = false,
   anuncianteId,
   onDeleteAgenda,
+  contatos = [],
 }: StatusAgendaProps) {
   const { user } = useAuth();
   const [expandedEventoId, setExpandedEventoId] = useState<number | null>(null);
@@ -67,6 +74,12 @@ export default function StatusAgenda({
     new Set(["pendente", "pendente_pagamento", "realizado", "substituicao"])
   );
   const [selectedEventoIds, setSelectedEventoIds] = useState<Set<number>>(new Set());
+
+  // Filters
+  const [filterDataDe, setFilterDataDe] = useState("");
+  const [filterDataAte, setFilterDataAte] = useState("");
+  const [filterContatoId, setFilterContatoId] = useState<number | null>(null);
+  const [filterStatus, setFilterStatus] = useState("");
 
   const sortedEventos = useMemo(() => {
     return [...eventos].sort(
@@ -187,10 +200,38 @@ export default function StatusAgenda({
   };
 
   const filteredEventos = useMemo(() => {
-    return sortedEventos.filter((evento) =>
-      selectedStatuses.has(evento.status)
-    );
-  }, [sortedEventos, selectedStatuses]);
+    return sortedEventos.filter((evento) => {
+      // Filter by selected statuses
+      if (!selectedStatuses.has(evento.status)) return false;
+
+      // Filter by date range (Data De)
+      if (filterDataDe) {
+        const eventoData = new Date(evento.dataInicio).toISOString().split("T")[0];
+        if (eventoData < filterDataDe) return false;
+      }
+
+      // Filter by date range (Data Ate)
+      if (filterDataAte) {
+        const eventoData = new Date(evento.dataInicio).toISOString().split("T")[0];
+        if (eventoData > filterDataAte) return false;
+      }
+
+      // Filter by contact
+      if (filterContatoId) {
+        const hasContato = (evento.contatos || []).some(
+          (c: any) => c.contatoId === filterContatoId
+        );
+        if (!hasContato) return false;
+      }
+
+      // Filter by status text
+      if (filterStatus && !evento.status.includes(filterStatus.toLowerCase())) {
+        return false;
+      }
+
+      return true;
+    });
+  }, [sortedEventos, selectedStatuses, filterDataDe, filterDataAte, filterContatoId, filterStatus]);
 
   const handleStatusChange = async (eventoId: number, newStatus: string) => {
     setUpdatingEventoId(eventoId);
@@ -267,7 +308,84 @@ export default function StatusAgenda({
         )}
       </div>
 
-      {/* Filters */}
+      {/* Advanced Filters */}
+      <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200">
+        <p className="text-sm font-semibold text-vitrii-text mb-3">Filtros Avançados:</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-4">
+          {/* Data De */}
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Data De</label>
+            <input
+              type="date"
+              value={filterDataDe}
+              onChange={(e) => setFilterDataDe(e.target.value)}
+              className="w-full px-2 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+            />
+          </div>
+
+          {/* Data Ate */}
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Data Até</label>
+            <input
+              type="date"
+              value={filterDataAte}
+              onChange={(e) => setFilterDataAte(e.target.value)}
+              className="w-full px-2 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+            />
+          </div>
+
+          {/* Contato */}
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Contato</label>
+            <select
+              value={filterContatoId || ""}
+              onChange={(e) => setFilterContatoId(e.target.value ? parseInt(e.target.value) : null)}
+              className="w-full px-2 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+            >
+              <option value="">Todos</option>
+              {contatos.map((contato) => (
+                <option key={contato.id} value={contato.id}>
+                  {contato.nome}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Status */}
+          <div>
+            <label className="block text-xs font-medium text-gray-600 mb-1">Status do Evento</label>
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="w-full px-2 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+            >
+              <option value="">Todos</option>
+              {STATUS_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Clear Filters Button */}
+        {(filterDataDe || filterDataAte || filterContatoId || filterStatus) && (
+          <button
+            onClick={() => {
+              setFilterDataDe("");
+              setFilterDataAte("");
+              setFilterContatoId(null);
+              setFilterStatus("");
+            }}
+            className="text-xs text-vitrii-blue hover:underline"
+          >
+            Limpar filtros avançados
+          </button>
+        )}
+      </div>
+
+      {/* Status Filter */}
       <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200">
         <p className="text-sm font-semibold text-vitrii-text mb-3">Filtrar por Status:</p>
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2">

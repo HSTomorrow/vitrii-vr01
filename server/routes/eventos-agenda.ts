@@ -1,5 +1,6 @@
 import { RequestHandler } from "express";
 import prisma from "../lib/prisma";
+import { createConversationForLinkedUsuarios } from "../lib/create-conversation";
 
 // Get all events for an announcer (only for the announcer)
 export const getEventosByAnunciante: RequestHandler = async (req, res) => {
@@ -268,6 +269,19 @@ export const createEvento: RequestHandler = async (req, res) => {
         },
       },
     });
+
+    // Create conversations for linked usuarios (async, don't wait)
+    if (contatosPermitidos && Array.isArray(contatosPermitidos) && contatosPermitidos.length > 0) {
+      createConversationForLinkedUsuarios({
+        usuarioId: userId,
+        anuncianteId: parseInt(anuncianteId),
+        evento_titulo: titulo,
+        evento_data: inicio,
+        tipo: "evento"
+      }).catch(error => {
+        console.error("[createEvento] Error creating conversations:", error);
+      });
+    }
 
     res.status(201).json({ data: eventoAtualizado });
   } catch (error) {

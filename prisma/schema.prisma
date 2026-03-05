@@ -250,6 +250,7 @@ model usracessos {
   mensagens               mensagens[]
   favoritos               favorito[]
   contatos                contatos[]
+  contato_links           contatos_usuarios_links[]
   localidadePadrao        localidades?                @relation(fields: [localidadePadraoId], references: [id], onDelete: SetNull)
 }
 
@@ -775,6 +776,7 @@ model contatos {
   usuario          usracessos  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   anunciante       anunciantes? @relation(fields: [anuncianteId], references: [id], onDelete: SetNull)
   eventos          eventos_contatos[]
+  usuario_links    contatos_usuarios_links[]
 
   @@index([usuarioId])
   @@index([anuncianteId])
@@ -794,4 +796,27 @@ model favorito {
   @@unique([usuarioId, anuncioId])
   @@index([usuarioId])
   @@index([anuncioId])
+}
+
+// Contatos-Usuarios Links - Hourly synced links by email and phone
+model contatos_usuarios_links {
+  id          BigInt      @id @default(autoincrement())
+  contato_id  Int         @map("contato_id")
+  usuario_id  Int         @map("usuario_id")
+  email       String?     @db.VarChar(255)
+  celular     String?     @db.VarChar(20)
+  data_vinculo DateTime    @default(now()) @map("data_vinculo")
+  ativo       Boolean     @default(true)
+
+  contato     contatos    @relation(fields: [contato_id], references: [id], onDelete: Cascade)
+  usuario     usracessos  @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+
+  @@unique([contato_id, usuario_id], map: "contato_id_usuario_id")
+  @@index([contato_id])
+  @@index([usuario_id])
+  @@index([email])
+  @@index([celular])
+  @@index([ativo])
+  @@index([data_vinculo])
+  @@map("contatos_usuarios_links")
 }

@@ -1,6 +1,7 @@
 import path from "path";
 import { createServer } from "./index";
 import * as express from "express";
+import { initializeScheduler } from "./lib/scheduler";
 
 /**
  * Fly.io Production Server Entry Point
@@ -8,6 +9,9 @@ import * as express from "express";
  */
 
 const app = createServer();
+
+// Initialize hourly scheduler for syncing contatos-usuarios
+initializeScheduler();
 const port = process.env.PORT || 3000;
 
 // In production, serve the built SPA files
