@@ -72,7 +72,7 @@ const INITIAL_FORM_DATA: FormData = {
   telefone: "",
   email: "",
   status: "ativo",
-  tipoContato: "",
+  tipoContato: "Outro",
   observacoes: "",
   imagem: "",
   anuncianteId: null,
