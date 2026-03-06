@@ -60,6 +60,54 @@ Certifique-se que seu backend está HTTPS (obrigatório para produção).
 
 ---
 
+## ⚠️ FASE 2.1: Configuração Android SDK (Segurança)
+
+### Por que ver um aviso de versão antiga?
+
+Se ao baixar a APK no Google Play você recebe um aviso:
+> "Este aplicativo foi feito para uma versão mais antiga do Android que pode trazer vulnerabilidades"
+
+Isso ocorre quando o `targetSdkVersion` está baixo. O `app.json` foi configurado com:
+
+```json
+"android": {
+  "minSdkVersion": 24,    // Android 7.0 (2016)
+  "targetSdkVersion": 34  // Android 14 (2024)
+}
+```
+
+### O que significam esses valores?
+
+| Campo | Valor | Significado |
+|-------|-------|-------------|
+| **minSdkVersion** | 24 | Mínimo suportado: Android 7.0 (2016) |
+| **targetSdkVersion** | 34 | Compilado para: Android 14 (2024) |
+
+### Como atualizar para versão mais recente?
+
+Se quiser usar o Android 15 mais novo (targetSdkVersion 35), edite `app.json`:
+
+```json
+"android": {
+  "minSdkVersion": 24,
+  "targetSdkVersion": 35  // Android 15
+}
+```
+
+Depois rebuild:
+```bash
+npm run build:android
+```
+
+### Recomendações de Segurança
+
+- ✅ **minSdkVersion 24**: Suporta ~95% dos dispositivos em uso
+- ✅ **targetSdkVersion 34**: Versão estável recomendada pelo Google
+- ⚡ **targetSdkVersion 35**: Use quando todas as dependências forem compatíveis
+- 🔒 Sempre manter atualizado com a versão mais recente do Android
+
+---
+
 ## 📱 FASE 3: Testar Localmente
 
 ### 3.1 No Simulador (iOS) ou Emulador (Android)

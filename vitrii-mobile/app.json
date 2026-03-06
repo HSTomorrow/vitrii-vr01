@@ -32,6 +32,8 @@
       },
       "package": "com.herestomorrow.vitrii",
       "versionCode": 1,
+      "minSdkVersion": 24,
+      "targetSdkVersion": 34,
       "permissions": [
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.ACCESS_COARSE_LOCATION",
