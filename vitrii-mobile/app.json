@@ -33,16 +33,14 @@
       "package": "com.herestomorrow.vitrii",
       "versionCode": 1,
       "minSdkVersion": 24,
-      "targetSdkVersion": 35,
-      "compileSdkVersion": 35,
+      "targetSdkVersion": 34,
       "permissions": [
         "android.permission.ACCESS_FINE_LOCATION",
         "android.permission.ACCESS_COARSE_LOCATION",
         "android.permission.CAMERA",
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE"
-      ],
-      "usesCleartextTraffic": false
+      ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
