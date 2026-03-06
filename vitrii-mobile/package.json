@@ -33,10 +33,7 @@
     "expo-camera": "13.4.0",
     "expo-web-browser": "12.8.0",
     "expo-linking": "6.2.0",
-    "react-native-qrcode-scanner": "1.4.23",
     "react-native-svg": "13.14.0",
-    "react-native-vector-icons": "10.0.0",
-    "@react-native-community/netinfo": "11.0.0",
     "lodash": "4.17.21",
     "date-fns": "2.30.0"
   },
