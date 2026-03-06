@@ -34,8 +34,11 @@ export const getEventosByAnunciante: RequestHandler = async (req, res) => {
     const { anuncianteId } = req.params;
     const userId = (req as any).userId;
 
+    console.log("[getEventosByAnunciante] Request:", { anuncianteId, userId });
+
     const anuncianteId_num = parseInt(anuncianteId);
     if (isNaN(anuncianteId_num)) {
+      console.error("[getEventosByAnunciante] Invalid announcer ID:", anuncianteId);
       return res.status(400).json({ error: "Invalid announcer ID" });
     }
 
@@ -48,11 +51,13 @@ export const getEventosByAnunciante: RequestHandler = async (req, res) => {
     });
 
     if (!usuarioAnunciante) {
+      console.error("[getEventosByAnunciante] User is not announcer:", { userId, anuncianteId_num });
       return res
         .status(403)
         .json({ error: "Acesso negado. Você não é responsável por este anunciante." });
     }
 
+    console.log("[getEventosByAnunciante] Fetching eventos for anunciante:", anuncianteId_num);
     const eventos = await prisma.eventos_agenda_anunciante.findMany({
       where: {
         anuncianteId: anuncianteId_num,
@@ -73,48 +78,64 @@ export const getEventosByAnunciante: RequestHandler = async (req, res) => {
         dataInicio: "asc",
       },
     });
+    console.log("[getEventosByAnunciante] Fetched eventos:", eventos.length);
 
-    // Batch fetch all horarios for this announcer to avoid N+1 queries
-    const horarios = await prisma.agendas_horarios.findMany({
-      where: {
-        anuncianteId: anuncianteId_num,
-        ativo: true,
-      },
-    });
+    try {
+      // Batch fetch all horarios for this announcer to avoid N+1 queries
+      console.log("[getEventosByAnunciante] Fetching horarios...");
+      const horarios = await prisma.agendas_horarios.findMany({
+        where: {
+          anuncianteId: anuncianteId_num,
+          ativo: true,
+        },
+      });
+      console.log("[getEventosByAnunciante] Fetched horarios:", horarios.length);
 
-    // Create a map of day -> horario for quick lookups
-    const horarioMap = new Map();
-    horarios.forEach((h) => {
-      horarioMap.set(h.diaSemana, h);
-    });
+      // Create a map of day -> horario for quick lookups
+      const horarioMap = new Map();
+      horarios.forEach((h) => {
+        horarioMap.set(h.diaSemana, h);
+      });
 
-    // Add dynamic status for out-of-schedule events
-    const eventosComStatus = eventos.map((evento) => {
-      try {
-        const diaSemana = evento.dataInicio.getDay();
-        const hora = `${String(evento.dataInicio.getHours()).padStart(2, "0")}:${String(evento.dataInicio.getMinutes()).padStart(2, "0")}`;
+      // Add dynamic status for out-of-schedule events
+      const eventosComStatus = eventos.map((evento) => {
+        try {
+          // Ensure dataInicio is a Date object
+          const dataInicio = evento.dataInicio instanceof Date ? evento.dataInicio : new Date(evento.dataInicio);
 
-        const horario = horarioMap.get(diaSemana);
-        const isWithinSchedule = horario && hora >= horario.horaInicio && hora < horario.horaFim;
+          const diaSemana = dataInicio.getDay();
+          const hora = `${String(dataInicio.getHours()).padStart(2, "0")}:${String(dataInicio.getMinutes()).padStart(2, "0")}`;
 
-        // If event is outside schedule, mark as "Fora do Horario"
-        const status = !isWithinSchedule ? "Fora do Horario" : evento.status;
+          const horario = horarioMap.get(diaSemana);
+          const isWithinSchedule = horario && hora >= horario.horaInicio && hora < horario.horaFim;
 
-        return {
-          ...evento,
-          status,
-        };
-      } catch (error) {
-        console.error("[getEventosByAnunciante] Error processing evento:", error);
-        // Return evento with original status if processing fails
-        return evento;
-      }
-    });
+          // If event is outside schedule, mark as "Fora do Horario"
+          const status = !isWithinSchedule ? "Fora do Horario" : evento.status;
 
-    res.json({ data: eventosComStatus });
+          return {
+            ...evento,
+            status,
+          };
+        } catch (error) {
+          console.error("[getEventosByAnunciante] Error processing evento:", error);
+          // Return evento with original status if processing fails
+          return evento;
+        }
+      });
+
+      console.log("[getEventosByAnunciante] Returning eventos with status:", eventosComStatus.length);
+      res.json({ data: eventosComStatus, success: true });
+    } catch (dbError) {
+      console.error("[getEventosByAnunciante] Database error fetching horarios:", dbError);
+      // Return eventos without status adjustment if horarios fetch fails
+      console.log("[getEventosByAnunciante] Returning eventos without status adjustment");
+      res.json({ data: eventos, success: true });
+    }
   } catch (error) {
-    console.error("[getEventosByAnunciante]", error);
-    res.status(500).json({ error: "Erro ao buscar eventos da agenda" });
+    console.error("[getEventosByAnunciante] Outer error:", error);
+    const errorMessage = error instanceof Error ? error.message : "Erro desconhecido ao buscar eventos";
+    console.error("[getEventosByAnunciante] Error details:", { message: errorMessage, error });
+    res.status(500).json({ error: "Erro ao buscar eventos da agenda", details: errorMessage });
   }
 };
 

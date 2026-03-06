@@ -147,9 +147,17 @@ export default function MinhaAgenda() {
 
         console.log("[MinhaAgenda] Eventos response status:", response.status);
         if (!response.ok) {
-          const error = await response.json();
-          console.error("[MinhaAgenda] Eventos error:", error);
-          throw new Error(error.error || "Erro ao buscar eventos");
+          let errorMessage = "Erro ao buscar eventos";
+          try {
+            const errorData = await response.json();
+            errorMessage = typeof errorData === 'string' ? errorData : (errorData?.error || errorData?.message || "Erro ao buscar eventos");
+            console.error("[MinhaAgenda] Eventos error response:", errorData);
+          } catch (parseError) {
+            const text = await response.text();
+            errorMessage = text || `Status ${response.status}`;
+            console.error("[MinhaAgenda] Eventos error text:", text);
+          }
+          throw new Error(errorMessage);
         }
         const result = await response.json();
         console.log("[MinhaAgenda] Eventos fetched:", result.data);
