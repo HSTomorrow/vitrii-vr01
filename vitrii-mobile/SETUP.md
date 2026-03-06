@@ -1,5 +1,35 @@
 # Vitrii Mobile App - Setup Completo
 
+## ⚡ QUICK FIX: Google Play Protect - "App de risco bloqueado"
+
+Se você recebeu o aviso ao tentar baixar a APK do botão flutuante:
+
+> "Google Play Protect App de risco bloqueado. Esse app foi criado para uma versao mais antiga do Android..."
+
+### ✅ Solução Rápida (2 minutos)
+
+```bash
+cd code/vitrii-mobile
+
+# Opção 1: Script automático (recomendado)
+bash update-and-rebuild.sh
+
+# Opção 2: Manual
+npm install                        # Atualiza dependências
+npx expo prebuild --clean         # Limpa cache
+npm run build:android             # Faz rebuild
+```
+
+### ✨ O que foi corrigido:
+- ✅ targetSdkVersion: **35** (Android 15 - 2024)
+- ✅ React Native: **0.74.0** (versão segura)
+- ✅ Expo: **51.0.0+** (suporte Android 15)
+- ✅ HTTPS obrigatório (sem HTTP não criptografado)
+
+Depois de fazer rebuild, o Google Play Protect NÃO vai mais bloquear! 🎉
+
+---
+
 ## 📱 Projeto React Native com Expo + EAS Build
 
 Este guia mostra como configurar, testar e publicar o aplicativo Vitrii nos iOS e Android.
@@ -62,49 +92,69 @@ Certifique-se que seu backend está HTTPS (obrigatório para produção).
 
 ## ⚠️ FASE 2.1: Configuração Android SDK (Segurança)
 
-### Por que ver um aviso de versão antiga?
+### ❌ Erro: Google Play Protect - "App de risco bloqueado"
 
-Se ao baixar a APK no Google Play você recebe um aviso:
-> "Este aplicativo foi feito para uma versão mais antiga do Android que pode trazer vulnerabilidades"
+Se você receber ao baixar do Google Play:
+> "Esse app foi criado para uma versão mais antiga do Android e não inclui as proteções de privacidade mais recentes"
 
-Isso ocorre quando o `targetSdkVersion` está baixo. O `app.json` foi configurado com:
+### ✅ Causa e Solução
 
-```json
-"android": {
-  "minSdkVersion": 24,    // Android 7.0 (2016)
-  "targetSdkVersion": 34  // Android 14 (2024)
-}
-```
-
-### O que significam esses valores?
-
-| Campo | Valor | Significado |
-|-------|-------|-------------|
-| **minSdkVersion** | 24 | Mínimo suportado: Android 7.0 (2016) |
-| **targetSdkVersion** | 34 | Compilado para: Android 14 (2024) |
-
-### Como atualizar para versão mais recente?
-
-Se quiser usar o Android 15 mais novo (targetSdkVersion 35), edite `app.json`:
+Este erro ocorre quando `targetSdkVersion` está desatualizado. **JÁ FOI CORRIGIDO** no `app.json`:
 
 ```json
 "android": {
-  "minSdkVersion": 24,
-  "targetSdkVersion": 35  // Android 15
+  "minSdkVersion": 24,         // Android 7.0 (2016)
+  "targetSdkVersion": 35,      // Android 15 (2024) ✅
+  "compileSdkVersion": 35,     // Compilado com Android 15 SDK
+  "usesCleartextTraffic": false // Força HTTPS obrigatório
 }
 ```
 
-Depois rebuild:
+### 📋 O que foi corrigido
+
+| Campo | Antes | Depois | Status |
+|-------|-------|--------|--------|
+| **targetSdkVersion** | 34 | **35 (Android 15)** | ✅ |
+| **compileSdkVersion** | - | **35** | ✅ |
+| **usesCleartextTraffic** | - | **false** | ✅ |
+| **React Native** | 0.73.0 | **0.74.0** | ✅ |
+| **Expo** | ~50.0.0 | **^51.0.0** | ✅ |
+| **Dependências** | Antigas | **Atualizadas** | ✅ |
+
+### 🚀 Fazer Nova Build com Segurança Atualizada
+
 ```bash
+cd code/vitrii-mobile
+
+# 1. Instalar dependências atualizadas
+npm install
+
+# 2. Limpar cache e fazer rebuild
+npx expo prebuild --clean
+
+# 3. Compilar para Android (Preview)
 npm run build:android
+
+# 4. Ou para Production (Google Play)
+eas build --platform android --profile production
 ```
 
-### Recomendações de Segurança
+### 📱 Suporte de Versões Android
 
-- ✅ **minSdkVersion 24**: Suporta ~95% dos dispositivos em uso
-- ✅ **targetSdkVersion 34**: Versão estável recomendada pelo Google
-- ⚡ **targetSdkVersion 35**: Use quando todas as dependências forem compatíveis
-- 🔒 Sempre manter atualizado com a versão mais recente do Android
+- ✅ **minSdkVersion 24**: Android 7.0+ (~95% dos dispositivos)
+- ✅ **targetSdkVersion 35**: Android 15 (versão mais recente 2024)
+- ✅ **Força HTTPS**: Nenhuma conexão HTTP não criptografada
+
+### 🔍 Verificar Vulnerabilidades
+
+```bash
+npm audit
+npm audit fix
+```
+
+### 📚 Mais Informações
+
+Ver `android-security.md` para detalhes completos de configuração de segurança.
 
 ---
 
