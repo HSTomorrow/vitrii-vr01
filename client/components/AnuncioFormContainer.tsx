@@ -30,15 +30,39 @@ export default function AnuncioFormContainer({
   // Global error handler for this component
   useEffect(() => {
     const handleError = (event: ErrorEvent) => {
+      const errorMsg = event.error?.message || "";
+
+      // Filter out non-critical errors
+      if (
+        errorMsg.includes("WebSocket") ||
+        errorMsg.includes("closed without opened") ||
+        errorMsg.includes("@vite/client")
+      ) {
+        console.warn("[AnuncioFormContainer] Non-critical error (WebSocket/Vite):", errorMsg);
+        return;
+      }
+
       console.error("[AnuncioFormContainer] Error caught:", event.error);
       setHasError(true);
-      setErrorMessage(event.error?.message || "Erro ao carregar formulário");
+      setErrorMessage(errorMsg || "Erro ao carregar formulário");
     };
 
     const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      const errorMsg = event.reason?.message || String(event.reason) || "";
+
+      // Filter out non-critical errors
+      if (
+        errorMsg.includes("WebSocket") ||
+        errorMsg.includes("closed without opened") ||
+        errorMsg.includes("@vite/client")
+      ) {
+        console.warn("[AnuncioFormContainer] Non-critical rejection (WebSocket/Vite):", errorMsg);
+        return;
+      }
+
       console.error("[AnuncioFormContainer] Unhandled rejection:", event.reason);
       setHasError(true);
-      setErrorMessage(event.reason?.message || "Erro ao carregar dados");
+      setErrorMessage(errorMsg || "Erro ao carregar dados");
     };
 
     window.addEventListener("error", handleError);

@@ -1,5 +1,5 @@
 import { Router, Request, Response } from "express";
-import { prisma } from "@/lib/prisma";
+import prisma from "../lib/prisma";
 
 const router = Router();
 
@@ -30,6 +30,9 @@ const checkAdminAuth = async (req: Request, res: Response, next: Function) => {
 // Initialize table if it doesn't exist
 async function initializeCategoriaTable() {
   try {
+    console.log("[Categorias] Starting table initialization...");
+
+    // Create table - execute separately
     await prisma.$executeRawUnsafe(`
       CREATE TABLE IF NOT EXISTS categorias (
         id SERIAL PRIMARY KEY,
@@ -38,12 +41,33 @@ async function initializeCategoriaTable() {
         ativo BOOLEAN DEFAULT true,
         "dataCriacao" TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         "dataAtualizacao" TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-      
-      CREATE INDEX IF NOT EXISTS categorias_ativo_idx ON categorias(ativo);
-      CREATE INDEX IF NOT EXISTS categorias_descricao_idx ON categorias(descricao);
+      )
     `);
-    console.log("[Categorias] Table initialized successfully");
+    console.log("[Categorias] Table created successfully");
+
+    // Create indexes - execute separately
+    try {
+      await prisma.$executeRawUnsafe(`
+        CREATE INDEX IF NOT EXISTS categorias_ativo_idx ON categorias(ativo)
+      `);
+    } catch (e) {
+      // Index might already exist, ignore
+    }
+
+    try {
+      await prisma.$executeRawUnsafe(`
+        CREATE INDEX IF NOT EXISTS categorias_descricao_idx ON categorias(descricao)
+      `);
+    } catch (e) {
+      // Index might already exist, ignore
+    }
+
+    // Check if table exists and count rows
+    const tableCheck = await prisma.$queryRaw<any[]>`
+      SELECT COUNT(*) as count FROM categorias
+    `;
+    const count = (tableCheck[0] as any).count || 0;
+    console.log("[Categorias] Table initialized successfully. Current count:", count);
   } catch (error) {
     console.error("[Categorias] Error initializing table:", error);
   }
@@ -55,6 +79,8 @@ initializeCategoriaTable();
 // GET all categories (public - for form dropdowns)
 router.get("/", async (req: Request, res: Response) => {
   try {
+    console.log("[Categorias] GET / - Fetching active categories");
+
     const categorias = await prisma.$queryRaw<any[]>`
       SELECT id, descricao, icone, ativo, "dataCriacao", "dataAtualizacao"
       FROM categorias
@@ -62,10 +88,16 @@ router.get("/", async (req: Request, res: Response) => {
       ORDER BY descricao ASC
     `;
 
+    console.log("[Categorias] GET / - Found", categorias.length, "categories");
     res.json(categorias);
   } catch (error) {
-    console.error("[Categorias] GET error:", error);
-    res.status(500).json({ error: "Failed to fetch categories" });
+    console.error("[Categorias] GET / - Error:", error);
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    res.status(500).json({
+      error: "Failed to fetch categories",
+      details: errorMsg,
+      timestamp: new Date().toISOString()
+    });
   }
 });
 

@@ -53,14 +53,55 @@ export default function CategoryFields({
   const [imoveisData, setImoveisData] = useState<ImoveisData>({});
 
   // Fetch categorias from API
-  const { data: categoriasAPI = [] } = useQuery({
+  const { data: categoriasAPI = [], error: categoriasError } = useQuery({
     queryKey: ["categorias-form"],
     queryFn: async () => {
-      const response = await fetch("/api/categorias");
-      if (!response.ok) throw new Error("Erro ao buscar categorias");
-      return response.json();
+      try {
+        console.log("[CategoryFields] Fetching categorias from /api/categorias");
+
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+
+        try {
+          const response = await fetch("/api/categorias", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            signal: controller.signal,
+          });
+
+          clearTimeout(timeoutId);
+
+          if (!response.ok) {
+            console.error(
+              "[CategoryFields] API returned status",
+              response.status,
+              response.statusText
+            );
+            throw new Error(
+              `Erro ao buscar categorias: ${response.status} ${response.statusText}`
+            );
+          }
+
+          const data = await response.json();
+          console.log("[CategoryFields] Successfully fetched categorias:", data);
+          return data;
+        } catch (error) {
+          clearTimeout(timeoutId);
+          if (error instanceof Error && error.name === "AbortError") {
+            throw new Error("Timeout ao buscar categorias (5s)");
+          }
+          throw error;
+        }
+      } catch (error) {
+        console.error("[CategoryFields] Fetch error:", error);
+        throw error;
+      }
     },
     staleTime: 600000, // 10 minutes
+    retry: 2,
+    retryDelay: (attemptIndex) => Math.min(1000 * Math.pow(1.5, attemptIndex), 3000),
   });
 
   // Parse existing data
@@ -102,6 +143,11 @@ export default function CategoryFields({
         <label className="block text-sm font-semibold text-vitrii-text mb-2">
           Categoria
         </label>
+        {categoriasError && (
+          <div className="mb-2 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-700">
+            Erro ao carregar categorias. Tente novamente ou selecione sem categoria.
+          </div>
+        )}
         <select
           value={categoria || ""}
           onChange={(e) => {
