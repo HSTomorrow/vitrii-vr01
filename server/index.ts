@@ -105,6 +105,7 @@ import {
   deleteItemListaDesejos,
   addPermissao,
   removePermissao,
+  listarUsuariosListaDesejosParaAnuncio,
 } from "./routes/listas_desejos";
 import {
   getAgendas,
@@ -919,6 +920,12 @@ export function createServer() {
     removePermissao,
   );
 
+  // GET users who added ad to wishlists (owner or admin only)
+  app.get(
+    "/api/anuncios/:anuncioId/usuarios-lista-desejos",
+    extractUserId,
+    listarUsuariosListaDesejosParaAnuncio,
+  );
 
   // Agendas (Service Schedule) routes
   app.get("/api/agendas", getAgendas);

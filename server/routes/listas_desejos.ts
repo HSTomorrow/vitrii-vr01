@@ -698,3 +698,92 @@ export const removePermissao: RequestHandler = async (req, res) => {
     });
   }
 };
+
+// GET - List users who added an ad to their wishlists (owner or admin only)
+export const listarUsuariosListaDesejosParaAnuncio: RequestHandler = async (req, res) => {
+  try {
+    const { anuncioId } = req.params;
+    const usuarioId = parseInt(req.headers["x-user-id"] as string || "0");
+    const isAdmin = req.headers["x-is-admin"] === "true";
+
+    const id = parseInt(anuncioId);
+
+    if (!anuncioId || isNaN(id)) {
+      return res.status(400).json({
+        success: false,
+        error: "anuncioId inválido",
+      });
+    }
+
+    // Verify ad exists
+    const anuncio = await prisma.anuncios.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        usuarioId: true,
+        titulo: true,
+      },
+    });
+
+    if (!anuncio) {
+      return res.status(404).json({
+        success: false,
+        error: "Anúncio não encontrado",
+      });
+    }
+
+    // Check permissions: only owner or admin can view
+    if (anuncio.usuarioId !== usuarioId && !isAdmin) {
+      return res.status(403).json({
+        success: false,
+        error: "Você não tem permissão para ver este relatório",
+      });
+    }
+
+    // Get all wishlists that contain this ad
+    const usuariosComAnuncioEmLista = await prisma.listas_desejos_itens.findMany({
+      where: {
+        anuncioId: id,
+      },
+      select: {
+        id: true,
+        dataCriacao: true,
+        observacoes: true,
+        lista: {
+          select: {
+            id: true,
+            titulo: true,
+            usuario: {
+              select: {
+                id: true,
+                nome: true,
+                email: true,
+                telefone: true,
+              },
+            },
+          },
+        },
+      },
+      orderBy: {
+        dataCriacao: "desc",
+      },
+    });
+
+    res.json({
+      success: true,
+      data: {
+        anuncioId: id,
+        anuncioTitulo: anuncio.titulo,
+        totalUsuarios: usuariosComAnuncioEmLista.length,
+        usuarios: usuariosComAnuncioEmLista,
+      },
+    });
+  } catch (error) {
+    console.error("[listas_desejos] Error listing users with ad in wishlist:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao buscar usuários",
+      details: error instanceof Error ? error.message : undefined,
+    });
+  }
+};
