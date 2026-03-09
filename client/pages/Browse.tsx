@@ -515,7 +515,7 @@ export default function Browse() {
                               src={getAnuncioImage(anuncio)}
                               alt={getImageAlt(anuncio.titulo)}
                               fallbackIcon={<Package className="w-12 h-12 text-white opacity-50" />}
-                              containerClassName="w-full h-52"
+                              containerClassName="w-full h-[187px]"
                               className="w-full h-full object-cover"
                             />
                           </div>

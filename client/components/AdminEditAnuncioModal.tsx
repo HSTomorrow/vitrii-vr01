@@ -2,6 +2,13 @@ import { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { X, AlertCircle } from "lucide-react";
+import MultiImageUpload from "./MultiImageUpload";
+
+interface UploadedImage {
+  id?: string;
+  file?: File;
+  url: string;
+}
 
 interface AdminEditAnuncioModalProps {
   anuncio: any;
@@ -32,6 +39,8 @@ export default function AdminEditAnuncioModal({
     dataFim: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
+  const [existingFotos, setExistingFotos] = useState<any[]>([]);
 
   // Fetch all anunciantes for dropdown
   const { data: anunciantesData } = useQuery({
@@ -41,6 +50,18 @@ export default function AdminEditAnuncioModal({
       if (!response.ok) throw new Error("Erro ao buscar anunciantes");
       return response.json();
     },
+  });
+
+  // Fetch existing fotos for the ad
+  const { data: fotosData } = useQuery({
+    queryKey: ["anuncio-fotos-edit", anuncio?.id],
+    queryFn: async () => {
+      if (!anuncio?.id) return null;
+      const response = await fetch(`/api/anuncios/${anuncio.id}/fotos`);
+      if (!response.ok) throw new Error("Erro ao buscar fotos");
+      return response.json();
+    },
+    enabled: !!anuncio?.id && isOpen,
   });
 
   // Update form when anuncio changes
@@ -75,11 +96,24 @@ export default function AdminEditAnuncioModal({
         tipo: anuncio.tipo || "produto",
         dataFim: dataFimValue,
       });
+
+      // Initialize existing fotos
+      const fotos = fotosData?.data || [];
+      setExistingFotos(fotos);
+
+      // Initialize uploaded images with existing fotos (mapped to match UploadedImage format)
+      const existingImages = fotos.map((foto: any) => ({
+        id: `existing-${foto.id}`,
+        url: foto.url,
+      }));
+      setUploadedImages(existingImages);
+
       console.log("[AdminEditAnuncioModal] dataFim raw value:", anuncio.dataFim);
       console.log("[AdminEditAnuncioModal] dataFim parsed value:", dataFimValue);
+      console.log("[AdminEditAnuncioModal] Existing fotos:", fotos);
       setErrors({});
     }
-  }, [anuncio, isOpen]);
+  }, [anuncio, isOpen, fotosData]);
 
   // Mutation to update anuncio
   const updateMutation = useMutation({
@@ -114,11 +148,61 @@ export default function AdminEditAnuncioModal({
         throw new Error(errorData.error || "Erro ao atualizar anúncio");
       }
 
+      // Sync photos after updating the ad
+      const headers: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (userId) {
+        headers["x-user-id"] = userId.toString();
+      }
+
+      // Determine which fotos to delete (existing fotos that are no longer in uploadedImages)
+      const uploadedUrlSet = new Set(uploadedImages.map(img => img.url));
+      const fotosToDelete = existingFotos.filter(
+        (foto: any) => !uploadedUrlSet.has(foto.url)
+      );
+
+      // Delete removed fotos
+      for (const foto of fotosToDelete) {
+        try {
+          await fetch(`/api/anuncios/${anuncio.id}/fotos/${foto.id}`, {
+            method: "DELETE",
+            headers,
+          });
+        } catch (error) {
+          console.error("Error deleting foto:", error);
+        }
+      }
+
+      // Determine which fotos to add (uploaded images that are not existing)
+      const existingUrlSet = new Set(existingFotos.map((foto: any) => foto.url));
+      const fotosToAdd = uploadedImages.filter(
+        (img) => !existingUrlSet.has(img.url)
+      );
+
+      // Add new fotos
+      for (const image of fotosToAdd) {
+        try {
+          await fetch(`/api/anuncios/${anuncio.id}/fotos`, {
+            method: "POST",
+            headers,
+            body: JSON.stringify({ url: image.url }),
+          });
+        } catch (error) {
+          console.error("Error adding foto:", error);
+        }
+      }
+
+      // Invalidate photo queries
+      queryClient.invalidateQueries({ queryKey: ["anuncio-fotos-edit", anuncio.id] });
+      queryClient.invalidateQueries({ queryKey: ["anuncio-fotos", anuncio.id] });
+
       return response.json();
     },
     onSuccess: () => {
       toast.success("Anúncio atualizado com sucesso");
       queryClient.invalidateQueries({ queryKey: ["admin-anuncios"] });
+      queryClient.invalidateQueries({ queryKey: ["browse-anuncios"] });
       onClose();
     },
     onError: (error) => {
@@ -243,10 +327,26 @@ export default function AdminEditAnuncioModal({
             )}
           </div>
 
-          {/* Imagem */}
+          {/* Imagens */}
           <div>
             <label className="block text-sm font-semibold text-vitrii-text mb-2">
-              URL da Imagem
+              Imagens do Anúncio (até 5)
+            </label>
+            <MultiImageUpload
+              onImagesChange={setUploadedImages}
+              currentImages={uploadedImages}
+              maxImages={5}
+              anuncianteFotoUrl={null}
+            />
+            <p className="text-xs text-vitrii-text-secondary mt-2">
+              A primeira imagem será a principal. Você pode adicionar ou remover imagens aqui.
+            </p>
+          </div>
+
+          {/* Imagem Principal (fallback) */}
+          <div>
+            <label className="block text-sm font-semibold text-vitrii-text mb-2">
+              URL da Imagem Principal (fallback)
             </label>
             <input
               type="text"
@@ -255,11 +355,14 @@ export default function AdminEditAnuncioModal({
               placeholder="https://..."
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
             />
+            <p className="text-xs text-vitrii-text-secondary mt-1">
+              Será usada como fallback se nenhuma imagem estiver adicionada acima.
+            </p>
             {formData.imagem && (
               <img
                 src={formData.imagem}
                 alt="Preview"
-                className="mt-2 max-w-xs max-h-64 rounded-lg"
+                className="mt-2 max-w-xs max-h-48 rounded-lg"
                 onError={() => {
                   setErrors((prev) => ({
                     ...prev,

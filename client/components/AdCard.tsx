@@ -101,7 +101,7 @@ export default function AdCard({
           src={getAnuncioImage(anuncio)}
           alt={getImageAlt(anuncio.titulo)}
           fallbackIcon={<Package className="w-12 h-12 text-white opacity-50" />}
-          containerClassName="w-full h-[9.6rem]"
+          containerClassName="w-full h-[138px]"
           className="w-full h-full object-cover"
         />
       </div>
