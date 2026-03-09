@@ -549,15 +549,11 @@ export default function Browse() {
                             <div className="flex justify-between items-center mb-4 pt-2 border-t">
                               <span className="text-lg font-bold text-vitrii-blue">
                                 {anuncio.isDoacao
-                                  ? "Grátis"
+                                  ? "Gratuito"
+                                  : anuncio.aCombinar
+                                  ? "A Combinar"
                                   : formatCurrencyDisplay(anuncio.preco)}
                               </span>
-                              <div className="flex items-center space-x-1">
-                                <Star className="w-4 h-4 fill-vitrii-yellow text-vitrii-yellow" />
-                                <span className="text-sm font-semibold">
-                                  5.0
-                                </span>
-                              </div>
                             </div>
 
                             <div className="space-y-2 mt-auto">

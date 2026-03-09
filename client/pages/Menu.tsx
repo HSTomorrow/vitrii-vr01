@@ -22,13 +22,10 @@ import {
   Phone,
   Star,
   Gift,
-  Smartphone,
-  Download,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import InstallAppMenuItem from "@/components/InstallAppMenuItem";
 
 export default function Menu() {
   const { user, logout } = useAuth();
@@ -62,45 +59,12 @@ export default function Menu() {
 
         {/* Menu Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Install App Links */}
-          <section className="mb-8">
-            <h2 className="text-lg font-semibold text-vitrii-text mb-4">
-              📱 Instalar Aplicativo
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Link
-                to="/install-ios"
-                className="flex items-center gap-4 px-6 py-4 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors border border-blue-200"
-              >
-                <Smartphone className="w-6 h-6 text-blue-600 flex-shrink-0" />
-                <div>
-                  <span className="text-vitrii-text font-medium block">Instalar no iOS</span>
-                  <span className="text-xs text-gray-600">iPhone e iPad</span>
-                </div>
-              </Link>
-
-              <Link
-                to="/install-android"
-                className="flex items-center gap-4 px-6 py-4 bg-green-50 hover:bg-green-100 rounded-lg transition-colors border border-green-200"
-              >
-                <Download className="w-6 h-6 text-green-600 flex-shrink-0" />
-                <div>
-                  <span className="text-vitrii-text font-medium block">Instalar no Android</span>
-                  <span className="text-xs text-gray-600">Dispositivos Android</span>
-                </div>
-              </Link>
-            </div>
-          </section>
-
           {/* Main Navigation */}
           <section className="mb-8">
             <h2 className="text-lg font-semibold text-vitrii-text mb-4">
               Navegação
             </h2>
             <div className="space-y-2">
-              {/* Install App Menu Item */}
-              <InstallAppMenuItem />
-
               <Link
                 to="/"
                 className="flex items-center gap-4 px-6 py-4 bg-vitrii-gray hover:bg-gray-200 rounded-lg transition-colors"
