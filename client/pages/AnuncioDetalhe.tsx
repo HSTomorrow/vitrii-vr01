@@ -343,12 +343,12 @@ export default function AnuncioDetalhe() {
       <Header />
 
       {/* Main Content */}
-      <main className="flex-1 py-12 pb-32 md:pb-12">
+      <main className="flex-1 py-6 pb-32 md:pb-12">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Back Button */}
           <button
             onClick={() => navigate(-1)}
-            className="inline-flex items-center text-vitrii-blue hover:text-vitrii-blue-dark font-semibold mb-8"
+            className="inline-flex items-center text-vitrii-blue hover:text-vitrii-blue-dark font-semibold mb-6"
           >
             <ChevronLeft className="w-5 h-5 mr-1" />
             Voltar

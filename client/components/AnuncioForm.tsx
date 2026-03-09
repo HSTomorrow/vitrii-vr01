@@ -14,6 +14,7 @@ import CategoryFields from "./CategoryFields";
 import CreateAnuncianteModal from "./CreateLojaModal";
 import CreateProductoModal from "./CreateProductoModal";
 import MultiImageUpload from "./MultiImageUpload";
+import ImageGallery from "./ImageGallery";
 import { BRAZILIAN_STATES } from "@shared/brazilianStates";
 import { TIPO_ANUNCIO_OPTIONS, TIPO_ANUNCIO_DESCRIPTIONS } from "@/constants/anuncioTypes";
 import { parseCurrencyInput, formatNumberToCurrency } from "@/utils/formatCurrency";
@@ -740,27 +741,26 @@ export default function AnuncioForm({
   }
 
   return (
-    <div className="min-h-screen bg-vitrii-gray-light py-12">
+    <div className="min-h-screen bg-vitrii-gray-light py-8">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="mb-8">
+        <div className="mb-6">
           <Link
             to="/sell"
-            className="inline-flex items-center text-vitrii-blue hover:text-vitrii-blue-dark font-semibold mb-4"
+            className="inline-flex items-center text-vitrii-blue hover:text-vitrii-blue-dark font-semibold mb-3"
           >
             <ChevronLeft className="w-5 h-5 mr-1" />
             Voltar
           </Link>
-          <h1 className="text-3xl font-bold text-vitrii-text">
+          <h1 className="text-3xl font-bold text-vitrii-text mb-1">
             {anuncioId ? "Editar Anúncio" : "Novo Anúncio"}
           </h1>
-          <p className="text-vitrii-text-secondary mt-2">
+          <p className="text-vitrii-text-secondary text-sm">
             {anuncioId
               ? "Atualize os detalhes do seu anúncio"
               : "Crie um novo anúncio para seus produtos e serviços"}
           </p>
         </div>
-
 
         {/* Form */}
         <div className="bg-white rounded-lg shadow-md p-8">
@@ -1313,6 +1313,32 @@ export default function AnuncioForm({
               <label className="block text-sm font-semibold text-vitrii-text mb-2">
                 Fotos (Opcional - máximo 5)
               </label>
+
+              {/* Show image gallery preview when editing with existing photos */}
+              {anuncioId && uploadedImages.length > 0 && (
+                <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm font-semibold text-blue-900 mb-3">
+                    📸 Imagens Atuais do Anúncio
+                  </p>
+                  <ImageGallery
+                    photos={uploadedImages
+                      .filter((img: any) => img.id) // Only show existing photos (with ID)
+                      .map((img: any, idx: number) => ({
+                        id: img.id,
+                        url: img.url,
+                        ordem: idx + 1,
+                      }))}
+                    anuncioId={anuncioId}
+                    canDelete={true}
+                    onPhotoDeleted={(fotoId: number) => {
+                      // Photo is already removed from uploadedImages by the gallery
+                      console.log("[AnuncioForm] Photo deleted:", fotoId);
+                    }}
+                    anuncianteFotoUrl={selectedAnunciante?.fotoUrl}
+                  />
+                </div>
+              )}
+
               <MultiImageUpload
                 currentImages={uploadedImages}
                 onImagesChange={(images) => {
