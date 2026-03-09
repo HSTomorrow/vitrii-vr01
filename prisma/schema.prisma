@@ -75,6 +75,8 @@ model anuncios {
   destaque            Boolean                @default(false)
   ordem               Int                    @default(10) // Admin can customize, default 10, sorted ascending + id descending
   isActive            Boolean                @default(true)
+  permiteReservar     Boolean                @default(false) // Allow reservations for this ad
+  quantidadeMaximaReservas Int?              // Maximum number of reservations allowed (null = unlimited)
   anunciantes         anunciantes            @relation(fields: [anuncianteId], references: [id], onDelete: Cascade, map: "anuncios_lojaId_fkey")
   anuncioVisualizados anuncioVisualizados[]
   fotos               fotos_anuncio[]
@@ -83,11 +85,13 @@ model anuncios {
   conversas           conversas[]
   pagamento           pagamentos?
   favoritos           favorito[]
+  reservas            reservas_anuncio[]
 
   @@index([anuncianteId])
   @@index([usuarioId])
   @@index([status])
   @@index([ordem, id])
+  @@index([permiteReservar])
 }
 
 // Anuncio Visualizacoes - Log table to track ad views
@@ -257,6 +261,7 @@ model usracessos {
   favoritos               favorito[]
   contatos                contatos[]
   contato_links           contatos_usuarios_links[]
+  reservas_anuncio        reservas_anuncio[]
   localidadePadrao        localidades?                @relation(fields: [localidadePadraoId], references: [id], onDelete: SetNull)
 }
 
@@ -844,4 +849,26 @@ model agendas_horarios {
   @@unique([anuncianteId, diaSemana])
   @@index([anuncianteId])
   @@map("agendas_horarios")
+}
+
+// Reservas de Anuncio - Track ad reservations
+model reservas_anuncio {
+  id              Int         @id @default(autoincrement())
+  anuncioId       Int
+  usuarioId       Int
+  dataReserva     DateTime    @default(now())
+  dataCancelamento DateTime?  // Null while active, set when cancelled
+  observacao      String?     @db.VarChar(500) // Optional note from user when booking
+  status          String      @default("ativa") @db.VarChar(50) // "ativa", "cancelada"
+  dataCriacao     DateTime    @default(now())
+  dataAtualizacao DateTime    @updatedAt
+
+  anuncio         anuncios    @relation(fields: [anuncioId], references: [id], onDelete: Cascade)
+  usuario         usracessos  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+
+  @@unique([anuncioId, usuarioId]) // One reservation per user per ad
+  @@index([anuncioId])
+  @@index([usuarioId])
+  @@index([status])
+  @@index([dataReserva])
 }

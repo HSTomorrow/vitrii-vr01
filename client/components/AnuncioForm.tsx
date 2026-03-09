@@ -112,6 +112,8 @@ export default function AnuncioForm({
     categoria: "" as string,
     dadosCategoria: "",
     tipo: normalizedTipo || "anuncio_padrao",
+    permiteReservar: false,
+    quantidadeMaximaReservas: 0,
   });
   const [uploadedImages, setUploadedImages] = useState<
     Array<{ id?: string; url: string }>
@@ -331,6 +333,8 @@ export default function AnuncioForm({
         categoria: ad.categoria || "",
         dadosCategoria: ad.dadosCategoria || "",
         tipo: ad.tipo || "produto",
+        permiteReservar: ad.permiteReservar || false,
+        quantidadeMaximaReservas: ad.quantidadeMaximaReservas || 0,
       });
 
       toast.success("Anúncio carregado com sucesso");
@@ -406,6 +410,8 @@ export default function AnuncioForm({
         destaque: data.destaque,
         categoria: data.categoria || null,
         dadosCategoria: data.dadosCategoria || null,
+        permiteReservar: data.permiteReservar,
+        quantidadeMaximaReservas: data.permiteReservar && data.quantidadeMaximaReservas > 0 ? data.quantidadeMaximaReservas : null,
       };
 
       // Add ordem field for admins only
@@ -1376,6 +1382,52 @@ export default function AnuncioForm({
                 </p>
               </label>
             </div>
+
+            {/* Permite Reservar (Allow Reservations) */}
+            <div className="flex items-start gap-3 p-4 bg-green-50 border border-green-200 rounded-lg">
+              <input
+                type="checkbox"
+                id="permiteReservar"
+                checked={formData.permiteReservar}
+                onChange={(e) => {
+                  handleInputChange("permiteReservar", e.target.checked);
+                }}
+                className="w-5 h-5 text-green-600 cursor-pointer rounded mt-1"
+              />
+              <label htmlFor="permiteReservar" className="flex-1 cursor-pointer">
+                <p className="font-semibold text-vitrii-text">
+                  🔖 Permitir Reservas
+                </p>
+                <p className="text-sm text-vitrii-text-secondary mt-1">
+                  Marque esta opção para permitir que os usuários façam reservas deste anúncio.
+                </p>
+              </label>
+            </div>
+
+            {/* Quantidade Máxima de Reservas (only show if permiteReservar is true) */}
+            {formData.permiteReservar && (
+              <div>
+                <label htmlFor="quantidadeMaximaReservas" className="block text-sm font-semibold text-vitrii-text mb-2">
+                  Quantidade Máxima de Reservas (Opcional)
+                </label>
+                <input
+                  type="number"
+                  id="quantidadeMaximaReservas"
+                  min="1"
+                  max="999"
+                  value={formData.quantidadeMaximaReservas || ""}
+                  onChange={(e) => {
+                    const val = e.target.value ? parseInt(e.target.value) : 0;
+                    handleInputChange("quantidadeMaximaReservas", val);
+                  }}
+                  placeholder="Deixe em branco para ilimitado"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                />
+                <p className="text-xs text-vitrii-text-secondary mt-1">
+                  Se deixado em branco, não há limite de reservas. Se preenchido, o anúncio só aceitará reservas até este número.
+                </p>
+              </div>
+            )}
 
             {/* Ordem Field (Admin Only) */}
             {user?.tipoUsuario === "adm" && (

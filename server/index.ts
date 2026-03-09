@@ -247,6 +247,7 @@ import {
   getLinkedContatosForUsuario,
 } from "./routes/sync-contatos-usuarios";
 import categoriasRouter from "./routes/categorias";
+import reservasAnuncioRouter from "./routes/reservas-anuncio";
 
 export function createServer() {
   const app = express();
@@ -1100,6 +1101,9 @@ export function createServer() {
 
   // Categorias routes (admin CRUD, public read)
   app.use("/api/categorias", categoriasRouter);
+
+  // Reservas de Anuncio routes
+  app.use("/api", reservasAnuncioRouter);
 
   // Sync contatos-usuarios (hourly synchronization)
   app.post("/api/sync/contatos-usuarios", syncContatosUsuarios);
