@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import AdminEditAnuncioModal from "@/components/AdminEditAnuncioModal";
 
 interface Anuncio {
   id: number;
@@ -44,6 +45,8 @@ export default function AdminManageAds() {
   const [expandedAd, setExpandedAd] = useState<number | null>(null);
   const [filterStatus, setFilterStatus] = useState<string>("todos");
   const [currentPage, setCurrentPage] = useState(1);
+  const [editingAnuncio, setEditingAnuncio] = useState<any>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const itemsPerPage = 20;
 
   // Check if user is admin
@@ -577,13 +580,16 @@ export default function AdminManageAds() {
                     {/* Actions */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2 pt-4 border-t border-gray-300">
                       {/* Edit Button */}
-                      <Link
-                        to={`/anuncio/${anuncio.id}/editar`}
+                      <button
+                        onClick={() => {
+                          setEditingAnuncio(anuncio);
+                          setIsEditModalOpen(true);
+                        }}
                         className="px-3 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2 text-sm font-semibold"
                       >
                         <Edit2 className="w-4 h-4" />
                         Editar
-                      </Link>
+                      </button>
 
                       {/* Toggle Active */}
                       <button
@@ -678,6 +684,17 @@ export default function AdminManageAds() {
           </div>
         )}
       </main>
+
+      {/* Edit Modal */}
+      <AdminEditAnuncioModal
+        anuncio={editingAnuncio}
+        isOpen={isEditModalOpen}
+        onClose={() => {
+          setIsEditModalOpen(false);
+          setEditingAnuncio(null);
+        }}
+        userId={user?.id}
+      />
 
       <Footer />
     </div>

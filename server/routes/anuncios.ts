@@ -12,6 +12,25 @@ import {
 import { parseId, parseIdOrThrow } from "../lib/parseId";
 import { sendQRCodeExpiredEmail } from "../lib/emailService";
 
+/**
+ * Calculate the end date (dataFim) for an ad based on the announcer type
+ * Padrão (Standard): 7 days
+ * Profissional (Professional): 30 days
+ * @param anuncianteType - The type of announcer (Padrão or Profissional)
+ * @param adminOverride - Optional date set by admin
+ * @returns The calculated end date
+ */
+function calculateDataFim(anuncianteType: string, adminOverride?: Date | null): Date {
+  if (adminOverride) {
+    return adminOverride;
+  }
+
+  const now = new Date();
+  const days = anuncianteType === "Profissional" ? 30 : 7;
+  const endDate = new Date(now.getTime() + days * 24 * 60 * 60 * 1000);
+  return endDate;
+}
+
 // Base schema for ads (without refinement)
 const AnuncioBaseSchema = z.object({
   usuarioId: z.number().int().positive("Usuário é obrigatório"),
@@ -30,6 +49,7 @@ const AnuncioBaseSchema = z.object({
     .optional()
     .nullable(),
   dataValidade: z.string().optional().nullable(),
+  dataFim: z.string().or(z.date()).optional().nullable(), // Admin-only override for ad end date
   equipeDeVendaId: z.number().int().positive().optional().nullable(),
   endereco: z
     .string()
@@ -527,6 +547,15 @@ export const createAnuncio: RequestHandler = async (req, res) => {
     // Only admins can set custom ordem, otherwise default to 10
     const ordem = usuario.tipoUsuario === "adm" ? (validatedData.ordem || 10) : 10;
 
+    // Calculate dataFim: admin can override, otherwise use anunciante type to determine duration
+    let adminDataFim: Date | null = null;
+    if (usuario.tipoUsuario === "adm" && validatedData.dataFim) {
+      adminDataFim = typeof validatedData.dataFim === "string"
+        ? new Date(validatedData.dataFim)
+        : validatedData.dataFim;
+    }
+    const dataFim = calculateDataFim(anunciante.tipo, adminDataFim);
+
     const anuncio = await prisma.anuncios.create({
       data: {
         usuarioId: validatedData.usuarioId,
@@ -546,6 +575,7 @@ export const createAnuncio: RequestHandler = async (req, res) => {
         isDoacao,
         aCombinar: validatedData.aCombinar || false,
         tipo: anuncioTipo,
+        dataFim,
         dataAtualizacao: new Date(),
       },
       include: {
@@ -638,6 +668,7 @@ export const updateAnuncio: RequestHandler = async (req, res) => {
         status: true,
         destaque: true,
         usuarioId: true,
+        anuncianteId: true,
       },
     });
 
@@ -678,11 +709,42 @@ export const updateAnuncio: RequestHandler = async (req, res) => {
       mappedData.aCombinar = updateData.aCombinar;
     if (updateData.destaque !== undefined)
       mappedData.destaque = updateData.destaque;
+    if (updateData.anuncianteId !== undefined)
+      mappedData.anuncianteId = updateData.anuncianteId;
 
     // When updating to donation, automatically approve and feature it
     if (updateData.isDoacao === true) {
       mappedData.statusPagamento = "aprovado";
       mappedData.destaque = true;
+    }
+
+    // Handle dataFim calculation (admin can override, otherwise recalculate based on anunciante type)
+    const userId = parseInt(req.headers["x-user-id"] as string || "0");
+    const user = await prisma.usracessos.findUnique({
+      where: { id: userId },
+      select: { tipoUsuario: true },
+    });
+
+    const isAdmin = user?.tipoUsuario === "adm";
+
+    if (isAdmin && updateData.dataFim) {
+      // Admin can set custom dataFim
+      const customDataFim = typeof updateData.dataFim === "string"
+        ? new Date(updateData.dataFim)
+        : updateData.dataFim;
+      mappedData.dataFim = customDataFim;
+    } else if (updateData.anuncianteId || updateData.anuncianteId === 0) {
+      // If anuncianteId is being changed, recalculate dataFim based on new anunciante type
+      const newAnuncianteId = updateData.anuncianteId || currentAd.anuncianteId;
+      const newAnunciante = await prisma.anunciantes.findUnique({
+        where: { id: newAnuncianteId },
+        select: { tipo: true },
+      });
+
+      if (newAnunciante) {
+        const newDataFim = calculateDataFim(newAnunciante.tipo, null);
+        mappedData.dataFim = newDataFim;
+      }
     }
 
     const anuncio = await prisma.anuncios.update({

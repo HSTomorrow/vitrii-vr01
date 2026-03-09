@@ -69,6 +69,7 @@ model anuncios {
   statusPagamento     String?                @default("pendente") @db.VarChar(50)
   dataCriacao         DateTime               @default(now())
   dataAtualizacao     DateTime
+  dataFim             DateTime?              // End date for ad validity (7 days for Standard, 30 days for Professional, or admin-set)
   cidade              String?                @db.VarChar(100)
   estado              String?                @db.VarChar(2)
   visualizacoes       Int                    @default(0)
