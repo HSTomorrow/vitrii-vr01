@@ -246,6 +246,7 @@ import {
   getLinkedUsuariosForContato,
   getLinkedContatosForUsuario,
 } from "./routes/sync-contatos-usuarios";
+import categoriasRouter from "./routes/categorias";
 
 export function createServer() {
   const app = express();
@@ -1096,6 +1097,9 @@ export function createServer() {
   app.post("/api/anunciantes/:anuncianteId/contatos", extractUserId, createContato);
   app.put("/api/anunciantes/:anuncianteId/contatos/:contatoId", extractUserId, updateContato);
   app.delete("/api/anunciantes/:anuncianteId/contatos/:contatoId", extractUserId, deleteContato);
+
+  // Categorias routes (admin CRUD, public read)
+  app.use("/api/categorias", categoriasRouter);
 
   // Sync contatos-usuarios (hourly synchronization)
   app.post("/api/sync/contatos-usuarios", syncContatosUsuarios);

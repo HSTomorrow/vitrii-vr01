@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 interface CategoryFieldsProps {
   categoria: string | null;
@@ -34,6 +35,13 @@ interface ImoveisData {
   mobiliado?: boolean;
 }
 
+interface CategoriaFromAPI {
+  id: number;
+  descricao: string;
+  icone: string;
+  ativo: boolean;
+}
+
 export default function CategoryFields({
   categoria,
   dadosCategoria,
@@ -43,6 +51,17 @@ export default function CategoryFields({
   const [roupasData, setRoupasData] = useState<RoupasData>({});
   const [carrosData, setCarrosData] = useState<CarrosData>({});
   const [imoveisData, setImoveisData] = useState<ImoveisData>({});
+
+  // Fetch categorias from API
+  const { data: categoriasAPI = [] } = useQuery({
+    queryKey: ["categorias-form"],
+    queryFn: async () => {
+      const response = await fetch("/api/categorias");
+      if (!response.ok) throw new Error("Erro ao buscar categorias");
+      return response.json();
+    },
+    staleTime: 600000, // 10 minutes
+  });
 
   // Parse existing data
   useEffect(() => {
@@ -97,9 +116,11 @@ export default function CategoryFields({
           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
         >
           <option value="">Sem Categoria Específica</option>
-          <option value="roupas">👕 Roupas e Moda</option>
-          <option value="carros">🚗 Carros e Motos</option>
-          <option value="imoveis">🏠 Imóveis</option>
+          {(categoriasAPI as CategoriaFromAPI[]).map((cat) => (
+            <option key={cat.id} value={cat.descricao}>
+              {cat.icone} {cat.descricao}
+            </option>
+          ))}
         </select>
       </div>
 

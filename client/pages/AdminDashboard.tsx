@@ -21,6 +21,7 @@ import {
   Key,
   Store,
   MapPin,
+  Tag,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import AdminEditUserModal from "@/components/AdminEditUserModal";
@@ -420,6 +421,23 @@ export default function AdminDashboard() {
             </div>
             <p className="text-sm text-vitrii-text-secondary">
               Crie e configure localidades para filtragem de anúncios
+            </p>
+          </button>
+
+          <button
+            onClick={() => navigate("/admin/categorias")}
+            className="bg-indigo-50 border border-indigo-200 rounded-lg p-6 hover:shadow-lg transition-shadow text-left group"
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center group-hover:bg-indigo-200 transition-colors">
+                <Tag className="w-6 h-6 text-indigo-600" />
+              </div>
+              <h3 className="font-semibold text-vitrii-text">
+                Gerenciar Categorias
+              </h3>
+            </div>
+            <p className="text-sm text-vitrii-text-secondary">
+              Crie e configure categorias de produtos e serviços
             </p>
           </button>
 

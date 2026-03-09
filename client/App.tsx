@@ -48,6 +48,7 @@ import AdminBanners from "./pages/AdminBanners";
 import AdminAnunciantes from "./pages/AdminAnunciantes";
 import AdminPagamentos from "./pages/AdminPagamentos";
 import AdminLocalidades from "./pages/AdminLocalidades";
+import AdminCategorias from "./pages/AdminCategorias";
 import Menu from "./pages/Menu";
 import MeusAnuncios from "./pages/MeusAnuncios";
 import MinhaAgenda from "./pages/MinhaAgenda";
@@ -173,6 +174,7 @@ function AppContent() {
           <Route path="/admin/anunciantes" element={<AdminAnunciantes />} />
           <Route path="/admin/pagamentos" element={<AdminPagamentos />} />
           <Route path="/admin/localidades" element={<AdminLocalidades />} />
+          <Route path="/admin/categorias" element={<AdminCategorias />} />
           <Route path="/cadastro-lojas" element={<CadastroLojas />} />
           <Route
             path="/cadastro-grupos-productos"
