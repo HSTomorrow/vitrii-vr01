@@ -94,12 +94,6 @@ import {
   getMembrosDisponiveis,
 } from "./routes/equipes-venda";
 import {
-  getFavoritos,
-  checkFavorito,
-  toggleFavorito,
-  getFavoritoCount,
-} from "./routes/favoritos";
-import {
   getListasDesejos,
   getListaDesejosById,
   createListaDesejos,
@@ -883,12 +877,6 @@ export function createServer() {
     "/api/equipes-venda/:equipeId/membros-disponiveis",
     getMembrosDisponiveis,
   );
-
-  // Favoritos (Favorites) routes
-  app.get("/api/favoritos", getFavoritos);
-  app.get("/api/favoritos/check", checkFavorito);
-  app.post("/api/favoritos/toggle", toggleFavorito);
-  app.get("/api/anuncios/:anuncioId/favoritos/count", getFavoritoCount);
 
   // Listas de Desejos (Wishlists) routes
   app.get("/api/listas-desejos", extractUserId, getListasDesejos);

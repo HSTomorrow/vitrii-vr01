@@ -192,16 +192,6 @@ export default function Menu() {
                   </Link>
 
                   <Link
-                    to="/favoritos"
-                    className="flex items-center gap-4 px-6 py-4 bg-vitrii-gray hover:bg-gray-200 rounded-lg transition-colors"
-                  >
-                    <Star className="w-6 h-6 fill-yellow-400 text-yellow-400" />
-                    <span className="text-vitrii-text font-medium">
-                      Meus Favoritos
-                    </span>
-                  </Link>
-
-                  <Link
                     to="/lista-desejos"
                     className="flex items-center gap-4 px-6 py-4 bg-vitrii-gray hover:bg-gray-200 rounded-lg transition-colors"
                   >

@@ -9,7 +9,6 @@ import ImageGallery from "@/components/ImageGallery";
 import ShareModal from "@/components/ShareModal";
 import QRCodeModal from "@/components/QRCodeModal";
 import WishlistButton from "@/components/WishlistButton";
-import FavoritesButton from "@/components/FavoritesButton";
 import ImageWithFallback from "@/components/ImageWithFallback";
 import { getAnuncioImage, getImageAlt } from "@/utils/imageFallback";
 import { formatCurrencyDisplay } from "@/utils/formatCurrency";
@@ -127,21 +126,6 @@ export default function AnuncioDetalhe() {
   });
 
   const canEdit = canEditData?.canEdit ?? false;
-
-  // Check if ad is favorited by current user
-  const { data: favoritoData } = useQuery({
-    queryKey: ["checkFavorito", id, user?.id],
-    queryFn: async () => {
-      const response = await fetch(
-        `/api/favoritos/check?usuarioId=${user?.id}&anuncioId=${id}`
-      );
-      if (!response.ok) throw new Error("Erro ao verificar favorito");
-      return response.json();
-    },
-    enabled: !!id && !!user?.id,
-  });
-
-  const isFavoritado = favoritoData?.isFavorited ?? false;
 
   // Fetch equipes do anunciante
   const { data: equipesData } = useQuery({
@@ -693,11 +677,6 @@ export default function AnuncioDetalhe() {
                     <QrCode className="w-4 h-4" />
                     QR Code
                   </button>
-                  <FavoritesButton
-                    anuncioId={anuncio.id}
-                    isFavorited={isFavoritado}
-                    variant="button"
-                  />
                   <WishlistButton
                     anuncioId={anuncio.id}
                     anuncioTitulo={anuncio.titulo}
@@ -1130,15 +1109,6 @@ export default function AnuncioDetalhe() {
 
         {/* Favorites, Wishlist & Solicitar Equipe de Vendas */}
         <div className="flex gap-2">
-          {/* Favorites - Icon only for mobile */}
-          <div className="flex-shrink-0">
-            <FavoritesButton
-              anuncioId={anuncio.id}
-              isFavorited={isFavoritado}
-              variant="icon"
-            />
-          </div>
-
           {/* Wishlist - Icon only for mobile */}
           <div className="flex-shrink-0">
             <WishlistButton

@@ -36,37 +36,11 @@ export default function Index() {
   const navigate = useNavigate();
   const { user, logout, isLoading } = useAuth();
   const queryClient = useQueryClient();
-  const [favoritos, setFavoritos] = useState<Set<number>>(new Set());
 
   // Debug log on mount and when user changes
   useEffect(() => {
     console.log("[Index] Page loaded - isLoading:", isLoading, "user:", user?.email || "null");
   }, [isLoading, user?.email]);
-
-  // Load user's favorites when page loads
-  useEffect(() => {
-    if (!user?.id) {
-      setFavoritos(new Set());
-      return;
-    }
-
-    const loadFavoritos = async () => {
-      try {
-        const response = await fetch(`/api/favoritos?usuarioId=${user.id}`);
-        if (!response.ok) throw new Error("Erro ao buscar favoritos");
-
-        const data = await response.json();
-        const favoritoIds = data.data?.map((anuncio: any) => anuncio.id) || [];
-
-        console.log("[Index] Loaded favorites:", favoritoIds);
-        setFavoritos(new Set(favoritoIds));
-      } catch (error) {
-        console.error("[Index] Error loading favorites:", error);
-      }
-    };
-
-    loadFavoritos();
-  }, [user?.id]);
 
   // Validate user status on page load (only if user is logged in)
   useEffect(() => {
@@ -105,44 +79,6 @@ export default function Index() {
   }, [user?.id]); // Only depend on user?.id, not logout/navigate
 
   // All paid ads are fetched and filtered on client side
-
-  const toggleFavoritoMutation = useMutation({
-    mutationFn: async (anuncioId: number) => {
-      if (!user) {
-        toast.error("Faça login para adicionar favoritos");
-        navigate("/auth/signin");
-        throw new Error("Not logged in");
-      }
-
-      const response = await fetch("/api/favoritos/toggle", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          usuarioId: user.id,
-          anuncioId,
-        }),
-      });
-
-      if (!response.ok) throw new Error("Erro ao adicionar favorito");
-      return { ...(await response.json()), anuncioId };
-    },
-    onSuccess: (data) => {
-      setFavoritos((prev) => {
-        const newFavoritos = new Set(prev);
-        if (data.isFavorited) {
-          newFavoritos.add(data.anuncioId);
-          toast.success("Adicionado aos favoritos!");
-        } else {
-          newFavoritos.delete(data.anuncioId);
-          toast.success("Removido dos favoritos");
-        }
-        return newFavoritos;
-      });
-    },
-    onError: () => {
-      // Error is handled, don't show double toast
-    },
-  });
 
   // Fetch all banners
   const { data: bannersData } = useQuery({
@@ -393,8 +329,7 @@ export default function Index() {
           <AnunciosCarousel
             anuncios={destaquedosCarousel1}
             isLoading={allAnunciosLoading}
-            isFavorited={(id) => favoritos.has(id)}
-            onToggleFavorito={(id) => toggleFavoritoMutation.mutate(id)}
+
             emptyMessage="Nenhum anúncio em destaque publicado ainda"
             color="blue"
           />
@@ -418,8 +353,7 @@ export default function Index() {
           <AnunciosCarousel
             anuncios={destaquedosCarousel2}
             isLoading={allAnunciosLoading}
-            isFavorited={(id) => favoritos.has(id)}
-            onToggleFavorito={(id) => toggleFavoritoMutation.mutate(id)}
+
             emptyMessage="Nenhum anúncio em destaque publicado ainda"
             color="blue"
           />
@@ -433,8 +367,7 @@ export default function Index() {
           <AnunciosCarousel
             anuncios={destaquedosCarousel3}
             isLoading={allAnunciosLoading}
-            isFavorited={(id) => favoritos.has(id)}
-            onToggleFavorito={(id) => toggleFavoritoMutation.mutate(id)}
+
             emptyMessage="Nenhum anúncio em destaque publicado ainda"
             color="blue"
           />
@@ -516,8 +449,7 @@ export default function Index() {
           <AnunciosCarousel
             anuncios={destaqueDoacoes}
             isLoading={allAnunciosLoading}
-            isFavorited={(id) => favoritos.has(id)}
-            onToggleFavorito={(id) => toggleFavoritoMutation.mutate(id)}
+
             emptyMessage="Nenhum item gratuito publicado ainda"
             color="green"
           />
@@ -566,8 +498,7 @@ export default function Index() {
           <AnunciosCarousel
             anuncios={destaqueEventos}
             isLoading={allAnunciosLoading}
-            isFavorited={(id) => favoritos.has(id)}
-            onToggleFavorito={(id) => toggleFavoritoMutation.mutate(id)}
+
             emptyMessage="Nenhum evento publicado ainda"
             color="purple"
           />
@@ -611,8 +542,7 @@ export default function Index() {
           <AnunciosCarousel
             anuncios={destaqueAgendas}
             isLoading={allAnunciosLoading}
-            isFavorited={(id) => favoritos.has(id)}
-            onToggleFavorito={(id) => toggleFavoritoMutation.mutate(id)}
+
             emptyMessage="Nenhuma agenda recorrente publicada ainda"
             color="orange"
           />
@@ -654,8 +584,7 @@ export default function Index() {
           <AnunciosCarousel
             anuncios={destaqueOportunidades}
             isLoading={allAnunciosLoading}
-            isFavorited={(id) => favoritos.has(id)}
-            onToggleFavorito={(id) => toggleFavoritoMutation.mutate(id)}
+
             emptyMessage="Nenhuma oportunidade de emprego publicada ainda"
             color="red"
           />

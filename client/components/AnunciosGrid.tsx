@@ -30,8 +30,6 @@ interface Anuncio {
 interface AnunciosGridProps {
   anuncios: Anuncio[];
   isLoading: boolean;
-  isFavorited?: (id: number) => boolean;
-  onToggleFavorito?: (id: number) => void;
   emptyMessage?: string;
   color?: "blue" | "green" | "purple" | "orange";
   adsPerRow?: number;
@@ -73,8 +71,6 @@ const colorClasses = {
 export default function AnunciosGrid({
   anuncios,
   isLoading,
-  isFavorited,
-  onToggleFavorito,
   emptyMessage = "Nenhum anúncio publicado ainda",
   color = "blue",
   adsPerRow = 15,
@@ -98,16 +94,6 @@ export default function AnunciosGrid({
   const totalPages = Math.ceil(anuncios.length / adsPerPage);
   const hasNextPage = currentPage < totalPages - 1;
   const hasPrevPage = currentPage > 0;
-
-  const handleToggleFavorito = (anuncioId: number, e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!user) {
-      toast.error("Faça login para adicionar favoritos");
-      navigate("/auth/signin");
-    } else {
-      onToggleFavorito?.(anuncioId);
-    }
-  };
 
   if (isLoading) {
     return (
@@ -236,28 +222,6 @@ export default function AnunciosGrid({
                 whatsappMessage={`Confira este anúncio: ${anuncio.titulo}`}
                 variant="icon"
               />
-
-              <button
-                onClick={(e) => handleToggleFavorito(anuncio.id, e)}
-                className={`p-2 rounded-full shadow-lg hover:shadow-xl transition-all ${
-                  isFavorited?.(anuncio.id)
-                    ? "bg-yellow-400"
-                    : "bg-white hover:bg-gray-100"
-                }`}
-                title={
-                  isFavorited?.(anuncio.id)
-                    ? "Remover dos favoritos"
-                    : "Adicionar aos favoritos"
-                }
-              >
-                <Star
-                  className={`w-5 h-5 transition-colors ${
-                    isFavorited?.(anuncio.id)
-                      ? "fill-white text-white"
-                      : "text-gray-400"
-                  }`}
-                />
-              </button>
             </div>
 
             {/* Content */}

@@ -22,7 +22,6 @@ import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
-import Favoritos from "./pages/Favoritos";
 import ListaDesejos from "./pages/ListaDesejos";
 import PerfilUsuario from "./pages/PerfilUsuario";
 import CriarAnuncio from "./pages/CriarAnuncio";
@@ -136,7 +135,6 @@ function AppContent() {
           <Route path="/reset-senha" element={<ResetPassword />} />
           <Route path="/verificar-email" element={<VerifyEmail />} />
           <Route path="/test-email" element={<TestEmail />} />
-          <Route path="/favoritos" element={<Favoritos />} />
           <Route path="/lista-desejos" element={<ListaDesejos />} />
           <Route path="/meus-anuncios" element={<MeusAnuncios />} />
           <Route path="/minha-agenda" element={<MinhaAgenda />} />

@@ -34,9 +34,6 @@ export default function ProfileScreen() {
           <Text style={styles.menuItemText}>Meus Anúncios</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.menuItem}>
-          <Text style={styles.menuItemText}>Favoritos</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.menuItem}>
           <Text style={styles.menuItemText}>Configurações</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.menuItem}>

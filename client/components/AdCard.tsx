@@ -13,76 +13,18 @@ import { formatCurrencyDisplay } from "@/utils/formatCurrency";
 
 interface AdCardProps {
   anuncio: any;
-  isFavorited?: boolean;
-  onFavoritoToggle?: (anuncioId: number, isFavorited: boolean) => void;
   variant?: "featured" | "donation";
   anunciante?: any;
 }
 
 export default function AdCard({
   anuncio,
-  isFavorited = false,
-  onFavoritoToggle,
   variant = "featured",
   anunciante,
 }: AdCardProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [showQRCodeModal, setShowQRCodeModal] = useState(false);
-  const [localIsFavorited, setLocalIsFavorited] = useState(isFavorited);
-  const heartButtonRef = useRef<HTMLButtonElement>(null);
-
-  // Sync local state with prop when prop changes
-  useEffect(() => {
-    setLocalIsFavorited(isFavorited);
-  }, [isFavorited]);
-
-  const toggleFavoritoMutation = useMutation({
-    mutationFn: async (anuncioId: number) => {
-      if (!user) {
-        toast.error("Faça login para adicionar favoritos");
-        navigate("/auth/signin");
-        throw new Error("Not logged in");
-      }
-
-      const response = await fetch("/api/favoritos/toggle", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          usuarioId: user.id,
-          anuncioId,
-        }),
-      });
-
-      if (!response.ok) throw new Error("Erro ao adicionar favorito");
-      return response.json();
-    },
-    onSuccess: (data) => {
-      // Update local state to trigger animation
-      setLocalIsFavorited(data.isFavorited);
-
-      // Trigger the data-favorited attribute for CSS animation
-      if (heartButtonRef.current) {
-        heartButtonRef.current.setAttribute('data-favorited', String(data.isFavorited));
-
-        // Reset animation trigger after animation completes
-        setTimeout(() => {
-          if (heartButtonRef.current) {
-            heartButtonRef.current.removeAttribute('data-favorited');
-          }
-        }, 350);
-      }
-
-      // Callback to parent component
-      onFavoritoToggle?.(anuncio.id, data.isFavorited);
-
-      if (data.isFavorited) {
-        toast.success("Adicionado aos favoritos!");
-      } else {
-        toast.success("Removido dos favoritos");
-      }
-    },
-  });
 
   const extractMunicipality = (endereco: string): string => {
     if (!endereco) return "Localização desconhecida";
@@ -112,28 +54,6 @@ export default function AdCard({
 
       {/* Action Buttons Container */}
       <div className="absolute top-3 right-3 z-10 flex gap-2">
-        {/* Favorito Star Button */}
-        <button
-          ref={heartButtonRef}
-          onClick={(e) => {
-            e.stopPropagation();
-            toggleFavoritoMutation.mutate(anuncio.id);
-          }}
-          disabled={toggleFavoritoMutation.isPending}
-          className={`p-2 rounded-full heart-toggle transition-all ${
-            localIsFavorited ? "bg-yellow-400" : "bg-white hover:bg-gray-100"
-          }`}
-          title={
-            localIsFavorited ? "Remover dos favoritos" : "Adicionar aos favoritos"
-          }
-        >
-          <Star
-            className={`w-5 h-5 transition-colors ${
-              localIsFavorited ? "fill-white text-white" : "text-gray-400"
-            }`}
-          />
-        </button>
-
         {/* Wishlist Button */}
         <div onClick={(e) => e.stopPropagation()}>
           <WishlistButton

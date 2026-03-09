@@ -31,8 +31,6 @@ interface Anuncio {
 interface AnunciosCarouselProps {
   anuncios: Anuncio[];
   isLoading: boolean;
-  isFavorited?: (id: number) => boolean;
-  onToggleFavorito?: (id: number) => void;
   emptyMessage?: string;
   color?: "blue" | "green" | "purple" | "orange";
 }
@@ -72,38 +70,16 @@ const colorClasses = {
 export default function AnunciosCarousel({
   anuncios,
   isLoading,
-  isFavorited,
-  onToggleFavorito,
   emptyMessage = "Nenhum anúncio publicado ainda",
   color = "blue",
 }: AnunciosCarouselProps) {
   const navigate = useNavigate();
   const { user } = useAuth();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const heartButtonRefs = useRef<Map<number, HTMLButtonElement>>(new Map());
-  const [animatingIds, setAnimatingIds] = useState<Set<number>>(new Set());
 
   // Ensure color is valid, default to "blue" if not
   const validColor = (color as keyof typeof colorClasses) in colorClasses ? color : "blue";
   const colors = colorClasses[validColor as keyof typeof colorClasses];
-
-  // Trigger animation when favorite status changes
-  useEffect(() => {
-    anuncios.forEach((anuncio) => {
-      const isFav = isFavorited?.(anuncio.id);
-      const button = heartButtonRefs.current.get(anuncio.id);
-      if (button && isFav && !animatingIds.has(anuncio.id)) {
-        setAnimatingIds(prev => new Set([...prev, anuncio.id]));
-        setTimeout(() => {
-          setAnimatingIds(prev => {
-            const next = new Set(prev);
-            next.delete(anuncio.id);
-            return next;
-          });
-        }, 350);
-      }
-    });
-  }, [isFavorited, anuncios, animatingIds]);
 
   const scroll = (direction: "left" | "right") => {
     if (scrollContainerRef.current) {
@@ -112,16 +88,6 @@ export default function AnunciosCarousel({
         left: direction === "left" ? -scrollAmount : scrollAmount,
         behavior: "smooth",
       });
-    }
-  };
-
-  const handleToggleFavorito = (anuncioId: number, e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!user) {
-      toast.error("Faça login para adicionar favoritos");
-      navigate("/auth/signin");
-    } else {
-      onToggleFavorito?.(anuncioId);
     }
   };
 
@@ -244,31 +210,6 @@ export default function AnunciosCarousel({
                   whatsappMessage={`Confira este anúncio: ${anuncio.titulo}`}
                   variant="icon"
                 />
-
-                <button
-                  ref={(el) => {
-                    if (el) heartButtonRefs.current.set(anuncio.id, el);
-                  }}
-                  onClick={(e) => handleToggleFavorito(anuncio.id, e)}
-                  className={`p-2 rounded-full heart-toggle shadow-lg hover:shadow-xl transition-all ${
-                    isFavorited?.(anuncio.id)
-                      ? "bg-yellow-400"
-                      : "bg-white hover:bg-gray-100"
-                  } ${animatingIds.has(anuncio.id) ? "animate-pulse-soft" : ""}`}
-                  title={
-                    isFavorited?.(anuncio.id)
-                      ? "Remover dos favoritos"
-                      : "Adicionar aos favoritos"
-                  }
-                >
-                  <Star
-                    className={`w-5 h-5 transition-colors ${
-                      isFavorited?.(anuncio.id)
-                        ? "fill-white text-white"
-                        : "text-gray-400"
-                    }`}
-                  />
-                </button>
               </div>
 
               {/* Anunciante Avatar - positioned at bottom-left of image */}
