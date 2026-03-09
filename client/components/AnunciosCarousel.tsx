@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import ShareButton from "./ShareButton";
 import AnuncianteIconColor from "./AnuncianteIconColor";
+import { formatCurrencyDisplay } from "@/utils/formatCurrency";
 
 interface Anuncio {
   id: number;
@@ -311,7 +312,7 @@ export default function AnunciosCarousel({
                   }`}
                 >
                   {anuncio.preco && anuncio.preco > 0
-                    ? `R$ ${Number(anuncio.preco).toFixed(2)}`
+                    ? formatCurrencyDisplay(anuncio.preco)
                     : anuncio.aCombinar
                       ? "A Combinar"
                       : anuncio.isDoacao

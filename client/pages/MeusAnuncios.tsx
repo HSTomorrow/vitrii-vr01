@@ -20,6 +20,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
+import { formatCurrencyDisplay } from "@/utils/formatCurrency";
 
 const PIX_KEY = "00020101021126470014br.gov.bcb.pix0125contato@herestomorrow.com520400005303986540519.905802BR5914HERES TOMORROW6009SAO PAULO622905251KHC5J8MPZBEFKH86HJ3H33VE6304A7E5";
 
@@ -323,7 +324,7 @@ export default function MeusAnuncios() {
 
                     {anuncio.preco && (
                       <p className="text-lg font-bold text-vitrii-blue mb-3">
-                        R$ {Number(anuncio.preco).toFixed(2)}
+                        {formatCurrencyDisplay(anuncio.preco)}
                       </p>
                     )}
 

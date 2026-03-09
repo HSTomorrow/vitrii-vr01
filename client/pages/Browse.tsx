@@ -10,6 +10,7 @@ import SearchOverlay from "@/components/SearchOverlay";
 import { useAuth } from "@/contexts/AuthContext";
 import ImageWithFallback from "@/components/ImageWithFallback";
 import { getAnuncioImage, getImageAlt } from "@/utils/imageFallback";
+import { formatCurrencyDisplay } from "@/utils/formatCurrency";
 
 const CATEGORIES = [
   { value: "roupas", label: "Roupas" },
@@ -542,11 +543,7 @@ export default function Browse() {
                               <span className="text-lg font-bold text-vitrii-blue">
                                 {anuncio.isDoacao
                                   ? "Grátis"
-                                  : `R$ ${Number(
-                                      anuncio.preco || 0,
-                                    ).toLocaleString("pt-BR", {
-                                      minimumFractionDigits: 2,
-                                    })}`}
+                                  : formatCurrencyDisplay(anuncio.preco)}
                               </span>
                               <div className="flex items-center space-x-1">
                                 <Star className="w-4 h-4 fill-vitrii-yellow text-vitrii-yellow" />

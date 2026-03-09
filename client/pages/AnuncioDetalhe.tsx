@@ -12,6 +12,7 @@ import WishlistButton from "@/components/WishlistButton";
 import FavoritesButton from "@/components/FavoritesButton";
 import ImageWithFallback from "@/components/ImageWithFallback";
 import { getAnuncioImage, getImageAlt } from "@/utils/imageFallback";
+import { formatCurrencyDisplay } from "@/utils/formatCurrency";
 import {
   ChevronLeft,
   AlertCircle,
@@ -594,7 +595,7 @@ export default function AnuncioDetalhe() {
                   <p className="text-sm opacity-90 mb-1">Preço</p>
                   <div className="flex items-baseline">
                     <span className="text-4xl font-bold">
-                      R$ {Number(anuncio.preco).toFixed(2)}
+                      {formatCurrencyDisplay(anuncio.preco)}
                     </span>
                   </div>
                 </div>

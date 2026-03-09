@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import ShareButton from "./ShareButton";
 import AnuncianteIconColor from "./AnuncianteIconColor";
+import { formatCurrencyDisplay } from "@/utils/formatCurrency";
 
 interface Anuncio {
   id: number;
@@ -293,7 +294,7 @@ export default function AnunciosGrid({
                 >
                   {anuncio.isDoacao
                     ? "Grátis"
-                    : `R$ ${anuncio.preco ? Number(anuncio.preco).toFixed(2) : "0.00"}`}
+                    : formatCurrencyDisplay(anuncio.preco)}
                 </span>
               </div>
 
