@@ -141,12 +141,19 @@ export default function Browse() {
         }
       }
 
-      // Search by title or description
+      // Search by title, description, announcer name, announcer ID, or CNPJ
       if (searchTerm) {
         const searchLower = searchTerm.toLowerCase();
+        // Check if search term is a number (for anuncianteId)
+        const searchAsNumber = parseInt(searchTerm, 10);
+        const isNumericSearch = !isNaN(searchAsNumber) && searchAsNumber.toString() === searchTerm;
+
         const matchesSearch =
           anuncio.titulo?.toLowerCase().includes(searchLower) ||
-          anuncio.descricao?.toLowerCase().includes(searchLower);
+          anuncio.descricao?.toLowerCase().includes(searchLower) ||
+          anuncio.anunciantes?.nome?.toLowerCase().includes(searchLower) ||
+          (isNumericSearch && anuncio.anuncianteId === searchAsNumber) ||
+          (anuncio.anunciantes?.cnpj?.replace(/\D/g, '').includes(searchTerm.replace(/\D/g, '')));
         if (!matchesSearch) return false;
       }
 

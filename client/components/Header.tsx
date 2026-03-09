@@ -43,7 +43,7 @@ export default function Header() {
               <div className="w-full relative">
                 <input
                   type="text"
-                  placeholder="Buscar anúncios, anunciantes, eventos..."
+                  placeholder="Buscar: nome, ID do anunciante, CNPJ..."
                   onKeyDown={(e) => {
                     if (
                       e.key === "Enter" &&
@@ -180,7 +180,7 @@ export default function Header() {
             <div className="relative">
               <input
                 type="text"
-                placeholder="Buscar anúncios, anunciantes..."
+                placeholder="Buscar: nome, ID, CNPJ..."
                 onKeyDown={(e) => {
                   if (
                     e.key === "Enter" &&
@@ -192,7 +192,7 @@ export default function Header() {
                   }
                 }}
                 className="w-full px-4 py-2 pl-10 bg-vitrii-gray border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-vitrii-blue"
-                title="Busque por anúncios, anunciantes, eventos, agendas e doações"
+                title="Busque por nome, ID do anunciante ou CNPJ"
               />
               <Search className="absolute left-3 top-2.5 text-gray-400 w-5 h-5" />
             </div>

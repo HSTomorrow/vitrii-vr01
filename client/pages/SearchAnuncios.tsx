@@ -80,11 +80,36 @@ export default function SearchAnuncios() {
     // Filter by search term
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
+      // Check if search term is a number (for anuncianteId)
+      const searchAsNumber = parseInt(term, 10);
+      const isNumericSearch = !isNaN(searchAsNumber) && searchAsNumber.toString() === term;
+
       ads = ads.filter(
-        (ad: any) =>
-          ad.titulo.toLowerCase().includes(term) ||
-          ad.descricao?.toLowerCase().includes(term) ||
-          ad.anunciantes?.nome?.toLowerCase().includes(term),
+        (ad: any) => {
+          // Search by title or description
+          if (ad.titulo.toLowerCase().includes(term) ||
+              ad.descricao?.toLowerCase().includes(term)) {
+            return true;
+          }
+
+          // Search by announcer name
+          if (ad.anunciantes?.nome?.toLowerCase().includes(term)) {
+            return true;
+          }
+
+          // Search by CNPJ (remove non-digits for comparison)
+          const cnpj = ad.anunciantes?.cnpj?.replace(/\D/g, '');
+          if (cnpj && cnpj.includes(term.replace(/\D/g, ''))) {
+            return true;
+          }
+
+          // Search by announcer ID (numeric search)
+          if (isNumericSearch && ad.anuncianteId === searchAsNumber) {
+            return true;
+          }
+
+          return false;
+        }
       );
     }
 
@@ -150,11 +175,32 @@ export default function SearchAnuncios() {
     // Filter by search term
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
+      // Check if search term is a number (for anuncianteId)
+      const searchAsNumber = parseInt(term, 10);
+      const isNumericSearch = !isNaN(searchAsNumber) && searchAsNumber.toString() === term;
+
       anunciantes = anunciantes.filter(
-        (anunciante: any) =>
-          anunciante.nome?.toLowerCase().includes(term) ||
-          anunciante.descricao?.toLowerCase().includes(term) ||
-          anunciante.cidade?.toLowerCase().includes(term),
+        (anunciante: any) => {
+          // Search by name or description or city
+          if (anunciante.nome?.toLowerCase().includes(term) ||
+              anunciante.descricao?.toLowerCase().includes(term) ||
+              anunciante.cidade?.toLowerCase().includes(term)) {
+            return true;
+          }
+
+          // Search by CNPJ (remove non-digits for comparison)
+          const cnpj = anunciante.cnpj?.replace(/\D/g, '');
+          if (cnpj && cnpj.includes(term.replace(/\D/g, ''))) {
+            return true;
+          }
+
+          // Search by announcer ID (numeric search)
+          if (isNumericSearch && anunciante.id === searchAsNumber) {
+            return true;
+          }
+
+          return false;
+        }
       );
     }
 
