@@ -703,8 +703,7 @@ export const removePermissao: RequestHandler = async (req, res) => {
 export const listarUsuariosListaDesejosParaAnuncio: RequestHandler = async (req, res) => {
   try {
     const { anuncioId } = req.params;
-    const usuarioId = parseInt(req.headers["x-user-id"] as string || "0");
-    const isAdmin = req.headers["x-is-admin"] === "true";
+    const usuarioId = (req as any).userId;
 
     const id = parseInt(anuncioId);
 
@@ -712,6 +711,13 @@ export const listarUsuariosListaDesejosParaAnuncio: RequestHandler = async (req,
       return res.status(400).json({
         success: false,
         error: "anuncioId inválido",
+      });
+    }
+
+    if (!usuarioId) {
+      return res.status(401).json({
+        success: false,
+        error: "Usuário não autenticado",
       });
     }
 
@@ -731,6 +737,24 @@ export const listarUsuariosListaDesejosParaAnuncio: RequestHandler = async (req,
         error: "Anúncio não encontrado",
       });
     }
+
+    // Check if user is admin
+    const user = await prisma.usracessos.findUnique({
+      where: { id: usuarioId },
+      select: {
+        id: true,
+        tipoUsuario: true,
+      },
+    });
+
+    if (!user) {
+      return res.status(401).json({
+        success: false,
+        error: "Usuário não encontrado",
+      });
+    }
+
+    const isAdmin = user.tipoUsuario === "adm";
 
     // Check permissions: only owner or admin can view
     if (anuncio.usuarioId !== usuarioId && !isAdmin) {
