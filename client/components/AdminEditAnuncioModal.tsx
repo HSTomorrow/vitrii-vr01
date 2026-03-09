@@ -46,11 +46,26 @@ export default function AdminEditAnuncioModal({
   // Update form when anuncio changes
   useEffect(() => {
     if (anuncio && isOpen) {
+      console.log("[AdminEditAnuncioModal] Loading anuncio:", anuncio);
+
+      // Parse dataFim properly
+      let dataFimValue = "";
+      if (anuncio.dataFim) {
+        try {
+          const date = new Date(anuncio.dataFim);
+          if (!isNaN(date.getTime())) {
+            dataFimValue = date.toISOString().split('T')[0];
+          }
+        } catch (e) {
+          console.error("[AdminEditAnuncioModal] Error parsing dataFim:", e);
+        }
+      }
+
       setFormData({
         titulo: anuncio.titulo || "",
         descricao: anuncio.descricao || "",
         imagem: anuncio.imagem || "",
-        preco: anuncio.preco ? anuncio.preco.toString() : "",
+        preco: anuncio.preco ? parseFloat(anuncio.preco).toString() : "",
         anuncianteId: anuncio.anuncianteId || 0,
         destaque: anuncio.destaque || false,
         status: anuncio.status || "ativo",
@@ -58,8 +73,10 @@ export default function AdminEditAnuncioModal({
         isDoacao: anuncio.isDoacao || false,
         aCombinar: anuncio.aCombinar || false,
         tipo: anuncio.tipo || "produto",
-        dataFim: anuncio.dataFim ? new Date(anuncio.dataFim).toISOString().split('T')[0] : "",
+        dataFim: dataFimValue,
       });
+      console.log("[AdminEditAnuncioModal] dataFim raw value:", anuncio.dataFim);
+      console.log("[AdminEditAnuncioModal] dataFim parsed value:", dataFimValue);
       setErrors({});
     }
   }, [anuncio, isOpen]);
@@ -67,26 +84,29 @@ export default function AdminEditAnuncioModal({
   // Mutation to update anuncio
   const updateMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
+      const payload = {
+        titulo: data.titulo,
+        descricao: data.descricao,
+        fotoUrl: data.imagem,
+        preco: data.isDoacao ? 0 : (data.preco ? parseFloat(data.preco) : null),
+        anuncianteId: parseInt(data.anuncianteId.toString()),
+        destaque: data.destaque,
+        status: data.status,
+        statusPagamento: data.statusPagamento,
+        isDoacao: data.isDoacao,
+        aCombinar: data.aCombinar,
+        tipo: data.tipo,
+        dataFim: data.dataFim ? new Date(data.dataFim).toISOString() : null,
+      };
+      console.log("[AdminEditAnuncioModal] Sending payload:", payload);
+
       const response = await fetch(`/api/anuncios/${anuncio.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
           "x-user-id": userId?.toString() || "",
         },
-        body: JSON.stringify({
-          titulo: data.titulo,
-          descricao: data.descricao,
-          fotoUrl: data.imagem,
-          preco: data.isDoacao ? 0 : (data.preco ? parseFloat(data.preco) : null),
-          anuncianteId: parseInt(data.anuncianteId.toString()),
-          destaque: data.destaque,
-          status: data.status,
-          statusPagamento: data.statusPagamento,
-          isDoacao: data.isDoacao,
-          aCombinar: data.aCombinar,
-          tipo: data.tipo,
-          dataFim: data.dataFim ? new Date(data.dataFim).toISOString() : null,
-        }),
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -140,6 +160,7 @@ export default function AdminEditAnuncioModal({
 
   const handleSubmit = () => {
     if (validateForm()) {
+      console.log("[AdminEditAnuncioModal] Submitting form with dataFim:", formData.dataFim);
       updateMutation.mutate(formData);
     }
   };

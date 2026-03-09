@@ -188,6 +188,7 @@ export const getAnuncios: RequestHandler = async (req, res) => {
           statusPagamento: true,
           dataCriacao: true,
           dataAtualizacao: true,
+          dataFim: true,
           cidade: true,
           estado: true,
           visualizacoes: true,
@@ -726,14 +727,16 @@ export const updateAnuncio: RequestHandler = async (req, res) => {
     });
 
     const isAdmin = user?.tipoUsuario === "adm";
+    console.log("[updateAnuncio] isAdmin:", isAdmin, "updateData.dataFim:", updateData.dataFim);
 
     if (isAdmin && updateData.dataFim) {
       // Admin can set custom dataFim
       const customDataFim = typeof updateData.dataFim === "string"
         ? new Date(updateData.dataFim)
         : updateData.dataFim;
+      console.log("[updateAnuncio] Setting custom dataFim:", customDataFim);
       mappedData.dataFim = customDataFim;
-    } else if (updateData.anuncianteId || updateData.anuncianteId === 0) {
+    } else if (updateData.anuncianteId !== undefined) {
       // If anuncianteId is being changed, recalculate dataFim based on new anunciante type
       const newAnuncianteId = updateData.anuncianteId || currentAd.anuncianteId;
       const newAnunciante = await prisma.anunciantes.findUnique({
@@ -743,7 +746,27 @@ export const updateAnuncio: RequestHandler = async (req, res) => {
 
       if (newAnunciante) {
         const newDataFim = calculateDataFim(newAnunciante.tipo, null);
+        console.log("[updateAnuncio] Recalculating dataFim due to anuncianteId change:", newDataFim);
         mappedData.dataFim = newDataFim;
+      }
+    } else {
+      // Ensure ad always has a dataFim - if missing, calculate it based on current anunciante
+      const existingAd = await prisma.anuncios.findUnique({
+        where: { id: adId },
+        select: { dataFim: true, anuncianteId: true },
+      });
+
+      if (!existingAd?.dataFim) {
+        const currentAnunciante = await prisma.anunciantes.findUnique({
+          where: { id: currentAd.anuncianteId },
+          select: { tipo: true },
+        });
+
+        if (currentAnunciante) {
+          const calculatedDataFim = calculateDataFim(currentAnunciante.tipo, null);
+          console.log("[updateAnuncio] Calculating missing dataFim:", calculatedDataFim);
+          mappedData.dataFim = calculatedDataFim;
+        }
       }
     }
 
