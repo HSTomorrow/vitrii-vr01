@@ -34,7 +34,7 @@ export function formatNumberToCurrency(value: string | number): string {
 /**
  * Parse Brazilian currency input to number
  * Handles both comma (,) and dot (.) as decimal separator
- * Example: "1.000,50" => 1000.50 | "1000.50" => 1000.50
+ * Example: "1.000,50" => 1000.50 | "1000.50" => 1000.50 | "19.90" => 19.90
  */
 export function parseCurrencyInput(value: string): number | null {
   if (!value || value.trim() === "") return null;
@@ -42,25 +42,35 @@ export function parseCurrencyInput(value: string): number | null {
   // Remove spaces and normalize
   let normalized = value.trim();
 
-  // Replace comma with dot for parsing
-  // But first check if there's a dot followed by comma (European format)
-  // or comma followed by dot (Brazilian format)
-  if (normalized.includes(",")) {
+  // If the value is empty string or just whitespace, return null
+  if (normalized.length === 0) return null;
+
+  // Check if this looks like a properly formatted Brazilian currency (with comma)
+  if (normalized.includes(",") && normalized.includes(".")) {
+    // Already in Brazilian format: 1.000,50
     // Remove thousand separators (dots) and replace comma with dot
     normalized = normalized.replace(/\./g, "").replace(",", ".");
-  } else if (normalized.lastIndexOf(".") > -1) {
-    // Assume US format or just dots as thousand separators
+  } else if (normalized.includes(",")) {
+    // Only comma: could be "1,50" or thousands with comma: "1000,50"
+    // Replace comma with dot
+    normalized = normalized.replace(",", ".");
+  } else if (normalized.includes(".")) {
+    // Only dots - could be US format (1000.50) or Brazilian thousand separator (1.000)
     const parts = normalized.split(".");
     if (parts.length > 2) {
-      // Multiple dots = thousand separators, keep last as decimal
+      // Multiple dots: assume thousand separators, keep last as decimal
       normalized = parts.join("").slice(0, -2) + "." + parts[parts.length - 1];
     }
-    // Otherwise it's already in correct format
+    // Otherwise it's already in correct format (single dot as decimal)
   }
+  // No dots or commas: just digits, no conversion needed
 
   const num = parseFloat(normalized);
 
-  return isNaN(num) ? null : num;
+  // Validate the result
+  if (isNaN(num) || !isFinite(num)) return null;
+
+  return num;
 }
 
 /**

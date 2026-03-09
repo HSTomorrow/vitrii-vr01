@@ -266,7 +266,15 @@ export default function AnuncioForm({
   useEffect(() => {
     if (anuncioData?.data) {
       const ad = anuncioData.data;
-      console.log("Loading anuncio data for editing:", ad);
+      console.log("[AnuncioForm] Loading anuncio data for editing:", {
+        ...ad,
+        precoOriginal: ad.preco,
+        precoType: typeof ad.preco,
+      });
+
+      // Ensure preco is stored as a clean numeric string
+      const precoAsString = ad.preco ? String(ad.preco).trim() : "";
+      console.log("[AnuncioForm] Preco value set to:", precoAsString);
 
       setSelectedAnuncianteId(ad.anuncianteId);
       setFormData({
@@ -276,7 +284,7 @@ export default function AnuncioForm({
         tabelaDePrecoId: ad.tabelaDePrecoId || 0,
         fotoUrl: ad.imagem || "",
         link: ad.link || "",
-        precoAnuncio: ad.preco ? ad.preco.toString() : "",
+        precoAnuncio: precoAsString,
         dataValidade: ad.dataValidade
           ? new Date(ad.dataValidade).toISOString().split("T")[0]
           : getDefaultValidityDate(),
@@ -328,13 +336,28 @@ export default function AnuncioForm({
         normalizedTipo = "aulas_cursos";
       }
 
+      // Parse preco carefully
+      let precoFinal: number | null = null;
+      if (data.aCombinar) {
+        precoFinal = 0;
+      } else if (data.precoAnuncio) {
+        // Use our custom parser to handle Brazilian format properly
+        const parsed = parseCurrencyInput(data.precoAnuncio);
+        precoFinal = parsed !== null ? parsed : null;
+        console.log("[AnuncioForm] Preco parsing:", {
+          input: data.precoAnuncio,
+          parsed: precoFinal,
+          type: typeof precoFinal,
+        });
+      }
+
       const payload = {
         usuarioId: user?.id,
         titulo: data.titulo,
         descricao: data.descricao,
         fotoUrl: data.fotoUrl,
         link: data.link || null,
-        precoAnuncio: data.aCombinar ? 0 : (data.precoAnuncio ? parseFloat(data.precoAnuncio) : null),
+        precoAnuncio: precoFinal,
         anuncianteId: selectedAnuncianteId,
         productId: data.productId > 0 ? data.productId : null,
         tabelaDePrecoId: data.tabelaDePrecoId > 0 ? data.tabelaDePrecoId : null,
@@ -747,15 +770,19 @@ export default function AnuncioForm({
                     inputMode="decimal"
                     value={
                       formData.isDoacao || formData.aCombinar
-                        ? ""
+                        ? "0,00"
                         : formData.precoAnuncio
                           ? formatNumberToCurrency(formData.precoAnuncio)
                           : ""
                     }
                     onChange={(e) => {
+                      const inputValue = e.target.value;
+                      console.log("[AnuncioForm] Preço input changed:", inputValue);
+
                       if (!formData.isDoacao && !formData.aCombinar) {
-                        const parsed = parseCurrencyInput(e.target.value);
-                        handleInputChange("precoAnuncio", parsed ? String(parsed) : "");
+                        const parsed = parseCurrencyInput(inputValue);
+                        console.log("[AnuncioForm] Parsed price:", parsed);
+                        handleInputChange("precoAnuncio", parsed !== null ? String(parsed) : "");
                       }
                     }}
                     disabled={formData.isDoacao || formData.aCombinar}
