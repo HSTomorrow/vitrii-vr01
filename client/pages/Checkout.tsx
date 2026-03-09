@@ -11,6 +11,7 @@ import {
   Upload,
   X,
 } from "lucide-react";
+import { formatCurrencyDisplay } from "@/utils/formatCurrency";
 
 export default function Checkout() {
   const { anuncioId: paramAnuncioId } = useParams<{ anuncioId: string }>();
@@ -554,7 +555,7 @@ export default function Checkout() {
                           Valor:
                         </span>
                         <span className="font-bold text-vitrii-blue">
-                          R$ {Number(payment.valor).toFixed(2)}
+                          {formatCurrencyDisplay(payment.valor)}
                         </span>
                       </div>
                     </div>

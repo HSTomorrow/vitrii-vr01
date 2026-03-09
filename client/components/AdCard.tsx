@@ -9,6 +9,7 @@ import ImageZoom from "./ImageZoom";
 import QRCodeModal from "./QRCodeModal";
 import WishlistButton from "./WishlistButton";
 import { getAnuncioImage, getImageAlt, getAnuncianteInitials } from "@/utils/imageFallback";
+import { formatCurrencyDisplay } from "@/utils/formatCurrency";
 
 interface AdCardProps {
   anuncio: any;
@@ -213,7 +214,7 @@ export default function AdCard({
           >
             {isDonation
               ? "Grátis"
-              : `R$ ${anuncio.tabelaDePreco?.preco ? Number(anuncio.tabelaDePreco.preco).toFixed(2) : "0.00"}`}
+              : formatCurrencyDisplay(anuncio.tabelaDePreco?.preco)}
           </span>
         </div>
 

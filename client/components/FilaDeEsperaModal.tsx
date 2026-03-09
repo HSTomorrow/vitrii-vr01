@@ -4,6 +4,7 @@ import { X, Plus, Info } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import ContatoSelectorModal from "./ContatoSelectorModal";
 import ContactDetailsModal from "./ContactDetailsModal";
+import { parseCurrencyInput, formatNumberToCurrency } from "@/utils/formatCurrency";
 
 interface Contato {
   id: number;
@@ -392,12 +393,14 @@ export default function FilaDeEsperaModal({
                 R$
               </span>
               <input
-                type="number"
-                step="0.01"
-                min="0"
+                type="text"
+                inputMode="decimal"
                 placeholder="0,00"
-                value={valor}
-                onChange={(e) => setValor(e.target.value)}
+                value={valor ? formatNumberToCurrency(valor) : ""}
+                onChange={(e) => {
+                  const parsed = parseCurrencyInput(e.target.value);
+                  setValor(parsed ? String(parsed) : "");
+                }}
                 className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue text-sm"
               />
             </div>

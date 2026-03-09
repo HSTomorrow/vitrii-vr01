@@ -11,6 +11,7 @@ import {
   X,
 } from "lucide-react";
 import { useState } from "react";
+import { formatCurrencyDisplay } from "@/utils/formatCurrency";
 
 interface Pagamento {
   id: number;
@@ -225,7 +226,7 @@ export default function AdminPagamentos() {
                       {/* Valor */}
                       <div className="text-right min-w-[120px]">
                         <p className="text-2xl font-bold text-vitrii-blue">
-                          R$ {Number(pagamento.valor).toFixed(2)}
+                          {formatCurrencyDisplay(pagamento.valor)}
                         </p>
                       </div>
                     </div>
@@ -284,7 +285,7 @@ export default function AdminPagamentos() {
                           Valor
                         </p>
                         <p className="font-bold text-vitrii-blue">
-                          R$ {Number(pagamento.valor).toFixed(2)}
+                          {formatCurrencyDisplay(pagamento.valor)}
                         </p>
                       </div>
                     </div>

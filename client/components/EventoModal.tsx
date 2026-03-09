@@ -3,6 +3,7 @@ import { X, ChevronDown, Plus, Info } from "lucide-react";
 import { toast } from "sonner";
 import ContatoSelectorModal from "./ContatoSelectorModal";
 import ContactDetailsModal from "./ContactDetailsModal";
+import { parseCurrencyInput, formatNumberToCurrency } from "@/utils/formatCurrency";
 
 interface Evento {
   id: number;
@@ -420,14 +421,14 @@ export default function EventoModal({
                 R$
               </span>
               <input
-                type="number"
-                step="0.01"
-                min="0"
+                type="text"
+                inputMode="decimal"
                 placeholder="0,00"
-                value={formData.valor}
-                onChange={(e) =>
-                  setFormData({ ...formData, valor: e.target.value })
-                }
+                value={formData.valor ? formatNumberToCurrency(formData.valor) : ""}
+                onChange={(e) => {
+                  const parsed = parseCurrencyInput(e.target.value);
+                  setFormData({ ...formData, valor: parsed ? String(parsed) : "" });
+                }}
                 className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue text-sm"
               />
             </div>

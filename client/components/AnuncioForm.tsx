@@ -16,6 +16,7 @@ import CreateProductoModal from "./CreateProductoModal";
 import MultiImageUpload from "./MultiImageUpload";
 import { BRAZILIAN_STATES } from "@shared/brazilianStates";
 import { TIPO_ANUNCIO_OPTIONS, TIPO_ANUNCIO_DESCRIPTIONS } from "@/constants/anuncioTypes";
+import { parseCurrencyInput, formatNumberToCurrency } from "@/utils/formatCurrency";
 
 interface AnuncioFormProps {
   anuncianteId?: number;
@@ -742,24 +743,30 @@ export default function AnuncioForm({
                 <div className="flex items-center gap-2 flex-1">
                   <span className="text-vitrii-text font-semibold text-lg min-w-10">R$</span>
                   <input
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    value={formData.isDoacao || formData.aCombinar ? "0" : formData.precoAnuncio}
-                    onChange={(e) =>
-                      !formData.isDoacao &&
-                      !formData.aCombinar &&
-                      handleInputChange("precoAnuncio", e.target.value)
+                    type="text"
+                    inputMode="decimal"
+                    value={
+                      formData.isDoacao || formData.aCombinar
+                        ? ""
+                        : formData.precoAnuncio
+                          ? formatNumberToCurrency(formData.precoAnuncio)
+                          : ""
                     }
+                    onChange={(e) => {
+                      if (!formData.isDoacao && !formData.aCombinar) {
+                        const parsed = parseCurrencyInput(e.target.value);
+                        handleInputChange("precoAnuncio", parsed ? String(parsed) : "");
+                      }
+                    }}
                     disabled={formData.isDoacao || formData.aCombinar}
                     placeholder={
                       formData.isDoacao
-                        ? "0.00 (Gratuito)"
+                        ? "0,00 (Gratuito)"
                         : formData.aCombinar
-                          ? "0.00 (A Combinar)"
+                          ? "0,00 (A Combinar)"
                           : selectedPriceTable
-                          ? `Ex: ${Number(selectedPriceTable.preco).toFixed(2)}`
-                          : "Ex: 99.90"
+                          ? `Ex: ${Number(selectedPriceTable.preco).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                          : "Ex: 99,90"
                     }
                     className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent text-lg ${
                       formData.isDoacao || formData.aCombinar ? "bg-gray-100 cursor-not-allowed" : ""
@@ -778,7 +785,7 @@ export default function AnuncioForm({
                     {(
                       Number(selectedPriceTable.preco) -
                       Number(formData.precoAnuncio)
-                    ).toFixed(2)}
+                    ).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                   </p>
                 )}
             </div>
