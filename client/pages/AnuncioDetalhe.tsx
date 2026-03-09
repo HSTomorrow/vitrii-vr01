@@ -376,7 +376,7 @@ export default function AnuncioDetalhe() {
                   </>
                 )}
               </div>
-              <div className="flex items-center gap-4 text-vitrii-text-secondary mt-2 mb-2">
+              <div className="space-y-1 text-vitrii-text-secondary mt-2 mb-2">
                 <div className="flex items-center gap-1">
                   <Eye className="w-4 h-4" />
                   <span>Visualizações: {anuncio.visualizacoes || 0}</span>
@@ -386,96 +386,15 @@ export default function AnuncioDetalhe() {
                   <span>ID: #{anuncio.id}</span>
                 </div>
               </div>
-              <p className="text-sm text-vitrii-text-secondary">
+              <p className="text-sm text-vitrii-text-secondary min-h-[1.75rem] flex items-center">
                 Publicado por:{" "}
-                <span className="font-semibold text-vitrii-text">
+                <span className="font-semibold text-vitrii-text ml-1">
                   {anuncio.anunciantes?.nome || "Anunciante desconhecido"}
                 </span>
               </p>
             </div>
 
             {/* Action Buttons - Only show if user can edit */}
-            {canEdit && (
-              <div className="flex gap-2 flex-wrap">
-                {!isInactive && (
-                  <Link
-                    to={`/anuncio/${id}/editar`}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors font-semibold"
-                  >
-                    <Edit className="w-4 h-4" />
-                    Editar
-                  </Link>
-                )}
-                <button
-                  onClick={() => {
-                    if (isInactive) {
-                      activateMutation.mutate();
-                    } else {
-                      if (
-                        confirm(
-                          "Tem certeza que deseja inativar este anúncio? Ele deixará de aparecer na busca.",
-                        )
-                      ) {
-                        inactivateMutation.mutate();
-                      }
-                    }
-                  }}
-                  disabled={
-                    inactivateMutation.isPending || activateMutation.isPending
-                  }
-                  className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors disabled:opacity-50 ${
-                    isInactive
-                      ? "bg-green-500 text-white hover:bg-green-600"
-                      : "bg-orange-500 text-white hover:bg-orange-600"
-                  }`}
-                >
-                  {isInactive ? (
-                    <>
-                      <RotateCcw className="w-4 h-4" />
-                      Reativar
-                    </>
-                  ) : (
-                    <>
-                      <Power className="w-4 h-4" />
-                      Inativar
-                    </>
-                  )}
-                </button>
-                {/* Admin-only: Toggle Featured status */}
-                {user?.tipoUsuario === "adm" && (
-                  <button
-                    onClick={() => destacueMutation.mutate()}
-                    disabled={destacueMutation.isPending}
-                    className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors disabled:opacity-50 ${
-                      anuncio.destaque
-                        ? "bg-yellow-500 text-white hover:bg-yellow-600"
-                        : "bg-gray-400 text-white hover:bg-gray-500"
-                    }`}
-                  >
-                    <Star className="w-4 h-4" />
-                    {anuncio.destaque
-                      ? "Remover do Destaque"
-                      : "Adicionar ao Destaque"}
-                  </button>
-                )}
-                <button
-                  onClick={() => {
-                    if (
-                      confirm(
-                        "Tem certeza que deseja deletar este anúncio? Isso não pode ser desfeito.",
-                      )
-                    ) {
-                      deleteMutation.mutate();
-                    }
-                  }}
-                  disabled={deleteMutation.isPending}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-semibold disabled:opacity-50"
-                >
-                  <Trash2 className="w-4 h-4" />
-                  Deletar
-                </button>
-              </div>
-            )}
           </div>
 
           {/* Grid Layout */}
@@ -525,6 +444,89 @@ export default function AnuncioDetalhe() {
                 <p className="text-vitrii-text-secondary whitespace-pre-wrap leading-relaxed">
                   {anuncio.descricao || "Sem descrição adicional"}
                 </p>
+
+                {/* Action Buttons - Below description */}
+                {canEdit && (
+                  <div className="flex gap-2 flex-wrap mt-6 pt-6 border-t border-gray-200">
+                    {!isInactive && (
+                      <Link
+                        to={`/anuncio/${id}/editar`}
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors font-semibold"
+                      >
+                        <Edit className="w-4 h-4" />
+                        Editar
+                      </Link>
+                    )}
+                    <button
+                      onClick={() => {
+                        if (isInactive) {
+                          activateMutation.mutate();
+                        } else {
+                          if (
+                            confirm(
+                              "Tem certeza que deseja inativar este anúncio? Ele deixará de aparecer na busca.",
+                            )
+                          ) {
+                            inactivateMutation.mutate();
+                          }
+                        }
+                      }}
+                      disabled={
+                        inactivateMutation.isPending || activateMutation.isPending
+                      }
+                      className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors disabled:opacity-50 ${
+                        isInactive
+                          ? "bg-green-500 text-white hover:bg-green-600"
+                          : "bg-orange-500 text-white hover:bg-orange-600"
+                      }`}
+                    >
+                      {isInactive ? (
+                        <>
+                          <RotateCcw className="w-4 h-4" />
+                          Reativar
+                        </>
+                      ) : (
+                        <>
+                          <Power className="w-4 h-4" />
+                          Inativar
+                        </>
+                      )}
+                    </button>
+                    {/* Admin-only: Toggle Featured status */}
+                    {user?.tipoUsuario === "adm" && (
+                      <button
+                        onClick={() => destacueMutation.mutate()}
+                        disabled={destacueMutation.isPending}
+                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors disabled:opacity-50 ${
+                          anuncio.destaque
+                            ? "bg-yellow-500 text-white hover:bg-yellow-600"
+                            : "bg-gray-400 text-white hover:bg-gray-500"
+                        }`}
+                      >
+                        <Star className="w-4 h-4" />
+                        {anuncio.destaque
+                          ? "Remover do Destaque"
+                          : "Adicionar ao Destaque"}
+                      </button>
+                    )}
+                    <button
+                      onClick={() => {
+                        if (
+                          confirm(
+                            "Tem certeza que deseja deletar este anúncio? Isso não pode ser desfeito.",
+                          )
+                        ) {
+                          deleteMutation.mutate();
+                        }
+                      }}
+                      disabled={deleteMutation.isPending}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-semibold disabled:opacity-50"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      Deletar
+                    </button>
+                  </div>
+                )}
               </div>
 
               {/* Product Details */}

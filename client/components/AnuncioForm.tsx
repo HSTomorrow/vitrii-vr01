@@ -494,9 +494,61 @@ export default function AnuncioForm({
           queryClient.invalidateQueries({ queryKey: ["banners"] });
           navigate("/");
         }, 500);
-      } else if (anuncioId && onSuccess) {
-        console.log("[AnuncioForm] Editing mode, calling onSuccess callback");
-        onSuccess();
+      } else if (anuncioId) {
+        console.log("[AnuncioForm] Editing mode, syncing photos");
+
+        // Sync photos: delete removed ones and add new ones
+        try {
+          const existingPhotos = fotosData?.data || [];
+          const existingIds = new Set(existingPhotos.map((f: any) => f.id));
+          const uploadedIds = new Set(uploadedImages.filter((img: any) => img.id).map((img: any) => img.id));
+
+          // Delete photos that were removed
+          for (const foto of existingPhotos) {
+            if (!uploadedImages.some((img: any) => img.id === foto.id)) {
+              console.log("[AnuncioForm] Deleting photo:", foto.id);
+              const headers: Record<string, string> = {};
+              if (user?.id) {
+                headers["x-user-id"] = user.id.toString();
+              }
+              await fetch(`/api/anuncios/${anuncioId}/fotos/${foto.id}`, {
+                method: "DELETE",
+                headers,
+              });
+            }
+          }
+
+          // Add new photos (those without ID, meaning they were just uploaded)
+          for (const image of uploadedImages) {
+            if (!image.id) {
+              console.log("[AnuncioForm] Adding new photo:", image.url);
+              const headers: Record<string, string> = {
+                "Content-Type": "application/json",
+              };
+              if (user?.id) {
+                headers["x-user-id"] = user.id.toString();
+              }
+              await fetch(`/api/anuncios/${anuncioId}/fotos`, {
+                method: "POST",
+                headers,
+                body: JSON.stringify({ url: image.url }),
+              });
+            }
+          }
+
+          // Invalidate photos query to refresh
+          queryClient.invalidateQueries({ queryKey: ["anuncio-fotos", anuncioId] });
+
+          console.log("[AnuncioForm] Photos synced successfully");
+        } catch (error) {
+          console.error("[AnuncioForm] Error syncing photos:", error);
+          toast.warning("Anúncio atualizado, mas houve erro ao sincronizar imagens");
+        }
+
+        if (onSuccess) {
+          console.log("[AnuncioForm] Calling onSuccess callback");
+          onSuccess();
+        }
       }
     },
     onError: (error) => {
