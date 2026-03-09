@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { AlertCircle } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import AnuncioForm from "@/components/AnuncioForm";
+import AnuncioFormContainer from "@/components/AnuncioFormContainer";
 
 export default function CriarAnuncio() {
   const navigate = useNavigate();
@@ -64,7 +64,7 @@ export default function CriarAnuncio() {
     <div className="min-h-screen flex flex-col bg-vitrii-gray-light">
       <Header />
       <main className="flex-1">
-        <AnuncioForm
+        <AnuncioFormContainer
           onSuccess={() => navigate("/sell")}
           isDonation={isDonation}
           anuncioTipo={anuncioTipo}
