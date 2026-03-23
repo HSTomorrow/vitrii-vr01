@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Heart, X, Plus, Loader, Check, AlertCircle, CheckCircle } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -36,6 +37,7 @@ export default function WishlistModal({
   anuncioPreco,
 }: WishlistModalProps) {
   const { user, isLoggedIn } = useAuth();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [step, setStep] = useState<ModalStep>("choice");
   const [selectedListaId, setSelectedListaId] = useState<number | null>(null);
@@ -212,7 +214,10 @@ export default function WishlistModal({
               Você precisa estar logado para reservar ou adicionar à lista de desejos
             </p>
             <button
-              onClick={() => handleCloseModal()}
+              onClick={() => {
+                onOpenChange(false);
+                navigate("/auth/signin");
+              }}
               className="inline-flex items-center gap-2 bg-vitrii-blue text-white px-6 py-2 rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors"
             >
               Fazer Login
