@@ -197,8 +197,23 @@ export default function AnuncioDetalhe() {
 
   const equipes = equipesData?.data || [];
   const membros = membrosData?.data || [];
-  const fotos = fotosData?.data || [];
+  const fotosBase = fotosData?.data || [];
   const quantidadeInfo = quantidadeData?.data;
+
+  // Combine primary image with other photos for the gallery
+  const fotos = anuncio?.imagem
+    ? [
+        {
+          id: 0, // Special ID for primary image
+          url: anuncio.imagem,
+          ordem: 0,
+        },
+        ...fotosBase.map((foto: any, index: number) => ({
+          ...foto,
+          ordem: index + 1, // Shift ordem values to account for primary image
+        })),
+      ]
+    : fotosBase;
 
   // Check if there are any available members in any team
   const temMembrosDisponiveis = equipes.some((equipe) =>
@@ -641,9 +656,9 @@ export default function AnuncioDetalhe() {
                       </div>
 
                       {/* Disponível */}
-                      <div className="bg-green-50 p-4 rounded-lg border border-green-100">
+                      <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                         <p className="text-xs text-gray-600 mb-1 font-medium">Disponível</p>
-                        <p className="text-3xl font-bold text-green-600">{quantidadeInfo.quantidade_disponivel}</p>
+                        <p className="text-3xl font-bold text-gray-700">{quantidadeInfo.quantidade_disponivel}</p>
                       </div>
 
                       {/* Reservadas */}
