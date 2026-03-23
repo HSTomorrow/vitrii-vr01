@@ -1,6 +1,11 @@
 import { Router, Request, Response } from "express";
 import prisma from "../lib/prisma";
 import { extractUserId } from "../middleware/permissionGuard";
+import {
+  notifyReservationCreated,
+  notifyProductFullyReserved,
+  getAnuncianteContactInfo,
+} from "../lib/notificationService";
 
 const router = Router();
 
@@ -106,10 +111,40 @@ export const criarReserva = async (req: Request, res: Response) => {
         data: { status: "Reservado" },
       });
 
-      // TODO: Send notification to announcer when product is fully reserved
+      // Send notification to announcer when product is fully reserved
       console.log(
         `[reservas-anuncio] Produto ${anuncio.titulo} (ID: ${id}) foi totalmente reservado!`
       );
+
+      const anuncianteInfo = await getAnuncianteContactInfo(anuncio.anuncianteId);
+      if (anuncianteInfo && anuncianteInfo.email) {
+        await notifyProductFullyReserved({
+          recipientEmail: anuncianteInfo.email,
+          recipientName: anuncianteInfo.nome,
+          anuncioId: id,
+          anuncioTitulo: anuncio.titulo,
+        });
+      }
+    } else {
+      // Send notification to announcer when reservation is created
+      const anuncianteInfo = await getAnuncianteContactInfo(anuncio.anuncianteId);
+      if (anuncianteInfo && anuncianteInfo.email) {
+        const usuario = await prisma.usracessos.findUnique({
+          where: { id: usuarioId },
+          select: { nome: true, email: true, telefone: true, whatsapp: true },
+        });
+
+        await notifyReservationCreated({
+          recipientEmail: anuncianteInfo.email,
+          recipientName: anuncianteInfo.nome,
+          anuncioId: id,
+          anuncioTitulo: anuncio.titulo,
+          usuarioNome: usuario?.nome,
+          usuarioEmail: usuario?.email,
+          usuarioTelefone: usuario?.telefone || undefined,
+          usuarioWhatsapp: usuario?.whatsapp || undefined,
+        });
+      }
     }
 
     res.status(201).json({
@@ -317,6 +352,31 @@ export const cancelarReserva = async (req: Request, res: Response) => {
         await prisma.anuncios.update({
           where: { id: aId },
           data: { status: "ativo" },
+        });
+      }
+    }
+
+    // Send cancellation notification to announcer
+    const anuncioData = await prisma.anuncios.findUnique({
+      where: { id: aId },
+      select: { titulo: true, anuncianteId: true },
+    });
+
+    if (anuncioData) {
+      const anuncianteInfo = await getAnuncianteContactInfo(anuncioData.anuncianteId);
+      const cancelledUserInfo = await prisma.usracessos.findUnique({
+        where: { id: reserva.usuarioId },
+        select: { nome: true },
+      });
+
+      if (anuncianteInfo && anuncianteInfo.email && cancelledUserInfo) {
+        const { notifyReservationCancelled } = await import("../lib/notificationService");
+        await notifyReservationCancelled({
+          recipientEmail: anuncianteInfo.email,
+          recipientName: anuncianteInfo.nome,
+          anuncioId: aId,
+          anuncioTitulo: anuncioData.titulo,
+          usuarioNome: cancelledUserInfo.nome,
         });
       }
     }

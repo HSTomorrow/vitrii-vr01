@@ -10,6 +10,7 @@ import ShareModal from "@/components/ShareModal";
 import QRCodeModal from "@/components/QRCodeModal";
 import WishlistButton from "@/components/WishlistButton";
 import ImageWithFallback from "@/components/ImageWithFallback";
+import ReservationManagementPanel from "@/components/ReservationManagementPanel";
 import { getAnuncioImage, getImageAlt } from "@/utils/imageFallback";
 import { formatCurrencyDisplay } from "@/utils/formatCurrency";
 import {
@@ -488,6 +489,14 @@ export default function AnuncioDetalhe() {
                         </>
                       )}
                     </button>
+                    {/* Reservation Management Panel */}
+                    <ReservationManagementPanel
+                      anuncioId={anuncio.id}
+                      anuncioTitulo={anuncio.titulo}
+                      isAdmin={user?.tipoUsuario === "adm"}
+                      userId={user?.id}
+                    />
+
                     {/* Admin-only: Toggle Featured status */}
                     {user?.tipoUsuario === "adm" && (
                       <button
