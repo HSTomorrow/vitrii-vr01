@@ -103,6 +103,63 @@ export const criarReserva = async (req: Request, res: Response) => {
       });
     }
 
+    // Automatically add to wishlist when reservation is created
+    try {
+      // Get or create default wishlist for user
+      let lista = await prisma.listas_desejos.findFirst({
+        where: {
+          usuarioId,
+          status: "privado",
+        },
+        select: { id: true },
+      });
+
+      // Create default wishlist if it doesn't exist
+      if (!lista) {
+        lista = await prisma.listas_desejos.create({
+          data: {
+            usuarioId,
+            titulo: "Minha Lista de Desejos",
+            status: "privado",
+          },
+          select: { id: true },
+        });
+      }
+
+      // Check if item already in wishlist
+      const existingItem = await prisma.listas_desejos_itens.findFirst({
+        where: {
+          listaId: lista.id,
+          anuncioId: id,
+        },
+      });
+
+      // Add to wishlist if not already there
+      if (!existingItem) {
+        await prisma.listas_desejos_itens.create({
+          data: {
+            listaId: lista.id,
+            tipo: "anuncio",
+            titulo: anuncio.titulo,
+            descricao: anuncio.descricao,
+            preco: anuncio.preco ? parseFloat(anuncio.preco.toString()) : undefined,
+            anuncioId: id,
+            imagem: anuncio.imagem,
+          },
+        });
+      }
+
+      console.log(
+        `[reservas-anuncio] Anúncio ${anuncio.titulo} (ID: ${id}) adicionado à lista de desejos do usuário ${usuarioId}`
+      );
+    } catch (wishlistError) {
+      console.warn(
+        "[reservas-anuncio] Erro ao adicionar à lista de desejos:",
+        wishlistError instanceof Error ? wishlistError.message : wishlistError
+      );
+      // Don't fail the reservation if wishlist addition fails
+    }
+
     // Check if quantity reached 0 and update ad status to "Reservado"
     const novaQuantidadeDisponivel = quantidadeDisponivel - 1;
     if (novaQuantidadeDisponivel <= 0) {

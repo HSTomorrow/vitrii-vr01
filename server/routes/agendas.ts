@@ -6,7 +6,7 @@ import { z } from "zod";
 const AgendaCreateSchema = z.object({
   anuncianteId: z.number().int().positive("Anunciante é obrigatório"),
   anuncioId: z.number().int().positive("Anúncio é obrigatório"),
-  dataHora: z.string().datetime("Data e hora devem estar em formato ISO"),
+  titulo: z.string().optional(),
   descricao: z.string().optional().nullable(),
   usuarioId: z.number().int().positive().optional().nullable(),
   status: z
@@ -26,12 +26,8 @@ export const getAgendas: RequestHandler = async (req, res) => {
     if (anuncioId) where.anuncioId = parseInt(anuncioId as string);
     if (status) where.status = status;
 
-    // Date range filter
-    if (dataInicio || dataFim) {
-      where.dataHora = {};
-      if (dataInicio) where.dataHora.gte = new Date(dataInicio as string);
-      if (dataFim) where.dataHora.lte = new Date(dataFim as string);
-    }
+    // Note: Date range filtering is not supported on agendas table
+    // Use slots_agenda table for date-based filtering instead
 
     const agendas = await prisma.agendas.findMany({
       where,
@@ -50,7 +46,7 @@ export const getAgendas: RequestHandler = async (req, res) => {
           },
         },
       },
-      orderBy: { dataHora: "asc" },
+      orderBy: { dataCriacao: "asc" },
     });
 
     res.json({
@@ -116,12 +112,11 @@ export const createAgenda: RequestHandler = async (req, res) => {
   try {
     const validatedData = AgendaCreateSchema.parse(req.body);
 
-    // Check if the time slot is already occupied
+    // Check if agenda already exists for this anunciante and anuncio
     const existingAgenda = await prisma.agendas.findFirst({
       where: {
         anuncianteId: validatedData.anuncianteId,
         anuncioId: validatedData.anuncioId,
-        dataHora: new Date(validatedData.dataHora),
         status: { not: "cancelado" },
       },
     });
@@ -129,7 +124,7 @@ export const createAgenda: RequestHandler = async (req, res) => {
     if (existingAgenda) {
       return res.status(400).json({
         success: false,
-        error: "Este horário já está ocupado. Consulte a lista de espera.",
+        error: "Uma agenda já existe para este anúncio.",
       });
     }
 
@@ -137,7 +132,7 @@ export const createAgenda: RequestHandler = async (req, res) => {
       data: {
         anuncianteId: validatedData.anuncianteId,
         anuncioId: validatedData.anuncioId,
-        dataHora: new Date(validatedData.dataHora),
+        titulo: validatedData.titulo || "Agenda",
         descricao: validatedData.descricao,
         status: validatedData.status || "disponivel",
       },
@@ -299,32 +294,14 @@ export const addToWaitlist: RequestHandler = async (req, res) => {
       });
     }
 
-    // Check if user is already in waitlist for this slot
-    const existingWaitlist = await prisma.agendas.findFirst({
-      where: {
-        anuncianteId: agendaOcupada.anuncianteId,
-        anuncioId: agendaOcupada.anuncioId,
-        dataHora: agendaOcupada.dataHora,
-        status: "fila_espera",
-      },
-    });
-
-    if (existingWaitlist) {
-      return res.status(400).json({
-        success: false,
-        error: "Este usuário já está na lista de espera para este horário",
-      });
-    }
-
     // Create waitlist entry using Agenda model
     const waitlistEntry = await prisma.agendas.create({
       data: {
         anuncianteId: agendaOcupada.anuncianteId,
         anuncioId: agendaOcupada.anuncioId,
-        dataHora: agendaOcupada.dataHora,
         titulo: `Fila: ${agendaOcupada.titulo}`,
         status: "fila_espera", // Custom status for waitlist
-        descricao: `Fila de espera para ${agendaOcupada.dataHora.toLocaleDateString("pt-BR")}`,
+        descricao: `Fila de espera para ${agendaOcupada.titulo}`,
       },
     });
 
@@ -375,7 +352,6 @@ export const getWaitlist: RequestHandler = async (req, res) => {
       where: {
         anuncianteId: agenda.anuncianteId,
         anuncioId: agenda.anuncioId,
-        dataHora: agenda.dataHora,
         status: "fila_espera",
       },
       orderBy: { dataCriacao: "asc" }, // First in, first out
@@ -440,7 +416,6 @@ export const promoteFromWaitlist: RequestHandler = async (req, res) => {
       where: {
         anuncianteId: agenda.anuncianteId,
         anuncioId: agenda.anuncioId,
-        dataHora: agenda.dataHora,
         status: "fila_espera",
       },
       orderBy: { dataCriacao: "asc" },
