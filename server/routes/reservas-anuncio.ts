@@ -104,8 +104,10 @@ export const criarReserva = async (req: Request, res: Response) => {
     }
 
     // Automatically add to wishlist when reservation is created
+    console.log(`[reservas-anuncio] Iniciando adição à lista de desejos para anúncio ${id}`);
     try {
       // Get or create default wishlist for user
+      console.log(`[reservas-anuncio] Procurando lista de desejos para usuário ${usuarioId}`);
       let lista = await prisma.listas_desejos.findFirst({
         where: {
           usuarioId,
@@ -116,6 +118,7 @@ export const criarReserva = async (req: Request, res: Response) => {
 
       // Create default wishlist if it doesn't exist
       if (!lista) {
+        console.log(`[reservas-anuncio] Criando nova lista de desejos para usuário ${usuarioId}`);
         lista = await prisma.listas_desejos.create({
           data: {
             usuarioId,
@@ -124,6 +127,9 @@ export const criarReserva = async (req: Request, res: Response) => {
           },
           select: { id: true },
         });
+        console.log(`[reservas-anuncio] Nova lista criada com ID ${lista.id}`);
+      } else {
+        console.log(`[reservas-anuncio] Lista existente encontrada com ID ${lista.id}`);
       }
 
       // Check if item already in wishlist
@@ -136,7 +142,8 @@ export const criarReserva = async (req: Request, res: Response) => {
 
       // Add to wishlist if not already there
       if (!existingItem) {
-        await prisma.listas_desejos_itens.create({
+        console.log(`[reservas-anuncio] Adicionando anúncio ${id} à lista ${lista.id}`);
+        const newItem = await prisma.listas_desejos_itens.create({
           data: {
             listaId: lista.id,
             tipo: "anuncio",
@@ -147,14 +154,17 @@ export const criarReserva = async (req: Request, res: Response) => {
             imagem: anuncio.imagem,
           },
         });
+        console.log(`[reservas-anuncio] Item adicionado com sucesso, ID: ${newItem.id}`);
+      } else {
+        console.log(`[reservas-anuncio] Anúncio ${id} já estava na lista de desejos`);
       }
 
       console.log(
-        `[reservas-anuncio] Anúncio ${anuncio.titulo} (ID: ${id}) adicionado à lista de desejos do usuário ${usuarioId}`
+        `[reservas-anuncio] ✅ Anúncio ${anuncio.titulo} (ID: ${id}) adicionado à lista de desejos do usuário ${usuarioId}`
       );
     } catch (wishlistError) {
-      console.warn(
-        "[reservas-anuncio] Erro ao adicionar à lista de desejos:",
+      console.error(
+        "[reservas-anuncio] ❌ Erro ao adicionar à lista de desejos:",
         wishlistError instanceof Error ? wishlistError.message : wishlistError
       );
       // Don't fail the reservation if wishlist addition fails
