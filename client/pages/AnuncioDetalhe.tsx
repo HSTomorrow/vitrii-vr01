@@ -201,11 +201,11 @@ export default function AnuncioDetalhe() {
   const quantidadeInfo = quantidadeData?.data;
 
   // Combine primary image with other photos for the gallery
-  const fotos = anuncio?.imagem
+  const fotos = data?.data?.imagem
     ? [
         {
           id: 0, // Special ID for primary image
-          url: anuncio.imagem,
+          url: data.data.imagem,
           ordem: 0,
         },
         ...fotosBase.map((foto: any, index: number) => ({
