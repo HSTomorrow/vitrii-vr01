@@ -50,7 +50,7 @@ export default function WishlistButton({
         className={`w-full flex items-center justify-center gap-2 px-4 py-2 border-2 border-purple-300 text-purple-600 rounded-lg font-semibold hover:bg-purple-50 transition-colors text-sm ${className}`}
       >
         <Gift className="w-4 h-4" />
-        Lista de Desejos
+        Solicitar Reservas e Lista de Desejos
       </button>
       <WishlistModal
         open={showModal}
