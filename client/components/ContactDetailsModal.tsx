@@ -135,7 +135,7 @@ export default function ContactDetailsModal({
                 fallbackIcon={<User className="w-12 h-12 text-vitrii-blue" />}
                 containerClassName="w-full h-full bg-vitrii-gray-light"
                 className="w-full h-full object-cover"
-                fallbackInitials={getUserInitials(contato)}
+                initials={getUserInitials(contato)}
               />
             </div>
 

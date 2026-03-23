@@ -1,6 +1,8 @@
 import { RequestHandler } from "express";
 import prisma from "../lib/prisma";
 import { z } from "zod";
+import fs from "fs";
+import path from "path";
 import {
   ANUNCIO_STATUS,
   VALID_UPDATE_STATUS,
@@ -1035,12 +1037,15 @@ export const deleteAnuncio: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
+    const anuncioId = parseInt(id);
+
     // Get ad details before deletion to check status
     const anuncio = await prisma.anuncios.findUnique({
-      where: { id: parseInt(id) },
+      where: { id: anuncioId },
       select: {
         status: true,
         usuarioId: true,
+        imagem: true,
       },
     });
 
@@ -1051,9 +1056,43 @@ export const deleteAnuncio: RequestHandler = async (req, res) => {
       });
     }
 
-    // Delete the ad
+    // Get all associated gallery photos before deletion
+    const fotos = await prisma.fotos_anuncio.findMany({
+      where: { anuncio_id: anuncioId },
+      select: { url: true },
+    });
+
+    // Delete physical files for all photos
+    const filesToDelete = [];
+
+    // Include primary image if it exists
+    if (anuncio.imagem) {
+      filesToDelete.push(anuncio.imagem);
+    }
+
+    // Include gallery photos
+    filesToDelete.push(...fotos.map(f => f.url));
+
+    // Delete physical files
+    for (const fileUrl of filesToDelete) {
+      try {
+        const urlPath = new URL(fileUrl, "http://localhost").pathname;
+        const filename = path.basename(urlPath);
+        const filePath = path.join(process.cwd(), "public", "uploads", filename);
+
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+          console.log(`[deleteAnuncio] ✅ Arquivo deletado: ${filePath}`);
+        }
+      } catch (fileError) {
+        console.warn(`[deleteAnuncio] ⚠️ Erro ao deletar arquivo ${fileUrl}:`, fileError);
+        // Don't fail the operation if file deletion fails
+      }
+    }
+
+    // Delete the ad (cascade will delete gallery photos from DB)
     await prisma.anuncios.delete({
-      where: { id: parseInt(id) },
+      where: { id: anuncioId },
     });
 
     // Decrement active ads counter if ad was active
@@ -1682,6 +1721,7 @@ export const deleteAnuncioFoto: RequestHandler = async (req, res) => {
       where: { id: photoId },
       select: {
         id: true,
+        url: true,
         anuncio_id: true,
         criado_por: true,
         ordem: true,
@@ -1719,7 +1759,28 @@ export const deleteAnuncioFoto: RequestHandler = async (req, res) => {
       });
     }
 
-    // Delete the photo
+    // Delete physical file if it exists
+    if (foto.url) {
+      try {
+        // Extract filename from URL (handle both /uploads/filename and full URLs)
+        const urlPath = new URL(foto.url, "http://localhost").pathname;
+        const filename = path.basename(urlPath);
+        const filePath = path.join(process.cwd(), "public", "uploads", filename);
+
+        // Check if file exists and delete it
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+          console.log(`[deleteAnuncioFoto] ✅ Arquivo deletado: ${filePath}`);
+        } else {
+          console.warn(`[deleteAnuncioFoto] ⚠️ Arquivo não encontrado: ${filePath}`);
+        }
+      } catch (fileError) {
+        console.error("[deleteAnuncioFoto] ❌ Erro ao deletar arquivo:", fileError);
+        // Don't fail the operation if file deletion fails
+      }
+    }
+
+    // Delete the photo from database
     await prisma.fotos_anuncio.delete({
       where: { id: photoId },
     });

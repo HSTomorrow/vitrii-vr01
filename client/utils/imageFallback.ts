@@ -118,15 +118,30 @@ export function getUserInitials(
 /**
  * Build a complete image URL or return null
  * Validates that the URL is not empty or whitespace
+ * For relative URLs (starting with /), converts to absolute if APP_URL is available
+ * This ensures mobile apps can properly load images with absolute URLs
  */
 export function normalizeImageUrl(url?: string | null): string | null {
   if (!url) return null;
   const trimmed = url.trim();
   if (!trimmed) return null;
-  // Basic validation: should start with http:// or https:// or data:
+
+  // Already an absolute URL or data URL
   if (trimmed.startsWith("http://") || trimmed.startsWith("https://") || trimmed.startsWith("data:")) {
     return trimmed;
   }
+
+  // Relative URL - try to make it absolute for mobile compatibility
+  if (trimmed.startsWith("/")) {
+    // Try to get the app URL from window (set by main.tsx on startup)
+    const appUrl = (window as any).APP_URL;
+    if (appUrl) {
+      return `${appUrl}${trimmed}`;
+    }
+    // If no app URL available, return the relative URL anyway (works in web browsers)
+    return trimmed;
+  }
+
   return null;
 }
 

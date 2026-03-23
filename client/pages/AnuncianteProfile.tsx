@@ -220,7 +220,7 @@ export default function AnuncianteProfile() {
               fallbackIcon={<Store className="w-24 h-24 text-white opacity-50" />}
               containerClassName="w-full h-full"
               className="w-full h-full object-cover"
-              fallbackInitials={getAnuncianteInitials(anunciante)}
+              initials={getAnuncianteInitials(anunciante)}
             />
           </div>
 

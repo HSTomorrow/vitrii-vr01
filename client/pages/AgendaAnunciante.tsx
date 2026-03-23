@@ -160,7 +160,7 @@ export default function AgendaAnunciante() {
                 fallbackIcon={<Store className="w-8 h-8 text-vitrii-blue" />}
                 containerClassName="w-full h-full bg-vitrii-gray-light"
                 className="w-full h-full object-cover"
-                fallbackInitials={getAnuncianteInitials(anunciante)}
+                initials={getAnuncianteInitials(anunciante)}
               />
             </div>
             <div className="flex-1">

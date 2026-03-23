@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import ShareButton from "./ShareButton";
 import AnuncianteIconColor from "./AnuncianteIconColor";
+import ImageWithFallback from "./ImageWithFallback";
 import { formatCurrencyDisplay } from "@/utils/formatCurrency";
 
 interface Anuncio {
@@ -167,15 +168,14 @@ export default function AnunciosCarousel({
                       : "from-vitrii-blue to-vitrii-blue-dark"
               }`}
             >
-              {anuncio.imagem ? (
-                <img
-                  src={anuncio.imagem}
-                  alt={anuncio.titulo}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                />
-              ) : (
-                <Package className="w-10 h-10 text-white opacity-50" />
-              )}
+              <ImageWithFallback
+                src={anuncio.imagem}
+                alt={anuncio.titulo}
+                fallbackIcon={<Package className="w-10 h-10 text-white opacity-50" />}
+                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                containerClassName="w-full h-full"
+                fallbackBgColor={`${anuncio.isDoacao ? "bg-gradient-to-br from-green-400 to-green-600" : "bg-gradient-to-br from-orange-400 to-orange-600"}`}
+              />
               <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
               {anuncio.isDoacao && (

@@ -843,7 +843,7 @@ export default function CadastroContatos() {
                           }
                           containerClassName="w-full h-full bg-vitrii-gray-light"
                           className="w-full h-full object-cover"
-                          fallbackInitials={getUserInitials(contato)}
+                          initials={getUserInitials(contato)}
                         />
                       </div>
 

@@ -139,7 +139,11 @@ export const handleUpload: RequestHandler = (req, res) => {
     });
 
     // Build the URL for the uploaded file
-    const fileUrl = `/uploads/${req.file.filename}`;
+    const relativePath = `/uploads/${req.file.filename}`;
+
+    // For mobile app compatibility, return absolute URL if APP_URL is set
+    const appUrl = process.env.APP_URL;
+    const fileUrl = appUrl ? `${appUrl}${relativePath}` : relativePath;
 
     res.status(200).json({
       success: true,

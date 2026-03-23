@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, X, Package } from "lucide-react";
 import { Button } from "./ui/button";
 import ImageZoomModal from "./ImageZoomModal";
+import ImageWithFallback from "./ImageWithFallback";
 import { useAuth } from "@/contexts/AuthContext";
 
 export interface GalleryPhoto {
@@ -133,17 +134,20 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
     <div className="w-full space-y-4">
       {/* Main Image */}
       <div
-        className="relative w-full bg-gray-100 rounded-lg overflow-hidden cursor-pointer aspect-square"
+        className="relative w-full rounded-lg overflow-hidden cursor-pointer aspect-square"
         onClick={() => setIsZoomed(true)}
       >
         {selectedPhoto ? (
-          <img
+          <ImageWithFallback
             src={selectedPhoto.url}
             alt={`Foto ${selectedIndex + 1}`}
+            fallbackIcon={<Package className="w-16 h-16 text-gray-600" />}
             className="w-full h-full object-cover"
+            containerClassName="w-full h-full"
+            fallbackBgColor="bg-gray-100"
           />
         ) : (
-          <div className="flex items-center justify-center h-full text-gray-400">
+          <div className="flex items-center justify-center h-full text-gray-400 bg-gray-100">
             Sem imagem
           </div>
         )}
@@ -204,17 +208,20 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({
               <div key={photo.id} className="relative flex-shrink-0">
                 <button
                   onClick={() => setSelectedIndex(index)}
-                  className={`relative w-20 h-20 rounded-lg overflow-hidden transition border-2 ${
+                  className={`relative w-20 h-20 rounded-lg overflow-hidden transition border-2 p-0 ${
                     selectedIndex === index
                       ? "border-vitrii-blue shadow-lg"
                       : "border-gray-200 hover:border-gray-300"
                   }`}
                   title={index === 0 ? "Imagem principal" : `Foto ${index + 1}`}
                 >
-                  <img
+                  <ImageWithFallback
                     src={photo.url}
                     alt={`Thumbnail ${index + 1}`}
+                    fallbackIcon={<Package className="w-4 h-4 text-gray-400" />}
                     className="w-full h-full object-cover"
+                    containerClassName="w-full h-full"
+                    fallbackBgColor="bg-gray-100"
                   />
                 </button>
 

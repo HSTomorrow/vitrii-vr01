@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { ImageOff, Package, User, Store } from "lucide-react";
 
 interface ImageWithFallbackProps {
@@ -51,6 +51,14 @@ export default function ImageWithFallback({
 }: ImageWithFallbackProps) {
   const [isBroken, setIsBroken] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+
+  // Reset broken state when src changes (critical for carousels)
+  useEffect(() => {
+    if (src && isBroken) {
+      setIsBroken(false);
+      setIsLoading(true);
+    }
+  }, [src, isBroken]);
 
   const hasImage = src && !isBroken;
 
