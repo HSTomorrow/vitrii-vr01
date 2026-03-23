@@ -22,6 +22,7 @@ import {
   Phone,
   Star,
   Gift,
+  Mail,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
@@ -289,6 +290,16 @@ export default function Menu() {
                       <FileText className="w-6 h-6 text-orange-700" />
                       <span className="text-orange-900 font-medium">
                         Gerenciar Anúncios
+                      </span>
+                    </Link>
+
+                    <Link
+                      to="/test-email"
+                      className="flex items-center gap-4 px-6 py-4 bg-blue-100 hover:bg-blue-200 rounded-lg transition-colors border border-blue-300"
+                    >
+                      <Mail className="w-6 h-6 text-blue-700" />
+                      <span className="text-blue-900 font-medium">
+                        Teste de Email SMTP
                       </span>
                     </Link>
                   </div>
