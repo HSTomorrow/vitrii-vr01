@@ -5,7 +5,7 @@ import { z } from "zod";
 // Schema validation for creating/updating agenda
 const AgendaCreateSchema = z.object({
   anuncianteId: z.number().int().positive("Anunciante é obrigatório"),
-  productId: z.number().int().positive("Produto é obrigatório"),
+  anuncioId: z.number().int().positive("Anúncio é obrigatório"),
   dataHora: z.string().datetime("Data e hora devem estar em formato ISO"),
   descricao: z.string().optional().nullable(),
   usuarioId: z.number().int().positive().optional().nullable(),
@@ -13,18 +13,17 @@ const AgendaCreateSchema = z.object({
     .enum(["disponivel", "ocupado", "cancelado"])
     .optional()
     .default("disponivel"),
-  isActive: z.boolean().optional().default(true),
 });
 
 // GET all agenda slots for an anunciante
 export const getAgendas: RequestHandler = async (req, res) => {
   try {
-    const { anuncianteId, productId, dataInicio, dataFim, status } = req.query;
+    const { anuncianteId, anuncioId, dataInicio, dataFim, status } = req.query;
 
-    const where: any = { isActive: true };
+    const where: any = {};
 
     if (anuncianteId) where.anuncianteId = parseInt(anuncianteId as string);
-    if (productId) where.productId = parseInt(productId as string);
+    if (anuncioId) where.anuncioId = parseInt(anuncioId as string);
     if (status) where.status = status;
 
     // Date range filter
@@ -44,18 +43,10 @@ export const getAgendas: RequestHandler = async (req, res) => {
             fotoUrl: true,
           },
         },
-        producto: {
+        anuncio: {
           select: {
             id: true,
-            nome: true,
-          },
-        },
-        usuario: {
-          select: {
-            id: true,
-            nome: true,
-            email: true,
-            telefone: true,
+            titulo: true,
           },
         },
       },
@@ -91,18 +82,10 @@ export const getAgendaById: RequestHandler = async (req, res) => {
             fotoUrl: true,
           },
         },
-        producto: {
+        anuncio: {
           select: {
             id: true,
-            nome: true,
-          },
-        },
-        usuario: {
-          select: {
-            id: true,
-            nome: true,
-            email: true,
-            telefone: true,
+            titulo: true,
           },
         },
       },
@@ -137,9 +120,8 @@ export const createAgenda: RequestHandler = async (req, res) => {
     const existingAgenda = await prisma.agendas.findFirst({
       where: {
         anuncianteId: validatedData.anuncianteId,
-        productId: validatedData.productId,
+        anuncioId: validatedData.anuncioId,
         dataHora: new Date(validatedData.dataHora),
-        isActive: true,
         status: { not: "cancelado" },
       },
     });
@@ -154,12 +136,10 @@ export const createAgenda: RequestHandler = async (req, res) => {
     const agenda = await prisma.agendas.create({
       data: {
         anuncianteId: validatedData.anuncianteId,
-        productId: validatedData.productId,
+        anuncioId: validatedData.anuncioId,
         dataHora: new Date(validatedData.dataHora),
         descricao: validatedData.descricao,
-        usuarioId: validatedData.usuarioId,
         status: validatedData.status || "disponivel",
-        isActive: validatedData.isActive !== false,
       },
       include: {
         anunciante: {
@@ -168,17 +148,10 @@ export const createAgenda: RequestHandler = async (req, res) => {
             nome: true,
           },
         },
-        producto: {
+        anuncio: {
           select: {
             id: true,
-            nome: true,
-          },
-        },
-        usuario: {
-          select: {
-            id: true,
-            nome: true,
-            email: true,
+            titulo: true,
           },
         },
       },
@@ -214,7 +187,7 @@ export const createAgenda: RequestHandler = async (req, res) => {
 export const updateAgendaStatus: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
-    const { status, usuarioId } = req.body;
+    const { status } = req.body;
 
     const validStatuses = ["disponivel", "ocupado", "cancelado"];
     if (!validStatuses.includes(status)) {
@@ -228,7 +201,6 @@ export const updateAgendaStatus: RequestHandler = async (req, res) => {
       where: { id: parseInt(id) },
       data: {
         status,
-        usuarioId: status === "ocupado" ? usuarioId || undefined : null,
       },
       include: {
         anunciante: {
@@ -237,17 +209,10 @@ export const updateAgendaStatus: RequestHandler = async (req, res) => {
             nome: true,
           },
         },
-        producto: {
+        anuncio: {
           select: {
             id: true,
-            nome: true,
-          },
-        },
-        usuario: {
-          select: {
-            id: true,
-            nome: true,
-            email: true,
+            titulo: true,
           },
         },
       },
@@ -267,14 +232,14 @@ export const updateAgendaStatus: RequestHandler = async (req, res) => {
   }
 };
 
-// DELETE agenda (logical deletion)
+// DELETE agenda (logical deletion via status)
 export const deleteAgenda: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
     const agenda = await prisma.agendas.update({
       where: { id: parseInt(id) },
-      data: { isActive: false },
+      data: { status: "cancelado" },
       include: {
         anunciante: {
           select: {
@@ -282,10 +247,10 @@ export const deleteAgenda: RequestHandler = async (req, res) => {
             nome: true,
           },
         },
-        producto: {
+        anuncio: {
           select: {
             id: true,
-            nome: true,
+            titulo: true,
           },
         },
       },
@@ -338,11 +303,9 @@ export const addToWaitlist: RequestHandler = async (req, res) => {
     const existingWaitlist = await prisma.agendas.findFirst({
       where: {
         anuncianteId: agendaOcupada.anuncianteId,
-        productId: agendaOcupada.productId,
+        anuncioId: agendaOcupada.anuncioId,
         dataHora: agendaOcupada.dataHora,
-        usuarioId: validatedData.usuarioId,
         status: "fila_espera",
-        isActive: true,
       },
     });
 
@@ -357,22 +320,11 @@ export const addToWaitlist: RequestHandler = async (req, res) => {
     const waitlistEntry = await prisma.agendas.create({
       data: {
         anuncianteId: agendaOcupada.anuncianteId,
-        productId: agendaOcupada.productId,
+        anuncioId: agendaOcupada.anuncioId,
         dataHora: agendaOcupada.dataHora,
-        usuarioId: validatedData.usuarioId,
+        titulo: `Fila: ${agendaOcupada.titulo}`,
         status: "fila_espera", // Custom status for waitlist
         descricao: `Fila de espera para ${agendaOcupada.dataHora.toLocaleDateString("pt-BR")}`,
-        isActive: true,
-      },
-      include: {
-        usuario: {
-          select: {
-            id: true,
-            nome: true,
-            email: true,
-            telefone: true,
-          },
-        },
       },
     });
 
@@ -422,20 +374,9 @@ export const getWaitlist: RequestHandler = async (req, res) => {
     const waitlist = await prisma.agendas.findMany({
       where: {
         anuncianteId: agenda.anuncianteId,
-        productId: agenda.productId,
+        anuncioId: agenda.anuncioId,
         dataHora: agenda.dataHora,
         status: "fila_espera",
-        isActive: true,
-      },
-      include: {
-        usuario: {
-          select: {
-            id: true,
-            nome: true,
-            email: true,
-            telefone: true,
-          },
-        },
       },
       orderBy: { dataCriacao: "asc" }, // First in, first out
     });
@@ -461,16 +402,7 @@ export const removeFromWaitlist: RequestHandler = async (req, res) => {
 
     const waitlistEntry = await prisma.agendas.update({
       where: { id: parseInt(waitlistId) },
-      data: { isActive: false },
-      include: {
-        usuario: {
-          select: {
-            id: true,
-            nome: true,
-            email: true,
-          },
-        },
-      },
+      data: { status: "cancelado" },
     });
 
     res.json({
@@ -507,22 +439,11 @@ export const promoteFromWaitlist: RequestHandler = async (req, res) => {
     const firstInWaitlist = await prisma.agendas.findFirst({
       where: {
         anuncianteId: agenda.anuncianteId,
-        productId: agenda.productId,
+        anuncioId: agenda.anuncioId,
         dataHora: agenda.dataHora,
         status: "fila_espera",
-        isActive: true,
       },
       orderBy: { dataCriacao: "asc" },
-      include: {
-        usuario: {
-          select: {
-            id: true,
-            nome: true,
-            email: true,
-            telefone: true,
-          },
-        },
-      },
     });
 
     if (!firstInWaitlist) {
@@ -537,14 +458,13 @@ export const promoteFromWaitlist: RequestHandler = async (req, res) => {
       where: { id: parseInt(agendaId) },
       data: {
         status: "disponivel",
-        usuarioId: null,
       },
     });
 
     // Remove the promoted person from waitlist
     await prisma.agendas.update({
       where: { id: firstInWaitlist.id },
-      data: { isActive: false },
+      data: { status: "cancelado" },
     });
 
     res.json({

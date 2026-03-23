@@ -499,6 +499,54 @@ export async function sendWelcomeEmail(
   }
 }
 
+// GENERIC EMAIL - Used by notification service and other modules
+export async function sendEmail(
+  options: {
+    to: string;
+    subject: string;
+    html: string;
+    from?: string;
+    text?: string;
+  }
+): Promise<boolean> {
+  try {
+    const { to, subject, html, from, text } = options;
+
+    if (!isValidEmail(to)) {
+      console.error(`❌ Email inválido: ${to}`);
+      return false;
+    }
+
+    const transporter = await getTransporter();
+    const mailOptions = {
+      from: from || process.env.MAIL_FROM || "noreply@vitrii.com",
+      to,
+      bcc: ["contato@herestomorrow.com"],
+      subject,
+      html,
+      text: text || html.replace(/<[^>]*>/g, ''), // Strip HTML if no text version provided
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`✅ Email enviado com sucesso`);
+    console.log(`   - Para: ${to}`);
+    console.log(`   - Assunto: ${subject}`);
+    console.log(`   - De: ${mailOptions.from}`);
+    console.log(`   - Message ID: ${info.messageId}`);
+
+    if (process.env.NODE_ENV !== "production") {
+      console.log(`   - Preview URL: ${nodemailer.getTestMessageUrl(info)}`);
+    }
+
+    return true;
+  } catch (error) {
+    console.error("❌ Erro ao enviar email genérico:", error);
+    console.error("   - Destinatário:", options.to);
+    console.error("   - Assunto:", options.subject);
+    return false;
+  }
+}
+
 // TEST EMAIL - Simple test email function
 export async function sendTestEmail(
   toEmail: string,
