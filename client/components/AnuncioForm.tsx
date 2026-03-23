@@ -119,6 +119,7 @@ export default function AnuncioForm({
     Array<{ id?: string; url: string }>
   >([]);
   const [loadingErrors, setLoadingErrors] = useState<string[]>([]);
+  const [priceInputFocused, setPriceInputFocused] = useState(false);
 
   // Handlers for inline creation
   const handleAnuncianteCreated = (newAnuncianteId: number) => {
@@ -897,9 +898,11 @@ export default function AnuncioForm({
                     value={
                       formData.isDoacao || formData.aCombinar
                         ? "0,00"
+                        : priceInputFocused
+                        ? formData.precoAnuncio
                         : formData.precoAnuncio
-                          ? formatNumberToCurrency(formData.precoAnuncio)
-                          : ""
+                        ? formatNumberToCurrency(formData.precoAnuncio)
+                        : ""
                     }
                     onChange={(e) => {
                       const inputValue = e.target.value;
@@ -908,7 +911,29 @@ export default function AnuncioForm({
                       if (!formData.isDoacao && !formData.aCombinar) {
                         const parsed = parseCurrencyInput(inputValue);
                         console.log("[AnuncioForm] Parsed price:", parsed);
-                        handleInputChange("precoAnuncio", parsed !== null ? String(parsed) : "");
+                        // Store the parsed number as string, or keep original input if parsing fails
+                        // This prevents the field from being cleared while user is typing
+                        if (parsed !== null) {
+                          handleInputChange("precoAnuncio", String(parsed));
+                        } else {
+                          // If parsing fails, just keep the input as-is for now
+                          // It will be validated on blur or submission
+                          handleInputChange("precoAnuncio", inputValue);
+                        }
+                      }
+                    }}
+                    onFocus={() => setPriceInputFocused(true)}
+                    onBlur={() => {
+                      setPriceInputFocused(false);
+                      // On blur, validate and format the price
+                      if (formData.precoAnuncio && !formData.isDoacao && !formData.aCombinar) {
+                        const parsed = parseCurrencyInput(formData.precoAnuncio);
+                        if (parsed !== null) {
+                          handleInputChange("precoAnuncio", String(parsed));
+                        } else {
+                          // If value can't be parsed, clear it
+                          handleInputChange("precoAnuncio", "");
+                        }
                       }
                     }}
                     disabled={formData.isDoacao || formData.aCombinar}
