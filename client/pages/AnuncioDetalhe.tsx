@@ -624,31 +624,35 @@ export default function AnuncioDetalhe() {
 
               {/* Quantity Card */}
               {quantidadeInfo && (
-                <div className={`rounded-lg p-6 mb-6 text-white ${quantidadeInfo.reservado ? "bg-red-600" : "bg-green-600"}`}>
-                  <p className="text-sm opacity-90 mb-2">Disponibilidade</p>
-                  <div className="space-y-3">
-                    <div>
-                      <p className="text-xs opacity-75 mb-1">Quantidade Total</p>
-                      <p className="text-2xl font-bold">{quantidadeInfo.quantidade_total}</p>
+                <div className="rounded-lg p-6 mb-6 bg-white border border-gray-200">
+                  <p className="text-sm font-semibold text-gray-800 mb-4">Disponibilidade</p>
+
+                  {quantidadeInfo.reservado ? (
+                    <div className="bg-red-50 border-l-4 border-red-600 p-4 rounded">
+                      <p className="text-lg font-bold text-red-700">🔴 RESERVADO</p>
+                      <p className="text-sm text-red-600 mt-1">Todas as unidades foram reservadas</p>
                     </div>
-                    {quantidadeInfo.reservado ? (
-                      <div className="pt-2 border-t border-white border-opacity-30">
-                        <p className="text-lg font-bold">🔴 RESERVADO</p>
-                        <p className="text-xs opacity-75 mt-1">Todas as unidades foram reservadas</p>
+                  ) : (
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                      {/* Quantidade Total */}
+                      <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                        <p className="text-xs text-gray-600 mb-1 font-medium">Quantidade Total</p>
+                        <p className="text-3xl font-bold text-vitrii-blue">{quantidadeInfo.quantidade_total}</p>
                       </div>
-                    ) : (
-                      <div className="pt-2 border-t border-white border-opacity-30 space-y-2">
-                        <div>
-                          <p className="text-xs opacity-75">Disponível</p>
-                          <p className="text-xl font-bold">{quantidadeInfo.quantidade_disponivel}</p>
-                        </div>
-                        <div>
-                          <p className="text-xs opacity-75">Reservadas</p>
-                          <p className="text-sm">{quantidadeInfo.reservas_ativas}</p>
-                        </div>
+
+                      {/* Disponível */}
+                      <div className="bg-green-50 p-4 rounded-lg border border-green-100">
+                        <p className="text-xs text-gray-600 mb-1 font-medium">Disponível</p>
+                        <p className="text-3xl font-bold text-green-600">{quantidadeInfo.quantidade_disponivel}</p>
                       </div>
-                    )}
-                  </div>
+
+                      {/* Reservadas */}
+                      <div className="bg-orange-50 p-4 rounded-lg border border-orange-100 col-span-2 md:col-span-1">
+                        <p className="text-xs text-gray-600 mb-1 font-medium">Reservadas</p>
+                        <p className="text-3xl font-bold text-orange-600">{quantidadeInfo.reservas_ativas}</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
