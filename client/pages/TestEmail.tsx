@@ -11,6 +11,8 @@ export default function TestEmail() {
   const [result, setResult] = useState<any>(null);
   const [diagnosticResult, setDiagnosticResult] = useState<any>(null);
   const [resetResult, setResetResult] = useState<any>(null);
+  const [verificationEmail, setVerificationEmail] = useState("");
+  const [verificationResult, setVerificationResult] = useState<any>(null);
 
   // Diagnostic mutation
   const diagnosticMutation = useMutation({
@@ -50,6 +52,32 @@ export default function TestEmail() {
     },
     onError: (error) => {
       const errorMsg = error instanceof Error ? error.message : "Erro desconhecido";
+      toast.error(errorMsg);
+    },
+  });
+
+  // Resend verification email mutation
+  const resendVerificationMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch("/api/auth/resend-verification-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: verificationEmail }),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Erro ao reenviar email");
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      setVerificationResult(data);
+      toast.success("✅ Email de verificação reenviado!");
+      console.log("Email de verificação reenviado:", data);
+    },
+    onError: (error) => {
+      const errorMsg = error instanceof Error ? error.message : "Erro desconhecido";
+      setVerificationResult({ success: false, error: errorMsg });
       toast.error(errorMsg);
     },
   });
@@ -176,6 +204,94 @@ export default function TestEmail() {
               )}
             </button>
           </form>
+
+          {/* Resend Verification Email Section */}
+          <div className="mt-8 pt-8 border-t border-gray-300">
+            <h2 className="text-xl font-bold text-vitrii-text mb-4">📧 Reenviar Email de Verificação</h2>
+            <p className="text-vitrii-text-secondary mb-4">
+              Digite o email de um usuário para reenviar o email de verificação
+            </p>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!verificationEmail) {
+                  toast.error("Digite um email");
+                  return;
+                }
+                resendVerificationMutation.mutate();
+              }}
+              className="space-y-4 mb-6"
+            >
+              <div>
+                <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                  Email do Usuário
+                </label>
+                <input
+                  type="email"
+                  value={verificationEmail}
+                  onChange={(e) => setVerificationEmail(e.target.value)}
+                  disabled={resendVerificationMutation.isPending}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+                  placeholder="usuario@exemplo.com"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={resendVerificationMutation.isPending}
+                className={`w-full py-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition-colors ${
+                  resendVerificationMutation.isPending
+                    ? "bg-gray-400 text-white cursor-not-allowed opacity-75"
+                    : "bg-purple-600 text-white hover:bg-purple-700"
+                }`}
+              >
+                {resendVerificationMutation.isPending ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+                    Reenviando...
+                  </>
+                ) : (
+                  <>
+                    <Mail className="w-5 h-5" />
+                    Reenviar Email de Verificação
+                  </>
+                )}
+              </button>
+            </form>
+
+            {verificationResult && (
+              <div
+                className={`rounded-lg p-6 flex gap-4 ${
+                  verificationResult.success
+                    ? "bg-green-50 border-l-4 border-green-500"
+                    : "bg-red-50 border-l-4 border-red-500"
+                }`}
+              >
+                {verificationResult.success ? (
+                  <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
+                ) : (
+                  <AlertCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
+                )}
+                <div>
+                  <h3
+                    className={`font-semibold mb-2 ${
+                      verificationResult.success ? "text-green-900" : "text-red-900"
+                    }`}
+                  >
+                    {verificationResult.success ? "✅ Sucesso!" : "❌ Erro"}
+                  </h3>
+                  <p
+                    className={`text-sm ${
+                      verificationResult.success ? "text-green-800" : "text-red-800"
+                    }`}
+                  >
+                    {verificationResult.message || verificationResult.error}
+                  </p>
+                </div>
+              </div>
+            )}
+          </div>
 
           {/* Result */}
           {result && (
