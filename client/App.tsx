@@ -81,6 +81,28 @@ const queryClient = new QueryClient({
 
 // Separate component to use the hook
 function AppContent() {
+  // Handle unhandled promise rejections gracefully
+  useEffect(() => {
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      // Log but don't crash the app
+      console.warn('[App] Unhandled Promise Rejection:', event.reason);
+
+      // Only prevent default if it's a Service Worker registration error
+      if (
+        event.reason &&
+        (event.reason.message?.includes('ServiceWorker') ||
+         event.reason.message?.includes('sw.js') ||
+         event.reason.message?.includes('script'))
+      ) {
+        // Service Worker errors are non-critical
+        event.preventDefault();
+      }
+    };
+
+    window.addEventListener('unhandledrejection', handleUnhandledRejection);
+    return () => window.removeEventListener('unhandledrejection', handleUnhandledRejection);
+  }, []);
+
   // Cleanup stale service workers on mount
   useEffect(() => {
     const cleanupSW = async () => {

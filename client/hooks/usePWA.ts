@@ -40,22 +40,36 @@ export const usePWA = (): UsePWAReturn => {
   useEffect(() => {
     // Register service worker only if browser supports it and is not Safari iOS
     if ('serviceWorker' in navigator && shouldRegisterServiceWorker()) {
-      navigator.serviceWorker
-        .register('/sw.js')
-        .then((registration) => {
-          console.log('[PWA] Service Worker registered:', registration);
+      // Add a small delay to ensure page is fully loaded
+      const registrationTimeout = setTimeout(() => {
+        navigator.serviceWorker
+          .register('/sw.js', {
+            scope: '/',
+            updateViaCache: 'none', // Always check for updates
+          })
+          .then((registration) => {
+            console.log('[PWA] Service Worker registered successfully:', registration.scope);
 
-          // Check for updates periodically
-          const updateInterval = setInterval(() => {
-            registration.update();
-          }, 60000); // Check every minute
+            // Check for updates periodically
+            const updateInterval = setInterval(() => {
+              registration.update().catch((error) => {
+                console.debug('[PWA] Service Worker update check failed:', error);
+              });
+            }, 60000); // Check every minute
 
-          return () => clearInterval(updateInterval);
-        })
-        .catch((error) => {
-          console.error('[PWA] Service Worker registration failed:', error);
-          // Service Worker is optional - app still works without it
-        });
+            return () => clearInterval(updateInterval);
+          })
+          .catch((error) => {
+            console.warn('[PWA] Service Worker registration failed:', error.message);
+            // Service Worker is optional - app still works without it
+            // Log more details for debugging
+            if (error.message.includes('script')) {
+              console.warn('[PWA] Possible causes: sw.js not found, invalid syntax, or CORS issue');
+            }
+          });
+      }, 1000); // 1 second delay
+
+      return () => clearTimeout(registrationTimeout);
     } else if (!shouldRegisterServiceWorker()) {
       console.log('[PWA] Service Worker registration skipped (Safari iOS or unsupported)');
     }
