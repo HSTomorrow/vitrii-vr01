@@ -72,6 +72,23 @@ export default function AnuncioDetalhe() {
     }
   }, [showPaymentModal]);
 
+  // Record ad view when page loads
+  useEffect(() => {
+    if (id) {
+      const recordView = async () => {
+        try {
+          await fetch(`/api/anuncios/${id}/view`, {
+            method: "POST",
+          });
+        } catch (error) {
+          console.warn("Erro ao registrar visualização:", error);
+          // Don't show error to user, this is non-critical
+        }
+      };
+      recordView();
+    }
+  }, [id]);
+
   // Fallback copy function for older browsers
   const fallbackCopy = (text: string) => {
     try {
