@@ -16,18 +16,19 @@ export const criarReserva = async (req: Request, res: Response) => {
     }
 
     const id = parseInt(anuncioId);
-    
-    // Verify ad exists and allows reservations
+
+    // Verify ad exists and get its details
     const anuncio = await prisma.anuncios.findUnique({
       where: { id },
+      include: {
+        anunciantes: {
+          select: { nome: true, email: true },
+        },
+      },
     });
 
     if (!anuncio) {
       return res.status(404).json({ error: "Anúncio não encontrado" });
-    }
-
-    if (!anuncio.permiteReservar) {
-      return res.status(400).json({ error: "Este anúncio não permite reservas" });
     }
 
     // Check if user already has a reservation
@@ -41,48 +42,85 @@ export const criarReserva = async (req: Request, res: Response) => {
       return res.status(409).json({ error: "Você já possui uma reserva ativa para este anúncio" });
     }
 
-    // Check reservation limit
-    if (anuncio.quantidadeMaximaReservas) {
-      const activeReservas = await prisma.reservas_anuncio.count({
-        where: {
-          anuncioId: id,
-          status: "ativa",
-        },
-      });
-
-      if (activeReservas >= anuncio.quantidadeMaximaReservas) {
-        return res.status(400).json({ 
-          error: "Limite de reservas para este anúncio foi atingido" 
-        });
-      }
-    }
-
-    // Create reservation
-    const reserva = await prisma.reservas_anuncio.create({
-      data: {
+    // Check quantity available (quantidade - active reservations)
+    const activeReservas = await prisma.reservas_anuncio.count({
+      where: {
         anuncioId: id,
-        usuarioId,
-        observacao: observacao || null,
         status: "ativa",
       },
-      select: {
-        id: true,
-        anuncioId: true,
-        usuarioId: true,
-        dataReserva: true,
-        observacao: true,
-        status: true,
-      },
     });
+
+    const quantidadeDisponivel = anuncio.quantidade - activeReservas;
+
+    if (quantidadeDisponivel <= 0) {
+      return res.status(400).json({
+        error: "Este produto já foi totalmente reservado"
+      });
+    }
+
+    // Create or reactivate reservation
+    let reserva;
+    if (existingReserva && existingReserva.status === "cancelada") {
+      // Reactivate cancelled reservation
+      reserva = await prisma.reservas_anuncio.update({
+        where: { id: existingReserva.id },
+        data: {
+          status: "ativa",
+          dataReserva: new Date(),
+          dataCancelamento: null,
+        },
+        select: {
+          id: true,
+          anuncioId: true,
+          usuarioId: true,
+          dataReserva: true,
+          observacao: true,
+          status: true,
+        },
+      });
+    } else {
+      // Create new reservation
+      reserva = await prisma.reservas_anuncio.create({
+        data: {
+          anuncioId: id,
+          usuarioId,
+          observacao: observacao || null,
+          status: "ativa",
+        },
+        select: {
+          id: true,
+          anuncioId: true,
+          usuarioId: true,
+          dataReserva: true,
+          observacao: true,
+          status: true,
+        },
+      });
+    }
+
+    // Check if quantity reached 0 and update ad status to "Reservado"
+    const novaQuantidadeDisponivel = quantidadeDisponivel - 1;
+    if (novaQuantidadeDisponivel <= 0) {
+      await prisma.anuncios.update({
+        where: { id },
+        data: { status: "Reservado" },
+      });
+
+      // TODO: Send notification to announcer when product is fully reserved
+      console.log(
+        `[reservas-anuncio] Produto ${anuncio.titulo} (ID: ${id}) foi totalmente reservado!`
+      );
+    }
 
     res.status(201).json({
       success: true,
       data: reserva,
       message: "Reserva criada com sucesso",
+      quantidadeDisponivel: Math.max(0, novaQuantidadeDisponivel),
     });
   } catch (error) {
     console.error("[reservas-anuncio] Error creating reservation:", error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: "Erro ao criar reserva",
       details: error instanceof Error ? error.message : undefined,
     });
@@ -216,6 +254,7 @@ export const cancelarReserva = async (req: Request, res: Response) => {
     }
 
     const rId = parseInt(reservaId);
+    const aId = parseInt(anuncioId);
 
     // Get the reservation
     const reserva = await prisma.reservas_anuncio.findUnique({
@@ -226,7 +265,7 @@ export const cancelarReserva = async (req: Request, res: Response) => {
       return res.status(404).json({ error: "Reserva não encontrada" });
     }
 
-    // Check permissions: user who made the reservation or admin
+    // Check permissions: user who made the reservation, ad owner, or admin
     const user = await prisma.usracessos.findUnique({
       where: { id: usuarioId },
     });
@@ -235,7 +274,17 @@ export const cancelarReserva = async (req: Request, res: Response) => {
       return res.status(401).json({ error: "Usuário não encontrado" });
     }
 
-    if (reserva.usuarioId !== usuarioId && user.tipoUsuario !== "adm") {
+    // Get ad to check ownership
+    const anuncio = await prisma.anuncios.findUnique({
+      where: { id: aId },
+      select: { usuarioId: true, status: true, quantidade: true },
+    });
+
+    const isAdmin = user.tipoUsuario === "adm";
+    const isReservationUser = reserva.usuarioId === usuarioId;
+    const isAdOwner = anuncio?.usuarioId === usuarioId;
+
+    if (!isAdmin && !isReservationUser && !isAdOwner) {
       return res.status(403).json({ error: "Você não tem permissão para cancelar esta reserva" });
     }
 
@@ -254,6 +303,24 @@ export const cancelarReserva = async (req: Request, res: Response) => {
       },
     });
 
+    // If ad was "Reservado", check if it should be "ativo" again
+    if (anuncio && anuncio.status === "Reservado") {
+      const ativasReservas = await prisma.reservas_anuncio.count({
+        where: {
+          anuncioId: aId,
+          status: "ativa",
+        },
+      });
+
+      // If now there's available quantity, reactivate the ad
+      if (ativasReservas < anuncio.quantidade) {
+        await prisma.anuncios.update({
+          where: { id: aId },
+          data: { status: "ativo" },
+        });
+      }
+    }
+
     res.json({
       success: true,
       data: updated,
@@ -261,7 +328,7 @@ export const cancelarReserva = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("[reservas-anuncio] Error cancelling reservation:", error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: "Erro ao cancelar reserva",
       details: error instanceof Error ? error.message : undefined,
     });
@@ -332,8 +399,55 @@ export const contarReservasAtivas = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("[reservas-anuncio] Error counting reservations:", error);
-    res.status(500).json({ 
+    res.status(500).json({
       error: "Erro ao contar reservas",
+      details: error instanceof Error ? error.message : undefined,
+    });
+  }
+};
+
+// GET - Get quantity info for an ad (quantidade, available, reserved count)
+export const getQuantidadeInfo = async (req: Request, res: Response) => {
+  try {
+    const { anuncioId } = req.params;
+    const id = parseInt(anuncioId);
+
+    const anuncio = await prisma.anuncios.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        quantidade: true,
+        status: true,
+      },
+    });
+
+    if (!anuncio) {
+      return res.status(404).json({ error: "Anúncio não encontrado" });
+    }
+
+    const reservasAtivas = await prisma.reservas_anuncio.count({
+      where: {
+        anuncioId: id,
+        status: "ativa",
+      },
+    });
+
+    const quantidadeDisponivel = Math.max(0, anuncio.quantidade - reservasAtivas);
+
+    res.json({
+      success: true,
+      data: {
+        quantidade_total: anuncio.quantidade,
+        reservas_ativas: reservasAtivas,
+        quantidade_disponivel: quantidadeDisponivel,
+        status: anuncio.status,
+        reservado: anuncio.status === "Reservado" || quantidadeDisponivel === 0,
+      },
+    });
+  } catch (error) {
+    console.error("[reservas-anuncio] Error getting quantity info:", error);
+    res.status(500).json({
+      error: "Erro ao obter informações de quantidade",
       details: error instanceof Error ? error.message : undefined,
     });
   }
@@ -344,6 +458,7 @@ router.post("/anuncios/:anuncioId/reservas", extractUserId, criarReserva);
 router.get("/anuncios/:anuncioId/reservas", extractUserId, listarReservasAnuncio);
 router.get("/anuncios/:anuncioId/minha-reserva", extractUserId, obterMinhaReserva);
 router.get("/anuncios/:anuncioId/reservas/count", contarReservasAtivas);
+router.get("/anuncios/:anuncioId/quantidade-info", getQuantidadeInfo);
 router.delete("/anuncios/:anuncioId/reservas/:reservaId", extractUserId, cancelarReserva);
 router.patch("/reservas/:reservaId", extractUserId, atualizarReserva);
 

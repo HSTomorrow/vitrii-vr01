@@ -78,6 +78,7 @@ model anuncios {
   isActive            Boolean                @default(true)
   permiteReservar     Boolean                @default(false) // Allow reservations for this ad
   quantidadeMaximaReservas Int?              // Maximum number of reservations allowed (null = unlimited)
+  quantidade          Int                    @default(1)  // Initial quantity for reservations (default 1, 0 = Reservado)
   anunciantes         anunciantes            @relation(fields: [anuncianteId], references: [id], onDelete: Cascade, map: "anuncios_lojaId_fkey")
   anuncioVisualizados anuncioVisualizados[]
   fotos               fotos_anuncio[]

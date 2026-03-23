@@ -183,9 +183,21 @@ export default function AnuncioDetalhe() {
     enabled: !!id,
   });
 
+  // Fetch quantity info for the ad
+  const { data: quantidadeData } = useQuery({
+    queryKey: ["anuncio-quantidade", id],
+    queryFn: async () => {
+      const response = await fetch(`/api/anuncios/${id}/quantidade-info`);
+      if (!response.ok) throw new Error("Erro ao buscar quantidade");
+      return response.json();
+    },
+    enabled: !!id,
+  });
+
   const equipes = equipesData?.data || [];
   const membros = membrosData?.data || [];
   const fotos = fotosData?.data || [];
+  const quantidadeInfo = quantidadeData?.data;
 
   // Check if there are any available members in any team
   const temMembrosDisponiveis = equipes.some((equipe) =>
@@ -600,6 +612,36 @@ export default function AnuncioDetalhe() {
                   </div>
                 </div>
               ) : null}
+
+              {/* Quantity Card */}
+              {quantidadeInfo && (
+                <div className={`rounded-lg p-6 mb-6 text-white ${quantidadeInfo.reservado ? "bg-red-600" : "bg-green-600"}`}>
+                  <p className="text-sm opacity-90 mb-2">Disponibilidade</p>
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-xs opacity-75 mb-1">Quantidade Total</p>
+                      <p className="text-2xl font-bold">{quantidadeInfo.quantidade_total}</p>
+                    </div>
+                    {quantidadeInfo.reservado ? (
+                      <div className="pt-2 border-t border-white border-opacity-30">
+                        <p className="text-lg font-bold">🔴 RESERVADO</p>
+                        <p className="text-xs opacity-75 mt-1">Todas as unidades foram reservadas</p>
+                      </div>
+                    ) : (
+                      <div className="pt-2 border-t border-white border-opacity-30 space-y-2">
+                        <div>
+                          <p className="text-xs opacity-75">Disponível</p>
+                          <p className="text-xl font-bold">{quantidadeInfo.quantidade_disponivel}</p>
+                        </div>
+                        <div>
+                          <p className="text-xs opacity-75">Reservadas</p>
+                          <p className="text-sm">{quantidadeInfo.reservas_ativas}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* Contact Actions */}
               <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6 space-y-3">
