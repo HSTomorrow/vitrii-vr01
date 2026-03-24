@@ -116,7 +116,10 @@ export default function CreateAnuncianteModal({
 
       const response = await fetch("/api/anunciantes", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(user?.id && { "X-User-Id": user.id.toString() }),
+        },
         body: JSON.stringify(apiData),
       });
 
