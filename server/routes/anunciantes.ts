@@ -751,7 +751,10 @@ export const getAnunciantesByUsuario: RequestHandler = async (req, res) => {
   try {
     const usuarioId = req.userId;
 
+    console.log("[getAnunciantesByUsuario] 📋 Iniciando busca de anunciantes para usuarioId:", usuarioId);
+
     if (!usuarioId) {
+      console.warn("[getAnunciantesByUsuario] ⚠️ Sem usuarioId na requisição");
       return res.status(401).json({
         success: false,
         error: "Usuário não autenticado",
@@ -764,7 +767,10 @@ export const getAnunciantesByUsuario: RequestHandler = async (req, res) => {
       select: { tipoUsuario: true },
     });
 
+    console.log("[getAnunciantesByUsuario] 👤 Usuario encontrado:", usuario?.tipoUsuario);
+
     if (!usuario) {
+      console.warn("[getAnunciantesByUsuario] ⚠️ Usuario não encontrado");
       return res.status(404).json({
         success: false,
         error: "Usuário não encontrado",
@@ -775,6 +781,7 @@ export const getAnunciantesByUsuario: RequestHandler = async (req, res) => {
 
     // If user is ADM, return all anunciantes
     if (usuario.tipoUsuario === "adm") {
+      console.log("[getAnunciantesByUsuario] 👑 Usuario é ADM, retornando todos os anunciantes");
       anunciantes = await prisma.anunciantes.findMany({
         select: {
           id: true,
@@ -801,6 +808,19 @@ export const getAnunciantesByUsuario: RequestHandler = async (req, res) => {
       });
     } else {
       // For regular users, return only anunciantes where they are linked
+      console.log("[getAnunciantesByUsuario] 👤 Usuario é regular, buscando anunciantes linkados");
+
+      // First check what links exist for this user
+      const userLinks = await prisma.usuarios_anunciantes.findMany({
+        where: { usuarioId: usuarioId },
+        select: { anuncianteId: true, papel: true },
+      });
+
+      console.log("[getAnunciantesByUsuario] 🔗 Links encontrados para usuario", usuarioId + ":", {
+        count: userLinks.length,
+        anuncianteIds: userLinks.map(l => l.anuncianteId),
+      });
+
       anunciantes = await prisma.anunciantes.findMany({
         where: {
           usuarios_anunciantes: {
@@ -831,6 +851,11 @@ export const getAnunciantesByUsuario: RequestHandler = async (req, res) => {
           dataAtualizacao: true,
         },
         orderBy: { dataCriacao: "desc" },
+      });
+
+      console.log("[getAnunciantesByUsuario] ✅ Anunciantes encontrados:", {
+        count: anunciantes.length,
+        ids: anunciantes.map((a: any) => a.id),
       });
     }
 

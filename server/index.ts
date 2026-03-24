@@ -682,6 +682,190 @@ export function createServer() {
     }
   });
 
+  // DEBUG: Manually link a user to an anunciante (for fixing broken relationships)
+  app.post("/api/debug/link-user-to-anunciante", async (req, res) => {
+    try {
+      const { usuarioId, anuncianteId, papel = "gerente" } = req.body;
+
+      if (!usuarioId || !anuncianteId) {
+        return res.status(400).json({
+          success: false,
+          error: "usuarioId and anuncianteId are required",
+        });
+      }
+
+      console.log(`\n🔗 DEBUG: Linking user ${usuarioId} to anunciante ${anuncianteId}...`);
+
+      // Check if user exists
+      const usuario = await prisma.usracessos.findUnique({
+        where: { id: usuarioId },
+        select: { id: true, email: true, nome: true },
+      });
+
+      if (!usuario) {
+        return res.status(404).json({
+          success: false,
+          error: `User ${usuarioId} not found`,
+        });
+      }
+
+      // Check if anunciante exists
+      const anunciante = await prisma.anunciantes.findUnique({
+        where: { id: anuncianteId },
+        select: { id: true, nome: true },
+      });
+
+      if (!anunciante) {
+        return res.status(404).json({
+          success: false,
+          error: `Anunciante ${anuncianteId} not found`,
+        });
+      }
+
+      // Check if linkage already exists
+      const existingLink = await prisma.usuarios_anunciantes.findFirst({
+        where: {
+          usuarioId: usuarioId,
+          anuncianteId: anuncianteId,
+        },
+      });
+
+      if (existingLink) {
+        return res.status(409).json({
+          success: false,
+          error: `User ${usuarioId} is already linked to anunciante ${anuncianteId}`,
+          data: existingLink,
+        });
+      }
+
+      // Create the linkage
+      const linkagem = await prisma.usuarios_anunciantes.create({
+        data: {
+          usuarioId: usuarioId,
+          anuncianteId: anuncianteId,
+          papel: papel,
+        },
+      });
+
+      console.log(`✅ Linkage created successfully:`, linkagem);
+
+      res.status(201).json({
+        success: true,
+        message: `Successfully linked user ${usuario.nome} to anunciante ${anunciante.nome}`,
+        data: {
+          usuario,
+          anunciante,
+          linkagem,
+        },
+      });
+    } catch (error) {
+      console.error(`❌ Error linking user to anunciante:`, error);
+      res.status(500).json({
+        success: false,
+        error: "Erro ao linkar usuário ao anunciante",
+        details: error instanceof Error ? error.message : "Desconhecido",
+      });
+    }
+  });
+
+  // DEBUG: Check anunciantes data for a specific user
+  app.get("/api/debug/anunciantes/:usuarioId", async (req, res) => {
+    try {
+      const usuarioId = parseInt(req.params.usuarioId);
+
+      console.log(`\n🔍 ========== DEBUG ANUNCIANTES FOR USER ${usuarioId} ==========`);
+
+      // 1. Check if user exists
+      console.log(`\n1️⃣  Verificando usuário ${usuarioId}...`);
+      const usuario = await prisma.usracessos.findUnique({
+        where: { id: usuarioId },
+        select: { id: true, email: true, nome: true, tipoUsuario: true },
+      });
+
+      if (!usuario) {
+        console.log(`❌ Usuário ${usuarioId} não encontrado`);
+        return res.status(404).json({
+          success: false,
+          error: `Usuário ${usuarioId} não encontrado`,
+        });
+      }
+
+      console.log(`✅ Usuário encontrado:`, usuario);
+
+      // 2. Check user-anunciante relationships
+      console.log(`\n2️⃣  Verificando relacionamentos usuarios_anunciantes para usuário ${usuarioId}...`);
+      const userLinks = await prisma.usuarios_anunciantes.findMany({
+        where: { usuarioId: usuarioId },
+        include: {
+          anunciantes: {
+            select: {
+              id: true,
+              nome: true,
+              status: true,
+              cnpj: true,
+              email: true,
+            },
+          },
+        },
+      });
+
+      console.log(`✅ Found ${userLinks.length} relacionamentos:`);
+      userLinks.forEach((link) => {
+        console.log(`   - Anunciante ID ${link.anuncianteId}: ${link.anunciantes.nome} (Papel: ${link.papel})`);
+      });
+
+      // 3. Test the query that getAnunciantesByUsuario uses
+      console.log(`\n3️⃣  Testando query de getAnunciantesByUsuario...`);
+      const anunciantes = await prisma.anunciantes.findMany({
+        where: {
+          usuarios_anunciantes: {
+            some: {
+              usuarioId: usuarioId,
+            },
+          },
+        },
+        select: {
+          id: true,
+          nome: true,
+          status: true,
+          tipo: true,
+          email: true,
+          cnpj: true,
+        },
+      });
+
+      console.log(`✅ Query retornou ${anunciantes.length} anunciantes:`, anunciantes);
+
+      res.status(200).json({
+        success: true,
+        debug: {
+          usuario,
+          usuario_anunciante_links: {
+            count: userLinks.length,
+            data: userLinks.map((link) => ({
+              usuarioId: link.usuarioId,
+              anuncianteId: link.anuncianteId,
+              papel: link.papel,
+              anunciante: link.anunciantes,
+            })),
+          },
+          anunciantes_from_query: {
+            count: anunciantes.length,
+            data: anunciantes,
+          },
+        },
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error(`❌ Erro no debug de anunciantes:`, error);
+      res.status(500).json({
+        success: false,
+        error: "Erro ao executar debug de anunciantes",
+        details: error instanceof Error ? error.message : "Desconhecido",
+      });
+    }
+  });
+
   // Send password reset email directly - for testing
   app.get("/api/send-reset-email", async (_req, res) => {
     try {

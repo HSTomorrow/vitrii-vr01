@@ -59,6 +59,7 @@ import HelpAndContact from "./pages/HelpAndContact";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfUse from "./pages/TermsOfUse";
 import Plans from "./pages/Plans";
+import DebugAnunciantes from "./pages/DebugAnunciantes";
 import VerifyEmail from "./pages/VerifyEmail";
 import TestEmail from "./pages/TestEmail";
 import BottomNavBar from "@/components/BottomNavBar";
@@ -157,6 +158,7 @@ function AppContent() {
           <Route path="/reset-senha" element={<ResetPassword />} />
           <Route path="/verificar-email" element={<VerifyEmail />} />
           <Route path="/test-email" element={<TestEmail />} />
+          <Route path="/debug/anunciantes" element={<DebugAnunciantes />} />
           <Route path="/lista-desejos" element={<ListaDesejos />} />
           <Route path="/meus-anuncios" element={<MeusAnuncios />} />
           <Route path="/minha-agenda" element={<MinhaAgenda />} />
