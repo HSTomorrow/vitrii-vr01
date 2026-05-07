@@ -64,34 +64,39 @@ export const saveHorariosAgenda: RequestHandler = async (req, res) => {
       return res.status(404).json({ error: "Announcer not found" });
     }
 
-    // First, delete all existing schedule entries for this announcer
-    await prisma.agendas_horarios.deleteMany({
-      where: {
-        anuncianteId: anuncianteId_num,
-      },
+    // Use a transaction to ensure atomicity: either all changes succeed or all fail
+    const result = await prisma.$transaction(async (tx) => {
+      // First, delete all existing schedule entries for this announcer
+      await tx.agendas_horarios.deleteMany({
+        where: {
+          anuncianteId: anuncianteId_num,
+        },
+      });
+
+      // If horarios is empty, return success (means deactivating all)
+      if (horarios.length === 0) {
+        return [];
+      }
+
+      // Create new schedule entries
+      const createdHorarios = await Promise.all(
+        horarios.map((horario) =>
+          tx.agendas_horarios.create({
+            data: {
+              anuncianteId: anuncianteId_num,
+              diaSemana: parseInt(horario.diaSemana),
+              horaInicio: horario.horaInicio,
+              horaFim: horario.horaFim,
+              ativo: true,
+            },
+          })
+        )
+      );
+
+      return createdHorarios;
     });
 
-    // If horarios is empty, return success (means deactivating all)
-    if (horarios.length === 0) {
-      return res.json({ success: true, data: [] });
-    }
-
-    // Create new schedule entries
-    const createdHorarios = await Promise.all(
-      horarios.map((horario) =>
-        prisma.agendas_horarios.create({
-          data: {
-            anuncianteId: anuncianteId_num,
-            diaSemana: parseInt(horario.diaSemana),
-            horaInicio: horario.horaInicio,
-            horaFim: horario.horaFim,
-            ativo: true,
-          },
-        })
-      )
-    );
-
-    res.json({ success: true, data: createdHorarios });
+    res.json({ success: true, data: result });
   } catch (error) {
     console.error("[saveHorariosAgenda]", error);
     res.status(500).json({ error: "Erro ao salvar horários da agenda" });

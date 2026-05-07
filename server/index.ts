@@ -2,6 +2,7 @@ import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import crypto from "crypto";
+import prisma from "./lib/prisma";
 import { sendTestEmail, testSmtpConnection } from "./lib/emailService";
 import {
   getAnuncios,
@@ -103,8 +104,8 @@ import {
   addItemAnuncio,
   updateItemListaDesejos,
   deleteItemListaDesejos,
-  addPermissao,
-  removePermissao,
+  addPermissao as addPermissaoListaDesejos,
+  removePermissao as removePermissaoListaDesejos,
   listarUsuariosListaDesejosParaAnuncio,
 } from "./routes/listas_desejos";
 import {
@@ -274,14 +275,26 @@ export function createServer() {
 
   app.use(express.static("public"));
 
+  // Guard middleware for debug endpoints - only allow in development
+  const guardDebugEndpoints = (_req: any, res: any, next: any) => {
+    if (process.env.NODE_ENV !== "development") {
+      console.warn(`⚠️ Debug endpoint access attempted in ${process.env.NODE_ENV} environment`);
+      return res.status(403).json({
+        success: false,
+        error: "Debug endpoints are only available in development",
+      });
+    }
+    next();
+  };
+
   // Example API routes
   app.get("/api/ping", (_req, res) => {
     const ping = process.env.PING_MESSAGE ?? "ping";
     res.json({ message: ping });
   });
 
-  // Simple test - returns immediately
-  app.get("/api/test", (_req, res) => {
+  // Simple test - returns immediately (dev only)
+  app.get("/api/test", guardDebugEndpoints, (_req, res) => {
     res.json({
       status: "ok",
       message: "Server is responding",
@@ -309,7 +322,7 @@ export function createServer() {
   });
 
   // Quick database test
-  app.get("/api/db-test", async (_req, res) => {
+  app.get("/api/db-test", guardDebugEndpoints, async (_req, res) => {
     try {
       const count = await prisma.anuncios.count();
       const anuncios = await prisma.anuncios.findMany({ take: 5 });
@@ -330,24 +343,23 @@ export function createServer() {
   // Health check and diagnostics
   app.get("/api/health", async (_req, res) => {
     try {
-      // Test database connection
-      const result = await fetch("https://www.google.com", {
-        method: "HEAD",
-      }).catch(() => null);
+      // Test database connection with a simple query
+      await prisma.$queryRaw`SELECT 1`;
 
       res.json({
         status: "ok",
         timestamp: new Date().toISOString(),
+        database: "connected",
         environment: {
           node_env: process.env.NODE_ENV,
           has_database_url: !!process.env.DATABASE_URL,
-          database_configured: process.env.DATABASE_URL ? "yes" : "no",
         },
       });
     } catch (error) {
       res.status(500).json({
         status: "error",
         timestamp: new Date().toISOString(),
+        database: "disconnected",
         error: error instanceof Error ? error.message : "Unknown error",
       });
     }
@@ -373,7 +385,7 @@ export function createServer() {
   app.post("/api/admin/recalculate-ad-counters", extractUserId, recalculateAdCountersAdmin);
 
   // DEBUG endpoint - Check email verification tokens and user status
-  app.get("/api/debug/verify-email-status", async (req, res) => {
+  app.get("/api/debug/verify-email-status", guardDebugEndpoints, async (req, res) => {
     try {
       const { email } = req.query;
 
@@ -440,8 +452,8 @@ export function createServer() {
     }
   });
 
-  // Test email endpoint - for debugging/testing SMTP configuration
-  app.post("/api/test-email", async (req, res) => {
+  // Test email endpoint - for debugging/testing SMTP configuration (dev only)
+  app.post("/api/test-email", guardDebugEndpoints, async (req, res) => {
     try {
       const { toEmail, fromEmail } = req.body;
 
@@ -490,7 +502,7 @@ export function createServer() {
   });
 
   // SMTP Diagnostic endpoint
-  app.get("/api/smtp-diagnostic", async (_req, res) => {
+  app.get("/api/smtp-diagnostic", guardDebugEndpoints, async (_req, res) => {
     try {
       console.log("🧪 Iniciando diagnóstico SMTP...");
 
@@ -524,7 +536,7 @@ export function createServer() {
   });
 
   // Diagnostic endpoint for SMTP configuration
-  app.get("/api/diagnostic-smtp", async (_req, res) => {
+  app.get("/api/diagnostic-smtp", guardDebugEndpoints, async (_req, res) => {
     try {
       console.log("\n🔍 ========== DIAGNOSTIC SMTP ==========");
 
@@ -682,8 +694,8 @@ export function createServer() {
     }
   });
 
-  // DEBUG: Manually link a user to an anunciante (for fixing broken relationships)
-  app.post("/api/debug/link-user-to-anunciante", async (req, res) => {
+  // DEBUG: Manually link a user to an anunciante (for fixing broken relationships) - dev only
+  app.post("/api/debug/link-user-to-anunciante", guardDebugEndpoints, async (req, res) => {
     try {
       const { usuarioId, anuncianteId, papel = "gerente" } = req.body;
 
@@ -768,8 +780,8 @@ export function createServer() {
     }
   });
 
-  // DEBUG: Check anunciantes data for a specific user
-  app.get("/api/debug/anunciantes/:usuarioId", async (req, res) => {
+  // DEBUG: Check anunciantes data for a specific user (dev only)
+  app.get("/api/debug/anunciantes/:usuarioId", guardDebugEndpoints, async (req, res) => {
     try {
       const usuarioId = parseInt(req.params.usuarioId);
 
@@ -996,8 +1008,8 @@ export function createServer() {
   );
   app.get("/api/anuncios", getAnuncios);
   app.get("/api/anuncios/:id", getAnuncioById);
-  app.post("/api/anuncios", createAnuncio);
-  app.put("/api/anuncios/:id", updateAnuncio);
+  app.post("/api/anuncios", extractUserId, createAnuncio);
+  app.put("/api/anuncios/:id", extractUserId, updateAnuncio);
   app.patch("/api/anuncios/:id/status", updateAnuncioStatus);
   app.patch(
     "/api/anuncios/:id/override-status",
@@ -1096,12 +1108,12 @@ export function createServer() {
   app.post(
     "/api/listas-desejos/:listaId/permissoes",
     extractUserId,
-    addPermissao,
+    addPermissaoListaDesejos,
   );
   app.delete(
     "/api/listas-desejos/:listaId/permissoes/:permissaoId",
     extractUserId,
-    removePermissao,
+    removePermissaoListaDesejos,
   );
 
   // GET users who added ad to wishlists (owner or admin only)
@@ -1173,16 +1185,16 @@ export function createServer() {
 
   // Pagamentos (Payment) routes
   app.get("/api/pagamentos", extractUserId, requireAdmin, getPagamentos);
-  app.get("/api/pagamentos/anuncio/:anuncioId", getPagamentoByAnuncioId);
-  app.get("/api/pagamentos/:id/status", getPagamentoStatus);
-  app.post("/api/pagamentos", createPagamento);
-  app.patch("/api/pagamentos/:id/status", updatePagamentoStatus);
-  app.delete("/api/pagamentos/:id/cancel", cancelPagamento);
-  app.post("/api/webhooks/pagamentos", handlePaymentWebhook);
-  app.post("/api/pagamentos/:id/comprovante", uploadComprovantePagemento);
-  app.post("/api/pagamentos/:id/aprovar", aprovarPagamento);
-  app.post("/api/pagamentos/:id/rejeitar", rejeitarPagamento);
-  app.post("/api/anuncios/:anuncioId/marcar-pagamento-realizado", marcarPagamentoRealizado);
+  app.get("/api/pagamentos/anuncio/:anuncioId", extractUserId, getPagamentoByAnuncioId);
+  app.get("/api/pagamentos/:id/status", extractUserId, getPagamentoStatus);
+  app.post("/api/pagamentos", extractUserId, createPagamento);
+  app.patch("/api/pagamentos/:id/status", extractUserId, updatePagamentoStatus);
+  app.delete("/api/pagamentos/:id/cancel", extractUserId, cancelPagamento);
+  app.post("/api/webhooks/pagamentos", handlePaymentWebhook); // Keep public for external webhooks, but handler must validate signatures
+  app.post("/api/pagamentos/:id/comprovante", extractUserId, uploadComprovantePagemento);
+  app.post("/api/pagamentos/:id/aprovar", extractUserId, requireAdmin, aprovarPagamento);
+  app.post("/api/pagamentos/:id/rejeitar", extractUserId, requireAdmin, rejeitarPagamento);
+  app.post("/api/anuncios/:anuncioId/marcar-pagamento-realizado", extractUserId, marcarPagamentoRealizado);
   app.patch(
     "/api/pagamentos/:id/confirmar",
     extractUserId,
