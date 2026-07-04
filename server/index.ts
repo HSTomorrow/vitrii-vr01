@@ -1,7 +1,6 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import crypto from "crypto";
 import prisma from "./lib/prisma";
 import { sendTestEmail, testSmtpConnection } from "./lib/emailService";
 import {
@@ -221,7 +220,7 @@ import {
   addAnuncianteToLocalidade,
   removeAnuncianteFromLocalidade,
 } from "./routes/localidades";
-import { extractUserId, requireAdmin } from "./middleware/permissionGuard";
+import { extractUserId, requireAdmin, optionalAuth } from "./middleware/permissionGuard";
 import {
   getBanners,
   getBannerById,
@@ -249,9 +248,35 @@ export function createServer() {
   const app = express();
 
   // Middleware
-  app.use(cors());
+  // In production, restrict cross-origin requests to our own configured origin(s).
+  // ALLOWED_ORIGINS accepts a comma-separated list; falls back to APP_URL if unset.
+  const allowedOrigins = (process.env.ALLOWED_ORIGINS || process.env.APP_URL || "")
+    .split(",")
+    .map((o) => o.trim())
+    .filter(Boolean);
+  app.use(
+    cors(
+      process.env.NODE_ENV === "production" && allowedOrigins.length > 0
+        ? { origin: allowedOrigins }
+        : undefined,
+    ),
+  );
+  app.use((req, res, next) => {
+    // Prevents browsers from MIME-sniffing uploaded/static files into an
+    // executable content type (e.g. serving a spoofed image as HTML).
+    res.set("X-Content-Type-Options", "nosniff");
+    next();
+  });
   // Increase body size limit to 10MB to support large base64-encoded images
-  app.use(express.json({ limit: "10mb" }));
+  app.use(
+    express.json({
+      limit: "10mb",
+      // Keep the raw bytes around so the payment webhook can verify its HMAC signature.
+      verify: (req: any, _res, buf) => {
+        req.rawBody = buf;
+      },
+    }),
+  );
   app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
   // Cache control headers
@@ -366,15 +391,15 @@ export function createServer() {
   });
 
   // Upload route
-  app.post("/api/upload", uploadMiddleware, handleUpload);
+  app.post("/api/upload", extractUserId, uploadMiddleware, handleUpload);
 
   // Usracessos routes (User Access)
-  app.get("/api/usracessos", getUsuarios);
-  app.get("/api/usracessos/:id", getUsuarioById);
+  app.get("/api/usracessos", extractUserId, requireAdmin, getUsuarios);
+  app.get("/api/usracessos/:id", extractUserId, getUsuarioById);
   app.get("/api/usracessos/:id/validate-status", validateUserStatus);
   app.get("/api/auth/check-status-by-email", checkUserStatusByEmail);
-  app.patch("/api/usracessos/:id/status", toggleUserStatus);
-  app.patch("/api/usracessos/:id/unlock", unlockUserAccount);
+  app.patch("/api/usracessos/:id/status", extractUserId, requireAdmin, toggleUserStatus);
+  app.patch("/api/usracessos/:id/unlock", extractUserId, requireAdmin, unlockUserAccount);
   app.post("/api/auth/signin", signInUsuario);
   app.post("/api/auth/signup", signUpUsuario);
   app.post("/api/auth/forgot-password", forgotPassword);
@@ -878,50 +903,9 @@ export function createServer() {
     }
   });
 
-  // Send password reset email directly - for testing
-  app.get("/api/send-reset-email", async (_req, res) => {
-    try {
-      const { sendPasswordResetEmail } = await import("./lib/emailService");
-
-      console.log("🧪 Enviando email de reset de senha...");
-
-      // Generate a test token
-      const resetToken = crypto.randomBytes(32).toString("hex");
-      const resetLink = `${process.env.APP_URL}/reset-senha?token=${resetToken}&email=vitriimarketplace@gmail.com`;
-
-      const success = await sendPasswordResetEmail(
-        "vitriimarketplace@gmail.com",
-        resetLink,
-        "Administrador"
-      );
-
-      if (success) {
-        res.status(200).json({
-          success: true,
-          message: "✅ Email de reset de senha enviado com sucesso!",
-          to: "vitriimarketplace@gmail.com",
-          resetLink: resetLink,
-          token: resetToken,
-        });
-      } else {
-        res.status(500).json({
-          success: false,
-          error: "❌ Erro ao enviar email de reset.",
-        });
-      }
-    } catch (error) {
-      console.error("Erro ao enviar email de reset:", error);
-      res.status(500).json({
-        success: false,
-        error: "Erro ao processar envio de email",
-        details: error instanceof Error ? error.message : "Desconhecido",
-      });
-    }
-  });
-
-  app.post("/api/usracessos", createUsuario);
-  app.put("/api/usracessos/:id", updateUsuario);
-  app.delete("/api/usracessos/:id", deleteUsuario);
+  app.post("/api/usracessos", extractUserId, requireAdmin, createUsuario);
+  app.put("/api/usracessos/:id", extractUserId, updateUsuario);
+  app.delete("/api/usracessos/:id", extractUserId, requireAdmin, deleteUsuario);
   app.patch("/api/usracessos/:id/localidade-padrao", extractUserId, updateLocalidadePadrao);
   app.patch("/api/usracessos/:id/change-password", extractUserId, changePassword);
 
@@ -960,12 +944,12 @@ export function createServer() {
     extractUserId,
     getAnunciantesByUsuario,
   );
-  app.get("/api/anunciantes", extractUserId, getAnunciantes);
+  app.get("/api/anunciantes", optionalAuth, getAnunciantes);
   app.get("/api/anunciantes/:id", getAnuncianteById);
   app.post("/api/anunciantes", extractUserId, createAnunciante);
   app.put("/api/anunciantes/:id", extractUserId, updateAnunciante);
-  app.delete("/api/anunciantes/:id", deleteAnunciante);
-  app.post("/api/anunciantes/:id/usuarios", adicionarUsuarioAnunciante);
+  app.delete("/api/anunciantes/:id", extractUserId, requireAdmin, deleteAnunciante);
+  app.post("/api/anunciantes/:id/usuarios", extractUserId, adicionarUsuarioAnunciante);
   app.get("/api/anunciantes/:anuncianteId/usuarios", getEquipeAnunciante);
   app.get(
     "/api/anunciantes/:anuncianteId/produtos-para-anuncio",
@@ -976,28 +960,28 @@ export function createServer() {
   // All /api/lojas calls should be updated to /api/anunciantes
 
   // Grupos de Productos routes
-  app.get("/api/grupos-productos", extractUserId, getGrupos);
+  app.get("/api/grupos-productos", optionalAuth, getGrupos);
   app.get("/api/grupos-productos/:id", getGrupoById);
   app.get("/api/grupos-productos/:id/productos", getProductosOfGrupo);
   // NOTE: /api/lojas/:anuncianteId/grupos-productos has been removed
   // Use /api/grupos-productos?anuncianteId=X instead
   app.post("/api/grupos-productos", extractUserId, createGrupo);
-  app.put("/api/grupos-productos/:id", updateGrupo);
-  app.delete("/api/grupos-productos/:id", deleteGrupo);
+  app.put("/api/grupos-productos/:id", extractUserId, updateGrupo);
+  app.delete("/api/grupos-productos/:id", extractUserId, deleteGrupo);
 
   // Productos routes
   app.get("/api/productos", getProductos);
   app.get("/api/productos/:id", getProductoById);
-  app.post("/api/productos", createProducto);
-  app.put("/api/productos/:id", updateProducto);
-  app.delete("/api/productos/:id", deleteProducto);
+  app.post("/api/productos", extractUserId, createProducto);
+  app.put("/api/productos/:id", extractUserId, updateProducto);
+  app.delete("/api/productos/:id", extractUserId, deleteProducto);
 
   // Tabelas de Preço routes
   app.get("/api/tabelas-preco", getTabelas);
   app.get("/api/tabelas-preco/:id", getTabelaById);
-  app.post("/api/tabelas-preco", createTabela);
-  app.put("/api/tabelas-preco/:id", updateTabela);
-  app.delete("/api/tabelas-preco/:id", deleteTabela);
+  app.post("/api/tabelas-preco", extractUserId, createTabela);
+  app.put("/api/tabelas-preco/:id", extractUserId, updateTabela);
+  app.delete("/api/tabelas-preco/:id", extractUserId, deleteTabela);
 
   // Anúncios routes
   // Note: More specific routes must come BEFORE parameterized routes
@@ -1033,7 +1017,7 @@ export function createServer() {
   app.patch("/api/anuncios/:id/activate", activateAnuncio);
   app.delete("/api/anuncios/:id", deleteAnuncio);
   app.get("/api/anuncios/:id/can-edit", canEditAnuncio);
-  app.post("/api/anuncios/:id/view", extractUserId, recordAnuncioView);
+  app.post("/api/anuncios/:id/view", optionalAuth, recordAnuncioView);
 
   // Anúncio Photos routes
   app.get("/api/anuncios/:id/fotos", getAnuncioFotos);
@@ -1143,7 +1127,7 @@ export function createServer() {
   app.get("/api/eventos-agenda/:anuncianteId/is-announcer", extractUserId, isUserAnunciante);
   app.get("/api/eventos-agenda/:eventoId/can-edit", extractUserId, canUserEditEvento);
   app.post("/api/eventos-agenda", extractUserId, createEvento);
-  app.post("/api/eventos-agenda/visitante/criar", createEventoVisitante); // No extractUserId - allows guests
+  app.post("/api/eventos-agenda/visitante/criar", optionalAuth, createEventoVisitante); // Allows guests, links to account if logged in
   app.put("/api/eventos-agenda/:id", extractUserId, updateEvento);
   app.delete("/api/eventos-agenda/:id", extractUserId, deleteEvento);
   app.post("/api/eventos-agenda/:id/permissoes", extractUserId, addPermissao);
@@ -1176,7 +1160,7 @@ export function createServer() {
   app.get("/api/agendas-horarios/check-time", isTimeWithinSchedule);
 
   // Reservas de Evento routes
-  app.post("/api/reservas-evento", criarReservaOuListaEspera);
+  app.post("/api/reservas-evento", optionalAuth, criarReservaOuListaEspera);
   app.get("/api/reservas-evento/:eventoId", extractUserId, getReservasDoEvento);
   app.get("/api/reservas-evento/:eventoId/count", getReservaCount);
   app.patch("/api/reservas-evento/:id/confirmar", extractUserId, confirmarReserva);
@@ -1222,40 +1206,55 @@ export function createServer() {
   app.get("/api/filas-espera/user-count", extractUserId, getWaitingListCount);
 
   // Funcionalidades (Features/Permissions) routes
+  // Granting/revoking permissions is admin-only: these define what any user account can do,
+  // so leaving them unguarded is a direct privilege-escalation path.
   app.get("/api/funcionalidades", getFuncionalidades);
   app.get("/api/funcionalidades/:id", getFuncionalidadeById);
   app.get(
     "/api/usuarios/:usuarioId/funcionalidades",
+    extractUserId,
     getFuncionalidadesByUsuario,
   );
-  app.post("/api/funcionalidades", createFuncionalidade);
-  app.put("/api/funcionalidades/:id", updateFuncionalidade);
-  app.delete("/api/funcionalidades/:id", deleteFuncionalidade);
+  app.post("/api/funcionalidades", extractUserId, requireAdmin, createFuncionalidade);
+  app.put("/api/funcionalidades/:id", extractUserId, requireAdmin, updateFuncionalidade);
+  app.delete("/api/funcionalidades/:id", extractUserId, requireAdmin, deleteFuncionalidade);
 
   // Usuario x Funcionalidades (User-Permission mapping) routes
   app.post(
     "/api/usuarios/:usuarioId/funcionalidades/grant",
+    extractUserId,
+    requireAdmin,
     grantFuncionalidade,
   );
   app.post(
     "/api/usuarios/:usuarioId/funcionalidades/grant-multiple",
+    extractUserId,
+    requireAdmin,
     grantFuncionalidades,
   );
   app.delete(
     "/api/usuarios/:usuarioId/funcionalidades/:funcionalidadeId",
+    extractUserId,
+    requireAdmin,
     revokeFuncionalidade,
   );
   app.post(
     "/api/usuarios/:usuarioId/funcionalidades/revoke-multiple",
+    extractUserId,
+    requireAdmin,
     revokeFuncionalidades,
   );
-  app.get("/api/usuarios-funcionalidades", listUserFuncionalidades);
+  app.get("/api/usuarios-funcionalidades", extractUserId, requireAdmin, listUserFuncionalidades);
   app.post(
     "/api/usuarios/:usuarioId/funcionalidades/grant-all",
+    extractUserId,
+    requireAdmin,
     grantAllFuncionalidades,
   );
   app.post(
     "/api/usuarios/:usuarioId/funcionalidades/revoke-all",
+    extractUserId,
+    requireAdmin,
     revokeAllFuncionalidades,
   );
 

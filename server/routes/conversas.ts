@@ -72,6 +72,7 @@ export async function getConversas(req: Request, res: Response) {
         },
       },
       orderBy: { dataAtualizacao: "desc" },
+      take: 200,
     });
 
     // Format response with last message

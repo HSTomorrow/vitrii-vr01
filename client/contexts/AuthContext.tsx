@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { setAuthToken } from "@/lib/apiAuth";
 
 interface User {
   id: number;
@@ -18,7 +19,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
-  login: (usuario: User) => void;
+  login: (usuario: User, token: string) => void;
   logout: () => void;
   isLoggedIn: boolean;
 }
@@ -39,19 +40,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error("Error loading user from localStorage:", error);
       localStorage.removeItem("vitrii_user");
+      setAuthToken(null);
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  const login = (usuario: User) => {
+  const login = (usuario: User, token: string) => {
     setUser(usuario);
     localStorage.setItem("vitrii_user", JSON.stringify(usuario));
+    setAuthToken(token);
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem("vitrii_user");
+    setAuthToken(null);
   };
 
   return (

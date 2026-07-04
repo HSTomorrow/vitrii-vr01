@@ -2,30 +2,29 @@ import { RequestHandler } from "express";
 import prisma from "../lib/prisma";
 import { createConversationForLinkedUsuarios } from "../lib/create-conversation";
 
-// Helper function to check if event time is within the announcer's schedule
-async function isEventWithinSchedule(anuncianteId: number, dataInicio: Date): Promise<boolean> {
-  try {
-    const diaSemana = dataInicio.getDay(); // 0=Sunday, 1=Monday, ..., 6=Saturday
-    const hora = `${String(dataInicio.getHours()).padStart(2, "0")}:${String(dataInicio.getMinutes()).padStart(2, "0")}`;
+// Fetches all active horarios for the announcer once, then computes each event's
+// status in memory, instead of one `agendas_horarios` query per event (N+1).
+async function attachScheduleStatus<T extends { dataInicio: Date }>(
+  anuncianteId: number,
+  eventos: T[],
+): Promise<(T & { statusCalculado: string })[]> {
+  const horarios = await prisma.agendas_horarios.findMany({
+    where: { anuncianteId, ativo: true },
+  });
 
-    const horario = await prisma.agendas_horarios.findFirst({
-      where: {
-        anuncianteId: anuncianteId,
-        diaSemana: diaSemana,
-        ativo: true,
-      },
-    });
+  const horarioMap = new Map(horarios.map((h) => [h.diaSemana, h]));
 
-    if (!horario) {
-      return false;
-    }
+  return eventos.map((evento) => {
+    const diaSemana = evento.dataInicio.getDay();
+    const hora = `${String(evento.dataInicio.getHours()).padStart(2, "0")}:${String(evento.dataInicio.getMinutes()).padStart(2, "0")}`;
+    const horario = horarioMap.get(diaSemana);
+    const isWithinSchedule = !!horario && hora >= horario.horaInicio && hora < horario.horaFim;
 
-    const isWithin = hora >= horario.horaInicio && hora < horario.horaFim;
-    return isWithin;
-  } catch (error) {
-    console.error("[isEventWithinSchedule]", error);
-    return false;
-  }
+    return {
+      ...evento,
+      statusCalculado: isWithinSchedule ? "Disponivel" : "Fora do Horario",
+    };
+  });
 }
 
 // Get all events for an announcer (only for the announcer)
@@ -200,22 +199,7 @@ export const getEventosVisivelsPara: RequestHandler = async (req, res) => {
       ].sort((a, b) => new Date(a.dataInicio).getTime() - new Date(b.dataInicio).getTime());
 
       // Add dynamic status for out-of-schedule events
-      const eventosComStatus = await Promise.all(
-        allVisibleEvents.map(async (evento) => {
-          const isWithinSchedule = await isEventWithinSchedule(
-            anuncianteId_num,
-            evento.dataInicio
-          );
-
-          // If event is outside schedule, add "Fora do Horario" status indicator
-          const calculatedStatus = !isWithinSchedule ? "Fora do Horario" : "Disponivel";
-
-          return {
-            ...evento,
-            statusCalculado: calculatedStatus,
-          };
-        })
-      );
+      const eventosComStatus = await attachScheduleStatus(anuncianteId_num, allVisibleEvents);
 
       return res.json({ data: eventosComStatus });
     }
@@ -281,22 +265,7 @@ export const getEventosVisivelsPara: RequestHandler = async (req, res) => {
     ].sort((a, b) => new Date(a.dataInicio).getTime() - new Date(b.dataInicio).getTime());
 
     // Add dynamic status for out-of-schedule events
-    const eventosComStatus = await Promise.all(
-      allVisibleEvents.map(async (evento) => {
-        const isWithinSchedule = await isEventWithinSchedule(
-          anuncianteId_num,
-          evento.dataInicio
-        );
-
-        // If event is outside schedule, add "Fora do Horario" status indicator
-        const calculatedStatus = !isWithinSchedule ? "Fora do Horario" : "Disponivel";
-
-        return {
-          ...evento,
-          statusCalculado: calculatedStatus,
-        };
-      })
-    );
+    const eventosComStatus = await attachScheduleStatus(anuncianteId_num, allVisibleEvents);
 
     res.json({ data: eventosComStatus });
   } catch (error) {
@@ -443,17 +412,18 @@ export const updateEvento: RequestHandler = async (req, res) => {
     }
 
     // Check if user is the announcer or admin
-    const usuarioAnunciante = await prisma.usuarios_anunciantes.findFirst({
-      where: {
-        usuarioId: userId,
-        anuncianteId: evento.anuncianteId,
-      },
-    });
-
-    const usuarioAdmin = await prisma.usracessos.findUnique({
-      where: { id: userId },
-      select: { tipoUsuario: true },
-    });
+    const [usuarioAnunciante, usuarioAdmin] = await Promise.all([
+      prisma.usuarios_anunciantes.findFirst({
+        where: {
+          usuarioId: userId,
+          anuncianteId: evento.anuncianteId,
+        },
+      }),
+      prisma.usracessos.findUnique({
+        where: { id: userId },
+        select: { tipoUsuario: true },
+      }),
+    ]);
 
     const isAnunciante = !!usuarioAnunciante;
     const isAdmin = usuarioAdmin?.tipoUsuario === "adm";
@@ -551,17 +521,18 @@ export const deleteEvento: RequestHandler = async (req, res) => {
     }
 
     // Check if user is the announcer or admin
-    const usuarioAnunciante = await prisma.usuarios_anunciantes.findFirst({
-      where: {
-        usuarioId: userId,
-        anuncianteId: evento.anuncianteId,
-      },
-    });
-
-    const usuarioAdmin = await prisma.usracessos.findUnique({
-      where: { id: userId },
-      select: { tipoUsuario: true },
-    });
+    const [usuarioAnunciante, usuarioAdmin] = await Promise.all([
+      prisma.usuarios_anunciantes.findFirst({
+        where: {
+          usuarioId: userId,
+          anuncianteId: evento.anuncianteId,
+        },
+      }),
+      prisma.usracessos.findUnique({
+        where: { id: userId },
+        select: { tipoUsuario: true },
+      }),
+    ]);
 
     const isAnunciante = !!usuarioAnunciante;
     const isAdmin = usuarioAdmin?.tipoUsuario === "adm";
@@ -1005,18 +976,18 @@ export const isUserAnunciante: RequestHandler = async (req, res) => {
     }
 
     // Check if user is the announcer
-    const usuarioAnunciante = await prisma.usuarios_anunciantes.findFirst({
-      where: {
-        usuarioId: userId,
-        anuncianteId: anuncianteId_num,
-      },
-    });
-
-    // Check if user is admin
-    const usuarioAdmin = await prisma.usracessos.findUnique({
-      where: { id: userId },
-      select: { tipoUsuario: true },
-    });
+    const [usuarioAnunciante, usuarioAdmin] = await Promise.all([
+      prisma.usuarios_anunciantes.findFirst({
+        where: {
+          usuarioId: userId,
+          anuncianteId: anuncianteId_num,
+        },
+      }),
+      prisma.usracessos.findUnique({
+        where: { id: userId },
+        select: { tipoUsuario: true },
+      }),
+    ]);
 
     const isAnunciante = !!usuarioAnunciante;
     const isAdmin = usuarioAdmin?.tipoUsuario === "adm";
@@ -1059,17 +1030,18 @@ export const canUserEditEvento: RequestHandler = async (req, res) => {
     }
 
     // Check if user is the announcer or admin
-    const usuarioAnunciante = await prisma.usuarios_anunciantes.findFirst({
-      where: {
-        usuarioId: userId,
-        anuncianteId: evento.anuncianteId,
-      },
-    });
-
-    const usuarioAdmin = await prisma.usracessos.findUnique({
-      where: { id: userId },
-      select: { tipoUsuario: true },
-    });
+    const [usuarioAnunciante, usuarioAdmin] = await Promise.all([
+      prisma.usuarios_anunciantes.findFirst({
+        where: {
+          usuarioId: userId,
+          anuncianteId: evento.anuncianteId,
+        },
+      }),
+      prisma.usracessos.findUnique({
+        where: { id: userId },
+        select: { tipoUsuario: true },
+      }),
+    ]);
 
     const isAnunciante = !!usuarioAnunciante;
     const isAdmin = usuarioAdmin?.tipoUsuario === "adm";

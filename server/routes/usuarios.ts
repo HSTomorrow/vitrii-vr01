@@ -4,6 +4,7 @@ import { z } from "zod";
 import bcryptjs from "bcryptjs";
 import { sendPasswordResetEmail, sendWelcomeEmail, sendEmailVerificationEmail } from "../lib/emailService";
 import { recalculateAdCounters } from "../lib/recalculateCounters";
+import { signAuthToken } from "../lib/jwt";
 import crypto from "crypto";
 
 // NOTE: This file handles usracessos (User Access) model operations
@@ -88,6 +89,7 @@ export const getUsuarios: RequestHandler = async (req, res) => {
       orderBy: {
         dataCriacao: "desc",
       },
+      take: 500,
     });
 
     res.json({
@@ -108,6 +110,14 @@ export const getUsuarios: RequestHandler = async (req, res) => {
 export const getUsuarioById: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
+
+    if (req.userId !== parseInt(id) && req.userType !== "adm") {
+      return res.status(403).json({
+        success: false,
+        error: "Você não tem permissão para ver este usuário",
+      });
+    }
+
     const usuario = await prisma.usracessos.findUnique({
       where: { id: parseInt(id) },
       select: {
@@ -293,14 +303,11 @@ export const signInUsuario: RequestHandler = async (req, res) => {
       },
     });
 
-    // Recalculate ad counters on login to ensure they're always accurate
-    try {
-      await recalculateAdCounters(usuario.id);
-      console.log("[signInUsuario] ✅ Contadores de anúncios recalculados");
-    } catch (error) {
-      console.warn("[signInUsuario] ⚠️ Erro ao recalcular contadores:", error);
-      // Don't fail login if counter recalculation fails
-    }
+    const token = signAuthToken({
+      userId: usuario.id,
+      tipoUsuario: usuario.tipoUsuario,
+      email: usuario.email,
+    });
 
     console.log("[signInUsuario] ✅ Login bem-sucedido:", {
       id: usuarioSemSenha.id,
@@ -313,8 +320,17 @@ export const signInUsuario: RequestHandler = async (req, res) => {
     res.status(200).json({
       success: true,
       data: usuarioSemSenha,
+      token,
       message: "Login realizado com sucesso",
     });
+
+    // Recalculate ad counters off the response critical path - doesn't affect
+    // the payload above (it was already read from `usuario` before this runs).
+    recalculateAdCounters(usuario.id)
+      .then(() => console.log("[signInUsuario] ✅ Contadores de anúncios recalculados"))
+      .catch((error) =>
+        console.warn("[signInUsuario] ⚠️ Erro ao recalcular contadores:", error),
+      );
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     const errorStack = error instanceof Error ? error.stack : "";
@@ -710,6 +726,14 @@ export const updateUsuario: RequestHandler = async (req, res) => {
     const validatedData = UsuarioUpdateSchema.parse(req.body);
 
     const userId = parseInt(id);
+
+    // Only the account owner or an admin may edit this profile.
+    if (req.userId !== userId && req.userType !== "adm") {
+      return res.status(403).json({
+        success: false,
+        error: "Você não tem permissão para editar este usuário",
+      });
+    }
 
     // Normalize CPF/CNPJ to digits-only format
     if (validatedData.cpf && validatedData.cpf.trim()) {
@@ -1426,8 +1450,9 @@ export const checkUserStatusByEmail: RequestHandler = async (req, res) => {
     const usuario = await prisma.usracessos.findUnique({
       where: { email: email as string },
       select: {
-        id: true,
-        nome: true,
+        // Only the fields the sign-in polling UI actually needs - this endpoint
+        // is intentionally public (checked before login), so it must not leak
+        // other users' names/ids to an arbitrary email scan.
         email: true,
         status: true,
         emailVerificado: true,

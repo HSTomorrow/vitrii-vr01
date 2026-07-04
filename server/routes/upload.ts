@@ -12,16 +12,48 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
+// Maps a *verified* mimetype to a fixed extension - the saved file's extension is never
+// taken from the client-supplied originalname, so an attacker can't upload e.g. "evil.html"
+// with a spoofed image/jpeg Content-Type and have it served back as HTML (stored XSS).
+const EXT_BY_MIME: Record<string, string> = {
+  "image/jpeg": ".jpg",
+  "image/png": ".png",
+  "image/gif": ".gif",
+  "image/webp": ".webp",
+};
+
+// First bytes ("magic numbers") of each allowed format, checked against the actual
+// file contents after upload since fileFilter only sees the client-supplied mimetype.
+const MAGIC_BYTES: Record<string, Buffer[]> = {
+  "image/jpeg": [Buffer.from([0xff, 0xd8, 0xff])],
+  "image/png": [Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])],
+  "image/gif": [Buffer.from("GIF87a", "ascii"), Buffer.from("GIF89a", "ascii")],
+  "image/webp": [Buffer.from("RIFF", "ascii")], // followed by size + "WEBP", checked separately below
+};
+
+function matchesMagicBytes(mimetype: string, buffer: Buffer): boolean {
+  const signatures = MAGIC_BYTES[mimetype];
+  if (!signatures) return false;
+
+  if (mimetype === "image/webp") {
+    return (
+      buffer.length >= 12 &&
+      buffer.subarray(0, 4).toString("ascii") === "RIFF" &&
+      buffer.subarray(8, 12).toString("ascii") === "WEBP"
+    );
+  }
+
+  return signatures.some((sig) => buffer.subarray(0, sig.length).equals(sig));
+}
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
-    // Generate unique filename
     const uniqueSuffix = `${Date.now()}-${crypto.randomBytes(6).toString("hex")}`;
-    const ext = path.extname(file.originalname);
-    const name = path.basename(file.originalname, ext);
-    cb(null, `${name}-${uniqueSuffix}${ext}`);
+    const ext = EXT_BY_MIME[file.mimetype] || ".bin";
+    cb(null, `upload-${uniqueSuffix}${ext}`);
   },
 });
 
@@ -123,10 +155,32 @@ export const handleUpload: RequestHandler = (req, res) => {
     // Validate file properties
     if (!req.file.size || req.file.size === 0) {
       console.warn("[handleUpload] Arquivo vazio:", req.file.originalname);
+      fs.unlink(req.file.path, () => {});
       return res.status(400).json({
         success: false,
         error: "Arquivo vazio",
         details: "O arquivo selecionado está vazio. Selecione outro arquivo.",
+      });
+    }
+
+    // fileFilter only checked the client-supplied Content-Type header, which an attacker
+    // controls. Confirm the actual file bytes match the claimed image format before
+    // accepting the upload; otherwise a non-image file could be smuggled onto the server.
+    const headerBytes = Buffer.alloc(12);
+    const fd = fs.openSync(req.file.path, "r");
+    fs.readSync(fd, headerBytes, 0, 12, 0);
+    fs.closeSync(fd);
+
+    if (!matchesMagicBytes(req.file.mimetype, headerBytes)) {
+      console.warn("[handleUpload] Conteúdo do arquivo não corresponde ao tipo declarado:", {
+        mimetype: req.file.mimetype,
+        filename: req.file.filename,
+      });
+      fs.unlink(req.file.path, () => {});
+      return res.status(400).json({
+        success: false,
+        error: "Arquivo inválido",
+        details: "O conteúdo do arquivo não corresponde a uma imagem válida.",
       });
     }
 

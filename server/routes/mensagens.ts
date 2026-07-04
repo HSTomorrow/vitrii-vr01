@@ -6,6 +6,8 @@ export async function getMensagensConversa(req: Request, res: Response) {
     const { conversaId } = req.params;
     const conversaIdNum = parseInt(conversaId, 10);
 
+    // Cap to the most recent 200 messages instead of loading the entire thread -
+    // long-lived conversations would otherwise grow this query unbounded.
     const mensagens = await prisma.mensagens.findMany({
       where: {
         conversaId: conversaIdNum,
@@ -33,8 +35,10 @@ export async function getMensagensConversa(req: Request, res: Response) {
           },
         },
       },
-      orderBy: { dataCriacao: "asc" },
+      orderBy: { dataCriacao: "desc" },
+      take: 200,
     });
+    mensagens.reverse();
 
     res.json({ data: mensagens });
   } catch (error) {

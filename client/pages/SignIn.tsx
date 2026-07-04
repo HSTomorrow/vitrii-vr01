@@ -110,7 +110,7 @@ export default function SignIn() {
     onSuccess: (responseData) => {
       console.log("[SignIn] Login success - Processing user data");
       if (responseData.data) {
-        login(responseData.data);
+        login(responseData.data, responseData.token);
         const userName = responseData.data.nome.split(" ")[0];
         toast.success(`Bem-vindo, ${userName}! 🎉`, {
           description: "Redirecionando para a página inicial...",

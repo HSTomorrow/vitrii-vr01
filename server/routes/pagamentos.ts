@@ -1,4 +1,5 @@
 import { RequestHandler } from "express";
+import crypto from "crypto";
 import prisma from "../lib/prisma";
 import { z } from "zod";
 import { Decimal } from "@prisma/client/runtime/library";
@@ -35,6 +36,13 @@ export const getPagamentoByAnuncioId: RequestHandler = async (req, res) => {
       });
     }
 
+    if (pagamento.anuncio.usuarioId !== req.userId && req.userType !== "adm") {
+      return res.status(403).json({
+        success: false,
+        error: "Você não tem permissão para ver este pagamento",
+      });
+    }
+
     res.json({
       success: true,
       data: pagamento,
@@ -62,6 +70,13 @@ export const createPagamento: RequestHandler = async (req, res) => {
       return res.status(404).json({
         success: false,
         error: "Anúncio não encontrado",
+      });
+    }
+
+    if (anuncio.usuarioId !== req.userId && req.userType !== "adm") {
+      return res.status(403).json({
+        success: false,
+        error: "Você não tem permissão para gerar pagamento para este anúncio",
       });
     }
 
@@ -134,6 +149,39 @@ export const updatePagamentoStatus: RequestHandler = async (req, res) => {
     const { id } = req.params;
     const validatedData = PagamentoStatusUpdateSchema.parse(req.body);
 
+    // req.userId is only set for real HTTP requests (extractUserId middleware) - the
+    // webhook handler below calls this function directly with a bare {params, body}
+    // object, so it's absent there and this check is skipped for that internal path.
+    if (req.userId !== undefined) {
+      const existing = await prisma.pagamentos.findUnique({
+        where: { id: parseInt(id) },
+        include: { anuncio: { select: { usuarioId: true } } },
+      });
+
+      if (!existing) {
+        return res.status(404).json({ success: false, error: "Pagamento não encontrado" });
+      }
+
+      const isOwner = existing.anuncio.usuarioId === req.userId;
+      const isAdmin = req.userType === "adm";
+
+      if (!isOwner && !isAdmin) {
+        return res.status(403).json({
+          success: false,
+          error: "Você não tem permissão para alterar este pagamento",
+        });
+      }
+
+      // Owners may only cancel their own pending payment - marking it "pago"/"aprovado"
+      // is reserved for admin approval or the payment provider's webhook.
+      if (!isAdmin && validatedData.status !== "cancelado") {
+        return res.status(403).json({
+          success: false,
+          error: "Apenas administradores podem confirmar pagamentos",
+        });
+      }
+    }
+
     const pagamento = await prisma.pagamentos.update({
       where: { id: parseInt(id) },
       data: {
@@ -197,12 +245,20 @@ export const getPagamentoStatus: RequestHandler = async (req, res) => {
 
     const pagamento = await prisma.pagamentos.findUnique({
       where: { id: parseInt(id) },
+      include: { anuncio: { select: { usuarioId: true } } },
     });
 
     if (!pagamento) {
       return res.status(404).json({
         success: false,
         error: "Pagamento não encontrado",
+      });
+    }
+
+    if (pagamento.anuncio.usuarioId !== req.userId && req.userType !== "adm") {
+      return res.status(403).json({
+        success: false,
+        error: "Você não tem permissão para ver este pagamento",
       });
     }
 
@@ -235,13 +291,41 @@ export const getPagamentoStatus: RequestHandler = async (req, res) => {
   }
 };
 
+// Verifies the `x-webhook-signature` header (hex HMAC-SHA256 of the raw body,
+// keyed with PAYMENT_WEBHOOK_SECRET). Without this, anyone could POST a forged
+// body to mark any payment as paid and activate the linked ad for free.
+function isValidWebhookSignature(req: any): boolean {
+  const secret = process.env.PAYMENT_WEBHOOK_SECRET;
+  if (!secret) {
+    console.error("[handlePaymentWebhook] PAYMENT_WEBHOOK_SECRET não configurado - recusando webhook");
+    return false;
+  }
+
+  const signature = req.headers["x-webhook-signature"];
+  const rawBody: Buffer | undefined = req.rawBody;
+  if (!signature || typeof signature !== "string" || !rawBody) {
+    return false;
+  }
+
+  const expected = crypto.createHmac("sha256", secret).update(rawBody).digest("hex");
+  const expectedBuf = Buffer.from(expected, "hex");
+  const signatureBuf = Buffer.from(signature, "hex");
+
+  return (
+    expectedBuf.length === signatureBuf.length &&
+    crypto.timingSafeEqual(expectedBuf, signatureBuf)
+  );
+}
+
 // Webhook handler for payment confirmations (from Mercado Pago or other providers)
 export const handlePaymentWebhook: RequestHandler = async (req, res) => {
   try {
-    const { action, data } = req.body;
+    if (!isValidWebhookSignature(req)) {
+      console.warn("[handlePaymentWebhook] Assinatura inválida ou ausente");
+      return res.status(401).json({ success: false, error: "Assinatura inválida" });
+    }
 
-    // Verify webhook signature (in production, verify with provider's signature)
-    // For demo, we'll accept any webhook
+    const { action, data } = req.body;
 
     if (action === "payment.created" || action === "payment.updated") {
       const { id: externalId, status, transaction_id } = data;
@@ -292,6 +376,22 @@ export const cancelPagamento: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
+    const existing = await prisma.pagamentos.findUnique({
+      where: { id: parseInt(id) },
+      include: { anuncio: { select: { usuarioId: true } } },
+    });
+
+    if (!existing) {
+      return res.status(404).json({ success: false, error: "Pagamento não encontrado" });
+    }
+
+    if (existing.anuncio.usuarioId !== req.userId && req.userType !== "adm") {
+      return res.status(403).json({
+        success: false,
+        error: "Você não tem permissão para cancelar este pagamento",
+      });
+    }
+
     const pagamento = await prisma.pagamentos.update({
       where: { id: parseInt(id) },
       data: {
@@ -332,6 +432,22 @@ export const uploadComprovantePagemento: RequestHandler = async (req, res) => {
       return res.status(400).json({
         success: false,
         error: "Comprovante é obrigatório",
+      });
+    }
+
+    const existing = await prisma.pagamentos.findUnique({
+      where: { id: parseInt(id) },
+      include: { anuncio: { select: { usuarioId: true } } },
+    });
+
+    if (!existing) {
+      return res.status(404).json({ success: false, error: "Pagamento não encontrado" });
+    }
+
+    if (existing.anuncio.usuarioId !== req.userId && req.userType !== "adm") {
+      return res.status(403).json({
+        success: false,
+        error: "Você não tem permissão para enviar comprovante para este pagamento",
       });
     }
 
@@ -568,6 +684,13 @@ export const marcarPagamentoRealizado: RequestHandler = async (req, res) => {
       return res.status(404).json({
         success: false,
         error: "Anúncio não encontrado",
+      });
+    }
+
+    if (anuncio.usuarioId !== req.userId && req.userType !== "adm") {
+      return res.status(403).json({
+        success: false,
+        error: "Você não tem permissão para alterar este anúncio",
       });
     }
 

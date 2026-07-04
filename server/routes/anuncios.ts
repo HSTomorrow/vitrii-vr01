@@ -385,6 +385,28 @@ export const createAnuncio: RequestHandler = async (req, res) => {
     const validatedData = AnuncioCreateSchema.parse(req.body);
     console.log("[createAnuncio] Data validated successfully:", validatedData);
 
+    // Prevent creating an ad under someone else's account: the body's usuarioId must
+    // match the authenticated caller (admins may act on behalf of any user).
+    if (validatedData.usuarioId !== req.userId && req.userType !== "adm") {
+      return res.status(403).json({
+        success: false,
+        error: "Você não tem permissão para criar anúncios para este usuário",
+      });
+    }
+
+    // The target anunciante must actually belong to this user's team.
+    if (req.userType !== "adm") {
+      const membership = await prisma.usuarios_anunciantes.findFirst({
+        where: { usuarioId: req.userId, anuncianteId: validatedData.anuncianteId },
+      });
+      if (!membership) {
+        return res.status(403).json({
+          success: false,
+          error: "Você não tem permissão para publicar anúncios para este anunciante",
+        });
+      }
+    }
+
     let tabelaDePrecoId: number | null = null;
     let anuncioTipo: string = validatedData.tipo || "produto";
 
@@ -679,6 +701,13 @@ export const updateAnuncio: RequestHandler = async (req, res) => {
       return res.status(404).json({
         success: false,
         error: "Anúncio não encontrado",
+      });
+    }
+
+    if (currentAd.usuarioId !== req.userId && req.userType !== "adm") {
+      return res.status(403).json({
+        success: false,
+        error: "Você não tem permissão para editar este anúncio",
       });
     }
 

@@ -1,5 +1,6 @@
 import { RequestHandler } from "express";
 import prisma from "../lib/prisma";
+import { verifyAuthToken } from "../lib/jwt";
 
 // Extend Express Request to include user info
 declare global {
@@ -150,48 +151,56 @@ export const requireAdmin: RequestHandler = async (req, res, next) => {
 };
 
 /**
- * Middleware to extract user ID from request
- * This should be used before permission guard middleware
- * Gets userId from multiple sources (params, query, body, headers)
+ * Auth middleware: verifies the signed JWT sent as `Authorization: Bearer <token>`
+ * and populates req.userId/req.userType from its (server-signed) payload.
+ *
+ * Kept the historical name `extractUserId` (rather than renaming to e.g. `authenticate`)
+ * because ~60 route registrations in server/index.ts import it by this name — previously
+ * it just read an unsigned `x-user-id` header, which let any caller impersonate any user.
+ * It now requires a valid token, so req.userId is trustworthy for authorization decisions.
  */
 export const extractUserId: RequestHandler = (req, res, next) => {
-  try {
-    // Try to get userId from (in order of priority):
-    // 1. Headers (x-user-id) - for authenticated API requests
-    // 2. URL parameter usuarioId (for nested routes like /api/usuarios/:usuarioId/...)
-    // Note: We avoid using generic :id param to prevent confusion between resource ID and user ID
-    // 3. Query parameter (?userId=123)
-    // 4. Request body ({userId: 123} or {usuarioId: 123})
+  const authHeader = req.headers.authorization;
+  const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
 
-    const userIdSource =
-      req.headers["x-user-id"] ||
-      req.params?.usuarioId ||
-      req.query?.userId ||
-      req.body?.usuarioId ||
-      req.body?.userId;
-
-    if (userIdSource) {
-      const parsedId = parseInt(userIdSource as string, 10);
-      if (!isNaN(parsedId)) {
-        req.userId = parsedId;
-        console.log(
-          `[extractUserId] Successfully extracted user ID: ${parsedId}`,
-        );
-      } else {
-        console.warn(`[extractUserId] Invalid user ID format: ${userIdSource}`);
-      }
-    } else {
-      console.log("[extractUserId] No user ID found in request");
-    }
-
-    next();
-  } catch (error) {
-    console.error("Error extracting user ID:", error);
-    res.status(400).json({
+  if (!token) {
+    return res.status(401).json({
       success: false,
-      error: "Erro ao processar ID do usuário",
+      error: "Autenticação necessária",
     });
   }
+
+  const payload = verifyAuthToken(token);
+  if (!payload) {
+    return res.status(401).json({
+      success: false,
+      error: "Sessão inválida ou expirada",
+    });
+  }
+
+  req.userId = payload.userId;
+  req.userType = payload.tipoUsuario;
+  next();
+};
+
+/**
+ * Like extractUserId, but for routes that must also work for anonymous callers
+ * (e.g. public listings, guest reservations). Populates req.userId when a valid
+ * token is present; otherwise leaves it undefined and continues.
+ */
+export const optionalAuth: RequestHandler = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+
+  if (token) {
+    const payload = verifyAuthToken(token);
+    if (payload) {
+      req.userId = payload.userId;
+      req.userType = payload.tipoUsuario;
+    }
+  }
+
+  next();
 };
 
 /**

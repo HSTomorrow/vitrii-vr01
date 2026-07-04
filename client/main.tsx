@@ -1,5 +1,9 @@
 import { createRoot } from "react-dom/client";
 import App from "./App";
+import { installAuthFetch } from "./lib/apiAuth";
+
+// Must run before any component mounts so every /api/ fetch call carries the auth token.
+installAuthFetch();
 
 // Initialize APP_URL for image URL normalization
 async function initializeAppUrl() {

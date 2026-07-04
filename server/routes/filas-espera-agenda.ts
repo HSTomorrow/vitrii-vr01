@@ -284,17 +284,18 @@ export const aprovarFilaEspera: RequestHandler = async (req, res) => {
     }
 
     // Check if user is the target announcer or admin
-    const usuarioAnunciante = await prisma.usuarios_anunciantes.findFirst({
-      where: {
-        usuarioId: userId,
-        anuncianteId: fila.anuncianteAlvoId,
-      },
-    });
-
-    const usuarioAdmin = await prisma.usracessos.findUnique({
-      where: { id: userId },
-      select: { tipoUsuario: true },
-    });
+    const [usuarioAnunciante, usuarioAdmin] = await Promise.all([
+      prisma.usuarios_anunciantes.findFirst({
+        where: {
+          usuarioId: userId,
+          anuncianteId: fila.anuncianteAlvoId,
+        },
+      }),
+      prisma.usracessos.findUnique({
+        where: { id: userId },
+        select: { tipoUsuario: true },
+      }),
+    ]);
 
     const isAnunciante = !!usuarioAnunciante;
     const isAdmin = usuarioAdmin?.tipoUsuario === "adm";
@@ -393,17 +394,18 @@ export const rejeitarFilaEspera: RequestHandler = async (req, res) => {
     }
 
     // Check if user is the target announcer or admin
-    const usuarioAnunciante = await prisma.usuarios_anunciantes.findFirst({
-      where: {
-        usuarioId: userId,
-        anuncianteId: fila.anuncianteAlvoId,
-      },
-    });
-
-    const usuarioAdmin = await prisma.usracessos.findUnique({
-      where: { id: userId },
-      select: { tipoUsuario: true },
-    });
+    const [usuarioAnunciante, usuarioAdmin] = await Promise.all([
+      prisma.usuarios_anunciantes.findFirst({
+        where: {
+          usuarioId: userId,
+          anuncianteId: fila.anuncianteAlvoId,
+        },
+      }),
+      prisma.usracessos.findUnique({
+        where: { id: userId },
+        select: { tipoUsuario: true },
+      }),
+    ]);
 
     const isAnunciante = !!usuarioAnunciante;
     const isAdmin = usuarioAdmin?.tipoUsuario === "adm";
@@ -468,17 +470,18 @@ export const cancelarFilaEspera: RequestHandler = async (req, res) => {
 
     // Check if user is the requester, target announcer, or admin
     const isRequester = fila.usuarioSolicitanteId === userId;
-    const usuarioAnunciante = await prisma.usuarios_anunciantes.findFirst({
-      where: {
-        usuarioId: userId,
-        anuncianteId: fila.anuncianteAlvoId,
-      },
-    });
-
-    const usuarioAdmin = await prisma.usracessos.findUnique({
-      where: { id: userId },
-      select: { tipoUsuario: true },
-    });
+    const [usuarioAnunciante, usuarioAdmin] = await Promise.all([
+      prisma.usuarios_anunciantes.findFirst({
+        where: {
+          usuarioId: userId,
+          anuncianteId: fila.anuncianteAlvoId,
+        },
+      }),
+      prisma.usracessos.findUnique({
+        where: { id: userId },
+        select: { tipoUsuario: true },
+      }),
+    ]);
 
     const isAnunciante = !!usuarioAnunciante;
     const isAdmin = usuarioAdmin?.tipoUsuario === "adm";
@@ -880,17 +883,18 @@ export const canUserEditFila: RequestHandler = async (req, res) => {
 
     // Check if user is requester, announcer, or admin
     const isRequester = fila.usuarioSolicitanteId === userId;
-    const usuarioAnunciante = await prisma.usuarios_anunciantes.findFirst({
-      where: {
-        usuarioId: userId,
-        anuncianteId: fila.anuncianteAlvoId,
-      },
-    });
-
-    const usuarioAdmin = await prisma.usracessos.findUnique({
-      where: { id: userId },
-      select: { tipoUsuario: true },
-    });
+    const [usuarioAnunciante, usuarioAdmin] = await Promise.all([
+      prisma.usuarios_anunciantes.findFirst({
+        where: {
+          usuarioId: userId,
+          anuncianteId: fila.anuncianteAlvoId,
+        },
+      }),
+      prisma.usracessos.findUnique({
+        where: { id: userId },
+        select: { tipoUsuario: true },
+      }),
+    ]);
 
     const isAnunciante = !!usuarioAnunciante;
     const isAdmin = usuarioAdmin?.tipoUsuario === "adm";
