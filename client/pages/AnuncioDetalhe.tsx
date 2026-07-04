@@ -1180,10 +1180,10 @@ export default function AnuncioDetalhe() {
             </a>
           )}
 
-          {/* WhatsApp Contact */}
-          {anuncio.telefone && (
+          {/* WhatsApp Contact - only when the anunciante has a WhatsApp number on file */}
+          {anuncio.anunciantes?.whatsapp && (
             <a
-              href={`https://wa.me/55${anuncio.telefone.replace(/\D/g, "")}`}
+              href={`https://wa.me/${anuncio.anunciantes.whatsapp.replace(/\D/g, "")}`}
               target="_blank"
               rel="noopener noreferrer"
               className="flex-1 px-4 py-3 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2 text-sm"
