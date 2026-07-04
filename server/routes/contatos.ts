@@ -42,7 +42,7 @@ const ContatoUpdateSchema = ContatoCreateSchema.partial();
 // GET all contatos for a user (admin sees all, users see only their own)
 export const getContatosByUsuario: RequestHandler = async (req, res) => {
   try {
-    const usuarioId = parseInt(req.headers["x-user-id"] as string || "0");
+    const usuarioId = req.userId;
 
     if (!usuarioId) {
       return res.status(401).json({
@@ -110,7 +110,7 @@ export const getContatosByUsuario: RequestHandler = async (req, res) => {
 // CREATE new contato
 export const createContato: RequestHandler = async (req, res) => {
   try {
-    const usuarioId = parseInt(req.headers["x-user-id"] as string || "0");
+    const usuarioId = req.userId;
     console.log("[createContato] ========== INICIANDO CRIAÇÃO DE CONTATO ==========");
     console.log("[createContato] usuarioId:", usuarioId);
     console.log("[createContato] Request headers:", req.headers);
@@ -277,7 +277,7 @@ export const createContato: RequestHandler = async (req, res) => {
 export const updateContato: RequestHandler = async (req, res) => {
   try {
     const { contatoId } = req.params;
-    const usuarioId = parseInt(req.headers["x-user-id"] as string || "0");
+    const usuarioId = req.userId;
     const validatedData = ContatoUpdateSchema.parse(req.body);
 
     if (!usuarioId) {
@@ -396,7 +396,7 @@ export const updateContato: RequestHandler = async (req, res) => {
 export const deleteContato: RequestHandler = async (req, res) => {
   try {
     const { contatoId } = req.params;
-    const usuarioId = parseInt(req.headers["x-user-id"] as string || "0");
+    const usuarioId = req.userId;
 
     if (!usuarioId) {
       return res.status(401).json({
@@ -456,7 +456,7 @@ export const deleteContato: RequestHandler = async (req, res) => {
 // CHECK for duplicate contacts by email or phone (across ALL users)
 export const checkDuplicateContato: RequestHandler = async (req, res) => {
   try {
-    const usuarioId = parseInt(req.headers["x-user-id"] as string || "0");
+    const usuarioId = req.userId;
     const { email, celular } = req.body;
 
     if (!usuarioId) {

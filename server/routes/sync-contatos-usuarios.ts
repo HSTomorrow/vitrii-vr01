@@ -158,7 +158,7 @@ export const getLinkedUsuariosForContato: RequestHandler = async (req, res) => {
 // Get linked contatos for a usuario
 export const getLinkedContatosForUsuario: RequestHandler = async (req, res) => {
   try {
-    const usuarioId = parseInt(req.headers["x-user-id"] as string || "0");
+    const usuarioId = req.userId;
 
     if (!usuarioId) {
       return res.status(401).json({

@@ -754,13 +754,8 @@ export const updateAnuncio: RequestHandler = async (req, res) => {
     }
 
     // Handle dataFim calculation (admin can override, otherwise recalculate based on anunciante type)
-    const userId = parseInt(req.headers["x-user-id"] as string || "0");
-    const user = await prisma.usracessos.findUnique({
-      where: { id: userId },
-      select: { tipoUsuario: true },
-    });
-
-    const isAdmin = user?.tipoUsuario === "adm";
+    // req.userType comes from the verified JWT (set by extractUserId) - not a client-supplied header.
+    const isAdmin = req.userType === "adm";
     console.log("[updateAnuncio] isAdmin:", isAdmin, "updateData.dataFim:", updateData.dataFim);
 
     if (isAdmin && updateData.dataFim) {
@@ -1289,21 +1284,13 @@ export const getProdutosParaAnuncio: RequestHandler = async (req, res) => {
 export const canEditAnuncio: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
-    // Try to get userId from different sources
-    let usuarioId = req.userId;
+    // req.userId comes only from a verified token (see optionalAuth) - no
+    // client-supplied query/header fallback, which would let anyone claim
+    // to be any user and get a true/false answer about their permissions.
+    const usuarioId = req.userId;
 
+    // If no userId, return not authenticated
     if (!usuarioId) {
-      // Try to get from query parameter or header
-      usuarioId = parseInt(
-        (req.query.usuarioId as string) ||
-          (req.headers["x-user-id"] as string) ||
-          "0",
-        10,
-      );
-    }
-
-    // If still no userId, return not authenticated
-    if (!usuarioId || usuarioId === 0) {
       return res.json({
         success: true,
         canEdit: false,

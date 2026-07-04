@@ -1,31 +1,13 @@
 import { Router, Request, Response } from "express";
 import prisma from "../lib/prisma";
+import { extractUserId, requireAdmin } from "../middleware/permissionGuard";
 
 const router = Router();
 
-// Middleware to check if user is admin
-const checkAdminAuth = async (req: Request, res: Response, next: Function) => {
-  try {
-    const userId = parseInt(req.headers["x-user-id"] as string);
-    if (!userId) {
-      return res.status(401).json({ error: "User ID is required" });
-    }
-
-    const user = await prisma.usracessos.findUnique({
-      where: { id: userId },
-    });
-
-    if (!user || user.tipoUsuario !== "adm") {
-      return res.status(403).json({ error: "Only admins can manage categories" });
-    }
-
-    req.user = user;
-    next();
-  } catch (error) {
-    console.error("[Categorias] Auth error:", error);
-    res.status(500).json({ error: "Authentication failed" });
-  }
-};
+// Admin check for category management now goes through the shared, JWT-verified
+// extractUserId + requireAdmin middleware instead of trusting a raw x-user-id
+// header, which anyone could set to any value to pose as an admin.
+const checkAdminAuth = [extractUserId, requireAdmin];
 
 // Initialize table if it doesn't exist
 async function initializeCategoriaTable() {

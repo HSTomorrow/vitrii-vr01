@@ -38,7 +38,7 @@ const UpdateItemSchema = z.object({
 // GET all wishlists for logged user
 export const getListasDesejos: RequestHandler = async (req, res) => {
   try {
-    const usuarioId = parseInt(req.headers["x-user-id"] as string);
+    const usuarioId = req.userId;
     if (!usuarioId) {
       return res.status(401).json({
         success: false,
@@ -91,7 +91,7 @@ export const getListasDesejos: RequestHandler = async (req, res) => {
 export const getListaDesejosById: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
-    const usuarioId = parseInt(req.headers["x-user-id"] as string || "0");
+    const usuarioId = req.userId || 0;
 
     const lista = await prisma.listas_desejos.findUnique({
       where: { id: parseInt(id) },
@@ -167,7 +167,7 @@ export const getListaDesejosById: RequestHandler = async (req, res) => {
 // CREATE new wishlist
 export const createListaDesejos: RequestHandler = async (req, res) => {
   try {
-    const usuarioId = parseInt(req.headers["x-user-id"] as string);
+    const usuarioId = req.userId;
     if (!usuarioId) {
       return res.status(401).json({
         success: false,
@@ -213,7 +213,7 @@ export const createListaDesejos: RequestHandler = async (req, res) => {
 export const updateListaDesejos: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
-    const usuarioId = parseInt(req.headers["x-user-id"] as string);
+    const usuarioId = req.userId;
 
     if (!usuarioId) {
       return res.status(401).json({
@@ -276,7 +276,7 @@ export const updateListaDesejos: RequestHandler = async (req, res) => {
 export const deleteListaDesejos: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
-    const usuarioId = parseInt(req.headers["x-user-id"] as string);
+    const usuarioId = req.userId;
 
     if (!usuarioId) {
       return res.status(401).json({
@@ -324,7 +324,7 @@ export const deleteListaDesejos: RequestHandler = async (req, res) => {
 export const addItemLivre: RequestHandler = async (req, res) => {
   try {
     const { listaId } = req.params;
-    const usuarioId = parseInt(req.headers["x-user-id"] as string);
+    const usuarioId = req.userId;
 
     if (!usuarioId) {
       return res.status(401).json({
@@ -381,7 +381,7 @@ export const addItemLivre: RequestHandler = async (req, res) => {
 export const addItemAnuncio: RequestHandler = async (req, res) => {
   try {
     const { listaId } = req.params;
-    const usuarioId = parseInt(req.headers["x-user-id"] as string);
+    const usuarioId = req.userId;
 
     if (!usuarioId) {
       return res.status(401).json({
@@ -474,7 +474,7 @@ export const addItemAnuncio: RequestHandler = async (req, res) => {
 export const updateItemListaDesejos: RequestHandler = async (req, res) => {
   try {
     const { listaId, itemId } = req.params;
-    const usuarioId = parseInt(req.headers["x-user-id"] as string);
+    const usuarioId = req.userId;
 
     if (!usuarioId) {
       return res.status(401).json({
@@ -539,7 +539,7 @@ export const updateItemListaDesejos: RequestHandler = async (req, res) => {
 export const deleteItemListaDesejos: RequestHandler = async (req, res) => {
   try {
     const { listaId, itemId } = req.params;
-    const usuarioId = parseInt(req.headers["x-user-id"] as string);
+    const usuarioId = req.userId;
 
     if (!usuarioId) {
       return res.status(401).json({
@@ -593,7 +593,7 @@ export const addPermissao: RequestHandler = async (req, res) => {
   try {
     const { listaId } = req.params;
     const { anuncianteId } = req.body;
-    const usuarioId = parseInt(req.headers["x-user-id"] as string);
+    const usuarioId = req.userId;
 
     if (!usuarioId) {
       return res.status(401).json({
@@ -661,7 +661,7 @@ export const addPermissao: RequestHandler = async (req, res) => {
 export const removePermissao: RequestHandler = async (req, res) => {
   try {
     const { listaId, permissaoId } = req.params;
-    const usuarioId = parseInt(req.headers["x-user-id"] as string);
+    const usuarioId = req.userId;
 
     if (!usuarioId) {
       return res.status(401).json({

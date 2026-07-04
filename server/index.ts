@@ -1016,7 +1016,7 @@ export function createServer() {
   app.patch("/api/anuncios/:id/inactivate", inactivateAnuncio);
   app.patch("/api/anuncios/:id/activate", activateAnuncio);
   app.delete("/api/anuncios/:id", deleteAnuncio);
-  app.get("/api/anuncios/:id/can-edit", canEditAnuncio);
+  app.get("/api/anuncios/:id/can-edit", optionalAuth, canEditAnuncio);
   app.post("/api/anuncios/:id/view", optionalAuth, recordAnuncioView);
 
   // Anúncio Photos routes
@@ -1061,7 +1061,7 @@ export function createServer() {
 
   // Listas de Desejos (Wishlists) routes
   app.get("/api/listas-desejos", extractUserId, getListasDesejos);
-  app.get("/api/listas-desejos/:id", getListaDesejosById);
+  app.get("/api/listas-desejos/:id", optionalAuth, getListaDesejosById);
   app.post("/api/listas-desejos", extractUserId, createListaDesejos);
   app.put("/api/listas-desejos/:id", extractUserId, updateListaDesejos);
   app.delete("/api/listas-desejos/:id", extractUserId, deleteListaDesejos);
