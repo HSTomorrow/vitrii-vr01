@@ -72,6 +72,12 @@ export const getEventosByAnunciante: RequestHandler = async (req, res) => {
             contatoId: true,
           },
         },
+        anuncio: {
+          select: {
+            id: true,
+            titulo: true,
+          },
+        },
       },
       orderBy: {
         dataInicio: "asc",
@@ -280,6 +286,7 @@ export const createEvento: RequestHandler = async (req, res) => {
     const userId = (req as any).userId;
     const {
       anuncianteId,
+      anuncioId,
       titulo,
       descricao,
       dataInicio,
@@ -309,6 +316,19 @@ export const createEvento: RequestHandler = async (req, res) => {
         .json({ error: "Acesso negado. Você não é responsável por este anunciante." });
     }
 
+    // If an ad is specified, make sure it actually belongs to this announcer
+    let validatedAnuncioId: number | null = null;
+    if (anuncioId) {
+      const anuncio = await prisma.anuncios.findUnique({
+        where: { id: parseInt(anuncioId) },
+        select: { anuncianteId: true },
+      });
+      if (!anuncio || anuncio.anuncianteId !== parseInt(anuncianteId)) {
+        return res.status(400).json({ error: "Anúncio não pertence a este anunciante" });
+      }
+      validatedAnuncioId = parseInt(anuncioId);
+    }
+
     // Validate dates
     const inicio = new Date(dataInicio);
     const fim = new Date(dataFim);
@@ -320,6 +340,7 @@ export const createEvento: RequestHandler = async (req, res) => {
     const evento = await prisma.eventos_agenda_anunciante.create({
       data: {
         anuncianteId: parseInt(anuncianteId),
+        anuncioId: validatedAnuncioId,
         titulo,
         descricao: descricao || null,
         dataInicio: inicio,
@@ -394,6 +415,7 @@ export const updateEvento: RequestHandler = async (req, res) => {
       privacidade,
       cor,
       valor,
+      anuncioId,
       contatosPermitidos,
     } = req.body;
 
@@ -443,6 +465,23 @@ export const updateEvento: RequestHandler = async (req, res) => {
       }
     }
 
+    // If the ad is being changed, make sure it still belongs to this event's announcer
+    let novoAnuncioId = evento.anuncioId;
+    if (anuncioId !== undefined) {
+      if (anuncioId === null) {
+        novoAnuncioId = null;
+      } else {
+        const anuncio = await prisma.anuncios.findUnique({
+          where: { id: parseInt(anuncioId) },
+          select: { anuncianteId: true },
+        });
+        if (!anuncio || anuncio.anuncianteId !== evento.anuncianteId) {
+          return res.status(400).json({ error: "Anúncio não pertence a este anunciante" });
+        }
+        novoAnuncioId = parseInt(anuncioId);
+      }
+    }
+
     // Update event
     const eventoAtualizado = await prisma.eventos_agenda_anunciante.update({
       where: { id: eventoId },
@@ -454,6 +493,7 @@ export const updateEvento: RequestHandler = async (req, res) => {
         privacidade: privacidade || evento.privacidade,
         cor: cor || evento.cor,
         valor: valor !== undefined ? (valor ? parseFloat(valor) : null) : evento.valor,
+        anuncioId: novoAnuncioId,
       },
       include: {
         permissoes: {

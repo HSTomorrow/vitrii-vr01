@@ -20,6 +20,8 @@ import DeleteFilterModal from "@/components/DeleteFilterModal";
 interface Evento {
   id: number;
   anuncianteId: number;
+  anuncioId?: number | null;
+  anuncio?: { id: number; titulo: string } | null;
   titulo: string;
   descricao?: string;
   dataInicio: string;
@@ -67,6 +69,7 @@ export default function MinhaAgenda() {
   const [filterContatoNome, setFilterContatoNome] = useState("");
   const [filterDescricao, setFilterDescricao] = useState("");
   const [filterTipoContato, setFilterTipoContato] = useState("");
+  const [filterAnuncioId, setFilterAnuncioId] = useState<number | null>(null);
   const reservasRef = useRef<HTMLDivElement>(null);
 
   // Fetch user's anunciantes
@@ -246,9 +249,31 @@ export default function MinhaAgenda() {
     gcTime: 600000,
   });
 
+  // Fetch ads for the selected announcer, to populate the "Anúncio" filter and the event form's picker
+  const { data: anunciosDoAnunciante = [] } = useQuery({
+    queryKey: ["anuncios-for-agenda-filter", selectedAnuncianteId],
+    queryFn: async () => {
+      if (!selectedAnuncianteId) return [];
+      const response = await fetch(
+        `/api/anuncios?anuncianteId=${selectedAnuncianteId}&includeInactive=true&limit=500`,
+      );
+      if (!response.ok) return [];
+      const result = await response.json();
+      return result.data || [];
+    },
+    enabled: !!selectedAnuncianteId,
+    staleTime: 600000,
+    gcTime: 600000,
+  });
+
   // Apply filters to eventos
   const filteredEventos = useMemo(() => {
     return (eventos || []).filter((evento) => {
+      // Filter by related ad
+      if (filterAnuncioId && evento.anuncioId !== filterAnuncioId) {
+        return false;
+      }
+
       // Filter by contato (if contato is selected in the event)
       if (filterContatoId) {
         const hasContato = (evento.contatos || []).some(
@@ -281,7 +306,7 @@ export default function MinhaAgenda() {
 
       return true;
     });
-  }, [eventos, filterContatoId, filterContatoNome, filterDescricao, anunciantes, todosContatos]);
+  }, [eventos, filterContatoId, filterContatoNome, filterDescricao, filterAnuncioId, anunciantes, todosContatos]);
 
   // Get unique contact types for filter
   const tiposContatoUnicos = useMemo(() => {
@@ -793,14 +818,36 @@ export default function MinhaAgenda() {
                             ))}
                           </select>
                         </div>
+
+                        {/* Filter by related Anúncio */}
+                        <div className="min-w-0">
+                          <label className="block text-xs sm:text-sm font-medium text-vitrii-text mb-1">
+                            Anúncio
+                          </label>
+                          <select
+                            value={filterAnuncioId ?? ""}
+                            onChange={(e) =>
+                              setFilterAnuncioId(e.target.value ? parseInt(e.target.value) : null)
+                            }
+                            className="w-full px-2 sm:px-3 py-2 border border-gray-300 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+                          >
+                            <option value="">Todos os anúncios</option>
+                            {anunciosDoAnunciante.map((anuncio: any) => (
+                              <option key={anuncio.id} value={anuncio.id}>
+                                {anuncio.titulo}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
                       </div>
-                      {(filterContatoId || filterContatoNome || filterDescricao || filterTipoContato) && (
+                      {(filterContatoId || filterContatoNome || filterDescricao || filterTipoContato || filterAnuncioId) && (
                         <button
                           onClick={() => {
                             setFilterContatoId(null);
                             setFilterContatoNome("");
                             setFilterDescricao("");
                             setFilterTipoContato("");
+                            setFilterAnuncioId(null);
                           }}
                           className="mt-2 text-xs sm:text-sm text-vitrii-blue hover:underline"
                         >
@@ -971,6 +1018,7 @@ export default function MinhaAgenda() {
         evento={selectedEvento}
         defaultDate={selectedDate || undefined}
         anuncianteId={selectedAnuncianteId || undefined}
+        anuncios={anunciosDoAnunciante}
         userId={user?.id}
         onClose={() => {
           setIsModalOpen(false);

@@ -14,7 +14,13 @@ interface Evento {
   privacidade: string;
   cor: string;
   valor?: number;
+  anuncioId?: number | null;
   contatos?: { contatoId: number }[];
+}
+
+interface AnuncioOption {
+  id: number;
+  titulo: string;
 }
 
 interface Contato {
@@ -40,6 +46,7 @@ interface EventoModalProps {
   evento?: Evento | null;
   defaultDate?: Date;
   anuncianteId?: number;
+  anuncios?: AnuncioOption[];
   userId?: number;
   onClose: () => void;
   onSave: (evento: Partial<Evento> & { contatosPermitidos?: number[] }) => void;
@@ -72,6 +79,7 @@ export default function EventoModal({
   evento,
   defaultDate,
   anuncianteId,
+  anuncios = [],
   userId,
   onClose,
   onSave,
@@ -87,6 +95,7 @@ export default function EventoModal({
     privacidade: "privado" as const,
     cor: "#3B82F6",
     valor: "",
+    anuncioId: null as number | null,
     contatosPermitidos: [] as number[],
   });
   const [contatos, setContatos] = useState<Contato[]>([]);
@@ -161,6 +170,7 @@ export default function EventoModal({
         privacidade: (evento.privacidade || "privado") as const,
         cor: evento.cor || "#3B82F6",
         valor: evento.valor ? evento.valor.toString() : "",
+        anuncioId: evento.anuncioId ?? null,
         contatosPermitidos: evento.contatos?.map((c) => c.contatoId) || [],
       });
     } else if (defaultDate) {
@@ -171,6 +181,7 @@ export default function EventoModal({
         dataFimData: dateStr,
         horaInicio: "09:00",
         horaFim: "10:00",
+        anuncioId: null,
       }));
     }
   }, [evento, defaultDate, isOpen]);
@@ -229,6 +240,7 @@ export default function EventoModal({
       privacidade: formData.privacidade,
       cor: formData.cor,
       valor: formData.valor ? parseFloat(formData.valor) : undefined,
+      anuncioId: formData.anuncioId,
       contatosPermitidos: formData.contatosPermitidos.length > 0 ? formData.contatosPermitidos : undefined,
     });
   };
@@ -285,6 +297,35 @@ export default function EventoModal({
               rows={3}
             />
           </div>
+
+          {/* Anúncio relacionado (Optional) */}
+          {anuncios.length > 0 && (
+            <div>
+              <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                Anúncio Relacionado (Opcional)
+              </label>
+              <select
+                value={formData.anuncioId ?? ""}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    anuncioId: e.target.value ? parseInt(e.target.value) : null,
+                  })
+                }
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+              >
+                <option value="">Nenhum anúncio específico</option>
+                {anuncios.map((anuncio) => (
+                  <option key={anuncio.id} value={anuncio.id}>
+                    {anuncio.titulo}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-gray-500 mt-1">
+                Vincule este horário a um anúncio para poder filtrá-lo depois na sua agenda.
+              </p>
+            </div>
+          )}
 
           {/* Data Início */}
           <div>

@@ -22,6 +22,8 @@ import {
   Store,
   MapPin,
   Tag,
+  Image,
+  CreditCard,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import AdminEditUserModal from "@/components/AdminEditUserModal";
@@ -438,6 +440,40 @@ export default function AdminDashboard() {
             </div>
             <p className="text-sm text-vitrii-text-secondary">
               Crie e configure categorias de produtos e serviços
+            </p>
+          </button>
+
+          <button
+            onClick={() => navigate("/admin/banners")}
+            className="bg-pink-50 border border-pink-200 rounded-lg p-6 hover:shadow-lg transition-shadow text-left group"
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-pink-100 rounded-lg flex items-center justify-center group-hover:bg-pink-200 transition-colors">
+                <Image className="w-6 h-6 text-pink-600" />
+              </div>
+              <h3 className="font-semibold text-vitrii-text">
+                Gerenciar Banners
+              </h3>
+            </div>
+            <p className="text-sm text-vitrii-text-secondary">
+              Configure o carrossel de banners da página inicial
+            </p>
+          </button>
+
+          <button
+            onClick={() => navigate("/admin/pagamentos")}
+            className="bg-teal-50 border border-teal-200 rounded-lg p-6 hover:shadow-lg transition-shadow text-left group"
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center group-hover:bg-teal-200 transition-colors">
+                <CreditCard className="w-6 h-6 text-teal-600" />
+              </div>
+              <h3 className="font-semibold text-vitrii-text">
+                Gerenciar Pagamentos
+              </h3>
+            </div>
+            <p className="text-sm text-vitrii-text-secondary">
+              Aprove ou rejeite comprovantes de pagamento de anúncios
             </p>
           </button>
 

@@ -87,6 +87,7 @@ model anuncios {
   conversas           conversas[]
   pagamento           pagamentos?
   reservas            reservas_anuncio[]
+  eventosAgenda       eventos_agenda_anunciante[]
 
   @@index([anuncianteId])
   @@index([usuarioId])
@@ -533,6 +534,7 @@ model lista_espera_agenda {
 model eventos_agenda_anunciante {
   id              Int      @id @default(autoincrement())
   anuncianteId    Int
+  anuncioId       Int? // Optional: ties this schedule slot to a specific ad, for filtering in Minha Agenda
   titulo          String   @db.VarChar(255)
   descricao       String?
   dataInicio      DateTime
@@ -545,12 +547,14 @@ model eventos_agenda_anunciante {
   dataAtualizacao DateTime @updatedAt
 
   anunciante  anunciantes                 @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
+  anuncio     anuncios?                   @relation(fields: [anuncioId], references: [id], onDelete: SetNull)
   permissoes  eventos_agenda_permissoes[]
   reservas    reservas_evento_agenda[]
   filasEspera filas_espera_agenda[]
   contatos    eventos_contatos[]
 
   @@index([anuncianteId])
+  @@index([anuncioId])
   @@index([dataInicio])
   @@index([privacidade])
   @@index([status])
