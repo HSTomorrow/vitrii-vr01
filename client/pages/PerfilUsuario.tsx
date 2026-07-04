@@ -137,8 +137,8 @@ export default function PerfilUsuario() {
         setCpfSaved(true);
       }
       setTimeout(() => {
-        // Navigate to home page after profile update
-        navigate("/");
+        // Return to the page the user came from
+        navigate(-1);
       }, 1500);
     },
     onError: (error: any) => {
