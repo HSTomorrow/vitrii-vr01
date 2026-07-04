@@ -1,4 +1,5 @@
 import { runContatosUsuariosSync } from "../routes/sync-contatos-usuarios";
+import { gerarCobrancasMensais } from "../routes/financeiro";
 
 /**
  * Sync contatos with usuarios based on matching email or phone
@@ -30,6 +31,10 @@ export function initializeScheduler() {
     console.error("[Scheduler] Error on startup sync:", error);
   });
 
+  gerarCobrancasMensais().catch(error => {
+    console.error("[Scheduler] Error on startup mensalidade generation:", error);
+  });
+
   // Then run every hour (3600000 ms = 1 hour)
   setInterval(() => {
     syncContatosUsuariosHourly().catch(error => {
@@ -37,5 +42,12 @@ export function initializeScheduler() {
     });
   }, 3600000); // 1 hour
 
-  console.log("[Scheduler] Hourly scheduler initialized");
+  // Recurring mensalidade charges only need a daily check (24h = 86400000 ms)
+  setInterval(() => {
+    gerarCobrancasMensais().catch(error => {
+      console.error("[Scheduler] Error in scheduled mensalidade generation:", error);
+    });
+  }, 86400000); // 24 hours
+
+  console.log("[Scheduler] Hourly + daily scheduler initialized");
 }

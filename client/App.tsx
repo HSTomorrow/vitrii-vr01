@@ -40,6 +40,9 @@ import SearchAnuncios from "./pages/SearchAnuncios";
 import SearchProdutos from "./pages/SearchProdutos";
 import Checkout from "./pages/Checkout";
 import Chat from "./pages/Chat";
+import Financeiro from "./pages/Financeiro";
+import Recibo from "./pages/Recibo";
+import AdminFinanceiro from "./pages/AdminFinanceiro";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminManageAds from "./pages/AdminManageAds";
 import AdminManageUsers from "./pages/AdminManageUsers";
@@ -187,6 +190,9 @@ function AppContent() {
           />
           <Route path="/checkout/:anuncioId" element={<Checkout />} />
           <Route path="/chat" element={<Chat />} />
+          <Route path="/financeiro" element={<Financeiro />} />
+          <Route path="/recibo/:token" element={<Recibo />} />
+          <Route path="/admin/financeiro" element={<AdminFinanceiro />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/anuncios" element={<AdminManageAds />} />
           <Route path="/admin/usuarios" element={<AdminManageUsers />} />

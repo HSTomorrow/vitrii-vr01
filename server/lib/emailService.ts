@@ -412,6 +412,76 @@ export async function sendQRCodeExpiredEmail(
   }
 }
 
+export async function sendReceiptEmail(
+  email: string,
+  contatoNome: string,
+  anuncianteNome: string,
+  valor: number,
+  dataPagamento: Date,
+  descricao: string | null,
+  reciboUrl: string,
+): Promise<boolean> {
+  try {
+    if (!isValidEmail(email)) {
+      console.error(`❌ Email inválido: ${email}`);
+      return false;
+    }
+
+    const valorFormatado = valor.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    const dataFormatada = dataPagamento.toLocaleDateString("pt-BR");
+
+    const transporter = await getTransporter();
+    const mailOptions = {
+      from: process.env.MAIL_FROM || "noreply@vitrii.com",
+      to: email,
+      subject: `Recibo de pagamento - ${anuncianteNome}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f5f5f5;">
+          <div style="background-color: white; border-radius: 8px; padding: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <div style="text-align: center; margin-bottom: 30px;">
+              <h1 style="color: #0071CE; margin: 0;">Vitrii</h1>
+              <p style="color: #666; font-size: 14px;">Recibo de Pagamento</p>
+            </div>
+
+            <p style="color: #666; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
+              Olá <strong>${contatoNome}</strong>,
+            </p>
+
+            <p style="color: #666; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;">
+              ${anuncianteNome} confirmou o recebimento do seu pagamento${descricao ? ` referente a "${descricao}"` : ""}.
+            </p>
+
+            <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+              <tr><td style="padding: 8px 0; color: #999;">Valor</td><td style="padding: 8px 0; text-align: right; font-weight: bold; color: #333;">${valorFormatado}</td></tr>
+              <tr><td style="padding: 8px 0; color: #999;">Data</td><td style="padding: 8px 0; text-align: right; color: #333;">${dataFormatada}</td></tr>
+            </table>
+
+            <div style="text-align: center; margin: 30px 0;">
+              <a href="${reciboUrl}" style="display: inline-block; background-color: #0071CE; color: white; padding: 12px 30px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 16px;">
+                Ver Recibo Completo
+              </a>
+            </div>
+
+            <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
+
+            <p style="color: #999; font-size: 12px; text-align: center; margin: 0;">
+              © 2026 Vitrii. Todos os direitos reservados.
+            </p>
+          </div>
+        </div>
+      `,
+      text: `Recibo de pagamento - ${anuncianteNome}\n\nOlá ${contatoNome},\n\n${anuncianteNome} confirmou o recebimento do seu pagamento${descricao ? ` referente a "${descricao}"` : ""}.\n\nValor: ${valorFormatado}\nData: ${dataFormatada}\n\nVeja o recibo completo em: ${reciboUrl}`,
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log("✅ Email de recibo enviado com sucesso - Para:", email, "- Message ID:", info.messageId);
+    return true;
+  } catch (error) {
+    console.error("❌ Erro ao enviar email de recibo:", error);
+    return false;
+  }
+}
+
 export async function sendWelcomeEmail(
   email: string,
   userName: string,

@@ -3,6 +3,7 @@ import crypto from "crypto";
 import prisma from "../lib/prisma";
 import { z } from "zod";
 import { Decimal } from "@prisma/client/runtime/library";
+import { generateMockQRCode } from "../lib/mockPix";
 
 // Schema validation
 const PagamentoCreateSchema = z.object({
@@ -717,15 +718,3 @@ export const marcarPagamentoRealizado: RequestHandler = async (req, res) => {
   }
 };
 
-// Helper function to generate mock Pix QR Code data
-// In production, this would call Mercado Pago API
-function generateMockQRCode(valor: number, pixId: string) {
-  // Mock Pix QR Code (in real scenario, call Mercado Pago API)
-  const qrCode = `00020126580014br.gov.bcb.brcode0136123e4567-e12b-12d1-a456-426655440000520400005303986540510.005802BR5913Vitrii6009Sao Paulo62410503***63041D3D`;
-  const urlCopiaECola = `00020126580014br.gov.bcb.brcode0136${pixId}520400005303986540510.005802BR5913Vitrii6009SaoPaulo62410503***63041D3D`;
-
-  return {
-    qrCode,
-    urlCopiaECola,
-  };
-}

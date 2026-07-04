@@ -243,6 +243,26 @@ import {
 } from "./routes/sync-contatos-usuarios";
 import categoriasRouter from "./routes/categorias";
 import reservasAnuncioRouter from "./routes/reservas-anuncio";
+import {
+  listarContratos,
+  criarContrato,
+  atualizarContrato,
+  atualizarStatusContrato,
+  criarReajuste,
+  anexarDocumentoContrato,
+  listarLancamentos,
+  obterLancamentoDoEvento,
+  criarLancamento,
+  atualizarLancamento,
+  gerarPixLancamento,
+  anexarComprovanteLancamento,
+  marcarLancamentoPago,
+  cancelarLancamento,
+  obterReciboPublico,
+  enviarReciboPorEmail,
+  adminListarLancamentos,
+  adminListarContratos,
+} from "./routes/financeiro";
 
 export function createServer() {
   const app = express();
@@ -1299,6 +1319,32 @@ export function createServer() {
   app.post("/api/sync/contatos-usuarios", syncContatosUsuarios);
   app.get("/api/contatos/:contatoId/usuarios", extractUserId, getLinkedUsuariosForContato);
   app.get("/api/usuarios/contatos-linked", extractUserId, getLinkedContatosForUsuario);
+
+  // Contratos financeiros (mensalidades, reajustes, documentos)
+  app.get("/api/contratos-financeiros/anunciante/:anuncianteId", extractUserId, listarContratos);
+  app.post("/api/contratos-financeiros", extractUserId, criarContrato);
+  app.put("/api/contratos-financeiros/:id", extractUserId, atualizarContrato);
+  app.patch("/api/contratos-financeiros/:id/status", extractUserId, atualizarStatusContrato);
+  app.post("/api/contratos-financeiros/:id/reajuste", extractUserId, criarReajuste);
+  app.post("/api/contratos-financeiros/:id/documentos", extractUserId, anexarDocumentoContrato);
+
+  // Lançamentos financeiros (cobranças de agenda, mensalidade e avulsas)
+  app.get("/api/lancamentos-financeiros/anunciante/:anuncianteId", extractUserId, listarLancamentos);
+  app.get("/api/lancamentos-financeiros/evento/:eventoId", extractUserId, obterLancamentoDoEvento);
+  app.post("/api/lancamentos-financeiros", extractUserId, criarLancamento);
+  app.patch("/api/lancamentos-financeiros/:id", extractUserId, atualizarLancamento);
+  app.post("/api/lancamentos-financeiros/:id/pix", extractUserId, gerarPixLancamento);
+  app.post("/api/lancamentos-financeiros/:id/comprovante", extractUserId, anexarComprovanteLancamento);
+  app.patch("/api/lancamentos-financeiros/:id/pagar", extractUserId, marcarLancamentoPago);
+  app.patch("/api/lancamentos-financeiros/:id/cancelar", extractUserId, cancelarLancamento);
+  app.post("/api/lancamentos-financeiros/:id/enviar-recibo", extractUserId, enviarReciboPorEmail);
+
+  // Recibo público (sem autenticação - o contato/cliente não tem login na plataforma)
+  app.get("/api/lancamentos-financeiros/recibo/:token", obterReciboPublico);
+
+  // Financeiro - visão administrativa (Vitrii audita qualquer anunciante)
+  app.get("/api/admin/lancamentos-financeiros", extractUserId, requireAdmin, adminListarLancamentos);
+  app.get("/api/admin/contratos-financeiros", extractUserId, requireAdmin, adminListarContratos);
 
   // Check APP_URL configuration
   app.get("/api/check-app-url", (_req, res) => {

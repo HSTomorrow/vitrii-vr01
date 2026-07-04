@@ -24,6 +24,7 @@ import {
   Tag,
   Image,
   CreditCard,
+  DollarSign,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import AdminEditUserModal from "@/components/AdminEditUserModal";
@@ -474,6 +475,23 @@ export default function AdminDashboard() {
             </div>
             <p className="text-sm text-vitrii-text-secondary">
               Aprove ou rejeite comprovantes de pagamento de anúncios
+            </p>
+          </button>
+
+          <button
+            onClick={() => navigate("/admin/financeiro")}
+            className="bg-emerald-50 border border-emerald-200 rounded-lg p-6 hover:shadow-lg transition-shadow text-left group"
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center group-hover:bg-emerald-200 transition-colors">
+                <DollarSign className="w-6 h-6 text-emerald-600" />
+              </div>
+              <h3 className="font-semibold text-vitrii-text">
+                Gestão Financeira
+              </h3>
+            </div>
+            <p className="text-sm text-vitrii-text-secondary">
+              Audite cobranças e contratos de qualquer anunciante
             </p>
           </button>
 

@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { X, ChevronDown, Plus, Info } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { X, ChevronDown, Plus, Info, DollarSign } from "lucide-react";
 import { toast } from "sonner";
 import ContatoSelectorModal from "./ContatoSelectorModal";
 import ContactDetailsModal from "./ContactDetailsModal";
@@ -103,6 +104,44 @@ export default function EventoModal({
   const [showContatoSelector, setShowContatoSelector] = useState(false);
   const [showContactDetails, setShowContactDetails] = useState(false);
   const [selectedContatoForDetails, setSelectedContatoForDetails] = useState<Contato | null>(null);
+
+  // Financial status for this event (Financeiro module) - only relevant when editing
+  // an existing event that has a price set.
+  const queryClient = useQueryClient();
+  const { data: lancamento } = useQuery({
+    queryKey: ["lancamento-evento", evento?.id],
+    queryFn: async () => {
+      const response = await fetch(`/api/lancamentos-financeiros/evento/${evento!.id}`);
+      if (!response.ok) return null;
+      const result = await response.json();
+      return result.data;
+    },
+    enabled: isOpen && !!evento?.id && !!evento?.valor,
+  });
+
+  const gerarCobrancaMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch("/api/lancamentos-financeiros", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          anuncianteId,
+          eventoId: evento!.id,
+          origem: "agenda",
+          categoria: "servico",
+          descricao: evento!.titulo,
+          valor: evento!.valor,
+        }),
+      });
+      if (!response.ok) throw new Error((await response.json()).error || "Erro ao gerar cobrança");
+      return response.json();
+    },
+    onSuccess: () => {
+      toast.success("Cobrança gerada! Veja em Financeiro.");
+      queryClient.invalidateQueries({ queryKey: ["lancamento-evento", evento?.id] });
+    },
+    onError: (error) => toast.error(error instanceof Error ? error.message : "Erro ao gerar cobrança"),
+  });
 
   // Fetch contatos when modal opens
   useEffect(() => {
@@ -479,6 +518,33 @@ export default function EventoModal({
               </p>
             )}
           </div>
+
+          {/* Financial status (Financeiro module) - only for existing events with a price */}
+          {evento?.id && evento?.valor ? (
+            <div className="flex items-center justify-between gap-3 p-4 bg-vitrii-blue/5 border border-vitrii-blue/20 rounded-lg">
+              <div className="flex items-center gap-2">
+                <DollarSign className="w-5 h-5 text-vitrii-blue" />
+                <div>
+                  <p className="text-sm font-semibold text-vitrii-text">Cobrança</p>
+                  <p className="text-xs text-vitrii-text-secondary">
+                    {lancamento
+                      ? `Status: ${lancamento.status === "pago" ? "Pago" : lancamento.status === "pix_gerado" ? "Pix gerado" : "Pendente"}`
+                      : "Nenhuma cobrança gerada ainda"}
+                  </p>
+                </div>
+              </div>
+              {!lancamento && (
+                <button
+                  type="button"
+                  onClick={() => gerarCobrancaMutation.mutate()}
+                  disabled={gerarCobrancaMutation.isPending}
+                  className="text-xs px-3 py-1.5 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors disabled:opacity-50 whitespace-nowrap"
+                >
+                  Gerar Cobrança
+                </button>
+              )}
+            </div>
+          ) : null}
 
           {/* Contatos - Available for all privacy levels */}
           <div className="border border-blue-200 bg-blue-50 rounded-lg p-4 space-y-3">

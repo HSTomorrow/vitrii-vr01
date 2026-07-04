@@ -49,6 +49,8 @@ model anunciantes {
   localidades          anunciantes_x_localidades[]
   contatos             contatos[]
   agendas_horarios     agendas_horarios[]
+  contratos_financeiros    contratos_financeiros[]
+  lancamentos_financeiros  lancamentos_financeiros[]
 }
 
 model anuncios {
@@ -552,12 +554,112 @@ model eventos_agenda_anunciante {
   reservas    reservas_evento_agenda[]
   filasEspera filas_espera_agenda[]
   contatos    eventos_contatos[]
+  lancamentos_financeiros lancamentos_financeiros[]
 
   @@index([anuncianteId])
   @@index([anuncioId])
   @@index([dataInicio])
   @@index([privacidade])
   @@index([status])
+}
+
+// Contratos de cobrança recorrente entre o anunciante e um contato (cliente)
+model contratos_financeiros {
+  id              Int       @id @default(autoincrement())
+  anuncianteId    Int
+  contatoId       Int
+  titulo          String    @db.VarChar(255)
+  descricao       String?
+  valorMensal     Decimal   @db.Decimal(10, 2)
+  diaVencimento   Int       @db.SmallInt
+  dataInicio      DateTime
+  dataFim         DateTime?
+  status          String    @default("ativo") @db.VarChar(20) // ativo, suspenso, encerrado
+  dataCriacao     DateTime  @default(now())
+  dataAtualizacao DateTime  @updatedAt
+
+  anunciante  anunciantes @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
+  contato     contatos    @relation(fields: [contatoId], references: [id], onDelete: Restrict)
+  reajustes   contratos_reajustes[]
+  documentos  contratos_documentos[]
+  lancamentos lancamentos_financeiros[]
+
+  @@index([anuncianteId])
+  @@index([contatoId])
+  @@index([status])
+}
+
+model contratos_reajustes {
+  id            Int      @id @default(autoincrement())
+  contratoId    Int
+  valorAnterior Decimal  @db.Decimal(10, 2)
+  valorNovo     Decimal  @db.Decimal(10, 2)
+  motivo        String?
+  dataVigencia  DateTime
+  criadoPor     Int
+  dataCriacao   DateTime @default(now())
+
+  contrato contratos_financeiros @relation(fields: [contratoId], references: [id], onDelete: Cascade)
+
+  @@index([contratoId])
+}
+
+model contratos_documentos {
+  id          Int      @id @default(autoincrement())
+  contratoId  Int
+  nome        String   @db.VarChar(255)
+  url         String   @db.VarChar(500)
+  tipo        String   @default("contrato") @db.VarChar(50) // contrato, aditivo, comprovante, outro
+  criadoPor   Int
+  dataCriacao DateTime @default(now())
+
+  contrato contratos_financeiros @relation(fields: [contratoId], references: [id], onDelete: Cascade)
+
+  @@index([contratoId])
+}
+
+// Lançamento financeiro unificado: cobranças de agenda, mensalidades e avulsos
+model lancamentos_financeiros {
+  id               Int       @id @default(autoincrement())
+  anuncianteId     Int
+  eventoId         Int?
+  contatoId        Int?
+  contratoId       Int?
+  origem           String    @db.VarChar(20) // "agenda", "mensalidade", "avulso"
+  categoria        String    @db.VarChar(30) // "servico", "multa", "venda_material", "hora_extra", "mensalidade", "outro"
+  descricao        String?
+  valor            Decimal   @db.Decimal(10, 2)
+  competencia      String?   @db.VarChar(7) // "YYYY-MM" - chave de dedup da mensalidade
+  vencimento       DateTime?
+  status           String    @default("pendente") @db.VarChar(30) // pendente, pix_gerado, comprovante_enviado, pago, cancelado
+  tipoPagamento    String    @default("pix") @db.VarChar(20)
+
+  pixId            String?   @db.VarChar(100)
+  qrCode           String?   @db.Text
+  urlCopiaECola    String?   @db.Text
+  dataExpiracaoPix DateTime?
+
+  comprovanteUrl   String?   @db.VarChar(500)
+  dataComprovante  DateTime?
+  dataPagamento    DateTime?
+
+  criadoPor        Int?      // null for system-generated (mensalidade) entries
+  reciboToken      String?   @unique @db.VarChar(64)
+  dataCriacao      DateTime  @default(now())
+  dataAtualizacao  DateTime  @updatedAt
+
+  anunciante anunciantes                @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
+  evento     eventos_agenda_anunciante? @relation(fields: [eventoId], references: [id], onDelete: SetNull)
+  contato    contatos?                  @relation(fields: [contatoId], references: [id], onDelete: SetNull)
+  contrato   contratos_financeiros?     @relation(fields: [contratoId], references: [id], onDelete: SetNull)
+
+  @@unique([contratoId, competencia])
+  @@index([anuncianteId])
+  @@index([eventoId])
+  @@index([contatoId])
+  @@index([contratoId])
+  @@index([status])
+  @@index([vencimento])
 }
 
 // Junction table for n-to-n relationship between eventos and contatos
@@ -793,6 +895,8 @@ model contatos {
   anunciante       anunciantes? @relation(fields: [anuncianteId], references: [id], onDelete: SetNull)
   eventos          eventos_contatos[]
   usuario_links    contatos_usuarios_links[]
+  contratos_financeiros   contratos_financeiros[]
+  lancamentos_financeiros lancamentos_financeiros[]
 
   @@index([usuarioId])
   @@index([anuncianteId])
