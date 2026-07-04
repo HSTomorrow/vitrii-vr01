@@ -40,7 +40,7 @@
     --accent: 210 100% 40%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 4 74% 49%; /* #D92D20 - aligned with vitrii-red */
     --destructive-foreground: 210 40% 98%;
 
     --border: 0 0% 92%;
@@ -88,7 +88,7 @@
     --accent: 210 100% 45%;
     --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 4 65% 32%; /* dark-mode variant of vitrii-red */
     --destructive-foreground: 210 40% 98%;
 
     --border: 0 0% 20%;

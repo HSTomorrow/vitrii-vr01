@@ -62,7 +62,7 @@ export default {
           blue: "#0071CE",
           "blue-dark": "#0052A3",
           yellow: "#FFC220",
-          green: "#16A34A",
+          green: "#128C3F",            // Unified with green-wcag below - was a second, uncoordinated green (#16A34A)
 
           // Neutral Colors - WCAG AA Adjusted
           "gray-bg": "#F7F7F7",
@@ -72,11 +72,16 @@ export default {
           "text-link": "#0052A3",     // Links: 5.64:1 on white ✓ (use blue-dark for text)
           bg: "#FFFFFF",
 
+          // Semantic status colors - one role each, consolidating the purple/pink/teal/
+          // cyan/indigo/amber/orange mix that had accumulated across components
+          warning: "#B45309",         // Pending/aguardando states - distinct from the yellow accent
+          info: "#0E7490",            // Neutral category tags (replaces purple/pink/cyan/indigo)
+
           // Category Colors - WCAG AA Adjusted
           purple: "#9333EA",          // Eventos: 3.2:1 (display only)
           orange: "#EA580C",          // Agendas/Aulas: 4.6:1 ✓
-          red: "#DC2626",             // Vagas/Oportunidades: 3.5:1 (use sparingly)
-          "orange-alert": "#F97316",  // Alerta/Warning: 4.2:1
+          red: "#D92D20",             // Vagas/Oportunidades, erros - refined from #DC2626
+          "orange-alert": "#B45309",  // Alerta/Warning - unified with `warning` above
           "green-wcag": "#128C3F",    // Adjusted green: 4.62:1 on white ✓
 
           // Hover/Active states
