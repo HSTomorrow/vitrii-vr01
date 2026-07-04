@@ -107,7 +107,7 @@ export default function AnuncioForm({
     estado: "RS",
     isDoacao: isDonation || normalizedIsDoacao,
     aCombinar: false,
-    destaque: true,
+    destaque: false,
     ordem: 10, // Default order for new ads (admin only)
     categoria: "" as string,
     dadosCategoria: "",
@@ -447,9 +447,15 @@ export default function AnuncioForm({
       queryClient.invalidateQueries({ queryKey: ["anuncios"] });
       queryClient.invalidateQueries({ queryKey: ["anuncios-all"] });
 
+      // A new ad marked "Destaque" beyond the free featured quota comes back
+      // pending payment instead of live - route the user straight to checkout
+      // instead of the generic success flow, or they'll think it never saved.
+      const needsPayment = !anuncioId && result.data?.status === "aguardando_pagamento";
       const successMessage = anuncioId
         ? "Anúncio atualizado com sucesso!"
-        : "Anúncio criado com sucesso!";
+        : needsPayment
+          ? "Anúncio criado! Complete o pagamento para publicá-lo."
+          : "Anúncio criado com sucesso!";
 
       console.log("[AnuncioForm] Showing toast:", successMessage);
       toast.success(successMessage);
@@ -495,12 +501,16 @@ export default function AnuncioForm({
         }
 
         setTimeout(() => {
-          // All ads now return to main page and refresh
-          console.log("[AnuncioForm] Navigating to main page after ad creation");
           // Invalidate all related queries to refresh the main page
           queryClient.invalidateQueries({ queryKey: ["anuncios-all"] });
           queryClient.invalidateQueries({ queryKey: ["banners"] });
-          navigate("/");
+          if (needsPayment) {
+            console.log("[AnuncioForm] Ad pending payment, navigating to checkout");
+            navigate(`/checkout/${result.data.id}`);
+          } else {
+            console.log("[AnuncioForm] Navigating to main page after ad creation");
+            navigate("/");
+          }
         }, 500);
       } else if (anuncioId) {
         console.log("[AnuncioForm] Editing mode, syncing photos");
