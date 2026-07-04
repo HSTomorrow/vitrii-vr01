@@ -47,10 +47,10 @@ export default function WishlistButton({
     <>
       <button
         onClick={() => setShowModal(true)}
-        className={`w-full flex items-center justify-center gap-2 px-4 py-2 border-2 border-purple-300 text-purple-600 rounded-lg font-semibold hover:bg-purple-50 transition-colors text-sm ${className}`}
+        className={`w-full min-w-0 flex items-center justify-center gap-2 px-3 sm:px-4 py-2 border-2 border-purple-300 text-purple-600 rounded-lg font-semibold hover:bg-purple-50 transition-colors text-xs sm:text-sm leading-tight text-center ${className}`}
       >
-        <Gift className="w-4 h-4" />
-        Solicitar Reservas e Lista de Desejos
+        <Gift className="w-4 h-4 shrink-0" />
+        <span>Solicitar Reservas e Lista de Desejos</span>
       </button>
       <WishlistModal
         open={showModal}

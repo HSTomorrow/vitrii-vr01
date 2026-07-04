@@ -181,7 +181,7 @@ export default function EventosAgendaCalendar({
                           e.stopPropagation();
                           onSelectEvento?.(evento);
                         }}
-                        className="text-xs rounded p-1 truncate cursor-pointer hover:opacity-80 text-white"
+                        className="text-xs rounded p-1 line-clamp-2 leading-tight cursor-pointer hover:opacity-80 text-white"
                         style={{ backgroundColor: evento.cor }}
                         title={evento.titulo}
                       >

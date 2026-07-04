@@ -137,7 +137,10 @@ export default function LocalidadeButton() {
         title="Alterar localidade padrão"
       >
         <MapPin className="w-4 h-4 text-cyan-600" />
-        <span className="text-[0.74rem] font-semibold text-cyan-800 hidden md:inline max-w-[120px] truncate">
+        <span
+          className="text-[0.74rem] font-semibold text-cyan-800 hidden md:inline max-w-[160px] lg:max-w-[220px] truncate"
+          title={displayText}
+        >
           {displayText}
         </span>
         <ChevronDown className="w-3 h-3 text-cyan-600" />

@@ -578,7 +578,7 @@ export default function AdminManageAds() {
                     </div>
 
                     {/* Actions */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 pt-4 border-t border-gray-300">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 pt-4 border-t border-gray-300">
                       {/* Edit Button */}
                       <button
                         onClick={() => {

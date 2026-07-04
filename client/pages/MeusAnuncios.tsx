@@ -570,11 +570,11 @@ export default function MeusAnuncios() {
               </div>
 
               {/* Buttons */}
-              <div className="flex gap-3 pt-4 border-t">
+              <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
                 <button
                   type="button"
                   onClick={() => setSelectedAdForPayment(null)}
-                  className="flex-1 px-3.5 py-1.5 border-2 border-vitrii-blue text-vitrii-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors text-xs"
+                  className="w-full sm:flex-1 px-3.5 py-1.5 border-2 border-vitrii-blue text-vitrii-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors text-xs"
                 >
                   Cancelar
                 </button>
@@ -582,10 +582,10 @@ export default function MeusAnuncios() {
                   type="button"
                   onClick={handleMarcarPagamentoRealizado}
                   disabled={isMarkingPayment}
-                  className="flex-1 px-3.5 py-1.5 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2 text-xs disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full sm:flex-1 min-w-0 px-3.5 py-1.5 bg-green-600 text-white rounded-lg font-semibold hover:bg-green-700 transition-colors flex items-center justify-center gap-2 text-xs leading-tight disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <Check className="w-3.5 h-3.5" />
-                  {isMarkingPayment ? "Processando..." : "Pagamento Realizado"}
+                  <Check className="w-3.5 h-3.5 shrink-0" />
+                  <span>{isMarkingPayment ? "Processando..." : "Pagamento Realizado"}</span>
                 </button>
               </div>
             </div>

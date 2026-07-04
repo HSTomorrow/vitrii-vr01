@@ -1219,10 +1219,10 @@ export default function AnuncioDetalhe() {
                   setShowMembrosModal(true);
                 }
               }}
-              className="flex-1 px-4 py-3 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors flex items-center justify-center gap-2 text-sm"
+              className="flex-1 min-w-0 px-3 py-3 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors flex items-center justify-center gap-1.5 text-xs sm:text-sm text-center leading-tight"
             >
-              <Users className="w-4 h-4" />
-              Solicitar Equipe de Vendas
+              <Users className="w-4 h-4 shrink-0" />
+              <span>Solicitar Equipe de Vendas</span>
             </button>
           )}
         </div>

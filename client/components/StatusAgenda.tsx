@@ -390,7 +390,7 @@ export default function StatusAgenda({
       {/* Status Filter */}
       <div className="bg-white rounded-lg shadow-md p-4 border border-gray-200">
         <p className="text-sm font-semibold text-vitrii-text mb-3">Filtrar por Status:</p>
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2">
           {STATUS_OPTIONS.map((option) => {
             const isSelected = selectedStatuses.has(option.value);
             const Icon = option.icon;

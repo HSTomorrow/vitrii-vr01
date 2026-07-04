@@ -142,14 +142,14 @@ export default function AdCard({
           <div className="flex gap-2">
             <Link
               to={`/agenda/anunciante/${anuncio.anuncianteId}`}
-              className={`flex-1 bg-orange-600 hover:bg-orange-700 text-white py-2 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2`}
+              className={`flex-1 min-w-0 bg-orange-600 hover:bg-orange-700 text-white py-2 rounded-lg font-semibold text-sm transition-colors flex items-center justify-center gap-1.5`}
             >
-              <Calendar className="w-4 h-4" />
-              Agendar
+              <Calendar className="w-4 h-4 shrink-0" />
+              <span className="truncate">Agendar</span>
             </Link>
             <button
               onClick={() => navigate(`/anuncio/${anuncio.id}`)}
-              className={`flex-1 ${buttonClass} text-white py-2 rounded-lg font-semibold transition-colors`}
+              className={`flex-1 min-w-0 ${buttonClass} text-white py-2 rounded-lg font-semibold text-sm transition-colors truncate`}
             >
               Detalhes
             </button>
