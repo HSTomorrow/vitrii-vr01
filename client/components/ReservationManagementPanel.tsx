@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
-import { X, Trash2, CheckCircle, AlertCircle, Users, Package } from "lucide-react";
+import { X, Trash2, CheckCircle, AlertCircle, Users, Package, MessageSquare, MessageCircle } from "lucide-react";
 
 interface ReservationUser {
   id: number;
@@ -32,6 +33,7 @@ interface QuantidadeInfo {
 interface ReservationManagementPanelProps {
   anuncioId: number;
   anuncioTitulo: string;
+  anuncianteId: number;
   isAdmin: boolean;
   userId?: number;
 }
@@ -39,10 +41,13 @@ interface ReservationManagementPanelProps {
 export default function ReservationManagementPanel({
   anuncioId,
   anuncioTitulo,
+  anuncianteId,
   isAdmin,
   userId,
 }: ReservationManagementPanelProps) {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const [startingChatFor, setStartingChatFor] = useState<number | null>(null);
   const [showPanel, setShowPanel] = useState(false);
 
   // Fetch quantidade info
@@ -73,9 +78,9 @@ export default function ReservationManagementPanel({
 
   // Cancel reservation mutation
   const cancelReservaMutation = useMutation({
-    mutationFn: async (usuarioId: number) => {
+    mutationFn: async (reservaId: number) => {
       const response = await fetch(
-        `/api/anuncios/${anuncioId}/reservas/${anuncioId}-${usuarioId}`,
+        `/api/anuncios/${anuncioId}/reservas/${reservaId}`,
         {
           method: "DELETE",
           headers: {
@@ -86,7 +91,7 @@ export default function ReservationManagementPanel({
       if (!response.ok) throw new Error("Erro ao cancelar reserva");
       return response.json();
     },
-    onSuccess: (data, usuarioId) => {
+    onSuccess: () => {
       toast.success("Reserva cancelada com sucesso");
       queryClient.invalidateQueries({ queryKey: ["anuncio-reservas", anuncioId] });
       queryClient.invalidateQueries({ queryKey: ["anuncio-quantidade", anuncioId] });
@@ -120,6 +125,45 @@ export default function ReservationManagementPanel({
       toast.error(error instanceof Error ? error.message : "Erro ao atualizar anúncio");
     },
   });
+
+  // Open (or start) an in-app chat with the user who made a reservation
+  const handleChatWithUser = async (reservaUsuarioId: number) => {
+    setStartingChatFor(reservaUsuarioId);
+    try {
+      // Look for an existing conversation about this ad with this buyer first,
+      // to avoid creating a duplicate thread every time.
+      const listResponse = await fetch(`/api/conversas?usuarioId=${userId}`);
+      if (listResponse.ok) {
+        const { data: conversas } = await listResponse.json();
+        const existing = conversas?.find(
+          (c: any) => c.usuarioId === reservaUsuarioId && c.anuncioId === anuncioId,
+        );
+        if (existing) {
+          navigate(`/chat?conversaId=${existing.id}`);
+          return;
+        }
+      }
+
+      const createResponse = await fetch("/api/conversas", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          usuarioId: reservaUsuarioId,
+          anuncianteId,
+          anuncioId,
+          assunto: anuncioTitulo,
+        }),
+      });
+
+      if (!createResponse.ok) throw new Error("Erro ao iniciar conversa");
+      const { data: novaConversa } = await createResponse.json();
+      navigate(`/chat?conversaId=${novaConversa.id}`);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Erro ao abrir chat");
+    } finally {
+      setStartingChatFor(null);
+    }
+  };
 
   const quantidadeInfo: QuantidadeInfo | undefined = quantidadeData?.data;
   const reservas: Reservation[] = reservasData?.data || [];
@@ -239,9 +283,6 @@ export default function ReservationManagementPanel({
                             {reserva.usuario.telefone && (
                               <p>📱 {reserva.usuario.telefone}</p>
                             )}
-                            {reserva.usuario.whatsapp && (
-                              <p>💬 WhatsApp: {reserva.usuario.whatsapp}</p>
-                            )}
                             <p className="text-xs text-gray-500">
                               Reservado em: {new Date(reserva.dataReserva).toLocaleDateString("pt-BR")}
                             </p>
@@ -252,6 +293,29 @@ export default function ReservationManagementPanel({
                               <p>{reserva.observacao}</p>
                             </div>
                           )}
+
+                          {/* Contact the buyer directly */}
+                          <div className="flex gap-2 mt-3">
+                            <button
+                              onClick={() => handleChatWithUser(reserva.usuarioId)}
+                              disabled={startingChatFor === reserva.usuarioId}
+                              className="flex items-center gap-1.5 px-3 py-1.5 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors text-xs font-semibold disabled:opacity-50"
+                            >
+                              <MessageSquare className="w-3.5 h-3.5" />
+                              {startingChatFor === reserva.usuarioId ? "Abrindo..." : "Chat"}
+                            </button>
+                            {reserva.usuario.whatsapp && (
+                              <a
+                                href={`https://wa.me/${reserva.usuario.whatsapp.replace(/\D/g, "")}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex items-center gap-1.5 px-3 py-1.5 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-xs font-semibold"
+                              >
+                                <MessageCircle className="w-3.5 h-3.5" />
+                                WhatsApp
+                              </a>
+                            )}
+                          </div>
                         </div>
 
                         {/* Cancel Button */}
@@ -262,7 +326,7 @@ export default function ReservationManagementPanel({
                                 `Deseja cancelar a reserva de ${reserva.usuario.nome}?`
                               )
                             ) {
-                              cancelReservaMutation.mutate(reserva.usuarioId);
+                              cancelReservaMutation.mutate(reserva.id);
                             }
                           }}
                           disabled={cancelReservaMutation.isPending}

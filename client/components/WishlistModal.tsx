@@ -18,6 +18,7 @@ interface WishlistModalProps {
   anuncioId: number;
   anuncioTitulo: string;
   anuncioPreco?: number;
+  permiteReservar?: boolean;
 }
 
 interface Wishlist {
@@ -35,11 +36,20 @@ export default function WishlistModal({
   anuncioId,
   anuncioTitulo,
   anuncioPreco,
+  permiteReservar = false,
 }: WishlistModalProps) {
   const { user, isLoggedIn } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
-  const [step, setStep] = useState<ModalStep>("choice");
+  // When the ad doesn't allow reservations, there's nothing to choose between -
+  // go straight to the wishlist flow instead of showing a "pick one" screen.
+  const [step, setStep] = useState<ModalStep>(permiteReservar ? "choice" : "wishlist");
+
+  useEffect(() => {
+    if (open) {
+      setStep(permiteReservar ? "choice" : "wishlist");
+    }
+  }, [open, permiteReservar]);
   const [selectedListaId, setSelectedListaId] = useState<number | null>(null);
   const [precoDesejado, setPrecoDesejado] = useState<string>("");
   const [observacoes, setObservacoes] = useState<string>("");
@@ -480,12 +490,12 @@ export default function WishlistModal({
                 </>
               )}
 
-              {/* Back Button */}
+              {/* Back/Cancel Button - only offer "back to choice" when there was a choice to begin with */}
               <button
-                onClick={() => setStep("choice")}
+                onClick={() => (permiteReservar ? setStep("choice") : handleCloseModal())}
                 className="w-full px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
               >
-                ← Voltar
+                {permiteReservar ? "← Voltar" : "Cancelar"}
               </button>
             </div>
           </>

@@ -36,6 +36,10 @@ export const criarReserva = async (req: Request, res: Response) => {
       return res.status(404).json({ error: "Anúncio não encontrado" });
     }
 
+    if (!anuncio.permiteReservar) {
+      return res.status(400).json({ error: "Este anúncio não permite reservas" });
+    }
+
     // Check if user already has a reservation
     const existingReserva = await prisma.reservas_anuncio.findUnique({
       where: {
@@ -276,6 +280,7 @@ export const listarReservasAnuncio = async (req: Request, res: Response) => {
             nome: true,
             email: true,
             telefone: true,
+            whatsapp: true,
           },
         },
       },

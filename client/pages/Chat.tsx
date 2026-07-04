@@ -77,6 +77,23 @@ export default function Chat() {
     }
   }, [searchParams, user?.cpf, user?.telefone]);
 
+  // Deep-link directly into an existing conversation (e.g. from the
+  // reservation management panel, so the anunciante can jump straight to
+  // the buyer's thread instead of hunting for it in the list).
+  useEffect(() => {
+    const conversaId = searchParams.get("conversaId");
+    if (!conversaId) return;
+
+    fetch(`/api/conversas/${conversaId}`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((result) => {
+        if (result?.data) {
+          setSelectedConversa(result.data);
+        }
+      })
+      .catch((err) => console.error("Error loading conversa:", err));
+  }, [searchParams]);
+
   // Fetch selected conversation with messages
   const { data: conversaData, refetch: refetchConversa } = useQuery({
     queryKey: ["conversa", selectedConversa?.id],

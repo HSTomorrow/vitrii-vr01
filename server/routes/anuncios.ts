@@ -197,6 +197,9 @@ export const getAnuncios: RequestHandler = async (req, res) => {
           destaque: true,
           ordem: true,
           isActive: true,
+          permiteReservar: true,
+          quantidadeMaximaReservas: true,
+          quantidade: true,
           anunciantes: {
             select: {
               id: true,

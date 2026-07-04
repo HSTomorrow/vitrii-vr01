@@ -62,6 +62,7 @@ export default function AdCard({
             anuncioPreco={
               anuncio.preco ? parseFloat(anuncio.preco.toString()) : undefined
             }
+            permiteReservar={anuncio.permiteReservar}
             variant="icon"
           />
         </div>

@@ -525,6 +525,7 @@ export default function AnuncioDetalhe() {
                     <ReservationManagementPanel
                       anuncioId={anuncio.id}
                       anuncioTitulo={anuncio.titulo}
+                      anuncianteId={anuncio.anuncianteId}
                       isAdmin={user?.tipoUsuario === "adm"}
                       userId={user?.id}
                     />
@@ -770,6 +771,7 @@ export default function AnuncioDetalhe() {
                     anuncioPreco={
                       anuncio.preco ? parseFloat(anuncio.preco.toString()) : undefined
                     }
+                    permiteReservar={anuncio.permiteReservar}
                     variant="button"
                   />
                 </div>
@@ -1204,6 +1206,7 @@ export default function AnuncioDetalhe() {
               anuncioPreco={
                 anuncio.preco ? parseFloat(anuncio.preco.toString()) : undefined
               }
+              permiteReservar={anuncio.permiteReservar}
               variant="icon"
             />
           </div>
