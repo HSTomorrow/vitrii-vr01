@@ -40,11 +40,11 @@ export default function UserButton() {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 px-4 py-2 bg-green-50 rounded-lg border border-green-200 hover:bg-green-100 transition-colors"
+        className="flex flex-shrink-0 items-center gap-1.5 px-3 py-1.5 bg-green-50 rounded-lg border border-green-200 hover:bg-green-100 transition-colors"
         title="Perfil do usuário"
       >
-        <User className="w-4 h-4 text-green-600" />
-        <span className="text-[0.74rem] font-semibold text-green-800 hidden md:inline">
+        <User className="w-4 h-4 text-green-600 flex-shrink-0" />
+        <span className="text-xs font-semibold text-green-800 hidden md:inline whitespace-nowrap">
           {user.nome.split(" ")[0]}
         </span>
       </button>

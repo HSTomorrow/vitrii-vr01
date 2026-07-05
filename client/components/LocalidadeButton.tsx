@@ -133,17 +133,17 @@ export default function LocalidadeButton() {
     <div className="relative" ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2 px-3 py-2 bg-cyan-50 rounded-lg border border-cyan-200 hover:bg-cyan-100 transition-colors"
+        className="flex flex-shrink-0 items-center gap-1.5 px-3 py-1.5 bg-cyan-50 rounded-lg border border-cyan-200 hover:bg-cyan-100 transition-colors"
         title="Alterar localidade padrão"
       >
-        <MapPin className="w-4 h-4 text-cyan-600" />
+        <MapPin className="w-4 h-4 text-cyan-600 flex-shrink-0" />
         <span
-          className="text-[0.74rem] font-semibold text-cyan-800 hidden md:inline max-w-[160px] lg:max-w-[220px] truncate"
+          className="text-xs font-semibold text-cyan-800 hidden md:inline max-w-[120px] lg:max-w-[200px] truncate"
           title={displayText}
         >
           {displayText}
         </span>
-        <ChevronDown className="w-3 h-3 text-cyan-600" />
+        <ChevronDown className="w-3 h-3 text-cyan-600 flex-shrink-0" />
       </button>
 
       {isOpen && (

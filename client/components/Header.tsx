@@ -107,44 +107,44 @@ export default function Header() {
                 <>
                   <Link
                     to="/anuncio/criar"
-                    className="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-vitrii-yellow text-vitrii-text rounded-lg hover:bg-vitrii-yellow-dark transition-colors font-semibold text-[0.85rem]"
+                    className="hidden sm:inline-flex flex-shrink-0 items-center gap-1.5 px-3 py-1.5 bg-vitrii-yellow text-vitrii-text rounded-lg hover:bg-vitrii-yellow-dark transition-colors font-semibold text-xs whitespace-nowrap"
                   >
-                    <Plus className="w-4 h-4" />
+                    <Plus className="w-4 h-4 flex-shrink-0" />
                     <span className="hidden md:inline">Publicar</span>
                   </Link>
 
                   {user.tipoUsuario === "adm" && (
-                    <div className="hidden sm:flex gap-2">
+                    <div className="hidden sm:flex gap-1.5">
                       <Link
                         to="/admin/dashboard"
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200 transition-colors font-semibold text-[0.85rem]"
+                        className="inline-flex flex-shrink-0 items-center gap-1.5 px-3 py-1.5 bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200 transition-colors font-semibold text-xs whitespace-nowrap"
                         title="Painel de Administrador"
                       >
-                        <Shield className="w-4 h-4" />
+                        <Shield className="w-4 h-4 flex-shrink-0" />
                         <span className="hidden md:inline">Administrador</span>
                       </Link>
                       <Link
                         to="/admin/anuncios"
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors font-semibold text-[0.85rem]"
+                        className="inline-flex flex-shrink-0 items-center gap-1.5 px-3 py-1.5 bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors font-semibold text-xs whitespace-nowrap"
                         title="Gerenciar Anúncios"
                       >
-                        <FileText className="w-4 h-4" />
+                        <FileText className="w-4 h-4 flex-shrink-0" />
                         <span className="hidden md:inline">Anúncios</span>
                       </Link>
                       <Link
                         to="/admin/banners"
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors font-semibold text-[0.85rem]"
+                        className="inline-flex flex-shrink-0 items-center gap-1.5 px-3 py-1.5 bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors font-semibold text-xs whitespace-nowrap"
                         title="Gerenciar Banners"
                       >
-                        <Plus className="w-4 h-4" />
+                        <Plus className="w-4 h-4 flex-shrink-0" />
                         <span className="hidden md:inline">Banners</span>
                       </Link>
                       <Link
                         to="/admin/localidades"
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors font-semibold text-[0.85rem]"
+                        className="inline-flex flex-shrink-0 items-center gap-1.5 px-3 py-1.5 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors font-semibold text-xs whitespace-nowrap"
                         title="Gerenciar Localidades"
                       >
-                        <MapPin className="w-4 h-4" />
+                        <MapPin className="w-4 h-4 flex-shrink-0" />
                         <span className="hidden md:inline">Localidades</span>
                       </Link>
                     </div>
@@ -158,15 +158,15 @@ export default function Header() {
                 <>
                   <Link
                     to="/anuncio/criar"
-                    className="hidden sm:inline-flex items-center gap-2 px-4 py-2 bg-vitrii-yellow text-vitrii-text rounded-lg hover:bg-vitrii-yellow-dark transition-colors font-semibold text-[0.85rem]"
+                    className="hidden sm:inline-flex flex-shrink-0 items-center gap-1.5 px-3 py-1.5 bg-vitrii-yellow text-vitrii-text rounded-lg hover:bg-vitrii-yellow-dark transition-colors font-semibold text-xs whitespace-nowrap"
                   >
-                    <Plus className="w-4 h-4" />
+                    <Plus className="w-4 h-4 flex-shrink-0" />
                     <span className="hidden md:inline">Publicar</span>
                   </Link>
 
                   <Link
                     to="/auth/signin"
-                    className="px-4 py-2 text-vitrii-blue hover:bg-blue-50 rounded-lg transition-colors hidden sm:block text-[0.85rem]"
+                    className="px-3 py-1.5 text-vitrii-blue hover:bg-blue-50 rounded-lg transition-colors hidden sm:block text-xs whitespace-nowrap flex-shrink-0"
                   >
                     Entrar
                   </Link>
