@@ -9,6 +9,7 @@ import ImageGallery from "@/components/ImageGallery";
 import ShareModal from "@/components/ShareModal";
 import QRCodeModal from "@/components/QRCodeModal";
 import WishlistButton from "@/components/WishlistButton";
+import ReservarButton from "@/components/ReservarButton";
 import ImageWithFallback from "@/components/ImageWithFallback";
 import ReservationManagementPanel from "@/components/ReservationManagementPanel";
 import { getAnuncioImage, getImageAlt } from "@/utils/imageFallback";
@@ -765,13 +766,19 @@ export default function AnuncioDetalhe() {
                     <QrCode className="w-4 h-4" />
                     QR Code
                   </button>
+                  {anuncio.permiteReservar && (
+                    <ReservarButton
+                      anuncioId={anuncio.id}
+                      anuncioTitulo={anuncio.titulo}
+                      variant="button"
+                    />
+                  )}
                   <WishlistButton
                     anuncioId={anuncio.id}
                     anuncioTitulo={anuncio.titulo}
                     anuncioPreco={
                       anuncio.preco ? parseFloat(anuncio.preco.toString()) : undefined
                     }
-                    permiteReservar={anuncio.permiteReservar}
                     variant="button"
                   />
                 </div>
@@ -1198,6 +1205,16 @@ export default function AnuncioDetalhe() {
 
         {/* Favorites, Wishlist & Solicitar Equipe de Vendas */}
         <div className="flex gap-2">
+          {/* Reservar - Icon only for mobile */}
+          {anuncio.permiteReservar && (
+            <div className="flex-shrink-0">
+              <ReservarButton
+                anuncioId={anuncio.id}
+                anuncioTitulo={anuncio.titulo}
+                variant="icon"
+              />
+            </div>
+          )}
           {/* Wishlist - Icon only for mobile */}
           <div className="flex-shrink-0">
             <WishlistButton
@@ -1206,7 +1223,6 @@ export default function AnuncioDetalhe() {
               anuncioPreco={
                 anuncio.preco ? parseFloat(anuncio.preco.toString()) : undefined
               }
-              permiteReservar={anuncio.permiteReservar}
               variant="icon"
             />
           </div>
