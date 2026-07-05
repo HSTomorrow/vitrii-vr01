@@ -262,6 +262,8 @@ import {
   enviarReciboPorEmail,
   adminListarLancamentos,
   adminListarContratos,
+  lancarMesContrato,
+  lancarLoteContratos,
 } from "./routes/financeiro";
 
 export function createServer() {
@@ -1327,6 +1329,8 @@ export function createServer() {
   app.patch("/api/contratos-financeiros/:id/status", extractUserId, atualizarStatusContrato);
   app.post("/api/contratos-financeiros/:id/reajuste", extractUserId, criarReajuste);
   app.post("/api/contratos-financeiros/:id/documentos", extractUserId, anexarDocumentoContrato);
+  app.post("/api/contratos-financeiros/lancar-lote", extractUserId, lancarLoteContratos);
+  app.post("/api/contratos-financeiros/:id/lancar", extractUserId, lancarMesContrato);
 
   // Lançamentos financeiros (cobranças de agenda, mensalidade e avulsas)
   app.get("/api/lancamentos-financeiros/anunciante/:anuncianteId", extractUserId, listarLancamentos);

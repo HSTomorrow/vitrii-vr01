@@ -97,7 +97,7 @@ export default function BottomNavBar() {
               }}
               className={`flex flex-col items-center justify-center w-full h-full gap-1 transition-all duration-150 ${
                 item.id === "publish"
-                  ? "bg-vitrii-yellow text-vitrii-text relative -top-4"
+                  ? `${isOnMinhaAgenda ? "bg-vitrii-green text-white" : "bg-vitrii-yellow text-vitrii-text"} relative -top-4`
                   : isActive
                     ? "text-vitrii-blue"
                     : "text-gray-500"
@@ -105,8 +105,8 @@ export default function BottomNavBar() {
               aria-label={item.label}
             >
               {item.id === "publish" ? (
-                <div className="bg-vitrii-yellow rounded-full p-2.5 shadow-lg">
-                  <Icon className="w-5 h-5 text-vitrii-text" />
+                <div className={`rounded-full p-2.5 shadow-lg ${isOnMinhaAgenda ? "bg-vitrii-green" : "bg-vitrii-yellow"}`}>
+                  <Icon className={`w-5 h-5 ${isOnMinhaAgenda ? "text-white" : "text-vitrii-text"}`} />
                 </div>
               ) : (
                 <>

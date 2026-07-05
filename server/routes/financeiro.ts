@@ -16,6 +16,8 @@ function getAppUrl(): string {
   return process.env.APP_URL || "https://app.vitrii.com.br";
 }
 
+const TIPOS_CONTRATO = ["Mensal", "Semanal", "Eventual", "Outros"];
+
 // ============ CONTRATOS ============
 
 export const listarContratos: RequestHandler = async (req, res) => {
@@ -25,8 +27,17 @@ export const listarContratos: RequestHandler = async (req, res) => {
       return res.status(403).json({ error: "Acesso negado a este anunciante" });
     }
 
+    const { titulo, diaVencimentoDe, diaVencimentoAte } = req.query;
+    const where: any = { anuncianteId };
+    if (titulo) where.titulo = { contains: titulo as string, mode: "insensitive" };
+    if (diaVencimentoDe || diaVencimentoAte) {
+      where.diaVencimento = {};
+      if (diaVencimentoDe) where.diaVencimento.gte = parseInt(diaVencimentoDe as string);
+      if (diaVencimentoAte) where.diaVencimento.lte = parseInt(diaVencimentoAte as string);
+    }
+
     const contratos = await prisma.contratos_financeiros.findMany({
-      where: { anuncianteId },
+      where,
       include: {
         contato: { select: { id: true, nome: true, email: true, celular: true } },
         reajustes: { orderBy: { dataCriacao: "desc" } },
@@ -44,7 +55,7 @@ export const listarContratos: RequestHandler = async (req, res) => {
 
 export const criarContrato: RequestHandler = async (req, res) => {
   try {
-    const { anuncianteId, contatoId, titulo, descricao, valorMensal, diaVencimento, dataInicio } = req.body;
+    const { anuncianteId, contatoId, titulo, descricao, tipoContrato, valorMensal, diaVencimento, dataInicio } = req.body;
 
     if (!anuncianteId || !contatoId || !titulo || !valorMensal || !diaVencimento || !dataInicio) {
       return res.status(400).json({
@@ -60,12 +71,17 @@ export const criarContrato: RequestHandler = async (req, res) => {
       return res.status(400).json({ error: "Dia de vencimento deve ser entre 1 e 28" });
     }
 
+    if (tipoContrato && !TIPOS_CONTRATO.includes(tipoContrato)) {
+      return res.status(400).json({ error: `tipoContrato deve ser um de: ${TIPOS_CONTRATO.join(", ")}` });
+    }
+
     const contrato = await prisma.contratos_financeiros.create({
       data: {
         anuncianteId: parseInt(anuncianteId),
         contatoId: parseInt(contatoId),
         titulo,
         descricao: descricao || null,
+        tipoContrato: tipoContrato || "Mensal",
         valorMensal: parseFloat(valorMensal),
         diaVencimento: parseInt(diaVencimento),
         dataInicio: new Date(dataInicio),
@@ -84,7 +100,7 @@ export const criarContrato: RequestHandler = async (req, res) => {
 export const atualizarContrato: RequestHandler = async (req, res) => {
   try {
     const id = parseInt(req.params.id as string);
-    const { titulo, descricao, diaVencimento, dataFim } = req.body;
+    const { titulo, descricao, tipoContrato, diaVencimento, dataFim } = req.body;
 
     const contrato = await prisma.contratos_financeiros.findUnique({ where: { id } });
     if (!contrato) return res.status(404).json({ error: "Contrato não encontrado" });
@@ -93,11 +109,16 @@ export const atualizarContrato: RequestHandler = async (req, res) => {
       return res.status(403).json({ error: "Acesso negado a este contrato" });
     }
 
+    if (tipoContrato && !TIPOS_CONTRATO.includes(tipoContrato)) {
+      return res.status(400).json({ error: `tipoContrato deve ser um de: ${TIPOS_CONTRATO.join(", ")}` });
+    }
+
     const atualizado = await prisma.contratos_financeiros.update({
       where: { id },
       data: {
         titulo: titulo ?? contrato.titulo,
         descricao: descricao !== undefined ? descricao : contrato.descricao,
+        tipoContrato: tipoContrato ?? contrato.tipoContrato,
         diaVencimento: diaVencimento ? parseInt(diaVencimento) : contrato.diaVencimento,
         dataFim: dataFim !== undefined ? (dataFim ? new Date(dataFim) : null) : contrato.dataFim,
       },
@@ -684,3 +705,100 @@ export async function gerarCobrancasMensais() {
     return { success: false, error: error instanceof Error ? error.message : "Unknown error" };
   }
 }
+
+// ============ LANÇAMENTO MANUAL DE CONTRATO (mês corrente) ============
+
+// Shared by the single-contract and batch "lançar" endpoints below. Always targets the
+// current month's competencia; relies on the same @@unique([contratoId, competencia])
+// constraint gerarCobrancasMensais() uses, so a contract already billed this month
+// (whether by the nightly job or a previous manual launch) is reported as "already exists"
+// rather than double-charged.
+async function gerarLancamentoDoContrato(
+  contrato: { id: number; anuncianteId: number; contatoId: number; titulo: string; valorMensal: any; diaVencimento: number },
+  criadoPor: number,
+): Promise<"gerado" | "existente"> {
+  const hoje = new Date();
+  const competencia = competenciaDe(hoje);
+  const vencimento = new Date(hoje.getFullYear(), hoje.getMonth(), contrato.diaVencimento);
+
+  try {
+    await prisma.lancamentos_financeiros.create({
+      data: {
+        anuncianteId: contrato.anuncianteId,
+        contatoId: contrato.contatoId,
+        contratoId: contrato.id,
+        origem: "contrato",
+        categoria: "mensalidade",
+        descricao: contrato.titulo,
+        valor: contrato.valorMensal,
+        competencia,
+        vencimento,
+        status: "pendente",
+        criadoPor,
+      },
+    });
+    return "gerado";
+  } catch (err: any) {
+    if (err?.code === "P2002") return "existente";
+    throw err;
+  }
+}
+
+export const lancarMesContrato: RequestHandler = async (req, res) => {
+  try {
+    const id = parseInt(req.params.id as string);
+
+    const contrato = await prisma.contratos_financeiros.findUnique({ where: { id } });
+    if (!contrato) return res.status(404).json({ error: "Contrato não encontrado" });
+
+    if (!(await podeGerenciarAnunciante(req.userId!, req.userType, contrato.anuncianteId))) {
+      return res.status(403).json({ error: "Acesso negado a este contrato" });
+    }
+
+    const resultado = await gerarLancamentoDoContrato(contrato, req.userId!);
+    res.json({
+      success: true,
+      data: { resultado },
+      message: resultado === "gerado" ? "Lançamento do mês gerado" : "Já existe um lançamento para este mês",
+    });
+  } catch (error) {
+    console.error("[lancarMesContrato]", error);
+    res.status(500).json({ error: "Erro ao lançar mês do contrato" });
+  }
+};
+
+export const lancarLoteContratos: RequestHandler = async (req, res) => {
+  try {
+    const { contratoIds } = req.body;
+    if (!Array.isArray(contratoIds) || contratoIds.length === 0) {
+      return res.status(400).json({ error: "contratoIds deve ser uma lista não vazia" });
+    }
+
+    let gerados = 0;
+    let jaExistentes = 0;
+    let erros = 0;
+
+    for (const rawId of contratoIds) {
+      const id = parseInt(rawId);
+      try {
+        const contrato = await prisma.contratos_financeiros.findUnique({ where: { id } });
+        if (!contrato || !(await podeGerenciarAnunciante(req.userId!, req.userType, contrato.anuncianteId))) {
+          erros++;
+          continue;
+        }
+
+        const resultado = await gerarLancamentoDoContrato(contrato, req.userId!);
+        if (resultado === "gerado") gerados++;
+        else jaExistentes++;
+      } catch (err) {
+        console.error(`[lancarLoteContratos] Erro no contrato ${id}:`, err);
+        erros++;
+      }
+    }
+
+    res.json({ success: true, data: { gerados, jaExistentes, erros } });
+  } catch (error) {
+    console.error("[lancarLoteContratos]", error);
+    res.status(500).json({ error: "Erro ao lançar lote de contratos" });
+  }
+};

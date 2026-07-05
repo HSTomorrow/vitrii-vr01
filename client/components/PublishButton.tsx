@@ -1,10 +1,12 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Plus } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useEffect, useState } from "react";
 
 export default function PublishButton() {
   const { user } = useAuth();
+  const location = useLocation();
+  const isOnMinhaAgenda = location.pathname === "/minha-agenda";
   const [isTablet, setIsTablet] = useState(false);
 
   useEffect(() => {
@@ -32,6 +34,20 @@ export default function PublishButton() {
   // Show on tablets/iPad (small floating button for mobile feel)
   // Hide on mobile (BottomNavBar handles it) and large desktop (use sticky header button)
   if (!isTablet) return null;
+
+  if (isOnMinhaAgenda) {
+    return (
+      <button
+        type="button"
+        onClick={() => window.dispatchEvent(new CustomEvent("addEvento"))}
+        className="fixed bottom-24 right-6 flex items-center justify-center p-3 bg-vitrii-green text-white rounded-full shadow-xl hover:shadow-2xl hover:bg-vitrii-green-dark transition-all hover:scale-110 z-40"
+        title="Adicionar evento à agenda"
+        aria-label="Adicionar evento à agenda"
+      >
+        <Plus className="w-6 h-6" />
+      </button>
+    );
+  }
 
   return (
     <Link

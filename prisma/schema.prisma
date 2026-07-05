@@ -570,6 +570,7 @@ model contratos_financeiros {
   contatoId       Int
   titulo          String    @db.VarChar(255)
   descricao       String?
+  tipoContrato    String    @default("Mensal") @db.VarChar(20) // Mensal, Semanal, Eventual, Outros
   valorMensal     Decimal   @db.Decimal(10, 2)
   diaVencimento   Int       @db.SmallInt
   dataInicio      DateTime

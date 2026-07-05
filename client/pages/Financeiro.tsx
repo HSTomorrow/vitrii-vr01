@@ -2,12 +2,14 @@ import { useState, useMemo } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { DollarSign, Plus, Check, X, Copy, FileText, Share2, Mail } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
+import { DollarSign, Plus, Check, X, Copy, FileText, Share2, Mail, Download, Zap } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ContatoSelectorModal from "@/components/ContatoSelectorModal";
 import ShareModal from "@/components/ShareModal";
 import { formatCurrencyDisplay } from "@/utils/formatCurrency";
+import { exportToCsv } from "@/utils/exportCsv";
 
 interface Anunciante {
   id: number;
@@ -21,6 +23,7 @@ interface Lancamento {
   descricao?: string;
   valor: string;
   status: string;
+  competencia?: string;
   vencimento?: string;
   dataPagamento?: string;
   qrCode?: string;
@@ -34,10 +37,18 @@ interface Contrato {
   id: number;
   titulo: string;
   descricao?: string;
+  tipoContrato: string;
   valorMensal: string;
   diaVencimento: number;
   status: string;
   contato: { id: number; nome: string };
+}
+
+const TIPOS_CONTRATO = ["Mensal", "Semanal", "Eventual", "Outros"];
+
+function currentMonthValue(): string {
+  const hoje = new Date();
+  return `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, "0")}`;
 }
 
 const STATUS_LABELS: Record<string, { label: string; className: string }> = {
@@ -63,6 +74,10 @@ export default function Financeiro() {
   const [selectedAnuncianteId, setSelectedAnuncianteId] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState<"lancamentos" | "contratos">("lancamentos");
   const [filterStatus, setFilterStatus] = useState("");
+  const [filterCompetencia, setFilterCompetencia] = useState(currentMonthValue());
+  const [filterDataDe, setFilterDataDe] = useState("");
+  const [filterDataAte, setFilterDataAte] = useState("");
+  const [filterContatoId, setFilterContatoId] = useState<number | null>(null);
   const [showNovoLancamento, setShowNovoLancamento] = useState(false);
   const [showNovoContrato, setShowNovoContrato] = useState(false);
   const [showContatoSelector, setShowContatoSelector] = useState(false);
@@ -76,12 +91,18 @@ export default function Financeiro() {
   });
   const [novoContrato, setNovoContrato] = useState({
     titulo: "",
+    tipoContrato: "Mensal",
     valorMensal: "",
     diaVencimento: "10",
     contatoId: null as number | null,
     contatoNome: "",
     dataInicio: new Date().toISOString().split("T")[0],
   });
+  const [loteMode, setLoteMode] = useState(false);
+  const [selectedContratoIds, setSelectedContratoIds] = useState<number[]>([]);
+  const [contratoFiltroTitulo, setContratoFiltroTitulo] = useState("");
+  const [contratoFiltroDiaDe, setContratoFiltroDiaDe] = useState("");
+  const [contratoFiltroDiaAte, setContratoFiltroDiaAte] = useState("");
 
   const { data: anunciantes = [] } = useQuery<Anunciante[]>({
     queryKey: ["anunciantes", user?.id],
@@ -115,11 +136,12 @@ export default function Financeiro() {
   }, [anunciantes, selectedAnuncianteId]);
 
   const { data: lancamentos = [], refetch: refetchLancamentos } = useQuery<Lancamento[]>({
-    queryKey: ["lancamentos-financeiros", selectedAnuncianteId, filterStatus],
+    queryKey: ["lancamentos-financeiros", selectedAnuncianteId, filterStatus, filterCompetencia],
     queryFn: async () => {
       if (!selectedAnuncianteId) return [];
       const params = new URLSearchParams();
       if (filterStatus) params.set("status", filterStatus);
+      if (filterCompetencia) params.set("competencia", filterCompetencia);
       const response = await fetch(
         `/api/lancamentos-financeiros/anunciante/${selectedAnuncianteId}?${params}`,
       );
@@ -130,11 +152,32 @@ export default function Financeiro() {
     enabled: !!selectedAnuncianteId,
   });
 
+  const lancamentosFiltrados = useMemo(() => {
+    return lancamentos.filter((l) => {
+      if (filterDataDe && (!l.vencimento || l.vencimento.slice(0, 10) < filterDataDe)) return false;
+      if (filterDataAte && (!l.vencimento || l.vencimento.slice(0, 10) > filterDataAte)) return false;
+      if (filterContatoId && l.contato?.id !== filterContatoId) return false;
+      return true;
+    });
+  }, [lancamentos, filterDataDe, filterDataAte, filterContatoId]);
+
+  const limparFiltrosLancamentos = () => {
+    setFilterStatus("");
+    setFilterCompetencia("");
+    setFilterDataDe("");
+    setFilterDataAte("");
+    setFilterContatoId(null);
+  };
+
   const { data: contratos = [], refetch: refetchContratos } = useQuery<Contrato[]>({
-    queryKey: ["contratos-financeiros", selectedAnuncianteId],
+    queryKey: ["contratos-financeiros", selectedAnuncianteId, contratoFiltroTitulo, contratoFiltroDiaDe, contratoFiltroDiaAte],
     queryFn: async () => {
       if (!selectedAnuncianteId) return [];
-      const response = await fetch(`/api/contratos-financeiros/anunciante/${selectedAnuncianteId}`);
+      const params = new URLSearchParams();
+      if (contratoFiltroTitulo) params.set("titulo", contratoFiltroTitulo);
+      if (contratoFiltroDiaDe) params.set("diaVencimentoDe", contratoFiltroDiaDe);
+      if (contratoFiltroDiaAte) params.set("diaVencimentoAte", contratoFiltroDiaAte);
+      const response = await fetch(`/api/contratos-financeiros/anunciante/${selectedAnuncianteId}?${params}`);
       if (!response.ok) return [];
       const result = await response.json();
       return result.data || [];
@@ -143,11 +186,11 @@ export default function Financeiro() {
   });
 
   const resumo = useMemo(() => {
-    const pendente = lancamentos
+    const pendente = lancamentosFiltrados
       .filter((l) => ["pendente", "pix_gerado", "comprovante_enviado"].includes(l.status))
       .reduce((sum, l) => sum + parseFloat(l.valor), 0);
     const hoje = new Date();
-    const recebidoNoMes = lancamentos
+    const recebidoNoMes = lancamentosFiltrados
       .filter(
         (l) =>
           l.status === "pago" &&
@@ -156,11 +199,11 @@ export default function Financeiro() {
           new Date(l.dataPagamento).getFullYear() === hoje.getFullYear(),
       )
       .reduce((sum, l) => sum + parseFloat(l.valor), 0);
-    const vencido = lancamentos.filter(
+    const vencido = lancamentosFiltrados.filter(
       (l) => l.status !== "pago" && l.status !== "cancelado" && l.vencimento && new Date(l.vencimento) < hoje,
     ).length;
     return { pendente, recebidoNoMes, vencido };
-  }, [lancamentos]);
+  }, [lancamentosFiltrados]);
 
   const criarLancamentoMutation = useMutation({
     mutationFn: async () => {
@@ -197,6 +240,7 @@ export default function Financeiro() {
           anuncianteId: selectedAnuncianteId,
           contatoId: novoContrato.contatoId,
           titulo: novoContrato.titulo,
+          tipoContrato: novoContrato.tipoContrato,
           valorMensal: parseFloat(novoContrato.valorMensal),
           diaVencimento: parseInt(novoContrato.diaVencimento),
           dataInicio: novoContrato.dataInicio,
@@ -208,10 +252,43 @@ export default function Financeiro() {
     onSuccess: () => {
       toast.success("Contrato criado!");
       setShowNovoContrato(false);
-      setNovoContrato({ titulo: "", valorMensal: "", diaVencimento: "10", contatoId: null, contatoNome: "", dataInicio: new Date().toISOString().split("T")[0] });
+      setNovoContrato({ titulo: "", tipoContrato: "Mensal", valorMensal: "", diaVencimento: "10", contatoId: null, contatoNome: "", dataInicio: new Date().toISOString().split("T")[0] });
       refetchContratos();
     },
     onError: (error) => toast.error(error instanceof Error ? error.message : "Erro ao criar contrato"),
+  });
+
+  const lancarMesMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await fetch(`/api/contratos-financeiros/${id}/lancar`, { method: "POST" });
+      if (!response.ok) throw new Error((await response.json()).error || "Erro ao lançar mês");
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast.success(data.message || "Lançamento processado");
+      refetchLancamentos();
+    },
+    onError: (error) => toast.error(error instanceof Error ? error.message : "Erro ao lançar mês"),
+  });
+
+  const lancarLoteMutation = useMutation({
+    mutationFn: async (contratoIds: number[]) => {
+      const response = await fetch("/api/contratos-financeiros/lancar-lote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contratoIds }),
+      });
+      if (!response.ok) throw new Error((await response.json()).error || "Erro ao lançar lote");
+      return response.json();
+    },
+    onSuccess: (data) => {
+      const { gerados, jaExistentes, erros } = data.data;
+      toast.success(`${gerados} lançado(s), ${jaExistentes} já existente(s)${erros ? `, ${erros} erro(s)` : ""}`);
+      setSelectedContratoIds([]);
+      setLoteMode(false);
+      refetchLancamentos();
+    },
+    onError: (error) => toast.error(error instanceof Error ? error.message : "Erro ao lançar lote"),
   });
 
   const gerarPixMutation = useMutation({
@@ -340,17 +417,87 @@ export default function Financeiro() {
 
         {activeTab === "lancamentos" && (
           <div>
-            <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-              <select
-                value={filterStatus}
-                onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+            <div className="flex flex-wrap items-end gap-3 mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+              <div>
+                <label className="block text-xs font-semibold text-vitrii-text-secondary mb-1">Status</label>
+                <select
+                  value={filterStatus}
+                  onChange={(e) => setFilterStatus(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                >
+                  <option value="">Todos os status</option>
+                  {Object.entries(STATUS_LABELS).map(([key, { label }]) => (
+                    <option key={key} value={key}>{label}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-vitrii-text-secondary mb-1">Competência</label>
+                <input
+                  type="month"
+                  value={filterCompetencia}
+                  onChange={(e) => setFilterCompetencia(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-vitrii-text-secondary mb-1">Vencimento de</label>
+                <input
+                  type="date"
+                  value={filterDataDe}
+                  onChange={(e) => setFilterDataDe(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-vitrii-text-secondary mb-1">até</label>
+                <input
+                  type="date"
+                  value={filterDataAte}
+                  onChange={(e) => setFilterDataAte(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-vitrii-text-secondary mb-1">Cliente</label>
+                <select
+                  value={filterContatoId ?? ""}
+                  onChange={(e) => setFilterContatoId(e.target.value ? parseInt(e.target.value) : null)}
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                >
+                  <option value="">Todos</option>
+                  {contatosDisponiveis.map((c) => (
+                    <option key={c.id} value={c.id}>{c.nome}</option>
+                  ))}
+                </select>
+              </div>
+              <button
+                onClick={limparFiltrosLancamentos}
+                className="px-3 py-2 text-sm text-vitrii-text-secondary hover:text-vitrii-text underline"
               >
-                <option value="">Todos os status</option>
-                {Object.entries(STATUS_LABELS).map(([key, { label }]) => (
-                  <option key={key} value={key}>{label}</option>
-                ))}
-              </select>
+                Limpar filtros
+              </button>
+              <div className="flex-1" />
+              <button
+                onClick={() =>
+                  exportToCsv(
+                    `lancamentos-${selectedAnuncianteId}.csv`,
+                    lancamentosFiltrados,
+                    [
+                      { header: "Data", value: (l) => new Date(l.vencimento || "").toLocaleDateString("pt-BR") || "" },
+                      { header: "Cliente", value: (l) => l.contato?.nome || "" },
+                      { header: "Categoria", value: (l) => CATEGORIA_LABELS[l.categoria] || l.categoria },
+                      { header: "Origem", value: (l) => l.origem },
+                      { header: "Valor", value: (l) => l.valor },
+                      { header: "Status", value: (l) => STATUS_LABELS[l.status]?.label || l.status },
+                    ],
+                  )
+                }
+                className="flex items-center gap-2 px-3 py-2 border border-gray-300 text-vitrii-text rounded-lg font-semibold hover:bg-gray-50 transition-colors text-sm"
+              >
+                <Download className="w-4 h-4" />
+                Exportar CSV
+              </button>
               <button
                 onClick={() => setShowNovoLancamento(true)}
                 className="flex items-center gap-2 px-4 py-2 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors text-sm"
@@ -361,10 +508,10 @@ export default function Financeiro() {
             </div>
 
             <div className="space-y-3">
-              {lancamentos.length === 0 ? (
+              {lancamentosFiltrados.length === 0 ? (
                 <p className="text-center text-vitrii-text-secondary py-12">Nenhum lançamento encontrado</p>
               ) : (
-                lancamentos.map((l) => {
+                lancamentosFiltrados.map((l) => {
                   const statusInfo = STATUS_LABELS[l.status] || STATUS_LABELS.pendente;
                   return (
                     <div key={l.id} className="p-4 border border-gray-200 rounded-lg">
@@ -385,12 +532,20 @@ export default function Financeiro() {
                         </div>
                       </div>
 
-                      {l.urlCopiaECola && l.status !== "pago" && l.status !== "cancelado" && (
-                        <div className="flex items-center gap-2 mt-2 p-2 bg-gray-50 rounded text-xs">
-                          <code className="flex-1 truncate">{l.urlCopiaECola}</code>
-                          <button onClick={() => copiarPix(l.urlCopiaECola!)} className="text-vitrii-blue">
-                            <Copy className="w-4 h-4" />
-                          </button>
+                      {l.qrCode && l.status !== "pago" && l.status !== "cancelado" && (
+                        <div className="flex items-center gap-3 mt-2 p-3 bg-gray-50 rounded-lg">
+                          <div className="bg-white p-2 rounded border border-gray-200 flex-shrink-0">
+                            <QRCodeSVG value={l.qrCode} size={96} />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs text-vitrii-text-secondary mb-1">Escaneie ou copie o código Pix</p>
+                            <div className="flex items-center gap-2">
+                              <code className="flex-1 truncate text-xs">{l.urlCopiaECola}</code>
+                              <button onClick={() => copiarPix(l.urlCopiaECola!)} className="text-vitrii-blue flex-shrink-0">
+                                <Copy className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
                         </div>
                       )}
 
@@ -448,7 +603,74 @@ export default function Financeiro() {
 
         {activeTab === "contratos" && (
           <div>
-            <div className="flex justify-end mb-4">
+            <div className="flex flex-wrap items-end gap-3 mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
+              <div>
+                <label className="block text-xs font-semibold text-vitrii-text-secondary mb-1">Título</label>
+                <input
+                  type="text"
+                  value={contratoFiltroTitulo}
+                  onChange={(e) => setContratoFiltroTitulo(e.target.value)}
+                  placeholder="Buscar por título..."
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-vitrii-text-secondary mb-1">Vencimento dia de</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="28"
+                  value={contratoFiltroDiaDe}
+                  onChange={(e) => setContratoFiltroDiaDe(e.target.value)}
+                  className="w-20 px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-vitrii-text-secondary mb-1">até</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="28"
+                  value={contratoFiltroDiaAte}
+                  onChange={(e) => setContratoFiltroDiaAte(e.target.value)}
+                  className="w-20 px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                />
+              </div>
+              <div className="flex-1" />
+              <button
+                onClick={() =>
+                  exportToCsv(
+                    `contratos-${selectedAnuncianteId}.csv`,
+                    contratos,
+                    [
+                      { header: "Título", value: (c) => c.titulo },
+                      { header: "Cliente", value: (c) => c.contato.nome },
+                      { header: "Tipo", value: (c) => c.tipoContrato },
+                      { header: "Valor Mensal", value: (c) => c.valorMensal },
+                      { header: "Dia Vencimento", value: (c) => c.diaVencimento },
+                      { header: "Status", value: (c) => c.status },
+                    ],
+                  )
+                }
+                className="flex items-center gap-2 px-3 py-2 border border-gray-300 text-vitrii-text rounded-lg font-semibold hover:bg-gray-50 transition-colors text-sm"
+              >
+                <Download className="w-4 h-4" />
+                Exportar CSV
+              </button>
+              <button
+                onClick={() => {
+                  setLoteMode(!loteMode);
+                  setSelectedContratoIds([]);
+                }}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg font-semibold transition-colors text-sm ${
+                  loteMode
+                    ? "bg-vitrii-blue text-white"
+                    : "border border-vitrii-blue text-vitrii-blue hover:bg-blue-50"
+                }`}
+              >
+                <Zap className="w-4 h-4" />
+                Lançamento em Lote
+              </button>
               <button
                 onClick={() => setShowNovoContrato(true)}
                 className="flex items-center gap-2 px-4 py-2 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors text-sm"
@@ -457,6 +679,23 @@ export default function Financeiro() {
                 Novo Contrato
               </button>
             </div>
+
+            {loteMode && (
+              <div className="flex items-center justify-between gap-3 mb-4 p-3 bg-blue-50 border border-vitrii-blue/20 rounded-lg">
+                <p className="text-sm text-vitrii-text">
+                  {selectedContratoIds.length} contrato(s) selecionado(s)
+                </p>
+                <button
+                  onClick={() => lancarLoteMutation.mutate(selectedContratoIds)}
+                  disabled={selectedContratoIds.length === 0 || lancarLoteMutation.isPending}
+                  className="flex items-center gap-2 px-4 py-2 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors text-sm disabled:opacity-50"
+                >
+                  <Zap className="w-4 h-4" />
+                  Lançar Selecionados
+                </button>
+              </div>
+            )}
+
             <div className="space-y-3">
               {contratos.length === 0 ? (
                 <p className="text-center text-vitrii-text-secondary py-12">Nenhum contrato cadastrado</p>
@@ -464,10 +703,29 @@ export default function Financeiro() {
                 contratos.map((c) => (
                   <div key={c.id} className="p-4 border border-gray-200 rounded-lg">
                     <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <p className="font-semibold text-vitrii-text">{c.titulo}</p>
-                        <p className="text-sm text-vitrii-text-secondary">Cliente: {c.contato.nome}</p>
-                        <p className="text-sm text-vitrii-text-secondary">Vencimento: dia {c.diaVencimento}</p>
+                      <div className="flex items-start gap-3">
+                        {loteMode && (
+                          <input
+                            type="checkbox"
+                            className="mt-1.5"
+                            checked={selectedContratoIds.includes(c.id)}
+                            onChange={(e) => {
+                              setSelectedContratoIds((prev) =>
+                                e.target.checked ? [...prev, c.id] : prev.filter((id) => id !== c.id),
+                              );
+                            }}
+                          />
+                        )}
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <p className="font-semibold text-vitrii-text">{c.titulo}</p>
+                            <span className="text-xs px-2 py-0.5 rounded-full bg-vitrii-info/10 text-vitrii-info">
+                              {c.tipoContrato}
+                            </span>
+                          </div>
+                          <p className="text-sm text-vitrii-text-secondary">Cliente: {c.contato.nome}</p>
+                          <p className="text-sm text-vitrii-text-secondary">Vencimento: dia {c.diaVencimento}</p>
+                        </div>
                       </div>
                       <div className="text-right">
                         <p className="font-bold text-vitrii-text">{formatCurrencyDisplay(parseFloat(c.valorMensal))}/mês</p>
@@ -476,6 +734,17 @@ export default function Financeiro() {
                         </span>
                       </div>
                     </div>
+                    {!loteMode && (
+                      <div className="flex justify-end mt-3">
+                        <button
+                          onClick={() => lancarMesMutation.mutate(c.id)}
+                          disabled={lancarMesMutation.isPending}
+                          className="flex items-center gap-1 text-xs px-3 py-1.5 border border-vitrii-blue text-vitrii-blue rounded-lg hover:bg-blue-50 disabled:opacity-50"
+                        >
+                          <Zap className="w-3.5 h-3.5" /> Lançar Mês
+                        </button>
+                      </div>
+                    )}
                   </div>
                 ))
               )}
@@ -575,6 +844,18 @@ export default function Financeiro() {
                 placeholder="Ex: Mensalidade academia"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg"
               />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold mb-1">Tipo de Contrato</label>
+              <select
+                value={novoContrato.tipoContrato}
+                onChange={(e) => setNovoContrato({ ...novoContrato, tipoContrato: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              >
+                {TIPOS_CONTRATO.map((tipo) => (
+                  <option key={tipo} value={tipo}>{tipo}</option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-sm font-semibold mb-1">Valor Mensal (R$)</label>
