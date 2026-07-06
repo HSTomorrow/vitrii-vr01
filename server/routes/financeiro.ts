@@ -245,7 +245,10 @@ export const listarLancamentos: RequestHandler = async (req, res) => {
     const where: any = { anuncianteId };
     if (status) where.status = status;
     if (origem) where.origem = origem;
-    if (competencia) where.competencia = competencia;
+    // Only recurring (contrato/mensalidade) lançamentos ever carry a competencia value —
+    // one-off manual/agenda/anuncio charges have it null. An exact-match filter would hide
+    // those permanently whenever a competencia filter is active, so always include nulls too.
+    if (competencia) where.OR = [{ competencia }, { competencia: null }];
     if (contatoId) where.contatoId = parseInt(contatoId as string);
 
     const lancamentos = await prisma.lancamentos_financeiros.findMany({
