@@ -13,6 +13,11 @@ const dispatchAddEventoEvent = () => {
   window.dispatchEvent(new CustomEvent("addEvento"));
 };
 
+// Dispatch a custom event to notify the Financeiro page to open "Novo Lançamento"
+const dispatchNovoLancamentoEvent = () => {
+  window.dispatchEvent(new CustomEvent("novoLancamento"));
+};
+
 export default function BottomNavBar() {
   const location = useLocation();
   const navigate = useNavigate();
@@ -33,8 +38,17 @@ export default function BottomNavBar() {
 
   if (isHidden) return null;
 
-  // Check if we're on the MinhaAgenda page (calendar view)
+  // Check if we're on the MinhaAgenda or Financeiro page, which repurpose the
+  // central "+" button for their own quick-add action instead of publishing an ad.
   const isOnMinhaAgenda = location.pathname === "/minha-agenda";
+  const isOnFinanceiro = location.pathname === "/financeiro";
+
+  const publishBgClass = isOnMinhaAgenda
+    ? "bg-vitrii-green"
+    : isOnFinanceiro
+      ? "bg-vitrii-blue"
+      : "bg-vitrii-yellow";
+  const publishTextClass = isOnMinhaAgenda || isOnFinanceiro ? "text-white" : "text-vitrii-text";
 
   const navItems = [
     {
@@ -53,12 +67,12 @@ export default function BottomNavBar() {
     },
     {
       id: "publish",
-      label: isOnMinhaAgenda ? "Evento" : "Publicar",
+      label: isOnMinhaAgenda ? "Evento" : isOnFinanceiro ? "Lançamento" : "Publicar",
       icon: Plus,
-      route: isOnMinhaAgenda ? "#" : user ? "/anuncio/criar" : "/signin",
-      isActive: isOnMinhaAgenda ? false : location.pathname.startsWith("/anuncio/criar"),
+      route: isOnMinhaAgenda || isOnFinanceiro ? "#" : user ? "/anuncio/criar" : "/signin",
+      isActive: isOnMinhaAgenda || isOnFinanceiro ? false : location.pathname.startsWith("/anuncio/criar"),
       requiresAuth: true,
-      onClick: isOnMinhaAgenda ? dispatchAddEventoEvent : undefined,
+      onClick: isOnMinhaAgenda ? dispatchAddEventoEvent : isOnFinanceiro ? dispatchNovoLancamentoEvent : undefined,
     },
     {
       id: "chat",
@@ -97,7 +111,7 @@ export default function BottomNavBar() {
               }}
               className={`flex flex-col items-center justify-center w-full h-full gap-1 transition-all duration-150 ${
                 item.id === "publish"
-                  ? `${isOnMinhaAgenda ? "bg-vitrii-green text-white" : "bg-vitrii-yellow text-vitrii-text"} relative -top-4`
+                  ? `${publishBgClass} ${publishTextClass} relative -top-4`
                   : isActive
                     ? "text-vitrii-blue"
                     : "text-gray-500"
@@ -105,8 +119,8 @@ export default function BottomNavBar() {
               aria-label={item.label}
             >
               {item.id === "publish" ? (
-                <div className={`rounded-full p-2.5 shadow-lg ${isOnMinhaAgenda ? "bg-vitrii-green" : "bg-vitrii-yellow"}`}>
-                  <Icon className={`w-5 h-5 ${isOnMinhaAgenda ? "text-white" : "text-vitrii-text"}`} />
+                <div className={`rounded-full p-2.5 shadow-lg ${publishBgClass}`}>
+                  <Icon className={`w-5 h-5 ${publishTextClass}`} />
                 </div>
               ) : (
                 <>

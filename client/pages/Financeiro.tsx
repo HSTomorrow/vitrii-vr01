@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -103,6 +103,17 @@ export default function Financeiro() {
   const [contratoFiltroTitulo, setContratoFiltroTitulo] = useState("");
   const [contratoFiltroDiaDe, setContratoFiltroDiaDe] = useState("");
   const [contratoFiltroDiaAte, setContratoFiltroDiaAte] = useState("");
+
+  // The floating "+" button (PublishButton/BottomNavBar) dispatches this while on
+  // /financeiro instead of navigating to ad creation — same pattern as MinhaAgenda's "addEvento".
+  useEffect(() => {
+    const handleNovoLancamentoEvent = () => {
+      setActiveTab("lancamentos");
+      setShowNovoLancamento(true);
+    };
+    window.addEventListener("novoLancamento", handleNovoLancamentoEvent);
+    return () => window.removeEventListener("novoLancamento", handleNovoLancamentoEvent);
+  }, []);
 
   const { data: anunciantes = [] } = useQuery<Anunciante[]>({
     queryKey: ["anunciantes", user?.id],
