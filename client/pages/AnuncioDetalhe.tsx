@@ -12,6 +12,7 @@ import WishlistButton from "@/components/WishlistButton";
 import ReservarButton from "@/components/ReservarButton";
 import ImageWithFallback from "@/components/ImageWithFallback";
 import ReservationManagementPanel from "@/components/ReservationManagementPanel";
+import AnuncioFinanceiroPanel from "@/components/AnuncioFinanceiroPanel";
 import { getAnuncioImage, getImageAlt } from "@/utils/imageFallback";
 import { formatCurrencyDisplay } from "@/utils/formatCurrency";
 import {
@@ -242,7 +243,10 @@ export default function AnuncioDetalhe() {
   const deleteMutation = useMutation({
     mutationFn: async () => {
       const response = await fetch(`/api/anuncios/${id}`, { method: "DELETE" });
-      if (!response.ok) throw new Error("Erro ao deletar");
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.error || "Erro ao deletar");
+      }
       return response.json();
     },
     onSuccess: () => {
@@ -528,6 +532,14 @@ export default function AnuncioDetalhe() {
                       anuncioTitulo={anuncio.titulo}
                       anuncianteId={anuncio.anuncianteId}
                       isAdmin={user?.tipoUsuario === "adm"}
+                      userId={user?.id}
+                    />
+
+                    {/* Anúncio Financeiro Panel */}
+                    <AnuncioFinanceiroPanel
+                      anuncioId={anuncio.id}
+                      anuncioTitulo={anuncio.titulo}
+                      anuncianteId={anuncio.anuncianteId}
                       userId={user?.id}
                     />
 

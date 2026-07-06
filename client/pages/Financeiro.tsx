@@ -68,6 +68,14 @@ const CATEGORIA_LABELS: Record<string, string> = {
   outro: "Outro",
 };
 
+const ORIGEM_LABELS: Record<string, string> = {
+  avulso: "Manual",
+  contrato: "Contrato",
+  mensalidade: "Contrato",
+  agenda: "Agenda",
+  anuncio: "Anúncio",
+};
+
 export default function Financeiro() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -498,7 +506,7 @@ export default function Financeiro() {
                       { header: "Data", value: (l) => new Date(l.vencimento || "").toLocaleDateString("pt-BR") || "" },
                       { header: "Cliente", value: (l) => l.contato?.nome || "" },
                       { header: "Categoria", value: (l) => CATEGORIA_LABELS[l.categoria] || l.categoria },
-                      { header: "Origem", value: (l) => l.origem },
+                      { header: "Origem", value: (l) => ORIGEM_LABELS[l.origem] || l.origem },
                       { header: "Valor", value: (l) => l.valor },
                       { header: "Status", value: (l) => STATUS_LABELS[l.status]?.label || l.status },
                     ],
@@ -528,10 +536,15 @@ export default function Financeiro() {
                     <div key={l.id} className="p-4 border border-gray-200 rounded-lg">
                       <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
                         <div>
-                          <p className="font-semibold text-vitrii-text">
-                            {CATEGORIA_LABELS[l.categoria] || l.categoria}
-                            {l.contato && <span className="text-vitrii-text-secondary"> · {l.contato.nome}</span>}
-                          </p>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className="font-semibold text-vitrii-text">
+                              {CATEGORIA_LABELS[l.categoria] || l.categoria}
+                              {l.contato && <span className="text-vitrii-text-secondary"> · {l.contato.nome}</span>}
+                            </p>
+                            <span className="text-[0.65rem] px-2 py-0.5 rounded-full bg-gray-100 text-vitrii-text-secondary font-semibold">
+                              {ORIGEM_LABELS[l.origem] || l.origem}
+                            </span>
+                          </div>
                           {l.descricao && <p className="text-sm text-vitrii-text-secondary">{l.descricao}</p>}
                           {l.evento && <p className="text-xs text-vitrii-info">Agenda: {l.evento.titulo}</p>}
                         </div>

@@ -26,6 +26,14 @@ const STATUS_LABELS: Record<string, string> = {
   cancelado: "Cancelado",
 };
 
+const ORIGEM_LABELS: Record<string, string> = {
+  avulso: "Manual",
+  contrato: "Contrato",
+  mensalidade: "Contrato",
+  agenda: "Agenda",
+  anuncio: "Anúncio",
+};
+
 export default function AdminFinanceiro() {
   const { user } = useAuth();
   const isAdmin = user?.tipoUsuario === "adm";
@@ -87,8 +95,10 @@ export default function AdminFinanceiro() {
           >
             <option value="">Todas as origens</option>
             <option value="agenda">Agenda</option>
-            <option value="mensalidade">Mensalidade</option>
-            <option value="avulso">Avulso</option>
+            <option value="contrato">Contrato (manual)</option>
+            <option value="mensalidade">Contrato (automático)</option>
+            <option value="avulso">Manual</option>
+            <option value="anuncio">Anúncio</option>
           </select>
           <div className="ml-auto text-sm text-vitrii-text-secondary">
             Total no filtro: <span className="font-bold text-vitrii-text">{formatCurrencyDisplay(totalGeral)}</span> ({lancamentos.length})
@@ -117,7 +127,7 @@ export default function AdminFinanceiro() {
                     <td className="px-4 py-3">{l.anunciante.nome}</td>
                     <td className="px-4 py-3">{l.contato?.nome || "-"}</td>
                     <td className="px-4 py-3">{l.categoria}</td>
-                    <td className="px-4 py-3">{l.origem}</td>
+                    <td className="px-4 py-3">{ORIGEM_LABELS[l.origem] || l.origem}</td>
                     <td className="px-4 py-3">{STATUS_LABELS[l.status] || l.status}</td>
                     <td className="px-4 py-3 text-right font-semibold">{formatCurrencyDisplay(parseFloat(l.valor))}</td>
                     <td className="px-4 py-3 text-vitrii-text-secondary">

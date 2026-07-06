@@ -1083,6 +1083,23 @@ export const deleteAnuncio: RequestHandler = async (req, res) => {
       });
     }
 
+    // A paid Financeiro charge is a financial record that must survive — block the delete
+    // entirely rather than losing the link. The client should offer "Inativar" instead.
+    const lancamentoPago = await prisma.lancamentos_financeiros.findFirst({
+      where: { anuncioId, status: "pago" },
+    });
+    if (lancamentoPago) {
+      return res.status(409).json({
+        success: false,
+        error: "Este anúncio possui um lançamento pago vinculado. Use 'Inativar' em vez de excluir.",
+      });
+    }
+
+    // Any not-yet-paid charge tied to this ad is disposable along with the ad itself.
+    await prisma.lancamentos_financeiros.deleteMany({
+      where: { anuncioId, status: { not: "pago" } },
+    });
+
     // Get all associated gallery photos before deletion
     const fotos = await prisma.fotos_anuncio.findMany({
       where: { anuncio_id: anuncioId },

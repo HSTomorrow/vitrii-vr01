@@ -524,7 +524,7 @@ export const atualizarStatusEvento: RequestHandler = async (req, res) => {
     }
 
     // Validate status
-    const statusValidos = ["pendente", "realizado", "pendente_pagamento", "substituicao"];
+    const statusValidos = ["pendente", "realizado", "pendente_pagamento", "substituicao", "inativo"];
     if (!statusValidos.includes(status)) {
       return res.status(400).json({
         error: `Status inválido. Valores válidos: ${statusValidos.join(", ")}`,

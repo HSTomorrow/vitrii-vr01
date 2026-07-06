@@ -291,16 +291,46 @@ export const obterLancamentoDoEvento: RequestHandler = async (req, res) => {
   }
 };
 
+export const listarLancamentosDoAnuncio: RequestHandler = async (req, res) => {
+  try {
+    const anuncioId = parseInt(req.params.anuncioId as string);
+
+    const anuncio = await prisma.anuncios.findUnique({ where: { id: anuncioId } });
+    if (!anuncio) return res.status(404).json({ error: "Anúncio não encontrado" });
+
+    if (!(await podeGerenciarAnunciante(req.userId!, req.userType, anuncio.anuncianteId))) {
+      return res.status(403).json({ error: "Acesso negado a este anúncio" });
+    }
+
+    const lancamentos = await prisma.lancamentos_financeiros.findMany({
+      where: { anuncioId, status: { not: "cancelado" } },
+      include: {
+        contato: { select: { id: true, nome: true, email: true, celular: true } },
+      },
+      orderBy: { dataCriacao: "desc" },
+    });
+
+    res.json({ success: true, data: lancamentos });
+  } catch (error) {
+    console.error("[listarLancamentosDoAnuncio]", error);
+    res.status(500).json({ error: "Erro ao buscar lançamentos do anúncio" });
+  }
+};
+
 export const criarLancamento: RequestHandler = async (req, res) => {
   try {
-    const { anuncianteId, eventoId, contatoId, origem, categoria, descricao, valor, vencimento } = req.body;
+    const { anuncianteId, eventoId, anuncioId, contatoId, origem, categoria, descricao, valor, vencimento } = req.body;
 
     if (!anuncianteId || !origem || !categoria || !valor) {
       return res.status(400).json({ error: "anuncianteId, origem, categoria e valor são obrigatórios" });
     }
 
-    if (!["agenda", "avulso"].includes(origem)) {
-      return res.status(400).json({ error: "origem deve ser 'agenda' ou 'avulso' ao criar manualmente" });
+    if (!["agenda", "avulso", "anuncio"].includes(origem)) {
+      return res.status(400).json({ error: "origem deve ser 'agenda', 'avulso' ou 'anuncio' ao criar manualmente" });
+    }
+
+    if (origem === "anuncio" && !anuncioId) {
+      return res.status(400).json({ error: "anuncioId é obrigatório para origem 'anuncio'" });
     }
 
     if (!(await podeGerenciarAnunciante(req.userId!, req.userType, parseInt(anuncianteId)))) {
@@ -314,10 +344,18 @@ export const criarLancamento: RequestHandler = async (req, res) => {
       }
     }
 
+    if (anuncioId) {
+      const anuncio = await prisma.anuncios.findUnique({ where: { id: parseInt(anuncioId) } });
+      if (!anuncio || anuncio.anuncianteId !== parseInt(anuncianteId)) {
+        return res.status(400).json({ error: "Anúncio não pertence a este anunciante" });
+      }
+    }
+
     const lancamento = await prisma.lancamentos_financeiros.create({
       data: {
         anuncianteId: parseInt(anuncianteId),
         eventoId: eventoId ? parseInt(eventoId) : null,
+        anuncioId: anuncioId ? parseInt(anuncioId) : null,
         contatoId: contatoId ? parseInt(contatoId) : null,
         origem,
         categoria,

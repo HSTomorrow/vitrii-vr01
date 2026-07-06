@@ -252,6 +252,7 @@ import {
   anexarDocumentoContrato,
   listarLancamentos,
   obterLancamentoDoEvento,
+  listarLancamentosDoAnuncio,
   criarLancamento,
   atualizarLancamento,
   gerarPixLancamento,
@@ -1335,6 +1336,7 @@ export function createServer() {
   // Lançamentos financeiros (cobranças de agenda, mensalidade e avulsas)
   app.get("/api/lancamentos-financeiros/anunciante/:anuncianteId", extractUserId, listarLancamentos);
   app.get("/api/lancamentos-financeiros/evento/:eventoId", extractUserId, obterLancamentoDoEvento);
+  app.get("/api/lancamentos-financeiros/anuncio/:anuncioId", extractUserId, listarLancamentosDoAnuncio);
   app.post("/api/lancamentos-financeiros", extractUserId, criarLancamento);
   app.patch("/api/lancamentos-financeiros/:id", extractUserId, atualizarLancamento);
   app.post("/api/lancamentos-financeiros/:id/pix", extractUserId, gerarPixLancamento);

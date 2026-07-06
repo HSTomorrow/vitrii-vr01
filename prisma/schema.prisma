@@ -90,6 +90,7 @@ model anuncios {
   pagamento           pagamentos?
   reservas            reservas_anuncio[]
   eventosAgenda       eventos_agenda_anunciante[]
+  lancamentosFinanceiros lancamentos_financeiros[]
 
   @@index([anuncianteId])
   @@index([usuarioId])
@@ -624,9 +625,10 @@ model lancamentos_financeiros {
   id               Int       @id @default(autoincrement())
   anuncianteId     Int
   eventoId         Int?
+  anuncioId        Int?
   contatoId        Int?
   contratoId       Int?
-  origem           String    @db.VarChar(20) // "agenda", "mensalidade", "avulso"
+  origem           String    @db.VarChar(20) // "agenda", "mensalidade", "avulso", "contrato", "anuncio"
   categoria        String    @db.VarChar(30) // "servico", "multa", "venda_material", "hora_extra", "mensalidade", "outro"
   descricao        String?
   valor            Decimal   @db.Decimal(10, 2)
@@ -651,12 +653,14 @@ model lancamentos_financeiros {
 
   anunciante anunciantes                @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
   evento     eventos_agenda_anunciante? @relation(fields: [eventoId], references: [id], onDelete: SetNull)
+  anuncio    anuncios?                  @relation(fields: [anuncioId], references: [id], onDelete: SetNull)
   contato    contatos?                  @relation(fields: [contatoId], references: [id], onDelete: SetNull)
   contrato   contratos_financeiros?     @relation(fields: [contratoId], references: [id], onDelete: SetNull)
 
   @@unique([contratoId, competencia])
   @@index([anuncianteId])
   @@index([eventoId])
+  @@index([anuncioId])
   @@index([contatoId])
   @@index([contratoId])
   @@index([status])

@@ -16,6 +16,7 @@ import AgendaEditorModal from "@/components/AgendaEditorModal";
 import ShareAgendaModal from "@/components/ShareAgendaModal";
 import RecurrenceModal, { RecurrenceData } from "@/components/RecurrenceModal";
 import DeleteFilterModal from "@/components/DeleteFilterModal";
+import SugerirCobrancaAgendaModal from "@/components/SugerirCobrancaAgendaModal";
 
 interface Evento {
   id: number;
@@ -29,7 +30,16 @@ interface Evento {
   privacidade: string;
   cor: string;
   status?: string;
+  valor?: number | null;
   contatos?: Array<{ contatoId: number }>;
+}
+
+interface SugestaoCobranca {
+  eventoId: number;
+  anuncianteId: number;
+  contatoId: number;
+  titulo: string;
+  valor: number;
 }
 
 interface Anunciante {
@@ -70,7 +80,22 @@ export default function MinhaAgenda() {
   const [filterDescricao, setFilterDescricao] = useState("");
   const [filterTipoContato, setFilterTipoContato] = useState("");
   const [filterAnuncioId, setFilterAnuncioId] = useState<number | null>(null);
+  const [sugestaoCobranca, setSugestaoCobranca] = useState<SugestaoCobranca | null>(null);
   const reservasRef = useRef<HTMLDivElement>(null);
+
+  // After saving an event with a price and exactly one contact, offer to turn it into a
+  // Financeiro charge (direct lançamento or a recurring contract) instead of doing it silently.
+  const maybeSuggestCobranca = (evento: Evento | undefined) => {
+    if (evento?.valor && evento.contatos?.length === 1 && selectedAnuncianteId) {
+      setSugestaoCobranca({
+        eventoId: evento.id,
+        anuncianteId: selectedAnuncianteId,
+        contatoId: evento.contatos[0].contatoId,
+        titulo: evento.titulo,
+        valor: evento.valor,
+      });
+    }
+  };
 
   // Fetch user's anunciantes
   const {
@@ -269,6 +294,12 @@ export default function MinhaAgenda() {
   // Apply filters to eventos
   const filteredEventos = useMemo(() => {
     return (eventos || []).filter((evento) => {
+      // Inactive events (kept for financial history, e.g. a paid charge blocked deletion)
+      // are hidden from the working calendar view.
+      if (evento.status === "inativo") {
+        return false;
+      }
+
       // Filter by related ad
       if (filterAnuncioId && evento.anuncioId !== filterAnuncioId) {
         return false;
@@ -338,12 +369,13 @@ export default function MinhaAgenda() {
 
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
       toast.success("Evento criado com sucesso!");
       setIsModalOpen(false);
       setSelectedEvento(null);
       setSelectedDate(null);
       refetchEventos();
+      maybeSuggestCobranca(result?.data);
     },
     onError: (error) => {
       toast.error(
@@ -373,11 +405,12 @@ export default function MinhaAgenda() {
 
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (result) => {
       toast.success("Evento atualizado com sucesso!");
       setIsModalOpen(false);
       setSelectedEvento(null);
       refetchEventos();
+      maybeSuggestCobranca(result?.data);
     },
     onError: (error) => {
       toast.error(
@@ -572,6 +605,9 @@ export default function MinhaAgenda() {
       toast.error(
         error instanceof Error ? error.message : "Erro ao deletar eventos",
       );
+      // The failed request runs alongside the others in parallel, so some events in the
+      // batch may have already been deleted by the time this one blocks — refresh either way.
+      refetchEventos();
     },
   });
 
@@ -1030,6 +1066,20 @@ export default function MinhaAgenda() {
           createEventoMutation.isPending || updateEventoMutation.isPending
         }
       />
+
+      {sugestaoCobranca && (
+        <SugerirCobrancaAgendaModal
+          open={!!sugestaoCobranca}
+          onOpenChange={(open) => {
+            if (!open) setSugestaoCobranca(null);
+          }}
+          eventoId={sugestaoCobranca.eventoId}
+          anuncianteId={sugestaoCobranca.anuncianteId}
+          contatoId={sugestaoCobranca.contatoId}
+          titulo={sugestaoCobranca.titulo}
+          valor={sugestaoCobranca.valor}
+        />
+      )}
 
       {selectedAnuncianteId && (
         <>

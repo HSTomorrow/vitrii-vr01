@@ -370,29 +370,6 @@ export const createEvento: RequestHandler = async (req, res) => {
       });
     }
 
-    // Auto-generate a pending Financeiro charge when the event has a price and exactly
-    // one contact (unambiguous who to bill). Multiple contacts fall back to the manual
-    // "Gerar Cobrança" button in EventoModal, since there's no single obvious payer.
-    if (valor && contatosPermitidos && contatosPermitidos.length === 1) {
-      try {
-        await prisma.lancamentos_financeiros.create({
-          data: {
-            anuncianteId: parseInt(anuncianteId),
-            eventoId: evento.id,
-            contatoId: parseInt(contatosPermitidos[0]),
-            origem: "agenda",
-            categoria: "servico",
-            descricao: titulo,
-            valor: parseFloat(valor),
-            status: "pendente",
-            criadoPor: userId,
-          },
-        });
-      } catch (err) {
-        console.error("[createEvento] Erro ao gerar lançamento automático:", err);
-      }
-    }
-
     // Refetch evento with updated contacts
     const eventoAtualizado = await prisma.eventos_agenda_anunciante.findUnique({
       where: { id: evento.id },
@@ -544,41 +521,6 @@ export const updateEvento: RequestHandler = async (req, res) => {
       });
     }
 
-    // Keep the auto-generated Financeiro charge in sync when there's a price and exactly
-    // one contact. Only a still-"pendente" charge is touched — once the client has moved
-    // past that (pix gerado, pago, etc.) we don't want to silently rewrite it.
-    if (eventoAtualizado.valor && contatosPermitidos && contatosPermitidos.length === 1) {
-      try {
-        const contatoId = parseInt(contatosPermitidos[0]);
-        const lancamentoPendente = await prisma.lancamentos_financeiros.findFirst({
-          where: { eventoId, status: "pendente" },
-        });
-
-        if (lancamentoPendente) {
-          await prisma.lancamentos_financeiros.update({
-            where: { id: lancamentoPendente.id },
-            data: { valor: eventoAtualizado.valor, contatoId, descricao: eventoAtualizado.titulo },
-          });
-        } else {
-          await prisma.lancamentos_financeiros.create({
-            data: {
-              anuncianteId: evento.anuncianteId,
-              eventoId,
-              contatoId,
-              origem: "agenda",
-              categoria: "servico",
-              descricao: eventoAtualizado.titulo,
-              valor: eventoAtualizado.valor,
-              status: "pendente",
-              criadoPor: userId,
-            },
-          });
-        }
-      } catch (err) {
-        console.error("[updateEvento] Erro ao sincronizar lançamento automático:", err);
-      }
-    }
-
     // Refetch evento with updated contacts
     const eventoFinal = await prisma.eventos_agenda_anunciante.findUnique({
       where: { id: eventoId },
@@ -641,15 +583,21 @@ export const deleteEvento: RequestHandler = async (req, res) => {
         .json({ error: "Acesso negado. Você não pode deletar este evento." });
     }
 
-    // Financeiro charges linked to this event: delete the ones still unpaid along with the
-    // event, but preserve any already-paid one (just unlink it) so the receipt/history survives.
+    // A paid Financeiro charge is a financial record that must survive — block the delete
+    // entirely rather than silently unlinking it. The client should offer "inativar" instead.
+    const lancamentoPago = await prisma.lancamentos_financeiros.findFirst({
+      where: { eventoId, status: "pago" },
+    });
+    if (lancamentoPago) {
+      return res.status(409).json({
+        error: "Este evento possui um lançamento pago vinculado. Marque-o como inativo em vez de excluir.",
+      });
+    }
+
+    // Any not-yet-paid charge is disposable along with the event itself.
     await prisma.$transaction([
       prisma.lancamentos_financeiros.deleteMany({
-        where: { eventoId, status: { not: "pago" } },
-      }),
-      prisma.lancamentos_financeiros.updateMany({
-        where: { eventoId, status: "pago" },
-        data: { eventoId: null },
+        where: { eventoId },
       }),
       // Delete event (permissões são deletadas automaticamente por CASCADE)
       prisma.eventos_agenda_anunciante.delete({

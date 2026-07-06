@@ -529,9 +529,7 @@ export default function EventoModal({
                   <p className="text-xs text-vitrii-text-secondary">
                     {lancamento
                       ? `Status: ${lancamento.status === "pago" ? "Pago" : lancamento.status === "pix_gerado" ? "Pix gerado" : "Pendente"}`
-                      : formData.contatosPermitidos.length === 1
-                        ? "Será gerada automaticamente ao salvar"
-                        : "Nenhuma cobrança gerada ainda"}
+                      : "Nenhuma cobrança gerada ainda"}
                   </p>
                 </div>
               </div>
