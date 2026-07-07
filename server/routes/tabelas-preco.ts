@@ -19,10 +19,10 @@ export const getTabelas: RequestHandler = async (req, res) => {
     const { anuncianteId, productId } = req.query;
 
     const where: any = {};
-    if (anuncianteId) where.anuncianteId = parseInt(anuncianteId as string);
+    if (anuncianteId) where.lojaId = parseInt(anuncianteId as string);
     if (productId) where.productId = parseInt(productId as string);
 
-    const tabelas = await prisma.tabelasPreco.findMany({
+    const tabelas = await prisma.tabelas_preco.findMany({
       where,
       include: {
         produto: {
@@ -51,18 +51,16 @@ export const getTabelas: RequestHandler = async (req, res) => {
 // GET tabela by ID
 export const getTabelaById: RequestHandler = async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = parseInt(req.params.id as string);
 
-    const tabela = await prisma.tabelasPreco.findUnique({
-      where: { id: parseInt(id) },
+    const tabela = await prisma.tabelas_preco.findUnique({
+      where: { id },
       include: {
         produto: {
           include: {
             grupo: true,
           },
         },
-        qrCodes: true,
-        anuncios: true,
       },
     });
 
@@ -113,11 +111,13 @@ export const createTabela: RequestHandler = async (req, res) => {
       });
     }
 
-    // Check if price table already exists for this product in this anunciante
-    const existingTabela = await prisma.tabelasPreco.findFirst({
+    // Check if price table already exists for this product/tamanho/cor in this anunciante
+    const existingTabela = await prisma.tabelas_preco.findFirst({
       where: {
         productId: validatedData.productId,
-        anuncianteId: validatedData.anuncianteId,
+        lojaId: validatedData.anuncianteId,
+        tamanho: validatedData.tamanho || null,
+        cor: validatedData.cor || null,
       },
     });
 
@@ -125,20 +125,21 @@ export const createTabela: RequestHandler = async (req, res) => {
       return res.status(400).json({
         success: false,
         error:
-          "Já existe uma tabela de preço para este produto neste anunciante",
+          "Já existe uma tabela de preço para este produto (com esse tamanho/cor) neste anunciante",
       });
     }
 
-    const tabela = await prisma.tabelasPreco.create({
+    const tabela = await prisma.tabelas_preco.create({
       data: {
         productId: validatedData.productId,
-        anuncianteId: validatedData.anuncianteId,
+        lojaId: validatedData.anuncianteId,
         tamanho: validatedData.tamanho || null,
         cor: validatedData.cor || null,
         preco: new Decimal(validatedData.preco.toString()),
         precoCusto: validatedData.precoCusto
           ? new Decimal(validatedData.precoCusto.toString())
           : undefined,
+        dataAtualizacao: new Date(),
       },
       include: {
         produto: {
@@ -174,27 +175,31 @@ export const createTabela: RequestHandler = async (req, res) => {
 // UPDATE tabela
 export const updateTabela: RequestHandler = async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = parseInt(req.params.id as string);
     const validatedData = TabelaPrecoCreateSchema.partial().parse(req.body);
 
-    const updatePayload: any = {};
+    const updatePayload: any = { dataAtualizacao: new Date() };
     if (validatedData.preco !== undefined) {
       updatePayload.preco = new Decimal(validatedData.preco.toString());
     }
     if (validatedData.precoCusto !== undefined) {
-      updatePayload.precoCusto = new Decimal(
-        validatedData.precoCusto.toString(),
-      );
+      updatePayload.precoCusto = new Decimal(validatedData.precoCusto.toString());
     }
     if (validatedData.productId !== undefined) {
       updatePayload.productId = validatedData.productId;
     }
     if (validatedData.anuncianteId !== undefined) {
-      updatePayload.anuncianteId = validatedData.anuncianteId;
+      updatePayload.lojaId = validatedData.anuncianteId;
+    }
+    if (validatedData.tamanho !== undefined) {
+      updatePayload.tamanho = validatedData.tamanho || null;
+    }
+    if (validatedData.cor !== undefined) {
+      updatePayload.cor = validatedData.cor || null;
     }
 
-    const tabela = await prisma.tabelasPreco.update({
-      where: { id: parseInt(id) },
+    const tabela = await prisma.tabelas_preco.update({
+      where: { id },
       data: updatePayload,
       include: {
         produto: {
@@ -230,10 +235,10 @@ export const updateTabela: RequestHandler = async (req, res) => {
 // DELETE tabela
 export const deleteTabela: RequestHandler = async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = parseInt(req.params.id as string);
 
-    await prisma.tabelasPreco.delete({
-      where: { id: parseInt(id) },
+    await prisma.tabelas_preco.delete({
+      where: { id },
     });
 
     res.json({

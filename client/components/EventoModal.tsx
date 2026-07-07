@@ -104,6 +104,47 @@ export default function EventoModal({
   const [showContatoSelector, setShowContatoSelector] = useState(false);
   const [showContactDetails, setShowContactDetails] = useState(false);
   const [selectedContatoForDetails, setSelectedContatoForDetails] = useState<Contato | null>(null);
+  const [selectedProdutoId, setSelectedProdutoId] = useState<number | null>(null);
+  const [selectedTabelaId, setSelectedTabelaId] = useState<number | null>(null);
+  const [useCustomTitle, setUseCustomTitle] = useState(false);
+
+  // Título can be picked from the anunciante's registered products/services instead of
+  // typed freely — picking one auto-fills Valor from its tabela de preços.
+  const { data: produtosData } = useQuery({
+    queryKey: ["produtos-anunciante", anuncianteId],
+    queryFn: async () => {
+      const response = await fetch("/api/productos");
+      if (!response.ok) return { data: [] };
+      return response.json();
+    },
+    enabled: isOpen && !!anuncianteId,
+  });
+  const produtos: { id: number; nome: string; lojaId: number }[] = (produtosData?.data || []).filter(
+    (p: any) => p.lojaId === anuncianteId,
+  );
+
+  const { data: tabelasData } = useQuery({
+    queryKey: ["tabelas-preco", anuncianteId, selectedProdutoId],
+    queryFn: async () => {
+      const response = await fetch(
+        `/api/tabelas-preco?anuncianteId=${anuncianteId}&productId=${selectedProdutoId}`,
+      );
+      if (!response.ok) return { data: [] };
+      return response.json();
+    },
+    enabled: isOpen && !!anuncianteId && !!selectedProdutoId,
+  });
+  const tabelasPreco: { id: number; preco: string; tamanho?: string; cor?: string }[] =
+    tabelasData?.data || [];
+
+  // Auto-fill Valor once we know which tabela de preços applies: directly when there's
+  // only one (no tamanho/cor variants), or once the user picks a variant below.
+  useEffect(() => {
+    if (tabelasPreco.length === 1) {
+      setFormData((prev) => ({ ...prev, valor: tabelasPreco[0].preco }));
+      setSelectedTabelaId(tabelasPreco[0].id);
+    }
+  }, [tabelasPreco]);
 
   // Financial status for this event (Financeiro module) - only relevant when editing
   // an existing event that has a price set.
@@ -212,6 +253,10 @@ export default function EventoModal({
         anuncioId: evento.anuncioId ?? null,
         contatosPermitidos: evento.contatos?.map((c) => c.contatoId) || [],
       });
+      // Existing events keep their título as free text — it doesn't map back to a produto.
+      setUseCustomTitle(true);
+      setSelectedProdutoId(null);
+      setSelectedTabelaId(null);
     } else if (defaultDate) {
       const dateStr = defaultDate.toISOString().split("T")[0];
       setFormData((prev) => ({
@@ -222,6 +267,9 @@ export default function EventoModal({
         horaFim: "10:00",
         anuncioId: null,
       }));
+      setUseCustomTitle(false);
+      setSelectedProdutoId(null);
+      setSelectedTabelaId(null);
     }
   }, [evento, defaultDate, isOpen]);
 
@@ -309,16 +357,75 @@ export default function EventoModal({
             <label className="block text-sm font-semibold text-vitrii-text mb-2">
               Título *
             </label>
-            <input
-              type="text"
-              required
-              value={formData.titulo}
-              onChange={(e) =>
-                setFormData({ ...formData, titulo: e.target.value })
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
-              placeholder="Ex: Reunião com cliente"
-            />
+            {produtos.length > 0 && !useCustomTitle ? (
+              <>
+                <select
+                  required
+                  value={selectedProdutoId ?? ""}
+                  onChange={(e) => {
+                    const id = e.target.value ? parseInt(e.target.value) : null;
+                    setSelectedProdutoId(id);
+                    setSelectedTabelaId(null);
+                    const produto = produtos.find((p) => p.id === id);
+                    setFormData({ ...formData, titulo: produto?.nome || "", valor: "" });
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+                >
+                  <option value="">— Selecione um produto/serviço —</option>
+                  {produtos.map((p) => (
+                    <option key={p.id} value={p.id}>{p.nome}</option>
+                  ))}
+                </select>
+                {tabelasPreco.length > 1 && (
+                  <select
+                    value={selectedTabelaId ?? ""}
+                    onChange={(e) => {
+                      const id = e.target.value ? parseInt(e.target.value) : null;
+                      setSelectedTabelaId(id);
+                      const tabela = tabelasPreco.find((t) => t.id === id);
+                      if (tabela) setFormData({ ...formData, valor: tabela.preco });
+                    }}
+                    className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue text-sm"
+                  >
+                    <option value="">— Selecione a variante (tamanho/cor) —</option>
+                    {tabelasPreco.map((t) => (
+                      <option key={t.id} value={t.id}>
+                        {[t.tamanho, t.cor].filter(Boolean).join(" / ") || "Padrão"} — R$ {parseFloat(t.preco).toFixed(2)}
+                      </option>
+                    ))}
+                  </select>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setUseCustomTitle(true)}
+                  className="text-xs text-vitrii-blue mt-1.5 hover:underline"
+                >
+                  Ou digitar um título personalizado
+                </button>
+              </>
+            ) : (
+              <>
+                <input
+                  type="text"
+                  required
+                  value={formData.titulo}
+                  onChange={(e) =>
+                    setFormData({ ...formData, titulo: e.target.value })
+                  }
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+                  placeholder="Ex: Reunião com cliente"
+                />
+                {produtos.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setUseCustomTitle(false)}
+                    className="text-xs text-vitrii-blue mt-1.5 hover:underline"
+                  >
+                    Ou selecionar um produto/serviço cadastrado
+                  </button>
+                )}
+              </>
+            )}
           </div>
 
           {/* Descrição */}

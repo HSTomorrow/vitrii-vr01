@@ -53,6 +53,7 @@ model anunciantes {
   lancamentos_financeiros  lancamentos_financeiros[]
   dashboard_cache          dashboard_cache?
   favoritos_de_usuarios    anunciantes_favoritos[]
+  tabelas_preco            tabelas_preco[]
 }
 
 // A usuário favoriting an entire anunciante (store) — distinct from listas_desejos, which
@@ -184,6 +185,7 @@ model productos {
   movimentos_estoque  movimentos_estoque[]
   produtos_em_estoque produtos_em_estoque[]
   links_externos      links_produtos_externos[]
+  tabelas_preco       tabelas_preco[]
 }
 
 model productos_visualizacoes {
@@ -235,10 +237,16 @@ model tabelas_preco {
   tamanho         String?  @db.VarChar(50)
   cor             String?  @db.VarChar(50)
   preco           Decimal  @db.Decimal(10, 2)
+  precoCusto      Decimal? @db.Decimal(10, 2)
   dataCriacao     DateTime @default(now())
   dataAtualizacao DateTime
 
+  produto productos   @relation(fields: [productId], references: [id], onDelete: Cascade)
+  loja    anunciantes @relation(fields: [lojaId], references: [id], onDelete: Cascade)
+
   @@unique([productId, lojaId, tamanho, cor])
+  @@index([lojaId])
+  @@index([productId])
 }
 
 model usracessos {
