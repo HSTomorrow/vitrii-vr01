@@ -3,13 +3,15 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { QRCodeSVG } from "qrcode.react";
-import { DollarSign, Plus, Check, X, Copy, FileText, Share2, Mail, Download, Zap } from "lucide-react";
+import { DollarSign, Plus, Check, X, Copy, FileText, Share2, Mail, Download, Zap, Lock, Unlock, Pencil, MessageCircle } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ContatoSelectorModal from "@/components/ContatoSelectorModal";
 import ShareModal from "@/components/ShareModal";
+import CobrancaModal from "@/components/CobrancaModal";
 import { formatCurrencyDisplay } from "@/utils/formatCurrency";
 import { exportToCsv } from "@/utils/exportCsv";
+import { exportToXlsx } from "@/utils/exportXlsx";
 
 interface Anunciante {
   id: number;
@@ -29,8 +31,17 @@ interface Lancamento {
   qrCode?: string;
   urlCopiaECola?: string;
   reciboToken?: string;
+  tipoPagamento?: string;
+  contaBanco?: string;
+  dataCriacao: string;
   contato?: { id: number; nome: string; email?: string; celular?: string };
   evento?: { id: number; titulo: string };
+}
+
+interface Fechamento {
+  competencia: string;
+  fechado: boolean;
+  dataFechamento: string;
 }
 
 interface Contrato {
@@ -76,6 +87,27 @@ const ORIGEM_LABELS: Record<string, string> = {
   anuncio: "Anúncio",
 };
 
+const TIPOS_PAGAMENTO = [
+  { value: "dinheiro", label: "Dinheiro" },
+  { value: "pix", label: "Pix" },
+  { value: "cartao", label: "Cartão" },
+  { value: "deposito", label: "Depósito" },
+  { value: "outros", label: "Outros" },
+];
+
+function competenciaDeLancamento(l: Lancamento): string {
+  if (l.competencia) return l.competencia;
+  const base = new Date(l.vencimento || l.dataCriacao);
+  return `${base.getFullYear()}-${String(base.getMonth() + 1).padStart(2, "0")}`;
+}
+
+function templateCobranca(l: Lancamento): string {
+  const nome = l.contato?.nome || "Cliente";
+  const valor = formatCurrencyDisplay(parseFloat(l.valor));
+  const venc = l.vencimento ? new Date(l.vencimento).toLocaleDateString("pt-BR") : "não definido";
+  return `Olá ${nome}, lembramos que o pagamento de ${valor} referente a "${l.descricao || CATEGORIA_LABELS[l.categoria] || l.categoria}" está pendente. Vencimento: ${venc}.`;
+}
+
 export default function Financeiro() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -90,12 +122,17 @@ export default function Financeiro() {
   const [showNovoContrato, setShowNovoContrato] = useState(false);
   const [showContatoSelector, setShowContatoSelector] = useState(false);
   const [shareTarget, setShareTarget] = useState<Lancamento | null>(null);
+  const [cobrancaTarget, setCobrancaTarget] = useState<Lancamento | null>(null);
+  const [editingLancamento, setEditingLancamento] = useState<Lancamento | null>(null);
+  const [editForm, setEditForm] = useState({ descricao: "", valor: "", vencimento: "", tipoPagamento: "pix", contaBanco: "" });
   const [novoLancamento, setNovoLancamento] = useState({
     categoria: "multa",
     descricao: "",
     valor: "",
     contatoId: null as number | null,
     contatoNome: "",
+    tipoPagamento: "pix",
+    contaBanco: "",
   });
   const [novoContrato, setNovoContrato] = useState({
     titulo: "",
@@ -180,6 +217,82 @@ export default function Financeiro() {
     });
   }, [lancamentos, filterDataDe, filterDataAte, filterContatoId]);
 
+  const { data: fechamentos = [], refetch: refetchFechamentos } = useQuery<Fechamento[]>({
+    queryKey: ["fechamentos-financeiros", selectedAnuncianteId],
+    queryFn: async () => {
+      if (!selectedAnuncianteId) return [];
+      const response = await fetch(`/api/financeiro/fechamentos/${selectedAnuncianteId}`);
+      if (!response.ok) return [];
+      const result = await response.json();
+      return result.data || [];
+    },
+    enabled: !!selectedAnuncianteId,
+  });
+
+  const competenciaFechada = !!filterCompetencia && fechamentos.some((f) => f.competencia === filterCompetencia);
+
+  const isLancamentoFechado = (l: Lancamento) =>
+    fechamentos.some((f) => f.competencia === competenciaDeLancamento(l));
+
+  const fecharMesMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch("/api/financeiro/fechamentos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ anuncianteId: selectedAnuncianteId, competencia: filterCompetencia }),
+      });
+      if (!response.ok) throw new Error((await response.json()).error || "Erro ao fechar mês");
+      return response.json();
+    },
+    onSuccess: () => {
+      toast.success(`Mês ${filterCompetencia} fechado`);
+      refetchFechamentos();
+    },
+    onError: (error) => toast.error(error instanceof Error ? error.message : "Erro ao fechar mês"),
+  });
+
+  const reabrirMesMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch("/api/financeiro/fechamentos/reabrir", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ anuncianteId: selectedAnuncianteId, competencia: filterCompetencia }),
+      });
+      if (!response.ok) throw new Error((await response.json()).error || "Erro ao reabrir mês");
+      return response.json();
+    },
+    onSuccess: () => {
+      toast.success(`Mês ${filterCompetencia} reaberto`);
+      refetchFechamentos();
+    },
+    onError: (error) => toast.error(error instanceof Error ? error.message : "Erro ao reabrir mês"),
+  });
+
+  const editarLancamentoMutation = useMutation({
+    mutationFn: async () => {
+      if (!editingLancamento) throw new Error("Nenhum lançamento selecionado");
+      const response = await fetch(`/api/lancamentos-financeiros/${editingLancamento.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          descricao: editForm.descricao,
+          valor: parseFloat(editForm.valor),
+          vencimento: editForm.vencimento || null,
+          tipoPagamento: editForm.tipoPagamento,
+          contaBanco: editForm.contaBanco,
+        }),
+      });
+      if (!response.ok) throw new Error((await response.json()).error || "Erro ao editar lançamento");
+      return response.json();
+    },
+    onSuccess: () => {
+      toast.success("Lançamento atualizado!");
+      setEditingLancamento(null);
+      refetchLancamentos();
+    },
+    onError: (error) => toast.error(error instanceof Error ? error.message : "Erro ao editar lançamento"),
+  });
+
   const limparFiltrosLancamentos = () => {
     setFilterStatus("");
     setFilterCompetencia("");
@@ -236,6 +349,8 @@ export default function Financeiro() {
           descricao: novoLancamento.descricao,
           valor: parseFloat(novoLancamento.valor),
           contatoId: novoLancamento.contatoId,
+          tipoPagamento: novoLancamento.tipoPagamento,
+          contaBanco: novoLancamento.contaBanco,
         }),
       });
       if (!response.ok) throw new Error((await response.json()).error || "Erro ao criar lançamento");
@@ -244,7 +359,7 @@ export default function Financeiro() {
     onSuccess: () => {
       toast.success("Lançamento criado!");
       setShowNovoLancamento(false);
-      setNovoLancamento({ categoria: "multa", descricao: "", valor: "", contatoId: null, contatoNome: "" });
+      setNovoLancamento({ categoria: "multa", descricao: "", valor: "", contatoId: null, contatoNome: "", tipoPagamento: "pix", contaBanco: "" });
       refetchLancamentos();
     },
     onError: (error) => toast.error(error instanceof Error ? error.message : "Erro ao criar lançamento"),
@@ -452,12 +567,38 @@ export default function Financeiro() {
               </div>
               <div>
                 <label className="block text-xs font-semibold text-vitrii-text-secondary mb-1">Competência</label>
-                <input
-                  type="month"
-                  value={filterCompetencia}
-                  onChange={(e) => setFilterCompetencia(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
-                />
+                <div className="flex items-center gap-2">
+                  <input
+                    type="month"
+                    value={filterCompetencia}
+                    onChange={(e) => setFilterCompetencia(e.target.value)}
+                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                  />
+                  {filterCompetencia && (
+                    competenciaFechada ? (
+                      <button
+                        onClick={() => reabrirMesMutation.mutate()}
+                        disabled={reabrirMesMutation.isPending}
+                        title="Mês fechado — clique para reabrir"
+                        className="flex items-center gap-1 text-xs px-3 py-2 bg-vitrii-warning/10 text-vitrii-warning border border-vitrii-warning/30 rounded-lg font-semibold hover:bg-vitrii-warning/20 disabled:opacity-50"
+                      >
+                        <Lock className="w-3.5 h-3.5" /> Mês Fechado
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => {
+                          if (confirm(`Fechar o mês ${filterCompetencia}? Os lançamentos desta competência não poderão mais ser alterados até que o mês seja reaberto.`)) {
+                            fecharMesMutation.mutate();
+                          }
+                        }}
+                        disabled={fecharMesMutation.isPending}
+                        className="flex items-center gap-1 text-xs px-3 py-2 border border-gray-300 text-vitrii-text-secondary rounded-lg font-semibold hover:bg-gray-100 disabled:opacity-50"
+                      >
+                        <Unlock className="w-3.5 h-3.5" /> Fechar Mês
+                      </button>
+                    )
+                  )}
+                </div>
               </div>
               <div>
                 <label className="block text-xs font-semibold text-vitrii-text-secondary mb-1">Vencimento de</label>
@@ -497,26 +638,36 @@ export default function Financeiro() {
                 Limpar filtros
               </button>
               <div className="flex-1" />
-              <button
-                onClick={() =>
-                  exportToCsv(
-                    `lancamentos-${selectedAnuncianteId}.csv`,
-                    lancamentosFiltrados,
-                    [
-                      { header: "Data", value: (l) => new Date(l.vencimento || "").toLocaleDateString("pt-BR") || "" },
-                      { header: "Cliente", value: (l) => l.contato?.nome || "" },
-                      { header: "Categoria", value: (l) => CATEGORIA_LABELS[l.categoria] || l.categoria },
-                      { header: "Origem", value: (l) => ORIGEM_LABELS[l.origem] || l.origem },
-                      { header: "Valor", value: (l) => l.valor },
-                      { header: "Status", value: (l) => STATUS_LABELS[l.status]?.label || l.status },
-                    ],
-                  )
-                }
-                className="flex items-center gap-2 px-3 py-2 border border-gray-300 text-vitrii-text rounded-lg font-semibold hover:bg-gray-50 transition-colors text-sm"
-              >
-                <Download className="w-4 h-4" />
-                Exportar CSV
-              </button>
+              {(() => {
+                const colunasExport = [
+                  { header: "Data", value: (l: Lancamento) => (l.vencimento ? new Date(l.vencimento).toLocaleDateString("pt-BR") : "") },
+                  { header: "Cliente", value: (l: Lancamento) => l.contato?.nome || "" },
+                  { header: "Categoria", value: (l: Lancamento) => CATEGORIA_LABELS[l.categoria] || l.categoria },
+                  { header: "Origem", value: (l: Lancamento) => ORIGEM_LABELS[l.origem] || l.origem },
+                  { header: "Valor", value: (l: Lancamento) => l.valor },
+                  { header: "Tipo de Pagamento", value: (l: Lancamento) => TIPOS_PAGAMENTO.find((t) => t.value === l.tipoPagamento)?.label || l.tipoPagamento || "" },
+                  { header: "Conta/Banco", value: (l: Lancamento) => l.contaBanco || "" },
+                  { header: "Status", value: (l: Lancamento) => STATUS_LABELS[l.status]?.label || l.status },
+                ];
+                return (
+                  <>
+                    <button
+                      onClick={() => exportToCsv(`lancamentos-${selectedAnuncianteId}.csv`, lancamentosFiltrados, colunasExport)}
+                      className="flex items-center gap-2 px-3 py-2 border border-gray-300 text-vitrii-text rounded-lg font-semibold hover:bg-gray-50 transition-colors text-sm"
+                    >
+                      <Download className="w-4 h-4" />
+                      Exportar CSV
+                    </button>
+                    <button
+                      onClick={() => exportToXlsx(`lancamentos-${selectedAnuncianteId}.xlsx`, lancamentosFiltrados, colunasExport)}
+                      className="flex items-center gap-2 px-3 py-2 border border-gray-300 text-vitrii-text rounded-lg font-semibold hover:bg-gray-50 transition-colors text-sm"
+                    >
+                      <Download className="w-4 h-4" />
+                      Exportar XLS
+                    </button>
+                  </>
+                );
+              })()}
               <button
                 onClick={() => setShowNovoLancamento(true)}
                 className="flex items-center gap-2 px-4 py-2 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors text-sm"
@@ -532,6 +683,7 @@ export default function Financeiro() {
               ) : (
                 lancamentosFiltrados.map((l) => {
                   const statusInfo = STATUS_LABELS[l.status] || STATUS_LABELS.pendente;
+                  const fechado = isLancamentoFechado(l);
                   return (
                     <div key={l.id} className="p-4 border border-gray-200 rounded-lg">
                       <div className="flex flex-wrap items-start justify-between gap-2 mb-2">
@@ -544,9 +696,18 @@ export default function Financeiro() {
                             <span className="text-[0.65rem] px-2 py-0.5 rounded-full bg-gray-100 text-vitrii-text-secondary font-semibold">
                               {ORIGEM_LABELS[l.origem] || l.origem}
                             </span>
+                            {fechado && (
+                              <span className="flex items-center gap-1 text-[0.65rem] px-2 py-0.5 rounded-full bg-vitrii-warning/10 text-vitrii-warning font-semibold">
+                                <Lock className="w-3 h-3" /> Mês Fechado
+                              </span>
+                            )}
                           </div>
                           {l.descricao && <p className="text-sm text-vitrii-text-secondary">{l.descricao}</p>}
                           {l.evento && <p className="text-xs text-vitrii-info">Agenda: {l.evento.titulo}</p>}
+                          <p className="text-xs text-vitrii-text-secondary mt-0.5">
+                            {TIPOS_PAGAMENTO.find((t) => t.value === l.tipoPagamento)?.label || "Pix"}
+                            {l.contaBanco && ` · ${l.contaBanco}`}
+                          </p>
                         </div>
                         <div className="flex items-center gap-2">
                           <span className={`px-3 py-1 rounded-full text-xs font-semibold ${statusInfo.className}`}>
@@ -574,10 +735,37 @@ export default function Financeiro() {
                       )}
 
                       <div className="flex flex-wrap gap-2 mt-3">
+                        <button
+                          onClick={() => {
+                            setEditingLancamento(l);
+                            setEditForm({
+                              descricao: l.descricao || "",
+                              valor: l.valor,
+                              vencimento: l.vencimento ? l.vencimento.slice(0, 10) : "",
+                              tipoPagamento: l.tipoPagamento || "pix",
+                              contaBanco: l.contaBanco || "",
+                            });
+                          }}
+                          disabled={fechado}
+                          title={fechado ? "Mês fechado" : undefined}
+                          className="flex items-center gap-1 text-xs px-3 py-1.5 border border-gray-300 text-vitrii-text rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                        >
+                          <Pencil className="w-3.5 h-3.5" /> Editar
+                        </button>
+                        {l.contato?.celular && (
+                          <button
+                            onClick={() => setCobrancaTarget(l)}
+                            className="flex items-center gap-1 text-xs px-3 py-1.5 border border-green-500 text-green-600 rounded-lg hover:bg-green-50"
+                          >
+                            <MessageCircle className="w-3.5 h-3.5" /> Cobrança
+                          </button>
+                        )}
                         {["pendente", "pix_gerado"].includes(l.status) && (
                           <button
                             onClick={() => gerarPixMutation.mutate(l.id)}
-                            className="text-xs px-3 py-1.5 border border-vitrii-blue text-vitrii-blue rounded-lg hover:bg-blue-50"
+                            disabled={fechado}
+                            title={fechado ? "Mês fechado" : undefined}
+                            className="text-xs px-3 py-1.5 border border-vitrii-blue text-vitrii-blue rounded-lg hover:bg-blue-50 disabled:opacity-40 disabled:cursor-not-allowed"
                           >
                             Gerar Pix
                           </button>
@@ -586,13 +774,17 @@ export default function Financeiro() {
                           <>
                             <button
                               onClick={() => marcarPagoMutation.mutate(l.id)}
-                              className="flex items-center gap-1 text-xs px-3 py-1.5 bg-vitrii-green text-white rounded-lg hover:opacity-90"
+                              disabled={fechado}
+                              title={fechado ? "Mês fechado" : undefined}
+                              className="flex items-center gap-1 text-xs px-3 py-1.5 bg-vitrii-green text-white rounded-lg hover:opacity-90 disabled:opacity-40 disabled:cursor-not-allowed"
                             >
                               <Check className="w-3.5 h-3.5" /> Marcar Pago
                             </button>
                             <button
                               onClick={() => cancelarMutation.mutate(l.id)}
-                              className="flex items-center gap-1 text-xs px-3 py-1.5 border border-vitrii-red text-vitrii-red rounded-lg hover:bg-red-50"
+                              disabled={fechado}
+                              title={fechado ? "Mês fechado" : undefined}
+                              className="flex items-center gap-1 text-xs px-3 py-1.5 border border-vitrii-red text-vitrii-red rounded-lg hover:bg-red-50 disabled:opacity-40 disabled:cursor-not-allowed"
                             >
                               <X className="w-3.5 h-3.5" /> Cancelar
                             </button>
@@ -825,6 +1017,28 @@ export default function Financeiro() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg"
               />
             </div>
+            <div>
+              <label className="block text-sm font-semibold mb-1">Tipo de Pagamento</label>
+              <select
+                value={novoLancamento.tipoPagamento}
+                onChange={(e) => setNovoLancamento({ ...novoLancamento, tipoPagamento: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              >
+                {TIPOS_PAGAMENTO.map((t) => (
+                  <option key={t.value} value={t.value}>{t.label}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold mb-1">Conta/Banco (opcional)</label>
+              <input
+                type="text"
+                value={novoLancamento.contaBanco}
+                onChange={(e) => setNovoLancamento({ ...novoLancamento, contaBanco: e.target.value })}
+                placeholder="Ex: Banco do Brasil - CC 12345"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              />
+            </div>
             <div className="flex gap-2 pt-2">
               <button
                 onClick={() => setShowNovoLancamento(false)}
@@ -838,6 +1052,80 @@ export default function Financeiro() {
                 className="flex-1 px-4 py-2 bg-vitrii-blue text-white rounded-lg font-semibold disabled:opacity-50"
               >
                 Criar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Editar Lançamento */}
+      {editingLancamento && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 space-y-4">
+            <h2 className="text-xl font-bold text-vitrii-text">Editar Lançamento</h2>
+            <div>
+              <label className="block text-sm font-semibold mb-1">Descrição</label>
+              <input
+                type="text"
+                value={editForm.descricao}
+                onChange={(e) => setEditForm({ ...editForm, descricao: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold mb-1">Valor (R$)</label>
+              <input
+                type="number"
+                step="0.01"
+                value={editForm.valor}
+                onChange={(e) => setEditForm({ ...editForm, valor: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold mb-1">Vencimento</label>
+              <input
+                type="date"
+                value={editForm.vencimento}
+                onChange={(e) => setEditForm({ ...editForm, vencimento: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold mb-1">Tipo de Pagamento</label>
+              <select
+                value={editForm.tipoPagamento}
+                onChange={(e) => setEditForm({ ...editForm, tipoPagamento: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              >
+                {TIPOS_PAGAMENTO.map((t) => (
+                  <option key={t.value} value={t.value}>{t.label}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold mb-1">Conta/Banco (opcional)</label>
+              <input
+                type="text"
+                value={editForm.contaBanco}
+                onChange={(e) => setEditForm({ ...editForm, contaBanco: e.target.value })}
+                placeholder="Ex: Banco do Brasil - CC 12345"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              />
+            </div>
+            <div className="flex gap-2 pt-2">
+              <button
+                onClick={() => setEditingLancamento(null)}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg font-semibold"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => editarLancamentoMutation.mutate()}
+                disabled={!editForm.valor || editarLancamentoMutation.isPending}
+                className="flex-1 px-4 py-2 bg-vitrii-blue text-white rounded-lg font-semibold disabled:opacity-50"
+              >
+                Salvar
               </button>
             </div>
           </div>
@@ -955,6 +1243,17 @@ export default function Financeiro() {
           url={`${window.location.origin}/recibo/${shareTarget.reciboToken}`}
           whatsappPhone={shareTarget.contato?.celular}
           whatsappMessage={`Aqui está o recibo do seu pagamento de ${formatCurrencyDisplay(parseFloat(shareTarget.valor))}:`}
+        />
+      )}
+
+      {cobrancaTarget && (
+        <CobrancaModal
+          isOpen={!!cobrancaTarget}
+          onClose={() => setCobrancaTarget(null)}
+          lancamentoId={cobrancaTarget.id}
+          contatoNome={cobrancaTarget.contato?.nome || "Cliente"}
+          contatoCelular={cobrancaTarget.contato?.celular || ""}
+          textoInicial={templateCobranca(cobrancaTarget)}
         />
       )}
 

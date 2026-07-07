@@ -54,6 +54,7 @@ model anunciantes {
   dashboard_cache          dashboard_cache?
   favoritos_de_usuarios    anunciantes_favoritos[]
   tabelas_preco            tabelas_preco[]
+  fechamentos_financeiros_log fechamentos_financeiros_log[]
 }
 
 // A usuário favoriting an entire anunciante (store) — distinct from listas_desejos, which
@@ -663,7 +664,8 @@ model lancamentos_financeiros {
   competencia      String?   @db.VarChar(7) // "YYYY-MM" - chave de dedup da mensalidade
   vencimento       DateTime?
   status           String    @default("pendente") @db.VarChar(30) // pendente, pix_gerado, comprovante_enviado, pago, cancelado
-  tipoPagamento    String    @default("pix") @db.VarChar(20)
+  tipoPagamento    String    @default("pix") @db.VarChar(20) // dinheiro, pix, cartao, deposito, outros
+  contaBanco       String?   @db.VarChar(100)
 
   pixId            String?   @db.VarChar(100)
   qrCode           String?   @db.Text
@@ -684,6 +686,7 @@ model lancamentos_financeiros {
   anuncio    anuncios?                  @relation(fields: [anuncioId], references: [id], onDelete: SetNull)
   contato    contatos?                  @relation(fields: [contatoId], references: [id], onDelete: SetNull)
   contrato   contratos_financeiros?     @relation(fields: [contratoId], references: [id], onDelete: SetNull)
+  mensagensCobranca lancamentos_mensagens[]
 
   @@unique([contratoId, competencia])
   @@index([anuncianteId])
@@ -693,6 +696,36 @@ model lancamentos_financeiros {
   @@index([contratoId])
   @@index([status])
   @@index([vencimento])
+}
+
+// Log de auditoria do fechamento mensal do Financeiro: nunca sobrescreve, cada
+// ação (fechar/reabrir) é uma linha nova. O estado atual de uma competência é
+// a ação da linha mais recente para aquele (anuncianteId, competencia).
+model fechamentos_financeiros_log {
+  id           Int      @id @default(autoincrement())
+  anuncianteId Int
+  competencia  String   @db.VarChar(7) // "YYYY-MM"
+  acao         String   @db.VarChar(10) // "fechar" | "reabrir"
+  usuarioId    Int
+  dataAcao     DateTime @default(now())
+
+  anunciante anunciantes @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
+
+  @@index([anuncianteId, competencia])
+}
+
+// Histórico de mensagens de cobrança enviadas via link do WhatsApp por lançamento.
+// O envio em si acontece no cliente (wa.me); esta tabela só registra que aconteceu.
+model lancamentos_mensagens {
+  id           Int      @id @default(autoincrement())
+  lancamentoId Int
+  texto        String   @db.Text
+  enviadoPor   Int
+  dataEnvio    DateTime @default(now())
+
+  lancamento lancamentos_financeiros @relation(fields: [lancamentoId], references: [id], onDelete: Cascade)
+
+  @@index([lancamentoId])
 }
 
 // Pre-computed dashboard aggregates, one row per anunciante. Populated by
@@ -797,12 +830,15 @@ model mensagens {
   conteudo        String   @db.Text
   status          String   @default("nao_lida") @db.VarChar(50) // "nao_lida", "lida", "entregue"
   excluido        Boolean  @default(false) // Soft delete flag
+  respondendoAId  Int?     @map("respondendoaid")
   dataCriacao     DateTime @default(now()) @map("datacriacao")
   dataAtualizacao DateTime @updatedAt @map("dataatualizacao")
 
   conversa   conversas    @relation(fields: [conversaId], references: [id], onDelete: Cascade)
   usuario    usracessos?  @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
   anunciante anunciantes? @relation(fields: [anuncianteId], references: [id], onDelete: SetNull)
+  respondendoA mensagens? @relation("MensagemResposta", fields: [respondendoAId], references: [id], onDelete: SetNull)
+  respostas    mensagens[] @relation("MensagemResposta")
 
   @@index([conversaId])
   @@index([usuarioId])

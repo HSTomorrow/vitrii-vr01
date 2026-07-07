@@ -21,6 +21,7 @@ export async function getMensagensConversa(req: Request, res: Response) {
         dataCriacao: true,
         usuarioId: true,
         anuncianteId: true,
+        respondendoAId: true,
         usuario: {
           select: {
             id: true,
@@ -32,6 +33,15 @@ export async function getMensagensConversa(req: Request, res: Response) {
           select: {
             id: true,
             nome: true,
+          },
+        },
+        respondendoA: {
+          select: {
+            id: true,
+            conteudo: true,
+            excluido: true,
+            usuario: { select: { id: true, nome: true } },
+            anunciante: { select: { id: true, nome: true } },
           },
         },
       },
@@ -49,12 +59,23 @@ export async function getMensagensConversa(req: Request, res: Response) {
 
 export async function createMensagem(req: Request, res: Response) {
   try {
-    const { conversaId, usuarioId, anuncianteId, conteudo } = req.body;
+    const { conversaId, usuarioId, anuncianteId, conteudo, respondendoAId } = req.body;
 
     if (!conversaId || !conteudo || (!usuarioId && !anuncianteId)) {
       return res.status(400).json({
         error: "conversaId, conteudo, e (usuarioId ou anuncianteId) são obrigatórios",
       });
+    }
+
+    let respondendoAIdValido: number | null = null;
+    if (respondendoAId) {
+      const original = await prisma.mensagens.findUnique({
+        where: { id: respondendoAId },
+        select: { conversaId: true },
+      });
+      if (original && original.conversaId === conversaId) {
+        respondendoAIdValido = respondendoAId;
+      }
     }
 
     const mensagem = await prisma.mensagens.create({
@@ -65,6 +86,7 @@ export async function createMensagem(req: Request, res: Response) {
         conteudo,
         status: "nao_lida",
         excluido: false,
+        respondendoAId: respondendoAIdValido,
       },
       select: {
         id: true,
@@ -74,6 +96,7 @@ export async function createMensagem(req: Request, res: Response) {
         dataCriacao: true,
         usuarioId: true,
         anuncianteId: true,
+        respondendoAId: true,
         usuario: {
           select: {
             id: true,
@@ -85,6 +108,15 @@ export async function createMensagem(req: Request, res: Response) {
           select: {
             id: true,
             nome: true,
+          },
+        },
+        respondendoA: {
+          select: {
+            id: true,
+            conteudo: true,
+            excluido: true,
+            usuario: { select: { id: true, nome: true } },
+            anunciante: { select: { id: true, nome: true } },
           },
         },
       },

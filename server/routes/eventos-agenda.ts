@@ -1200,3 +1200,60 @@ export const getAgendaPrivacyStatus: RequestHandler = async (req, res) => {
     res.status(500).json({ error: "Erro ao verificar privacidade da agenda" });
   }
 };
+
+function escapeIcsText(text: string): string {
+  return text
+    .replace(/\\/g, "\\\\")
+    .replace(/;/g, "\\;")
+    .replace(/,/g, "\\,")
+    .replace(/\n/g, "\\n");
+}
+
+function formatIcsDate(date: Date): string {
+  return date.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+}
+
+// Generates a downloadable .ics file for a single commitment, so it can be shared to the
+// event's linked contacts. wa.me links can only pre-fill text (no attachments), so the
+// client either uses the mobile share sheet (real attachment) or downloads this file and
+// opens WhatsApp with a text heads-up as a fallback.
+export const obterEventoICS: RequestHandler = async (req, res) => {
+  try {
+    const id = parseInt(req.params.id as string);
+    const userId = (req as any).userId;
+
+    const evento = await prisma.eventos_agenda_anunciante.findUnique({ where: { id } });
+    if (!evento) return res.status(404).json({ error: "Evento não encontrado" });
+
+    const membership = await prisma.usuarios_anunciantes.findFirst({
+      where: { usuarioId: userId, anuncianteId: evento.anuncianteId },
+    });
+    if (!membership) {
+      return res.status(403).json({ error: "Acesso negado a este evento" });
+    }
+
+    const uid = `evento-${evento.id}@vitrii.com.br`;
+    const ics = [
+      "BEGIN:VCALENDAR",
+      "VERSION:2.0",
+      "PRODID:-//Vitrii//Agenda//PT",
+      "CALSCALE:GREGORIAN",
+      "BEGIN:VEVENT",
+      `UID:${uid}`,
+      `DTSTAMP:${formatIcsDate(new Date())}`,
+      `DTSTART:${formatIcsDate(evento.dataInicio)}`,
+      `DTEND:${formatIcsDate(evento.dataFim)}`,
+      `SUMMARY:${escapeIcsText(evento.titulo)}`,
+      ...(evento.descricao ? [`DESCRIPTION:${escapeIcsText(evento.descricao)}`] : []),
+      "END:VEVENT",
+      "END:VCALENDAR",
+    ].join("\r\n");
+
+    res.setHeader("Content-Type", "text/calendar; charset=utf-8");
+    res.setHeader("Content-Disposition", `attachment; filename="compromisso-${evento.id}.ics"`);
+    res.send(ics);
+  } catch (error) {
+    console.error("[obterEventoICS]", error);
+    res.status(500).json({ error: "Erro ao gerar arquivo de agenda" });
+  }
+};

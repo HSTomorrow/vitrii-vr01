@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { X, ChevronDown, Plus, Info, DollarSign } from "lucide-react";
+import { X, ChevronDown, Plus, Info, DollarSign, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import ContatoSelectorModal from "./ContatoSelectorModal";
 import ContactDetailsModal from "./ContactDetailsModal";
 import { parseCurrencyInput, formatNumberToCurrency } from "@/utils/formatCurrency";
+import { TIME_SLOTS } from "@/lib/timeSlots";
 
 interface Evento {
   id: number;
@@ -107,6 +108,46 @@ export default function EventoModal({
   const [selectedProdutoId, setSelectedProdutoId] = useState<number | null>(null);
   const [selectedTabelaId, setSelectedTabelaId] = useState<number | null>(null);
   const [useCustomTitle, setUseCustomTitle] = useState(false);
+  const [showShareOptions, setShowShareOptions] = useState(false);
+
+  // A wa.me link only pre-fills text — WhatsApp's click-to-chat API has no way to attach a
+  // file. So the real "share the .ics" only happens through the mobile OS share sheet
+  // (navigator.share with files); everywhere else this just downloads the file and opens
+  // WhatsApp with a text heads-up so the user can attach it manually.
+  const handleShareEvento = async (contato: Contato) => {
+    if (!evento) return;
+    try {
+      const response = await fetch(`/api/eventos-agenda/${evento.id}/ics`);
+      if (!response.ok) throw new Error("Erro ao gerar arquivo de agenda");
+      const blob = await response.blob();
+      const fileName = `compromisso-${evento.id}.ics`;
+      const texto = `Compromisso: ${evento.titulo}`;
+
+      const file = new File([blob], fileName, { type: "text/calendar" });
+      const nav = navigator as Navigator & { canShare?: (data?: ShareData) => boolean };
+      if (nav.share && nav.canShare && nav.canShare({ files: [file] })) {
+        await nav.share({ files: [file], title: evento.titulo, text: texto });
+      } else {
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+
+        const celular = contato.celular.replace(/\D/g, "");
+        const mensagem = encodeURIComponent(
+          `${texto}\n\nBaixamos o arquivo de agenda (.ics) — anexe-o nesta conversa para ${contato.nome} adicionar o compromisso ao calendário.`,
+        );
+        window.open(`https://wa.me/55${celular}?text=${mensagem}`, "_blank");
+      }
+      setShowShareOptions(false);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Erro ao compartilhar agenda");
+    }
+  };
 
   // Título can be picked from the anunciante's registered products/services instead of
   // typed freely — picking one auto-fills Valor from its tabela de preços.
@@ -496,8 +537,7 @@ export default function EventoModal({
             <label className="block text-sm font-semibold text-vitrii-text mb-2">
               Hora Início *
             </label>
-            <input
-              type="time"
+            <select
               required
               value={formData.horaInicio}
               onChange={(e) => {
@@ -506,7 +546,13 @@ export default function EventoModal({
                 setFormData({ ...formData, horaInicio: newHoraInicio, horaFim, dataFimData });
               }}
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
-            />
+            >
+              {(TIME_SLOTS.includes(formData.horaInicio) ? TIME_SLOTS : [formData.horaInicio, ...TIME_SLOTS].sort()).map(
+                (hora) => (
+                  <option key={hora} value={hora}>{hora}</option>
+                ),
+              )}
+            </select>
           </div>
 
           {/* Data Fim */}
@@ -530,15 +576,20 @@ export default function EventoModal({
             <label className="block text-sm font-semibold text-vitrii-text mb-2">
               Hora Fim *
             </label>
-            <input
-              type="time"
+            <select
               required
               value={formData.horaFim}
               onChange={(e) =>
                 setFormData({ ...formData, horaFim: e.target.value })
               }
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
-            />
+            >
+              {(TIME_SLOTS.includes(formData.horaFim) ? TIME_SLOTS : [formData.horaFim, ...TIME_SLOTS].sort()).map(
+                (hora) => (
+                  <option key={hora} value={hora}>{hora}</option>
+                ),
+              )}
+            </select>
           </div>
 
           {/* Cor */}
@@ -744,12 +795,51 @@ export default function EventoModal({
           </div>
 
           {evento && (
-            <button
-              type="button"
-              className="w-full px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors font-semibold"
-            >
-              Excluir Evento
-            </button>
+            <div className="space-y-2">
+              <button
+                type="button"
+                onClick={() => {
+                  const contatosDoEvento = contatos.filter((c) =>
+                    formData.contatosPermitidos.includes(c.id),
+                  );
+                  if (contatosDoEvento.length === 0) {
+                    toast.error("Nenhum contato vinculado a este compromisso");
+                    return;
+                  }
+                  if (contatosDoEvento.length === 1) {
+                    handleShareEvento(contatosDoEvento[0]);
+                  } else {
+                    setShowShareOptions((prev) => !prev);
+                  }
+                }}
+                className="w-full flex items-center justify-center gap-2 px-4 py-2 border border-vitrii-blue text-vitrii-blue rounded-lg hover:bg-blue-50 transition-colors font-semibold"
+              >
+                <Share2 className="w-4 h-4" />
+                Compartilhar Agenda (.ics)
+              </button>
+              {showShareOptions && (
+                <div className="border border-gray-200 rounded-lg divide-y divide-gray-100 overflow-hidden">
+                  {contatos
+                    .filter((c) => formData.contatosPermitidos.includes(c.id))
+                    .map((c) => (
+                      <button
+                        key={c.id}
+                        type="button"
+                        onClick={() => handleShareEvento(c)}
+                        className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50"
+                      >
+                        {c.nome}
+                      </button>
+                    ))}
+                </div>
+              )}
+              <button
+                type="button"
+                className="w-full px-4 py-2 border border-red-300 text-red-600 rounded-lg hover:bg-red-50 transition-colors font-semibold"
+              >
+                Excluir Evento
+              </button>
+            </div>
           )}
         </form>
       </div>

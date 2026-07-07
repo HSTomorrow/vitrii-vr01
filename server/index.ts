@@ -134,6 +134,7 @@ import {
   getAgendaPrivacyStatus,
   canUserEditEvento,
   isUserAnunciante,
+  obterEventoICS,
 } from "./routes/eventos-agenda";
 import {
   getFilasEsperaParaAnunciante,
@@ -266,6 +267,11 @@ import {
   adminListarContratos,
   lancarMesContrato,
   lancarLoteContratos,
+  listarFechamentos,
+  fecharCompetencia,
+  reabrirCompetencia,
+  listarMensagensCobranca,
+  criarMensagemCobranca,
 } from "./routes/financeiro";
 import {
   obterDashboard,
@@ -1176,6 +1182,7 @@ export function createServer() {
   app.patch("/api/eventos-agenda/:eventoId/status", extractUserId, atualizarStatusEvento);
   app.get("/api/eventos-agenda/:id/usuarios", extractUserId, getEventoUsers);
   app.post("/api/eventos-agenda/:id/usuarios", extractUserId, addUserToEvento);
+  app.get("/api/eventos-agenda/:id/ics", extractUserId, obterEventoICS);
 
   // Search usuarios route
   app.get("/api/usuarios/search", extractUserId, searchUsers);
@@ -1362,6 +1369,13 @@ export function createServer() {
   app.patch("/api/lancamentos-financeiros/:id/pagar", extractUserId, marcarLancamentoPago);
   app.patch("/api/lancamentos-financeiros/:id/cancelar", extractUserId, cancelarLancamento);
   app.post("/api/lancamentos-financeiros/:id/enviar-recibo", extractUserId, enviarReciboPorEmail);
+  app.get("/api/lancamentos-financeiros/:id/mensagens", extractUserId, listarMensagensCobranca);
+  app.post("/api/lancamentos-financeiros/:id/mensagens", extractUserId, criarMensagemCobranca);
+
+  // Fechamento mensal do financeiro
+  app.get("/api/financeiro/fechamentos/:anuncianteId", extractUserId, listarFechamentos);
+  app.post("/api/financeiro/fechamentos", extractUserId, fecharCompetencia);
+  app.post("/api/financeiro/fechamentos/reabrir", extractUserId, reabrirCompetencia);
 
   // Recibo público (sem autenticação - o contato/cliente não tem login na plataforma)
   app.get("/api/lancamentos-financeiros/recibo/:token", obterReciboPublico);

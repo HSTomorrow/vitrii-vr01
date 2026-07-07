@@ -17,6 +17,25 @@ function getAppUrl(): string {
 }
 
 const TIPOS_CONTRATO = ["Mensal", "Semanal", "Eventual", "Outros"];
+const TIPOS_PAGAMENTO = ["dinheiro", "pix", "cartao", "deposito", "outros"];
+
+function competenciaDeLancamento(lancamento: {
+  competencia: string | null;
+  vencimento: Date | null;
+  dataCriacao: Date;
+}): string {
+  if (lancamento.competencia) return lancamento.competencia;
+  const base = lancamento.vencimento || lancamento.dataCriacao;
+  return `${base.getFullYear()}-${String(base.getMonth() + 1).padStart(2, "0")}`;
+}
+
+async function isCompetenciaFechada(anuncianteId: number, competencia: string): Promise<boolean> {
+  const ultimaAcao = await prisma.fechamentos_financeiros_log.findFirst({
+    where: { anuncianteId, competencia },
+    orderBy: { dataAcao: "desc" },
+  });
+  return ultimaAcao?.acao === "fechar";
+}
 
 // ============ CONTRATOS ============
 
@@ -319,7 +338,7 @@ export const listarLancamentosDoAnuncio: RequestHandler = async (req, res) => {
 
 export const criarLancamento: RequestHandler = async (req, res) => {
   try {
-    const { anuncianteId, eventoId, anuncioId, contatoId, origem, categoria, descricao, valor, vencimento } = req.body;
+    const { anuncianteId, eventoId, anuncioId, contatoId, origem, categoria, descricao, valor, vencimento, tipoPagamento, contaBanco } = req.body;
 
     if (!anuncianteId || !origem || !categoria || !valor) {
       return res.status(400).json({ error: "anuncianteId, origem, categoria e valor são obrigatórios" });
@@ -327,6 +346,10 @@ export const criarLancamento: RequestHandler = async (req, res) => {
 
     if (!["agenda", "avulso", "anuncio"].includes(origem)) {
       return res.status(400).json({ error: "origem deve ser 'agenda', 'avulso' ou 'anuncio' ao criar manualmente" });
+    }
+
+    if (tipoPagamento && !TIPOS_PAGAMENTO.includes(tipoPagamento)) {
+      return res.status(400).json({ error: `tipoPagamento deve ser um de: ${TIPOS_PAGAMENTO.join(", ")}` });
     }
 
     if (origem === "anuncio" && !anuncioId) {
@@ -363,6 +386,8 @@ export const criarLancamento: RequestHandler = async (req, res) => {
         valor: parseFloat(valor),
         vencimento: vencimento ? new Date(vencimento) : null,
         status: "pendente",
+        tipoPagamento: tipoPagamento || "pix",
+        contaBanco: contaBanco || null,
         criadoPor: req.userId!,
       },
     });
@@ -377,7 +402,7 @@ export const criarLancamento: RequestHandler = async (req, res) => {
 export const atualizarLancamento: RequestHandler = async (req, res) => {
   try {
     const id = parseInt(req.params.id as string);
-    const { descricao, valor, vencimento } = req.body;
+    const { descricao, valor, vencimento, tipoPagamento, contaBanco } = req.body;
 
     const lancamento = await prisma.lancamentos_financeiros.findUnique({ where: { id } });
     if (!lancamento) return res.status(404).json({ error: "Lançamento não encontrado" });
@@ -386,8 +411,13 @@ export const atualizarLancamento: RequestHandler = async (req, res) => {
       return res.status(403).json({ error: "Acesso negado a este lançamento" });
     }
 
-    if (lancamento.status !== "pendente") {
-      return res.status(400).json({ error: "Só é possível editar lançamentos pendentes" });
+    if (tipoPagamento && !TIPOS_PAGAMENTO.includes(tipoPagamento)) {
+      return res.status(400).json({ error: `tipoPagamento deve ser um de: ${TIPOS_PAGAMENTO.join(", ")}` });
+    }
+
+    const competencia = competenciaDeLancamento(lancamento);
+    if (await isCompetenciaFechada(lancamento.anuncianteId, competencia)) {
+      return res.status(423).json({ error: `O mês ${competencia} está fechado e não pode ser alterado. Reabra o mês antes de editar.` });
     }
 
     const atualizado = await prisma.lancamentos_financeiros.update({
@@ -396,6 +426,8 @@ export const atualizarLancamento: RequestHandler = async (req, res) => {
         descricao: descricao !== undefined ? descricao : lancamento.descricao,
         valor: valor !== undefined ? parseFloat(valor) : lancamento.valor,
         vencimento: vencimento !== undefined ? (vencimento ? new Date(vencimento) : null) : lancamento.vencimento,
+        tipoPagamento: tipoPagamento !== undefined ? tipoPagamento : lancamento.tipoPagamento,
+        contaBanco: contaBanco !== undefined ? (contaBanco || null) : lancamento.contaBanco,
       },
     });
 
@@ -418,6 +450,10 @@ export const gerarPixLancamento: RequestHandler = async (req, res) => {
 
     if (!(await podeGerenciarAnunciante(req.userId!, req.userType, lancamento.anuncianteId))) {
       return res.status(403).json({ error: "Acesso negado a este lançamento" });
+    }
+
+    if (await isCompetenciaFechada(lancamento.anuncianteId, competenciaDeLancamento(lancamento))) {
+      return res.status(423).json({ error: "O mês deste lançamento está fechado." });
     }
 
     const pixId = `LF-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
@@ -463,6 +499,10 @@ export const anexarComprovanteLancamento: RequestHandler = async (req, res) => {
       return res.status(403).json({ error: "Acesso negado a este lançamento" });
     }
 
+    if (await isCompetenciaFechada(lancamento.anuncianteId, competenciaDeLancamento(lancamento))) {
+      return res.status(423).json({ error: "O mês deste lançamento está fechado." });
+    }
+
     const atualizado = await prisma.lancamentos_financeiros.update({
       where: { id },
       data: {
@@ -488,6 +528,10 @@ export const marcarLancamentoPago: RequestHandler = async (req, res) => {
 
     if (!(await podeGerenciarAnunciante(req.userId!, req.userType, lancamento.anuncianteId))) {
       return res.status(403).json({ error: "Acesso negado a este lançamento" });
+    }
+
+    if (await isCompetenciaFechada(lancamento.anuncianteId, competenciaDeLancamento(lancamento))) {
+      return res.status(423).json({ error: "O mês deste lançamento está fechado." });
     }
 
     const reciboToken = lancamento.reciboToken || crypto.randomBytes(32).toString("hex");
@@ -517,6 +561,10 @@ export const cancelarLancamento: RequestHandler = async (req, res) => {
 
     if (!(await podeGerenciarAnunciante(req.userId!, req.userType, lancamento.anuncianteId))) {
       return res.status(403).json({ error: "Acesso negado a este lançamento" });
+    }
+
+    if (await isCompetenciaFechada(lancamento.anuncianteId, competenciaDeLancamento(lancamento))) {
+      return res.status(423).json({ error: "O mês deste lançamento está fechado." });
     }
 
     const atualizado = await prisma.lancamentos_financeiros.update({
@@ -841,5 +889,162 @@ export const lancarLoteContratos: RequestHandler = async (req, res) => {
   } catch (error) {
     console.error("[lancarLoteContratos]", error);
     res.status(500).json({ error: "Erro ao lançar lote de contratos" });
+  }
+};
+
+// ============ FECHAMENTO MENSAL ============
+
+export const listarFechamentos: RequestHandler = async (req, res) => {
+  try {
+    const anuncianteId = parseInt(req.params.anuncianteId as string);
+    if (!(await podeGerenciarAnunciante(req.userId!, req.userType, anuncianteId))) {
+      return res.status(403).json({ error: "Acesso negado a este anunciante" });
+    }
+
+    const logs = await prisma.fechamentos_financeiros_log.findMany({
+      where: { anuncianteId },
+      orderBy: { dataAcao: "desc" },
+    });
+
+    const estadoPorCompetencia = new Map<string, typeof logs[number]>();
+    for (const log of logs) {
+      if (!estadoPorCompetencia.has(log.competencia)) {
+        estadoPorCompetencia.set(log.competencia, log);
+      }
+    }
+
+    const fechamentos = Array.from(estadoPorCompetencia.values())
+      .filter((log) => log.acao === "fechar")
+      .map((log) => ({
+        competencia: log.competencia,
+        fechado: true,
+        dataFechamento: log.dataAcao,
+        fechadoPor: log.usuarioId,
+      }));
+
+    res.json({ success: true, data: fechamentos });
+  } catch (error) {
+    console.error("[listarFechamentos]", error);
+    res.status(500).json({ error: "Erro ao buscar fechamentos" });
+  }
+};
+
+export const fecharCompetencia: RequestHandler = async (req, res) => {
+  try {
+    const { anuncianteId, competencia } = req.body;
+    if (!anuncianteId || !competencia) {
+      return res.status(400).json({ error: "anuncianteId e competencia são obrigatórios" });
+    }
+    if (!/^\d{4}-\d{2}$/.test(competencia)) {
+      return res.status(400).json({ error: "competencia deve estar no formato YYYY-MM" });
+    }
+
+    if (!(await podeGerenciarAnunciante(req.userId!, req.userType, parseInt(anuncianteId)))) {
+      return res.status(403).json({ error: "Acesso negado a este anunciante" });
+    }
+
+    const log = await prisma.fechamentos_financeiros_log.create({
+      data: {
+        anuncianteId: parseInt(anuncianteId),
+        competencia,
+        acao: "fechar",
+        usuarioId: req.userId!,
+      },
+    });
+
+    res.status(201).json({ success: true, data: log });
+  } catch (error) {
+    console.error("[fecharCompetencia]", error);
+    res.status(500).json({ error: "Erro ao fechar mês" });
+  }
+};
+
+export const reabrirCompetencia: RequestHandler = async (req, res) => {
+  try {
+    const { anuncianteId, competencia } = req.body;
+    if (!anuncianteId || !competencia) {
+      return res.status(400).json({ error: "anuncianteId e competencia são obrigatórios" });
+    }
+
+    if (!(await podeGerenciarAnunciante(req.userId!, req.userType, parseInt(anuncianteId)))) {
+      return res.status(403).json({ error: "Acesso negado a este anunciante" });
+    }
+
+    const log = await prisma.fechamentos_financeiros_log.create({
+      data: {
+        anuncianteId: parseInt(anuncianteId),
+        competencia,
+        acao: "reabrir",
+        usuarioId: req.userId!,
+      },
+    });
+
+    res.status(201).json({ success: true, data: log });
+  } catch (error) {
+    console.error("[reabrirCompetencia]", error);
+    res.status(500).json({ error: "Erro ao reabrir mês" });
+  }
+};
+
+// ============ MENSAGENS DE COBRANÇA (histórico, via link do WhatsApp) ============
+
+export const listarMensagensCobranca: RequestHandler = async (req, res) => {
+  try {
+    const lancamentoId = parseInt(req.params.id as string);
+
+    const lancamento = await prisma.lancamentos_financeiros.findUnique({ where: { id: lancamentoId } });
+    if (!lancamento) return res.status(404).json({ error: "Lançamento não encontrado" });
+
+    if (!(await podeGerenciarAnunciante(req.userId!, req.userType, lancamento.anuncianteId))) {
+      return res.status(403).json({ error: "Acesso negado a este lançamento" });
+    }
+
+    const mensagens = await prisma.lancamentos_mensagens.findMany({
+      where: { lancamentoId },
+      orderBy: { dataEnvio: "desc" },
+    });
+
+    res.json({ success: true, data: mensagens });
+  } catch (error) {
+    console.error("[listarMensagensCobranca]", error);
+    res.status(500).json({ error: "Erro ao buscar histórico de cobrança" });
+  }
+};
+
+export const criarMensagemCobranca: RequestHandler = async (req, res) => {
+  try {
+    const lancamentoId = parseInt(req.params.id as string);
+    const { texto } = req.body;
+
+    if (!texto) {
+      return res.status(400).json({ error: "texto é obrigatório" });
+    }
+
+    const lancamento = await prisma.lancamentos_financeiros.findUnique({
+      where: { id: lancamentoId },
+      include: { contato: { select: { celular: true } } },
+    });
+    if (!lancamento) return res.status(404).json({ error: "Lançamento não encontrado" });
+
+    if (!(await podeGerenciarAnunciante(req.userId!, req.userType, lancamento.anuncianteId))) {
+      return res.status(403).json({ error: "Acesso negado a este lançamento" });
+    }
+
+    if (!lancamento.contato?.celular) {
+      return res.status(400).json({ error: "Este lançamento não tem um contato com celular cadastrado" });
+    }
+
+    const registro = await prisma.lancamentos_mensagens.create({
+      data: {
+        lancamentoId,
+        texto,
+        enviadoPor: req.userId!,
+      },
+    });
+
+    res.status(201).json({ success: true, data: registro });
+  } catch (error) {
+    console.error("[criarMensagemCobranca]", error);
+    res.status(500).json({ error: "Erro ao registrar mensagem de cobrança" });
   }
 };

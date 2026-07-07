@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Send, Trash2 } from "lucide-react";
+import { Send, Trash2, Reply, X } from "lucide-react";
 import ProfileCompletionGate from "./ProfileCompletionGate";
 
 interface Message {
@@ -12,6 +12,7 @@ interface Message {
   excluido: boolean;
   usuarioId?: number;
   anuncianteId?: number;
+  respondendoAId?: number | null;
   usuario?: {
     id: number;
     nome: string;
@@ -20,6 +21,13 @@ interface Message {
     id: number;
     nome: string;
   };
+  respondendoA?: {
+    id: number;
+    conteudo: string;
+    excluido: boolean;
+    usuario?: { id: number; nome: string };
+    anunciante?: { id: number; nome: string };
+  } | null;
 }
 
 interface ChatBoxProps {
@@ -46,6 +54,7 @@ export default function ChatBox({
   const queryClient = useQueryClient();
   const [messageText, setMessageText] = useState("");
   const [showProfileGate, setShowProfileGate] = useState(false);
+  const [replyingTo, setReplyingTo] = useState<Message | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messageInputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -74,6 +83,7 @@ export default function ChatBox({
           usuarioId: tipoUsuario === "usuario" ? currentUserId : null,
           anuncianteId: tipoUsuario === "anunciante" ? currentUserId : null,
           conteudo,
+          respondendoAId: replyingTo?.id ?? null,
         }),
       });
 
@@ -87,6 +97,7 @@ export default function ChatBox({
     onSuccess: (result) => {
       onNewMessage(result.data);
       setMessageText("");
+      setReplyingTo(null);
       queryClient.invalidateQueries({ queryKey: ["conversa", conversaId] });
     },
     onError: (error) => {
@@ -258,21 +269,52 @@ export default function ChatBox({
                               : "bg-gray-100 text-vitrii-text"
                           }`}
                         >
+                          {msg.respondendoA && (
+                            <div
+                              className={`mb-1.5 pl-2 border-l-2 text-xs rounded ${
+                                isCurrentUser
+                                  ? "border-white/60 text-white/80"
+                                  : "border-vitrii-blue text-vitrii-text-secondary"
+                              }`}
+                            >
+                              <p className="font-semibold">
+                                {msg.respondendoA.usuario?.nome ||
+                                  msg.respondendoA.anunciante?.nome ||
+                                  "Usuário desconhecido"}
+                              </p>
+                              <p className="truncate">
+                                {msg.respondendoA.excluido
+                                  ? "Mensagem apagada"
+                                  : msg.respondendoA.conteudo}
+                              </p>
+                            </div>
+                          )}
                           <p className="break-words text-sm">{msg.conteudo}</p>
                         </div>
 
-                        {/* Delete Button */}
-                        {isCurrentUser && (
+                        <div className="mt-1 flex items-center gap-3">
                           <button
-                            onClick={() => deleteMessageMutation.mutate(msg.id)}
-                            disabled={deleteMessageMutation.isPending}
-                            className="mt-1 text-xs text-gray-400 hover:text-red-600 transition-colors flex items-center gap-1"
-                            title="Deletar mensagem"
+                            onClick={() => setReplyingTo(msg)}
+                            className="text-xs text-gray-400 hover:text-vitrii-blue transition-colors flex items-center gap-1"
+                            title="Responder mensagem"
                           >
-                            <Trash2 className="w-3 h-3" />
-                            Deletar
+                            <Reply className="w-3 h-3" />
+                            Responder
                           </button>
-                        )}
+
+                          {/* Delete Button */}
+                          {isCurrentUser && (
+                            <button
+                              onClick={() => deleteMessageMutation.mutate(msg.id)}
+                              disabled={deleteMessageMutation.isPending}
+                              className="text-xs text-gray-400 hover:text-red-600 transition-colors flex items-center gap-1"
+                              title="Deletar mensagem"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                              Deletar
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   );
@@ -286,6 +328,27 @@ export default function ChatBox({
 
       {/* Input Area */}
       <div className="border-t border-gray-200 p-4">
+        {replyingTo && (
+          <div className="mb-2 flex items-start justify-between gap-2 bg-gray-50 border-l-2 border-vitrii-blue rounded px-3 py-2">
+            <div className="min-w-0">
+              <p className="text-xs font-semibold text-vitrii-blue">
+                Respondendo a{" "}
+                {replyingTo.usuario?.nome || replyingTo.anunciante?.nome || "mensagem"}
+              </p>
+              <p className="text-xs text-vitrii-text-secondary truncate">
+                {replyingTo.conteudo}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setReplyingTo(null)}
+              className="text-gray-400 hover:text-gray-600 flex-shrink-0"
+              title="Cancelar resposta"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
         <form onSubmit={handleSendMessage} className="space-y-2">
           <div className="flex gap-2">
             <textarea
