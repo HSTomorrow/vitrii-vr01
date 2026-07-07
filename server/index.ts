@@ -266,6 +266,11 @@ import {
   lancarMesContrato,
   lancarLoteContratos,
 } from "./routes/financeiro";
+import {
+  obterDashboard,
+  reprocessarDashboard,
+  obterDashboardSomatorio,
+} from "./routes/dashboard";
 
 export function createServer() {
   const app = express();
@@ -1351,6 +1356,12 @@ export function createServer() {
   // Financeiro - visão administrativa (Vitrii audita qualquer anunciante)
   app.get("/api/admin/lancamentos-financeiros", extractUserId, requireAdmin, adminListarLancamentos);
   app.get("/api/admin/contratos-financeiros", extractUserId, requireAdmin, adminListarContratos);
+
+  // Dashboard (cache pré-computado — nunca agrega ao vivo; "somatorio" tem que vir antes
+  // de ":anuncianteId" para não ser engolido pela rota de parâmetro)
+  app.get("/api/dashboard/somatorio", extractUserId, obterDashboardSomatorio);
+  app.get("/api/dashboard/:anuncianteId", extractUserId, obterDashboard);
+  app.post("/api/dashboard/:anuncianteId/reprocessar", extractUserId, reprocessarDashboard);
 
   // Check APP_URL configuration
   app.get("/api/check-app-url", (_req, res) => {

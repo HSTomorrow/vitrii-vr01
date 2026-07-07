@@ -51,6 +51,7 @@ model anunciantes {
   agendas_horarios     agendas_horarios[]
   contratos_financeiros    contratos_financeiros[]
   lancamentos_financeiros  lancamentos_financeiros[]
+  dashboard_cache          dashboard_cache?
 }
 
 model anuncios {
@@ -665,6 +666,19 @@ model lancamentos_financeiros {
   @@index([contratoId])
   @@index([status])
   @@index([vencimento])
+}
+
+// Pre-computed dashboard aggregates, one row per anunciante. Populated by
+// gerarDashboardCache() (server/routes/dashboard.ts) — the dashboard screen only ever
+// reads this table, it never aggregates anuncios/lancamentos_financeiros live, so opening
+// it stays cheap regardless of how much data an anunciante has accumulated.
+model dashboard_cache {
+  id           Int      @id @default(autoincrement())
+  anuncianteId Int      @unique
+  dados        Json     // { mensal: [...], porPeriodo: { "7": {...}, "30": {...}, "90": {...}, "365": {...} } }
+  geradoEm     DateTime @default(now())
+
+  anunciante anunciantes @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
 }
 
 // Junction table for n-to-n relationship between eventos and contatos
