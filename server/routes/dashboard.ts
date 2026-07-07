@@ -37,24 +37,25 @@ async function calcularSerieMensal(anuncianteId: number) {
   const meses = ultimosMeses(6);
   const desde = meses[0].start;
 
-  const [publicados, vendidos, pagos, pendentes] = await Promise.all([
-    prisma.anuncios.findMany({
-      where: { anuncianteId, dataCriacao: { gte: desde } },
-      select: { dataCriacao: true },
-    }),
-    prisma.anuncios.findMany({
-      where: { anuncianteId, status: "vendido", dataAtualizacao: { gte: desde } },
-      select: { dataAtualizacao: true },
-    }),
-    prisma.lancamentos_financeiros.findMany({
-      where: { anuncianteId, status: "pago", dataPagamento: { gte: desde } },
-      select: { dataPagamento: true, valor: true },
-    }),
-    prisma.lancamentos_financeiros.findMany({
-      where: { anuncianteId, status: { in: PENDENTE_STATUSES }, dataCriacao: { gte: desde } },
-      select: { dataCriacao: true, valor: true },
-    }),
-  ]);
+  // Sequential, not Promise.all: this project's DB connection is a pooler with only
+  // 3 connections available (confirmed in production — parallelizing the ~17 queries
+  // gerarDashboardCache needs blows through that pool and every query times out).
+  const publicados = await prisma.anuncios.findMany({
+    where: { anuncianteId, dataCriacao: { gte: desde } },
+    select: { dataCriacao: true },
+  });
+  const vendidos = await prisma.anuncios.findMany({
+    where: { anuncianteId, status: "vendido", dataAtualizacao: { gte: desde } },
+    select: { dataAtualizacao: true },
+  });
+  const pagos = await prisma.lancamentos_financeiros.findMany({
+    where: { anuncianteId, status: "pago", dataPagamento: { gte: desde } },
+    select: { dataPagamento: true, valor: true },
+  });
+  const pendentes = await prisma.lancamentos_financeiros.findMany({
+    where: { anuncianteId, status: { in: PENDENTE_STATUSES }, dataCriacao: { gte: desde } },
+    select: { dataCriacao: true, valor: true },
+  });
 
   return meses.map((m) => ({
     mes: m.label,
@@ -74,51 +75,40 @@ async function calcularJanela(anuncianteId: number, dias: number) {
   const inicioAtual = new Date(fimAtual.getTime() - dias * 86400000);
   const inicioAnterior = new Date(inicioAtual.getTime() - dias * 86400000);
 
-  const [
-    novosAtual, novosAnterior,
-    visAtual, visAnterior,
-    vendasAtual, vendasAnterior,
-    fatAtual, fatAnterior,
-    anunciosAtivos,
-    porCategoriaQtd,
-    porCategoriaValor,
-    topVistosRaw,
-    topVendidosRaw,
-  ] = await Promise.all([
-    prisma.anuncios.count({ where: { anuncianteId, dataCriacao: { gte: inicioAtual, lt: fimAtual } } }),
-    prisma.anuncios.count({ where: { anuncianteId, dataCriacao: { gte: inicioAnterior, lt: inicioAtual } } }),
-    prisma.anuncioVisualizados.count({ where: { anuncio: { anuncianteId }, dataCriacao: { gte: inicioAtual, lt: fimAtual } } }),
-    prisma.anuncioVisualizados.count({ where: { anuncio: { anuncianteId }, dataCriacao: { gte: inicioAnterior, lt: inicioAtual } } }),
-    prisma.reservas_anuncio.count({ where: { status: "ativa", anuncio: { anuncianteId }, dataReserva: { gte: inicioAtual, lt: fimAtual } } }),
-    prisma.reservas_anuncio.count({ where: { status: "ativa", anuncio: { anuncianteId }, dataReserva: { gte: inicioAnterior, lt: inicioAtual } } }),
-    prisma.lancamentos_financeiros.aggregate({ _sum: { valor: true }, where: { anuncianteId, status: "pago", dataPagamento: { gte: inicioAtual, lt: fimAtual } } }),
-    prisma.lancamentos_financeiros.aggregate({ _sum: { valor: true }, where: { anuncianteId, status: "pago", dataPagamento: { gte: inicioAnterior, lt: inicioAtual } } }),
-    prisma.anuncios.count({ where: { anuncianteId, isActive: true } }),
-    prisma.anuncios.groupBy({
-      by: ["categoria"],
-      where: { anuncianteId, dataCriacao: { gte: inicioAtual, lt: fimAtual } },
-      _count: { _all: true },
-    }),
-    prisma.anuncios.groupBy({
-      by: ["categoria"],
-      where: { anuncianteId, status: "vendido", dataAtualizacao: { gte: inicioAtual, lt: fimAtual } },
-      _sum: { preco: true },
-    }),
-    prisma.anuncioVisualizados.groupBy({
-      by: ["anuncioId"],
-      where: { anuncio: { anuncianteId }, dataCriacao: { gte: inicioAtual, lt: fimAtual } },
-      _count: { _all: true },
-      orderBy: { _count: { anuncioId: "desc" } },
-      take: 5,
-    }),
-    prisma.reservas_anuncio.groupBy({
-      by: ["anuncioId"],
-      where: { status: "ativa", anuncio: { anuncianteId }, dataReserva: { gte: inicioAtual, lt: fimAtual } },
-      _count: { _all: true },
-      orderBy: { _count: { anuncioId: "desc" } },
-      take: 5,
-    }),
-  ]);
+  // Sequential — see the note in calcularSerieMensal about the 3-connection pool.
+  const novosAtual = await prisma.anuncios.count({ where: { anuncianteId, dataCriacao: { gte: inicioAtual, lt: fimAtual } } });
+  const novosAnterior = await prisma.anuncios.count({ where: { anuncianteId, dataCriacao: { gte: inicioAnterior, lt: inicioAtual } } });
+  const visAtual = await prisma.anuncioVisualizados.count({ where: { anuncio: { anuncianteId }, dataCriacao: { gte: inicioAtual, lt: fimAtual } } });
+  const visAnterior = await prisma.anuncioVisualizados.count({ where: { anuncio: { anuncianteId }, dataCriacao: { gte: inicioAnterior, lt: inicioAtual } } });
+  const vendasAtual = await prisma.reservas_anuncio.count({ where: { status: "ativa", anuncio: { anuncianteId }, dataReserva: { gte: inicioAtual, lt: fimAtual } } });
+  const vendasAnterior = await prisma.reservas_anuncio.count({ where: { status: "ativa", anuncio: { anuncianteId }, dataReserva: { gte: inicioAnterior, lt: inicioAtual } } });
+  const fatAtual = await prisma.lancamentos_financeiros.aggregate({ _sum: { valor: true }, where: { anuncianteId, status: "pago", dataPagamento: { gte: inicioAtual, lt: fimAtual } } });
+  const fatAnterior = await prisma.lancamentos_financeiros.aggregate({ _sum: { valor: true }, where: { anuncianteId, status: "pago", dataPagamento: { gte: inicioAnterior, lt: inicioAtual } } });
+  const anunciosAtivos = await prisma.anuncios.count({ where: { anuncianteId, isActive: true } });
+  const porCategoriaQtd = await prisma.anuncios.groupBy({
+    by: ["categoria"],
+    where: { anuncianteId, dataCriacao: { gte: inicioAtual, lt: fimAtual } },
+    _count: { _all: true },
+  });
+  const porCategoriaValor = await prisma.anuncios.groupBy({
+    by: ["categoria"],
+    where: { anuncianteId, status: "vendido", dataAtualizacao: { gte: inicioAtual, lt: fimAtual } },
+    _sum: { preco: true },
+  });
+  const topVistosRaw = await prisma.anuncioVisualizados.groupBy({
+    by: ["anuncioId"],
+    where: { anuncio: { anuncianteId }, dataCriacao: { gte: inicioAtual, lt: fimAtual } },
+    _count: { _all: true },
+    orderBy: { _count: { anuncioId: "desc" } },
+    take: 5,
+  });
+  const topVendidosRaw = await prisma.reservas_anuncio.groupBy({
+    by: ["anuncioId"],
+    where: { status: "ativa", anuncio: { anuncianteId }, dataReserva: { gte: inicioAtual, lt: fimAtual } },
+    _count: { _all: true },
+    orderBy: { _count: { anuncioId: "desc" } },
+    take: 5,
+  });
 
   const anuncioIds = Array.from(new Set([
     ...topVistosRaw.map((r) => r.anuncioId),
@@ -153,13 +143,12 @@ async function calcularJanela(anuncianteId: number, dias: number) {
 }
 
 export async function gerarDashboardCache(anuncianteId: number) {
-  const [mensal, ...janelas] = await Promise.all([
-    calcularSerieMensal(anuncianteId),
-    ...PERIODOS.map((dias) => calcularJanela(anuncianteId, dias)),
-  ]);
-
+  // Sequential — see the note in calcularSerieMensal about the 3-connection pool.
+  const mensal = await calcularSerieMensal(anuncianteId);
   const porPeriodo: Record<string, unknown> = {};
-  PERIODOS.forEach((dias, i) => { porPeriodo[String(dias)] = janelas[i]; });
+  for (const dias of PERIODOS) {
+    porPeriodo[String(dias)] = await calcularJanela(anuncianteId, dias);
+  }
 
   const dados = { mensal, porPeriodo };
   const dadosJson = dados as unknown as Prisma.InputJsonValue;
@@ -224,13 +213,13 @@ export const obterDashboardSomatorio: RequestHandler = async (req, res) => {
       }
     }
 
-    const caches = await Promise.all(
-      anuncianteIds.map(async (id) => {
-        const existing = await prisma.dashboard_cache.findUnique({ where: { anuncianteId: id } });
-        if (existing) return existing.dados as any;
-        return gerarDashboardCache(id);
-      }),
-    );
+    // Sequential — see the note in calcularSerieMensal about the 3-connection pool
+    // (only matters when one or more of these anunciantes still needs a first-time generate).
+    const caches: any[] = [];
+    for (const id of anuncianteIds) {
+      const existing = await prisma.dashboard_cache.findUnique({ where: { anuncianteId: id } });
+      caches.push(existing ? (existing.dados as any) : await gerarDashboardCache(id));
+    }
 
     const mesesBase = (caches[0]?.mensal || []).map((m: any) => m.mes);
     const mensal = mesesBase.map((mes: string, i: number) => ({
