@@ -16,6 +16,7 @@ import {
   ChevronUp,
   FileText,
   Lock,
+  Image as ImageIcon,
 } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -29,6 +30,7 @@ interface Anuncio {
   imagem?: string;
   preco?: number;
   destaque: boolean;
+  bannerInicial?: boolean;
   isActive: boolean;
   status: string;
   statusPagamento?: string;
@@ -108,6 +110,30 @@ export default function AdminManageAds() {
     },
     onError: (error) => {
       toast.error(error instanceof Error ? error.message : "Erro ao atualizar");
+    },
+  });
+
+  // Mutation to toggle the Banner Inicial (homepage popup) — the server enforces that
+  // only one ad may hold this at a time, unsetting any previous one automatically.
+  const toggleBannerInicialMutation = useMutation({
+    mutationFn: async ({ anuncioId, bannerInicial }: { anuncioId: number; bannerInicial: boolean }) => {
+      const response = await fetch(`/api/anuncios/${anuncioId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          "x-user-id": user?.id ? String(user.id) : "",
+        },
+        body: JSON.stringify({ bannerInicial: !bannerInicial }),
+      });
+      if (!response.ok) throw new Error("Erro ao atualizar Banner Inicial");
+      return response.json();
+    },
+    onSuccess: () => {
+      toast.success("Banner Inicial atualizado");
+      queryClient.invalidateQueries({ queryKey: ["admin-anuncios"] });
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : "Erro ao atualizar Banner Inicial");
     },
   });
 
@@ -636,6 +662,26 @@ export default function AdminManageAds() {
                       >
                         <Star className="w-4 h-4" />
                         {anuncio.destaque ? "Retirar Destaque" : "Destacar"}
+                      </button>
+
+                      {/* Toggle Banner Inicial - only one ad may hold this at a time */}
+                      <button
+                        onClick={() =>
+                          toggleBannerInicialMutation.mutate({
+                            anuncioId: anuncio.id,
+                            bannerInicial: !!anuncio.bannerInicial,
+                          })
+                        }
+                        disabled={toggleBannerInicialMutation.isPending}
+                        title="Exibir como pop-up ao entrar na tela inicial (só 1 anúncio por vez)"
+                        className={`px-3 py-2 rounded-lg transition flex items-center justify-center gap-2 text-sm font-semibold ${
+                          anuncio.bannerInicial
+                            ? "bg-purple-100 text-purple-700 hover:bg-purple-200"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        }`}
+                      >
+                        <ImageIcon className="w-4 h-4" />
+                        {anuncio.bannerInicial ? "Remover Banner Inicial" : "Banner Inicial"}
                       </button>
 
                       {/* Delete Button */}

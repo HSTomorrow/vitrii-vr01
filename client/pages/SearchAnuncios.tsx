@@ -19,12 +19,14 @@ import {
 } from "lucide-react";
 import ImageWithFallback from "@/components/ImageWithFallback";
 import { getAnuncioImage, getImageAlt } from "@/utils/imageFallback";
+import { useAuth } from "@/contexts/AuthContext";
 
 const ITEMS_PER_PAGE = 12;
 
 export default function SearchAnuncios() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { isLoggedIn } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [priceRange, setPriceRange] = useState({ min: "", max: "" });
@@ -35,6 +37,23 @@ export default function SearchAnuncios() {
   const [currentPage, setCurrentPage] = useState(1);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
   const [showFilters, setShowFilters] = useState(true);
+  const [onlyFavorites, setOnlyFavorites] = useState(false);
+
+  // Favorited anunciantes: ads from them are always sorted first, and the "Somente
+  // favoritos" toggle below filters the list down to just them.
+  const { data: favoritosData } = useQuery({
+    queryKey: ["anunciantes-favoritos"],
+    queryFn: async () => {
+      const response = await fetch("/api/anunciantes-favoritos");
+      if (!response.ok) return { data: [] };
+      return response.json();
+    },
+    enabled: isLoggedIn,
+  });
+  const favoritoIds = useMemo(
+    () => new Set((favoritosData?.data || []).map((a: any) => a.id)),
+    [favoritosData],
+  );
 
   // Read search query parameter on mount
   useEffect(() => {
@@ -133,8 +152,19 @@ export default function SearchAnuncios() {
       });
     }
 
-    // Sort ads
+    // Filter to only favorited anunciantes, if toggled
+    if (onlyFavorites) {
+      ads = ads.filter((ad: any) => favoritoIds.has(ad.anuncianteId));
+    }
+
+    // Favorited anunciantes always come first; the chosen sortBy criteria only breaks
+    // ties within each group (favorited vs. not) — a single comparator, since two
+    // separate .sort() calls would let the second one undo the first's ordering.
     ads.sort((a: any, b: any) => {
+      const aFav = favoritoIds.has(a.anuncianteId);
+      const bFav = favoritoIds.has(b.anuncianteId);
+      if (aFav !== bFav) return aFav ? -1 : 1;
+
       if (sortBy === "featured") {
         // Featured ads first, then by creation date
         if (a.destaque !== b.destaque) return b.destaque ? 1 : -1;
@@ -166,6 +196,8 @@ export default function SearchAnuncios() {
     selectedStore,
     priceRange,
     sortBy,
+    onlyFavorites,
+    favoritoIds,
   ]);
 
   // Filter and search anunciantes
@@ -308,6 +340,26 @@ export default function SearchAnuncios() {
                   </div>
                 </div>
 
+                {/* Favorites Filter */}
+                {isLoggedIn && (
+                  <div>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={onlyFavorites}
+                        onChange={(e) => {
+                          setOnlyFavorites(e.target.checked);
+                          setCurrentPage(1);
+                        }}
+                        className="w-4 h-4 text-vitrii-blue rounded"
+                      />
+                      <span className="text-sm font-semibold text-vitrii-text">
+                        ❤️ Somente anunciantes favoritos
+                      </span>
+                    </label>
+                  </div>
+                )}
+
                 {/* Price Filter */}
                 <div>
                   <h3 className="font-semibold text-vitrii-text mb-3">
@@ -386,13 +438,15 @@ export default function SearchAnuncios() {
                   selectedCategory ||
                   selectedStore ||
                   priceRange.min ||
-                  priceRange.max) && (
+                  priceRange.max ||
+                  onlyFavorites) && (
                   <button
                     onClick={() => {
                       setSearchTerm("");
                       setSelectedCategory(null);
                       setSelectedStore(null);
                       setPriceRange({ min: "", max: "" });
+                      setOnlyFavorites(false);
                       setCurrentPage(1);
                     }}
                     className="w-full px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors text-sm font-semibold"

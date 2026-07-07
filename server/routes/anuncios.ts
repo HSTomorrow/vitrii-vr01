@@ -75,6 +75,7 @@ const AnuncioBaseSchema = z.object({
   isDoacao: z.boolean().optional().default(false),
   aCombinar: z.boolean().optional().default(false),
   destaque: z.boolean().optional().default(false),
+  bannerInicial: z.boolean().optional(), // Admin-only: see updateAnuncio for the exclusivity + permission check
   ordem: z.number().int().positive().optional().default(10), // Default 10 for new ads (admin only)
   isActive: z.boolean().optional().default(true),
   status: z
@@ -121,6 +122,28 @@ const AnuncioCreateSchema = AnuncioBaseSchema.refine(
 
 // Schema for updating ad (partial fields, no refinement for flexibility)
 const AnuncioUpdateSchema = AnuncioBaseSchema.partial();
+
+// Public: the single ad (if any) currently marked as the homepage popup banner.
+export const getBannerInicial: RequestHandler = async (_req, res) => {
+  try {
+    const anuncio = await prisma.anuncios.findFirst({
+      where: { bannerInicial: true, isActive: true },
+      select: {
+        id: true,
+        titulo: true,
+        imagem: true,
+        preco: true,
+        aCombinar: true,
+        isDoacao: true,
+      },
+    });
+
+    res.json({ success: true, data: anuncio });
+  } catch (error) {
+    console.error("[getBannerInicial]", error);
+    res.status(500).json({ error: "Erro ao buscar banner inicial" });
+  }
+};
 
 // GET all ads
 export const getAnuncios: RequestHandler = async (req, res) => {
@@ -195,6 +218,7 @@ export const getAnuncios: RequestHandler = async (req, res) => {
           estado: true,
           visualizacoes: true,
           destaque: true,
+          bannerInicial: true,
           ordem: true,
           isActive: true,
           permiteReservar: true,
@@ -799,7 +823,18 @@ export const updateAnuncio: RequestHandler = async (req, res) => {
       }
     }
 
-    const anuncio = await prisma.anuncios.update({
+    // Banner Inicial (homepage popup) is admin-only, and only one ad may hold it at a time.
+    if (updateData.bannerInicial !== undefined) {
+      if (!isAdmin) {
+        return res.status(403).json({
+          success: false,
+          error: "Apenas administradores podem definir o Banner Inicial",
+        });
+      }
+      mappedData.bannerInicial = updateData.bannerInicial;
+    }
+
+    const updateAnuncioQuery = prisma.anuncios.update({
       where: { id: adId },
       data: {
         ...mappedData,
@@ -809,6 +844,22 @@ export const updateAnuncio: RequestHandler = async (req, res) => {
         anunciantes: true,
       },
     });
+
+    let anuncio;
+    if (updateData.bannerInicial === true) {
+      // Unsetting every other ad first, in the same transaction as the update below,
+      // guarantees at most one ad ever has bannerInicial=true even under concurrent admin requests.
+      const [, updated] = await prisma.$transaction([
+        prisma.anuncios.updateMany({
+          where: { bannerInicial: true, id: { not: adId } },
+          data: { bannerInicial: false },
+        }),
+        updateAnuncioQuery,
+      ]);
+      anuncio = updated;
+    } else {
+      anuncio = await updateAnuncioQuery;
+    }
 
     // Handle counter updates when status or destaque changes
     const newStatus = mappedData.status || currentAd.status;

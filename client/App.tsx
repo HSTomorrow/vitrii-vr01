@@ -23,6 +23,8 @@ import SignUp from "./pages/SignUp";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import ListaDesejos from "./pages/ListaDesejos";
+import AnunciantesFavoritos from "./pages/AnunciantesFavoritos";
+import Totem from "./pages/Totem";
 import PerfilUsuario from "./pages/PerfilUsuario";
 import CriarAnuncio from "./pages/CriarAnuncio";
 import AnuncioDetalhe from "./pages/AnuncioDetalhe";
@@ -161,6 +163,9 @@ function AppContent() {
           <Route path="/test-email" element={<TestEmail />} />
           <Route path="/debug/anunciantes" element={<DebugAnunciantes />} />
           <Route path="/lista-desejos" element={<ListaDesejos />} />
+          <Route path="/anunciantes-favoritos" element={<AnunciantesFavoritos />} />
+          <Route path="/totem" element={<Totem />} />
+          <Route path="/totem/:anuncianteId" element={<Totem />} />
           <Route path="/meus-anuncios" element={<MeusAnuncios />} />
           <Route path="/minha-agenda" element={<MinhaAgenda />} />
           <Route path="/agenda/:anuncianteId" element={<AgendaAnunciante />} />

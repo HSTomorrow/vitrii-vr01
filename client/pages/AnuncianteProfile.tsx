@@ -6,6 +6,7 @@ import { QRCodeSVG } from "qrcode.react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ShareButton from "@/components/ShareButton";
+import AnuncianteFavoritoButton from "@/components/AnuncianteFavoritoButton";
 import {
   MapPin,
   Mail,
@@ -290,6 +291,13 @@ export default function AnuncianteProfile() {
           <h3 className="text-lg font-bold text-vitrii-text mb-4">Compartilhe este Perfil</h3>
 
           <div className="flex flex-col sm:flex-row gap-4 items-center sm:items-start">
+            {/* Favorito Button */}
+            <AnuncianteFavoritoButton
+              anuncianteId={anunciante.id}
+              label="Favorito"
+              className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-4 py-3 rounded-lg font-semibold border-2 border-red-300 text-red-600 hover:bg-red-50 transition-all transform hover:-translate-y-1"
+            />
+
             {/* Share Button */}
             <ShareButton
               title={`Perfil: ${anunciante.nome}`}

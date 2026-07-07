@@ -52,6 +52,23 @@ model anunciantes {
   contratos_financeiros    contratos_financeiros[]
   lancamentos_financeiros  lancamentos_financeiros[]
   dashboard_cache          dashboard_cache?
+  favoritos_de_usuarios    anunciantes_favoritos[]
+}
+
+// A usuário favoriting an entire anunciante (store) — distinct from listas_desejos, which
+// favorites individual anuncio items.
+model anunciantes_favoritos {
+  id           Int      @id @default(autoincrement())
+  usuarioId    Int
+  anuncianteId Int
+  dataCriacao  DateTime @default(now())
+
+  usuario    usracessos  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  anunciante anunciantes @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
+
+  @@unique([usuarioId, anuncianteId])
+  @@index([usuarioId])
+  @@index([anuncianteId])
 }
 
 model anuncios {
@@ -77,6 +94,7 @@ model anuncios {
   estado              String?                @db.VarChar(2)
   visualizacoes       Int                    @default(0)
   destaque            Boolean                @default(false)
+  bannerInicial       Boolean                @default(false) // Admin-only: the one ad shown as the homepage popup. Exclusivity enforced in updateAnuncio, not the DB.
   ordem               Int                    @default(10) // Admin can customize, default 10, sorted ascending + id descending
   isActive            Boolean                @default(true)
   permiteReservar     Boolean                @default(false) // Allow reservations for this ad
@@ -267,6 +285,7 @@ model usracessos {
   contatos                contatos[]
   contato_links           contatos_usuarios_links[]
   reservas_anuncio        reservas_anuncio[]
+  anunciantes_favoritos   anunciantes_favoritos[]
   localidadePadrao        localidades?                @relation(fields: [localidadePadraoId], references: [id], onDelete: SetNull)
 }
 

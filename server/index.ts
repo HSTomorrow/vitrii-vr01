@@ -5,6 +5,7 @@ import prisma from "./lib/prisma";
 import { sendTestEmail, testSmtpConnection } from "./lib/emailService";
 import {
   getAnuncios,
+  getBannerInicial,
   getAnuncioById,
   createAnuncio,
   updateAnuncio,
@@ -271,6 +272,11 @@ import {
   reprocessarDashboard,
   obterDashboardSomatorio,
 } from "./routes/dashboard";
+import {
+  listarAnunciantesFavoritos,
+  favoritarAnunciante,
+  desfavoritarAnunciante,
+} from "./routes/anunciantes-favoritos";
 
 export function createServer() {
   const app = express();
@@ -979,6 +985,11 @@ export function createServer() {
   app.delete("/api/anunciantes/:id", extractUserId, requireAdmin, deleteAnunciante);
   app.post("/api/anunciantes/:id/usuarios", extractUserId, adicionarUsuarioAnunciante);
   app.get("/api/anunciantes/:anuncianteId/usuarios", getEquipeAnunciante);
+
+  // Anunciantes favoritos (favoritar a loja inteira — distinto da Lista de Desejos, que favorita itens)
+  app.get("/api/anunciantes-favoritos", extractUserId, listarAnunciantesFavoritos);
+  app.post("/api/anunciantes-favoritos", extractUserId, favoritarAnunciante);
+  app.delete("/api/anunciantes-favoritos/:anuncianteId", extractUserId, desfavoritarAnunciante);
   app.get(
     "/api/anunciantes/:anuncianteId/produtos-para-anuncio",
     getProdutosParaAnuncio,
@@ -1019,6 +1030,8 @@ export function createServer() {
     getAnunciosDUsuario,
   );
   app.get("/api/anuncios", getAnuncios);
+  // Must come before "/api/anuncios/:id" so "banner-inicial" isn't swallowed as an :id.
+  app.get("/api/anuncios/banner-inicial", getBannerInicial);
   app.get("/api/anuncios/:id", getAnuncioById);
   app.post("/api/anuncios", extractUserId, createAnuncio);
   app.put("/api/anuncios/:id", extractUserId, updateAnuncio);

@@ -8,6 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import BannerCarousel from "@/components/BannerCarousel";
 import AnunciosCarousel from "@/components/AnunciosCarousel";
 import AnunciantesCarousel from "@/components/AnunciantesCarousel";
+import BannerInicialModal from "@/components/BannerInicialModal";
 import {
   Star,
   ArrowRight,
@@ -79,6 +80,18 @@ export default function Index() {
   }, [user?.id]); // Only depend on user?.id, not logout/navigate
 
   // All paid ads are fetched and filtered on client side
+
+  // Favorited anunciantes: their ads are always sorted first in the featured carousels below.
+  const { data: favoritosData } = useQuery({
+    queryKey: ["anunciantes-favoritos"],
+    queryFn: async () => {
+      const response = await fetch("/api/anunciantes-favoritos");
+      if (!response.ok) return { data: [] };
+      return response.json();
+    },
+    enabled: !!user,
+  });
+  const favoritoIds = new Set((favoritosData?.data || []).map((a: any) => a.id));
 
   // Fetch all banners
   const { data: bannersData } = useQuery({
@@ -226,7 +239,15 @@ export default function Index() {
         !isGratis(anuncio) &&
         ["anuncio_padrao", "produto", "servico"].includes(anuncio.tipo) &&
         matchesLocalidade(anuncio),
-    );
+    )
+    // Ads from favorited anunciantes always come first (stable sort — no favorites
+    // means the existing order is left untouched).
+    .sort((a: any, b: any) => {
+      const aFav = favoritoIds.has(a.anuncianteId);
+      const bFav = favoritoIds.has(b.anuncianteId);
+      if (aFav === bFav) return 0;
+      return aFav ? -1 : 1;
+    });
 
   // Split featured ads into 3 groups of 15 ads each
   const destaquedosCarousel1 = destacados.slice(0, 15);
@@ -282,6 +303,7 @@ export default function Index() {
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
+      <BannerInicialModal />
 
       {/* Banner Carousel Section */}
       <section className="py-0 md:py-1 bg-white">

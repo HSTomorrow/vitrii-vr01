@@ -10,6 +10,7 @@ import ShareModal from "@/components/ShareModal";
 import QRCodeModal from "@/components/QRCodeModal";
 import WishlistButton from "@/components/WishlistButton";
 import ReservarButton from "@/components/ReservarButton";
+import AnuncianteFavoritoButton from "@/components/AnuncianteFavoritoButton";
 import ImageWithFallback from "@/components/ImageWithFallback";
 import ReservationManagementPanel from "@/components/ReservationManagementPanel";
 import AnuncioFinanceiroPanel from "@/components/AnuncioFinanceiroPanel";
@@ -792,6 +793,10 @@ export default function AnuncioDetalhe() {
                       anuncio.preco ? parseFloat(anuncio.preco.toString()) : undefined
                     }
                     variant="button"
+                  />
+                  <AnuncianteFavoritoButton
+                    anuncianteId={anuncio.anuncianteId}
+                    label="Anunciante Favorito"
                   />
                 </div>
 
