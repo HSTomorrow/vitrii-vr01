@@ -32,6 +32,10 @@ model anunciantes {
   localidadeId         Int? // Default locality for filtering ads
   dataCriacao          DateTime                    @default(now())
   dataAtualizacao      DateTime
+  criadoPor            Int?
+  atualizadoPor        Int?
+  dataExclusao         DateTime?
+  excluidoPor          Int?
   anuncios             anuncios[]
   movimentos_estoque   movimentos_estoque[]
   produtos_em_estoque  produtos_em_estoque[]
@@ -55,6 +59,8 @@ model anunciantes {
   favoritos_de_usuarios    anunciantes_favoritos[]
   tabelas_preco            tabelas_preco[]
   fechamentos_financeiros_log fechamentos_financeiros_log[]
+
+  @@index([dataExclusao])
 }
 
 // A usuário favoriting an entire anunciante (store) — distinct from listas_desejos, which
@@ -91,6 +97,10 @@ model anuncios {
   statusPagamento     String?                @default("pendente") @db.VarChar(50)
   dataCriacao         DateTime               @default(now())
   dataAtualizacao     DateTime
+  criadoPor           Int?
+  atualizadoPor       Int?
+  dataExclusao        DateTime?
+  excluidoPor         Int?
   dataFim             DateTime?              // End date for ad validity (7 days for Standard, 30 days for Professional, or admin-set)
   cidade              String?                @db.VarChar(100)
   estado              String?                @db.VarChar(2)
@@ -118,6 +128,7 @@ model anuncios {
   @@index([status])
   @@index([ordem, id])
   @@index([permiteReservar])
+  @@index([dataExclusao])
 }
 
 // Anuncio Visualizacoes - Log table to track ad views
@@ -149,13 +160,19 @@ model grupos_produtos {
   nome            String      @db.VarChar(255)
   descricao       String?
   icone           String?     @db.VarChar(50)
+  status          String      @default("ativo") @db.VarChar(20) // "ativo" | "inativo"
   dataCriacao     DateTime    @default(now())
   dataAtualizacao DateTime    @default(now())
+  criadoPor       Int?
+  atualizadoPor   Int?
+  dataExclusao    DateTime?
+  excluidoPor     Int?
   usuario         usracessos? @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   anunciante      anunciantes @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
   productos       productos[]
 
   @@unique([usuarioId, anuncianteId, nome])
+  @@index([dataExclusao])
 }
 
 model movimentos_estoque {
@@ -180,13 +197,20 @@ model productos {
   descricao           String?
   sku                 String?                   @db.VarChar(100)
   tipo                String                    @default("produto") @db.VarChar(50)
+  status              String                    @default("ativo") @db.VarChar(20) // "ativo" | "inativo"
   dataCriacao         DateTime                  @default(now())
   dataAtualizacao     DateTime
+  criadoPor           Int?
+  atualizadoPor       Int?
+  dataExclusao        DateTime?
+  excluidoPor         Int?
   grupo               grupos_produtos           @relation(fields: [grupoId], references: [id], onDelete: Cascade)
   movimentos_estoque  movimentos_estoque[]
   produtos_em_estoque produtos_em_estoque[]
   links_externos      links_produtos_externos[]
   tabelas_preco       tabelas_preco[]
+
+  @@index([dataExclusao])
 }
 
 model productos_visualizacoes {
@@ -269,6 +293,10 @@ model usracessos {
   ultimaTentativaLogin    DateTime? // Timestamp da última tentativa de login
   dataCriacao             DateTime                    @default(now())
   dataAtualizacao         DateTime                    @updatedAt
+  criadoPor               Int?
+  atualizadoPor           Int?
+  dataExclusao            DateTime?
+  excluidoPor             Int?
   endereco                String?
   dataVigenciaContrato    DateTime                    @default(now())
   numeroAnunciosAtivos    Int                         @default(0)
@@ -296,6 +324,8 @@ model usracessos {
   reservas_anuncio        reservas_anuncio[]
   anunciantes_favoritos   anunciantes_favoritos[]
   localidadePadrao        localidades?                @relation(fields: [localidadePadraoId], references: [id], onDelete: SetNull)
+
+  @@index([dataExclusao])
 }
 
 model passwordResetToken {
@@ -341,9 +371,14 @@ model equipes_de_venda {
   isActive        Boolean          @default(true)
   dataCriacao     DateTime         @default(now())
   dataAtualizacao DateTime         @updatedAt
+  criadoPor       Int?
+  atualizadoPor   Int?
+  dataExclusao    DateTime?
+  excluidoPor     Int?
   anunciantes     anunciantes      @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
   membros_equipe  membros_equipe[]
 
+  @@index([dataExclusao])
   @@map("equipes_de_venda")
 }
 
@@ -577,6 +612,10 @@ model eventos_agenda_anunciante {
   valor           Decimal? @db.Decimal(10, 2) // Optional price field - hidden for restricted/private events
   dataCriacao     DateTime @default(now())
   dataAtualizacao DateTime @updatedAt
+  criadoPor       Int?
+  atualizadoPor   Int?
+  dataExclusao    DateTime?
+  excluidoPor     Int?
 
   anunciante  anunciantes                 @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
   anuncio     anuncios?                   @relation(fields: [anuncioId], references: [id], onDelete: SetNull)
@@ -591,6 +630,7 @@ model eventos_agenda_anunciante {
   @@index([dataInicio])
   @@index([privacidade])
   @@index([status])
+  @@index([dataExclusao])
 }
 
 // Contratos de cobrança recorrente entre o anunciante e um contato (cliente)
@@ -608,6 +648,10 @@ model contratos_financeiros {
   status          String    @default("ativo") @db.VarChar(20) // ativo, suspenso, encerrado
   dataCriacao     DateTime  @default(now())
   dataAtualizacao DateTime  @updatedAt
+  criadoPor       Int?
+  atualizadoPor   Int?
+  dataExclusao    DateTime?
+  excluidoPor     Int?
 
   anunciante  anunciantes @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
   contato     contatos    @relation(fields: [contatoId], references: [id], onDelete: Restrict)
@@ -618,6 +662,7 @@ model contratos_financeiros {
   @@index([anuncianteId])
   @@index([contatoId])
   @@index([status])
+  @@index([dataExclusao])
 }
 
 model contratos_reajustes {
@@ -677,6 +722,9 @@ model lancamentos_financeiros {
   dataPagamento    DateTime?
 
   criadoPor        Int?      // null for system-generated (mensalidade) entries
+  atualizadoPor    Int?
+  dataExclusao     DateTime?
+  excluidoPor      Int?
   reciboToken      String?   @unique @db.VarChar(64)
   dataCriacao      DateTime  @default(now())
   dataAtualizacao  DateTime  @updatedAt
@@ -696,6 +744,7 @@ model lancamentos_financeiros {
   @@index([contratoId])
   @@index([status])
   @@index([vencimento])
+  @@index([dataExclusao])
 }
 
 // Log de auditoria do fechamento mensal do Financeiro: nunca sobrescreve, cada
@@ -972,6 +1021,10 @@ model contatos {
   imagem           String?  @db.VarChar(500)
   dataCriacao      DateTime @default(now())
   dataAtualizacao  DateTime @updatedAt
+  criadoPor        Int?
+  atualizadoPor    Int?
+  dataExclusao     DateTime?
+  excluidoPor      Int?
 
   usuario          usracessos  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   anunciante       anunciantes? @relation(fields: [anuncianteId], references: [id], onDelete: SetNull)
@@ -982,6 +1035,7 @@ model contatos {
 
   @@index([usuarioId])
   @@index([anuncianteId])
+  @@index([dataExclusao])
   @@map("contatos")
 }
 

@@ -12,7 +12,7 @@ const GrupoCreateSchema = z.object({
 // GET all grupos (with pagination and user filtering)
 export const getGrupos: RequestHandler = async (req, res) => {
   try {
-    const { anuncianteId, limit = "20", offset = "0" } = req.query;
+    const { anuncianteId, limit = "20", offset = "0", status } = req.query;
     const userId = req.userId;
 
     // Validate pagination parameters
@@ -22,8 +22,11 @@ export const getGrupos: RequestHandler = async (req, res) => {
     );
     const pageOffset = Math.max(parseInt(offset as string) || 0, 0);
 
-    const where: any = {};
+    const where: any = { dataExclusao: null };
     if (anuncianteId) where.anuncianteId = parseInt(anuncianteId as string);
+    // status filter: "ativo" (default), "inativo", or "todos"
+    if (!status || status === "ativo") where.status = "ativo";
+    else if (status === "inativo") where.status = "inativo";
 
     // Filter by user who created the group
     if (userId) {
@@ -82,7 +85,7 @@ export const getGrupoById: RequestHandler = async (req, res) => {
     const { id } = req.params;
 
     const grupo = await prisma.grupos_produtos.findUnique({
-      where: { id: parseInt(id) },
+      where: { id: parseInt(id), dataExclusao: null },
       select: {
         id: true,
         nome: true,
@@ -135,7 +138,7 @@ export const getProductosOfGrupo: RequestHandler = async (req, res) => {
     // Get total count and paginated data in parallel
     const [productos, total] = await Promise.all([
       prisma.productos.findMany({
-        where: { grupoId: parseInt(id) },
+        where: { grupoId: parseInt(id), dataExclusao: null },
         select: {
           id: true,
           nome: true,
@@ -147,7 +150,7 @@ export const getProductosOfGrupo: RequestHandler = async (req, res) => {
         take: pageLimit,
         skip: pageOffset,
       }),
-      prisma.productos.count({ where: { grupoId: parseInt(id) } }),
+      prisma.productos.count({ where: { grupoId: parseInt(id), dataExclusao: null } }),
     ]);
 
     res.json({
@@ -192,6 +195,7 @@ export const createGrupo: RequestHandler = async (req, res) => {
       data: {
         ...validatedData,
         usuarioId: userId,
+        criadoPor: userId,
       },
       include: {
         usuario: {
@@ -247,8 +251,8 @@ export const updateGrupo: RequestHandler = async (req, res) => {
     const updateData = GrupoCreateSchema.partial().parse(req.body);
 
     const grupo = await prisma.grupos_produtos.update({
-      where: { id: parseInt(id) },
-      data: updateData,
+      where: { id: parseInt(id), dataExclusao: null },
+      data: { ...updateData, atualizadoPor: req.userId ?? null },
       include: {
         anunciante: {
           select: {
@@ -281,13 +285,29 @@ export const updateGrupo: RequestHandler = async (req, res) => {
   }
 };
 
-// DELETE grupo
+// DELETE grupo — blocked if it still has any produto inside it (even inactive ones); the
+// client should offer "desativar" instead.
 export const deleteGrupo: RequestHandler = async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = parseInt(req.params.id);
 
-    await prisma.grupos_produtos.delete({
-      where: { id: parseInt(id) },
+    const grupo = await prisma.grupos_produtos.findUnique({ where: { id, dataExclusao: null } });
+    if (!grupo) {
+      return res.status(404).json({ success: false, error: "Grupo de produtos não encontrado" });
+    }
+
+    const produtoNoGrupo = await prisma.productos.findFirst({ where: { grupoId: id, dataExclusao: null } });
+    if (produtoNoGrupo) {
+      return res.status(400).json({
+        success: false,
+        error: "Este grupo possui produtos cadastrados e não pode ser excluído. Desative-o em vez de excluir.",
+        podeDesativar: true,
+      });
+    }
+
+    await prisma.grupos_produtos.update({
+      where: { id },
+      data: { dataExclusao: new Date(), excluidoPor: req.userId ?? null },
     });
 
     res.json({
@@ -300,5 +320,27 @@ export const deleteGrupo: RequestHandler = async (req, res) => {
       success: false,
       error: "Erro ao deletar grupo de produtos",
     });
+  }
+};
+
+// PATCH grupo status — ativo/inativo toggle (the "desativar em vez de excluir" path)
+export const atualizarStatusGrupo: RequestHandler = async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const { status } = req.body;
+
+    if (!["ativo", "inativo"].includes(status)) {
+      return res.status(400).json({ success: false, error: "status deve ser 'ativo' ou 'inativo'" });
+    }
+
+    const grupo = await prisma.grupos_produtos.update({
+      where: { id, dataExclusao: null },
+      data: { status, atualizadoPor: req.userId ?? null },
+    });
+
+    res.json({ success: true, data: grupo });
+  } catch (error) {
+    console.error("Error updating grupo status:", error);
+    res.status(500).json({ success: false, error: "Erro ao atualizar status do grupo" });
   }
 };

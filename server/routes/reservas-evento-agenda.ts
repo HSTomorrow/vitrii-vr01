@@ -107,7 +107,7 @@ export const criarReservaOuListaEspera: RequestHandler = async (req, res) => {
 
     // Verify evento exists
     const evento = await prisma.eventos_agenda_anunciante.findUnique({
-      where: { id: parseInt(eventoId) },
+      where: { id: parseInt(eventoId), dataExclusao: null },
     });
 
     if (!evento) {
@@ -198,7 +198,7 @@ export const getReservasDoEvento: RequestHandler = async (req, res) => {
 
     // Get event and verify ownership
     const evento = await prisma.eventos_agenda_anunciante.findUnique({
-      where: { id: eventoId_num },
+      where: { id: eventoId_num, dataExclusao: null },
     });
 
     if (!evento) {

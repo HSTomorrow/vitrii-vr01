@@ -421,6 +421,7 @@ export const signUpUsuario: RequestHandler = async (req, res) => {
           cep: "",
           descricao: "",
           status: "Ativo",
+          criadoPor: usuario.id,
         },
       });
 
@@ -788,7 +789,7 @@ export const updateUsuario: RequestHandler = async (req, res) => {
 
     const usuario = await prisma.usracessos.update({
       where: { id: userId },
-      data: validatedData,
+      data: { ...validatedData, atualizadoPor: userId },
       select: {
         id: true,
         nome: true,
@@ -883,10 +884,11 @@ export const deleteUsuario: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Soft delete: change status to inativo instead of actually deleting
+    // Soft delete: change status to inativo instead of actually deleting, and now also
+    // record it in the same audit columns the other 9 entities use.
     const usuario = await prisma.usracessos.update({
       where: { id: parseInt(id) },
-      data: { status: "inativo" },
+      data: { status: "inativo", dataExclusao: new Date(), excluidoPor: req.userId ?? null },
       select: {
         id: true,
         email: true,
@@ -939,6 +941,7 @@ export const updateMaxAnunciosAtivos: RequestHandler = async (req, res) => {
       where: { id: userId },
       data: {
         maxAnunciosAtivos,
+        atualizadoPor: req.userId ?? null,
       },
       select: {
         id: true,
@@ -1678,7 +1681,7 @@ export const adminUpdateUserProfile: RequestHandler = async (req, res) => {
     // Update user profile
     const updatedUsuario = await prisma.usracessos.update({
       where: { id: userId },
-      data: cleanedData,
+      data: { ...cleanedData, atualizadoPor: req.userId ?? null },
       select: {
         id: true,
         nome: true,
@@ -1760,6 +1763,7 @@ export const updateLocalidadePadrao: RequestHandler = async (req, res) => {
       where: { id: userId },
       data: {
         localidadePadraoId: localidadePadraoId || null,
+        atualizadoPor: req.userId ?? null,
       },
       select: {
         id: true,
@@ -1885,7 +1889,11 @@ export const toggleUserStatus: RequestHandler = async (req, res) => {
       data: {
         status,
         // Reset login attempts when unblocking
-        ...(status === "ativo" && { tentativasLoginFalhadas: 0 })
+        ...(status === "ativo" && { tentativasLoginFalhadas: 0 }),
+        // Reactivating clears the soft-delete markers deleteUsuario sets when status
+        // moves to "inativo" — otherwise a reactivated account would look excluded.
+        ...(status === "ativo" && { dataExclusao: null, excluidoPor: null }),
+        atualizadoPor: req.userId ?? null,
       },
       select: {
         id: true,
@@ -1929,6 +1937,9 @@ export const unlockUserAccount: RequestHandler = async (req, res) => {
         status: "ativo",
         tentativasLoginFalhadas: 0,
         ultimaTentativaLogin: null,
+        dataExclusao: null,
+        excluidoPor: null,
+        atualizadoPor: req.userId ?? null,
       },
       select: {
         id: true,

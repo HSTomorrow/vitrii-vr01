@@ -41,7 +41,7 @@ export const getAnunciantes: RequestHandler = async (req, res) => {
     );
     const pageOffset = Math.max(parseInt(offset as string) || 0, 0);
 
-    const where: any = {};
+    const where: any = { dataExclusao: null };
 
     // Filter by status - only show Ativo unless explicitly requested otherwise
     if (includeInactive !== "true") {
@@ -142,7 +142,7 @@ export const getAnuncianteById: RequestHandler = async (req, res) => {
     const { id } = req.params;
 
     const anunciante = await prisma.anunciantes.findUnique({
-      where: { id: parseInt(id) },
+      where: { id: parseInt(id), dataExclusao: null },
       select: {
         id: true,
         nome: true,
@@ -339,6 +339,7 @@ export const createAnunciante: RequestHandler = async (req, res) => {
         temAgenda: validatedData.temAgenda,
         dataCriacao: new Date(),
         dataAtualizacao: new Date(),
+        criadoPor: usuarioId ?? null,
       },
     });
 
@@ -499,7 +500,7 @@ export const updateAnunciante: RequestHandler = async (req, res) => {
 
     // Check if anunciante exists
     const anunciante = await prisma.anunciantes.findUnique({
-      where: { id: parseInt(id) },
+      where: { id: parseInt(id), dataExclusao: null },
       select: {
         id: true,
         nome: true,
@@ -555,6 +556,7 @@ export const updateAnunciante: RequestHandler = async (req, res) => {
       data: {
         ...cleanedData,
         dataAtualizacao: new Date(),
+        atualizadoPor: usuarioId ?? null,
       },
     });
 
@@ -724,14 +726,76 @@ export const getEquipeAnunciante: RequestHandler = async (req, res) => {
   }
 };
 
-// Delete anunciante
+// Delete anunciante — soft-delete, cascading the same exclusão to its direct children
+// (anuncios, contatos, contratos_financeiros, productos/grupos_produtos, equipes_de_venda) so
+// they disappear from listings exactly like the old onDelete: Cascade used to, but stay in
+// the audit trail instead of being wiped from the database.
 export const deleteAnunciante: RequestHandler = async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = parseInt(req.params.id);
+    const usuarioId = req.userId;
 
-    await prisma.anunciantes.delete({
-      where: { id: parseInt(id) },
-    });
+    const anunciante = await prisma.anunciantes.findUnique({ where: { id, dataExclusao: null } });
+    if (!anunciante) {
+      return res.status(404).json({ success: false, error: "Anunciante não encontrado" });
+    }
+
+    // Check permissions - allow if user is admin or owner of the anunciante (this route had
+    // no access check at all before; needed now anyway since excluidoPor requires a trusted
+    // req.userId).
+    if (usuarioId) {
+      const usuario = await prisma.usracessos.findUnique({
+        where: { id: usuarioId },
+        select: { tipoUsuario: true },
+      });
+
+      if (usuario?.tipoUsuario !== "adm") {
+        const hasAccess = await prisma.usuarios_anunciantes.findFirst({
+          where: { usuarioId, anuncianteId: id },
+        });
+
+        if (!hasAccess) {
+          return res.status(403).json({
+            success: false,
+            error: "Você não tem permissão para excluir este anunciante",
+          });
+        }
+      }
+    } else {
+      return res.status(401).json({ success: false, error: "Usuário não autenticado" });
+    }
+
+    const agora = new Date();
+    await prisma.$transaction([
+      prisma.anunciantes.update({
+        where: { id },
+        data: { dataExclusao: agora, excluidoPor: usuarioId },
+      }),
+      prisma.anuncios.updateMany({
+        where: { anuncianteId: id, dataExclusao: null },
+        data: { dataExclusao: agora, excluidoPor: usuarioId },
+      }),
+      prisma.contatos.updateMany({
+        where: { anuncianteId: id, dataExclusao: null },
+        data: { dataExclusao: agora, excluidoPor: usuarioId },
+      }),
+      prisma.contratos_financeiros.updateMany({
+        where: { anuncianteId: id, dataExclusao: null },
+        data: { dataExclusao: agora, excluidoPor: usuarioId },
+      }),
+      prisma.grupos_produtos.updateMany({
+        where: { anuncianteId: id, dataExclusao: null },
+        data: { dataExclusao: agora, excluidoPor: usuarioId },
+      }),
+      prisma.productos.updateMany({
+        where: { lojaId: id, dataExclusao: null },
+        data: { dataExclusao: agora, excluidoPor: usuarioId },
+      }),
+      prisma.equipes_de_venda.updateMany({
+        where: { anuncianteId: id, dataExclusao: null },
+        data: { dataExclusao: agora, excluidoPor: usuarioId },
+      }),
+    ]);
 
     res.json({
       success: true,
@@ -783,6 +847,7 @@ export const getAnunciantesByUsuario: RequestHandler = async (req, res) => {
     if (usuario.tipoUsuario === "adm") {
       console.log("[getAnunciantesByUsuario] 👑 Usuario é ADM, retornando todos os anunciantes");
       anunciantes = await prisma.anunciantes.findMany({
+        where: { dataExclusao: null },
         select: {
           id: true,
           nome: true,
@@ -823,6 +888,7 @@ export const getAnunciantesByUsuario: RequestHandler = async (req, res) => {
 
       anunciantes = await prisma.anunciantes.findMany({
         where: {
+          dataExclusao: null,
           usuarios_anunciantes: {
             some: {
               usuarioId: usuarioId,

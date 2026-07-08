@@ -17,10 +17,13 @@ const ProductoCreateSchema = z.object({
 // GET all productos
 export const getProductos: RequestHandler = async (req, res) => {
   try {
-    const { grupoId } = req.query;
+    const { grupoId, status } = req.query;
 
-    const where: any = {};
+    const where: any = { dataExclusao: null };
     if (grupoId) where.grupoId = parseInt(grupoId as string);
+    // status filter: "ativo" (default), "inativo", or "todos"
+    if (!status || status === "ativo") where.status = "ativo";
+    else if (status === "inativo") where.status = "inativo";
 
     const productos = await prisma.productos.findMany({
       where,
@@ -62,7 +65,7 @@ export const getProductoById: RequestHandler = async (req, res) => {
     const { id } = req.params;
 
     const producto = await prisma.productos.findUnique({
-      where: { id: parseInt(id) },
+      where: { id: parseInt(id), dataExclusao: null },
       include: {
         grupo: {
           include: {
@@ -100,7 +103,7 @@ export const createProducto: RequestHandler = async (req, res) => {
 
     // Verify that the grupo exists and get its lojaId (anuncianteId)
     const grupo = await prisma.grupos_produtos.findUnique({
-      where: { id: validatedData.grupoId },
+      where: { id: validatedData.grupoId, dataExclusao: null },
     });
 
     if (!grupo) {
@@ -115,6 +118,7 @@ export const createProducto: RequestHandler = async (req, res) => {
         ...validatedData,
         lojaId: grupo.anuncianteId,
         dataAtualizacao: new Date(),
+        criadoPor: req.userId ?? null,
       },
       include: {
         grupo: {
@@ -154,10 +158,11 @@ export const updateProducto: RequestHandler = async (req, res) => {
     const updateData = ProductoCreateSchema.partial().parse(req.body);
 
     const producto = await prisma.productos.update({
-      where: { id: parseInt(id) },
+      where: { id: parseInt(id), dataExclusao: null },
       data: {
         ...updateData,
         dataAtualizacao: new Date(),
+        atualizadoPor: req.userId ?? null,
       },
       include: {
         grupo: {
@@ -190,13 +195,35 @@ export const updateProducto: RequestHandler = async (req, res) => {
   }
 };
 
-// DELETE producto
+// DELETE producto — blocked if the product is already referenced anywhere (price table,
+// stock movement/entry, external link); the client should offer "desativar" instead.
 export const deleteProducto: RequestHandler = async (req, res) => {
   try {
-    const { id } = req.params;
+    const id = parseInt(req.params.id);
 
-    await prisma.productos.delete({
-      where: { id: parseInt(id) },
+    const producto = await prisma.productos.findUnique({ where: { id, dataExclusao: null } });
+    if (!producto) {
+      return res.status(404).json({ success: false, error: "Produto não encontrado" });
+    }
+
+    const [tabelaPreco, movimentoEstoque, produtoEmEstoque, linkExterno] = await Promise.all([
+      prisma.tabelas_preco.findFirst({ where: { productId: id } }),
+      prisma.movimentos_estoque.findFirst({ where: { productId: id } }),
+      prisma.produtos_em_estoque.findFirst({ where: { productId: id } }),
+      prisma.links_produtos_externos.findFirst({ where: { productId: id } }),
+    ]);
+
+    if (tabelaPreco || movimentoEstoque || produtoEmEstoque || linkExterno) {
+      return res.status(400).json({
+        success: false,
+        error: "Este produto já está em uso (tabela de preço, estoque ou link externo vinculado) e não pode ser excluído. Desative-o em vez de excluir.",
+        podeDesativar: true,
+      });
+    }
+
+    await prisma.productos.update({
+      where: { id },
+      data: { dataExclusao: new Date(), excluidoPor: req.userId ?? null },
     });
 
     res.json({
@@ -209,5 +236,27 @@ export const deleteProducto: RequestHandler = async (req, res) => {
       success: false,
       error: "Erro ao deletar produto",
     });
+  }
+};
+
+// PATCH producto status — ativo/inativo toggle (the "desativar em vez de excluir" path)
+export const atualizarStatusProducto: RequestHandler = async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const { status } = req.body;
+
+    if (!["ativo", "inativo"].includes(status)) {
+      return res.status(400).json({ success: false, error: "status deve ser 'ativo' ou 'inativo'" });
+    }
+
+    const producto = await prisma.productos.update({
+      where: { id, dataExclusao: null },
+      data: { status, atualizadoPor: req.userId ?? null },
+    });
+
+    res.json({ success: true, data: producto });
+  } catch (error) {
+    console.error("Error updating producto status:", error);
+    res.status(500).json({ success: false, error: "Erro ao atualizar status do produto" });
   }
 };

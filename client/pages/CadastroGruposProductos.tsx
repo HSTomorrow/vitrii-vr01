@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Plus, Trash2, Edit2 } from "lucide-react";
+import { Plus, Trash2, Edit2, Power } from "lucide-react";
 
 interface Loja {
   id: number;
@@ -16,6 +16,7 @@ interface GrupoDeProductos {
   anuncianteId: number;
   nome: string;
   descricao?: string;
+  status?: "ativo" | "inativo";
   anunciante?: Loja;
 }
 
@@ -23,6 +24,7 @@ export default function CadastroGruposProductos() {
   const { user } = useAuth();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [statusFilter, setStatusFilter] = useState<"ativo" | "inativo" | "todos">("ativo");
   const [formData, setFormData] = useState({
     anuncianteId: "",
     nome: "",
@@ -48,14 +50,14 @@ export default function CadastroGruposProductos() {
 
   // Fetch grupos with user context
   const { data: grupos, refetch } = useQuery<GrupoDeProductos[]>({
-    queryKey: ["grupos-produtos", user?.id],
+    queryKey: ["grupos-produtos", user?.id, statusFilter],
     queryFn: async () => {
       const headers: Record<string, string> = {};
       if (user?.id) {
         headers["x-user-id"] = user.id.toString();
       }
 
-      const response = await fetch("/api/grupos-productos", { headers });
+      const response = await fetch(`/api/grupos-productos?status=${statusFilter}`, { headers });
       if (!response.ok) throw new Error("Erro ao buscar grupos");
       const result = await response.json();
       return result.data || [];
@@ -119,8 +121,9 @@ export default function CadastroGruposProductos() {
       const response = await fetch(`/api/grupos-productos/${id}`, {
         method: "DELETE",
       });
-      if (!response.ok) throw new Error("Erro ao deletar grupo");
-      return response.json();
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Erro ao deletar grupo");
+      return result;
     },
     onSuccess: () => {
       toast.success("Grupo deletado com sucesso!");
@@ -131,6 +134,24 @@ export default function CadastroGruposProductos() {
         error instanceof Error ? error.message : "Erro ao deletar grupo",
       );
     },
+  });
+
+  // Toggle grupo status (ativo/inativo)
+  const statusGrupoMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: number; status: "ativo" | "inativo" }) => {
+      const response = await fetch(`/api/grupos-productos/${id}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      if (!response.ok) throw new Error("Erro ao atualizar status do grupo");
+      return response.json();
+    },
+    onSuccess: (_data, variables) => {
+      toast.success(variables.status === "ativo" ? "Grupo ativado!" : "Grupo desativado!");
+      refetch();
+    },
+    onError: () => toast.error("Erro ao atualizar status do grupo"),
   });
 
   const handleEdit = (grupo: GrupoDeProductos) => {
@@ -157,21 +178,32 @@ export default function CadastroGruposProductos() {
       <Header />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-wrap justify-between items-center gap-3 mb-8">
           <h1 className="text-3xl font-bold text-vitrii-text">
             Cadastro de Grupos de Produtos
           </h1>
-          <button
-            onClick={() => {
-              setIsFormOpen(!isFormOpen);
-              setEditingId(null);
-              setFormData({ anuncianteId: "", nome: "", descricao: "" });
-            }}
-            className="flex items-center gap-2 px-4 py-2 bg-vitrii-yellow text-vitrii-text rounded-lg hover:bg-vitrii-yellow-dark transition-colors font-semibold"
-          >
-            <Plus className="w-5 h-5" />
-            Novo Grupo
-          </button>
+          <div className="flex items-center gap-3">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value as "ativo" | "inativo" | "todos")}
+              className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+            >
+              <option value="ativo">Ativos</option>
+              <option value="inativo">Desativados</option>
+              <option value="todos">Todos</option>
+            </select>
+            <button
+              onClick={() => {
+                setIsFormOpen(!isFormOpen);
+                setEditingId(null);
+                setFormData({ anuncianteId: "", nome: "", descricao: "" });
+              }}
+              className="flex items-center gap-2 px-4 py-2 bg-vitrii-yellow text-vitrii-text rounded-lg hover:bg-vitrii-yellow-dark transition-colors font-semibold"
+            >
+              <Plus className="w-5 h-5" />
+              Novo Grupo
+            </button>
+          </div>
         </div>
 
         {/* Form */}
@@ -273,6 +305,9 @@ export default function CadastroGruposProductos() {
                     Descrição
                   </th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-vitrii-text whitespace-nowrap">
+                    Status
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-vitrii-text whitespace-nowrap">
                     Ações
                   </th>
                 </tr>
@@ -281,7 +316,7 @@ export default function CadastroGruposProductos() {
                 {!grupos || grupos.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={4}
+                      colSpan={5}
                       className="px-4 py-4 text-center text-gray-500"
                     >
                       Nenhum grupo cadastrado
@@ -299,7 +334,30 @@ export default function CadastroGruposProductos() {
                       <td className="px-4 py-4 text-vitrii-text text-sm">
                         {grupo.descricao || "-"}
                       </td>
+                      <td className="px-4 py-4 text-sm">
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                            grupo.status === "inativo"
+                              ? "bg-gray-100 text-gray-600"
+                              : "bg-vitrii-green/10 text-vitrii-green"
+                          }`}
+                        >
+                          {grupo.status === "inativo" ? "Inativo" : "Ativo"}
+                        </span>
+                      </td>
                       <td className="px-4 py-4 flex gap-2">
+                        <button
+                          onClick={() =>
+                            statusGrupoMutation.mutate({
+                              id: grupo.id,
+                              status: grupo.status === "inativo" ? "ativo" : "inativo",
+                            })
+                          }
+                          className="p-2 text-vitrii-text-secondary hover:bg-gray-100 rounded-lg transition-colors"
+                          title={grupo.status === "inativo" ? "Ativar" : "Desativar"}
+                        >
+                          <Power className="w-4 h-4" />
+                        </button>
                         <button
                           onClick={() => handleEdit(grupo)}
                           className="p-2 text-vitrii-blue hover:bg-blue-50 rounded-lg transition-colors"
@@ -351,8 +409,29 @@ export default function CadastroGruposProductos() {
                         <p className="text-xs text-vitrii-text-secondary mt-1">
                           {grupo.anunciante?.nome || "N/A"}
                         </p>
+                        <span
+                          className={`inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-semibold ${
+                            grupo.status === "inativo"
+                              ? "bg-gray-100 text-gray-600"
+                              : "bg-vitrii-green/10 text-vitrii-green"
+                          }`}
+                        >
+                          {grupo.status === "inativo" ? "Inativo" : "Ativo"}
+                        </span>
                       </div>
                       <div className="flex gap-1 flex-shrink-0">
+                        <button
+                          onClick={() =>
+                            statusGrupoMutation.mutate({
+                              id: grupo.id,
+                              status: grupo.status === "inativo" ? "ativo" : "inativo",
+                            })
+                          }
+                          className="p-2 text-vitrii-text-secondary hover:bg-gray-100 rounded-lg transition-colors"
+                          title={grupo.status === "inativo" ? "Ativar" : "Desativar"}
+                        >
+                          <Power className="w-4 h-4" />
+                        </button>
                         <button
                           onClick={() => handleEdit(grupo)}
                           className="p-2 text-vitrii-blue hover:bg-blue-50 rounded-lg transition-colors"

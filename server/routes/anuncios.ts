@@ -176,8 +176,8 @@ export const getAnuncios: RequestHandler = async (req, res) => {
       pageOffset,
     });
 
-    const where: any = { status: PUBLIC_LIST_DEFAULT_STATUS }; // Default: only active ads
-    const anuncianteWhere: any = { status: "Ativo" }; // Default: only active anunciantes
+    const where: any = { status: PUBLIC_LIST_DEFAULT_STATUS, dataExclusao: null }; // Default: only active ads
+    const anuncianteWhere: any = { status: "Ativo", dataExclusao: null }; // Default: only active anunciantes
 
     if (anuncianteId) where.anuncianteId = parseInt(anuncianteId as string);
     if (status) where.status = status;
@@ -327,7 +327,7 @@ export const getAnuncioById: RequestHandler = async (req, res) => {
     }
 
     const anuncio = await prisma.anuncios.findUnique({
-      where: { id: anuncioId },
+      where: { id: anuncioId, dataExclusao: null },
       include: {
         anunciantes: {
           select: {
@@ -471,7 +471,7 @@ export const createAnuncio: RequestHandler = async (req, res) => {
     if (validatedData.productId && validatedData.productId > 0) {
       // Verify that the product belongs to the anunciante
       const producto = await prisma.productos.findUnique({
-        where: { id: validatedData.productId },
+        where: { id: validatedData.productId, dataExclusao: null },
       });
 
       if (!producto || producto.lojaId !== validatedData.anuncianteId) {
@@ -629,6 +629,7 @@ export const createAnuncio: RequestHandler = async (req, res) => {
         tipo: anuncioTipo,
         dataFim,
         dataAtualizacao: new Date(),
+        criadoPor: validatedData.usuarioId,
       },
       include: {
         anunciantes: true,
@@ -715,7 +716,7 @@ export const updateAnuncio: RequestHandler = async (req, res) => {
 
     // Get current ad to track counter changes
     const currentAd = await prisma.anuncios.findUnique({
-      where: { id: adId },
+      where: { id: adId, dataExclusao: null },
       select: {
         status: true,
         destaque: true,
@@ -839,6 +840,7 @@ export const updateAnuncio: RequestHandler = async (req, res) => {
       data: {
         ...mappedData,
         dataAtualizacao: new Date(),
+        atualizadoPor: req.userId ?? null,
       },
       include: {
         anunciantes: true,
@@ -1119,7 +1121,7 @@ export const deleteAnuncio: RequestHandler = async (req, res) => {
 
     // Get ad details before deletion to check status
     const anuncio = await prisma.anuncios.findUnique({
-      where: { id: anuncioId },
+      where: { id: anuncioId, dataExclusao: null },
       select: {
         status: true,
         usuarioId: true,
@@ -1146,9 +1148,10 @@ export const deleteAnuncio: RequestHandler = async (req, res) => {
       });
     }
 
-    // Any not-yet-paid charge tied to this ad is disposable along with the ad itself.
-    await prisma.lancamentos_financeiros.deleteMany({
-      where: { anuncioId, status: { not: "pago" } },
+    // Any not-yet-paid charge tied to this ad is soft-deleted along with the ad itself.
+    await prisma.lancamentos_financeiros.updateMany({
+      where: { anuncioId, status: { not: "pago" }, dataExclusao: null },
+      data: { dataExclusao: new Date(), excluidoPor: req.userId ?? null },
     });
 
     // Get all associated gallery photos before deletion
@@ -1185,9 +1188,11 @@ export const deleteAnuncio: RequestHandler = async (req, res) => {
       }
     }
 
-    // Delete the ad (cascade will delete gallery photos from DB)
-    await prisma.anuncios.delete({
+    // Soft-delete the ad (gallery photo rows are left as-is — they aren't in the audit-trail
+    // scope and staying linked to a soft-deleted ad is harmless).
+    await prisma.anuncios.update({
       where: { id: anuncioId },
+      data: { dataExclusao: new Date(), excluidoPor: req.userId ?? null },
     });
 
     // Decrement active ads counter if ad was active
@@ -1315,6 +1320,8 @@ export const getProdutosParaAnuncio: RequestHandler = async (req, res) => {
     const productos = await prisma.productos.findMany({
       where: {
         lojaId: parseInt(anuncianteId),
+        dataExclusao: null,
+        status: "ativo",
       },
     });
 

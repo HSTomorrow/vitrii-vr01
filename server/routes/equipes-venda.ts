@@ -40,8 +40,8 @@ export const getEquipes: RequestHandler = async (req, res) => {
     const { anuncianteId } = req.query;
 
     const where = anuncianteId
-      ? { anuncianteId: parseInt(anuncianteId as string) }
-      : {};
+      ? { anuncianteId: parseInt(anuncianteId as string), dataExclusao: null }
+      : { dataExclusao: null };
 
     const equipes = await prisma.equipes_de_venda.findMany({
       where,
@@ -98,7 +98,7 @@ export const getEquipeById: RequestHandler = async (req, res) => {
     const usuarioId = req.userId;
 
     const equipe = await prisma.equipes_de_venda.findUnique({
-      where: { id: parseInt(id) },
+      where: { id: parseInt(id), dataExclusao: null },
       include: {
         anunciantes: {
           select: {
@@ -179,7 +179,7 @@ export const createEquipe: RequestHandler = async (req, res) => {
 
     // Verify anunciante exists
     const anunciante = await prisma.anunciantes.findUnique({
-      where: { id: body.anuncianteId },
+      where: { id: body.anuncianteId, dataExclusao: null },
     });
 
     if (!anunciante) {
@@ -219,6 +219,7 @@ export const createEquipe: RequestHandler = async (req, res) => {
         anuncianteId: body.anuncianteId,
         nome: body.nome,
         descricao: body.descricao,
+        criadoPor: usuarioId ?? null,
       },
       include: {
         membros_equipe: {
@@ -276,7 +277,7 @@ export const updateEquipe: RequestHandler = async (req, res) => {
     const body = EquipeUpdateSchema.parse(req.body);
 
     const equipe = await prisma.equipes_de_venda.findUnique({
-      where: { id: parseInt(id) },
+      where: { id: parseInt(id), dataExclusao: null },
     });
 
     if (!equipe) {
@@ -313,7 +314,7 @@ export const updateEquipe: RequestHandler = async (req, res) => {
 
     const updated = await prisma.equipes_de_venda.update({
       where: { id: parseInt(id) },
-      data: body,
+      data: { ...body, atualizadoPor: usuarioId ?? null },
       include: {
         membros_equipe: {
           include: {
@@ -366,9 +367,10 @@ export const updateEquipe: RequestHandler = async (req, res) => {
 export const deleteEquipe: RequestHandler = async (req, res) => {
   try {
     const { id } = req.params;
+    const usuarioId = req.userId;
 
     const equipe = await prisma.equipes_de_venda.findUnique({
-      where: { id: parseInt(id) },
+      where: { id: parseInt(id), dataExclusao: null },
     });
 
     if (!equipe) {
@@ -378,8 +380,37 @@ export const deleteEquipe: RequestHandler = async (req, res) => {
       });
     }
 
-    await prisma.equipes_de_venda.delete({
+    // Check permissions - allow if user is admin or owner of the anunciante (this route had
+    // no access check at all before; needed now anyway since excluidoPor requires a trusted
+    // req.userId).
+    if (usuarioId) {
+      const usuario = await prisma.usracessos.findUnique({
+        where: { id: usuarioId },
+        select: { tipoUsuario: true },
+      });
+
+      if (usuario?.tipoUsuario !== "adm") {
+        const hasAccess = await prisma.usuarios_anunciantes.findFirst({
+          where: {
+            usuarioId: usuarioId,
+            anuncianteId: equipe.anuncianteId,
+          },
+        });
+
+        if (!hasAccess) {
+          return res.status(403).json({
+            success: false,
+            error: "Você não tem permissão para excluir esta equipe",
+          });
+        }
+      }
+    } else {
+      return res.status(401).json({ success: false, error: "Usuário não autenticado" });
+    }
+
+    await prisma.equipes_de_venda.update({
       where: { id: parseInt(id) },
+      data: { dataExclusao: new Date(), excluidoPor: usuarioId },
     });
 
     res.json({
@@ -417,7 +448,7 @@ export const adicionarMembro: RequestHandler = async (req, res) => {
     }
 
     const equipe = await prisma.equipes_de_venda.findUnique({
-      where: { id: parseInt(id) },
+      where: { id: parseInt(id), dataExclusao: null },
     });
 
     if (!equipe) {
@@ -668,7 +699,7 @@ export const getUsuariosDisponiveis: RequestHandler = async (req, res) => {
     const { id } = req.params;
 
     const equipe = await prisma.equipes_de_venda.findUnique({
-      where: { id: parseInt(id) },
+      where: { id: parseInt(id), dataExclusao: null },
     });
 
     if (!equipe) {

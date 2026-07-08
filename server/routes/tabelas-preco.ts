@@ -91,7 +91,7 @@ export const createTabela: RequestHandler = async (req, res) => {
 
     // Verify that the product exists and belongs to a grupo in the specified anunciante
     const producto = await prisma.productos.findUnique({
-      where: { id: validatedData.productId },
+      where: { id: validatedData.productId, dataExclusao: null },
       include: {
         grupo: true,
       },

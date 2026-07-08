@@ -60,6 +60,7 @@ export const getEventosByAnunciante: RequestHandler = async (req, res) => {
     const eventos = await prisma.eventos_agenda_anunciante.findMany({
       where: {
         anuncianteId: anuncianteId_num,
+        dataExclusao: null,
       },
       include: {
         permissoes: {
@@ -160,6 +161,7 @@ export const getEventosVisivelsPara: RequestHandler = async (req, res) => {
       where: {
         anuncianteId: anuncianteId_num,
         privacidade: "publico",
+        dataExclusao: null,
       },
       select: {
         id: true,
@@ -180,6 +182,7 @@ export const getEventosVisivelsPara: RequestHandler = async (req, res) => {
         where: {
           anuncianteId: anuncianteId_num,
           privacidade: "privado_usuarios",
+          dataExclusao: null,
         },
         select: {
           id: true,
@@ -215,6 +218,7 @@ export const getEventosVisivelsPara: RequestHandler = async (req, res) => {
       where: {
         anuncianteId: anuncianteId_num,
         privacidade: "privado_usuarios",
+        dataExclusao: null,
         permissoes: {
           some: {
             usuarioId: userId,
@@ -240,6 +244,7 @@ export const getEventosVisivelsPara: RequestHandler = async (req, res) => {
       where: {
         anuncianteId: anuncianteId_num,
         privacidade: "privado_usuarios",
+        dataExclusao: null,
         permissoes: {
           none: {
             usuarioId: userId,
@@ -320,7 +325,7 @@ export const createEvento: RequestHandler = async (req, res) => {
     let validatedAnuncioId: number | null = null;
     if (anuncioId) {
       const anuncio = await prisma.anuncios.findUnique({
-        where: { id: parseInt(anuncioId) },
+        where: { id: parseInt(anuncioId), dataExclusao: null },
         select: { anuncianteId: true },
       });
       if (!anuncio || anuncio.anuncianteId !== parseInt(anuncianteId)) {
@@ -348,6 +353,7 @@ export const createEvento: RequestHandler = async (req, res) => {
         privacidade: privacidade || "privado",
         cor: cor || "#3B82F6",
         valor: valor ? parseFloat(valor) : null,
+        criadoPor: userId,
       },
       include: {
         permissoes: {
@@ -426,7 +432,7 @@ export const updateEvento: RequestHandler = async (req, res) => {
 
     // Get event and verify ownership
     const evento = await prisma.eventos_agenda_anunciante.findUnique({
-      where: { id: eventoId },
+      where: { id: eventoId, dataExclusao: null },
     });
 
     if (!evento) {
@@ -472,7 +478,7 @@ export const updateEvento: RequestHandler = async (req, res) => {
         novoAnuncioId = null;
       } else {
         const anuncio = await prisma.anuncios.findUnique({
-          where: { id: parseInt(anuncioId) },
+          where: { id: parseInt(anuncioId), dataExclusao: null },
           select: { anuncianteId: true },
         });
         if (!anuncio || anuncio.anuncianteId !== evento.anuncianteId) {
@@ -494,6 +500,7 @@ export const updateEvento: RequestHandler = async (req, res) => {
         cor: cor || evento.cor,
         valor: valor !== undefined ? (valor ? parseFloat(valor) : null) : evento.valor,
         anuncioId: novoAnuncioId,
+        atualizadoPor: userId,
       },
       include: {
         permissoes: {
@@ -553,7 +560,7 @@ export const deleteEvento: RequestHandler = async (req, res) => {
 
     // Get event and verify ownership
     const evento = await prisma.eventos_agenda_anunciante.findUnique({
-      where: { id: eventoId },
+      where: { id: eventoId, dataExclusao: null },
     });
 
     if (!evento) {
@@ -594,14 +601,17 @@ export const deleteEvento: RequestHandler = async (req, res) => {
       });
     }
 
-    // Any not-yet-paid charge is disposable along with the event itself.
+    // Soft-delete: any not-yet-paid charge is marked excluded along with the event itself,
+    // instead of hard-deleted, so both remain in the audit trail.
+    const agora = new Date();
     await prisma.$transaction([
-      prisma.lancamentos_financeiros.deleteMany({
-        where: { eventoId },
+      prisma.lancamentos_financeiros.updateMany({
+        where: { eventoId, dataExclusao: null },
+        data: { dataExclusao: agora, excluidoPor: userId },
       }),
-      // Delete event (permissões são deletadas automaticamente por CASCADE)
-      prisma.eventos_agenda_anunciante.delete({
+      prisma.eventos_agenda_anunciante.update({
         where: { id: eventoId },
+        data: { dataExclusao: agora, excluidoPor: userId },
       }),
     ]);
 
@@ -626,7 +636,7 @@ export const addPermissao: RequestHandler = async (req, res) => {
 
     // Get event and verify ownership
     const evento = await prisma.eventos_agenda_anunciante.findUnique({
-      where: { id: eventoId },
+      where: { id: eventoId, dataExclusao: null },
     });
 
     if (!evento) {
@@ -679,7 +689,7 @@ export const removePermissao: RequestHandler = async (req, res) => {
 
     // Get event and verify ownership
     const evento = await prisma.eventos_agenda_anunciante.findUnique({
-      where: { id: eventoId },
+      where: { id: eventoId, dataExclusao: null },
     });
 
     if (!evento) {
@@ -728,7 +738,7 @@ export const getEventoUsers: RequestHandler = async (req, res) => {
 
     // Get event
     const evento = await prisma.eventos_agenda_anunciante.findUnique({
-      where: { id: eventoId },
+      where: { id: eventoId, dataExclusao: null },
     });
 
     if (!evento) {
@@ -834,7 +844,7 @@ export const addUserToEvento: RequestHandler = async (req, res) => {
 
     // Get event
     const evento = await prisma.eventos_agenda_anunciante.findUnique({
-      where: { id: eventoId },
+      where: { id: eventoId, dataExclusao: null },
     });
 
     if (!evento) {
@@ -934,7 +944,7 @@ export const createEventoVisitante: RequestHandler = async (req, res) => {
 
     // Check if announcer exists
     const anunciante = await prisma.anunciantes.findUnique({
-      where: { id: parseInt(anuncianteId) },
+      where: { id: parseInt(anuncianteId), dataExclusao: null },
     });
 
     if (!anunciante) {
@@ -952,6 +962,7 @@ export const createEventoVisitante: RequestHandler = async (req, res) => {
         privacidade: "privado_usuarios", // Restrict to creator, admin, and announcer
         cor: "#3B82F6",
         status: "pendente", // External users create pending events
+        criadoPor: userId || null,
       },
       include: {
         permissoes: {
@@ -1079,7 +1090,7 @@ export const canUserEditEvento: RequestHandler = async (req, res) => {
 
     // Get event
     const evento = await prisma.eventos_agenda_anunciante.findUnique({
-      where: { id: eventoId_num },
+      where: { id: eventoId_num, dataExclusao: null },
     });
 
     if (!evento) {
@@ -1148,7 +1159,7 @@ export const getAgendaPrivacyStatus: RequestHandler = async (req, res) => {
 
     // Determine agenda privacy status based on events
     const eventos = await prisma.eventos_agenda_anunciante.findMany({
-      where: { anuncianteId: anuncianteId_num },
+      where: { anuncianteId: anuncianteId_num, dataExclusao: null },
       select: {
         privacidade: true,
         status: true,
@@ -1222,7 +1233,7 @@ export const obterEventoICS: RequestHandler = async (req, res) => {
     const id = parseInt(req.params.id as string);
     const userId = (req as any).userId;
 
-    const evento = await prisma.eventos_agenda_anunciante.findUnique({ where: { id } });
+    const evento = await prisma.eventos_agenda_anunciante.findUnique({ where: { id, dataExclusao: null } });
     if (!evento) return res.status(404).json({ error: "Evento não encontrado" });
 
     const membership = await prisma.usuarios_anunciantes.findFirst({

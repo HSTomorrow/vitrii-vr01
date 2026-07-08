@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Plus, Trash2, Edit2, Palette } from "lucide-react";
+import { Plus, Trash2, Edit2, Palette, Power } from "lucide-react";
 import Pagination from "@/components/Pagination";
 
 interface Loja {
@@ -25,6 +25,7 @@ interface Producto {
   nome: string;
   descricao?: string;
   sku?: string;
+  status?: "ativo" | "inativo";
   grupo?: GrupoDeProductos;
 }
 
@@ -35,6 +36,7 @@ export default function CadastroProdutos() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [selectedLojaId, setSelectedLojaId] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState<"ativo" | "inativo" | "todos">("ativo");
   const ITEMS_PER_PAGE = 20;
   const [formData, setFormData] = useState({
     grupoId: "",
@@ -84,14 +86,14 @@ export default function CadastroProdutos() {
 
   // Fetch produtos
   const { data: productos, refetch } = useQuery<Producto[]>({
-    queryKey: ["productos", user?.id],
+    queryKey: ["productos", user?.id, statusFilter],
     queryFn: async () => {
       const headers: Record<string, string> = {};
       if (user?.id) {
         headers["x-user-id"] = user.id.toString();
       }
 
-      const response = await fetch("/api/productos", { headers });
+      const response = await fetch(`/api/productos?status=${statusFilter}`, { headers });
       if (!response.ok) throw new Error("Erro ao buscar produtos");
       const result = await response.json();
       return result.data || [];
@@ -157,8 +159,9 @@ export default function CadastroProdutos() {
       const response = await fetch(`/api/productos/${id}`, {
         method: "DELETE",
       });
-      if (!response.ok) throw new Error("Erro ao deletar produto");
-      return response.json();
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error || "Erro ao deletar produto");
+      return result;
     },
     onSuccess: () => {
       toast.success("Produto deletado com sucesso!");
@@ -169,6 +172,24 @@ export default function CadastroProdutos() {
         error instanceof Error ? error.message : "Erro ao deletar produto",
       );
     },
+  });
+
+  // Toggle producto status (ativo/inativo)
+  const statusProductoMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: number; status: "ativo" | "inativo" }) => {
+      const response = await fetch(`/api/productos/${id}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      if (!response.ok) throw new Error("Erro ao atualizar status do produto");
+      return response.json();
+    },
+    onSuccess: (_data, variables) => {
+      toast.success(variables.status === "ativo" ? "Produto ativado!" : "Produto desativado!");
+      refetch();
+    },
+    onError: () => toast.error("Erro ao atualizar status do produto"),
   });
 
   const handleEdit = (producto: Producto) => {
@@ -202,11 +223,24 @@ export default function CadastroProdutos() {
       <Header />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex flex-wrap justify-between items-center gap-3 mb-8">
           <h1 className="text-3xl font-bold text-vitrii-text">
             Cadastro de Produtos
           </h1>
-          <button
+          <div className="flex items-center gap-3">
+            <select
+              value={statusFilter}
+              onChange={(e) => {
+                setStatusFilter(e.target.value as "ativo" | "inativo" | "todos");
+                setCurrentPage(1);
+              }}
+              className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+            >
+              <option value="ativo">Ativos</option>
+              <option value="inativo">Desativados</option>
+              <option value="todos">Todos</option>
+            </select>
+            <button
             onClick={() => {
               setIsFormOpen(!isFormOpen);
               setEditingId(null);
@@ -222,7 +256,8 @@ export default function CadastroProdutos() {
           >
             <Plus className="w-5 h-5" />
             Novo Produto
-          </button>
+            </button>
+          </div>
         </div>
 
         {/* Form */}
@@ -386,6 +421,9 @@ export default function CadastroProdutos() {
                     Descrição
                   </th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-vitrii-text whitespace-nowrap">
+                    Status
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-vitrii-text whitespace-nowrap">
                     Ações
                   </th>
                 </tr>
@@ -394,7 +432,7 @@ export default function CadastroProdutos() {
                 {!productos || productos.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={5}
+                      colSpan={6}
                       className="px-4 py-4 text-center text-gray-500"
                     >
                       Nenhum produto cadastrado
@@ -415,7 +453,30 @@ export default function CadastroProdutos() {
                       <td className="px-4 py-4 text-vitrii-text text-sm">
                         {producto.descricao || "-"}
                       </td>
+                      <td className="px-4 py-4 text-sm">
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                            producto.status === "inativo"
+                              ? "bg-gray-100 text-gray-600"
+                              : "bg-vitrii-green/10 text-vitrii-green"
+                          }`}
+                        >
+                          {producto.status === "inativo" ? "Inativo" : "Ativo"}
+                        </span>
+                      </td>
                       <td className="px-4 py-4 flex gap-2">
+                        <button
+                          onClick={() =>
+                            statusProductoMutation.mutate({
+                              id: producto.id,
+                              status: producto.status === "inativo" ? "ativo" : "inativo",
+                            })
+                          }
+                          className="p-2 text-vitrii-text-secondary hover:bg-gray-100 rounded-lg transition-colors"
+                          title={producto.status === "inativo" ? "Ativar" : "Desativar"}
+                        >
+                          <Power className="w-4 h-4" />
+                        </button>
                         <button
                           onClick={() =>
                             navigate(`/cadastros/variantes/${producto.id}`)
@@ -476,8 +537,29 @@ export default function CadastroProdutos() {
                         <p className="text-xs text-vitrii-text-secondary mt-1">
                           {producto.grupo?.nome || "N/A"}
                         </p>
+                        <span
+                          className={`inline-block mt-1 px-2 py-0.5 rounded-full text-xs font-semibold ${
+                            producto.status === "inativo"
+                              ? "bg-gray-100 text-gray-600"
+                              : "bg-vitrii-green/10 text-vitrii-green"
+                          }`}
+                        >
+                          {producto.status === "inativo" ? "Inativo" : "Ativo"}
+                        </span>
                       </div>
                       <div className="flex gap-1 flex-shrink-0">
+                        <button
+                          onClick={() =>
+                            statusProductoMutation.mutate({
+                              id: producto.id,
+                              status: producto.status === "inativo" ? "ativo" : "inativo",
+                            })
+                          }
+                          className="p-2 text-vitrii-text-secondary hover:bg-gray-100 rounded-lg transition-colors"
+                          title={producto.status === "inativo" ? "Ativar" : "Desativar"}
+                        >
+                          <Power className="w-4 h-4" />
+                        </button>
                         <button
                           onClick={() =>
                             navigate(`/cadastros/variantes/${producto.id}`)

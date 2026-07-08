@@ -67,12 +67,17 @@ export const getContatosByUsuario: RequestHandler = async (req, res) => {
     const isAdmin = usuario.tipoUsuario === "adm";
 
     // Build filter: admin sees all, regular users see only their own
-    const contatosFilter: any = {};
+    const contatosFilter: any = { dataExclusao: null };
 
     if (!isAdmin) {
       // Regular users only see contacts they created
       contatosFilter.usuarioId = usuarioId;
     }
+
+    // status filter: "ativo" (default), "inativo", or "todos"
+    const { status } = req.query;
+    if (!status || status === "ativo") contatosFilter.status = "ativo";
+    else if (status === "inativo") contatosFilter.status = "inativo";
 
     const contatos = await prisma.contatos.findMany({
       where: contatosFilter,
@@ -154,7 +159,7 @@ export const createContato: RequestHandler = async (req, res) => {
     if (validatedData.anuncianteId) {
       console.log("[createContato] Verificando anunciante:", validatedData.anuncianteId);
       const anunciante = await prisma.anunciantes.findUnique({
-        where: { id: validatedData.anuncianteId },
+        where: { id: validatedData.anuncianteId, dataExclusao: null },
         select: { id: true },
       });
 
@@ -182,6 +187,7 @@ export const createContato: RequestHandler = async (req, res) => {
         tipoContato: validatedData.tipoContato,
         observacoes: validatedData.observacoes || null,
         imagem: validatedData.imagem || null,
+        criadoPor: usuarioId,
       },
       include: {
         usuario: {
@@ -289,7 +295,7 @@ export const updateContato: RequestHandler = async (req, res) => {
 
     // Get the contact to verify ownership
     const contato = await prisma.contatos.findUnique({
-      where: { id: parseInt(contatoId) },
+      where: { id: parseInt(contatoId), dataExclusao: null },
       select: {
         usuarioId: true,
         anuncianteId: true,
@@ -322,7 +328,7 @@ export const updateContato: RequestHandler = async (req, res) => {
     // If anuncianteId is provided, verify it exists
     if (validatedData.anuncianteId) {
       const anunciante = await prisma.anunciantes.findUnique({
-        where: { id: validatedData.anuncianteId },
+        where: { id: validatedData.anuncianteId, dataExclusao: null },
         select: { id: true },
       });
 
@@ -352,6 +358,7 @@ export const updateContato: RequestHandler = async (req, res) => {
         ...(validatedData.anuncianteId !== undefined && {
           anuncianteId: validatedData.anuncianteId,
         }),
+        atualizadoPor: usuarioId,
       },
       include: {
         usuario: {
@@ -407,7 +414,7 @@ export const deleteContato: RequestHandler = async (req, res) => {
 
     // Get the contact to verify ownership
     const contato = await prisma.contatos.findUnique({
-      where: { id: parseInt(contatoId) },
+      where: { id: parseInt(contatoId), dataExclusao: null },
       select: {
         usuarioId: true,
       },
@@ -436,8 +443,26 @@ export const deleteContato: RequestHandler = async (req, res) => {
       });
     }
 
-    await prisma.contatos.delete({
-      where: { id: parseInt(contatoId) },
+    // Blocked if already in use (contract, financial charge, or agenda event linked); the
+    // client should offer "desativar" instead.
+    const contatoId_num = parseInt(contatoId);
+    const [contrato, lancamento, eventoVinculado] = await Promise.all([
+      prisma.contratos_financeiros.findFirst({ where: { contatoId: contatoId_num, dataExclusao: null } }),
+      prisma.lancamentos_financeiros.findFirst({ where: { contatoId: contatoId_num, dataExclusao: null } }),
+      prisma.eventos_contatos.findFirst({ where: { contatoId: contatoId_num } }),
+    ]);
+
+    if (contrato || lancamento || eventoVinculado) {
+      return res.status(400).json({
+        success: false,
+        error: "Este contato já está em uso (contrato, lançamento financeiro ou compromisso de agenda vinculado) e não pode ser excluído. Desative-o em vez de excluir.",
+        podeDesativar: true,
+      });
+    }
+
+    await prisma.contatos.update({
+      where: { id: contatoId_num },
+      data: { dataExclusao: new Date(), excluidoPor: usuarioId },
     });
 
     res.json({
@@ -470,6 +495,7 @@ export const checkDuplicateContato: RequestHandler = async (req, res) => {
       const existingByEmail = await prisma.contatos.findFirst({
         where: {
           email,
+          dataExclusao: null,
         },
         select: {
           id: true,
@@ -494,6 +520,7 @@ export const checkDuplicateContato: RequestHandler = async (req, res) => {
       const existingByCelular = await prisma.contatos.findFirst({
         where: {
           celular,
+          dataExclusao: null,
         },
         select: {
           id: true,

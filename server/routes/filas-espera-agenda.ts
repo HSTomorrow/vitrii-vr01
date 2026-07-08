@@ -316,6 +316,7 @@ export const aprovarFilaEspera: RequestHandler = async (req, res) => {
         dataFim: fila.dataFim,
         privacidade: "privado_usuarios",
         status: "pendente",
+        criadoPor: userId,
       },
     });
 
@@ -533,7 +534,7 @@ export const atualizarStatusEvento: RequestHandler = async (req, res) => {
 
     // Get event
     const evento = await prisma.eventos_agenda_anunciante.findUnique({
-      where: { id: eventoId_num },
+      where: { id: eventoId_num, dataExclusao: null },
     });
 
     if (!evento) {
@@ -559,6 +560,7 @@ export const atualizarStatusEvento: RequestHandler = async (req, res) => {
       where: { id: eventoId_num },
       data: {
         status: status,
+        atualizadoPor: userId,
       },
     });
 
@@ -597,12 +599,30 @@ export const deletarAgenda: RequestHandler = async (req, res) => {
         .json({ error: "Acesso negado. Você não é responsável por esta agenda." });
     }
 
-    // Delete all events for this announcer
-    await prisma.eventos_agenda_anunciante.deleteMany({
-      where: {
-        anuncianteId: anuncianteId_num,
-      },
+    // Same guard deleteEvento uses: a paid Financeiro charge must survive, so block the
+    // whole bulk delete if any event in this agenda has one linked.
+    const lancamentoPago = await prisma.lancamentos_financeiros.findFirst({
+      where: { evento: { anuncianteId: anuncianteId_num, dataExclusao: null }, status: "pago" },
     });
+    if (lancamentoPago) {
+      return res.status(409).json({
+        error: "Um ou mais eventos desta agenda possuem lançamento pago vinculado. Marque-os como inativo em vez de excluir.",
+      });
+    }
+
+    // Soft-delete: events and their not-yet-paid charges are marked excluded, not
+    // hard-deleted, so both remain in the audit trail (same as deleteEvento).
+    const agora = new Date();
+    await prisma.$transaction([
+      prisma.lancamentos_financeiros.updateMany({
+        where: { evento: { anuncianteId: anuncianteId_num }, dataExclusao: null },
+        data: { dataExclusao: agora, excluidoPor: userId },
+      }),
+      prisma.eventos_agenda_anunciante.updateMany({
+        where: { anuncianteId: anuncianteId_num, dataExclusao: null },
+        data: { dataExclusao: agora, excluidoPor: userId },
+      }),
+    ]);
 
     // Delete all waiting queues for this announcer
     await prisma.filas_espera_agenda.deleteMany({

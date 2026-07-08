@@ -129,15 +129,16 @@ export default function CadastroContatos() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM_DATA);
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"ativo" | "inativo" | "todos">("ativo");
   const [currentPage, setCurrentPage] = useState(1);
   const [showContactDetails, setShowContactDetails] = useState(false);
   const [selectedContatoForDetails, setSelectedContatoForDetails] = useState<Contato | null>(null);
   const ITEMS_PER_PAGE = 20;
 
-  // Reset to page 1 when search term changes
+  // Reset to page 1 when search term or status filter changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm]);
+  }, [searchTerm, statusFilter]);
 
   // Debug: Log when user changes
   useEffect(() => {
@@ -438,12 +439,15 @@ export default function CadastroContatos() {
   };
 
   const filteredContatos =
-    contatosData?.filter(
-      (contato: Contato) =>
+    contatosData?.filter((contato: Contato) => {
+      const matchesSearch =
         contato.nome.toLowerCase().includes(searchTerm.toLowerCase()) ||
         contato.celular.includes(searchTerm) ||
-        (contato.email?.toLowerCase().includes(searchTerm.toLowerCase()) || false)
-    ) || [];
+        (contato.email?.toLowerCase().includes(searchTerm.toLowerCase()) || false);
+      if (!matchesSearch) return false;
+      if (statusFilter === "todos") return true;
+      return contato.status === statusFilter;
+    }) || [];
 
   // Pagination logic
   const totalPages = Math.ceil(filteredContatos.length / ITEMS_PER_PAGE);
@@ -802,17 +806,28 @@ export default function CadastroContatos() {
 
           {/* Contatos List */}
           <div className="space-y-4">
-            <div className="flex items-center justify-between">
+            <div className="flex flex-wrap items-center justify-between gap-3">
               <h2 className="text-lg font-semibold text-vitrii-text">
                 Meus Contatos ({filteredContatos.length})
               </h2>
-              <input
-                type="text"
-                placeholder="Buscar por nome, celular ou email..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
-              />
+              <div className="flex items-center gap-3">
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value as "ativo" | "inativo" | "todos")}
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+                >
+                  <option value="ativo">Ativos</option>
+                  <option value="inativo">Desativados</option>
+                  <option value="todos">Todos</option>
+                </select>
+                <input
+                  type="text"
+                  placeholder="Buscar por nome, celular ou email..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+                />
+              </div>
             </div>
 
             {filteredContatos.length === 0 ? (

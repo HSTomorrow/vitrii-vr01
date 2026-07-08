@@ -42,6 +42,7 @@ import {
   createGrupo,
   updateGrupo,
   deleteGrupo,
+  atualizarStatusGrupo,
 } from "./routes/grupos-productos";
 import {
   getProductos,
@@ -49,6 +50,7 @@ import {
   createProducto,
   updateProducto,
   deleteProducto,
+  atualizarStatusProducto,
 } from "./routes/productos";
 import {
   getTabelas,
@@ -1014,6 +1016,7 @@ export function createServer() {
   app.post("/api/grupos-productos", extractUserId, createGrupo);
   app.put("/api/grupos-productos/:id", extractUserId, updateGrupo);
   app.delete("/api/grupos-productos/:id", extractUserId, deleteGrupo);
+  app.patch("/api/grupos-productos/:id/status", extractUserId, atualizarStatusGrupo);
 
   // Productos routes
   app.get("/api/productos", getProductos);
@@ -1021,6 +1024,7 @@ export function createServer() {
   app.post("/api/productos", extractUserId, createProducto);
   app.put("/api/productos/:id", extractUserId, updateProducto);
   app.delete("/api/productos/:id", extractUserId, deleteProducto);
+  app.patch("/api/productos/:id/status", extractUserId, atualizarStatusProducto);
 
   // Tabelas de Preço routes
   app.get("/api/tabelas-preco", getTabelas);

@@ -8,6 +8,7 @@ export async function runContatosUsuariosSync(): Promise<{ linkedCount: number }
   // Get all contatos with email or celular
   const contatos = await prisma.contatos.findMany({
     where: {
+      dataExclusao: null,
       OR: [
         { email: { not: null } },
         { celular: { not: null } }

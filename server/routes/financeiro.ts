@@ -47,7 +47,7 @@ export const listarContratos: RequestHandler = async (req, res) => {
     }
 
     const { titulo, diaVencimentoDe, diaVencimentoAte } = req.query;
-    const where: any = { anuncianteId };
+    const where: any = { anuncianteId, dataExclusao: null };
     if (titulo) where.titulo = { contains: titulo as string, mode: "insensitive" };
     if (diaVencimentoDe || diaVencimentoAte) {
       where.diaVencimento = {};
@@ -105,6 +105,7 @@ export const criarContrato: RequestHandler = async (req, res) => {
         diaVencimento: parseInt(diaVencimento),
         dataInicio: new Date(dataInicio),
         status: "ativo",
+        criadoPor: req.userId!,
       },
       include: { contato: { select: { id: true, nome: true } } },
     });
@@ -121,7 +122,7 @@ export const atualizarContrato: RequestHandler = async (req, res) => {
     const id = parseInt(req.params.id as string);
     const { titulo, descricao, tipoContrato, diaVencimento, dataFim } = req.body;
 
-    const contrato = await prisma.contratos_financeiros.findUnique({ where: { id } });
+    const contrato = await prisma.contratos_financeiros.findUnique({ where: { id, dataExclusao: null } });
     if (!contrato) return res.status(404).json({ error: "Contrato não encontrado" });
 
     if (!(await podeGerenciarAnunciante(req.userId!, req.userType, contrato.anuncianteId))) {
@@ -140,6 +141,7 @@ export const atualizarContrato: RequestHandler = async (req, res) => {
         tipoContrato: tipoContrato ?? contrato.tipoContrato,
         diaVencimento: diaVencimento ? parseInt(diaVencimento) : contrato.diaVencimento,
         dataFim: dataFim !== undefined ? (dataFim ? new Date(dataFim) : null) : contrato.dataFim,
+        atualizadoPor: req.userId!,
       },
     });
 
@@ -159,7 +161,7 @@ export const atualizarStatusContrato: RequestHandler = async (req, res) => {
       return res.status(400).json({ error: "Status inválido" });
     }
 
-    const contrato = await prisma.contratos_financeiros.findUnique({ where: { id } });
+    const contrato = await prisma.contratos_financeiros.findUnique({ where: { id, dataExclusao: null } });
     if (!contrato) return res.status(404).json({ error: "Contrato não encontrado" });
 
     if (!(await podeGerenciarAnunciante(req.userId!, req.userType, contrato.anuncianteId))) {
@@ -168,7 +170,7 @@ export const atualizarStatusContrato: RequestHandler = async (req, res) => {
 
     const atualizado = await prisma.contratos_financeiros.update({
       where: { id },
-      data: { status },
+      data: { status, atualizadoPor: req.userId! },
     });
 
     res.json({ success: true, data: atualizado });
@@ -187,7 +189,7 @@ export const criarReajuste: RequestHandler = async (req, res) => {
       return res.status(400).json({ error: "valorNovo é obrigatório" });
     }
 
-    const contrato = await prisma.contratos_financeiros.findUnique({ where: { id: contratoId } });
+    const contrato = await prisma.contratos_financeiros.findUnique({ where: { id: contratoId, dataExclusao: null } });
     if (!contrato) return res.status(404).json({ error: "Contrato não encontrado" });
 
     if (!(await podeGerenciarAnunciante(req.userId!, req.userType, contrato.anuncianteId))) {
@@ -207,7 +209,7 @@ export const criarReajuste: RequestHandler = async (req, res) => {
       }),
       prisma.contratos_financeiros.update({
         where: { id: contratoId },
-        data: { valorMensal: parseFloat(valorNovo) },
+        data: { valorMensal: parseFloat(valorNovo), atualizadoPor: req.userId! },
       }),
     ]);
 
@@ -227,7 +229,7 @@ export const anexarDocumentoContrato: RequestHandler = async (req, res) => {
       return res.status(400).json({ error: "nome e url são obrigatórios" });
     }
 
-    const contrato = await prisma.contratos_financeiros.findUnique({ where: { id: contratoId } });
+    const contrato = await prisma.contratos_financeiros.findUnique({ where: { id: contratoId, dataExclusao: null } });
     if (!contrato) return res.status(404).json({ error: "Contrato não encontrado" });
 
     if (!(await podeGerenciarAnunciante(req.userId!, req.userType, contrato.anuncianteId))) {
@@ -261,7 +263,7 @@ export const listarLancamentos: RequestHandler = async (req, res) => {
     }
 
     const { status, origem, competencia, contatoId } = req.query;
-    const where: any = { anuncianteId };
+    const where: any = { anuncianteId, dataExclusao: null };
     if (status) where.status = status;
     if (origem) where.origem = origem;
     // Only recurring (contrato/mensalidade) lançamentos ever carry a competencia value —
@@ -291,7 +293,7 @@ export const obterLancamentoDoEvento: RequestHandler = async (req, res) => {
   try {
     const eventoId = parseInt(req.params.eventoId as string);
 
-    const evento = await prisma.eventos_agenda_anunciante.findUnique({ where: { id: eventoId } });
+    const evento = await prisma.eventos_agenda_anunciante.findUnique({ where: { id: eventoId, dataExclusao: null } });
     if (!evento) return res.status(404).json({ error: "Evento não encontrado" });
 
     if (!(await podeGerenciarAnunciante(req.userId!, req.userType, evento.anuncianteId))) {
@@ -299,7 +301,7 @@ export const obterLancamentoDoEvento: RequestHandler = async (req, res) => {
     }
 
     const lancamento = await prisma.lancamentos_financeiros.findFirst({
-      where: { eventoId, status: { not: "cancelado" } },
+      where: { eventoId, status: { not: "cancelado" }, dataExclusao: null },
       orderBy: { dataCriacao: "desc" },
     });
 
@@ -314,7 +316,7 @@ export const listarLancamentosDoAnuncio: RequestHandler = async (req, res) => {
   try {
     const anuncioId = parseInt(req.params.anuncioId as string);
 
-    const anuncio = await prisma.anuncios.findUnique({ where: { id: anuncioId } });
+    const anuncio = await prisma.anuncios.findUnique({ where: { id: anuncioId, dataExclusao: null } });
     if (!anuncio) return res.status(404).json({ error: "Anúncio não encontrado" });
 
     if (!(await podeGerenciarAnunciante(req.userId!, req.userType, anuncio.anuncianteId))) {
@@ -322,7 +324,7 @@ export const listarLancamentosDoAnuncio: RequestHandler = async (req, res) => {
     }
 
     const lancamentos = await prisma.lancamentos_financeiros.findMany({
-      where: { anuncioId, status: { not: "cancelado" } },
+      where: { anuncioId, status: { not: "cancelado" }, dataExclusao: null },
       include: {
         contato: { select: { id: true, nome: true, email: true, celular: true } },
       },
@@ -361,14 +363,14 @@ export const criarLancamento: RequestHandler = async (req, res) => {
     }
 
     if (eventoId) {
-      const evento = await prisma.eventos_agenda_anunciante.findUnique({ where: { id: parseInt(eventoId) } });
+      const evento = await prisma.eventos_agenda_anunciante.findUnique({ where: { id: parseInt(eventoId), dataExclusao: null } });
       if (!evento || evento.anuncianteId !== parseInt(anuncianteId)) {
         return res.status(400).json({ error: "Evento não pertence a este anunciante" });
       }
     }
 
     if (anuncioId) {
-      const anuncio = await prisma.anuncios.findUnique({ where: { id: parseInt(anuncioId) } });
+      const anuncio = await prisma.anuncios.findUnique({ where: { id: parseInt(anuncioId), dataExclusao: null } });
       if (!anuncio || anuncio.anuncianteId !== parseInt(anuncianteId)) {
         return res.status(400).json({ error: "Anúncio não pertence a este anunciante" });
       }
@@ -404,7 +406,7 @@ export const atualizarLancamento: RequestHandler = async (req, res) => {
     const id = parseInt(req.params.id as string);
     const { descricao, valor, vencimento, tipoPagamento, contaBanco } = req.body;
 
-    const lancamento = await prisma.lancamentos_financeiros.findUnique({ where: { id } });
+    const lancamento = await prisma.lancamentos_financeiros.findUnique({ where: { id, dataExclusao: null } });
     if (!lancamento) return res.status(404).json({ error: "Lançamento não encontrado" });
 
     if (!(await podeGerenciarAnunciante(req.userId!, req.userType, lancamento.anuncianteId))) {
@@ -428,6 +430,7 @@ export const atualizarLancamento: RequestHandler = async (req, res) => {
         vencimento: vencimento !== undefined ? (vencimento ? new Date(vencimento) : null) : lancamento.vencimento,
         tipoPagamento: tipoPagamento !== undefined ? tipoPagamento : lancamento.tipoPagamento,
         contaBanco: contaBanco !== undefined ? (contaBanco || null) : lancamento.contaBanco,
+        atualizadoPor: req.userId!,
       },
     });
 
@@ -443,7 +446,7 @@ export const gerarPixLancamento: RequestHandler = async (req, res) => {
     const id = parseInt(req.params.id as string);
 
     const lancamento = await prisma.lancamentos_financeiros.findUnique({
-      where: { id },
+      where: { id, dataExclusao: null },
       include: { anunciante: { select: { chavePix: true } } },
     });
     if (!lancamento) return res.status(404).json({ error: "Lançamento não encontrado" });
@@ -473,6 +476,7 @@ export const gerarPixLancamento: RequestHandler = async (req, res) => {
         urlCopiaECola,
         dataExpiracaoPix,
         status: lancamento.status === "pendente" ? "pix_gerado" : lancamento.status,
+        atualizadoPor: req.userId!,
       },
     });
 
@@ -492,7 +496,7 @@ export const anexarComprovanteLancamento: RequestHandler = async (req, res) => {
       return res.status(400).json({ error: "comprovanteUrl é obrigatório" });
     }
 
-    const lancamento = await prisma.lancamentos_financeiros.findUnique({ where: { id } });
+    const lancamento = await prisma.lancamentos_financeiros.findUnique({ where: { id, dataExclusao: null } });
     if (!lancamento) return res.status(404).json({ error: "Lançamento não encontrado" });
 
     if (!(await podeGerenciarAnunciante(req.userId!, req.userType, lancamento.anuncianteId))) {
@@ -509,6 +513,7 @@ export const anexarComprovanteLancamento: RequestHandler = async (req, res) => {
         comprovanteUrl,
         dataComprovante: new Date(),
         status: "comprovante_enviado",
+        atualizadoPor: req.userId!,
       },
     });
 
@@ -523,7 +528,7 @@ export const marcarLancamentoPago: RequestHandler = async (req, res) => {
   try {
     const id = parseInt(req.params.id as string);
 
-    const lancamento = await prisma.lancamentos_financeiros.findUnique({ where: { id } });
+    const lancamento = await prisma.lancamentos_financeiros.findUnique({ where: { id, dataExclusao: null } });
     if (!lancamento) return res.status(404).json({ error: "Lançamento não encontrado" });
 
     if (!(await podeGerenciarAnunciante(req.userId!, req.userType, lancamento.anuncianteId))) {
@@ -542,6 +547,7 @@ export const marcarLancamentoPago: RequestHandler = async (req, res) => {
         status: "pago",
         dataPagamento: new Date(),
         reciboToken,
+        atualizadoPor: req.userId!,
       },
     });
 
@@ -556,7 +562,7 @@ export const cancelarLancamento: RequestHandler = async (req, res) => {
   try {
     const id = parseInt(req.params.id as string);
 
-    const lancamento = await prisma.lancamentos_financeiros.findUnique({ where: { id } });
+    const lancamento = await prisma.lancamentos_financeiros.findUnique({ where: { id, dataExclusao: null } });
     if (!lancamento) return res.status(404).json({ error: "Lançamento não encontrado" });
 
     if (!(await podeGerenciarAnunciante(req.userId!, req.userType, lancamento.anuncianteId))) {
@@ -569,7 +575,7 @@ export const cancelarLancamento: RequestHandler = async (req, res) => {
 
     const atualizado = await prisma.lancamentos_financeiros.update({
       where: { id },
-      data: { status: "cancelado" },
+      data: { status: "cancelado", atualizadoPor: req.userId! },
     });
 
     res.json({ success: true, data: atualizado });
@@ -586,7 +592,7 @@ export const obterReciboPublico: RequestHandler = async (req, res) => {
     const token = req.params.token as string;
 
     const lancamento = await prisma.lancamentos_financeiros.findUnique({
-      where: { reciboToken: token },
+      where: { reciboToken: token, dataExclusao: null },
       include: {
         anunciante: { select: { nome: true, cnpj: true, telefone: true, email: true } },
         contato: { select: { nome: true } },
@@ -619,7 +625,7 @@ export const enviarReciboPorEmail: RequestHandler = async (req, res) => {
     const id = parseInt(req.params.id as string);
 
     const lancamento = await prisma.lancamentos_financeiros.findUnique({
-      where: { id },
+      where: { id, dataExclusao: null },
       include: {
         anunciante: { select: { nome: true } },
         contato: { select: { nome: true, email: true } },
@@ -735,6 +741,7 @@ export async function gerarCobrancasMensais() {
     const contratos = await prisma.contratos_financeiros.findMany({
       where: {
         status: "ativo",
+        dataExclusao: null,
         OR: [{ dataFim: null }, { dataFim: { gte: hoje } }],
       },
       include: {
@@ -837,7 +844,7 @@ export const lancarMesContrato: RequestHandler = async (req, res) => {
   try {
     const id = parseInt(req.params.id as string);
 
-    const contrato = await prisma.contratos_financeiros.findUnique({ where: { id } });
+    const contrato = await prisma.contratos_financeiros.findUnique({ where: { id, dataExclusao: null } });
     if (!contrato) return res.status(404).json({ error: "Contrato não encontrado" });
 
     if (!(await podeGerenciarAnunciante(req.userId!, req.userType, contrato.anuncianteId))) {
@@ -870,7 +877,7 @@ export const lancarLoteContratos: RequestHandler = async (req, res) => {
     for (const rawId of contratoIds) {
       const id = parseInt(rawId);
       try {
-        const contrato = await prisma.contratos_financeiros.findUnique({ where: { id } });
+        const contrato = await prisma.contratos_financeiros.findUnique({ where: { id, dataExclusao: null } });
         if (!contrato || !(await podeGerenciarAnunciante(req.userId!, req.userType, contrato.anuncianteId))) {
           erros++;
           continue;
@@ -992,7 +999,7 @@ export const listarMensagensCobranca: RequestHandler = async (req, res) => {
   try {
     const lancamentoId = parseInt(req.params.id as string);
 
-    const lancamento = await prisma.lancamentos_financeiros.findUnique({ where: { id: lancamentoId } });
+    const lancamento = await prisma.lancamentos_financeiros.findUnique({ where: { id: lancamentoId, dataExclusao: null } });
     if (!lancamento) return res.status(404).json({ error: "Lançamento não encontrado" });
 
     if (!(await podeGerenciarAnunciante(req.userId!, req.userType, lancamento.anuncianteId))) {
@@ -1021,7 +1028,7 @@ export const criarMensagemCobranca: RequestHandler = async (req, res) => {
     }
 
     const lancamento = await prisma.lancamentos_financeiros.findUnique({
-      where: { id: lancamentoId },
+      where: { id: lancamentoId, dataExclusao: null },
       include: { contato: { select: { celular: true } } },
     });
     if (!lancamento) return res.status(404).json({ error: "Lançamento não encontrado" });
