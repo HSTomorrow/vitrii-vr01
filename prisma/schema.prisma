@@ -9,56 +9,56 @@ datasource db {
 }
 
 model anunciantes {
-  id                   Int                         @id(map: "lojas_pkey") @default(autoincrement())
-  nome                 String                      @db.VarChar(255)
-  tipo                 String                      @default("Padrão") @db.VarChar(50)
-  descricao            String?
-  cnpj                 String?                     @db.VarChar(14)
-  telefone             String?                     @db.VarChar(20)
-  email                String?                     @db.VarChar(255)
-  endereco             String?                     @db.VarChar(255)
-  cidade               String                      @db.VarChar(100)
-  estado               String                      @db.VarChar(2)
-  cep                  String?                     @db.VarChar(8)
-  site                 String?                     @db.VarChar(255)
-  instagram            String?                     @db.VarChar(255)
-  facebook             String?                     @db.VarChar(255)
-  whatsapp             String?                     @db.VarChar(20)
-  chavePix             String?                     @db.VarChar(32) // PIX key (máximo 32 caracteres)
-  fotoUrl              String?                     @db.VarChar(500)
-  iconColor            String                      @default("azul") @db.VarChar(20) // azul, verde, rosa, vermelho, laranja
-  status               String                      @default("Ativo") @db.VarChar(50) // Ativo ou Desativado
-  tipoCobranca         String                      @default("Propria") @db.VarChar(20) // "Propria" ou "Vitrii" - somente admin altera
-  temAgenda            Boolean                     @default(false) // Se sim, mostra o botão de agenda nos anuncios
-  localidadeId         Int? // Default locality for filtering ads
-  dataCriacao          DateTime                    @default(now())
-  dataAtualizacao      DateTime
-  criadoPor            Int?
-  atualizadoPor        Int?
-  dataExclusao         DateTime?
-  excluidoPor          Int?
-  anuncios             anuncios[]
-  movimentos_estoque   movimentos_estoque[]
-  produtos_em_estoque  produtos_em_estoque[]
-  usuarios_anunciantes usuarios_anunciantes[]
-  equipes_de_venda     equipes_de_venda[]
-  grupos_produtos      grupos_produtos[]
-  wishlist_permissoes  listas_desejos_permissoes[]
-  agendas              agendas[]
-  eventos_agenda       eventos_agenda_anunciante[]
-  filas_espera         filas_espera_agenda[]       @relation("filas_espera_anunciante")
-  links_externos       links_produtos_externos[]
-  conversas            conversas[]
-  mensagens            mensagens[]
-  localidade           localidades?                @relation(fields: [localidadeId], references: [id], onDelete: SetNull)
-  localidades          anunciantes_x_localidades[]
-  contatos             contatos[]
-  agendas_horarios     agendas_horarios[]
-  contratos_financeiros    contratos_financeiros[]
-  lancamentos_financeiros  lancamentos_financeiros[]
-  dashboard_cache          dashboard_cache?
-  favoritos_de_usuarios    anunciantes_favoritos[]
-  tabelas_preco            tabelas_preco[]
+  id                          Int                           @id(map: "lojas_pkey") @default(autoincrement())
+  nome                        String                        @db.VarChar(255)
+  tipo                        String                        @default("Padrão") @db.VarChar(50)
+  descricao                   String?
+  cnpj                        String?                       @db.VarChar(14)
+  telefone                    String?                       @db.VarChar(20)
+  email                       String?                       @db.VarChar(255)
+  endereco                    String?                       @db.VarChar(255)
+  cidade                      String                        @db.VarChar(100)
+  estado                      String                        @db.VarChar(2)
+  cep                         String?                       @db.VarChar(8)
+  site                        String?                       @db.VarChar(255)
+  instagram                   String?                       @db.VarChar(255)
+  facebook                    String?                       @db.VarChar(255)
+  whatsapp                    String?                       @db.VarChar(20)
+  chavePix                    String?                       @db.VarChar(32) // PIX key (máximo 32 caracteres)
+  fotoUrl                     String?                       @db.VarChar(500)
+  iconColor                   String                        @default("azul") @db.VarChar(20) // azul, verde, rosa, vermelho, laranja
+  status                      String                        @default("Ativo") @db.VarChar(50) // Ativo ou Desativado
+  tipoCobranca                String                        @default("Propria") @db.VarChar(20) // "Propria" ou "Vitrii" - somente admin altera
+  temAgenda                   Boolean                       @default(false) // Se sim, mostra o botão de agenda nos anuncios
+  localidadeId                Int? // Default locality for filtering ads
+  dataCriacao                 DateTime                      @default(now())
+  dataAtualizacao             DateTime
+  criadoPor                   Int?
+  atualizadoPor               Int?
+  dataExclusao                DateTime?
+  excluidoPor                 Int?
+  anuncios                    anuncios[]
+  movimentos_estoque          movimentos_estoque[]
+  produtos_em_estoque         produtos_em_estoque[]
+  usuarios_anunciantes        usuarios_anunciantes[]
+  equipes_de_venda            equipes_de_venda[]
+  grupos_produtos             grupos_produtos[]
+  wishlist_permissoes         listas_desejos_permissoes[]
+  agendas                     agendas[]
+  eventos_agenda              eventos_agenda_anunciante[]
+  filas_espera                filas_espera_agenda[]         @relation("filas_espera_anunciante")
+  links_externos              links_produtos_externos[]
+  conversas                   conversas[]
+  mensagens                   mensagens[]
+  localidade                  localidades?                  @relation(fields: [localidadeId], references: [id], onDelete: SetNull)
+  localidades                 anunciantes_x_localidades[]
+  contatos                    contatos[]
+  agendas_horarios            agendas_horarios[]
+  contratos_financeiros       contratos_financeiros[]
+  lancamentos_financeiros     lancamentos_financeiros[]
+  dashboard_cache             dashboard_cache?
+  favoritos_de_usuarios       anunciantes_favoritos[]
+  tabelas_preco               tabelas_preco[]
   fechamentos_financeiros_log fechamentos_financeiros_log[]
 
   @@index([dataExclusao])
@@ -81,48 +81,48 @@ model anunciantes_favoritos {
 }
 
 model anuncios {
-  id                  Int                    @id @default(autoincrement())
-  usuarioId           Int
-  anuncianteId        Int
-  titulo              String                 @db.VarChar(255)
-  descricao           String?
-  preco               Decimal?               @db.Decimal(10, 2)
-  categoria           String?                @db.VarChar(100)
-  imagem              String?                @db.VarChar(500)
-  link                String?                @db.VarChar(500)
-  status              String                 @default("ativo") @db.VarChar(50)
-  tipo                String                 @default("produto") @db.VarChar(50)
-  isDoacao            Boolean                @default(false) @map("isdoacao")
-  aCombinar           Boolean                @default(false)
-  diasRestantes       Int?
-  statusPagamento     String?                @default("pendente") @db.VarChar(50)
-  dataCriacao         DateTime               @default(now())
-  dataAtualizacao     DateTime
-  criadoPor           Int?
-  atualizadoPor       Int?
-  dataExclusao        DateTime?
-  excluidoPor         Int?
-  dataFim             DateTime?              // End date for ad validity (7 days for Standard, 30 days for Professional, or admin-set)
-  cidade              String?                @db.VarChar(100)
-  estado              String?                @db.VarChar(2)
-  visualizacoes       Int                    @default(0)
-  destaque            Boolean                @default(false)
-  bannerInicial       Boolean                @default(false) // Admin-only: the one ad shown as the homepage popup. Exclusivity enforced in updateAnuncio, not the DB.
-  ordem               Int                    @default(10) // Admin can customize, default 10, sorted ascending + id descending
-  isActive            Boolean                @default(true)
-  permiteReservar     Boolean                @default(false) // Allow reservations for this ad
-  quantidadeMaximaReservas Int?              // Maximum number of reservations allowed (null = unlimited)
-  quantidade          Int                    @default(1)  // Initial quantity for reservations (default 1, 0 = Reservado)
-  anunciantes         anunciantes            @relation(fields: [anuncianteId], references: [id], onDelete: Cascade, map: "anuncios_lojaId_fkey")
-  anuncioVisualizados anuncioVisualizados[]
-  fotos               fotos_anuncio[]
-  wishlists_itens     listas_desejos_itens[]
-  agendas             agendas[]
-  conversas           conversas[]
-  pagamento           pagamentos?
-  reservas            reservas_anuncio[]
-  eventosAgenda       eventos_agenda_anunciante[]
-  lancamentosFinanceiros lancamentos_financeiros[]
+  id                       Int                         @id @default(autoincrement())
+  usuarioId                Int
+  anuncianteId             Int
+  titulo                   String                      @db.VarChar(255)
+  descricao                String?
+  preco                    Decimal?                    @db.Decimal(10, 2)
+  categoria                String?                     @db.VarChar(100)
+  imagem                   String?                     @db.VarChar(500)
+  link                     String?                     @db.VarChar(500)
+  status                   String                      @default("ativo") @db.VarChar(50)
+  tipo                     String                      @default("produto") @db.VarChar(50)
+  isDoacao                 Boolean                     @default(false) @map("isdoacao")
+  aCombinar                Boolean                     @default(false)
+  diasRestantes            Int?
+  statusPagamento          String?                     @default("pendente") @db.VarChar(50)
+  dataCriacao              DateTime                    @default(now())
+  dataAtualizacao          DateTime
+  criadoPor                Int?
+  atualizadoPor            Int?
+  dataExclusao             DateTime?
+  excluidoPor              Int?
+  dataFim                  DateTime? // End date for ad validity (7 days for Standard, 30 days for Professional, or admin-set)
+  cidade                   String?                     @db.VarChar(100)
+  estado                   String?                     @db.VarChar(2)
+  visualizacoes            Int                         @default(0)
+  destaque                 Boolean                     @default(false)
+  bannerInicial            Boolean                     @default(false) // Admin-only: the one ad shown as the homepage popup. Exclusivity enforced in updateAnuncio, not the DB.
+  ordem                    Int                         @default(10) // Admin can customize, default 10, sorted ascending + id descending
+  isActive                 Boolean                     @default(true)
+  permiteReservar          Boolean                     @default(false) // Allow reservations for this ad
+  quantidadeMaximaReservas Int? // Maximum number of reservations allowed (null = unlimited)
+  quantidade               Int                         @default(1) // Initial quantity for reservations (default 1, 0 = Reservado)
+  anunciantes              anunciantes                 @relation(fields: [anuncianteId], references: [id], onDelete: Cascade, map: "anuncios_lojaId_fkey")
+  anuncioVisualizados      anuncioVisualizados[]
+  fotos                    fotos_anuncio[]
+  wishlists_itens          listas_desejos_itens[]
+  agendas                  agendas[]
+  conversas                conversas[]
+  pagamento                pagamentos?
+  reservas                 reservas_anuncio[]
+  eventosAgenda            eventos_agenda_anunciante[]
+  lancamentosFinanceiros   lancamentos_financeiros[]
 
   @@index([anuncianteId])
   @@index([usuarioId])
@@ -144,14 +144,6 @@ model anuncioVisualizados {
   @@index([anuncioId])
   @@index([usuarioId])
   @@index([dataCriacao])
-}
-
-model fotos_grupos {
-  id          Int      @id @default(autoincrement())
-  grupoId     Int
-  url         String   @db.VarChar(500)
-  ordem       Int?     @default(1)
-  dataCriacao DateTime @default(now())
 }
 
 model grupos_produtos {
@@ -214,13 +206,6 @@ model productos {
   @@index([dataExclusao])
 }
 
-model productos_visualizacoes {
-  id               Int      @id @default(autoincrement())
-  usuarioId        Int?
-  productId        Int
-  dataVisualizacao DateTime @default(now())
-}
-
 model produtos_em_estoque {
   id                 Int                  @id @default(autoincrement())
   anuncianteId       Int
@@ -235,25 +220,6 @@ model produtos_em_estoque {
   productos          productos            @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@unique([anuncianteId, productId], map: "produtos_em_estoque_lojaId_productId_key")
-}
-
-model qrcodes {
-  id              Int      @id @default(autoincrement())
-  lojaId          Int
-  productId       Int
-  codigo          String   @unique @db.VarChar(255)
-  localizacao     String?  @db.VarChar(255)
-  ativo           Boolean  @default(true)
-  dataCriacao     DateTime @default(now())
-  dataAtualizacao DateTime
-
-  @@unique([lojaId, productId])
-}
-
-model qrcodes_chamadas {
-  id          Int      @id @default(autoincrement())
-  qrcodeId    Int
-  dataChamada DateTime @default(now())
 }
 
 model tabelas_preco {
@@ -276,55 +242,53 @@ model tabelas_preco {
 }
 
 model usracessos {
-  id                      Int                         @id @default(autoincrement())
-  nome                    String                      @db.VarChar(255)
-  email                   String                      @unique @db.VarChar(255)
-  senha                   String                      @db.VarChar(255)
-  cpf                     String?                     @unique @db.VarChar(14)
-  telefone                String?                     @unique @db.VarChar(20)
-  whatsapp                String?                     @db.VarChar(20)
-  linkedin                String?                     @db.VarChar(255)
-  facebook                String?                     @db.VarChar(255)
-  tipoUsuario             String                      @default("common") @db.VarChar(20)
-  tassinatura             String                      @default("Gratuito") @db.VarChar(20)
-  status                  String                      @default("bloqueado") @db.VarChar(20) // "ativo", "inativo", ou "bloqueado" (new users start as "bloqueado" until email verification)
-  emailVerificado         Boolean                     @default(false) // Email verification status
-  ultimoEmailValidacao    DateTime? // Timestamp do último email de validação enviado (rate limiting)
-  tentativasLoginFalhadas Int                         @default(0) // Contador de tentativas de login falhadas
-  ultimaTentativaLogin    DateTime? // Timestamp da última tentativa de login
-  dataCriacao             DateTime                    @default(now())
-  dataAtualizacao         DateTime                    @updatedAt
-  criadoPor               Int?
-  atualizadoPor           Int?
-  dataExclusao            DateTime?
-  excluidoPor             Int?
-  endereco                String?
-  dataVigenciaContrato    DateTime                    @default(now())
-  numeroAnunciosAtivos    Int                         @default(0)
-  numeroAnunciosAtivosDestaque Int                    @default(0)
-  maxAnunciosAtivos       Int                         @default(10)
-  localidadePadraoId      Int? // Default locality for filtering ads
-  usuarios_anunciantes    usuarios_anunciantes[]
-  membros_equipe          membros_equipe[]
-  passwordResetTokens     passwordResetToken[]
-  emailVerificationTokens emailVerificationToken[]
-  anuncioVisualizados     anuncioVisualizados[]
-  fotos_anuncio           fotos_anuncio[]
-  grupos_produtos         grupos_produtos[]
-  listas_desejos          listas_desejos[]
-  reservas_agenda         reservas_agenda[]
-  lista_espera_agenda     lista_espera_agenda[]
-  filas_espera            filas_espera_agenda[]       @relation("fila_espera_usuario")
-  eventos_permissoes      eventos_agenda_permissoes[]
-  filas_espera_permissoes filas_espera_permissoes[]
-  reservas_evento         reservas_evento_agenda[]
-  conversas               conversas[]
-  mensagens               mensagens[]
-  contatos                contatos[]
-  contato_links           contatos_usuarios_links[]
-  reservas_anuncio        reservas_anuncio[]
-  anunciantes_favoritos   anunciantes_favoritos[]
-  localidadePadrao        localidades?                @relation(fields: [localidadePadraoId], references: [id], onDelete: SetNull)
+  id                           Int                         @id @default(autoincrement())
+  nome                         String                      @db.VarChar(255)
+  email                        String                      @unique @db.VarChar(255)
+  senha                        String                      @db.VarChar(255)
+  cpf                          String?                     @unique @db.VarChar(14)
+  telefone                     String?                     @unique @db.VarChar(20)
+  whatsapp                     String?                     @db.VarChar(20)
+  linkedin                     String?                     @db.VarChar(255)
+  facebook                     String?                     @db.VarChar(255)
+  tipoUsuario                  String                      @default("common") @db.VarChar(20)
+  tassinatura                  String                      @default("Gratuito") @db.VarChar(20)
+  status                       String                      @default("bloqueado") @db.VarChar(20) // "ativo", "inativo", ou "bloqueado" (new users start as "bloqueado" until email verification)
+  emailVerificado              Boolean                     @default(false) // Email verification status
+  ultimoEmailValidacao         DateTime? // Timestamp do último email de validação enviado (rate limiting)
+  tentativasLoginFalhadas      Int                         @default(0) // Contador de tentativas de login falhadas
+  ultimaTentativaLogin         DateTime? // Timestamp da última tentativa de login
+  dataCriacao                  DateTime                    @default(now())
+  dataAtualizacao              DateTime                    @updatedAt
+  criadoPor                    Int?
+  atualizadoPor                Int?
+  dataExclusao                 DateTime?
+  excluidoPor                  Int?
+  endereco                     String?
+  dataVigenciaContrato         DateTime                    @default(now())
+  numeroAnunciosAtivos         Int                         @default(0)
+  numeroAnunciosAtivosDestaque Int                         @default(0)
+  maxAnunciosAtivos            Int                         @default(10)
+  localidadePadraoId           Int? // Default locality for filtering ads
+  usuarios_anunciantes         usuarios_anunciantes[]
+  membros_equipe               membros_equipe[]
+  passwordResetTokens          passwordResetToken[]
+  emailVerificationTokens      emailVerificationToken[]
+  anuncioVisualizados          anuncioVisualizados[]
+  fotos_anuncio                fotos_anuncio[]
+  grupos_produtos              grupos_produtos[]
+  listas_desejos               listas_desejos[]
+  filas_espera                 filas_espera_agenda[]       @relation("fila_espera_usuario")
+  eventos_permissoes           eventos_agenda_permissoes[]
+  filas_espera_permissoes      filas_espera_permissoes[]
+  reservas_evento              reservas_evento_agenda[]
+  conversas                    conversas[]
+  mensagens                    mensagens[]
+  contatos                     contatos[]
+  contato_links                contatos_usuarios_links[]
+  reservas_anuncio             reservas_anuncio[]
+  anunciantes_favoritos        anunciantes_favoritos[]
+  localidadePadrao             localidades?                @relation(fields: [localidadePadraoId], references: [id], onDelete: SetNull)
 
   @@index([dataExclusao])
 }
@@ -369,7 +333,6 @@ model equipes_de_venda {
   anuncianteId    Int
   nome            String           @db.VarChar(255)
   descricao       String?          @db.Text
-  isActive        Boolean          @default(true)
   dataCriacao     DateTime         @default(now())
   dataAtualizacao DateTime         @updatedAt
   criadoPor       Int?
@@ -504,11 +467,8 @@ model agendas {
   dataCriacao     DateTime @default(now())
   dataAtualizacao DateTime @updatedAt
 
-  anuncio      anuncios              @relation(fields: [anuncioId], references: [id], onDelete: Cascade)
-  anunciante   anunciantes           @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
-  slots        slots_agenda[]
-  reservas     reservas_agenda[]
-  lista_espera lista_espera_agenda[]
+  anuncio    anuncios    @relation(fields: [anuncioId], references: [id], onDelete: Cascade)
+  anunciante anunciantes @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
 
   @@index([anuncioId])
   @@index([anuncianteId])
@@ -538,92 +498,32 @@ model links_produtos_externos {
   @@index([status])
 }
 
-// Slots de Agenda (Horários Disponíveis)
-model slots_agenda {
-  id                Int      @id @default(autoincrement())
-  agendaId          Int
-  data_hora_inicio  DateTime
-  data_hora_fim     DateTime
-  vagas_disponiveis Int
-  vagas_preenchidas Int      @default(0)
-  status            String   @default("disponivel") @db.VarChar(20)
-  dataCriacao       DateTime @default(now())
-
-  agenda   agendas           @relation(fields: [agendaId], references: [id], onDelete: Cascade)
-  reservas reservas_agenda[]
-
-  @@index([agendaId])
-  @@index([data_hora_inicio])
-  @@index([status])
-}
-
-// Reservas de Agenda
-model reservas_agenda {
-  id               Int      @id @default(autoincrement())
-  slotId           Int
-  usuarioId        Int
-  agendaId         Int
-  status           String   @default("confirmado") @db.VarChar(20)
-  data_confirmacao DateTime @default(now())
-  dataCriacao      DateTime @default(now())
-
-  slot    slots_agenda @relation(fields: [slotId], references: [id], onDelete: Cascade)
-  usuario usracessos   @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-  agenda  agendas      @relation(fields: [agendaId], references: [id], onDelete: Cascade)
-
-  @@unique([slotId, usuarioId])
-  @@index([slotId])
-  @@index([usuarioId])
-  @@index([agendaId])
-  @@index([status])
-}
-
-// Lista de Espera para Agendas
-model lista_espera_agenda {
-  id                    Int       @id @default(autoincrement())
-  agendaId              Int
-  usuarioId             Int
-  data_horario_desejada DateTime?
-  posicao               Int
-  status                String    @default("aguardando") @db.VarChar(20)
-  motivo_cancelamento   String?
-  dataCriacao           DateTime  @default(now())
-
-  agenda  agendas    @relation(fields: [agendaId], references: [id], onDelete: Cascade)
-  usuario usracessos @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-
-  @@unique([agendaId, usuarioId])
-  @@index([agendaId])
-  @@index([usuarioId])
-  @@index([status])
-}
-
 // Eventos de Agenda do Anunciante (Compromissos, Horários, etc)
 model eventos_agenda_anunciante {
-  id              Int      @id @default(autoincrement())
+  id              Int       @id @default(autoincrement())
   anuncianteId    Int
   anuncioId       Int? // Optional: ties this schedule slot to a specific ad, for filtering in Minha Agenda
-  titulo          String   @db.VarChar(255)
+  titulo          String    @db.VarChar(255)
   descricao       String?
   dataInicio      DateTime
   dataFim         DateTime
-  privacidade     String   @default("privado") @db.VarChar(20) // "publico", "privado_usuarios", "privado"
-  cor             String?  @default("#3B82F6") @db.VarChar(7)
-  status          String   @default("pendente") @db.VarChar(30) // "pendente", "realizado", "pendente_pagamento", "substituicao"
-  valor           Decimal? @db.Decimal(10, 2) // Optional price field - hidden for restricted/private events
-  dataCriacao     DateTime @default(now())
-  dataAtualizacao DateTime @updatedAt
+  privacidade     String    @default("privado") @db.VarChar(20) // "publico", "privado_usuarios", "privado"
+  cor             String?   @default("#3B82F6") @db.VarChar(7)
+  status          String    @default("pendente") @db.VarChar(30) // "pendente", "realizado", "pendente_pagamento", "substituicao"
+  valor           Decimal?  @db.Decimal(10, 2) // Optional price field - hidden for restricted/private events
+  dataCriacao     DateTime  @default(now())
+  dataAtualizacao DateTime  @updatedAt
   criadoPor       Int?
   atualizadoPor   Int?
   dataExclusao    DateTime?
   excluidoPor     Int?
 
-  anunciante  anunciantes                 @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
-  anuncio     anuncios?                   @relation(fields: [anuncioId], references: [id], onDelete: SetNull)
-  permissoes  eventos_agenda_permissoes[]
-  reservas    reservas_evento_agenda[]
-  filasEspera filas_espera_agenda[]
-  contatos    eventos_contatos[]
+  anunciante              anunciantes                 @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
+  anuncio                 anuncios?                   @relation(fields: [anuncioId], references: [id], onDelete: SetNull)
+  permissoes              eventos_agenda_permissoes[]
+  reservas                reservas_evento_agenda[]
+  filasEspera             filas_espera_agenda[]
+  contatos                eventos_contatos[]
   lancamentos_financeiros lancamentos_financeiros[]
 
   @@index([anuncianteId])
@@ -654,8 +554,8 @@ model contratos_financeiros {
   dataExclusao    DateTime?
   excluidoPor     Int?
 
-  anunciante  anunciantes @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
-  contato     contatos    @relation(fields: [contatoId], references: [id], onDelete: Restrict)
+  anunciante  anunciantes               @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
+  contato     contatos                  @relation(fields: [contatoId], references: [id], onDelete: Restrict)
   reajustes   contratos_reajustes[]
   documentos  contratos_documentos[]
   lancamentos lancamentos_financeiros[]
@@ -697,44 +597,44 @@ model contratos_documentos {
 
 // Lançamento financeiro unificado: cobranças de agenda, mensalidades e avulsos
 model lancamentos_financeiros {
-  id               Int       @id @default(autoincrement())
-  anuncianteId     Int
-  eventoId         Int?
-  anuncioId        Int?
-  contatoId        Int?
-  contratoId       Int?
-  origem           String    @db.VarChar(20) // "agenda", "mensalidade", "avulso", "contrato", "anuncio"
-  categoria        String    @db.VarChar(30) // "servico", "multa", "venda_material", "hora_extra", "mensalidade", "outro"
-  descricao        String?
-  valor            Decimal   @db.Decimal(10, 2)
-  competencia      String?   @db.VarChar(7) // "YYYY-MM" - chave de dedup da mensalidade
-  vencimento       DateTime?
-  status           String    @default("pendente") @db.VarChar(30) // pendente, pix_gerado, comprovante_enviado, pago, cancelado
-  tipoPagamento    String    @default("pix") @db.VarChar(20) // dinheiro, pix, cartao, deposito, outros
-  contaBanco       String?   @db.VarChar(100)
+  id            Int       @id @default(autoincrement())
+  anuncianteId  Int
+  eventoId      Int?
+  anuncioId     Int?
+  contatoId     Int?
+  contratoId    Int?
+  origem        String    @db.VarChar(20) // "agenda", "mensalidade", "avulso", "contrato", "anuncio"
+  categoria     String    @db.VarChar(30) // "servico", "multa", "venda_material", "hora_extra", "mensalidade", "outro"
+  descricao     String?
+  valor         Decimal   @db.Decimal(10, 2)
+  competencia   String?   @db.VarChar(7) // "YYYY-MM" - chave de dedup da mensalidade
+  vencimento    DateTime?
+  status        String    @default("pendente") @db.VarChar(30) // pendente, pix_gerado, comprovante_enviado, pago, cancelado
+  tipoPagamento String    @default("pix") @db.VarChar(20) // dinheiro, pix, cartao, deposito, outros
+  contaBanco    String?   @db.VarChar(100)
 
   pixId            String?   @db.VarChar(100)
   qrCode           String?   @db.Text
   urlCopiaECola    String?   @db.Text
   dataExpiracaoPix DateTime?
 
-  comprovanteUrl   String?   @db.VarChar(500)
-  dataComprovante  DateTime?
-  dataPagamento    DateTime?
+  comprovanteUrl  String?   @db.VarChar(500)
+  dataComprovante DateTime?
+  dataPagamento   DateTime?
 
-  criadoPor        Int?      // null for system-generated (mensalidade) entries
-  atualizadoPor    Int?
-  dataExclusao     DateTime?
-  excluidoPor      Int?
-  reciboToken      String?   @unique @db.VarChar(64)
-  dataCriacao      DateTime  @default(now())
-  dataAtualizacao  DateTime  @updatedAt
+  criadoPor       Int? // null for system-generated (mensalidade) entries
+  atualizadoPor   Int?
+  dataExclusao    DateTime?
+  excluidoPor     Int?
+  reciboToken     String?   @unique @db.VarChar(64)
+  dataCriacao     DateTime  @default(now())
+  dataAtualizacao DateTime  @updatedAt
 
-  anunciante anunciantes                @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
-  evento     eventos_agenda_anunciante? @relation(fields: [eventoId], references: [id], onDelete: SetNull)
-  anuncio    anuncios?                  @relation(fields: [anuncioId], references: [id], onDelete: SetNull)
-  contato    contatos?                  @relation(fields: [contatoId], references: [id], onDelete: SetNull)
-  contrato   contratos_financeiros?     @relation(fields: [contratoId], references: [id], onDelete: SetNull)
+  anunciante        anunciantes                @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
+  evento            eventos_agenda_anunciante? @relation(fields: [eventoId], references: [id], onDelete: SetNull)
+  anuncio           anuncios?                  @relation(fields: [anuncioId], references: [id], onDelete: SetNull)
+  contato           contatos?                  @relation(fields: [contatoId], references: [id], onDelete: SetNull)
+  contrato          contratos_financeiros?     @relation(fields: [contratoId], references: [id], onDelete: SetNull)
   mensagensCobranca lancamentos_mensagens[]
 
   @@unique([contratoId, competencia])
@@ -785,7 +685,7 @@ model lancamentos_mensagens {
 model dashboard_cache {
   id           Int      @id @default(autoincrement())
   anuncianteId Int      @unique
-  dados        Json     // { mensal: [...], porPeriodo: { "7": {...}, "30": {...}, "90": {...}, "365": {...} } }
+  dados        Json // { mensal: [...], porPeriodo: { "7": {...}, "30": {...}, "90": {...}, "365": {...} } }
   geradoEm     DateTime @default(now())
 
   anunciante anunciantes @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
@@ -793,9 +693,9 @@ model dashboard_cache {
 
 // Junction table for n-to-n relationship between eventos and contatos
 model eventos_contatos {
-  id        Int      @id @default(autoincrement())
-  eventoId  Int
-  contatoId Int
+  id          Int      @id @default(autoincrement())
+  eventoId    Int
+  contatoId   Int
   dataCriacao DateTime @default(now())
 
   evento  eventos_agenda_anunciante @relation(fields: [eventoId], references: [id], onDelete: Cascade)
@@ -884,11 +784,11 @@ model mensagens {
   dataCriacao     DateTime @default(now()) @map("datacriacao")
   dataAtualizacao DateTime @updatedAt @map("dataatualizacao")
 
-  conversa   conversas    @relation(fields: [conversaId], references: [id], onDelete: Cascade)
-  usuario    usracessos?  @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
-  anunciante anunciantes? @relation(fields: [anuncianteId], references: [id], onDelete: SetNull)
-  respondendoA mensagens? @relation("MensagemResposta", fields: [respondendoAId], references: [id], onDelete: SetNull)
-  respostas    mensagens[] @relation("MensagemResposta")
+  conversa     conversas    @relation(fields: [conversaId], references: [id], onDelete: Cascade)
+  usuario      usracessos?  @relation(fields: [usuarioId], references: [id], onDelete: SetNull)
+  anunciante   anunciantes? @relation(fields: [anuncianteId], references: [id], onDelete: SetNull)
+  respondendoA mensagens?   @relation("MensagemResposta", fields: [respondendoAId], references: [id], onDelete: SetNull)
+  respostas    mensagens[]  @relation("MensagemResposta")
 
   @@index([conversaId])
   @@index([usuarioId])
@@ -957,13 +857,13 @@ model filas_espera_agenda {
 
 // Permissões para Filas de Espera Privadas com Usuários Específicos
 model filas_espera_permissoes {
-  id          Int       @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   filaId      Int
   usuarioId   Int
-  dataCriacao DateTime  @default(now())
+  dataCriacao DateTime @default(now())
 
-  fila   filas_espera_agenda @relation(fields: [filaId], references: [id], onDelete: Cascade)
-  usuario usracessos         @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  fila    filas_espera_agenda @relation(fields: [filaId], references: [id], onDelete: Cascade)
+  usuario usracessos          @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
   @@unique([filaId, usuarioId])
   @@index([filaId])
@@ -1009,28 +909,28 @@ model anunciantes_x_localidades {
 
 // Contatos - Contact list by user (shared across their announcers, optionally limited to specific announcer)
 model contatos {
-  id               Int      @id @default(autoincrement())
-  usuarioId        Int      // Who created this contact
-  anuncianteId     Int?     // Optional: if set, contact is specific to this announcer; if null, can be used by all user's announcers
-  nome             String   @db.VarChar(255)
-  celular          String   @db.VarChar(20)
-  telefone         String?  @db.VarChar(20)
-  email            String?  @db.VarChar(255)
-  status           String   @default("ativo") @db.VarChar(20) // ativo, inativo, analise
-  tipoContato      String   @db.VarChar(100)
-  observacoes      String?  @db.VarChar(1000) // Added limit: max 1000 characters
-  imagem           String?  @db.VarChar(500)
-  dataCriacao      DateTime @default(now())
-  dataAtualizacao  DateTime @updatedAt
-  criadoPor        Int?
-  atualizadoPor    Int?
-  dataExclusao     DateTime?
-  excluidoPor      Int?
+  id              Int       @id @default(autoincrement())
+  usuarioId       Int // Who created this contact
+  anuncianteId    Int? // Optional: if set, contact is specific to this announcer; if null, can be used by all user's announcers
+  nome            String    @db.VarChar(255)
+  celular         String    @db.VarChar(20)
+  telefone        String?   @db.VarChar(20)
+  email           String?   @db.VarChar(255)
+  status          String    @default("ativo") @db.VarChar(20) // ativo, inativo, analise
+  tipoContato     String    @db.VarChar(100)
+  observacoes     String?   @db.VarChar(1000) // Added limit: max 1000 characters
+  imagem          String?   @db.VarChar(500)
+  dataCriacao     DateTime  @default(now())
+  dataAtualizacao DateTime  @updatedAt
+  criadoPor       Int?
+  atualizadoPor   Int?
+  dataExclusao    DateTime?
+  excluidoPor     Int?
 
-  usuario          usracessos  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-  anunciante       anunciantes? @relation(fields: [anuncianteId], references: [id], onDelete: SetNull)
-  eventos          eventos_contatos[]
-  usuario_links    contatos_usuarios_links[]
+  usuario                 usracessos                @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  anunciante              anunciantes?              @relation(fields: [anuncianteId], references: [id], onDelete: SetNull)
+  eventos                 eventos_contatos[]
+  usuario_links           contatos_usuarios_links[]
   contratos_financeiros   contratos_financeiros[]
   lancamentos_financeiros lancamentos_financeiros[]
 
@@ -1042,16 +942,16 @@ model contatos {
 
 // Contatos-Usuarios Links - Hourly synced links by email and phone
 model contatos_usuarios_links {
-  id          BigInt      @id @default(autoincrement())
-  contato_id  Int         @map("contato_id")
-  usuario_id  Int         @map("usuario_id")
-  email       String?     @db.VarChar(255)
-  celular     String?     @db.VarChar(20)
-  data_vinculo DateTime    @default(now()) @map("data_vinculo")
-  ativo       Boolean     @default(true)
+  id           BigInt   @id @default(autoincrement())
+  contato_id   Int      @map("contato_id")
+  usuario_id   Int      @map("usuario_id")
+  email        String?  @db.VarChar(255)
+  celular      String?  @db.VarChar(20)
+  data_vinculo DateTime @default(now()) @map("data_vinculo")
+  ativo        Boolean  @default(true)
 
-  contato     contatos    @relation(fields: [contato_id], references: [id], onDelete: Cascade)
-  usuario     usracessos  @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
+  contato contatos   @relation(fields: [contato_id], references: [id], onDelete: Cascade)
+  usuario usracessos @relation(fields: [usuario_id], references: [id], onDelete: Cascade)
 
   @@unique([contato_id, usuario_id], map: "contato_id_usuario_id")
   @@index([contato_id])
@@ -1065,16 +965,16 @@ model contatos_usuarios_links {
 
 // Agendas Horários - Available days and hours for event creation per announcer
 model agendas_horarios {
-  id              Int       @id @default(autoincrement())
+  id              Int      @id @default(autoincrement())
   anuncianteId    Int
-  diaSemana       Int       // 0=Sunday, 1=Monday, ..., 6=Saturday
-  horaInicio      String    @db.VarChar(5) // HH:mm format (e.g., "09:00")
-  horaFim         String    @db.VarChar(5) // HH:mm format (e.g., "18:00")
-  ativo           Boolean   @default(true)
-  dataCriacao     DateTime  @default(now())
-  dataAtualizacao DateTime  @updatedAt
+  diaSemana       Int // 0=Sunday, 1=Monday, ..., 6=Saturday
+  horaInicio      String   @db.VarChar(5) // HH:mm format (e.g., "09:00")
+  horaFim         String   @db.VarChar(5) // HH:mm format (e.g., "18:00")
+  ativo           Boolean  @default(true)
+  dataCriacao     DateTime @default(now())
+  dataAtualizacao DateTime @updatedAt
 
-  anunciante      anunciantes @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
+  anunciante anunciantes @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
 
   @@unique([anuncianteId, diaSemana])
   @@index([anuncianteId])
@@ -1083,18 +983,18 @@ model agendas_horarios {
 
 // Reservas de Anuncio - Track ad reservations
 model reservas_anuncio {
-  id              Int         @id @default(autoincrement())
-  anuncioId       Int
-  usuarioId       Int
-  dataReserva     DateTime    @default(now())
-  dataCancelamento DateTime?  // Null while active, set when cancelled
-  observacao      String?     @db.VarChar(500) // Optional note from user when booking
-  status          String      @default("ativa") @db.VarChar(50) // "ativa", "cancelada"
-  dataCriacao     DateTime    @default(now())
-  dataAtualizacao DateTime    @updatedAt
+  id               Int       @id @default(autoincrement())
+  anuncioId        Int
+  usuarioId        Int
+  dataReserva      DateTime  @default(now())
+  dataCancelamento DateTime? // Null while active, set when cancelled
+  observacao       String?   @db.VarChar(500) // Optional note from user when booking
+  status           String    @default("ativa") @db.VarChar(50) // "ativa", "cancelada"
+  dataCriacao      DateTime  @default(now())
+  dataAtualizacao  DateTime  @updatedAt
 
-  anuncio         anuncios    @relation(fields: [anuncioId], references: [id], onDelete: Cascade)
-  usuario         usracessos  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  anuncio anuncios   @relation(fields: [anuncioId], references: [id], onDelete: Cascade)
+  usuario usracessos @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
 
   @@unique([anuncioId, usuarioId]) // One reservation per user per ad
   @@index([anuncioId])
