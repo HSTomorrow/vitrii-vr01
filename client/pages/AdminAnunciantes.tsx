@@ -1,9 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { Search, Edit2, Trash2, Check, X, AlertCircle } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import Pagination from "@/components/Pagination";
 
 interface Anunciante {
   id: number;
@@ -44,6 +45,8 @@ export default function AdminAnunciantes() {
   );
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editingData, setEditingData] = useState<EditingData>({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 20;
 
   // Fetch all localidades
   const { data: localidadesData } = useQuery({
@@ -108,6 +111,19 @@ export default function AdminAnunciantes() {
       })
       .sort((a: any, b: any) => a.nome.localeCompare(b.nome));
   }, [anunciantesData?.data, searchTerm, statusFilter]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter]);
+
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const anunciantesPagina = anunciantes.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+  const localidadeLabel = (localidadeId?: number | null) =>
+    localidadeId
+      ? localidades.find((l) => l.id === localidadeId)?.descricao ||
+        localidades.find((l) => l.id === localidadeId)?.municipio
+      : "-";
 
   const handleSave = (id: number) => {
     updateMutation.mutate({
@@ -218,7 +234,7 @@ export default function AdminAnunciantes() {
             </p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-gray-200 bg-vitrii-gray-light">
@@ -246,7 +262,7 @@ export default function AdminAnunciantes() {
                 </tr>
               </thead>
               <tbody>
-                {anunciantes.map((anunciante) => (
+                {anunciantesPagina.map((anunciante) => (
                   <tr
                     key={anunciante.id}
                     className="border-b border-gray-100 hover:bg-gray-50 transition-colors"
@@ -429,6 +445,144 @@ export default function AdminAnunciantes() {
             </table>
           </div>
         )}
+
+        {/* Mobile Card View */}
+        {!isLoading && anunciantes.length > 0 && (
+          <div className="md:hidden space-y-3">
+            {anunciantesPagina.map((anunciante) => (
+              <div
+                key={anunciante.id}
+                className="border border-gray-200 rounded-lg p-4 space-y-3"
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-vitrii-text truncate">{anunciante.nome}</p>
+                    <p className="text-sm text-vitrii-text-secondary truncate">
+                      {anunciante.email || "-"}
+                    </p>
+                  </div>
+                  <span
+                    className={`flex-shrink-0 px-3 py-1 rounded-full text-xs font-semibold ${getStatusBadgeColor(anunciante.status)}`}
+                  >
+                    {anunciante.status}
+                  </span>
+                </div>
+
+                {editingId === anunciante.id ? (
+                  <div className="space-y-2">
+                    <input
+                      type="email"
+                      value={editingData.email || ""}
+                      onChange={(e) =>
+                        setEditingData({ ...editingData, email: e.target.value || undefined })
+                      }
+                      placeholder="email@example.com"
+                      className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-vitrii-blue"
+                    />
+                    <div className="grid grid-cols-2 gap-2">
+                      <select
+                        value={editingData.tipo || ""}
+                        onChange={(e) => setEditingData({ ...editingData, tipo: e.target.value })}
+                        className="px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-vitrii-blue"
+                      >
+                        <option value="Padrão">Padrão</option>
+                        <option value="Profissional">Profissional</option>
+                      </select>
+                      <select
+                        value={editingData.status || ""}
+                        onChange={(e) => setEditingData({ ...editingData, status: e.target.value })}
+                        className="px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-vitrii-blue"
+                      >
+                        <option value="Ativo">Ativo</option>
+                        <option value="Desativado">Desativado</option>
+                      </select>
+                    </div>
+                    <select
+                      value={editingData.localidadeId || ""}
+                      onChange={(e) =>
+                        setEditingData({
+                          ...editingData,
+                          localidadeId: e.target.value ? parseInt(e.target.value) : null,
+                        })
+                      }
+                      className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-vitrii-blue"
+                    >
+                      <option value="">Sem localidade</option>
+                      {localidades.map((localidade) => (
+                        <option key={localidade.id} value={localidade.id}>
+                          {localidade.descricao || `${localidade.municipio}, ${localidade.estado}`}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      value={editingData.iconColor || "azul"}
+                      onChange={(e) => setEditingData({ ...editingData, iconColor: e.target.value })}
+                      className="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-vitrii-blue"
+                    >
+                      <option value="azul">Azul</option>
+                      <option value="verde">Verde</option>
+                      <option value="rosa">Rosa</option>
+                      <option value="vermelho">Vermelho</option>
+                      <option value="laranja">Laranja</option>
+                    </select>
+                    <div className="flex gap-2 pt-1">
+                      <button
+                        onClick={() => handleSave(anunciante.id)}
+                        disabled={updateMutation.isPending}
+                        className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50 text-sm"
+                      >
+                        <Check className="w-4 h-4" /> Salvar
+                      </button>
+                      <button
+                        onClick={() => {
+                          setEditingId(null);
+                          setEditingData({});
+                        }}
+                        className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors text-sm"
+                      >
+                        <X className="w-4 h-4" /> Cancelar
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="grid grid-cols-2 gap-3 text-sm">
+                      <div>
+                        <p className="text-xs text-vitrii-text-secondary">Tipo</p>
+                        <span
+                          className={`inline-block mt-0.5 px-2 py-0.5 rounded-full text-xs font-semibold ${
+                            anunciante.tipo === "Profissional"
+                              ? "bg-blue-100 text-blue-700"
+                              : "bg-gray-100 text-gray-700"
+                          }`}
+                        >
+                          {anunciante.tipo}
+                        </span>
+                      </div>
+                      <div>
+                        <p className="text-xs text-vitrii-text-secondary">Localização</p>
+                        <p className="text-vitrii-text">{localidadeLabel(anunciante.localidadeId)}</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleEdit(anunciante)}
+                      className="w-full flex items-center justify-center gap-1 px-3 py-2 bg-vitrii-blue text-white rounded hover:bg-vitrii-blue-dark transition-colors text-sm"
+                    >
+                      <Edit2 className="w-4 h-4" /> Editar
+                    </button>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        <Pagination
+          currentPage={currentPage}
+          totalItems={anunciantes.length}
+          itemsPerPage={ITEMS_PER_PAGE}
+          onPageChange={setCurrentPage}
+        />
 
         {/* Summary */}
         {anunciantes.length > 0 && (

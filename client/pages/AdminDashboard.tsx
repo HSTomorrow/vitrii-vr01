@@ -26,8 +26,17 @@ import {
   CreditCard,
   DollarSign,
 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import AdminEditUserModal from "@/components/AdminEditUserModal";
+import { renderLineChart, fmtInt } from "@/lib/dashboardCharts";
+
+interface EstatisticasUsuarios {
+  total: number;
+  novosNoMes: number;
+  ativos: number;
+  bloqueados: number;
+  serieMensal: { mes: string; novos: number }[];
+}
 
 interface Usuario {
   id: number;
@@ -95,6 +104,29 @@ export default function AdminDashboard() {
     },
     enabled: user?.tipoUsuario === "adm",
   });
+
+  // Stats for the dedicated "Usuários" section below the Quick Links grid.
+  const { data: estatisticasData } = useQuery<{ data: EstatisticasUsuarios }>({
+    queryKey: ["admin-usuarios-estatisticas"],
+    queryFn: async () => {
+      const response = await fetch("/api/admin/usuarios/estatisticas");
+      if (!response.ok) throw new Error("Erro ao buscar estatísticas de usuários");
+      return response.json();
+    },
+    enabled: user?.tipoUsuario === "adm",
+  });
+  const estatisticas = estatisticasData?.data;
+
+  const usuariosChartRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!estatisticas?.serieMensal.length || !usuariosChartRef.current) return;
+    renderLineChart(
+      usuariosChartRef.current,
+      estatisticas.serieMensal.map((m) => m.mes),
+      [{ name: "Novos cadastros", color: "#0071CE", values: estatisticas.serieMensal.map((m) => m.novos) }],
+      fmtInt,
+    );
+  }, [estatisticas]);
 
   // Fetch all funcionalidades - DISABLED: Model not in database
   // const { data: funcionalidadesData, isLoading: funcLoading } = useQuery({
@@ -507,6 +539,37 @@ export default function AdminDashboard() {
             <p className="text-2xl font-bold text-vitrii-blue">
               {usuariosData?.count || 0}
             </p>
+          </div>
+        </div>
+
+        {/* Usuários */}
+        <div className="mb-8">
+          <h2 className="text-xl font-bold text-vitrii-text mb-4 flex items-center gap-2">
+            <Users className="w-5 h-5 text-vitrii-blue" />
+            Usuários
+          </h2>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+            <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+              <p className="text-xs text-vitrii-text-secondary mb-1">Total</p>
+              <p className="text-2xl font-bold text-vitrii-text">{fmtInt(estatisticas?.total || 0)}</p>
+            </div>
+            <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+              <p className="text-xs text-vitrii-text-secondary mb-1">Novos no Mês</p>
+              <p className="text-2xl font-bold text-vitrii-blue">{fmtInt(estatisticas?.novosNoMes || 0)}</p>
+            </div>
+            <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+              <p className="text-xs text-vitrii-text-secondary mb-1">Ativos</p>
+              <p className="text-2xl font-bold text-vitrii-green">{fmtInt(estatisticas?.ativos || 0)}</p>
+            </div>
+            <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+              <p className="text-xs text-vitrii-text-secondary mb-1">Bloqueados</p>
+              <p className="text-2xl font-bold text-vitrii-red">{fmtInt(estatisticas?.bloqueados || 0)}</p>
+            </div>
+          </div>
+          <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+            <h3 className="font-bold text-sm text-vitrii-text mb-1">Novos Cadastros</h3>
+            <p className="text-xs text-vitrii-text-secondary mb-2">Últimos 12 meses</p>
+            <div ref={usuariosChartRef} />
           </div>
         </div>
 

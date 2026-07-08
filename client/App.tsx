@@ -4,7 +4,7 @@ import React, { useEffect } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useParams } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ThemeProvider } from "next-themes";
 import ErrorBoundary from "@/components/ErrorBoundary";
@@ -24,7 +24,7 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import ListaDesejos from "./pages/ListaDesejos";
 import AnunciantesFavoritos from "./pages/AnunciantesFavoritos";
-import Totem from "./pages/Totem";
+import Catalogo from "./pages/Catalogo";
 import PerfilUsuario from "./pages/PerfilUsuario";
 import CriarAnuncio from "./pages/CriarAnuncio";
 import AnuncioDetalhe from "./pages/AnuncioDetalhe";
@@ -83,6 +83,12 @@ const queryClient = new QueryClient({
     },
   },
 });
+
+// Legacy "/totem/:anuncianteId" URLs redirect here, forwarding the same id to "/catalogo/:id".
+function RedirectToCatalogo() {
+  const { anuncianteId } = useParams<{ anuncianteId?: string }>();
+  return <Navigate to={`/catalogo/${anuncianteId ?? ""}`} replace />;
+}
 
 // Separate component to use the hook
 function AppContent() {
@@ -164,8 +170,12 @@ function AppContent() {
           <Route path="/debug/anunciantes" element={<DebugAnunciantes />} />
           <Route path="/lista-desejos" element={<ListaDesejos />} />
           <Route path="/anunciantes-favoritos" element={<AnunciantesFavoritos />} />
-          <Route path="/totem" element={<Totem />} />
-          <Route path="/totem/:anuncianteId" element={<Totem />} />
+          <Route path="/catalogo" element={<Catalogo />} />
+          <Route path="/catalogo/:anuncianteId" element={<Catalogo />} />
+          {/* Legacy "Totem" URLs — kept as redirects so QR codes/links already printed
+              for the physical-store kiosk keep working after the rename to Catálogo. */}
+          <Route path="/totem" element={<Navigate to="/catalogo" replace />} />
+          <Route path="/totem/:anuncianteId" element={<RedirectToCatalogo />} />
           <Route path="/meus-anuncios" element={<MeusAnuncios />} />
           <Route path="/minha-agenda" element={<MinhaAgenda />} />
           <Route path="/agenda/:anuncianteId" element={<AgendaAnunciante />} />

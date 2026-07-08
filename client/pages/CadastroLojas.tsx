@@ -6,6 +6,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ImageZoom from "@/components/ImageZoom";
 import { Plus, Trash2, Edit2, Upload, X } from "lucide-react";
+import Pagination from "@/components/Pagination";
 import { BRAZILIAN_STATES } from "@shared/brazilianStates";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -47,6 +48,8 @@ export default function CadastroAnunciantes() {
   const { user } = useAuth();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 20;
   const [formData, setFormData] = useState({
     nome: "",
     tipo: "Padrão",
@@ -90,6 +93,8 @@ export default function CadastroAnunciantes() {
 
   // Ensure anunciantes is always an array
   const anunciantes = Array.isArray(anunciantesData) ? anunciantesData : [];
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const anunciantesPagina = anunciantes.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   // Fetch active localidades
   const { data: localidadesData } = useQuery({
@@ -893,7 +898,7 @@ export default function CadastroAnunciantes() {
                     </td>
                   </tr>
                 ) : (
-                  anunciantes.map((loja) => (
+                  anunciantesPagina.map((loja) => (
                     <tr key={loja.id} className="hover:bg-gray-50">
                       <td className="px-4 py-4 font-semibold text-vitrii-text text-sm">
                         {loja.nome}
@@ -973,7 +978,7 @@ export default function CadastroAnunciantes() {
               </div>
             ) : (
               <div className="space-y-3 p-4">
-                {anunciantes.map((loja) => (
+                {anunciantesPagina.map((loja) => (
                   <div
                     key={loja.id}
                     className="border border-gray-200 rounded-lg p-4 space-y-3 hover:shadow-md transition-shadow"
@@ -1071,6 +1076,13 @@ export default function CadastroAnunciantes() {
               </div>
             )}
           </div>
+
+          <Pagination
+            currentPage={currentPage}
+            totalItems={anunciantes.length}
+            itemsPerPage={ITEMS_PER_PAGE}
+            onPageChange={setCurrentPage}
+          />
         </div>
       </main>
 

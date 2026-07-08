@@ -300,3 +300,37 @@ export async function atualizarDashboardCacheDeTodos() {
     return { success: false, error: error instanceof Error ? error.message : "Unknown error" };
   }
 }
+
+// Usuarios (usracessos) section of /admin/dashboard. usracessos is a small table (unlike
+// the anuncios/lancamentos data the per-anunciante dashboard aggregates), so a single
+// findMany + in-memory bucketing is enough — no need for the dashboard_cache/sequential-query
+// dance calcularSerieMensal uses.
+export const obterEstatisticasUsuarios: RequestHandler = async (_req, res) => {
+  try {
+    const usuarios = await prisma.usracessos.findMany({
+      select: { dataCriacao: true, status: true },
+    });
+
+    const meses = ultimosMeses(12);
+    const inicioMesAtual = meses[meses.length - 1].start;
+
+    const serieMensal = meses.map((m) => ({
+      mes: m.label,
+      novos: usuarios.filter((u) => u.dataCriacao >= m.start && u.dataCriacao < m.end).length,
+    }));
+
+    res.json({
+      success: true,
+      data: {
+        total: usuarios.length,
+        novosNoMes: usuarios.filter((u) => u.dataCriacao >= inicioMesAtual).length,
+        ativos: usuarios.filter((u) => u.status === "ativo").length,
+        bloqueados: usuarios.filter((u) => u.status === "bloqueado").length,
+        serieMensal,
+      },
+    });
+  } catch (error) {
+    console.error("[obterEstatisticasUsuarios] Erro:", error);
+    res.status(500).json({ error: "Erro ao buscar estatísticas de usuários" });
+  }
+}

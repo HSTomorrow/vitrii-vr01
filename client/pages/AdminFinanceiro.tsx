@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { DollarSign } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import Pagination from "@/components/Pagination";
 import { formatCurrencyDisplay } from "@/utils/formatCurrency";
 
 interface LancamentoAdmin {
@@ -39,6 +40,8 @@ export default function AdminFinanceiro() {
   const isAdmin = user?.tipoUsuario === "adm";
   const [filterStatus, setFilterStatus] = useState("");
   const [filterOrigem, setFilterOrigem] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 20;
 
   const { data: lancamentos = [], isLoading } = useQuery<LancamentoAdmin[]>({
     queryKey: ["admin-lancamentos-financeiros", filterStatus, filterOrigem],
@@ -67,6 +70,12 @@ export default function AdminFinanceiro() {
   }
 
   const totalGeral = lancamentos.reduce((sum, l) => sum + parseFloat(l.valor), 0);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const lancamentosPagina = lancamentos.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filterStatus, filterOrigem]);
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
@@ -108,43 +117,81 @@ export default function AdminFinanceiro() {
         {isLoading ? (
           <p className="text-center text-vitrii-text-secondary py-12">Carregando...</p>
         ) : (
-          <div className="overflow-x-auto border border-gray-200 rounded-lg">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50 text-left text-xs uppercase text-vitrii-text-secondary">
-                <tr>
-                  <th className="px-4 py-3">Anunciante</th>
-                  <th className="px-4 py-3">Cliente</th>
-                  <th className="px-4 py-3">Categoria</th>
-                  <th className="px-4 py-3">Origem</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3 text-right">Valor</th>
-                  <th className="px-4 py-3">Data</th>
-                </tr>
-              </thead>
-              <tbody>
-                {lancamentos.map((l) => (
-                  <tr key={l.id} className="border-t border-gray-100">
-                    <td className="px-4 py-3">{l.anunciante.nome}</td>
-                    <td className="px-4 py-3">{l.contato?.nome || "-"}</td>
-                    <td className="px-4 py-3">{l.categoria}</td>
-                    <td className="px-4 py-3">{ORIGEM_LABELS[l.origem] || l.origem}</td>
-                    <td className="px-4 py-3">{STATUS_LABELS[l.status] || l.status}</td>
-                    <td className="px-4 py-3 text-right font-semibold">{formatCurrencyDisplay(parseFloat(l.valor))}</td>
-                    <td className="px-4 py-3 text-vitrii-text-secondary">
-                      {new Date(l.dataCriacao).toLocaleDateString("pt-BR")}
-                    </td>
-                  </tr>
-                ))}
-                {lancamentos.length === 0 && (
+          <>
+            <div className="hidden md:block overflow-x-auto border border-gray-200 rounded-lg">
+              <table className="w-full text-sm">
+                <thead className="bg-gray-50 text-left text-xs uppercase text-vitrii-text-secondary">
                   <tr>
-                    <td colSpan={7} className="px-4 py-12 text-center text-vitrii-text-secondary">
-                      Nenhum lançamento encontrado
-                    </td>
+                    <th className="px-4 py-3">Anunciante</th>
+                    <th className="px-4 py-3">Cliente</th>
+                    <th className="px-4 py-3">Categoria</th>
+                    <th className="px-4 py-3">Origem</th>
+                    <th className="px-4 py-3">Status</th>
+                    <th className="px-4 py-3 text-right">Valor</th>
+                    <th className="px-4 py-3">Data</th>
                   </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {lancamentosPagina.map((l) => (
+                    <tr key={l.id} className="border-t border-gray-100">
+                      <td className="px-4 py-3">{l.anunciante.nome}</td>
+                      <td className="px-4 py-3">{l.contato?.nome || "-"}</td>
+                      <td className="px-4 py-3">{l.categoria}</td>
+                      <td className="px-4 py-3">{ORIGEM_LABELS[l.origem] || l.origem}</td>
+                      <td className="px-4 py-3">{STATUS_LABELS[l.status] || l.status}</td>
+                      <td className="px-4 py-3 text-right font-semibold">{formatCurrencyDisplay(parseFloat(l.valor))}</td>
+                      <td className="px-4 py-3 text-vitrii-text-secondary">
+                        {new Date(l.dataCriacao).toLocaleDateString("pt-BR")}
+                      </td>
+                    </tr>
+                  ))}
+                  {lancamentos.length === 0 && (
+                    <tr>
+                      <td colSpan={7} className="px-4 py-12 text-center text-vitrii-text-secondary">
+                        Nenhum lançamento encontrado
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Card View */}
+            {lancamentos.length === 0 ? (
+              <div className="md:hidden px-4 py-12 text-center text-vitrii-text-secondary border border-gray-200 rounded-lg">
+                Nenhum lançamento encontrado
+              </div>
+            ) : (
+              <div className="md:hidden space-y-3">
+                {lancamentosPagina.map((l) => (
+                  <div key={l.id} className="border border-gray-200 rounded-lg p-4 space-y-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0">
+                        <p className="font-semibold text-vitrii-text truncate">{l.anunciante.nome}</p>
+                        <p className="text-sm text-vitrii-text-secondary truncate">{l.contato?.nome || "-"}</p>
+                      </div>
+                      <span className="flex-shrink-0 font-bold text-vitrii-text">
+                        {formatCurrencyDisplay(parseFloat(l.valor))}
+                      </span>
+                    </div>
+                    <div className="flex flex-wrap gap-2 text-xs text-vitrii-text-secondary">
+                      <span className="px-2 py-0.5 rounded-full bg-gray-100">{l.categoria}</span>
+                      <span className="px-2 py-0.5 rounded-full bg-gray-100">{ORIGEM_LABELS[l.origem] || l.origem}</span>
+                      <span className="px-2 py-0.5 rounded-full bg-gray-100">{STATUS_LABELS[l.status] || l.status}</span>
+                      <span className="ml-auto">{new Date(l.dataCriacao).toLocaleDateString("pt-BR")}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <Pagination
+              currentPage={currentPage}
+              totalItems={lancamentos.length}
+              itemsPerPage={ITEMS_PER_PAGE}
+              onPageChange={setCurrentPage}
+            />
+          </>
         )}
       </main>
       <Footer />

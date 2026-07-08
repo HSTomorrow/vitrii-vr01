@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import Header from "@/components/Header";
@@ -13,6 +13,7 @@ import {
   Save,
   X,
 } from "lucide-react";
+import Pagination from "@/components/Pagination";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface Usuario {
@@ -66,6 +67,8 @@ export default function CadastroEquipeDeVenda() {
     status: "disponivel" as const,
   });
   const [searchEquipe, setSearchEquipe] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 20;
   const [searchMembro, setSearchMembro] = useState({});
 
   // Fetch anunciantes (filtered by current user, or all if admin)
@@ -470,6 +473,13 @@ export default function CadastroEquipeDeVenda() {
     );
   }, [equipes, searchEquipe]);
 
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const equipesPagina = equipesFiltered.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchEquipe]);
+
   // Filter membros based on search - memoized to avoid re-filtering on every render
   const getFilteredMembros = (membros: MembroEquipe[] | undefined, equipeId: number) => {
     if (!membros) return [];
@@ -673,7 +683,7 @@ export default function CadastroEquipeDeVenda() {
               </p>
             </div>
           ) : (
-            equipesFiltered.map((equipe: EquipeDeVenda) => (
+            equipesPagina.map((equipe: EquipeDeVenda) => (
               <div
                 key={equipe.id}
                 className="bg-white rounded-lg shadow-md overflow-hidden"
@@ -1236,6 +1246,13 @@ export default function CadastroEquipeDeVenda() {
             ))
           )}
         </div>
+
+        <Pagination
+          currentPage={currentPage}
+          totalItems={equipesFiltered.length}
+          itemsPerPage={ITEMS_PER_PAGE}
+          onPageChange={setCurrentPage}
+        />
       </main>
 
       <Footer />

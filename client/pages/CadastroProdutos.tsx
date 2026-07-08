@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Plus, Trash2, Edit2, Palette } from "lucide-react";
+import Pagination from "@/components/Pagination";
 
 interface Loja {
   id: number;
@@ -33,6 +34,8 @@ export default function CadastroProdutos() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [selectedLojaId, setSelectedLojaId] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const ITEMS_PER_PAGE = 20;
   const [formData, setFormData] = useState({
     grupoId: "",
     nome: "",
@@ -95,6 +98,9 @@ export default function CadastroProdutos() {
     },
     enabled: !!user,
   });
+
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const productosPagina = (productos || []).slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   // Save producto mutation
   const saveProductoMutation = useMutation({
@@ -395,7 +401,7 @@ export default function CadastroProdutos() {
                     </td>
                   </tr>
                 ) : (
-                  productos.map((producto) => (
+                  productosPagina.map((producto) => (
                     <tr key={producto.id} className="hover:bg-gray-50">
                       <td className="px-4 py-4 font-semibold text-vitrii-text text-sm">
                         {producto.nome}
@@ -457,7 +463,7 @@ export default function CadastroProdutos() {
               </div>
             ) : (
               <div className="space-y-3 p-4">
-                {productos.map((producto) => (
+                {productosPagina.map((producto) => (
                   <div
                     key={producto.id}
                     className="border border-gray-200 rounded-lg p-4 space-y-3 hover:shadow-md transition-shadow"
@@ -526,6 +532,13 @@ export default function CadastroProdutos() {
               </div>
             )}
           </div>
+
+          <Pagination
+            currentPage={currentPage}
+            totalItems={productos?.length || 0}
+            itemsPerPage={ITEMS_PER_PAGE}
+            onPageChange={setCurrentPage}
+          />
         </div>
       </main>
 

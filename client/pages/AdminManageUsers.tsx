@@ -262,7 +262,8 @@ export default function AdminManageUsers() {
               </div>
             </div>
           ) : filteredUsuarios.length > 0 ? (
-            <div className="overflow-x-auto">
+            <div>
+            <div className="hidden md:block overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b-2 border-gray-200">
@@ -392,12 +393,100 @@ export default function AdminManageUsers() {
                   ))}
                 </tbody>
               </table>
-              <Pagination
-                currentPage={currentPage}
-                totalItems={filteredUsuarios.length}
-                itemsPerPage={itemsPerPage}
-                onPageChange={setCurrentPage}
-              />
+            </div>
+
+            {/* Mobile Card View */}
+            <div className="md:hidden space-y-3">
+              {paginatedUsuarios.map((usuario: Usuario) => (
+                <div key={usuario.id} className="border border-gray-200 rounded-lg p-4 space-y-3">
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-vitrii-text truncate">{usuario.nome}</p>
+                      <p className="text-sm text-vitrii-text-secondary truncate">{usuario.email}</p>
+                    </div>
+                    <span
+                      className={`flex-shrink-0 px-3 py-1 rounded-full text-xs font-semibold ${
+                        usuario.tipoUsuario === "adm"
+                          ? "bg-red-100 text-red-800"
+                          : "bg-blue-100 text-blue-800"
+                      }`}
+                    >
+                      {usuario.tipoUsuario === "adm" ? "Administrador" : "Comum"}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <code className="bg-gray-100 px-3 py-1 rounded text-xs font-mono text-gray-700 flex-1 truncate">
+                      {showPasswords.has(usuario.id) ? usuario.senha : "••••••••"}
+                    </code>
+                    <button
+                      onClick={() => togglePasswordVisibility(usuario.id)}
+                      className="p-1 hover:bg-gray-200 rounded transition-colors flex-shrink-0"
+                      title={showPasswords.has(usuario.id) ? "Ocultar" : "Mostrar"}
+                    >
+                      {showPasswords.has(usuario.id) ? (
+                        <EyeOff className="w-4 h-4 text-gray-600" />
+                      ) : (
+                        <Eye className="w-4 h-4 text-gray-600" />
+                      )}
+                    </button>
+                    <button
+                      onClick={() => copyToClipboard(usuario.senha, usuario.id)}
+                      className="p-1 hover:bg-gray-200 rounded transition-colors flex-shrink-0"
+                      title="Copiar"
+                    >
+                      {copiedId === usuario.id ? (
+                        <Check className="w-4 h-4 text-green-600" />
+                      ) : (
+                        <Copy className="w-4 h-4 text-gray-600" />
+                      )}
+                    </button>
+                  </div>
+
+                  <div>
+                    <span
+                      className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${
+                        usuario.tassinatura === "Master"
+                          ? "bg-purple-100 text-purple-800"
+                          : usuario.tassinatura === "Premium"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : usuario.tassinatura === "Padrao"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-gray-100 text-gray-800"
+                      }`}
+                    >
+                      {usuario.tassinatura || "Gratuito"}
+                    </span>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setEditingUser(usuario)}
+                      className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 bg-vitrii-green text-white rounded-lg hover:bg-vitrii-green-dark transition-colors text-sm font-medium"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                      Editar
+                    </button>
+                    <button
+                      onClick={() =>
+                        setResetPasswordModal({ usuarioId: usuario.id, nome: usuario.nome })
+                      }
+                      className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors text-sm font-medium"
+                    >
+                      <RefreshCw className="w-4 h-4" />
+                      Resetar
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <Pagination
+              currentPage={currentPage}
+              totalItems={filteredUsuarios.length}
+              itemsPerPage={itemsPerPage}
+              onPageChange={setCurrentPage}
+            />
             </div>
           ) : (
             <div className="text-center py-12">

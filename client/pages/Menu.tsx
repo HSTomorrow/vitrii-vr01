@@ -179,12 +179,12 @@ export default function Menu() {
                   </Link>
 
                   <Link
-                    to="/totem"
+                    to="/catalogo"
                     className="flex items-center gap-4 px-6 py-4 bg-vitrii-gray hover:bg-gray-200 rounded-lg transition-colors"
                   >
                     <Tablet className="w-6 h-6 text-vitrii-blue" />
                     <span className="text-vitrii-text font-medium">
-                      Modo Totem
+                      Meu Catálogo
                     </span>
                   </Link>
 

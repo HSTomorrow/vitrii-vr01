@@ -277,6 +277,7 @@ import {
   obterDashboard,
   reprocessarDashboard,
   obterDashboardSomatorio,
+  obterEstatisticasUsuarios,
 } from "./routes/dashboard";
 import {
   listarAnunciantesFavoritos,
@@ -1387,6 +1388,7 @@ export function createServer() {
   // Dashboard (cache pré-computado — nunca agrega ao vivo; "somatorio" tem que vir antes
   // de ":anuncianteId" para não ser engolido pela rota de parâmetro)
   app.get("/api/dashboard/somatorio", extractUserId, obterDashboardSomatorio);
+  app.get("/api/admin/usuarios/estatisticas", extractUserId, requireAdmin, obterEstatisticasUsuarios);
   app.get("/api/dashboard/:anuncianteId", extractUserId, obterDashboard);
   app.post("/api/dashboard/:anuncianteId/reprocessar", extractUserId, reprocessarDashboard);
 

@@ -300,7 +300,7 @@ export default function AdminCategorias() {
                 </button>
               </div>
             ) : (
-              <div className="overflow-x-auto">
+              <div className="hidden md:block overflow-x-auto">
                 <table className="w-full">
                   <thead className="bg-gray-100 border-b border-gray-300">
                     <tr>
@@ -392,6 +392,63 @@ export default function AdminCategorias() {
                     ))}
                   </tbody>
                 </table>
+              </div>
+            )}
+
+            {/* Mobile Card View */}
+            {!isLoading && categoriasArray.length > 0 && (
+              <div className="md:hidden divide-y divide-gray-200">
+                {categoriasArray.map((categoria) => (
+                  <div key={categoria.id} className="p-4 space-y-3">
+                    <div className="flex items-center gap-3">
+                      <span className="text-3xl flex-shrink-0">{categoria.icone}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-vitrii-text truncate">
+                          {categoria.descricao}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Criada em {new Date(categoria.dataCriacao).toLocaleDateString("pt-BR")}
+                        </p>
+                      </div>
+                      <span
+                        className={`flex-shrink-0 inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold ${
+                          categoria.ativo
+                            ? "bg-green-100 text-green-700"
+                            : "bg-gray-100 text-gray-700"
+                        }`}
+                      >
+                        {categoria.ativo ? (
+                          <>
+                            <Check className="w-3.5 h-3.5" /> Ativo
+                          </>
+                        ) : (
+                          <>
+                            <X className="w-3.5 h-3.5" /> Inativo
+                          </>
+                        )}
+                      </span>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => startEdit(categoria)}
+                        className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-vitrii-blue border border-vitrii-blue rounded-lg hover:bg-blue-50 transition-colors text-sm"
+                      >
+                        <Edit2 className="w-4 h-4" /> Editar
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (confirm(`Deseja deletar a categoria "${categoria.descricao}"?`)) {
+                            deleteMutation.mutate(categoria.id);
+                          }
+                        }}
+                        disabled={deleteMutation.isPending}
+                        className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-red-600 border border-red-300 rounded-lg hover:bg-red-50 transition-colors disabled:opacity-50 text-sm"
+                      >
+                        <Trash2 className="w-4 h-4" /> Deletar
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </div>
