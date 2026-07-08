@@ -1,7 +1,7 @@
 import { RequestHandler } from "express";
 import crypto from "crypto";
 import prisma from "../lib/prisma";
-import { generateMockQRCode } from "../lib/mockPix";
+import { generatePixBRCode } from "../lib/pixBRCode";
 import { sendReceiptEmail } from "../lib/emailService";
 
 async function podeGerenciarAnunciante(userId: number, userType: string | undefined, anuncianteId: number): Promise<boolean> {
@@ -447,7 +447,7 @@ export const gerarPixLancamento: RequestHandler = async (req, res) => {
 
     const lancamento = await prisma.lancamentos_financeiros.findUnique({
       where: { id, dataExclusao: null },
-      include: { anunciante: { select: { chavePix: true } } },
+      include: { anunciante: { select: { chavePix: true, nome: true, cidade: true } } },
     });
     if (!lancamento) return res.status(404).json({ error: "Lançamento não encontrado" });
 
@@ -466,11 +466,15 @@ export const gerarPixLancamento: RequestHandler = async (req, res) => {
     }
 
     const pixId = `LF-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
-    const { qrCode, urlCopiaECola } = generateMockQRCode(
-      Number(lancamento.valor),
-      pixId,
-      lancamento.anunciante.chavePix,
-    );
+    const pixPayload = generatePixBRCode({
+      chavePix: lancamento.anunciante.chavePix,
+      valor: Number(lancamento.valor),
+      nomeRecebedor: lancamento.anunciante.nome,
+      cidadeRecebedor: lancamento.anunciante.cidade,
+      txid: pixId,
+    });
+    const qrCode = pixPayload;
+    const urlCopiaECola = pixPayload;
     const dataExpiracaoPix = new Date();
     dataExpiracaoPix.setMinutes(dataExpiracaoPix.getMinutes() + 30);
 
