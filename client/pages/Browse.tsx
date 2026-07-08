@@ -41,10 +41,11 @@ export default function Browse() {
   const itemsPerPage = 20;
   const anuncianteIdParam = searchParams.get("anuncianteId");
 
-  // Clear all filters on component mount
+  // Clear all filters on component mount, except a category carried over via
+  // ?categoria= (used by the home page's category chip row).
   useEffect(() => {
     setSearchTerm("");
-    setSelectedCategory("");
+    setSelectedCategory(searchParams.get("categoria") || "");
     setSelectedType("");
     setSelectedLocation("");
     setSelectedLocalidade(null);

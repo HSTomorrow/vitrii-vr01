@@ -300,6 +300,21 @@ export default function Index() {
     )
     .slice(0, 100);
 
+  // Category quick-filter chips: derived from the categoria values actually present on
+  // live ads (not the separate admin categorias table), ranked by how many ads use them,
+  // so every chip is guaranteed to produce results when clicked.
+  const topCategorias = Object.entries(
+    allAnuncios.reduce((acc: Record<string, number>, anuncio: any) => {
+      if (anuncio.categoria) acc[anuncio.categoria] = (acc[anuncio.categoria] || 0) + 1;
+      return acc;
+    }, {}),
+  )
+    .sort((a, b) => (b[1] as number) - (a[1] as number))
+    .slice(0, 10)
+    .map(([categoria]) => categoria);
+
+  const temFavoritos = favoritoIds.size > 0;
+
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
@@ -326,17 +341,46 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Featured Listings Section - Carousel 1 */}
-      <section className="py-2 md:py-3 bg-vitrii-gray-light">
+      {/* Category Quick Filters */}
+      {topCategorias.length > 0 && (
+        <section className="py-2 bg-white border-b border-gray-100">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+              <Link
+                to="/browse"
+                className="flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold bg-vitrii-blue text-white hover:bg-vitrii-blue-dark transition-colors"
+              >
+                Todas
+              </Link>
+              {topCategorias.map((categoria) => (
+                <Link
+                  key={categoria}
+                  to={`/browse?categoria=${encodeURIComponent(categoria)}`}
+                  className="flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold bg-vitrii-gray-light text-vitrii-text hover:bg-blue-50 hover:text-vitrii-blue transition-colors"
+                >
+                  {categoria}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Featured Listings Section - Carousel 1 (the hero row: bigger heading + a
+          highlighted band so it visually outranks the other curated rows below it) */}
+      <section className="py-3 md:py-4 bg-gradient-to-r from-blue-50 to-vitrii-gray-light border-y border-blue-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-2">
-            <div>
-              <h2 className="text-h2 mb-0.5" style={{ color: "#0071CE" }}>
-                Anúncios em Destaque
-              </h2>
-              <p className="text-label" style={{ color: "#0071CE" }}>
-                Veja os produtos e serviços mais procurados
-              </p>
+            <div className="flex items-center gap-2">
+              <Star className="w-6 h-6 text-vitrii-blue fill-vitrii-blue flex-shrink-0" />
+              <div>
+                <h2 className="text-xl md:text-2xl font-extrabold" style={{ color: "#0071CE" }}>
+                  Anúncios em Destaque
+                </h2>
+                <p className="text-label" style={{ color: "#0071CE" }}>
+                  Veja os produtos e serviços mais procurados
+                </p>
+              </div>
             </div>
             <Link
               to="/browse"
@@ -407,6 +451,12 @@ export default function Index() {
               <p className="text-label">
                 Conheça os principais anunciantes da plataforma
               </p>
+              {user && !temFavoritos && (
+                <p className="text-xs text-vitrii-text-secondary mt-1 flex items-center gap-1">
+                  <Heart className="w-3.5 h-3.5" />
+                  Favorite lojas para vê-las aqui primeiro
+                </p>
+              )}
             </div>
             <Link
               to="/browse"

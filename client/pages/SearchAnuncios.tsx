@@ -55,12 +55,16 @@ export default function SearchAnuncios() {
     [favoritosData],
   );
 
-  // Read search query parameter on mount
+  // Read search/category query parameters on mount
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const q = params.get("q");
     if (q) {
       setSearchTerm(decodeURIComponent(q));
+    }
+    const categoria = params.get("categoria");
+    if (categoria) {
+      setSelectedCategory(decodeURIComponent(categoria));
     }
   }, [location.search]);
 
