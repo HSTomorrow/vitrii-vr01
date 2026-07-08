@@ -551,6 +551,58 @@ export default function Financeiro() {
 
         {activeTab === "lancamentos" && (
           <div>
+            {/* Fechamento Mensal: deliberately its own full-width banner (not just another
+                filter field) so the closing routine is easy to find, not buried among the
+                other filters. */}
+            <div
+              className={`flex flex-wrap items-center justify-between gap-3 mb-4 p-4 rounded-lg border-2 ${
+                competenciaFechada
+                  ? "bg-vitrii-warning/10 border-vitrii-warning/30"
+                  : "bg-blue-50 border-vitrii-blue/20"
+              }`}
+            >
+              <div className="flex items-center gap-2">
+                {competenciaFechada ? (
+                  <Lock className="w-5 h-5 text-vitrii-warning flex-shrink-0" />
+                ) : (
+                  <Unlock className="w-5 h-5 text-vitrii-blue flex-shrink-0" />
+                )}
+                <div>
+                  <p className="font-bold text-vitrii-text">Fechamento Mensal</p>
+                  <p className="text-sm text-vitrii-text-secondary">
+                    {filterCompetencia
+                      ? competenciaFechada
+                        ? `O mês ${filterCompetencia} está fechado — os lançamentos não podem ser alterados.`
+                        : `O mês ${filterCompetencia} está aberto para edição.`
+                      : "Selecione uma competência no filtro abaixo para gerenciar o fechamento."}
+                  </p>
+                </div>
+              </div>
+              {filterCompetencia && (
+                competenciaFechada ? (
+                  <button
+                    onClick={() => reabrirMesMutation.mutate()}
+                    disabled={reabrirMesMutation.isPending}
+                    className="flex items-center gap-2 px-4 py-2 bg-vitrii-warning text-white rounded-lg font-semibold hover:opacity-90 disabled:opacity-50"
+                  >
+                    <Unlock className="w-4 h-4" /> Reabrir Mês
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      if (confirm(`Fechar o mês ${filterCompetencia}? Os lançamentos desta competência não poderão mais ser alterados até que o mês seja reaberto.`)) {
+                        fecharMesMutation.mutate();
+                      }
+                    }}
+                    disabled={fecharMesMutation.isPending}
+                    className="flex items-center gap-2 px-4 py-2 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark disabled:opacity-50"
+                  >
+                    <Lock className="w-4 h-4" /> Fechar Mês
+                  </button>
+                )
+              )}
+            </div>
+
             <div className="flex flex-wrap items-end gap-3 mb-4 p-3 bg-gray-50 rounded-lg border border-gray-200">
               <div>
                 <label className="block text-xs font-semibold text-vitrii-text-secondary mb-1">Status</label>
@@ -567,38 +619,12 @@ export default function Financeiro() {
               </div>
               <div>
                 <label className="block text-xs font-semibold text-vitrii-text-secondary mb-1">Competência</label>
-                <div className="flex items-center gap-2">
-                  <input
-                    type="month"
-                    value={filterCompetencia}
-                    onChange={(e) => setFilterCompetencia(e.target.value)}
-                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
-                  />
-                  {filterCompetencia && (
-                    competenciaFechada ? (
-                      <button
-                        onClick={() => reabrirMesMutation.mutate()}
-                        disabled={reabrirMesMutation.isPending}
-                        title="Mês fechado — clique para reabrir"
-                        className="flex items-center gap-1 text-xs px-3 py-2 bg-vitrii-warning/10 text-vitrii-warning border border-vitrii-warning/30 rounded-lg font-semibold hover:bg-vitrii-warning/20 disabled:opacity-50"
-                      >
-                        <Lock className="w-3.5 h-3.5" /> Mês Fechado
-                      </button>
-                    ) : (
-                      <button
-                        onClick={() => {
-                          if (confirm(`Fechar o mês ${filterCompetencia}? Os lançamentos desta competência não poderão mais ser alterados até que o mês seja reaberto.`)) {
-                            fecharMesMutation.mutate();
-                          }
-                        }}
-                        disabled={fecharMesMutation.isPending}
-                        className="flex items-center gap-1 text-xs px-3 py-2 border border-gray-300 text-vitrii-text-secondary rounded-lg font-semibold hover:bg-gray-100 disabled:opacity-50"
-                      >
-                        <Unlock className="w-3.5 h-3.5" /> Fechar Mês
-                      </button>
-                    )
-                  )}
-                </div>
+                <input
+                  type="month"
+                  value={filterCompetencia}
+                  onChange={(e) => setFilterCompetencia(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                />
               </div>
               <div>
                 <label className="block text-xs font-semibold text-vitrii-text-secondary mb-1">Vencimento de</label>
