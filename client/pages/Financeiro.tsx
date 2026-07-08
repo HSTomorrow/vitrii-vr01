@@ -16,6 +16,7 @@ import { exportToXlsx } from "@/utils/exportXlsx";
 interface Anunciante {
   id: number;
   nome: string;
+  chavePix?: string;
 }
 
 interface Lancamento {
@@ -317,6 +318,9 @@ export default function Financeiro() {
     enabled: !!selectedAnuncianteId,
   });
 
+  const selectedAnunciante = anunciantes.find((a) => a.id === selectedAnuncianteId);
+  const anuncianteTemChavePix = !!selectedAnunciante?.chavePix;
+
   const resumo = useMemo(() => {
     const pendente = lancamentosFiltrados
       .filter((l) => ["pendente", "pix_gerado", "comprovante_enviado"].includes(l.status))
@@ -551,6 +555,12 @@ export default function Financeiro() {
 
         {activeTab === "lancamentos" && (
           <div>
+            {!anuncianteTemChavePix && (
+              <div className="mb-4 p-3 bg-vitrii-warning/10 border border-vitrii-warning/30 rounded-lg text-sm text-vitrii-warning">
+                Este anunciante não tem uma Chave Pix cadastrada — o botão "Gerar Pix" fica
+                oculto até que uma Chave Pix seja cadastrada em Cadastro de Anunciantes.
+              </div>
+            )}
             {/* Fechamento Mensal: deliberately its own full-width banner (not just another
                 filter field) so the closing routine is easy to find, not buried among the
                 other filters. */}
@@ -786,7 +796,7 @@ export default function Financeiro() {
                             <MessageCircle className="w-3.5 h-3.5" /> Cobrança
                           </button>
                         )}
-                        {["pendente", "pix_gerado"].includes(l.status) && (
+                        {["pendente", "pix_gerado"].includes(l.status) && anuncianteTemChavePix && (
                           <button
                             onClick={() => gerarPixMutation.mutate(l.id)}
                             disabled={fechado}

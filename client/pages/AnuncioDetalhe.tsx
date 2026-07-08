@@ -476,7 +476,7 @@ export default function AnuncioDetalhe() {
                 <h2 className="text-2xl font-bold text-vitrii-text mb-4">
                   Descrição
                 </h2>
-                <p className="text-vitrii-text-secondary whitespace-pre-wrap leading-relaxed">
+                <p className="text-[0.8rem] text-vitrii-text-secondary whitespace-pre-wrap leading-relaxed">
                   {anuncio.descricao || "Sem descrição adicional"}
                 </p>
 
@@ -599,6 +599,11 @@ export default function AnuncioDetalhe() {
                           "Endereço não informado"}
                       </span>
                     </div>
+                    {anuncio.anunciantes?.cnpj && (
+                      <div className="text-left text-sm text-vitrii-text-secondary break-all">
+                        CNPJ: {anuncio.anunciantes.cnpj}
+                      </div>
+                    )}
                     {/* Social Media Links */}
                     <div className="flex gap-3 pt-2">
                       {anuncio.anunciantes?.email && (
@@ -609,11 +614,6 @@ export default function AnuncioDetalhe() {
                         >
                           <Mail className="w-4 h-4" />
                         </a>
-                      )}
-                      {anuncio.anunciantes?.cnpj && (
-                        <div className="text-sm text-vitrii-text-secondary">
-                          CNPJ: {anuncio.anunciantes.cnpj}
-                        </div>
                       )}
                       {anuncio.anunciantes?.telefone && (
                         <a

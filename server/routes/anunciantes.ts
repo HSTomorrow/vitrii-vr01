@@ -448,6 +448,7 @@ const AnuncianteUpdateSchema = z.object({
   iconColor: z.enum(["azul", "verde", "rosa", "vermelho", "laranja"]).optional(),
   localidadeId: z.number().int().nullable().optional(),
   status: z.enum(["Ativo", "Desativado"]).optional(),
+  tipoCobranca: z.enum(["Propria", "Vitrii"]).optional(),
 });
 
 // UPDATE anunciante (only safe fields allowed)
@@ -549,6 +550,21 @@ export const updateAnunciante: RequestHandler = async (req, res) => {
         `[updateAnunciante] ⚠️ User ${usuarioId} attempted to change anunciante type without admin permission`
       );
       delete cleanedData.tipo;
+    }
+
+    // Restrict tipoCobranca field - only admin can change it
+    if ("tipoCobranca" in cleanedData) {
+      if (!isAdmin) {
+        console.warn(
+          `[updateAnunciante] ⚠️ User ${usuarioId} attempted to change tipoCobranca without admin permission`
+        );
+        delete cleanedData.tipoCobranca;
+      } else if (!["Propria", "Vitrii"].includes(cleanedData.tipoCobranca)) {
+        return res.status(400).json({
+          success: false,
+          error: "tipoCobranca deve ser 'Propria' ou 'Vitrii'",
+        });
+      }
     }
 
     const updatedAnunciante = await prisma.anunciantes.update({
@@ -864,8 +880,10 @@ export const getAnunciantesByUsuario: RequestHandler = async (req, res) => {
           instagram: true,
           facebook: true,
           whatsapp: true,
+          chavePix: true,
           fotoUrl: true,
           status: true,
+          tipoCobranca: true,
           dataCriacao: true,
           dataAtualizacao: true,
         },
@@ -911,8 +929,10 @@ export const getAnunciantesByUsuario: RequestHandler = async (req, res) => {
           instagram: true,
           facebook: true,
           whatsapp: true,
+          chavePix: true,
           fotoUrl: true,
           status: true,
+          tipoCobranca: true,
           dataCriacao: true,
           dataAtualizacao: true,
         },

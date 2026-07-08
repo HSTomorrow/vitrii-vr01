@@ -31,6 +31,7 @@ interface Anunciante {
   iconColor?: string;
   temAgenda?: boolean;
   status?: string;
+  tipoCobranca?: string;
   localidadeId?: number | null;
 }
 
@@ -71,6 +72,7 @@ export default function CadastroAnunciantes() {
     temAgenda: false,
     localidadeId: null as number | null,
     status: "Ativo",
+    tipoCobranca: "Propria",
   });
 
   // Fetch anunciantes (filtered by current user, or all if admin)
@@ -208,6 +210,7 @@ export default function CadastroAnunciantes() {
         temAgenda: false,
         localidadeId: null,
         status: "Ativo",
+        tipoCobranca: "Propria",
       });
       setEditingId(null);
       setIsFormOpen(false);
@@ -266,6 +269,7 @@ export default function CadastroAnunciantes() {
       temAgenda: loja.temAgenda || false,
       localidadeId: loja.localidadeId || null,
       status: loja.status || "Ativo",
+      tipoCobranca: loja.tipoCobranca || "Propria",
     });
     setEditingId(loja.id);
     setIsFormOpen(true);
@@ -385,6 +389,7 @@ export default function CadastroAnunciantes() {
                 temAgenda: false,
                 localidadeId: null,
                 status: "Ativo",
+                tipoCobranca: "Propria",
               });
             }}
             className="flex items-center gap-2 px-4 py-2 bg-vitrii-yellow text-vitrii-text rounded-lg hover:bg-vitrii-yellow-dark transition-colors font-semibold"
@@ -695,6 +700,31 @@ export default function CadastroAnunciantes() {
                   />
                   <p className="text-xs text-vitrii-text-secondary mt-1">
                     Máximo 32 caracteres
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                    Tipo de Cobrança
+                  </label>
+                  {user?.tipoUsuario === "adm" ? (
+                    <select
+                      value={formData.tipoCobranca}
+                      onChange={(e) =>
+                        setFormData({ ...formData, tipoCobranca: e.target.value })
+                      }
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
+                    >
+                      <option value="Propria">Própria</option>
+                      <option value="Vitrii">Vitrii</option>
+                    </select>
+                  ) : (
+                    <p className="w-full px-4 py-2 border border-gray-200 rounded-lg bg-gray-50 text-vitrii-text-secondary">
+                      {formData.tipoCobranca === "Vitrii" ? "Vitrii" : "Própria"}
+                    </p>
+                  )}
+                  <p className="text-xs text-vitrii-text-secondary mt-1">
+                    Somente o administrador pode alterar
                   </p>
                 </div>
               </div>

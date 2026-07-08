@@ -28,6 +28,7 @@ model anunciantes {
   fotoUrl              String?                     @db.VarChar(500)
   iconColor            String                      @default("azul") @db.VarChar(20) // azul, verde, rosa, vermelho, laranja
   status               String                      @default("Ativo") @db.VarChar(50) // Ativo ou Desativado
+  tipoCobranca         String                      @default("Propria") @db.VarChar(20) // "Propria" ou "Vitrii" - somente admin altera
   temAgenda            Boolean                     @default(false) // Se sim, mostra o botão de agenda nos anuncios
   localidadeId         Int? // Default locality for filtering ads
   dataCriacao          DateTime                    @default(now())

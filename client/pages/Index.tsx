@@ -331,10 +331,10 @@ export default function Index() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-2">
             <div>
-              <h2 className="text-h2 mb-0.5">
+              <h2 className="text-h2 mb-0.5" style={{ color: "#0071CE" }}>
                 Anúncios em Destaque
               </h2>
-              <p className="text-label">
+              <p className="text-label" style={{ color: "#0071CE" }}>
                 Veja os produtos e serviços mais procurados
               </p>
             </div>

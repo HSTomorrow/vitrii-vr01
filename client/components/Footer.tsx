@@ -24,6 +24,16 @@ export default function Footer() {
             <p className="text-gray-400 text-xs mt-2">
               <a href="mailto:contato@herestomorrow.com.br" className="text-white hover:text-vitrii-blue transition-colors">contato@herestomorrow.com.br</a>
             </p>
+            <p className="text-gray-400 text-xs mt-2">
+              <a
+                href="https://wa.me/5551991930384"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-white hover:text-vitrii-green transition-colors"
+              >
+                WhatsApp: +55 51 99193-0384
+              </a>
+            </p>
           </div>
 
           {/* Vendedor */}

@@ -43,7 +43,7 @@ export default function Header() {
               <div className="w-full relative">
                 <input
                   type="text"
-                  placeholder="Buscar: nome, ID do anunciante, CNPJ..."
+                  placeholder="Anunciante, Produto, Serviço, Id do anúncio..."
                   onKeyDown={(e) => {
                     if (
                       e.key === "Enter" &&
@@ -180,7 +180,7 @@ export default function Header() {
             <div className="relative">
               <input
                 type="text"
-                placeholder="Buscar: nome, ID, CNPJ..."
+                placeholder="Anunciante, Produto, Serviço, Id do anúncio..."
                 onKeyDown={(e) => {
                   if (
                     e.key === "Enter" &&

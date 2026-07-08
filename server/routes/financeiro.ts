@@ -459,6 +459,12 @@ export const gerarPixLancamento: RequestHandler = async (req, res) => {
       return res.status(423).json({ error: "O mês deste lançamento está fechado." });
     }
 
+    if (!lancamento.anunciante.chavePix) {
+      return res.status(400).json({
+        error: "Este anunciante não possui Chave Pix cadastrada. Cadastre uma Chave Pix no cadastro do anunciante antes de gerar o Pix.",
+      });
+    }
+
     const pixId = `LF-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
     const { qrCode, urlCopiaECola } = generateMockQRCode(
       Number(lancamento.valor),
