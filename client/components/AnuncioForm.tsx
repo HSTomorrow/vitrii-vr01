@@ -1012,20 +1012,14 @@ export default function AnuncioForm({
                     }
                     onChange={(e) => {
                       const inputValue = e.target.value;
-                      console.log("[AnuncioForm] Preço input changed:", inputValue);
 
+                      // Store the raw input as-is while the user is typing — parsing/
+                      // normalizing on every keystroke was clobbering partial states like
+                      // "1," or "1,5" (parseFloat("1,") silently rounds to "1", eating the
+                      // decimal separator before the user can type the cents). Normalization
+                      // happens on blur instead, once the value is complete.
                       if (!formData.isDoacao && !formData.aCombinar) {
-                        const parsed = parseCurrencyInput(inputValue);
-                        console.log("[AnuncioForm] Parsed price:", parsed);
-                        // Store the parsed number as string, or keep original input if parsing fails
-                        // This prevents the field from being cleared while user is typing
-                        if (parsed !== null) {
-                          handleInputChange("precoAnuncio", String(parsed));
-                        } else {
-                          // If parsing fails, just keep the input as-is for now
-                          // It will be validated on blur or submission
-                          handleInputChange("precoAnuncio", inputValue);
-                        }
+                        handleInputChange("precoAnuncio", inputValue);
                       }
                     }}
                     onFocus={() => setPriceInputFocused(true)}
@@ -1074,8 +1068,8 @@ export default function AnuncioForm({
                 )}
             </div>
 
-            {/* "A Combinar" Checkbox - For Produtos, Serviços, Agendas, and Opportunities (not for Eventos) */}
-            {!["evento"].includes(formData.tipo || "") && (
+            {/* "A Combinar" Checkbox - available for every tipo, including Eventos */}
+            {(
               <div className="flex items-center gap-3 p-4 border rounded-lg bg-yellow-50 border-yellow-200">
                 <input
                   type="checkbox"
@@ -1108,7 +1102,7 @@ export default function AnuncioForm({
                       formData.isDoacao ? "cursor-not-allowed opacity-75" : "cursor-pointer"
                     }`}
                   >
-                    A combinar
+                    A combinar / Consultar Valor
                   </label>
                   <p className="text-xs text-gray-600 mt-1">
                     Selecione para indicar que o valor será negociado diretamente

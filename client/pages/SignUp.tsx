@@ -412,11 +412,21 @@ export default function SignUp() {
                     />
                     <span className="text-sm text-vitrii-text-secondary">
                       Concordo com os{" "}
-                      <a href="#" className="text-vitrii-blue hover:underline font-semibold">
+                      <a
+                        href="/termos-de-uso"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-vitrii-blue hover:underline font-semibold"
+                      >
                         Termos de Uso
                       </a>
                       {" "}e{" "}
-                      <a href="#" className="text-vitrii-blue hover:underline font-semibold">
+                      <a
+                        href="/privacidade"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-vitrii-blue hover:underline font-semibold"
+                      >
                         Política de Privacidade
                       </a>
                     </span>

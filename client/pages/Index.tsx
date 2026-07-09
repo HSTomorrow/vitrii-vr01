@@ -417,7 +417,9 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Featured Listings Section - Carousel 2 */}
+      {/* Featured Listings Section - Carousel 2 (only when it actually has ads —
+          otherwise it would show a redundant empty-state right below Carousel 1) */}
+      {(destaquedosCarousel2.length > 0 || allAnunciosLoading) && (
       <section className="py-2 md:py-3 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Featured Cards Carousel 2 */}
@@ -430,8 +432,10 @@ export default function Index() {
           />
         </div>
       </section>
+      )}
 
       {/* Featured Listings Section - Carousel 3 */}
+      {(destaquedosCarousel3.length > 0 || allAnunciosLoading) && (
       <section className="py-2 md:py-3 bg-vitrii-gray-light">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Featured Cards Carousel 3 */}
@@ -444,6 +448,7 @@ export default function Index() {
           />
         </div>
       </section>
+      )}
 
       {/* Featured Anunciantes Section */}
       <section className="py-3 md:py-4 bg-gradient-to-r from-amber-50 to-vitrii-gray-light border-y border-amber-100">
