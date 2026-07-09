@@ -2,9 +2,10 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState, useMemo, useEffect } from "react";
-import { ArrowLeft, Store, Loader, Search } from "lucide-react";
+import { ArrowLeft, Store, Loader, Search, Share2 } from "lucide-react";
 import Pagination from "@/components/Pagination";
 import ImageWithFallback from "@/components/ImageWithFallback";
+import ShareModal from "@/components/ShareModal";
 import { getAnuncioImage, getImageAlt } from "@/utils/imageFallback";
 import { formatCurrencyDisplay } from "@/utils/formatCurrency";
 
@@ -36,6 +37,7 @@ export default function Catalogo() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategoria, setSelectedCategoria] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [showShareModal, setShowShareModal] = useState(false);
 
   const { data: anuncianteData } = useQuery<{ data: Anunciante }>({
     queryKey: ["catalogo-anunciante", anuncianteId],
@@ -137,13 +139,22 @@ export default function Catalogo() {
             <Store className="w-8 h-8 text-vitrii-blue" />
             <h1 className="text-2xl font-bold text-vitrii-text">{anunciante?.nome || "Catálogo"}</h1>
           </div>
-          <button
-            onClick={() => navigate("/catalogo")}
-            className="flex items-center gap-2 px-4 py-2 border-2 border-gray-300 rounded-lg font-semibold text-vitrii-text-secondary hover:bg-gray-50 transition-colors"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            Voltar ao Catálogo
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowShareModal(true)}
+              className="flex items-center gap-2 px-4 py-2 border-2 border-vitrii-blue text-vitrii-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+            >
+              <Share2 className="w-5 h-5" />
+              Compartilhar
+            </button>
+            <button
+              onClick={() => navigate("/catalogo")}
+              className="flex items-center gap-2 px-4 py-2 border-2 border-gray-300 rounded-lg font-semibold text-vitrii-text-secondary hover:bg-gray-50 transition-colors"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              Voltar ao Catálogo
+            </button>
+          </div>
         </div>
 
         <div className="flex flex-wrap gap-3 mt-4">
@@ -222,6 +233,14 @@ export default function Catalogo() {
           </>
         )}
       </main>
+
+      <ShareModal
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+        title={anunciante?.nome ? `Catálogo de ${anunciante.nome}` : "Catálogo"}
+        url={window.location.href}
+        whatsappMessage={`Confira o catálogo de ${anunciante?.nome || "este anunciante"}:`}
+      />
     </div>
   );
 }
