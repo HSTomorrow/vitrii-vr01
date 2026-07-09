@@ -187,6 +187,7 @@ import {
   getConversaById,
   createConversa,
   deleteConversa,
+  limparConversasDeletadas,
 } from "./routes/conversas";
 import {
   getMensagensConversa,
@@ -1245,7 +1246,12 @@ export function createServer() {
   app.get("/api/conversas", getConversas);
   app.get("/api/conversas/:id", getConversaById);
   app.post("/api/conversas", createConversa);
-  app.delete("/api/conversas/:id", deleteConversa);
+  app.delete("/api/conversas/:id", extractUserId, deleteConversa);
+  app.post(
+    "/api/conversas/limpar-deletadas",
+    extractUserId,
+    limparConversasDeletadas,
+  );
 
   // Mensagens (Chat Messages) routes
   app.get("/api/conversas/:conversaId/mensagens", getMensagensConversa);

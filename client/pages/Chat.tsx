@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { ChevronLeft, Plus } from "lucide-react";
+import { ChevronLeft, Plus, MessageCircle, Archive } from "lucide-react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import ConversaList from "../components/ConversaList";
-import ChatBox from "../components/ChatBox";
+import ChatBox, { ChatBoxHandle } from "../components/ChatBox";
 import CreateConversaModal from "../components/CreateConversaModal";
 import ProfileCompletionGate from "../components/ProfileCompletionGate";
 
@@ -29,6 +29,7 @@ interface Conversa {
   ultimaMensagem: string;
   dataUltimaMensagem: string;
   tipo: "publica" | "privada";
+  dataExclusao?: string | null;
   usuario: {
     id: number;
     nome: string;
@@ -51,6 +52,7 @@ export default function Chat() {
   const [selectedConversa, setSelectedConversa] = useState<Conversa | null>(
     null,
   );
+  const chatBoxRef = useRef<ChatBoxHandle>(null);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showProfileGate, setShowProfileGate] = useState(false);
   const [preFilledData, setPreFilledData] = useState<{
@@ -142,6 +144,8 @@ export default function Chat() {
     toast.success("Conversa iniciada!");
   };
 
+  const isSelectedDeleted = !!selectedConversa?.dataExclusao;
+
   return (
     <div className="min-h-screen bg-vitrii-gray-light">
       {/* Header */}
@@ -154,12 +158,13 @@ export default function Chat() {
             <ChevronLeft className="w-5 h-5 mr-1" />
             Voltar
           </Link>
-          <h1 className="text-2xl font-bold text-vitrii-text">
+          <h1 className="text-2xl font-bold text-vitrii-text flex items-center gap-2">
+            <MessageCircle className="w-6 h-6 text-vitrii-blue" />
             Minhas Mensagens
           </h1>
           <button
             onClick={handleCreateConversa}
-            className="flex items-center gap-2 px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors shadow-sm"
           >
             <Plus className="w-4 h-4" />
             Nova Conversa
@@ -176,6 +181,7 @@ export default function Chat() {
               usuarioId={user?.id || 0}
               onSelectConversa={(conversa) => setSelectedConversa(conversa)}
               selectedConversaId={selectedConversa?.id}
+              onResponder={() => chatBoxRef.current?.focusInput()}
             />
           </div>
 
@@ -184,23 +190,40 @@ export default function Chat() {
             {selectedConversa && conversa ? (
               <div className="flex flex-col h-full">
                 {/* Conversation Header */}
-                <div className="bg-white rounded-t-lg shadow-md border-b border-gray-200 p-4">
-                  <h2 className="font-bold text-vitrii-text text-lg">
-                    {selectedConversa.assunto}
-                  </h2>
-                  <p className="text-sm text-vitrii-text-secondary">
-                    com {selectedConversa.anunciante.nome} •{" "}
-                    {selectedConversa.usuario.nome}
-                  </p>
-                  {selectedConversa.anuncio && (
-                    <p className="text-sm text-gray-500 mt-2">
-                      📢 Sobre: {selectedConversa.anuncio.titulo}
-                    </p>
-                  )}
+                <div
+                  className={`rounded-t-lg shadow-md border-b p-4 ${
+                    isSelectedDeleted
+                      ? "bg-red-50 border-red-100"
+                      : "bg-white border-gray-200"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <h2 className="font-bold text-vitrii-text text-lg">
+                        {selectedConversa.assunto}
+                      </h2>
+                      <p className="text-sm text-vitrii-text-secondary">
+                        com {selectedConversa.anunciante.nome} •{" "}
+                        {selectedConversa.usuario.nome}
+                      </p>
+                      {selectedConversa.anuncio && (
+                        <p className="text-sm text-gray-500 mt-2">
+                          📢 Sobre: {selectedConversa.anuncio.titulo}
+                        </p>
+                      )}
+                    </div>
+                    {isSelectedDeleted && (
+                      <span className="text-xs px-2 py-1 rounded-full bg-red-100 text-red-600 flex items-center gap-1 flex-shrink-0">
+                        <Archive className="w-3.5 h-3.5" />
+                        Deletada
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 {/* Chat Box */}
                 <ChatBox
+                  ref={chatBoxRef}
                   conversaId={selectedConversa.id}
                   messages={messages}
                   currentUserId={user?.id || 0}
@@ -209,11 +232,13 @@ export default function Chat() {
                   userCpf={user?.cpf}
                   userTelefone={user?.telefone}
                   onProfileIncomplete={() => setShowProfileGate(true)}
+                  readOnly={isSelectedDeleted}
                 />
               </div>
             ) : (
               <div className="bg-white rounded-lg shadow-md flex items-center justify-center h-full">
                 <div className="text-center">
+                  <MessageCircle className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                   <p className="text-vitrii-text-secondary text-lg mb-4">
                     Selecione uma conversa para começar
                   </p>

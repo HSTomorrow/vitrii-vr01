@@ -30,6 +30,11 @@ export async function getConversas(req: Request, res: Response) {
             ? [{ anuncianteId: { in: anunciantesIds } }]
             : []),
         ],
+        // Cleared (dataLimpeza set) conversations are gone from the UI for good, even
+        // in the "Deletadas" tab — kept in the DB for audit only. Soft-deleted-but-not-
+        // cleared ones are still returned here; the client splits them into the
+        // "Deletadas" tab by dataExclusao instead of a separate query.
+        dataLimpeza: null,
       },
       select: {
         id: true,
@@ -40,6 +45,7 @@ export async function getConversas(req: Request, res: Response) {
         tipo: true,
         dataCriacao: true,
         dataAtualizacao: true,
+        dataExclusao: true,
         usuario: {
           select: {
             id: true,
@@ -106,6 +112,7 @@ export async function getConversaById(req: Request, res: Response) {
         tipo: true,
         dataCriacao: true,
         dataAtualizacao: true,
+        dataExclusao: true,
         usuario: {
           select: {
             id: true,
@@ -218,13 +225,49 @@ export async function deleteConversa(req: Request, res: Response) {
     const { conversaId } = req.params;
     const conversaIdNum = parseInt(conversaId, 10);
 
-    await prisma.conversas.delete({
+    // Soft delete: the conversation and its messages stay in the DB for audit,
+    // they just move to the "Deletadas" tab instead of vanishing.
+    await prisma.conversas.update({
       where: { id: conversaIdNum },
+      data: { dataExclusao: new Date(), excluidoPor: req.userId ?? null },
     });
 
     res.json({ data: { message: "Conversa deletada com sucesso" } });
   } catch (error) {
     console.error("[deleteConversa] Error:", error);
     res.status(500).json({ error: "Erro ao deletar conversa" });
+  }
+}
+
+// Permanently hides already-deleted conversations from the UI (both tabs) while
+// keeping their rows in the DB for audit — the "limpar" action from the Deletadas tab.
+export async function limparConversasDeletadas(req: Request, res: Response) {
+  try {
+    const userId = req.userId!;
+
+    const usuarioAnunciantes = await prisma.usuarios_anunciantes.findMany({
+      where: { usuarioId: userId },
+      select: { anuncianteId: true },
+    });
+    const anunciantesIds = usuarioAnunciantes.map((ua) => ua.anuncianteId);
+
+    const result = await prisma.conversas.updateMany({
+      where: {
+        dataExclusao: { not: null },
+        dataLimpeza: null,
+        OR: [
+          { usuarioId: userId },
+          ...(anunciantesIds.length > 0
+            ? [{ anuncianteId: { in: anunciantesIds } }]
+            : []),
+        ],
+      },
+      data: { dataLimpeza: new Date() },
+    });
+
+    res.json({ data: { count: result.count } });
+  } catch (error) {
+    console.error("[limparConversasDeletadas] Error:", error);
+    res.status(500).json({ error: "Erro ao limpar conversas deletadas" });
   }
 }

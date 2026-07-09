@@ -1,7 +1,15 @@
-import { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Send, Trash2, Reply, X } from "lucide-react";
+import { Send, Trash2, Reply, X, Archive } from "lucide-react";
 import ProfileCompletionGate from "./ProfileCompletionGate";
 
 interface Message {
@@ -39,24 +47,45 @@ interface ChatBoxProps {
   userCpf?: string;
   userTelefone?: string;
   onProfileIncomplete?: () => void;
+  // Deleted conversations are read-only audit views: no composing, no per-message
+  // reply/delete actions.
+  readOnly?: boolean;
 }
 
-export default function ChatBox({
-  conversaId,
-  messages,
-  currentUserId,
-  tipoUsuario,
-  onNewMessage,
-  userCpf,
-  userTelefone,
-  onProfileIncomplete,
-}: ChatBoxProps) {
+export interface ChatBoxHandle {
+  focusInput: () => void;
+}
+
+const ChatBox = forwardRef<ChatBoxHandle, ChatBoxProps>(function ChatBox(
+  {
+    conversaId,
+    messages,
+    currentUserId,
+    tipoUsuario,
+    onNewMessage,
+    userCpf,
+    userTelefone,
+    onProfileIncomplete,
+    readOnly,
+  },
+  ref,
+) {
   const queryClient = useQueryClient();
   const [messageText, setMessageText] = useState("");
   const [showProfileGate, setShowProfileGate] = useState(false);
   const [replyingTo, setReplyingTo] = useState<Message | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messageInputRef = useRef<HTMLTextAreaElement>(null);
+
+  useImperativeHandle(ref, () => ({
+    focusInput: () => {
+      messageInputRef.current?.focus();
+      messageInputRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    },
+  }));
 
   // Auto-scroll to bottom
   useEffect(() => {
@@ -292,29 +321,31 @@ export default function ChatBox({
                           <p className="break-words text-sm">{msg.conteudo}</p>
                         </div>
 
-                        <div className="mt-1 flex items-center gap-3">
-                          <button
-                            onClick={() => setReplyingTo(msg)}
-                            className="text-xs text-gray-400 hover:text-vitrii-blue transition-colors flex items-center gap-1"
-                            title="Responder mensagem"
-                          >
-                            <Reply className="w-3 h-3" />
-                            Responder
-                          </button>
-
-                          {/* Delete Button */}
-                          {isCurrentUser && (
+                        {!readOnly && (
+                          <div className="mt-1 flex items-center gap-3">
                             <button
-                              onClick={() => deleteMessageMutation.mutate(msg.id)}
-                              disabled={deleteMessageMutation.isPending}
-                              className="text-xs text-gray-400 hover:text-red-600 transition-colors flex items-center gap-1"
-                              title="Deletar mensagem"
+                              onClick={() => setReplyingTo(msg)}
+                              className="text-xs text-gray-400 hover:text-vitrii-blue transition-colors flex items-center gap-1"
+                              title="Responder mensagem"
                             >
-                              <Trash2 className="w-3 h-3" />
-                              Deletar
+                              <Reply className="w-3 h-3" />
+                              Responder
                             </button>
-                          )}
-                        </div>
+
+                            {/* Delete Button */}
+                            {isCurrentUser && (
+                              <button
+                                onClick={() => deleteMessageMutation.mutate(msg.id)}
+                                disabled={deleteMessageMutation.isPending}
+                                className="text-xs text-gray-400 hover:text-red-600 transition-colors flex items-center gap-1"
+                                title="Deletar mensagem"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                                Deletar
+                              </button>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
                   );
@@ -327,6 +358,12 @@ export default function ChatBox({
       </div>
 
       {/* Input Area */}
+      {readOnly ? (
+        <div className="border-t border-gray-200 p-4 flex items-center justify-center gap-2 text-sm text-vitrii-text-secondary bg-gray-50 rounded-b-lg">
+          <Archive className="w-4 h-4" />
+          Conversa deletada — visualização somente para consulta.
+        </div>
+      ) : (
       <div className="border-t border-gray-200 p-4">
         {replyingTo && (
           <div className="mb-2 flex items-start justify-between gap-2 bg-gray-50 border-l-2 border-vitrii-blue rounded px-3 py-2">
@@ -375,6 +412,7 @@ export default function ChatBox({
           </p>
         </form>
       </div>
+      )}
 
       {/* Profile Completion Gate */}
       <ProfileCompletionGate
@@ -384,4 +422,6 @@ export default function ChatBox({
       />
     </div>
   );
-}
+});
+
+export default ChatBox;

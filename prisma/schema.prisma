@@ -793,6 +793,9 @@ model conversas {
   tipo            String   @default("privada") @db.VarChar(50) // "privada" ou "publica"
   dataCriacao     DateTime @default(now()) @map("datacriacao")
   dataAtualizacao DateTime @updatedAt @map("dataatualizacao")
+  dataExclusao    DateTime? @map("dataexclusao")
+  excluidoPor     Int?      @map("excluidopor")
+  dataLimpeza     DateTime? @map("datalimpeza")
 
   usuario    usracessos  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   anunciante anunciantes @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
@@ -803,6 +806,7 @@ model conversas {
   @@index([anuncianteId])
   @@index([anuncioId])
   @@index([dataCriacao])
+  @@index([dataExclusao])
   @@map("conversas")
 }
 
