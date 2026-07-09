@@ -106,8 +106,10 @@ model anuncios {
   dataExclusao             DateTime?
   excluidoPor              Int?
   dataFim                  DateTime? // End date for ad validity (7 days for Standard, 30 days for Professional, or admin-set)
+  endereco                 String?                     @db.VarChar(255)
   cidade                   String?                     @db.VarChar(100)
   estado                   String?                     @db.VarChar(2)
+  ocultarEndereco          Boolean                     @default(false) // When true, show "Consultar endereço com anunciante" instead of the address
   visualizacoes            Int                         @default(0)
   destaque                 Boolean                     @default(false)
   bannerInicial            Boolean                     @default(false) // Admin-only: the one ad shown as the homepage popup. Exclusivity enforced in updateAnuncio, not the DB.

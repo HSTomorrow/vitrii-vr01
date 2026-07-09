@@ -357,6 +357,15 @@ export default function AnuncioDetalhe() {
   }
 
   const anuncio = data.data;
+
+  // The anúncio's own address wins over the anunciante's registered one (it can be
+  // overridden per-ad); ocultarEndereco suppresses display entirely.
+  const enderecoAnuncio = [anuncio.endereco, anuncio.cidade, anuncio.estado]
+    .filter(Boolean)
+    .join(", ");
+  const enderecoExibicao = enderecoAnuncio || anuncio.anunciantes?.endereco || "";
+  const mostrarEndereco = !anuncio.ocultarEndereco && !!enderecoExibicao;
+
   const statusColors: any = {
     em_edicao: "bg-yellow-100 text-yellow-800",
     aguardando_pagamento: "bg-blue-100 text-blue-800",
@@ -593,12 +602,24 @@ export default function AnuncioDetalhe() {
                       {anuncio.anunciantes?.nome || "Anunciante desconhecido"}
                     </p>
                     <div className="flex items-center gap-2 text-vitrii-text-secondary text-sm">
-                      <MapPin className="w-4 h-4" />
+                      <MapPin className="w-4 h-4 flex-shrink-0" />
                       <span>
-                        {anuncio.anunciantes?.endereco ||
-                          "Endereço não informado"}
+                        {anuncio.ocultarEndereco
+                          ? "Consultar endereço com anunciante"
+                          : enderecoExibicao || "Endereço não informado"}
                       </span>
                     </div>
+                    {mostrarEndereco && (
+                      <a
+                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(enderecoExibicao)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 text-sm font-semibold text-vitrii-blue hover:underline"
+                      >
+                        <MapPin className="w-4 h-4" />
+                        Encontre no Mapa
+                      </a>
+                    )}
                     {anuncio.anunciantes?.cnpj && (
                       <div className="text-left text-sm text-vitrii-text-secondary break-all">
                         CNPJ: {anuncio.anunciantes.cnpj}

@@ -68,6 +68,9 @@ interface Anunciante {
   id: number;
   nome: string;
   tipo?: string;
+  endereco?: string;
+  cidade?: string;
+  estado?: string;
 }
 
 interface EquipeDeVenda {
@@ -128,6 +131,7 @@ export default function AnuncioForm({
     endereco: "",
     cidade: "",
     estado: "RS",
+    ocultarEndereco: false,
     isDoacao: isDonation || normalizedIsDoacao,
     aCombinar: false,
     destaque: false,
@@ -300,6 +304,19 @@ export default function AnuncioForm({
     }
   }, [selectedAnunciante?.id, selectedAnunciante?.tipo]);
 
+  // Auto-fill the ad's address from the selected anunciante's own cadastro, only when
+  // creating a new ad (editing an existing one keeps whatever it already has stored).
+  useEffect(() => {
+    if (!anuncioId && selectedAnunciante) {
+      setFormData((prev) => ({
+        ...prev,
+        endereco: selectedAnunciante.endereco || prev.endereco,
+        cidade: selectedAnunciante.cidade || prev.cidade,
+        estado: selectedAnunciante.estado || prev.estado,
+      }));
+    }
+  }, [selectedAnunciante?.id, anuncioId]);
+
   // Update tipo when product is selected
   useEffect(() => {
     if (selectedProducto && selectedProducto.tipo) {
@@ -367,6 +384,7 @@ export default function AnuncioForm({
         endereco: ad.endereco || "",
         cidade: ad.cidade || "",
         estado: ad.estado || "RS",
+        ocultarEndereco: ad.ocultarEndereco || false,
         isDoacao: ad.isDoacao || false,
         aCombinar: ad.aCombinar || false,
         destaque: ad.destaque || false,
@@ -448,6 +466,7 @@ export default function AnuncioForm({
         endereco: data.endereco || null,
         cidade: data.cidade || null,
         estado: data.estado || null,
+        ocultarEndereco: data.ocultarEndereco,
         tipo: normalizedTipo,
         isDoacao: normalizedIsDoacao,
         aCombinar: data.aCombinar,
@@ -1433,6 +1452,25 @@ export default function AnuncioForm({
                   ))}
                 </select>
               </div>
+            </div>
+
+            {/* Ocultar Endereço */}
+            <div className="flex items-center gap-3 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+              <input
+                type="checkbox"
+                id="ocultarEndereco"
+                checked={formData.ocultarEndereco}
+                onChange={(e) => handleInputChange("ocultarEndereco", e.target.checked)}
+                className="w-5 h-5 text-vitrii-blue cursor-pointer rounded"
+              />
+              <label htmlFor="ocultarEndereco" className="flex-1 cursor-pointer">
+                <span className="text-sm font-semibold text-vitrii-text">
+                  Ocultar Endereço
+                </span>
+                <p className="text-xs text-gray-600 mt-1">
+                  Em vez do endereço, o anúncio mostrará "Consultar endereço com anunciante".
+                </p>
+              </label>
             </div>
 
             {/* Link para Mais Detalhes */}

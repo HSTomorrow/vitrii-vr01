@@ -68,6 +68,7 @@ const AnuncioBaseSchema = z.object({
     .length(2, "Estado deve ter 2 caracteres")
     .optional()
     .nullable(),
+  ocultarEndereco: z.boolean().optional().default(false),
   tipo: z
     .enum(["anuncio_padrao", "produto", "servico", "evento", "aulas_cursos", "oportunidade"])
     .optional()
@@ -234,8 +235,10 @@ export const getAnuncios: RequestHandler = async (req, res) => {
           dataCriacao: true,
           dataAtualizacao: true,
           dataFim: true,
+          endereco: true,
           cidade: true,
           estado: true,
+          ocultarEndereco: true,
           visualizacoes: true,
           destaque: true,
           bannerInicial: true,
@@ -712,8 +715,10 @@ export const createAnuncio: RequestHandler = async (req, res) => {
         categoriaId: validatedData.categoriaId || null,
         tabelaDePrecoId,
         usarValorTabela: validatedData.usarValorTabela && precoTabelaAtual !== null,
+        endereco: validatedData.endereco,
         cidade: validatedData.cidade,
         estado: validatedData.estado,
+        ocultarEndereco: validatedData.ocultarEndereco,
         status,
         statusPagamento,
         destaque,
@@ -863,8 +868,11 @@ export const updateAnuncio: RequestHandler = async (req, res) => {
       });
       if (tabela) mappedData.preco = Number(tabela.preco);
     }
+    if (updateData.endereco !== undefined) mappedData.endereco = updateData.endereco;
     if (updateData.cidade !== undefined) mappedData.cidade = updateData.cidade;
     if (updateData.estado !== undefined) mappedData.estado = updateData.estado;
+    if (updateData.ocultarEndereco !== undefined)
+      mappedData.ocultarEndereco = updateData.ocultarEndereco;
     if (updateData.status !== undefined) mappedData.status = updateData.status;
     if (updateData.statusPagamento !== undefined)
       mappedData.statusPagamento = updateData.statusPagamento;
