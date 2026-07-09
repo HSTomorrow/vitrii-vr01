@@ -84,7 +84,8 @@ const AnuncioBaseSchema = z.object({
   statusPagamento: z
     .enum(["pendente", "aprovado", "recusado"])
     .optional(),
-  categoria: z.enum(["roupas", "carros", "imoveis"]).optional().nullable(),
+  categoria: z.string().max(100).optional().nullable(),
+  categoriaId: z.number().int().positive().optional().nullable(),
   dadosCategoria: z.string().optional().nullable(), // JSON string
   link: z
     .string()
@@ -204,6 +205,7 @@ export const getAnuncios: RequestHandler = async (req, res) => {
           descricao: true,
           preco: true,
           categoria: true,
+          categoriaId: true,
           imagem: true,
           link: true,
           status: true,
@@ -618,6 +620,7 @@ export const createAnuncio: RequestHandler = async (req, res) => {
         link: validatedData.link || null,
         preco: precoAnuncio,
         categoria: validatedData.categoria,
+        categoriaId: validatedData.categoriaId || null,
         cidade: validatedData.cidade,
         estado: validatedData.estado,
         status,
@@ -757,6 +760,8 @@ export const updateAnuncio: RequestHandler = async (req, res) => {
       mappedData.preco = updateData.precoAnuncio;
     if (updateData.categoria !== undefined)
       mappedData.categoria = updateData.categoria;
+    if (updateData.categoriaId !== undefined)
+      mappedData.categoriaId = updateData.categoriaId;
     if (updateData.cidade !== undefined) mappedData.cidade = updateData.cidade;
     if (updateData.estado !== undefined) mappedData.estado = updateData.estado;
     if (updateData.status !== undefined) mappedData.status = updateData.status;
@@ -1322,6 +1327,16 @@ export const getProdutosParaAnuncio: RequestHandler = async (req, res) => {
         lojaId: parseInt(anuncianteId),
         dataExclusao: null,
         status: "ativo",
+      },
+      include: {
+        grupo: {
+          select: {
+            id: true,
+            nome: true,
+            categoriaId: true,
+            categoriaRef: { select: { descricao: true } },
+          },
+        },
       },
     });
 

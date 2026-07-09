@@ -12,12 +12,6 @@ import ImageWithFallback from "@/components/ImageWithFallback";
 import { getAnuncioImage, getImageAlt } from "@/utils/imageFallback";
 import { formatCurrencyDisplay } from "@/utils/formatCurrency";
 
-const CATEGORIES = [
-  { value: "roupas", label: "Roupas" },
-  { value: "carros", label: "Carros" },
-  { value: "imoveis", label: "Imóveis" },
-];
-
 const TYPES = [
   { value: "produto", label: "Produto" },
   { value: "servico", label: "Serviço" },
@@ -32,7 +26,7 @@ export default function Browse() {
   const [searchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
+  const [selectedCategoriaId, setSelectedCategoriaId] = useState("");
   const [selectedType, setSelectedType] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
   const [selectedLocalidade, setSelectedLocalidade] = useState<number | null>(null);
@@ -42,10 +36,10 @@ export default function Browse() {
   const anuncianteIdParam = searchParams.get("anuncianteId");
 
   // Clear all filters on component mount, except a category carried over via
-  // ?categoria= (used by the home page's category chip row).
+  // ?categoriaId= (used by the home page's category chip row).
   useEffect(() => {
     setSearchTerm("");
-    setSelectedCategory(searchParams.get("categoria") || "");
+    setSelectedCategoriaId(searchParams.get("categoriaId") || "");
     setSelectedType("");
     setSelectedLocation("");
     setSelectedLocalidade(null);
@@ -53,6 +47,16 @@ export default function Browse() {
     setCurrentPage(1);
     setShowFilters(false);
   }, []);
+
+  // Fetch real categorias for the filter dropdown
+  const { data: categorias = [] } = useQuery({
+    queryKey: ["categorias"],
+    queryFn: async () => {
+      const response = await fetch("/api/categorias");
+      if (!response.ok) throw new Error("Erro ao buscar categorias");
+      return response.json();
+    },
+  });
 
   // Fetch all active ads with pagination
   // Note: The API already filters by status="ativo" by default when no status param is provided
@@ -159,7 +163,7 @@ export default function Browse() {
       }
 
       // Filter by category
-      if (selectedCategory && anuncio.categoria !== selectedCategory) {
+      if (selectedCategoriaId && String(anuncio.categoriaId) !== selectedCategoriaId) {
         return false;
       }
 
@@ -207,7 +211,7 @@ export default function Browse() {
   }, [
     allAnuncios,
     searchTerm,
-    selectedCategory,
+    selectedCategoriaId,
     selectedType,
     selectedLocation,
     priceRange,
@@ -246,7 +250,7 @@ export default function Browse() {
   };
 
   const handleCategoryChange = (value: string) => {
-    setSelectedCategory(value);
+    setSelectedCategoriaId(value);
     handleFilterChange();
   };
 
@@ -272,7 +276,7 @@ export default function Browse() {
 
   const clearFilters = () => {
     setSearchTerm("");
-    setSelectedCategory("");
+    setSelectedCategoriaId("");
     setSelectedType("");
     setSelectedLocation("");
     setSelectedLocalidade(null);
@@ -282,7 +286,7 @@ export default function Browse() {
 
   const hasActiveFilters =
     searchTerm ||
-    selectedCategory ||
+    selectedCategoriaId ||
     selectedType ||
     selectedLocation ||
     selectedLocalidade ||
@@ -384,14 +388,14 @@ export default function Browse() {
                       Categoria
                     </label>
                     <select
-                      value={selectedCategory}
+                      value={selectedCategoriaId}
                       onChange={(e) => handleCategoryChange(e.target.value)}
                       className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
                     >
                       <option value="">Todas</option>
-                      {CATEGORIES.map((cat) => (
-                        <option key={cat.value} value={cat.value}>
-                          {cat.label}
+                      {categorias.map((cat: { id: number; descricao: string; icone: string }) => (
+                        <option key={cat.id} value={cat.id}>
+                          {cat.icone} {cat.descricao}
                         </option>
                       ))}
                     </select>

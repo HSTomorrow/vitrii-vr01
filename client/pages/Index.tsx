@@ -302,18 +302,19 @@ export default function Index() {
     )
     .slice(0, 100);
 
-  // Category quick-filter chips: derived from the categoria values actually present on
-  // live ads (not the separate admin categorias table), ranked by how many ads use them,
-  // so every chip is guaranteed to produce results when clicked.
-  const topCategorias = Object.entries(
-    allAnuncios.reduce((acc: Record<string, number>, anuncio: any) => {
-      if (anuncio.categoria) acc[anuncio.categoria] = (acc[anuncio.categoria] || 0) + 1;
-      return acc;
-    }, {}),
-  )
-    .sort((a, b) => (b[1] as number) - (a[1] as number))
-    .slice(0, 10)
-    .map(([categoria]) => categoria);
+  // Category quick-filter chips: ranked by how many live ads use each real categoria
+  // (via categoriaId, the admin-managed categorias table), so every chip is guaranteed
+  // to produce results when clicked and stays consistent with the admin's taxonomy.
+  const categoriaUsage = new Map<number, { id: number; descricao: string; count: number }>();
+  for (const anuncio of allAnuncios) {
+    if (!anuncio.categoriaId || !anuncio.categoria) continue;
+    const entry = categoriaUsage.get(anuncio.categoriaId);
+    if (entry) entry.count++;
+    else categoriaUsage.set(anuncio.categoriaId, { id: anuncio.categoriaId, descricao: anuncio.categoria, count: 1 });
+  }
+  const topCategorias = Array.from(categoriaUsage.values())
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 10);
 
   const temFavoritos = favoritoIds.size > 0;
 
@@ -354,13 +355,13 @@ export default function Index() {
               >
                 Todas
               </Link>
-              {topCategorias.map((categoria) => (
+              {topCategorias.map((cat) => (
                 <Link
-                  key={categoria}
-                  to={`/browse?categoria=${encodeURIComponent(categoria)}`}
+                  key={cat.id}
+                  to={`/browse?categoriaId=${cat.id}`}
                   className="flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold bg-vitrii-gray-light text-vitrii-text hover:bg-blue-50 hover:text-vitrii-blue transition-colors"
                 >
-                  {categoria}
+                  {cat.descricao}
                 </Link>
               ))}
             </div>

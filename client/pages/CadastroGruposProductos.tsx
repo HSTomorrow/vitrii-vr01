@@ -11,6 +11,12 @@ interface Loja {
   nome: string;
 }
 
+interface Categoria {
+  id: number;
+  descricao: string;
+  icone: string;
+}
+
 interface GrupoDeProductos {
   id: number;
   anuncianteId: number;
@@ -18,6 +24,8 @@ interface GrupoDeProductos {
   descricao?: string;
   status?: "ativo" | "inativo";
   anunciante?: Loja;
+  categoriaId?: number | null;
+  categoriaRef?: Categoria | null;
 }
 
 export default function CadastroGruposProductos() {
@@ -29,6 +37,7 @@ export default function CadastroGruposProductos() {
     anuncianteId: "",
     nome: "",
     descricao: "",
+    categoriaId: "",
   });
 
   // Fetch anunciantes with user context
@@ -46,6 +55,16 @@ export default function CadastroGruposProductos() {
       return result.data || [];
     },
     enabled: !!user,
+  });
+
+  // Fetch categorias for the category selector
+  const { data: categorias = [] } = useQuery<Categoria[]>({
+    queryKey: ["categorias"],
+    queryFn: async () => {
+      const response = await fetch("/api/categorias");
+      if (!response.ok) throw new Error("Erro ao buscar categorias");
+      return response.json();
+    },
   });
 
   // Fetch grupos with user context
@@ -87,6 +106,7 @@ export default function CadastroGruposProductos() {
           anuncianteId: parseInt(data.anuncianteId),
           nome: data.nome,
           descricao: data.descricao,
+          categoriaId: data.categoriaId ? parseInt(data.categoriaId) : null,
         }),
       });
 
@@ -103,7 +123,7 @@ export default function CadastroGruposProductos() {
           ? "Grupo atualizado com sucesso!"
           : "Grupo criado com sucesso!",
       );
-      setFormData({ anuncianteId: "", nome: "", descricao: "" });
+      setFormData({ anuncianteId: "", nome: "", descricao: "", categoriaId: "" });
       setEditingId(null);
       setIsFormOpen(false);
       refetch();
@@ -159,6 +179,7 @@ export default function CadastroGruposProductos() {
       anuncianteId: grupo.anuncianteId.toString(),
       nome: grupo.nome,
       descricao: grupo.descricao || "",
+      categoriaId: grupo.categoriaId ? grupo.categoriaId.toString() : "",
     });
     setEditingId(grupo.id);
     setIsFormOpen(true);
@@ -196,7 +217,7 @@ export default function CadastroGruposProductos() {
               onClick={() => {
                 setIsFormOpen(!isFormOpen);
                 setEditingId(null);
-                setFormData({ anuncianteId: "", nome: "", descricao: "" });
+                setFormData({ anuncianteId: "", nome: "", descricao: "", categoriaId: "" });
               }}
               className="flex items-center gap-2 px-4 py-2 bg-vitrii-yellow text-vitrii-text rounded-lg hover:bg-vitrii-yellow-dark transition-colors font-semibold"
             >
@@ -249,6 +270,29 @@ export default function CadastroGruposProductos() {
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
                   />
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                  Categoria (Opcional)
+                </label>
+                <select
+                  value={formData.categoriaId}
+                  onChange={(e) =>
+                    setFormData({ ...formData, categoriaId: e.target.value })
+                  }
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50"
+                >
+                  <option value="">Sem categoria específica</option>
+                  {categorias.map((cat) => (
+                    <option key={cat.id} value={cat.id}>
+                      {cat.icone} {cat.descricao}
+                    </option>
+                  ))}
+                </select>
+                <p className="mt-1 text-xs text-vitrii-text-secondary">
+                  Sugerida automaticamente nos anúncios criados a partir de um produto deste grupo.
+                </p>
               </div>
 
               <div>

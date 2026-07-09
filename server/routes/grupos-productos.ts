@@ -7,6 +7,7 @@ const GrupoCreateSchema = z.object({
   anuncianteId: z.number().int().positive("Anunciante é obrigatório"),
   nome: z.string().min(1, "Nome é obrigatório"),
   descricao: z.string().optional(),
+  categoriaId: z.number().int().positive().optional().nullable(),
 });
 
 // GET all grupos (with pagination and user filtering)
@@ -50,6 +51,8 @@ export const getGrupos: RequestHandler = async (req, res) => {
           nome: true,
           descricao: true,
           anuncianteId: true,
+          categoriaId: true,
+          categoriaRef: { select: { id: true, descricao: true, icone: true } },
           dataCriacao: true,
         },
         orderBy: { dataCriacao: "desc" },
@@ -91,6 +94,8 @@ export const getGrupoById: RequestHandler = async (req, res) => {
         nome: true,
         descricao: true,
         anuncianteId: true,
+        categoriaId: true,
+        categoriaRef: { select: { id: true, descricao: true, icone: true } },
         dataCriacao: true,
         anunciante: {
           select: {
@@ -193,7 +198,10 @@ export const createGrupo: RequestHandler = async (req, res) => {
 
     const grupo = await prisma.grupos_produtos.create({
       data: {
-        ...validatedData,
+        anuncianteId: validatedData.anuncianteId,
+        nome: validatedData.nome,
+        descricao: validatedData.descricao,
+        categoriaId: validatedData.categoriaId ?? null,
         usuarioId: userId,
         criadoPor: userId,
       },
@@ -209,6 +217,9 @@ export const createGrupo: RequestHandler = async (req, res) => {
             id: true,
             nome: true,
           },
+        },
+        categoriaRef: {
+          select: { id: true, descricao: true, icone: true },
         },
       },
     });
@@ -259,6 +270,9 @@ export const updateGrupo: RequestHandler = async (req, res) => {
             id: true,
             nome: true,
           },
+        },
+        categoriaRef: {
+          select: { id: true, descricao: true, icone: true },
         },
       },
     });

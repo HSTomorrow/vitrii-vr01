@@ -88,6 +88,7 @@ model anuncios {
   descricao                String?
   preco                    Decimal?                    @db.Decimal(10, 2)
   categoria                String?                     @db.VarChar(100)
+  categoriaId              Int?
   imagem                   String?                     @db.VarChar(500)
   link                     String?                     @db.VarChar(500)
   status                   String                      @default("ativo") @db.VarChar(50)
@@ -114,6 +115,7 @@ model anuncios {
   quantidadeMaximaReservas Int? // Maximum number of reservations allowed (null = unlimited)
   quantidade               Int                         @default(1) // Initial quantity for reservations (default 1, 0 = Reservado)
   anunciantes              anunciantes                 @relation(fields: [anuncianteId], references: [id], onDelete: Cascade, map: "anuncios_lojaId_fkey")
+  categoriaRef             categorias?                 @relation(fields: [categoriaId], references: [id], onDelete: SetNull)
   anuncioVisualizados      anuncioVisualizados[]
   fotos                    fotos_anuncio[]
   wishlists_itens          listas_desejos_itens[]
@@ -130,6 +132,25 @@ model anuncios {
   @@index([ordem, id])
   @@index([permiteReservar])
   @@index([dataExclusao])
+  @@index([categoriaId])
+}
+
+// Admin-managed category taxonomy. Table already exists in the DB (created via raw SQL
+// by server/routes/categorias.ts on first boot); this model just gives it a real Prisma
+// relation so anuncios/grupos_produtos can carry a genuine FK instead of a free-text copy.
+model categorias {
+  id              Int      @id @default(autoincrement())
+  descricao       String   @unique @db.VarChar(100)
+  icone           String   @db.VarChar(100)
+  ativo           Boolean  @default(true)
+  dataCriacao     DateTime @default(now())
+  dataAtualizacao DateTime @default(now())
+
+  anuncios        anuncios[]
+  grupos_produtos grupos_produtos[]
+
+  @@index([ativo])
+  @@index([descricao])
 }
 
 // Anuncio Visualizacoes - Log table to track ad views
@@ -154,6 +175,7 @@ model grupos_produtos {
   descricao       String?
   icone           String?     @db.VarChar(50)
   status          String      @default("ativo") @db.VarChar(20) // "ativo" | "inativo"
+  categoriaId     Int? // Suggests this category on anuncios created from a produto in this grupo
   dataCriacao     DateTime    @default(now())
   dataAtualizacao DateTime    @default(now())
   criadoPor       Int?
@@ -162,10 +184,12 @@ model grupos_produtos {
   excluidoPor     Int?
   usuario         usracessos? @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   anunciante      anunciantes @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
+  categoriaRef    categorias? @relation(fields: [categoriaId], references: [id], onDelete: SetNull)
   productos       productos[]
 
   @@unique([usuarioId, anuncianteId, nome])
   @@index([dataExclusao])
+  @@index([categoriaId])
 }
 
 model movimentos_estoque {

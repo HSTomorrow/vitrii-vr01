@@ -28,7 +28,7 @@ export default function SearchAnuncios() {
   const location = useLocation();
   const { isLoggedIn } = useAuth();
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedCategoriaId, setSelectedCategoriaId] = useState<number | null>(null);
   const [priceRange, setPriceRange] = useState({ min: "", max: "" });
   const [selectedStore, setSelectedStore] = useState<number | null>(null);
   const [sortBy, setSortBy] = useState<
@@ -55,6 +55,16 @@ export default function SearchAnuncios() {
     [favoritosData],
   );
 
+  // Fetch real categorias for the filter list
+  const { data: categorias = [] } = useQuery({
+    queryKey: ["categorias"],
+    queryFn: async () => {
+      const response = await fetch("/api/categorias");
+      if (!response.ok) throw new Error("Erro ao buscar categorias");
+      return response.json();
+    },
+  });
+
   // Read search/category query parameters on mount
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -62,9 +72,9 @@ export default function SearchAnuncios() {
     if (q) {
       setSearchTerm(decodeURIComponent(q));
     }
-    const categoria = params.get("categoria");
-    if (categoria) {
-      setSelectedCategory(decodeURIComponent(categoria));
+    const categoriaId = params.get("categoriaId");
+    if (categoriaId) {
+      setSelectedCategoriaId(parseInt(categoriaId, 10));
     }
   }, [location.search]);
 
@@ -137,8 +147,8 @@ export default function SearchAnuncios() {
     }
 
     // Filter by category
-    if (selectedCategory) {
-      ads = ads.filter((ad: any) => ad.categoria === selectedCategory);
+    if (selectedCategoriaId) {
+      ads = ads.filter((ad: any) => ad.categoriaId === selectedCategoriaId);
     }
 
     // Filter by store
@@ -196,7 +206,7 @@ export default function SearchAnuncios() {
   }, [
     anunciosData?.data,
     searchTerm,
-    selectedCategory,
+    selectedCategoriaId,
     selectedStore,
     priceRange,
     sortBy,
@@ -311,33 +321,31 @@ export default function SearchAnuncios() {
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
                         type="radio"
-                        checked={selectedCategory === null}
+                        checked={selectedCategoriaId === null}
                         onChange={() => {
-                          setSelectedCategory(null);
+                          setSelectedCategoriaId(null);
                           setCurrentPage(1);
                         }}
                         className="w-4 h-4 text-vitrii-blue"
                       />
                       <span className="text-sm text-vitrii-text">Todas</span>
                     </label>
-                    {["roupas", "carros", "imoveis"].map((cat) => (
+                    {categorias.map((cat: { id: number; descricao: string; icone: string }) => (
                       <label
-                        key={cat}
+                        key={cat.id}
                         className="flex items-center gap-2 cursor-pointer"
                       >
                         <input
                           type="radio"
-                          checked={selectedCategory === cat}
+                          checked={selectedCategoriaId === cat.id}
                           onChange={() => {
-                            setSelectedCategory(cat);
+                            setSelectedCategoriaId(cat.id);
                             setCurrentPage(1);
                           }}
                           className="w-4 h-4 text-vitrii-blue"
                         />
-                        <span className="text-sm text-vitrii-text capitalize">
-                          {cat === "roupas" && "👕 Roupas"}
-                          {cat === "carros" && "🚗 Carros"}
-                          {cat === "imoveis" && "🏠 Imóveis"}
+                        <span className="text-sm text-vitrii-text">
+                          {cat.icone} {cat.descricao}
                         </span>
                       </label>
                     ))}
@@ -439,7 +447,7 @@ export default function SearchAnuncios() {
 
                 {/* Clear Filters */}
                 {(searchTerm ||
-                  selectedCategory ||
+                  selectedCategoriaId ||
                   selectedStore ||
                   priceRange.min ||
                   priceRange.max ||
@@ -447,7 +455,7 @@ export default function SearchAnuncios() {
                   <button
                     onClick={() => {
                       setSearchTerm("");
-                      setSelectedCategory(null);
+                      setSelectedCategoriaId(null);
                       setSelectedStore(null);
                       setPriceRange({ min: "", max: "" });
                       setOnlyFavorites(false);

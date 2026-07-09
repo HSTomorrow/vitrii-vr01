@@ -3,8 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 
 interface CategoryFieldsProps {
   categoria: string | null;
+  categoriaId?: number | null;
   dadosCategoria: string;
-  onCategoryChange: (categoria: string | null) => void;
+  onCategoryChange: (categoria: string | null, categoriaId: number | null) => void;
   onDadosChange: (dados: string) => void;
 }
 
@@ -44,6 +45,7 @@ interface CategoriaFromAPI {
 
 export default function CategoryFields({
   categoria,
+  categoriaId,
   dadosCategoria,
   onCategoryChange,
   onDadosChange,
@@ -149,12 +151,16 @@ export default function CategoryFields({
           </div>
         )}
         <select
-          value={categoria || ""}
+          value={categoriaId ? String(categoriaId) : ""}
           onChange={(e) => {
-            const newCategoria = e.target.value || null;
-            onCategoryChange(newCategoria);
+            const selectedId = e.target.value ? parseInt(e.target.value, 10) : null;
+            const selectedCat = (categoriasAPI as CategoriaFromAPI[]).find(
+              (cat) => cat.id === selectedId,
+            );
+            const newCategoria = selectedCat?.descricao || null;
+            onCategoryChange(newCategoria, selectedId);
             onDadosChange("");
-            // Reset data for the new category
+            // Reset data for the legacy structured sub-fields
             if (newCategoria === "roupas") setRoupasData({});
             else if (newCategoria === "carros") setCarrosData({});
             else if (newCategoria === "imoveis") setImoveisData({});
@@ -163,7 +169,7 @@ export default function CategoryFields({
         >
           <option value="">Sem Categoria Específica</option>
           {(categoriasAPI as CategoriaFromAPI[]).map((cat) => (
-            <option key={cat.id} value={cat.descricao}>
+            <option key={cat.id} value={cat.id}>
               {cat.icone} {cat.descricao}
             </option>
           ))}

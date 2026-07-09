@@ -44,8 +44,18 @@ interface Producto {
   nome: string;
   descricao?: string;
   tipo?: string; // "produto", "servico", "evento", "aulas_cursos"
-  grupo?: { id: number; nome: string };
-  grupoDeProductos?: { id: number; nome: string };
+  grupo?: {
+    id: number;
+    nome: string;
+    categoriaId?: number | null;
+    categoriaRef?: { descricao: string } | null;
+  };
+  grupoDeProductos?: {
+    id: number;
+    nome: string;
+    categoriaId?: number | null;
+    categoriaRef?: { descricao: string } | null;
+  };
   tabelasDePreco: Array<{
     id: number;
     preco: number;
@@ -123,6 +133,7 @@ export default function AnuncioForm({
     destaque: false,
     ordem: 10, // Default order for new ads (admin only)
     categoria: "" as string,
+    categoriaId: null as number | null,
     dadosCategoria: "",
     tipo: normalizedTipo || "anuncio_padrao",
     permiteReservar: false,
@@ -298,6 +309,19 @@ export default function AnuncioForm({
     }
   }, [selectedProducto?.id]);
 
+  // Suggest the anúncio's categoria from the selected produto's grupo, without
+  // overwriting a category the user already picked.
+  useEffect(() => {
+    const grupo = selectedProducto?.grupo || selectedProducto?.grupoDeProductos;
+    if (grupo?.categoriaId && grupo.categoriaRef?.descricao && !formData.categoriaId) {
+      setFormData((prev) => ({
+        ...prev,
+        categoriaId: grupo.categoriaId!,
+        categoria: grupo.categoriaRef!.descricao,
+      }));
+    }
+  }, [selectedProducto?.id]);
+
   // Monitor loading errors
   useEffect(() => {
     const errors: string[] = [];
@@ -347,6 +371,7 @@ export default function AnuncioForm({
         destaque: ad.destaque || false,
         ordem: ad.ordem || 10,
         categoria: ad.categoria || "",
+        categoriaId: ad.categoriaId || null,
         dadosCategoria: ad.dadosCategoria || "",
         tipo: ad.tipo || "produto",
         permiteReservar: ad.permiteReservar || false,
@@ -425,6 +450,7 @@ export default function AnuncioForm({
         aCombinar: data.aCombinar,
         destaque: data.destaque,
         categoria: data.categoria || null,
+        categoriaId: data.categoriaId || null,
         dadosCategoria: data.dadosCategoria || null,
         permiteReservar: data.permiteReservar,
         quantidadeMaximaReservas: data.permiteReservar && data.quantidadeMaximaReservas > 0 ? data.quantidadeMaximaReservas : null,
@@ -1312,22 +1338,25 @@ export default function AnuncioForm({
                     </div>
                   )}
                 </div>
-
-                {/* Category-Specific Fields */}
-                <div className="mb-6">
-                  <CategoryFields
-                    categoria={formData.categoria}
-                    dadosCategoria={formData.dadosCategoria}
-                    onCategoryChange={(categoria) =>
-                      handleInputChange("categoria", categoria)
-                    }
-                    onDadosChange={(dados) =>
-                      handleInputChange("dadosCategoria", dados)
-                    }
-                  />
-                </div>
               </div>
             )}
+
+            {/* Category-Specific Fields — available to every anunciante (not just
+                Profissional), since categoria powers the home page filter for all ads */}
+            <div className="mb-6">
+              <CategoryFields
+                categoria={formData.categoria}
+                categoriaId={formData.categoriaId}
+                dadosCategoria={formData.dadosCategoria}
+                onCategoryChange={(categoria, categoriaId) => {
+                  handleInputChange("categoria", categoria);
+                  handleInputChange("categoriaId", categoriaId);
+                }}
+                onDadosChange={(dados) =>
+                  handleInputChange("dadosCategoria", dados)
+                }
+              />
+            </div>
 
             {/* Endereço */}
             <div>
