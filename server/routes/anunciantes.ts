@@ -24,6 +24,7 @@ const AnuncianteCreateSchema = z.object({
   fotoUrl: z.union([z.null(), z.string().max(500, "URL da foto muito longa")]).optional(),
   iconColor: z.enum(["azul", "verde", "rosa", "vermelho", "laranja"]).default("azul"),
   localidadeId: z.number().int().positive("Localidade inválida"),
+  categoriaPrincipalId: z.number().int().positive("Categoria Principal é obrigatória"),
   status: z.enum(["Ativo", "Desativado"]).default("Ativo"),
   temAgenda: z.boolean().default(false),
 });
@@ -106,6 +107,7 @@ export const getAnunciantes: RequestHandler = async (req, res) => {
           iconColor: true,
           status: true,
           localidadeId: true,
+          categoriaPrincipalId: true,
           dataCriacao: true,
           dataAtualizacao: true,
         },
@@ -167,6 +169,14 @@ export const getAnuncianteById: RequestHandler = async (req, res) => {
           select: {
             id: true,
             descricao: true,
+          },
+        },
+        categoriaPrincipalId: true,
+        categoriaPrincipal: {
+          select: {
+            id: true,
+            descricao: true,
+            icone: true,
           },
         },
         status: true,
@@ -335,6 +345,7 @@ export const createAnunciante: RequestHandler = async (req, res) => {
         fotoUrl: validatedData.fotoUrl,
         iconColor: validatedData.iconColor,
         localidadeId: validatedData.localidadeId,
+        categoriaPrincipalId: validatedData.categoriaPrincipalId,
         status: validatedData.status,
         temAgenda: validatedData.temAgenda,
         dataCriacao: new Date(),
@@ -447,6 +458,7 @@ const AnuncianteUpdateSchema = z.object({
   fotoUrl: z.string().optional(),
   iconColor: z.enum(["azul", "verde", "rosa", "vermelho", "laranja"]).optional(),
   localidadeId: z.number().int().nullable().optional(),
+  categoriaPrincipalId: z.number().int().positive("Categoria Principal é obrigatória").optional(),
   status: z.enum(["Ativo", "Desativado"]).optional(),
   tipoCobranca: z.enum(["Propria", "Vitrii"]).optional(),
 });
@@ -884,6 +896,10 @@ export const getAnunciantesByUsuario: RequestHandler = async (req, res) => {
           fotoUrl: true,
           status: true,
           tipoCobranca: true,
+          categoriaPrincipalId: true,
+          categoriaPrincipal: {
+            select: { id: true, descricao: true, icone: true },
+          },
           dataCriacao: true,
           dataAtualizacao: true,
         },
@@ -933,6 +949,10 @@ export const getAnunciantesByUsuario: RequestHandler = async (req, res) => {
           fotoUrl: true,
           status: true,
           tipoCobranca: true,
+          categoriaPrincipalId: true,
+          categoriaPrincipal: {
+            select: { id: true, descricao: true, icone: true },
+          },
           dataCriacao: true,
           dataAtualizacao: true,
         },

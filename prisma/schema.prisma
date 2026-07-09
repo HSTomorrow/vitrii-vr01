@@ -31,6 +31,7 @@ model anunciantes {
   tipoCobranca                String                        @default("Propria") @db.VarChar(20) // "Propria" ou "Vitrii" - somente admin altera
   temAgenda                   Boolean                       @default(false) // Se sim, mostra o botão de agenda nos anuncios
   localidadeId                Int? // Default locality for filtering ads
+  categoriaPrincipalId        Int? // Required on the cadastro form; fallback category for anuncios that don't have one directly or via grupo
   dataCriacao                 DateTime                      @default(now())
   dataAtualizacao             DateTime
   criadoPor                   Int?
@@ -51,6 +52,7 @@ model anunciantes {
   conversas                   conversas[]
   mensagens                   mensagens[]
   localidade                  localidades?                  @relation(fields: [localidadeId], references: [id], onDelete: SetNull)
+  categoriaPrincipal          categorias?                   @relation(fields: [categoriaPrincipalId], references: [id], onDelete: SetNull)
   localidades                 anunciantes_x_localidades[]
   contatos                    contatos[]
   agendas_horarios            agendas_horarios[]
@@ -151,6 +153,7 @@ model categorias {
 
   anuncios        anuncios[]
   grupos_produtos grupos_produtos[]
+  anunciantes     anunciantes[]
 
   @@index([ativo])
   @@index([descricao])

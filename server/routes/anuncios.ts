@@ -208,7 +208,22 @@ export const getAnuncios: RequestHandler = async (req, res) => {
           categoria: true,
           categoriaId: true,
           usarValorTabela: true,
-          tabelaDePreco: { select: { preco: true, status: true } },
+          tabelaDePreco: {
+            select: {
+              preco: true,
+              status: true,
+              produto: {
+                select: {
+                  grupo: {
+                    select: {
+                      categoriaId: true,
+                      categoriaRef: { select: { descricao: true } },
+                    },
+                  },
+                },
+              },
+            },
+          },
           imagem: true,
           link: true,
           status: true,
@@ -240,6 +255,8 @@ export const getAnuncios: RequestHandler = async (req, res) => {
               whatsapp: true,
               temAgenda: true,
               iconColor: true,
+              categoriaPrincipalId: true,
+              categoriaPrincipal: { select: { descricao: true } },
             },
           },
         },
@@ -273,15 +290,31 @@ export const getAnuncios: RequestHandler = async (req, res) => {
 
     // When an anúncio is live-linked to a tabela de preço, always serve that table's
     // current price instead of the stored copy, so price edits propagate automatically.
-    const anunciosComPrecoAoVivo = anuncios.map((a: any) =>
-      a.usarValorTabela && a.tabelaDePreco && a.tabelaDePreco.status === "ativo"
-        ? { ...a, preco: a.tabelaDePreco.preco }
-        : a,
-    );
+    // Also resolve the effective category for filtering: the anúncio's own categoria wins;
+    // if absent, fall back to its produto's grupo categoria; if still absent, fall back to
+    // the anunciante's Categoria Principal — so every ad is always classifiable.
+    const anunciosProcessados = anuncios.map((a: any) => {
+      const processed = { ...a };
+      if (a.usarValorTabela && a.tabelaDePreco && a.tabelaDePreco.status === "ativo") {
+        processed.preco = a.tabelaDePreco.preco;
+      }
+      if (!processed.categoriaId) {
+        const grupoCategoriaId = a.tabelaDePreco?.produto?.grupo?.categoriaId;
+        const grupoCategoriaDescricao = a.tabelaDePreco?.produto?.grupo?.categoriaRef?.descricao;
+        if (grupoCategoriaId) {
+          processed.categoriaId = grupoCategoriaId;
+          processed.categoria = grupoCategoriaDescricao;
+        } else if (a.anunciantes?.categoriaPrincipalId) {
+          processed.categoriaId = a.anunciantes.categoriaPrincipalId;
+          processed.categoria = a.anunciantes.categoriaPrincipal?.descricao;
+        }
+      }
+      return processed;
+    });
 
     res.json({
       success: true,
-      data: anunciosComPrecoAoVivo,
+      data: anunciosProcessados,
       pagination: {
         count: anuncios.length,
         total,
@@ -352,6 +385,8 @@ export const getAnuncioById: RequestHandler = async (req, res) => {
             telefone: true,
             whatsapp: true,
             fotoUrl: true,
+            categoriaPrincipalId: true,
+            categoriaPrincipal: { select: { descricao: true } },
           },
         },
         fotos: {
@@ -362,7 +397,22 @@ export const getAnuncioById: RequestHandler = async (req, res) => {
           },
           orderBy: { ordem: "asc" },
         },
-        tabelaDePreco: { select: { preco: true, status: true } },
+        tabelaDePreco: {
+          select: {
+            preco: true,
+            status: true,
+            produto: {
+              select: {
+                grupo: {
+                  select: {
+                    categoriaId: true,
+                    categoriaRef: { select: { descricao: true } },
+                  },
+                },
+              },
+            },
+          },
+        },
       },
     });
 
@@ -380,6 +430,20 @@ export const getAnuncioById: RequestHandler = async (req, res) => {
       anuncio.tabelaDePreco.status === "ativo"
     ) {
       (anuncio as any).preco = anuncio.tabelaDePreco.preco;
+    }
+
+    // Resolve effective category: anúncio's own -> produto's grupo -> anunciante's Categoria
+    // Principal, so every ad is always classifiable even without a category set directly.
+    if (!anuncio.categoriaId) {
+      const grupoCategoriaId = (anuncio as any).tabelaDePreco?.produto?.grupo?.categoriaId;
+      const grupoCategoriaDescricao = (anuncio as any).tabelaDePreco?.produto?.grupo?.categoriaRef?.descricao;
+      if (grupoCategoriaId) {
+        (anuncio as any).categoriaId = grupoCategoriaId;
+        (anuncio as any).categoria = grupoCategoriaDescricao;
+      } else if (anuncio.anunciantes?.categoriaPrincipalId) {
+        (anuncio as any).categoriaId = anuncio.anunciantes.categoriaPrincipalId;
+        (anuncio as any).categoria = (anuncio.anunciantes as any).categoriaPrincipal?.descricao;
+      }
     }
 
     // Check if ad is expired and redirect to announcer profile

@@ -33,6 +33,13 @@ interface Anunciante {
   status?: string;
   tipoCobranca?: string;
   localidadeId?: number | null;
+  categoriaPrincipalId?: number | null;
+}
+
+interface Categoria {
+  id: number;
+  descricao: string;
+  icone: string;
 }
 
 interface Localidade {
@@ -71,6 +78,7 @@ export default function CadastroAnunciantes() {
     iconColor: "azul",
     temAgenda: false,
     localidadeId: null as number | null,
+    categoriaPrincipalId: null as number | null,
     status: "Ativo",
     tipoCobranca: "Propria",
   });
@@ -111,6 +119,18 @@ export default function CadastroAnunciantes() {
   });
 
   const localidades = (localidadesData?.data || []) as Localidade[];
+
+  // Fetch categorias for the Categoria Principal selector
+  const { data: categoriasData } = useQuery({
+    queryKey: ["categorias"],
+    queryFn: async () => {
+      const response = await fetch("/api/categorias");
+      if (!response.ok) throw new Error("Erro ao buscar categorias");
+      return response.json();
+    },
+  });
+
+  const categorias = (categoriasData || []) as Categoria[];
 
   // Create/Update loja mutation
   const saveAnuncianteMutation = useMutation({
@@ -211,6 +231,7 @@ export default function CadastroAnunciantes() {
         iconColor: "azul",
         temAgenda: false,
         localidadeId: null,
+        categoriaPrincipalId: null,
         status: "Ativo",
         tipoCobranca: "Propria",
       });
@@ -270,6 +291,7 @@ export default function CadastroAnunciantes() {
       iconColor: loja.iconColor || "azul",
       temAgenda: loja.temAgenda || false,
       localidadeId: loja.localidadeId || null,
+      categoriaPrincipalId: loja.categoriaPrincipalId || null,
       status: loja.status || "Ativo",
       tipoCobranca: loja.tipoCobranca || "Propria",
     });
@@ -330,6 +352,7 @@ export default function CadastroAnunciantes() {
     if (!formData.cep) errors.push("CEP");
     if (!formData.email) errors.push("Email");
     if (!formData.localidadeId) errors.push("Localidade");
+    if (!formData.categoriaPrincipalId) errors.push("Categoria Principal");
 
     if (errors.length > 0) {
       const errorMessage = `Preencha os campos obrigatórios:\n${errors.join(", ")}`;
@@ -390,6 +413,7 @@ export default function CadastroAnunciantes() {
                 iconColor: "azul",
                 temAgenda: false,
                 localidadeId: null,
+                categoriaPrincipalId: null,
                 status: "Ativo",
                 tipoCobranca: "Propria",
               });
@@ -569,6 +593,34 @@ export default function CadastroAnunciantes() {
                       </option>
                     ))}
                   </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                    Categoria Principal *
+                  </label>
+                  <select
+                    required
+                    value={formData.categoriaPrincipalId || ""}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        categoriaPrincipalId: e.target.value ? parseInt(e.target.value) : null,
+                      })
+                    }
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50 bg-white"
+                  >
+                    <option value="">Selecione uma categoria</option>
+                    {categorias.map((categoria) => (
+                      <option key={categoria.id} value={categoria.id}>
+                        {categoria.icone} {categoria.descricao}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    Usada como categoria padrão dos anúncios deste anunciante quando não houver
+                    categoria específica no anúncio ou no grupo de produtos.
+                  </p>
                 </div>
 
                 <div>
