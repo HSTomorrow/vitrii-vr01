@@ -9,6 +9,7 @@ import Footer from "@/components/Footer";
 import ContatoSelectorModal from "@/components/ContatoSelectorModal";
 import ShareModal from "@/components/ShareModal";
 import CobrancaModal from "@/components/CobrancaModal";
+import AnexosUpload, { Anexo } from "@/components/AnexosUpload";
 import { formatCurrencyDisplay } from "@/utils/formatCurrency";
 import { exportToCsv } from "@/utils/exportCsv";
 import { exportToXlsx } from "@/utils/exportXlsx";
@@ -37,6 +38,7 @@ interface Lancamento {
   dataCriacao: string;
   contato?: { id: number; nome: string; email?: string; celular?: string };
   evento?: { id: number; titulo: string };
+  documentos?: Anexo[];
 }
 
 interface Fechamento {
@@ -54,6 +56,7 @@ interface Contrato {
   diaVencimento: number;
   status: string;
   contato: { id: number; nome: string };
+  documentos?: Anexo[];
 }
 
 const TIPOS_CONTRATO = ["Mensal", "Semanal", "Eventual", "Outros"];
@@ -126,6 +129,7 @@ export default function Financeiro() {
   const [cobrancaTarget, setCobrancaTarget] = useState<Lancamento | null>(null);
   const [editingLancamento, setEditingLancamento] = useState<Lancamento | null>(null);
   const [editForm, setEditForm] = useState({ descricao: "", valor: "", vencimento: "", tipoPagamento: "pix", contaBanco: "" });
+  const [editLancamentoAnexos, setEditLancamentoAnexos] = useState<Anexo[]>([]);
   const [novoLancamento, setNovoLancamento] = useState({
     categoria: "multa",
     descricao: "",
@@ -135,6 +139,7 @@ export default function Financeiro() {
     tipoPagamento: "pix",
     contaBanco: "",
   });
+  const [novoLancamentoAnexos, setNovoLancamentoAnexos] = useState<Anexo[]>([]);
   const [novoContrato, setNovoContrato] = useState({
     titulo: "",
     tipoContrato: "Mensal",
@@ -144,6 +149,8 @@ export default function Financeiro() {
     contatoNome: "",
     dataInicio: new Date().toISOString().split("T")[0],
   });
+  const [novoContratoAnexos, setNovoContratoAnexos] = useState<Anexo[]>([]);
+  const [anexosContratoAberto, setAnexosContratoAberto] = useState<number | null>(null);
   const [loteMode, setLoteMode] = useState(false);
   const [selectedContratoIds, setSelectedContratoIds] = useState<number[]>([]);
   const [contratoFiltroTitulo, setContratoFiltroTitulo] = useState("");
@@ -360,10 +367,23 @@ export default function Financeiro() {
       if (!response.ok) throw new Error((await response.json()).error || "Erro ao criar lançamento");
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: async (result) => {
+      const novoId = result?.data?.id;
+      if (novoId && novoLancamentoAnexos.length > 0) {
+        await Promise.all(
+          novoLancamentoAnexos.map((anexo) =>
+            fetch(`/api/lancamentos-financeiros/${novoId}/documentos`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ nome: anexo.nome, url: anexo.url }),
+            }),
+          ),
+        );
+      }
       toast.success("Lançamento criado!");
       setShowNovoLancamento(false);
       setNovoLancamento({ categoria: "multa", descricao: "", valor: "", contatoId: null, contatoNome: "", tipoPagamento: "pix", contaBanco: "" });
+      setNovoLancamentoAnexos([]);
       refetchLancamentos();
     },
     onError: (error) => toast.error(error instanceof Error ? error.message : "Erro ao criar lançamento"),
@@ -387,10 +407,23 @@ export default function Financeiro() {
       if (!response.ok) throw new Error((await response.json()).error || "Erro ao criar contrato");
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: async (result) => {
+      const novoId = result?.data?.id;
+      if (novoId && novoContratoAnexos.length > 0) {
+        await Promise.all(
+          novoContratoAnexos.map((anexo) =>
+            fetch(`/api/contratos-financeiros/${novoId}/documentos`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ nome: anexo.nome, url: anexo.url }),
+            }),
+          ),
+        );
+      }
       toast.success("Contrato criado!");
       setShowNovoContrato(false);
       setNovoContrato({ titulo: "", tipoContrato: "Mensal", valorMensal: "", diaVencimento: "10", contatoId: null, contatoNome: "", dataInicio: new Date().toISOString().split("T")[0] });
+      setNovoContratoAnexos([]);
       refetchContratos();
     },
     onError: (error) => toast.error(error instanceof Error ? error.message : "Erro ao criar contrato"),
@@ -781,6 +814,7 @@ export default function Financeiro() {
                               tipoPagamento: l.tipoPagamento || "pix",
                               contaBanco: l.contaBanco || "",
                             });
+                            setEditLancamentoAnexos(l.documentos || []);
                           }}
                           disabled={fechado}
                           title={fechado ? "Mês fechado" : undefined}
@@ -987,7 +1021,16 @@ export default function Financeiro() {
                       </div>
                     </div>
                     {!loteMode && (
-                      <div className="flex justify-end mt-3">
+                      <div className="flex justify-end gap-2 mt-3">
+                        <button
+                          onClick={() =>
+                            setAnexosContratoAberto(anexosContratoAberto === c.id ? null : c.id)
+                          }
+                          className="flex items-center gap-1 text-xs px-3 py-1.5 border border-gray-300 text-vitrii-text rounded-lg hover:bg-gray-50"
+                        >
+                          <FileText className="w-3.5 h-3.5" />
+                          Anexos {c.documentos?.length ? `(${c.documentos.length})` : ""}
+                        </button>
                         <button
                           onClick={() => lancarMesMutation.mutate(c.id)}
                           disabled={lancarMesMutation.isPending}
@@ -995,6 +1038,17 @@ export default function Financeiro() {
                         >
                           <Zap className="w-3.5 h-3.5" /> Lançar Mês
                         </button>
+                      </div>
+                    )}
+                    {anexosContratoAberto === c.id && (
+                      <div className="mt-3 pt-3 border-t border-gray-100">
+                        <AnexosUpload
+                          anexos={c.documentos || []}
+                          onChange={() => refetchContratos()}
+                          maxAnexos={5}
+                          anexarUrl={`/api/contratos-financeiros/${c.id}/documentos`}
+                          removerUrlBase="/api/contratos-financeiros/documentos"
+                        />
                       </div>
                     )}
                   </div>
@@ -1075,9 +1129,20 @@ export default function Financeiro() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg"
               />
             </div>
+            <div>
+              <label className="block text-sm font-semibold mb-1">Anexos</label>
+              <AnexosUpload
+                anexos={novoLancamentoAnexos}
+                onChange={setNovoLancamentoAnexos}
+                maxAnexos={3}
+              />
+            </div>
             <div className="flex gap-2 pt-2">
               <button
-                onClick={() => setShowNovoLancamento(false)}
+                onClick={() => {
+                  setShowNovoLancamento(false);
+                  setNovoLancamentoAnexos([]);
+                }}
                 className="flex-1 px-4 py-2 border border-gray-300 rounded-lg font-semibold"
               >
                 Cancelar
@@ -1147,6 +1212,19 @@ export default function Financeiro() {
                 onChange={(e) => setEditForm({ ...editForm, contaBanco: e.target.value })}
                 placeholder="Ex: Banco do Brasil - CC 12345"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold mb-1">Anexos</label>
+              <AnexosUpload
+                anexos={editLancamentoAnexos}
+                onChange={(anexos) => {
+                  setEditLancamentoAnexos(anexos);
+                  refetchLancamentos();
+                }}
+                maxAnexos={3}
+                anexarUrl={`/api/lancamentos-financeiros/${editingLancamento.id}/documentos`}
+                removerUrlBase="/api/lancamentos-financeiros/documentos"
               />
             </div>
             <div className="flex gap-2 pt-2">
@@ -1235,9 +1313,20 @@ export default function Financeiro() {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg"
               />
             </div>
+            <div>
+              <label className="block text-sm font-semibold mb-1">Anexos</label>
+              <AnexosUpload
+                anexos={novoContratoAnexos}
+                onChange={setNovoContratoAnexos}
+                maxAnexos={5}
+              />
+            </div>
             <div className="flex gap-2 pt-2">
               <button
-                onClick={() => setShowNovoContrato(false)}
+                onClick={() => {
+                  setShowNovoContrato(false);
+                  setNovoContratoAnexos([]);
+                }}
                 className="flex-1 px-4 py-2 border border-gray-300 rounded-lg font-semibold"
               >
                 Cancelar

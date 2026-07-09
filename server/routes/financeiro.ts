@@ -220,6 +220,9 @@ export const criarReajuste: RequestHandler = async (req, res) => {
   }
 };
 
+const MAX_ANEXOS_CONTRATO = 5;
+const MAX_ANEXOS_LANCAMENTO = 3;
+
 export const anexarDocumentoContrato: RequestHandler = async (req, res) => {
   try {
     const contratoId = parseInt(req.params.id as string);
@@ -236,6 +239,11 @@ export const anexarDocumentoContrato: RequestHandler = async (req, res) => {
       return res.status(403).json({ error: "Acesso negado a este contrato" });
     }
 
+    const totalAtual = await prisma.contratos_documentos.count({ where: { contratoId } });
+    if (totalAtual >= MAX_ANEXOS_CONTRATO) {
+      return res.status(400).json({ error: `Máximo de ${MAX_ANEXOS_CONTRATO} anexos por contrato` });
+    }
+
     const documento = await prisma.contratos_documentos.create({
       data: {
         contratoId,
@@ -250,6 +258,29 @@ export const anexarDocumentoContrato: RequestHandler = async (req, res) => {
   } catch (error) {
     console.error("[anexarDocumentoContrato]", error);
     res.status(500).json({ error: "Erro ao anexar documento" });
+  }
+};
+
+export const removerDocumentoContrato: RequestHandler = async (req, res) => {
+  try {
+    const documentoId = parseInt(req.params.documentoId as string);
+
+    const documento = await prisma.contratos_documentos.findUnique({
+      where: { id: documentoId },
+      include: { contrato: true },
+    });
+    if (!documento) return res.status(404).json({ error: "Anexo não encontrado" });
+
+    if (!(await podeGerenciarAnunciante(req.userId!, req.userType, documento.contrato.anuncianteId))) {
+      return res.status(403).json({ error: "Acesso negado a este contrato" });
+    }
+
+    await prisma.contratos_documentos.delete({ where: { id: documentoId } });
+
+    res.json({ success: true, data: { message: "Anexo removido" } });
+  } catch (error) {
+    console.error("[removerDocumentoContrato]", error);
+    res.status(500).json({ error: "Erro ao remover anexo" });
   }
 };
 
@@ -277,6 +308,7 @@ export const listarLancamentos: RequestHandler = async (req, res) => {
       include: {
         contato: { select: { id: true, nome: true, email: true, celular: true } },
         evento: { select: { id: true, titulo: true, dataInicio: true } },
+        documentos: { orderBy: { dataCriacao: "desc" } },
       },
       orderBy: { dataCriacao: "desc" },
       take: 300,
@@ -531,6 +563,67 @@ export const anexarComprovanteLancamento: RequestHandler = async (req, res) => {
   } catch (error) {
     console.error("[anexarComprovanteLancamento]", error);
     res.status(500).json({ error: "Erro ao anexar comprovante" });
+  }
+};
+
+export const anexarDocumentoLancamento: RequestHandler = async (req, res) => {
+  try {
+    const lancamentoId = parseInt(req.params.id as string);
+    const { nome, url, tipo } = req.body;
+
+    if (!nome || !url) {
+      return res.status(400).json({ error: "nome e url são obrigatórios" });
+    }
+
+    const lancamento = await prisma.lancamentos_financeiros.findUnique({ where: { id: lancamentoId, dataExclusao: null } });
+    if (!lancamento) return res.status(404).json({ error: "Lançamento não encontrado" });
+
+    if (!(await podeGerenciarAnunciante(req.userId!, req.userType, lancamento.anuncianteId))) {
+      return res.status(403).json({ error: "Acesso negado a este lançamento" });
+    }
+
+    const totalAtual = await prisma.lancamentos_documentos.count({ where: { lancamentoId } });
+    if (totalAtual >= MAX_ANEXOS_LANCAMENTO) {
+      return res.status(400).json({ error: `Máximo de ${MAX_ANEXOS_LANCAMENTO} anexos por lançamento` });
+    }
+
+    const documento = await prisma.lancamentos_documentos.create({
+      data: {
+        lancamentoId,
+        nome,
+        url,
+        tipo: tipo || "anexo",
+        criadoPor: req.userId!,
+      },
+    });
+
+    res.status(201).json({ success: true, data: documento });
+  } catch (error) {
+    console.error("[anexarDocumentoLancamento]", error);
+    res.status(500).json({ error: "Erro ao anexar documento" });
+  }
+};
+
+export const removerDocumentoLancamento: RequestHandler = async (req, res) => {
+  try {
+    const documentoId = parseInt(req.params.documentoId as string);
+
+    const documento = await prisma.lancamentos_documentos.findUnique({
+      where: { id: documentoId },
+      include: { lancamento: true },
+    });
+    if (!documento) return res.status(404).json({ error: "Anexo não encontrado" });
+
+    if (!(await podeGerenciarAnunciante(req.userId!, req.userType, documento.lancamento.anuncianteId))) {
+      return res.status(403).json({ error: "Acesso negado a este lançamento" });
+    }
+
+    await prisma.lancamentos_documentos.delete({ where: { id: documentoId } });
+
+    res.json({ success: true, data: { message: "Anexo removido" } });
+  } catch (error) {
+    console.error("[removerDocumentoLancamento]", error);
+    res.status(500).json({ error: "Erro ao remover anexo" });
   }
 };
 

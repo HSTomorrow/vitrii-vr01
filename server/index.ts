@@ -256,6 +256,7 @@ import {
   atualizarStatusContrato,
   criarReajuste,
   anexarDocumentoContrato,
+  removerDocumentoContrato,
   listarLancamentos,
   obterLancamentoDoEvento,
   listarLancamentosDoAnuncio,
@@ -263,6 +264,8 @@ import {
   atualizarLancamento,
   gerarPixLancamento,
   anexarComprovanteLancamento,
+  anexarDocumentoLancamento,
+  removerDocumentoLancamento,
   marcarLancamentoPago,
   cancelarLancamento,
   obterReciboPublico,
@@ -1368,6 +1371,7 @@ export function createServer() {
   app.patch("/api/contratos-financeiros/:id/status", extractUserId, atualizarStatusContrato);
   app.post("/api/contratos-financeiros/:id/reajuste", extractUserId, criarReajuste);
   app.post("/api/contratos-financeiros/:id/documentos", extractUserId, anexarDocumentoContrato);
+  app.delete("/api/contratos-financeiros/documentos/:documentoId", extractUserId, removerDocumentoContrato);
   app.post("/api/contratos-financeiros/lancar-lote", extractUserId, lancarLoteContratos);
   app.post("/api/contratos-financeiros/:id/lancar", extractUserId, lancarMesContrato);
 
@@ -1379,6 +1383,8 @@ export function createServer() {
   app.patch("/api/lancamentos-financeiros/:id", extractUserId, atualizarLancamento);
   app.post("/api/lancamentos-financeiros/:id/pix", extractUserId, gerarPixLancamento);
   app.post("/api/lancamentos-financeiros/:id/comprovante", extractUserId, anexarComprovanteLancamento);
+  app.post("/api/lancamentos-financeiros/:id/documentos", extractUserId, anexarDocumentoLancamento);
+  app.delete("/api/lancamentos-financeiros/documentos/:documentoId", extractUserId, removerDocumentoLancamento);
   app.patch("/api/lancamentos-financeiros/:id/pagar", extractUserId, marcarLancamentoPago);
   app.patch("/api/lancamentos-financeiros/:id/cancelar", extractUserId, cancelarLancamento);
   app.post("/api/lancamentos-financeiros/:id/enviar-recibo", extractUserId, enviarReciboPorEmail);

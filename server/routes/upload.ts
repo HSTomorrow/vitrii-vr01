@@ -20,6 +20,7 @@ const EXT_BY_MIME: Record<string, string> = {
   "image/png": ".png",
   "image/gif": ".gif",
   "image/webp": ".webp",
+  "application/pdf": ".pdf",
 };
 
 // First bytes ("magic numbers") of each allowed format, checked against the actual
@@ -29,6 +30,7 @@ const MAGIC_BYTES: Record<string, Buffer[]> = {
   "image/png": [Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])],
   "image/gif": [Buffer.from("GIF87a", "ascii"), Buffer.from("GIF89a", "ascii")],
   "image/webp": [Buffer.from("RIFF", "ascii")], // followed by size + "WEBP", checked separately below
+  "application/pdf": [Buffer.from("%PDF", "ascii")],
 };
 
 function matchesMagicBytes(mimetype: string, buffer: Buffer): boolean {
@@ -62,7 +64,7 @@ const fileFilter = (
   file: Express.Multer.File,
   cb: multer.FileFilterCallback
 ) => {
-  const allowedMimes = ["image/jpeg", "image/png", "image/gif", "image/webp"];
+  const allowedMimes = ["image/jpeg", "image/png", "image/gif", "image/webp", "application/pdf"];
 
   if (!file) {
     return cb(new Error("Nenhum arquivo foi enviado"));
@@ -71,7 +73,7 @@ const fileFilter = (
   if (!allowedMimes.includes(file.mimetype)) {
     const mimeType = file.mimetype || "desconhecido";
     const ext = path.extname(file.originalname) || "sem extensão";
-    return cb(new Error(`Formato inválido: ${mimeType} (${ext}). Use JPEG, PNG, GIF ou WEBP.`));
+    return cb(new Error(`Formato inválido: ${mimeType} (${ext}). Use JPEG, PNG, GIF, WEBP ou PDF.`));
   }
 
   cb(null, true);
@@ -105,7 +107,7 @@ export const uploadMiddleware = (
         return res.status(413).json({
           success: false,
           error: "Arquivo muito grande",
-          details: "O arquivo excede o limite de 5MB. Comprima a imagem e tente novamente.",
+          details: "O arquivo excede o limite de 5MB. Reduza o tamanho e tente novamente.",
           limit: "5MB",
         });
       } else if (err.code === "LIMIT_FILE_COUNT") {
@@ -148,7 +150,7 @@ export const handleUpload: RequestHandler = (req, res) => {
       return res.status(400).json({
         success: false,
         error: "Nenhum arquivo foi enviado",
-        details: "Selecione uma imagem para fazer upload",
+        details: "Selecione um arquivo para fazer upload",
       });
     }
 
@@ -164,8 +166,8 @@ export const handleUpload: RequestHandler = (req, res) => {
     }
 
     // fileFilter only checked the client-supplied Content-Type header, which an attacker
-    // controls. Confirm the actual file bytes match the claimed image format before
-    // accepting the upload; otherwise a non-image file could be smuggled onto the server.
+    // controls. Confirm the actual file bytes match the claimed format before accepting
+    // the upload; otherwise a different file type could be smuggled onto the server.
     const headerBytes = Buffer.alloc(12);
     const fd = fs.openSync(req.file.path, "r");
     fs.readSync(fd, headerBytes, 0, 12, 0);
@@ -180,7 +182,7 @@ export const handleUpload: RequestHandler = (req, res) => {
       return res.status(400).json({
         success: false,
         error: "Arquivo inválido",
-        details: "O conteúdo do arquivo não corresponde a uma imagem válida.",
+        details: "O conteúdo do arquivo não corresponde ao formato declarado.",
       });
     }
 
@@ -205,13 +207,13 @@ export const handleUpload: RequestHandler = (req, res) => {
       filename: req.file.filename,
       size: req.file.size,
       mimetype: req.file.mimetype,
-      message: "Imagem enviada com sucesso",
+      message: "Arquivo enviado com sucesso",
     });
   } catch (error) {
     console.error("[handleUpload] 🔴 Erro:", error instanceof Error ? error.message : error);
     res.status(500).json({
       success: false,
-      error: "Erro ao fazer upload da imagem",
+      error: "Erro ao fazer upload do arquivo",
       details: error instanceof Error ? error.message : "Erro desconhecido",
     });
   }

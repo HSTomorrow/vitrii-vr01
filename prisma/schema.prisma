@@ -671,6 +671,7 @@ model lancamentos_financeiros {
   contato           contatos?                  @relation(fields: [contatoId], references: [id], onDelete: SetNull)
   contrato          contratos_financeiros?     @relation(fields: [contratoId], references: [id], onDelete: SetNull)
   mensagensCobranca lancamentos_mensagens[]
+  documentos        lancamentos_documentos[]
 
   @@unique([contratoId, competencia])
   @@index([anuncianteId])
@@ -681,6 +682,22 @@ model lancamentos_financeiros {
   @@index([status])
   @@index([vencimento])
   @@index([dataExclusao])
+}
+
+// Anexos de um lançamento (comprovantes, notas, etc.) — até 3 por lançamento,
+// enforçado no handler de criação, não aqui.
+model lancamentos_documentos {
+  id           Int      @id @default(autoincrement())
+  lancamentoId Int
+  nome         String   @db.VarChar(255)
+  url          String   @db.VarChar(500)
+  tipo         String   @default("anexo") @db.VarChar(50)
+  criadoPor    Int
+  dataCriacao  DateTime @default(now())
+
+  lancamento lancamentos_financeiros @relation(fields: [lancamentoId], references: [id], onDelete: Cascade)
+
+  @@index([lancamentoId])
 }
 
 // Log de auditoria do fechamento mensal do Financeiro: nunca sobrescreve, cada
