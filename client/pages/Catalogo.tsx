@@ -59,7 +59,7 @@ export default function Catalogo() {
 
   // No anuncianteId in the URL: if the logged-in user manages one or more anunciantes,
   // let them pick which one's catalog to open.
-  const { data: meusAnunciantesData } = useQuery<{ data: Anunciante[] }>({
+  const { data: meusAnunciantesData, isLoading: isLoadingMeusAnunciantes } = useQuery<{ data: Anunciante[] }>({
     queryKey: ["anunciantes", user?.id],
     queryFn: async () => {
       const response = await fetch("/api/anunciantes/do-usuario/listar");
@@ -102,6 +102,11 @@ export default function Catalogo() {
         <h1 className="text-2xl font-bold text-vitrii-text mb-2">Meu Catálogo</h1>
         {!user ? (
           <p className="text-vitrii-text-secondary">Faça login para escolher qual anunciante exibir.</p>
+        ) : isLoadingMeusAnunciantes ? (
+          <p className="text-vitrii-text-secondary flex items-center gap-2">
+            <Loader className="w-4 h-4 animate-spin" />
+            Procurando anunciantes cadastrados...
+          </p>
         ) : meusAnunciantes.length === 0 ? (
           <p className="text-vitrii-text-secondary">Você ainda não possui um anunciante.</p>
         ) : (

@@ -1249,7 +1249,7 @@ export default function AnuncioForm({
                       Tipo:{" "}
                       <span className="font-semibold capitalize">
                         {selectedProducto.tipo === "aulas_cursos"
-                          ? "Aulas e Cursos"
+                          ? "Aulas, Cursos e Atendimentos Especializados"
                           : selectedProducto.tipo}
                       </span>
                     </p>

@@ -24,6 +24,8 @@ import {
   User,
   Store,
   Gift,
+  GraduationCap,
+  Briefcase,
 } from "lucide-react";
 
 const extractMunicipality = (endereco: string): string => {
@@ -557,14 +559,19 @@ export default function Index() {
       </section>
 
       {/* Events Listings Section */}
-      <section className="py-2 md:py-3 bg-vitrii-gray-light">
+      <section className="py-3 md:py-4 bg-gradient-to-r from-purple-50 to-vitrii-gray-light border-y border-purple-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-2">
-            <div>
-              <h2 className="text-h2 mb-0.5">Eventos</h2>
-              <p className="text-label">
-                Descubra eventos, workshops e experiências próximas a você
-              </p>
+            <div className="flex items-center gap-2">
+              <Calendar className="w-6 h-6 text-purple-600 flex-shrink-0" />
+              <div>
+                <h2 className="text-xl md:text-2xl font-extrabold text-purple-700">
+                  Eventos, Shows e Palestras
+                </h2>
+                <p className="text-label text-purple-700">
+                  Descubra eventos, workshops e experiências próximas a você
+                </p>
+              </div>
             </div>
             <Link
               to="/browse?filter=evento"
@@ -599,16 +606,19 @@ export default function Index() {
       </section>
 
       {/* Recurring Schedule Listings Section */}
-      <section className="py-2 md:py-3 bg-white">
+      <section className="py-3 md:py-4 bg-gradient-to-r from-orange-50 to-vitrii-gray-light border-y border-orange-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-2">
-            <div>
-              <h2 className="text-h2 mb-0.5">
-                Aulas, Cursos e Atendimentos Agendados
-              </h2>
-              <p className="text-label">
-                Aulas, Cursos e Atendimentos Agendados
-              </p>
+            <div className="flex items-center gap-2">
+              <GraduationCap className="w-6 h-6 text-orange-600 flex-shrink-0" />
+              <div>
+                <h2 className="text-xl md:text-2xl font-extrabold text-orange-700">
+                  Aulas, Cursos e Atendimentos Especializados
+                </h2>
+                <p className="text-label text-orange-700">
+                  Aulas, cursos e atendimentos especializados perto de você
+                </p>
+              </div>
             </div>
             <Link
               to="/browse?filter=aulas_cursos"
@@ -641,16 +651,19 @@ export default function Index() {
       </section>
 
       {/* Job Opportunities Listings Section */}
-      <section className="py-2 md:py-3 bg-vitrii-gray-light">
+      <section className="py-3 md:py-4 bg-gradient-to-r from-cyan-50 to-vitrii-gray-light border-y border-cyan-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-2">
-            <div>
-              <h2 className="text-h2 mb-0.5">
-                Oportunidades e Vagas de Emprego
-              </h2>
-              <p className="text-label">
-                Descubra oportunidades profissionais e vagas de emprego
-              </p>
+            <div className="flex items-center gap-2">
+              <Briefcase className="w-6 h-6 text-cyan-700 flex-shrink-0" />
+              <div>
+                <h2 className="text-xl md:text-2xl font-extrabold text-cyan-800">
+                  Oportunidades e Vagas de Emprego
+                </h2>
+                <p className="text-label text-cyan-800">
+                  Descubra oportunidades profissionais e vagas de emprego
+                </p>
+              </div>
             </div>
             <Link
               to="/browse?filter=oportunidade"
@@ -667,7 +680,7 @@ export default function Index() {
             isLoading={allAnunciosLoading}
 
             emptyMessage="Nenhuma oportunidade de emprego publicada ainda"
-            color="red"
+            color="blue"
           />
 
           <div className="text-center mt-2">
