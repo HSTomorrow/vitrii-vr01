@@ -71,6 +71,9 @@ export const getEventosByAnunciante: RequestHandler = async (req, res) => {
         contatos: {
           select: {
             contatoId: true,
+            contato: {
+              select: { id: true, nome: true, celular: true },
+            },
           },
         },
         anuncio: {
@@ -383,6 +386,9 @@ export const createEvento: RequestHandler = async (req, res) => {
         contatos: {
           select: {
             contatoId: true,
+            contato: {
+              select: { id: true, nome: true, celular: true },
+            },
           },
         },
       },
@@ -535,6 +541,9 @@ export const updateEvento: RequestHandler = async (req, res) => {
         contatos: {
           select: {
             contatoId: true,
+            contato: {
+              select: { id: true, nome: true, celular: true },
+            },
           },
         },
       },
@@ -1008,6 +1017,9 @@ export const createEventoVisitante: RequestHandler = async (req, res) => {
         contatos: {
           select: {
             contatoId: true,
+            contato: {
+              select: { id: true, nome: true, celular: true },
+            },
           },
         },
         permissoes: {

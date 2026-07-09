@@ -1,5 +1,11 @@
 import { useState, useMemo } from "react";
-import { ChevronLeft, ChevronRight, Clock, MapPin, Users } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, MapPin, Users, MessageCircle } from "lucide-react";
+
+interface Contato {
+  id: number;
+  nome: string;
+  celular: string;
+}
 
 interface Evento {
   id: number;
@@ -9,20 +15,37 @@ interface Evento {
   dataFim: string;
   privacidade: string;
   cor: string;
+  contatos?: Array<{ contatoId: number; contato?: Contato }>;
 }
 
 interface ViewDiaEventoProps {
   eventos: Evento[];
   onSelectEvento?: (evento: Evento) => void;
   isEditable?: boolean;
+  anuncianteNome?: string;
+}
+
+// Builds the wa.me link + reminder message for a given event and contact.
+function buildLembreteWhatsAppUrl(evento: Evento, contato: Contato, anuncianteNome: string) {
+  const inicio = new Date(evento.dataInicio);
+  const dataFormatada = inicio.toLocaleDateString("pt-BR");
+  const horaFormatada = inicio.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
+  const mensagem = `Olá, esta mensagem é para lembrar da ${evento.titulo} na data ${dataFormatada} e às ${horaFormatada}. Um abraço, ${anuncianteNome}`;
+  const celularLimpo = contato.celular.replace(/\D/g, "");
+  return `https://wa.me/${celularLimpo}?text=${encodeURIComponent(mensagem)}`;
 }
 
 export default function ViewDiaEvento({
   eventos,
   onSelectEvento,
   isEditable = false,
+  anuncianteNome = "",
 }: ViewDiaEventoProps) {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  // Which contact is currently selected (for the "Recordar Agenda" WhatsApp target) per event.
+  const [selectedContatoByEvento, setSelectedContatoByEvento] = useState<Record<number, number>>({});
+  // Which event's contact list is expanded to show all contacts (beyond the first 4).
+  const [expandedContatosEventoId, setExpandedContatosEventoId] = useState<number | null>(null);
 
   const dayEventos = useMemo(() => {
     return eventos.filter((evento) => {
@@ -249,6 +272,76 @@ export default function ViewDiaEvento({
                               : "🔒 Privado"}
                         </span>
                       </div>
+
+                      {/* Contatos + Recordar Agenda */}
+                      {(() => {
+                        const contatosDoEvento = (evento.contatos || [])
+                          .map((c) => c.contato)
+                          .filter((c): c is Contato => !!c);
+                        if (contatosDoEvento.length === 0) return null;
+
+                        const isExpanded = expandedContatosEventoId === evento.id;
+                        const visiveis = isExpanded
+                          ? contatosDoEvento
+                          : contatosDoEvento.slice(0, 4);
+                        const restante = contatosDoEvento.length - 4;
+                        const selectedId =
+                          selectedContatoByEvento[evento.id] ?? contatosDoEvento[0].id;
+                        const contatoSelecionado = contatosDoEvento.find(
+                          (c) => c.id === selectedId,
+                        );
+
+                        return (
+                          <div
+                            className="mt-3 pt-3 border-t border-gray-200"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <div className="flex flex-wrap items-center gap-1.5 mb-2">
+                              {visiveis.map((contato) => (
+                                <button
+                                  key={contato.id}
+                                  onClick={() =>
+                                    setSelectedContatoByEvento((prev) => ({
+                                      ...prev,
+                                      [evento.id]: contato.id,
+                                    }))
+                                  }
+                                  className={`text-xs px-2 py-1 rounded-full font-semibold transition-colors ${
+                                    contato.id === selectedId
+                                      ? "bg-vitrii-blue text-white"
+                                      : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                  }`}
+                                >
+                                  {contato.nome}
+                                </button>
+                              ))}
+                              {!isExpanded && restante > 0 && (
+                                <button
+                                  onClick={() => setExpandedContatosEventoId(evento.id)}
+                                  className="text-xs px-2 py-1 rounded-full font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200"
+                                >
+                                  +{restante}
+                                </button>
+                              )}
+                            </div>
+                            {contatoSelecionado && (
+                              <a
+                                href={buildLembreteWhatsAppUrl(
+                                  evento,
+                                  contatoSelecionado,
+                                  anuncianteNome,
+                                )}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 text-xs font-semibold text-green-700 bg-green-50 border border-green-200 px-2.5 py-1.5 rounded-lg hover:bg-green-100 transition-colors"
+                              >
+                                <MessageCircle className="w-3.5 h-3.5" />
+                                Recordar Agenda ({contatoSelecionado.nome})
+                              </a>
+                            )}
+                          </div>
+                        );
+                      })()}
                     </div>
 
                     {/* Color Indicator */}

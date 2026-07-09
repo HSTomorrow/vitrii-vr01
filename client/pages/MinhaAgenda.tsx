@@ -31,7 +31,10 @@ interface Evento {
   cor: string;
   status?: string;
   valor?: number | null;
-  contatos?: Array<{ contatoId: number }>;
+  contatos?: Array<{
+    contatoId: number;
+    contato?: { id: number; nome: string; celular: string };
+  }>;
 }
 
 interface SugestaoCobranca {
@@ -1006,6 +1009,9 @@ export default function MinhaAgenda() {
                   eventos={filteredEventos}
                   onSelectEvento={handleSelectEvento}
                   isEditable={true}
+                  anuncianteNome={
+                    anunciantes.find((a) => a.id === selectedAnuncianteId)?.nome || ""
+                  }
                 />
               </div>
             )}
