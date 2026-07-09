@@ -36,7 +36,7 @@ export default function SearchAnuncios() {
   >("recent");
   const [currentPage, setCurrentPage] = useState(1);
   const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-  const [showFilters, setShowFilters] = useState(true);
+  const [showFilters, setShowFilters] = useState(false);
   const [onlyFavorites, setOnlyFavorites] = useState(false);
 
   // Favorited anunciantes: ads from them are always sorted first, and the "Somente
@@ -136,8 +136,8 @@ export default function SearchAnuncios() {
             return true;
           }
 
-          // Search by announcer ID (numeric search)
-          if (isNumericSearch && ad.anuncianteId === searchAsNumber) {
+          // Search by ad ID or announcer ID (numeric search)
+          if (isNumericSearch && (ad.id === searchAsNumber || ad.anuncianteId === searchAsNumber)) {
             return true;
           }
 
@@ -445,6 +445,14 @@ export default function SearchAnuncios() {
                   </select>
                 </div>
 
+                {/* Confirm Filters - closes the (mobile) filter panel to show results */}
+                <button
+                  onClick={() => setShowFilters(false)}
+                  className="w-full px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors text-sm font-semibold md:hidden"
+                >
+                  Confirmar
+                </button>
+
                 {/* Clear Filters */}
                 {(searchTerm ||
                   selectedCategoriaId ||
@@ -461,7 +469,7 @@ export default function SearchAnuncios() {
                       setOnlyFavorites(false);
                       setCurrentPage(1);
                     }}
-                    className="w-full px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors text-sm font-semibold"
+                    className="w-full px-4 py-2 border-2 border-vitrii-blue text-vitrii-blue rounded-lg hover:bg-blue-50 transition-colors text-sm font-semibold"
                   >
                     Limpar Filtros
                   </button>
