@@ -71,6 +71,17 @@ export default function CadastroEquipeDeVenda() {
   const ITEMS_PER_PAGE = 20;
   const [searchMembro, setSearchMembro] = useState({});
 
+  // Listen for the custom event dispatched by the bottom nav's "+" button on this page
+  useEffect(() => {
+    const handleNovaEquipe = () => {
+      setIsFormOpen(true);
+      setEditingId(null);
+      setFormData({ nome: "", descricao: "" });
+    };
+    window.addEventListener("novaEquipe", handleNovaEquipe);
+    return () => window.removeEventListener("novaEquipe", handleNovaEquipe);
+  }, []);
+
   // Fetch anunciantes (filtered by current user, or all if admin)
   const { data: anunciantesData } = useQuery({
     queryKey: ["anunciantes", user?.id],

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -45,6 +45,17 @@ export default function CadastroProdutos() {
     sku: "",
     tipo: "produto",
   });
+
+  // Listen for the custom event dispatched by the bottom nav's "+" button on this page
+  useEffect(() => {
+    const handleNovoProduto = () => {
+      setIsFormOpen(true);
+      setEditingId(null);
+      setFormData({ grupoId: "", nome: "", descricao: "", sku: "", tipo: "produto" });
+    };
+    window.addEventListener("novoProduto", handleNovoProduto);
+    return () => window.removeEventListener("novoProduto", handleNovoProduto);
+  }, []);
 
   // Fetch lojas with user context
   const { data: lojas = [] } = useQuery<Loja[]>({

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -31,6 +31,17 @@ export default function CadastroVariantes() {
     preco: "",
     precoCusto: "",
   });
+
+  // Listen for the custom event dispatched by the bottom nav's "+" button on this page
+  useEffect(() => {
+    const handleNovaVariante = () => {
+      setIsFormOpen(true);
+      setEditingId(null);
+      setFormData({ tamanho: "", cor: "", preco: "", precoCusto: "" });
+    };
+    window.addEventListener("novaVariante", handleNovaVariante);
+    return () => window.removeEventListener("novaVariante", handleNovaVariante);
+  }, []);
 
   // Fetch product details
   const { data: productData } = useQuery({

@@ -201,6 +201,17 @@ export default function CadastroContatos() {
   const [isImporting, setIsImporting] = useState(false);
   const ITEMS_PER_PAGE = 20;
 
+  // Listen for the custom event dispatched by the bottom nav's "+" button on this page
+  useEffect(() => {
+    const handleNovoContato = () => {
+      setFormData(INITIAL_FORM_DATA);
+      setEditingId(null);
+      setIsFormOpen(true);
+    };
+    window.addEventListener("novoContato", handleNovoContato);
+    return () => window.removeEventListener("novoContato", handleNovoContato);
+  }, []);
+
   // Reset to page 1 when search term or status filter changes
   useEffect(() => {
     setCurrentPage(1);

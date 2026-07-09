@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
@@ -40,6 +40,19 @@ export default function CadastroTabelasPreco() {
     preco: "",
     precoCusto: "",
   });
+
+  // Listen for the custom event dispatched by the bottom nav's "+" button on this page
+  useEffect(() => {
+    const handleNovaTabelaPreco = () => {
+      setIsFormOpen(true);
+      setEditingId(null);
+      setFormData({ productId: "", anuncianteId: "", preco: "", precoCusto: "" });
+      setSelectedAnuncianteId("");
+      setSelectedGrupoId("");
+    };
+    window.addEventListener("novaTabelaPreco", handleNovaTabelaPreco);
+    return () => window.removeEventListener("novaTabelaPreco", handleNovaTabelaPreco);
+  }, []);
 
   // Fetch anunciantes
   const { data: anunciantes = [] } = useQuery<Anunciante[]>({

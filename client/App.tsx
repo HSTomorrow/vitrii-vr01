@@ -225,7 +225,7 @@ function AppContent() {
           <Route path="/cadastro-tabelas-preco" element={<CadastroTabelasPreco />} />
           <Route path="/cadastro-variantes" element={<CadastroVariantesLista />} />
           <Route
-            path="/cadastro-variantes/:produtoId"
+            path="/cadastro-variantes/:productId"
             element={<CadastroVariantes />}
           />
           <Route

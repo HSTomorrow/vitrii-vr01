@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
@@ -39,6 +39,17 @@ export default function CadastroGruposProductos() {
     descricao: "",
     categoriaId: "",
   });
+
+  // Listen for the custom event dispatched by the bottom nav's "+" button on this page
+  useEffect(() => {
+    const handleNovoGrupo = () => {
+      setIsFormOpen(true);
+      setEditingId(null);
+      setFormData({ anuncianteId: "", nome: "", descricao: "", categoriaId: "" });
+    };
+    window.addEventListener("novoGrupo", handleNovoGrupo);
+    return () => window.removeEventListener("novoGrupo", handleNovoGrupo);
+  }, []);
 
   // Fetch anunciantes with user context
   const { data: anunciantes = [] } = useQuery<Loja[]>({

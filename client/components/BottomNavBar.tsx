@@ -8,14 +8,18 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
-// Dispatch a custom event to notify the MinhaAgenda page to add an evento
-const dispatchAddEventoEvent = () => {
-  window.dispatchEvent(new CustomEvent("addEvento"));
-};
-
-// Dispatch a custom event to notify the Financeiro page to open "Novo Lançamento"
-const dispatchNovoLancamentoEvent = () => {
-  window.dispatchEvent(new CustomEvent("novoLancamento"));
+// Routes that repurpose the central "+" button for their own quick-add action instead of
+// publishing an ad. Each page listens for its `event` via window.addEventListener to open
+// its own "Novo X" form/modal — see the matching useEffect in that page's component.
+const CADASTRO_BUTTON_CONFIG: Record<string, { label: string; event: string; color: string }> = {
+  "/minha-agenda": { label: "Evento", event: "addEvento", color: "bg-vitrii-green" },
+  "/financeiro": { label: "Lançamento", event: "novoLancamento", color: "bg-vitrii-blue" },
+  "/cadastro-lojas": { label: "Anunciante", event: "novoAnunciante", color: "bg-vitrii-blue" },
+  "/cadastro-grupos-productos": { label: "Grupo", event: "novoGrupo", color: "bg-vitrii-blue" },
+  "/cadastro-productos": { label: "Produto", event: "novoProduto", color: "bg-vitrii-blue" },
+  "/cadastro-tabelas-preco": { label: "Tabela", event: "novaTabelaPreco", color: "bg-vitrii-blue" },
+  "/cadastro-equipe-venda": { label: "Equipe", event: "novaEquipe", color: "bg-vitrii-blue" },
+  "/cadastro-contatos": { label: "Contato", event: "novoContato", color: "bg-vitrii-blue" },
 };
 
 export default function BottomNavBar() {
@@ -38,17 +42,16 @@ export default function BottomNavBar() {
 
   if (isHidden) return null;
 
-  // Check if we're on the MinhaAgenda or Financeiro page, which repurpose the
-  // central "+" button for their own quick-add action instead of publishing an ad.
-  const isOnMinhaAgenda = location.pathname === "/minha-agenda";
-  const isOnFinanceiro = location.pathname === "/financeiro";
+  // /cadastro-variantes/:productId is a dynamic route (variant editor for one produto) —
+  // the bare /cadastro-variantes list page has no create-form of its own, so it's excluded.
+  const isOnVariantesDetail =
+    location.pathname.startsWith("/cadastro-variantes/") && location.pathname !== "/cadastro-variantes/";
+  const cadastroConfig = isOnVariantesDetail
+    ? { label: "Variante", event: "novaVariante", color: "bg-vitrii-blue" }
+    : CADASTRO_BUTTON_CONFIG[location.pathname];
 
-  const publishBgClass = isOnMinhaAgenda
-    ? "bg-vitrii-green"
-    : isOnFinanceiro
-      ? "bg-vitrii-blue"
-      : "bg-vitrii-yellow";
-  const publishTextClass = isOnMinhaAgenda || isOnFinanceiro ? "text-white" : "text-vitrii-text";
+  const publishBgClass = cadastroConfig?.color || "bg-vitrii-yellow";
+  const publishTextClass = cadastroConfig ? "text-white" : "text-vitrii-text";
 
   const navItems = [
     {
@@ -67,12 +70,14 @@ export default function BottomNavBar() {
     },
     {
       id: "publish",
-      label: isOnMinhaAgenda ? "Evento" : isOnFinanceiro ? "Lançamento" : "Publicar",
+      label: cadastroConfig?.label || "Publicar",
       icon: Plus,
-      route: isOnMinhaAgenda || isOnFinanceiro ? "#" : user ? "/anuncio/criar" : "/signin",
-      isActive: isOnMinhaAgenda || isOnFinanceiro ? false : location.pathname.startsWith("/anuncio/criar"),
+      route: cadastroConfig ? "#" : user ? "/anuncio/criar" : "/signin",
+      isActive: cadastroConfig ? false : location.pathname.startsWith("/anuncio/criar"),
       requiresAuth: true,
-      onClick: isOnMinhaAgenda ? dispatchAddEventoEvent : isOnFinanceiro ? dispatchNovoLancamentoEvent : undefined,
+      onClick: cadastroConfig
+        ? () => window.dispatchEvent(new CustomEvent(cadastroConfig.event))
+        : undefined,
     },
     {
       id: "chat",

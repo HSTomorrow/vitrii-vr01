@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
@@ -82,6 +82,40 @@ export default function CadastroAnunciantes() {
     status: "Ativo",
     tipoCobranca: "Propria",
   });
+
+  // Listen for the custom event dispatched by the bottom nav's "+" button on this page
+  useEffect(() => {
+    const handleNovoAnunciante = () => {
+      setIsFormOpen(true);
+      setEditingId(null);
+      setFormData({
+        nome: "",
+        tipo: "Padrão",
+        cnpj: "",
+        endereco: "",
+        cidade: "",
+        estado: "RS",
+        cep: "",
+        descricao: "",
+        email: "",
+        telefone: "",
+        site: "",
+        instagram: "",
+        facebook: "",
+        whatsapp: "",
+        chavePix: "",
+        fotoUrl: "",
+        iconColor: "azul",
+        temAgenda: false,
+        localidadeId: null,
+        categoriaPrincipalId: null,
+        status: "Ativo",
+        tipoCobranca: "Propria",
+      });
+    };
+    window.addEventListener("novoAnunciante", handleNovoAnunciante);
+    return () => window.removeEventListener("novoAnunciante", handleNovoAnunciante);
+  }, []);
 
   // Fetch anunciantes (filtered by current user, or all if admin)
   const { data: anunciantesData, refetch } = useQuery({
