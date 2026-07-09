@@ -21,19 +21,47 @@ const EXT_BY_MIME: Record<string, string> = {
   "image/gif": ".gif",
   "image/webp": ".webp",
   "application/pdf": ".pdf",
+  "application/msword": ".doc",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document": ".docx",
+  "application/vnd.ms-excel": ".xls",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": ".xlsx",
+  "application/vnd.ms-powerpoint": ".ppt",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation": ".pptx",
+  "text/plain": ".txt",
+  "text/csv": ".csv",
+  "application/zip": ".zip",
 };
 
 // First bytes ("magic numbers") of each allowed format, checked against the actual
 // file contents after upload since fileFilter only sees the client-supplied mimetype.
+// Modern Office formats (.docx/.xlsx/.pptx) and .zip are all ZIP containers sharing the
+// same "PK\x03\x04" signature - the container format is verified, not the inner content.
+// Legacy Office formats (.doc/.xls/.ppt) similarly share the OLE2 compound-file signature.
+const ZIP_SIGNATURE = [Buffer.from([0x50, 0x4b, 0x03, 0x04])];
+const OLE2_SIGNATURE = [Buffer.from([0xd0, 0xcf, 0x11, 0xe0, 0xa1, 0xb1, 0x1a, 0xe1])];
 const MAGIC_BYTES: Record<string, Buffer[]> = {
   "image/jpeg": [Buffer.from([0xff, 0xd8, 0xff])],
   "image/png": [Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])],
   "image/gif": [Buffer.from("GIF87a", "ascii"), Buffer.from("GIF89a", "ascii")],
   "image/webp": [Buffer.from("RIFF", "ascii")], // followed by size + "WEBP", checked separately below
   "application/pdf": [Buffer.from("%PDF", "ascii")],
+  "application/msword": OLE2_SIGNATURE,
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document": ZIP_SIGNATURE,
+  "application/vnd.ms-excel": OLE2_SIGNATURE,
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": ZIP_SIGNATURE,
+  "application/vnd.ms-powerpoint": OLE2_SIGNATURE,
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation": ZIP_SIGNATURE,
+  "application/zip": ZIP_SIGNATURE,
 };
 
+// text/plain and text/csv have no reliable magic number - any short ASCII/UTF-8 text
+// passes - so they're checked separately (just "isn't binary garbage") rather than via
+// MAGIC_BYTES/matchesMagicBytes.
+const TEXT_MIMES = new Set(["text/plain", "text/csv"]);
+
 function matchesMagicBytes(mimetype: string, buffer: Buffer): boolean {
+  if (TEXT_MIMES.has(mimetype)) return true;
+
   const signatures = MAGIC_BYTES[mimetype];
   if (!signatures) return false;
 
@@ -64,7 +92,7 @@ const fileFilter = (
   file: Express.Multer.File,
   cb: multer.FileFilterCallback
 ) => {
-  const allowedMimes = ["image/jpeg", "image/png", "image/gif", "image/webp", "application/pdf"];
+  const allowedMimes = Object.keys(EXT_BY_MIME);
 
   if (!file) {
     return cb(new Error("Nenhum arquivo foi enviado"));
@@ -73,7 +101,7 @@ const fileFilter = (
   if (!allowedMimes.includes(file.mimetype)) {
     const mimeType = file.mimetype || "desconhecido";
     const ext = path.extname(file.originalname) || "sem extensão";
-    return cb(new Error(`Formato inválido: ${mimeType} (${ext}). Use JPEG, PNG, GIF, WEBP ou PDF.`));
+    return cb(new Error(`Formato inválido: ${mimeType} (${ext}). Use JPEG, PNG, GIF, WEBP, PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, CSV ou ZIP.`));
   }
 
   cb(null, true);

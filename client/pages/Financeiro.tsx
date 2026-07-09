@@ -54,10 +54,12 @@ interface Contrato {
   tipoContrato: string;
   valorMensal: string;
   diaVencimento: number;
+  dataFim?: string | null;
   status: string;
   contato: { id: number; nome: string };
   documentos?: Anexo[];
   categoria?: { id: number; codigo: string; descricao: string } | null;
+  categoriaId?: number | null;
 }
 
 interface CategoriaLancamento {
@@ -160,6 +162,15 @@ export default function Financeiro() {
   });
   const [novoContratoAnexos, setNovoContratoAnexos] = useState<Anexo[]>([]);
   const [anexosContratoAberto, setAnexosContratoAberto] = useState<number | null>(null);
+  const [editingContrato, setEditingContrato] = useState<Contrato | null>(null);
+  const [editContratoForm, setEditContratoForm] = useState({
+    titulo: "",
+    tipoContrato: "Mensal",
+    diaVencimento: "10",
+    dataFim: "",
+    categoriaId: null as number | null,
+    status: "ativo",
+  });
   const [loteMode, setLoteMode] = useState(false);
   const [selectedContratoIds, setSelectedContratoIds] = useState<number[]>([]);
   const [contratoFiltroTitulo, setContratoFiltroTitulo] = useState("");
@@ -490,6 +501,42 @@ export default function Financeiro() {
       refetchContratos();
     },
     onError: (error) => toast.error(error instanceof Error ? error.message : "Erro ao criar contrato"),
+  });
+
+  const editarContratoMutation = useMutation({
+    mutationFn: async () => {
+      if (!editingContrato) throw new Error("Nenhum contrato selecionado");
+
+      const response = await fetch(`/api/contratos-financeiros/${editingContrato.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          titulo: editContratoForm.titulo,
+          tipoContrato: editContratoForm.tipoContrato,
+          diaVencimento: parseInt(editContratoForm.diaVencimento),
+          dataFim: editContratoForm.dataFim || null,
+          categoriaId: editContratoForm.categoriaId,
+        }),
+      });
+      if (!response.ok) throw new Error((await response.json()).error || "Erro ao atualizar contrato");
+
+      if (editContratoForm.status !== editingContrato.status) {
+        const statusResponse = await fetch(`/api/contratos-financeiros/${editingContrato.id}/status`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: editContratoForm.status }),
+        });
+        if (!statusResponse.ok) throw new Error((await statusResponse.json()).error || "Erro ao atualizar status do contrato");
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      toast.success("Contrato atualizado!");
+      setEditingContrato(null);
+      refetchContratos();
+    },
+    onError: (error) => toast.error(error instanceof Error ? error.message : "Erro ao atualizar contrato"),
   });
 
   const lancarMesMutation = useMutation({
@@ -1061,6 +1108,22 @@ export default function Financeiro() {
                     {!loteMode && (
                       <div className="flex justify-end gap-2 mt-3">
                         <button
+                          onClick={() => {
+                            setEditingContrato(c);
+                            setEditContratoForm({
+                              titulo: c.titulo,
+                              tipoContrato: c.tipoContrato,
+                              diaVencimento: String(c.diaVencimento),
+                              dataFim: c.dataFim ? c.dataFim.slice(0, 10) : "",
+                              categoriaId: c.categoriaId ?? c.categoria?.id ?? null,
+                              status: c.status,
+                            });
+                          }}
+                          className="flex items-center gap-1 text-xs px-3 py-1.5 border border-gray-300 text-vitrii-text rounded-lg hover:bg-gray-50"
+                        >
+                          <Pencil className="w-3.5 h-3.5" /> Editar
+                        </button>
+                        <button
                           onClick={() =>
                             setAnexosContratoAberto(anexosContratoAberto === c.id ? null : c.id)
                           }
@@ -1528,6 +1591,106 @@ export default function Financeiro() {
                 className="flex-1 px-4 py-2 bg-vitrii-blue text-white rounded-lg font-semibold disabled:opacity-50"
               >
                 Criar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Editar Contrato */}
+      {editingContrato && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 space-y-4">
+            <h2 className="text-xl font-bold text-vitrii-text">Editar Contrato</h2>
+            <p className="text-sm text-vitrii-text-secondary">
+              Cliente: {editingContrato.contato.nome} (não pode ser alterado)
+            </p>
+            <div>
+              <label className="block text-sm font-semibold mb-1">Título</label>
+              <input
+                type="text"
+                value={editContratoForm.titulo}
+                onChange={(e) => setEditContratoForm({ ...editContratoForm, titulo: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold mb-1">Tipo de Contrato</label>
+              <select
+                value={editContratoForm.tipoContrato}
+                onChange={(e) => setEditContratoForm({ ...editContratoForm, tipoContrato: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              >
+                {TIPOS_CONTRATO.map((tipo) => (
+                  <option key={tipo} value={tipo}>{tipo}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold mb-1">Dia do Vencimento</label>
+              <input
+                type="number"
+                min="1"
+                max="28"
+                value={editContratoForm.diaVencimento}
+                onChange={(e) => setEditContratoForm({ ...editContratoForm, diaVencimento: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold mb-1">Fim (opcional)</label>
+              <input
+                type="date"
+                value={editContratoForm.dataFim}
+                onChange={(e) => setEditContratoForm({ ...editContratoForm, dataFim: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold mb-1">Categoria</label>
+              <select
+                value={editContratoForm.categoriaId ?? ""}
+                onChange={(e) =>
+                  setEditContratoForm({
+                    ...editContratoForm,
+                    categoriaId: e.target.value ? parseInt(e.target.value) : null,
+                  })
+                }
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              >
+                <option value="">Sem categoria</option>
+                {categoriasLancamento.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.descricao}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold mb-1">Status</label>
+              <select
+                value={editContratoForm.status}
+                onChange={(e) => setEditContratoForm({ ...editContratoForm, status: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              >
+                <option value="ativo">Ativo</option>
+                <option value="suspenso">Suspenso</option>
+                <option value="encerrado">Encerrado</option>
+              </select>
+            </div>
+            <div className="flex gap-2 pt-2">
+              <button
+                onClick={() => setEditingContrato(null)}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg font-semibold"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => editarContratoMutation.mutate()}
+                disabled={!editContratoForm.titulo || editarContratoMutation.isPending}
+                className="flex-1 px-4 py-2 bg-vitrii-blue text-white rounded-lg font-semibold disabled:opacity-50"
+              >
+                Salvar
               </button>
             </div>
           </div>

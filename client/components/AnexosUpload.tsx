@@ -23,8 +23,39 @@ interface AnexosUploadProps {
 
 const MAX_UPLOAD_TIME_MS = 15000;
 const MAX_FILE_SIZE_MB = 5;
-const ALLOWED_MIMES = ["image/jpeg", "image/png", "image/gif", "image/webp", "application/pdf"];
-const ALLOWED_EXTENSIONS = ["jpg", "jpeg", "png", "gif", "webp", "pdf"];
+const ALLOWED_MIMES = [
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "application/vnd.ms-excel",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  "application/vnd.ms-powerpoint",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  "text/plain",
+  "text/csv",
+  "application/zip",
+];
+const ALLOWED_EXTENSIONS = [
+  "jpg",
+  "jpeg",
+  "png",
+  "gif",
+  "webp",
+  "pdf",
+  "doc",
+  "docx",
+  "xls",
+  "xlsx",
+  "ppt",
+  "pptx",
+  "txt",
+  "csv",
+  "zip",
+];
 
 function formatFileSize(bytes: number): string {
   if (bytes === 0) return "0 B";
@@ -62,7 +93,7 @@ export default function AnexosUpload({
       for (const file of newFiles) {
         if (!ALLOWED_MIMES.includes(file.type)) {
           toast.error(`${file.name}: formato inválido`, {
-            description: "Use PDF, JPEG, PNG, GIF ou WEBP.",
+            description: "Use PDF, DOC, DOCX, XLS, XLSX, PPT, PPTX, TXT, CSV, ZIP, JPEG, PNG, GIF ou WEBP.",
           });
           continue;
         }
@@ -169,7 +200,7 @@ export default function AnexosUpload({
           type="file"
           id={`anexos-upload-${anexarUrl || "pending"}`}
           multiple
-          accept=".pdf,.jpg,.jpeg,.png,.gif,.webp,application/pdf,image/*"
+          accept={ALLOWED_EXTENSIONS.map((ext) => `.${ext}`).join(",")}
           onChange={(e) => handleFileSelect(e.target.files)}
           disabled={isUploading || anexos.length >= maxAnexos}
           className="hidden"
@@ -199,16 +230,17 @@ export default function AnexosUpload({
       {anexos.length > 0 && (
         <ul className="space-y-1.5">
           {anexos.map((anexo, index) => {
-            const isPdf = anexo.url.toLowerCase().endsWith(".pdf");
+            const extension = anexo.url.split(".").pop()?.toLowerCase() || "";
+            const isImage = ["jpg", "jpeg", "png", "gif", "webp"].includes(extension);
             return (
               <li
                 key={anexo.id ?? `${anexo.url}-${index}`}
                 className="flex items-center gap-2 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm"
               >
-                {isPdf ? (
-                  <FileText className="w-4 h-4 text-red-500 flex-shrink-0" />
-                ) : (
+                {isImage ? (
                   <ImageIcon className="w-4 h-4 text-vitrii-blue flex-shrink-0" />
+                ) : (
+                  <FileText className="w-4 h-4 text-red-500 flex-shrink-0" />
                 )}
                 <a
                   href={anexo.url}
@@ -233,7 +265,7 @@ export default function AnexosUpload({
       )}
 
       <p className="text-xs text-vitrii-text-secondary">
-        PDF, JPEG, PNG, GIF ou WEBP • máx {MAX_FILE_SIZE_MB}MB por arquivo
+        PDF, Word, Excel, PowerPoint, TXT, CSV, ZIP, JPEG, PNG, GIF ou WEBP • máx {MAX_FILE_SIZE_MB}MB por arquivo
       </p>
     </div>
   );
