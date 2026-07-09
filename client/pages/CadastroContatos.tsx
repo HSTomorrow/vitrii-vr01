@@ -17,6 +17,8 @@ import {
   Briefcase,
   User,
   Send,
+  Upload,
+  Check,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
@@ -96,6 +98,68 @@ const formatWhatsAppPhone = (phone: string): string => {
   return phone.replace(/\D/g, "");
 };
 
+interface ContatoImportado {
+  nome: string;
+  celular: string;
+  email: string;
+  selecionado: boolean;
+}
+
+// Parses a .vcf (vCard 3.0/4.0) file's text content into name/phone/email rows.
+function parseVCard(text: string): ContatoImportado[] {
+  const cards = text.split(/BEGIN:VCARD/i).slice(1);
+  const contatos: ContatoImportado[] = [];
+  for (const card of cards) {
+    const lines = card.split(/\r\n|\r|\n/);
+    let nome = "";
+    let celular = "";
+    let email = "";
+    for (const line of lines) {
+      const separatorIndex = line.indexOf(":");
+      if (separatorIndex === -1) continue;
+      const rawKey = line.slice(0, separatorIndex);
+      const value = line.slice(separatorIndex + 1).trim();
+      if (!value) continue;
+      const key = rawKey.split(";")[0].toUpperCase();
+      if (key === "FN") nome = value;
+      else if (key === "N" && !nome)
+        nome = value.split(";").filter(Boolean).reverse().join(" ");
+      else if (key === "TEL" && !celular) celular = value.replace(/[^\d+]/g, "");
+      else if (key === "EMAIL" && !email) email = value;
+    }
+    if (nome || celular) {
+      contatos.push({ nome: nome || "Sem nome", celular, email, selecionado: !!celular });
+    }
+  }
+  return contatos;
+}
+
+// Parses a .csv file's text content, matching header names in Portuguese/English.
+function parseCSVContatos(text: string): ContatoImportado[] {
+  const lines = text.split(/\r\n|\r|\n/).filter((l) => l.trim());
+  if (lines.length < 2) return [];
+  const headers = lines[0]
+    .split(",")
+    .map((h) => h.trim().toLowerCase().replace(/^"|"$/g, ""));
+  const nomeIdx = headers.findIndex((h) => ["nome", "name", "nome completo"].includes(h));
+  const celularIdx = headers.findIndex((h) =>
+    ["celular", "telefone", "phone", "whatsapp", "mobile", "tel"].includes(h),
+  );
+  const emailIdx = headers.findIndex((h) => ["email", "e-mail"].includes(h));
+
+  const contatos: ContatoImportado[] = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cols = lines[i].split(",").map((c) => c.trim().replace(/^"|"$/g, ""));
+    const nome = nomeIdx >= 0 ? cols[nomeIdx] || "" : "";
+    const celular = celularIdx >= 0 ? (cols[celularIdx] || "").replace(/[^\d+]/g, "") : "";
+    const email = emailIdx >= 0 ? cols[emailIdx] || "" : "";
+    if (nome || celular) {
+      contatos.push({ nome: nome || "Sem nome", celular, email, selecionado: !!celular });
+    }
+  }
+  return contatos;
+}
+
 // Helper function to format date to Brazilian format (DD/MM/YYYY HH:MM:SS)
 const formatarData = (data: string | undefined): string => {
   if (!data) return "-";
@@ -133,6 +197,8 @@ export default function CadastroContatos() {
   const [currentPage, setCurrentPage] = useState(1);
   const [showContactDetails, setShowContactDetails] = useState(false);
   const [selectedContatoForDetails, setSelectedContatoForDetails] = useState<Contato | null>(null);
+  const [importedContatos, setImportedContatos] = useState<ContatoImportado[] | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
   const ITEMS_PER_PAGE = 20;
 
   // Reset to page 1 when search term or status filter changes
@@ -427,6 +493,75 @@ export default function CadastroContatos() {
     setIsFormOpen(false);
   };
 
+  const handleImportFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // Allow re-selecting the same file later
+    if (!file) return;
+
+    const text = await file.text();
+    const isVcf = file.name.toLowerCase().endsWith(".vcf") || /BEGIN:VCARD/i.test(text);
+    const parsed = isVcf ? parseVCard(text) : parseCSVContatos(text);
+
+    if (parsed.length === 0) {
+      toast.error("Nenhum contato encontrado no arquivo");
+      return;
+    }
+    setImportedContatos(parsed);
+  };
+
+  const toggleImportedSelecionado = (index: number) => {
+    setImportedContatos((prev) =>
+      prev
+        ? prev.map((c, i) => (i === index ? { ...c, selecionado: !c.selecionado } : c))
+        : prev,
+    );
+  };
+
+  const handleConfirmImport = async () => {
+    if (!importedContatos) return;
+    const selecionados = importedContatos.filter((c) => c.selecionado && c.celular);
+    if (selecionados.length === 0) {
+      toast.error("Selecione ao menos um contato com celular para importar");
+      return;
+    }
+
+    setIsImporting(true);
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    if (user?.id) headers["X-User-Id"] = user.id.toString();
+
+    let sucesso = 0;
+    let falhas = 0;
+    for (const contato of selecionados) {
+      try {
+        const response = await fetch("/api/contatos", {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
+            nome: contato.nome,
+            celular: contato.celular,
+            email: contato.email || null,
+            status: "ativo",
+            tipoContato: "Outro",
+          }),
+        });
+        if (response.ok) sucesso++;
+        else falhas++;
+      } catch {
+        falhas++;
+      }
+    }
+
+    setIsImporting(false);
+    setImportedContatos(null);
+    refetchContatos();
+
+    if (falhas === 0) {
+      toast.success(`${sucesso} contato(s) importado(s) com sucesso!`);
+    } else {
+      toast.error(`${sucesso} importado(s), ${falhas} falharam (verifique duplicados ou nome muito curto)`);
+    }
+  };
+
   const handleDelete = (contatoId: number) => {
     if (confirm("Tem certeza que deseja deletar este contato?")) {
       deleteContatoMutation.mutate(contatoId);
@@ -524,13 +659,25 @@ export default function CadastroContatos() {
             </div>
 
             {!isFormOpen ? (
-              <button
-                onClick={() => setIsFormOpen(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                <Plus className="w-5 h-5" />
-                Novo Contato
-              </button>
+              <div className="flex flex-wrap items-center gap-3">
+                <button
+                  onClick={() => setIsFormOpen(true)}
+                  className="flex items-center gap-2 px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  <Plus className="w-5 h-5" />
+                  Novo Contato
+                </button>
+                <label className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-vitrii-text rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                  <Upload className="w-5 h-5" />
+                  Importar Contatos (.vcf/.csv)
+                  <input
+                    type="file"
+                    accept=".vcf,.csv,text/vcard,text/csv"
+                    onChange={handleImportFile}
+                    className="hidden"
+                  />
+                </label>
+              </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Nome */}
@@ -1017,6 +1164,78 @@ export default function CadastroContatos() {
           setSelectedContatoForDetails(null);
         }}
       />
+
+      {importedContatos && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[85vh] flex flex-col">
+            <div className="flex items-center justify-between p-6 border-b border-gray-200">
+              <h2 className="text-lg font-semibold text-vitrii-text">
+                Revisar Contatos Importados ({importedContatos.length} encontrados)
+              </h2>
+              <button
+                onClick={() => setImportedContatos(null)}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                aria-label="Fechar"
+              >
+                <X className="w-5 h-5 text-vitrii-text" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-6 space-y-2">
+              {importedContatos.map((contato, index) => (
+                <label
+                  key={index}
+                  className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                    !contato.celular
+                      ? "border-gray-200 bg-gray-50 opacity-60 cursor-not-allowed"
+                      : contato.selecionado
+                        ? "border-vitrii-blue bg-blue-50"
+                        : "border-gray-200 hover:bg-gray-50"
+                  }`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={contato.selecionado}
+                    disabled={!contato.celular}
+                    onChange={() => toggleImportedSelecionado(index)}
+                    className="w-5 h-5 text-vitrii-blue cursor-pointer rounded flex-shrink-0"
+                  />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-vitrii-text truncate">{contato.nome}</p>
+                    <p className="text-sm text-vitrii-text-secondary">
+                      {contato.celular || "Sem celular — não pode ser importado"}
+                      {contato.email ? ` · ${contato.email}` : ""}
+                    </p>
+                  </div>
+                </label>
+              ))}
+            </div>
+
+            <div className="flex items-center justify-between gap-4 p-6 border-t border-gray-200">
+              <p className="text-sm text-vitrii-text-secondary">
+                {importedContatos.filter((c) => c.selecionado && c.celular).length} selecionado(s)
+              </p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setImportedContatos(null)}
+                  disabled={isImporting}
+                  className="px-4 py-2 bg-gray-200 text-vitrii-text rounded-lg hover:bg-gray-300 transition-colors font-semibold disabled:opacity-50"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleConfirmImport}
+                  disabled={isImporting}
+                  className="flex items-center gap-2 px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold disabled:opacity-50"
+                >
+                  <Check className="w-4 h-4" />
+                  {isImporting ? "Importando..." : "Importar Selecionados"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>
