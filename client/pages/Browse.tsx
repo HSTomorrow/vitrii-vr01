@@ -11,6 +11,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import ImageWithFallback from "@/components/ImageWithFallback";
 import { getAnuncioImage, getImageAlt } from "@/utils/imageFallback";
 import { formatCurrencyDisplay } from "@/utils/formatCurrency";
+import { getEnderecoExibicao } from "@/utils/enderecoAnuncio";
 
 const TYPES = [
   { value: "produto", label: "Produto" },
@@ -530,13 +531,11 @@ export default function Browse() {
                               {anuncio.titulo}
                             </h3>
 
-                            {(anuncio.endereco ||
-                              anuncio.anunciantes?.endereco) && (
+                            {getEnderecoExibicao(anuncio) && (
                               <div className="flex items-center gap-1 mb-3 text-xs text-vitrii-text-secondary">
                                 <MapPin className="w-3 h-3 flex-shrink-0" />
                                 <span className="truncate">
-                                  {anuncio.endereco ||
-                                    anuncio.anunciantes?.endereco}
+                                  {getEnderecoExibicao(anuncio)}
                                 </span>
                               </div>
                             )}

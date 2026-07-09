@@ -16,6 +16,7 @@ import ReservationManagementPanel from "@/components/ReservationManagementPanel"
 import AnuncioFinanceiroPanel from "@/components/AnuncioFinanceiroPanel";
 import { getAnuncioImage, getImageAlt } from "@/utils/imageFallback";
 import { formatCurrencyDisplay } from "@/utils/formatCurrency";
+import { getEnderecoExibicao, podeExibirNoMapa } from "@/utils/enderecoAnuncio";
 import {
   ChevronLeft,
   AlertCircle,
@@ -359,12 +360,9 @@ export default function AnuncioDetalhe() {
   const anuncio = data.data;
 
   // The anúncio's own address wins over the anunciante's registered one (it can be
-  // overridden per-ad); ocultarEndereco suppresses display entirely.
-  const enderecoAnuncio = [anuncio.endereco, anuncio.cidade, anuncio.estado]
-    .filter(Boolean)
-    .join(", ");
-  const enderecoExibicao = enderecoAnuncio || anuncio.anunciantes?.endereco || "";
-  const mostrarEndereco = !anuncio.ocultarEndereco && !!enderecoExibicao;
+  // overridden per-ad); ocultarEndereco overrides both with "A consultar".
+  const enderecoExibicao = getEnderecoExibicao(anuncio);
+  const mostrarEndereco = podeExibirNoMapa(anuncio);
 
   const statusColors: any = {
     em_edicao: "bg-yellow-100 text-yellow-800",
@@ -606,9 +604,7 @@ export default function AnuncioDetalhe() {
                     <div className="flex items-center gap-2 text-vitrii-text-secondary text-sm">
                       <MapPin className="w-4 h-4 flex-shrink-0" />
                       <span>
-                        {anuncio.ocultarEndereco
-                          ? "Consultar endereço com anunciante"
-                          : enderecoExibicao || "Endereço não informado"}
+                        {enderecoExibicao || "Endereço não informado"}
                       </span>
                     </div>
                     {mostrarEndereco && (
