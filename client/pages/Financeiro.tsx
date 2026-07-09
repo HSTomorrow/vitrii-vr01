@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { QRCodeSVG } from "qrcode.react";
-import { DollarSign, Plus, Check, X, Copy, FileText, Share2, Mail, Download, Zap, Lock, Unlock, Pencil, MessageCircle } from "lucide-react";
+import { DollarSign, Plus, Check, X, Copy, FileText, Share2, Mail, Download, Zap, Lock, Unlock, Pencil, MessageCircle, Eye } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ContatoSelectorModal from "@/components/ContatoSelectorModal";
@@ -140,6 +140,9 @@ export default function Financeiro() {
   const [editingLancamento, setEditingLancamento] = useState<Lancamento | null>(null);
   const [editForm, setEditForm] = useState({ descricao: "", valor: "", vencimento: "", tipoPagamento: "pix", contaBanco: "" });
   const [editLancamentoAnexos, setEditLancamentoAnexos] = useState<Anexo[]>([]);
+  const [anexosLancamentoAberto, setAnexosLancamentoAberto] = useState<number | null>(null);
+  const [viewingLancamento, setViewingLancamento] = useState<Lancamento | null>(null);
+  const [viewingContrato, setViewingContrato] = useState<Contrato | null>(null);
   const [novoLancamento, setNovoLancamento] = useState({
     categoria: "multa",
     descricao: "",
@@ -227,7 +230,7 @@ export default function Financeiro() {
     }
   }, [anunciantes, selectedAnuncianteId]);
 
-  const { data: lancamentos = [], refetch: refetchLancamentos } = useQuery<Lancamento[]>({
+  const { data: lancamentos = [], isLoading: isLoadingLancamentos, refetch: refetchLancamentos } = useQuery<Lancamento[]>({
     queryKey: ["lancamentos-financeiros", selectedAnuncianteId, filterStatus, filterCompetencia],
     queryFn: async () => {
       if (!selectedAnuncianteId) return [];
@@ -372,7 +375,7 @@ export default function Financeiro() {
     setFilterContatoId(null);
   };
 
-  const { data: contratos = [], refetch: refetchContratos } = useQuery<Contrato[]>({
+  const { data: contratos = [], isLoading: isLoadingContratos, refetch: refetchContratos } = useQuery<Contrato[]>({
     queryKey: ["contratos-financeiros", selectedAnuncianteId, contratoFiltroTitulo, contratoFiltroDiaDe, contratoFiltroDiaAte],
     queryFn: async () => {
       if (!selectedAnuncianteId) return [];
@@ -834,7 +837,9 @@ export default function Financeiro() {
             </div>
 
             <div className="space-y-3">
-              {lancamentosFiltrados.length === 0 ? (
+              {isLoadingLancamentos ? (
+                <p className="text-center text-vitrii-text-secondary py-12">Verificando lançamentos...</p>
+              ) : lancamentosFiltrados.length === 0 ? (
                 <p className="text-center text-vitrii-text-secondary py-12">Nenhum lançamento encontrado</p>
               ) : (
                 lancamentosFiltrados.map((l) => {
@@ -892,6 +897,12 @@ export default function Financeiro() {
 
                       <div className="flex flex-wrap gap-2 mt-3">
                         <button
+                          onClick={() => setViewingLancamento(l)}
+                          className="flex items-center gap-1 text-xs px-3 py-1.5 border border-gray-300 text-vitrii-text rounded-lg hover:bg-gray-50"
+                        >
+                          <Eye className="w-3.5 h-3.5" /> Visualizar
+                        </button>
+                        <button
                           onClick={() => {
                             setEditingLancamento(l);
                             setEditForm({
@@ -908,6 +919,15 @@ export default function Financeiro() {
                           className="flex items-center gap-1 text-xs px-3 py-1.5 border border-gray-300 text-vitrii-text rounded-lg hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                           <Pencil className="w-3.5 h-3.5" /> Editar
+                        </button>
+                        <button
+                          onClick={() =>
+                            setAnexosLancamentoAberto(anexosLancamentoAberto === l.id ? null : l.id)
+                          }
+                          className="flex items-center gap-1 text-xs px-3 py-1.5 border border-gray-300 text-vitrii-text rounded-lg hover:bg-gray-50"
+                        >
+                          <FileText className="w-3.5 h-3.5" />
+                          Anexos {l.documentos?.length ? `(${l.documentos.length})` : ""}
                         </button>
                         {l.contato?.celular && (
                           <button
@@ -966,6 +986,17 @@ export default function Financeiro() {
                           </>
                         )}
                       </div>
+                      {anexosLancamentoAberto === l.id && (
+                        <div className="mt-3 pt-3 border-t border-gray-100">
+                          <AnexosUpload
+                            anexos={l.documentos || []}
+                            onChange={() => refetchLancamentos()}
+                            maxAnexos={3}
+                            anexarUrl={`/api/lancamentos-financeiros/${l.id}/documentos`}
+                            removerUrlBase="/api/lancamentos-financeiros/documentos"
+                          />
+                        </div>
+                      )}
                     </div>
                   );
                 })
@@ -1068,7 +1099,9 @@ export default function Financeiro() {
             )}
 
             <div className="space-y-3">
-              {contratos.length === 0 ? (
+              {isLoadingContratos ? (
+                <p className="text-center text-vitrii-text-secondary py-12">Verificando contratos...</p>
+              ) : contratos.length === 0 ? (
                 <p className="text-center text-vitrii-text-secondary py-12">Nenhum contrato cadastrado</p>
               ) : (
                 contratos.map((c) => (
@@ -1107,6 +1140,12 @@ export default function Financeiro() {
                     </div>
                     {!loteMode && (
                       <div className="flex justify-end gap-2 mt-3">
+                        <button
+                          onClick={() => setViewingContrato(c)}
+                          className="flex items-center gap-1 text-xs px-3 py-1.5 border border-gray-300 text-vitrii-text rounded-lg hover:bg-gray-50"
+                        >
+                          <Eye className="w-3.5 h-3.5" /> Visualizar
+                        </button>
                         <button
                           onClick={() => {
                             setEditingContrato(c);
@@ -1163,7 +1202,7 @@ export default function Financeiro() {
       {/* Modal: Exportar Lançamentos */}
       {showExportLancamentos && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 space-y-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto p-6 space-y-4">
             <h2 className="text-xl font-bold text-vitrii-text">Exportar Lançamentos</h2>
             <p className="text-sm text-vitrii-text-secondary">
               Escolha os filtros para a exportação (deixe em branco para incluir tudo).
@@ -1293,7 +1332,7 @@ export default function Financeiro() {
       {/* Modal: Novo Lançamento */}
       {showNovoLancamento && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 space-y-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto p-6 space-y-4">
             <h2 className="text-xl font-bold text-vitrii-text">Novo Lançamento</h2>
             <div>
               <label className="block text-sm font-semibold mb-1">Categoria</label>
@@ -1393,7 +1432,7 @@ export default function Financeiro() {
       {/* Modal: Editar Lançamento */}
       {editingLancamento && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 space-y-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto p-6 space-y-4">
             <h2 className="text-xl font-bold text-vitrii-text">Editar Lançamento</h2>
             <div>
               <label className="block text-sm font-semibold mb-1">Descrição</label>
@@ -1449,9 +1488,9 @@ export default function Financeiro() {
               <label className="block text-sm font-semibold mb-1">Anexos</label>
               <AnexosUpload
                 anexos={editLancamentoAnexos}
-                onChange={(anexos) => {
+                onChange={async (anexos) => {
                   setEditLancamentoAnexos(anexos);
-                  refetchLancamentos();
+                  await refetchLancamentos();
                 }}
                 maxAnexos={3}
                 anexarUrl={`/api/lancamentos-financeiros/${editingLancamento.id}/documentos`}
@@ -1477,10 +1516,100 @@ export default function Financeiro() {
         </div>
       )}
 
+      {/* Modal: Visualizar Lançamento (somente leitura) */}
+      {viewingLancamento && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto p-6 space-y-4">
+            <h2 className="text-xl font-bold text-vitrii-text">Visualizar Lançamento</h2>
+            <div className="space-y-3 text-sm">
+              <div>
+                <p className="text-vitrii-text-secondary">Categoria</p>
+                <p className="font-semibold text-vitrii-text">
+                  {CATEGORIA_LABELS[viewingLancamento.categoria] || viewingLancamento.categoria}
+                </p>
+              </div>
+              <div>
+                <p className="text-vitrii-text-secondary">Origem</p>
+                <p className="font-semibold text-vitrii-text">
+                  {ORIGEM_LABELS[viewingLancamento.origem] || viewingLancamento.origem}
+                </p>
+              </div>
+              {viewingLancamento.descricao && (
+                <div>
+                  <p className="text-vitrii-text-secondary">Descrição</p>
+                  <p className="font-semibold text-vitrii-text">{viewingLancamento.descricao}</p>
+                </div>
+              )}
+              <div>
+                <p className="text-vitrii-text-secondary">Cliente</p>
+                <p className="font-semibold text-vitrii-text">{viewingLancamento.contato?.nome || "-"}</p>
+              </div>
+              <div>
+                <p className="text-vitrii-text-secondary">Valor</p>
+                <p className="font-semibold text-vitrii-text">{formatCurrencyDisplay(parseFloat(viewingLancamento.valor))}</p>
+              </div>
+              <div>
+                <p className="text-vitrii-text-secondary">Status</p>
+                <p className="font-semibold text-vitrii-text">
+                  {STATUS_LABELS[viewingLancamento.status]?.label || viewingLancamento.status}
+                </p>
+              </div>
+              {viewingLancamento.vencimento && (
+                <div>
+                  <p className="text-vitrii-text-secondary">Vencimento</p>
+                  <p className="font-semibold text-vitrii-text">
+                    {new Date(viewingLancamento.vencimento).toLocaleDateString("pt-BR")}
+                  </p>
+                </div>
+              )}
+              <div>
+                <p className="text-vitrii-text-secondary">Tipo de Pagamento</p>
+                <p className="font-semibold text-vitrii-text">
+                  {TIPOS_PAGAMENTO.find((t) => t.value === viewingLancamento.tipoPagamento)?.label ||
+                    viewingLancamento.tipoPagamento ||
+                    "-"}
+                </p>
+              </div>
+              {viewingLancamento.contaBanco && (
+                <div>
+                  <p className="text-vitrii-text-secondary">Conta/Banco</p>
+                  <p className="font-semibold text-vitrii-text">{viewingLancamento.contaBanco}</p>
+                </div>
+              )}
+              {viewingLancamento.documentos && viewingLancamento.documentos.length > 0 && (
+                <div>
+                  <p className="text-vitrii-text-secondary mb-1">Anexos</p>
+                  <ul className="space-y-1">
+                    {viewingLancamento.documentos.map((doc) => (
+                      <li key={doc.id ?? doc.url}>
+                        <a
+                          href={doc.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-vitrii-blue hover:underline"
+                        >
+                          {doc.nome}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+            <button
+              onClick={() => setViewingLancamento(null)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg font-semibold hover:bg-gray-50"
+            >
+              Fechar
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Modal: Novo Contrato */}
       {showNovoContrato && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 space-y-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto p-6 space-y-4">
             <h2 className="text-xl font-bold text-vitrii-text">Novo Contrato</h2>
             <div>
               <label className="block text-sm font-semibold mb-1">Cliente</label>
@@ -1600,7 +1729,7 @@ export default function Financeiro() {
       {/* Modal: Editar Contrato */}
       {editingContrato && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 space-y-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto p-6 space-y-4">
             <h2 className="text-xl font-bold text-vitrii-text">Editar Contrato</h2>
             <p className="text-sm text-vitrii-text-secondary">
               Cliente: {editingContrato.contato.nome} (não pode ser alterado)
@@ -1693,6 +1822,78 @@ export default function Financeiro() {
                 Salvar
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Visualizar Contrato (somente leitura) */}
+      {viewingContrato && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto p-6 space-y-4">
+            <h2 className="text-xl font-bold text-vitrii-text">Visualizar Contrato</h2>
+            <div className="space-y-3 text-sm">
+              <div>
+                <p className="text-vitrii-text-secondary">Título</p>
+                <p className="font-semibold text-vitrii-text">{viewingContrato.titulo}</p>
+              </div>
+              <div>
+                <p className="text-vitrii-text-secondary">Cliente</p>
+                <p className="font-semibold text-vitrii-text">{viewingContrato.contato.nome}</p>
+              </div>
+              <div>
+                <p className="text-vitrii-text-secondary">Tipo de Contrato</p>
+                <p className="font-semibold text-vitrii-text">{viewingContrato.tipoContrato}</p>
+              </div>
+              <div>
+                <p className="text-vitrii-text-secondary">Categoria</p>
+                <p className="font-semibold text-vitrii-text">{viewingContrato.categoria?.descricao || "Sem categoria"}</p>
+              </div>
+              <div>
+                <p className="text-vitrii-text-secondary">Valor Mensal</p>
+                <p className="font-semibold text-vitrii-text">{formatCurrencyDisplay(parseFloat(viewingContrato.valorMensal))}</p>
+              </div>
+              <div>
+                <p className="text-vitrii-text-secondary">Dia do Vencimento</p>
+                <p className="font-semibold text-vitrii-text">{viewingContrato.diaVencimento}</p>
+              </div>
+              {viewingContrato.dataFim && (
+                <div>
+                  <p className="text-vitrii-text-secondary">Fim</p>
+                  <p className="font-semibold text-vitrii-text">
+                    {new Date(viewingContrato.dataFim).toLocaleDateString("pt-BR")}
+                  </p>
+                </div>
+              )}
+              <div>
+                <p className="text-vitrii-text-secondary">Status</p>
+                <p className="font-semibold text-vitrii-text">{viewingContrato.status}</p>
+              </div>
+              {viewingContrato.documentos && viewingContrato.documentos.length > 0 && (
+                <div>
+                  <p className="text-vitrii-text-secondary mb-1">Anexos</p>
+                  <ul className="space-y-1">
+                    {viewingContrato.documentos.map((doc) => (
+                      <li key={doc.id ?? doc.url}>
+                        <a
+                          href={doc.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-vitrii-blue hover:underline"
+                        >
+                          {doc.nome}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+            <button
+              onClick={() => setViewingContrato(null)}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg font-semibold hover:bg-gray-50"
+            >
+              Fechar
+            </button>
           </div>
         </div>
       )}

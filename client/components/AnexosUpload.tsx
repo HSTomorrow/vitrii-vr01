@@ -11,7 +11,7 @@ export interface Anexo {
 
 interface AnexosUploadProps {
   anexos: Anexo[];
-  onChange: (anexos: Anexo[]) => void;
+  onChange: (anexos: Anexo[]) => void | Promise<unknown>;
   maxAnexos: number;
   // Live mode: when both are given, each add/remove hits the server immediately
   // (used when editing an entity that already exists). Without them, files are
@@ -73,6 +73,7 @@ export default function AnexosUpload({
   removerUrlBase,
 }: AnexosUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
+  const [isRemoving, setIsRemoving] = useState(false);
   const isLive = !!anexarUrl;
 
   const handleFileSelect = async (files: FileList | null) => {
@@ -170,7 +171,10 @@ export default function AnexosUpload({
       }
 
       if (novosAnexos.length > 0) {
-        onChange([...anexos, ...novosAnexos]);
+        // Await so the spinner stays up through the caller's own refetch/state update too -
+        // otherwise it flips off right as the parent is still re-fetching, and the new
+        // attachment appears to have vanished for the second or two until that resolves.
+        await onChange([...anexos, ...novosAnexos]);
       }
     } finally {
       setIsUploading(false);
@@ -180,17 +184,20 @@ export default function AnexosUpload({
   const removeAnexo = async (index: number) => {
     const anexo = anexos[index];
 
+    setIsRemoving(true);
     if (isLive && anexo.id && removerUrlBase) {
       try {
         const response = await fetch(`${removerUrlBase}/${anexo.id}`, { method: "DELETE" });
         if (!response.ok) throw new Error((await response.json()).error || "Erro ao remover anexo");
       } catch (error) {
         toast.error(error instanceof Error ? error.message : "Erro ao remover anexo");
+        setIsRemoving(false);
         return;
       }
     }
 
-    onChange(anexos.filter((_, i) => i !== index));
+    await onChange(anexos.filter((_, i) => i !== index));
+    setIsRemoving(false);
   };
 
   return (
@@ -202,13 +209,13 @@ export default function AnexosUpload({
           multiple
           accept={ALLOWED_EXTENSIONS.map((ext) => `.${ext}`).join(",")}
           onChange={(e) => handleFileSelect(e.target.files)}
-          disabled={isUploading || anexos.length >= maxAnexos}
+          disabled={isUploading || isRemoving || anexos.length >= maxAnexos}
           className="hidden"
         />
         <label
           htmlFor={`anexos-upload-${anexarUrl || "pending"}`}
           className={`flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed rounded-lg cursor-pointer transition-colors text-sm ${
-            isUploading || anexos.length >= maxAnexos
+            isUploading || isRemoving || anexos.length >= maxAnexos
               ? "bg-gray-50 border-gray-300 cursor-not-allowed text-vitrii-text-secondary"
               : "border-vitrii-blue hover:bg-blue-50 text-vitrii-blue"
           }`}
@@ -216,7 +223,12 @@ export default function AnexosUpload({
           {isUploading ? (
             <>
               <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-vitrii-blue" />
-              Enviando...
+              Processando anexo...
+            </>
+          ) : isRemoving ? (
+            <>
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-vitrii-blue" />
+              Removendo...
             </>
           ) : (
             <>
@@ -253,7 +265,8 @@ export default function AnexosUpload({
                 <button
                   type="button"
                   onClick={() => removeAnexo(index)}
-                  className="text-gray-400 hover:text-red-600 flex-shrink-0"
+                  disabled={isUploading || isRemoving}
+                  className="text-gray-400 hover:text-red-600 flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
                   title="Remover anexo"
                 >
                   <X className="w-4 h-4" />
