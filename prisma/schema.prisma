@@ -585,6 +585,7 @@ model contratos_financeiros {
   dataInicio      DateTime
   dataFim         DateTime?
   status          String    @default("ativo") @db.VarChar(20) // ativo, suspenso, encerrado
+  categoriaId     Int? // Category used for the lançamentos this contract generates
   dataCriacao     DateTime  @default(now())
   dataAtualizacao DateTime  @updatedAt
   criadoPor       Int?
@@ -594,6 +595,7 @@ model contratos_financeiros {
 
   anunciante  anunciantes               @relation(fields: [anuncianteId], references: [id], onDelete: Cascade)
   contato     contatos                  @relation(fields: [contatoId], references: [id], onDelete: Restrict)
+  categoria   categorias_lancamento?    @relation(fields: [categoriaId], references: [id], onDelete: SetNull)
   reajustes   contratos_reajustes[]
   documentos  contratos_documentos[]
   lancamentos lancamentos_financeiros[]
@@ -602,6 +604,24 @@ model contratos_financeiros {
   @@index([contatoId])
   @@index([status])
   @@index([dataExclusao])
+  @@index([categoriaId])
+}
+
+// Admin-managed lookup of categoria types for lançamentos financeiros (and the contratos
+// that generate them). "Bloquear" = flip status to "desativado", never a hard delete, since
+// historical contratos/lancamentos may still reference a category.
+model categorias_lancamento {
+  id              Int      @id @default(autoincrement())
+  codigo          String   @unique @db.VarChar(50)
+  descricao       String   @db.VarChar(255)
+  status          String   @default("ativo") @db.VarChar(20) // "ativo" ou "desativado"
+  dataCriacao     DateTime @default(now())
+  dataAtualizacao DateTime @updatedAt
+
+  contratos   contratos_financeiros[]
+  lancamentos lancamentos_financeiros[]
+
+  @@index([status])
 }
 
 model contratos_reajustes {
@@ -643,6 +663,7 @@ model lancamentos_financeiros {
   contratoId    Int?
   origem        String    @db.VarChar(20) // "agenda", "mensalidade", "avulso", "contrato", "anuncio"
   categoria     String    @db.VarChar(30) // "servico", "multa", "venda_material", "hora_extra", "mensalidade", "outro"
+  categoriaId   Int? // FK into categorias_lancamento; categoria (string) above stays for legacy filters/display
   descricao     String?
   valor         Decimal   @db.Decimal(10, 2)
   competencia   String?   @db.VarChar(7) // "YYYY-MM" - chave de dedup da mensalidade
@@ -673,6 +694,7 @@ model lancamentos_financeiros {
   anuncio           anuncios?                  @relation(fields: [anuncioId], references: [id], onDelete: SetNull)
   contato           contatos?                  @relation(fields: [contatoId], references: [id], onDelete: SetNull)
   contrato          contratos_financeiros?     @relation(fields: [contratoId], references: [id], onDelete: SetNull)
+  categoriaLancamento categorias_lancamento?   @relation(fields: [categoriaId], references: [id], onDelete: SetNull)
   mensagensCobranca lancamentos_mensagens[]
   documentos        lancamentos_documentos[]
 
@@ -685,6 +707,7 @@ model lancamentos_financeiros {
   @@index([status])
   @@index([vencimento])
   @@index([dataExclusao])
+  @@index([categoriaId])
 }
 
 // Anexos de um lançamento (comprovantes, notas, etc.) — até 3 por lançamento,

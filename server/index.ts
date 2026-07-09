@@ -251,6 +251,12 @@ import {
 import categoriasRouter from "./routes/categorias";
 import reservasAnuncioRouter from "./routes/reservas-anuncio";
 import {
+  getCategoriasLancamento,
+  createCategoriaLancamento,
+  updateCategoriaLancamento,
+  toggleStatusCategoriaLancamento,
+} from "./routes/categorias-lancamento";
+import {
   listarContratos,
   criarContrato,
   atualizarContrato,
@@ -1346,6 +1352,12 @@ export function createServer() {
   app.get("/api/localidades/:id/anunciantes", getAnunciantesForLocalidade);
   app.post("/api/localidades/:id/anunciantes", extractUserId, requireAdmin, addAnuncianteToLocalidade);
   app.delete("/api/localidades/:id/anunciantes/:anuncianteId", extractUserId, requireAdmin, removeAnuncianteFromLocalidade);
+
+  // Categorias de Lançamento (financeiro) - admin CRUD
+  app.get("/api/categorias-lancamento", extractUserId, getCategoriasLancamento);
+  app.post("/api/categorias-lancamento", extractUserId, requireAdmin, createCategoriaLancamento);
+  app.put("/api/categorias-lancamento/:id", extractUserId, requireAdmin, updateCategoriaLancamento);
+  app.patch("/api/categorias-lancamento/:id/status", extractUserId, requireAdmin, toggleStatusCategoriaLancamento);
 
   // Contatos routes (user-based contacts, shared across announcers)
   app.get("/api/contatos", extractUserId, getContatosByAnunciante); // Returns user's contacts (or all if admin)

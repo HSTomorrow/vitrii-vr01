@@ -57,6 +57,14 @@ interface Contrato {
   status: string;
   contato: { id: number; nome: string };
   documentos?: Anexo[];
+  categoria?: { id: number; codigo: string; descricao: string } | null;
+}
+
+interface CategoriaLancamento {
+  id: number;
+  codigo: string;
+  descricao: string;
+  status: string;
 }
 
 const TIPOS_CONTRATO = ["Mensal", "Semanal", "Eventual", "Outros"];
@@ -148,6 +156,7 @@ export default function Financeiro() {
     contatoId: null as number | null,
     contatoNome: "",
     dataInicio: new Date().toISOString().split("T")[0],
+    categoriaId: null as number | null,
   });
   const [novoContratoAnexos, setNovoContratoAnexos] = useState<Anexo[]>([]);
   const [anexosContratoAberto, setAnexosContratoAberto] = useState<number | null>(null);
@@ -156,9 +165,17 @@ export default function Financeiro() {
   const [contratoFiltroTitulo, setContratoFiltroTitulo] = useState("");
   const [contratoFiltroDiaDe, setContratoFiltroDiaDe] = useState("");
   const [contratoFiltroDiaAte, setContratoFiltroDiaAte] = useState("");
+  const [showExportLancamentos, setShowExportLancamentos] = useState(false);
+  const [exportFiltro, setExportFiltro] = useState({
+    dataInicio: "",
+    dataFim: "",
+    categorias: [] as string[],
+    status: "",
+    contatoId: null as number | null,
+  });
 
-  // The floating "+" button (PublishButton/BottomNavBar) dispatches this while on
-  // /financeiro instead of navigating to ad creation — same pattern as MinhaAgenda's "addEvento".
+  // The bottom nav's "+" button dispatches this while on /financeiro instead of
+  // navigating to ad creation — same pattern as MinhaAgenda's "addEvento".
   useEffect(() => {
     const handleNovoLancamentoEvent = () => {
       setActiveTab("lancamentos");
@@ -224,6 +241,41 @@ export default function Financeiro() {
       return true;
     });
   }, [lancamentos, filterDataDe, filterDataAte, filterContatoId]);
+
+  // Filters for the export dialog - independent from the on-screen filters above, applied
+  // over whatever lançamentos are currently loaded (i.e. within the active competência,
+  // or across all months if the competência filter has been cleared).
+  const lancamentosParaExportar = useMemo(() => {
+    return lancamentos.filter((l) => {
+      if (exportFiltro.dataInicio && (!l.vencimento || l.vencimento.slice(0, 10) < exportFiltro.dataInicio)) return false;
+      if (exportFiltro.dataFim && (!l.vencimento || l.vencimento.slice(0, 10) > exportFiltro.dataFim)) return false;
+      if (exportFiltro.categorias.length > 0 && !exportFiltro.categorias.includes(l.categoria)) return false;
+      if (exportFiltro.status && l.status !== exportFiltro.status) return false;
+      if (exportFiltro.contatoId && l.contato?.id !== exportFiltro.contatoId) return false;
+      return true;
+    });
+  }, [lancamentos, exportFiltro]);
+
+  const colunasExportLancamentos = [
+    { header: "Data", value: (l: Lancamento) => (l.vencimento ? new Date(l.vencimento).toLocaleDateString("pt-BR") : "") },
+    { header: "Cliente", value: (l: Lancamento) => l.contato?.nome || "" },
+    { header: "Categoria", value: (l: Lancamento) => CATEGORIA_LABELS[l.categoria] || l.categoria },
+    { header: "Origem", value: (l: Lancamento) => ORIGEM_LABELS[l.origem] || l.origem },
+    { header: "Valor", value: (l: Lancamento) => l.valor },
+    { header: "Tipo de Pagamento", value: (l: Lancamento) => TIPOS_PAGAMENTO.find((t) => t.value === l.tipoPagamento)?.label || l.tipoPagamento || "" },
+    { header: "Conta/Banco", value: (l: Lancamento) => l.contaBanco || "" },
+    { header: "Status", value: (l: Lancamento) => STATUS_LABELS[l.status]?.label || l.status },
+  ];
+
+  const colunasExportContratos = [
+    { header: "Título", value: (c: Contrato) => c.titulo },
+    { header: "Cliente", value: (c: Contrato) => c.contato.nome },
+    { header: "Tipo", value: (c: Contrato) => c.tipoContrato },
+    { header: "Categoria", value: (c: Contrato) => c.categoria?.descricao || "" },
+    { header: "Valor Mensal", value: (c: Contrato) => c.valorMensal },
+    { header: "Dia Vencimento", value: (c: Contrato) => c.diaVencimento },
+    { header: "Status", value: (c: Contrato) => c.status },
+  ];
 
   const { data: fechamentos = [], refetch: refetchFechamentos } = useQuery<Fechamento[]>({
     queryKey: ["fechamentos-financeiros", selectedAnuncianteId],
@@ -325,6 +377,16 @@ export default function Financeiro() {
     enabled: !!selectedAnuncianteId,
   });
 
+  const { data: categoriasLancamentoData } = useQuery({
+    queryKey: ["categorias-lancamento", "ativo"],
+    queryFn: async () => {
+      const response = await fetch("/api/categorias-lancamento?status=ativo");
+      if (!response.ok) return { data: [] };
+      return response.json();
+    },
+  });
+  const categoriasLancamento: CategoriaLancamento[] = categoriasLancamentoData?.data || [];
+
   const selectedAnunciante = anunciantes.find((a) => a.id === selectedAnuncianteId);
   const anuncianteTemChavePix = !!selectedAnunciante?.chavePix;
 
@@ -402,6 +464,7 @@ export default function Financeiro() {
           valorMensal: parseFloat(novoContrato.valorMensal),
           diaVencimento: parseInt(novoContrato.diaVencimento),
           dataInicio: novoContrato.dataInicio,
+          categoriaId: novoContrato.categoriaId,
         }),
       });
       if (!response.ok) throw new Error((await response.json()).error || "Erro ao criar contrato");
@@ -422,7 +485,7 @@ export default function Financeiro() {
       }
       toast.success("Contrato criado!");
       setShowNovoContrato(false);
-      setNovoContrato({ titulo: "", tipoContrato: "Mensal", valorMensal: "", diaVencimento: "10", contatoId: null, contatoNome: "", dataInicio: new Date().toISOString().split("T")[0] });
+      setNovoContrato({ titulo: "", tipoContrato: "Mensal", valorMensal: "", diaVencimento: "10", contatoId: null, contatoNome: "", dataInicio: new Date().toISOString().split("T")[0], categoriaId: null });
       setNovoContratoAnexos([]);
       refetchContratos();
     },
@@ -707,36 +770,13 @@ export default function Financeiro() {
                 Limpar filtros
               </button>
               <div className="flex-1" />
-              {(() => {
-                const colunasExport = [
-                  { header: "Data", value: (l: Lancamento) => (l.vencimento ? new Date(l.vencimento).toLocaleDateString("pt-BR") : "") },
-                  { header: "Cliente", value: (l: Lancamento) => l.contato?.nome || "" },
-                  { header: "Categoria", value: (l: Lancamento) => CATEGORIA_LABELS[l.categoria] || l.categoria },
-                  { header: "Origem", value: (l: Lancamento) => ORIGEM_LABELS[l.origem] || l.origem },
-                  { header: "Valor", value: (l: Lancamento) => l.valor },
-                  { header: "Tipo de Pagamento", value: (l: Lancamento) => TIPOS_PAGAMENTO.find((t) => t.value === l.tipoPagamento)?.label || l.tipoPagamento || "" },
-                  { header: "Conta/Banco", value: (l: Lancamento) => l.contaBanco || "" },
-                  { header: "Status", value: (l: Lancamento) => STATUS_LABELS[l.status]?.label || l.status },
-                ];
-                return (
-                  <>
-                    <button
-                      onClick={() => exportToCsv(`lancamentos-${selectedAnuncianteId}.csv`, lancamentosFiltrados, colunasExport)}
-                      className="flex items-center gap-2 px-3 py-2 border border-gray-300 text-vitrii-text rounded-lg font-semibold hover:bg-gray-50 transition-colors text-sm"
-                    >
-                      <Download className="w-4 h-4" />
-                      Exportar CSV
-                    </button>
-                    <button
-                      onClick={() => exportToXlsx(`lancamentos-${selectedAnuncianteId}.xlsx`, lancamentosFiltrados, colunasExport)}
-                      className="flex items-center gap-2 px-3 py-2 border border-gray-300 text-vitrii-text rounded-lg font-semibold hover:bg-gray-50 transition-colors text-sm"
-                    >
-                      <Download className="w-4 h-4" />
-                      Exportar XLS
-                    </button>
-                  </>
-                );
-              })()}
+              <button
+                onClick={() => setShowExportLancamentos(true)}
+                className="flex items-center gap-2 px-3 py-2 border border-gray-300 text-vitrii-text rounded-lg font-semibold hover:bg-gray-50 transition-colors text-sm"
+              >
+                <Download className="w-4 h-4" />
+                Exportar
+              </button>
               <button
                 onClick={() => setShowNovoLancamento(true)}
                 className="flex items-center gap-2 px-4 py-2 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors text-sm"
@@ -925,23 +965,21 @@ export default function Financeiro() {
               <div className="flex-1" />
               <button
                 onClick={() =>
-                  exportToCsv(
-                    `contratos-${selectedAnuncianteId}.csv`,
-                    contratos,
-                    [
-                      { header: "Título", value: (c) => c.titulo },
-                      { header: "Cliente", value: (c) => c.contato.nome },
-                      { header: "Tipo", value: (c) => c.tipoContrato },
-                      { header: "Valor Mensal", value: (c) => c.valorMensal },
-                      { header: "Dia Vencimento", value: (c) => c.diaVencimento },
-                      { header: "Status", value: (c) => c.status },
-                    ],
-                  )
+                  exportToCsv(`contratos-${selectedAnuncianteId}.csv`, contratos, colunasExportContratos)
                 }
                 className="flex items-center gap-2 px-3 py-2 border border-gray-300 text-vitrii-text rounded-lg font-semibold hover:bg-gray-50 transition-colors text-sm"
               >
                 <Download className="w-4 h-4" />
                 Exportar CSV
+              </button>
+              <button
+                onClick={() =>
+                  exportToXlsx(`contratos-${selectedAnuncianteId}.xlsx`, contratos, colunasExportContratos)
+                }
+                className="flex items-center gap-2 px-3 py-2 border border-gray-300 text-vitrii-text rounded-lg font-semibold hover:bg-gray-50 transition-colors text-sm"
+              >
+                <Download className="w-4 h-4" />
+                Exportar XLS
               </button>
               <button
                 onClick={() => {
@@ -1058,6 +1096,136 @@ export default function Financeiro() {
           </div>
         )}
       </main>
+
+      {/* Modal: Exportar Lançamentos */}
+      {showExportLancamentos && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 space-y-4">
+            <h2 className="text-xl font-bold text-vitrii-text">Exportar Lançamentos</h2>
+            <p className="text-sm text-vitrii-text-secondary">
+              Escolha os filtros para a exportação (deixe em branco para incluir tudo).
+            </p>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-sm font-semibold mb-1">Data Início</label>
+                <input
+                  type="date"
+                  value={exportFiltro.dataInicio}
+                  onChange={(e) => setExportFiltro({ ...exportFiltro, dataInicio: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold mb-1">Data Fim</label>
+                <input
+                  type="date"
+                  value={exportFiltro.dataFim}
+                  onChange={(e) => setExportFiltro({ ...exportFiltro, dataFim: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold mb-1">Categorias</label>
+              <div className="flex flex-wrap gap-2">
+                {Object.entries(CATEGORIA_LABELS).map(([key, label]) => {
+                  const checked = exportFiltro.categorias.includes(key);
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() =>
+                        setExportFiltro({
+                          ...exportFiltro,
+                          categorias: checked
+                            ? exportFiltro.categorias.filter((c) => c !== key)
+                            : [...exportFiltro.categorias, key],
+                        })
+                      }
+                      className={`px-3 py-1 rounded-full text-sm border transition-colors ${
+                        checked
+                          ? "bg-vitrii-blue text-white border-vitrii-blue"
+                          : "bg-white text-vitrii-text border-gray-300 hover:bg-gray-50"
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="text-xs text-vitrii-text-secondary mt-1">
+                Nenhuma selecionada = todas as categorias
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold mb-1">Status</label>
+              <select
+                value={exportFiltro.status}
+                onChange={(e) => setExportFiltro({ ...exportFiltro, status: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              >
+                <option value="">Todos os status</option>
+                {Object.entries(STATUS_LABELS).map(([key, { label }]) => (
+                  <option key={key} value={key}>{label}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold mb-1">Cliente</label>
+              <select
+                value={exportFiltro.contatoId ?? ""}
+                onChange={(e) =>
+                  setExportFiltro({
+                    ...exportFiltro,
+                    contatoId: e.target.value ? parseInt(e.target.value) : null,
+                  })
+                }
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              >
+                <option value="">Todos</option>
+                {contatosDisponiveis.map((c) => (
+                  <option key={c.id} value={c.id}>{c.nome}</option>
+                ))}
+              </select>
+            </div>
+
+            <p className="text-sm text-vitrii-text-secondary">
+              {lancamentosParaExportar.length} lançamento(s) serão exportados
+            </p>
+
+            <div className="flex gap-2 pt-2">
+              <button
+                onClick={() => setShowExportLancamentos(false)}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg font-semibold"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={() => {
+                  exportToCsv(`lancamentos-${selectedAnuncianteId}.csv`, lancamentosParaExportar, colunasExportLancamentos);
+                  setShowExportLancamentos(false);
+                }}
+                className="flex-1 px-4 py-2 border-2 border-vitrii-blue text-vitrii-blue rounded-lg font-semibold hover:bg-blue-50"
+              >
+                Baixar CSV
+              </button>
+              <button
+                onClick={() => {
+                  exportToXlsx(`lancamentos-${selectedAnuncianteId}.xlsx`, lancamentosParaExportar, colunasExportLancamentos);
+                  setShowExportLancamentos(false);
+                }}
+                className="flex-1 px-4 py-2 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark"
+              >
+                Baixar XLS
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal: Novo Lançamento */}
       {showNovoLancamento && (
@@ -1312,6 +1480,29 @@ export default function Financeiro() {
                 onChange={(e) => setNovoContrato({ ...novoContrato, dataInicio: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg"
               />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold mb-1">Categoria</label>
+              <select
+                value={novoContrato.categoriaId ?? ""}
+                onChange={(e) =>
+                  setNovoContrato({
+                    ...novoContrato,
+                    categoriaId: e.target.value ? parseInt(e.target.value) : null,
+                  })
+                }
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg"
+              >
+                <option value="">Sem categoria</option>
+                {categoriasLancamento.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.descricao}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-vitrii-text-secondary mt-1">
+                Usada nos lançamentos gerados automaticamente por este contrato
+              </p>
             </div>
             <div>
               <label className="block text-sm font-semibold mb-1">Anexos</label>

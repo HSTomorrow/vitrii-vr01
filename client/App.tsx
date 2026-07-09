@@ -52,6 +52,7 @@ import AdminBanners from "./pages/AdminBanners";
 import AdminAnunciantes from "./pages/AdminAnunciantes";
 import AdminPagamentos from "./pages/AdminPagamentos";
 import AdminLocalidades from "./pages/AdminLocalidades";
+import AdminCategoriasLancamento from "./pages/AdminCategoriasLancamento";
 import AdminCategorias from "./pages/AdminCategorias";
 import Menu from "./pages/Menu";
 import MeusAnuncios from "./pages/MeusAnuncios";
@@ -69,7 +70,6 @@ import VerifyEmail from "./pages/VerifyEmail";
 import TestEmail from "./pages/TestEmail";
 import BottomNavBar from "@/components/BottomNavBar";
 import PageTransition from "@/components/PageTransition";
-import PublishButton from "@/components/PublishButton";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -146,7 +146,6 @@ function AppContent() {
   return (
     <BrowserRouter>
       <BottomNavBar />
-      <PublishButton />
       <PageTransition>
         <Routes>
           <Route path="/" element={<Index />} />
@@ -215,6 +214,7 @@ function AppContent() {
           <Route path="/admin/anunciantes" element={<AdminAnunciantes />} />
           <Route path="/admin/pagamentos" element={<AdminPagamentos />} />
           <Route path="/admin/localidades" element={<AdminLocalidades />} />
+          <Route path="/admin/categorias-lancamento" element={<AdminCategoriasLancamento />} />
           <Route path="/admin/categorias" element={<AdminCategorias />} />
           <Route path="/cadastro-lojas" element={<CadastroLojas />} />
           <Route

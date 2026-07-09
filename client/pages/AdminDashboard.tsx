@@ -25,6 +25,7 @@ import {
   Image,
   CreditCard,
   DollarSign,
+  Tags,
 } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import AdminEditUserModal from "@/components/AdminEditUserModal";
@@ -473,6 +474,23 @@ export default function AdminDashboard() {
             </div>
             <p className="text-sm text-vitrii-text-secondary">
               Crie e configure categorias de produtos e serviços
+            </p>
+          </button>
+
+          <button
+            onClick={() => navigate("/admin/categorias-lancamento")}
+            className="bg-teal-50 border border-teal-200 rounded-lg p-6 hover:shadow-lg transition-shadow text-left group"
+          >
+            <div className="flex items-center gap-3 mb-2">
+              <div className="w-10 h-10 bg-teal-100 rounded-lg flex items-center justify-center group-hover:bg-teal-200 transition-colors">
+                <Tags className="w-6 h-6 text-teal-600" />
+              </div>
+              <h3 className="font-semibold text-vitrii-text">
+                Categorias de Lançamento
+              </h3>
+            </div>
+            <p className="text-sm text-vitrii-text-secondary">
+              Gerencie os tipos de categoria usados nos lançamentos financeiros
             </p>
           </button>
 

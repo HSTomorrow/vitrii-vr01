@@ -61,6 +61,7 @@ export const listarContratos: RequestHandler = async (req, res) => {
         contato: { select: { id: true, nome: true, email: true, celular: true } },
         reajustes: { orderBy: { dataCriacao: "desc" } },
         documentos: { orderBy: { dataCriacao: "desc" } },
+        categoria: { select: { id: true, codigo: true, descricao: true } },
       },
       orderBy: { dataCriacao: "desc" },
     });
@@ -74,7 +75,7 @@ export const listarContratos: RequestHandler = async (req, res) => {
 
 export const criarContrato: RequestHandler = async (req, res) => {
   try {
-    const { anuncianteId, contatoId, titulo, descricao, tipoContrato, valorMensal, diaVencimento, dataInicio } = req.body;
+    const { anuncianteId, contatoId, titulo, descricao, tipoContrato, valorMensal, diaVencimento, dataInicio, categoriaId } = req.body;
 
     if (!anuncianteId || !contatoId || !titulo || !valorMensal || !diaVencimento || !dataInicio) {
       return res.status(400).json({
@@ -105,9 +106,13 @@ export const criarContrato: RequestHandler = async (req, res) => {
         diaVencimento: parseInt(diaVencimento),
         dataInicio: new Date(dataInicio),
         status: "ativo",
+        categoriaId: categoriaId ? parseInt(categoriaId) : null,
         criadoPor: req.userId!,
       },
-      include: { contato: { select: { id: true, nome: true } } },
+      include: {
+        contato: { select: { id: true, nome: true } },
+        categoria: { select: { id: true, codigo: true, descricao: true } },
+      },
     });
 
     res.status(201).json({ success: true, data: contrato });
@@ -120,7 +125,7 @@ export const criarContrato: RequestHandler = async (req, res) => {
 export const atualizarContrato: RequestHandler = async (req, res) => {
   try {
     const id = parseInt(req.params.id as string);
-    const { titulo, descricao, tipoContrato, diaVencimento, dataFim } = req.body;
+    const { titulo, descricao, tipoContrato, diaVencimento, dataFim, categoriaId } = req.body;
 
     const contrato = await prisma.contratos_financeiros.findUnique({ where: { id, dataExclusao: null } });
     if (!contrato) return res.status(404).json({ error: "Contrato não encontrado" });
@@ -141,6 +146,7 @@ export const atualizarContrato: RequestHandler = async (req, res) => {
         tipoContrato: tipoContrato ?? contrato.tipoContrato,
         diaVencimento: diaVencimento ? parseInt(diaVencimento) : contrato.diaVencimento,
         dataFim: dataFim !== undefined ? (dataFim ? new Date(dataFim) : null) : contrato.dataFim,
+        categoriaId: categoriaId !== undefined ? (categoriaId ? parseInt(categoriaId) : null) : contrato.categoriaId,
         atualizadoPor: req.userId!,
       },
     });
@@ -309,6 +315,7 @@ export const listarLancamentos: RequestHandler = async (req, res) => {
         contato: { select: { id: true, nome: true, email: true, celular: true } },
         evento: { select: { id: true, titulo: true, dataInicio: true } },
         documentos: { orderBy: { dataCriacao: "desc" } },
+        categoriaLancamento: { select: { id: true, codigo: true, descricao: true } },
       },
       orderBy: { dataCriacao: "desc" },
       take: 300,
@@ -853,6 +860,7 @@ export async function gerarCobrancasMensais() {
           orderBy: { competencia: "desc" },
           take: 1,
         },
+        categoria: { select: { codigo: true } },
       },
     });
 
@@ -876,7 +884,8 @@ export async function gerarCobrancasMensais() {
               contatoId: contrato.contatoId,
               contratoId: contrato.id,
               origem: "mensalidade",
-              categoria: "mensalidade",
+              categoria: contrato.categoria?.codigo || "mensalidade",
+              categoriaId: contrato.categoriaId,
               descricao: contrato.titulo,
               valor: contrato.valorMensal,
               competencia,
@@ -913,12 +922,27 @@ export async function gerarCobrancasMensais() {
 // (whether by the nightly job or a previous manual launch) is reported as "already exists"
 // rather than double-charged.
 async function gerarLancamentoDoContrato(
-  contrato: { id: number; anuncianteId: number; contatoId: number; titulo: string; valorMensal: any; diaVencimento: number },
+  contrato: {
+    id: number;
+    anuncianteId: number;
+    contatoId: number;
+    titulo: string;
+    valorMensal: any;
+    diaVencimento: number;
+    categoriaId?: number | null;
+  },
   criadoPor: number,
 ): Promise<"gerado" | "existente"> {
   const hoje = new Date();
   const competencia = competenciaDe(hoje);
   const vencimento = new Date(hoje.getFullYear(), hoje.getMonth(), contrato.diaVencimento);
+
+  const categoria = contrato.categoriaId
+    ? await prisma.categorias_lancamento.findUnique({
+        where: { id: contrato.categoriaId },
+        select: { codigo: true },
+      })
+    : null;
 
   try {
     await prisma.lancamentos_financeiros.create({
@@ -927,7 +951,8 @@ async function gerarLancamentoDoContrato(
         contatoId: contrato.contatoId,
         contratoId: contrato.id,
         origem: "contrato",
-        categoria: "mensalidade",
+        categoria: categoria?.codigo || "mensalidade",
+        categoriaId: contrato.categoriaId ?? null,
         descricao: contrato.titulo,
         valor: contrato.valorMensal,
         competencia,
