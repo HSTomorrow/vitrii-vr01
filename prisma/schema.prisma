@@ -843,6 +843,15 @@ model pagamentos {
   status String  @default("pendente") @db.VarChar(50) // pendente, comprovante_enviado, aprovado, rejeitado
   tipo   String  @default("pix") @db.VarChar(50)
 
+  // Pix
+  pixId         String?   @db.VarChar(100)
+  qrCode        String?   @db.Text
+  urlCopiaECola String?   @db.Text
+  dataExpiracao DateTime?
+  idExterno     String?   @db.VarChar(100) // External provider's payment ID (webhook lookup)
+  erroMsg       String?   @db.Text
+  dataPagamento DateTime?
+
   // Comprovante
   comprovantePagamento String?   @db.VarChar(500) // URL do comprovante (storage)
   dataComprovante      DateTime?
@@ -854,6 +863,7 @@ model pagamentos {
   @@index([anuncioId])
   @@index([status])
   @@index([dataCriacao])
+  @@index([idExterno])
   @@map("pagamentos")
 }
 

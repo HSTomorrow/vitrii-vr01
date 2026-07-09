@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { X, DollarSign, Plus } from "lucide-react";
+import { X, DollarSign, Plus, Copy, Check, QrCode } from "lucide-react";
+import { QRCodeSVG } from "qrcode.react";
 import ContatoSelectorModal from "./ContatoSelectorModal";
 import { formatCurrencyDisplay } from "@/utils/formatCurrency";
 
@@ -35,6 +36,8 @@ interface AnuncioFinanceiroPanelProps {
   anuncioTitulo: string;
   anuncianteId: number;
   userId?: number;
+  statusPagamento?: string | null;
+  valorAnuncio?: number;
 }
 
 export default function AnuncioFinanceiroPanel({
@@ -42,17 +45,51 @@ export default function AnuncioFinanceiroPanel({
   anuncioTitulo,
   anuncianteId,
   userId,
+  statusPagamento,
+  valorAnuncio,
 }: AnuncioFinanceiroPanelProps) {
   const queryClient = useQueryClient();
   const [showPanel, setShowPanel] = useState(false);
   const [showNovaCobranca, setShowNovaCobranca] = useState(false);
   const [showContatoSelector, setShowContatoSelector] = useState(false);
+  const [pixCopiado, setPixCopiado] = useState(false);
   const [novaCobranca, setNovaCobranca] = useState({
     categoria: "servico",
     descricao: "",
     valor: "",
     contatoId: null as number | null,
     contatoNome: "",
+  });
+
+  // Payment owed TO Vitrii/HeresTomorrow for publishing this ad (separate from the
+  // lançamentos below, which are the anunciante billing their own clients).
+  const { data: pagamentoData, refetch: refetchPagamento } = useQuery({
+    queryKey: ["pagamento-anuncio", anuncioId],
+    queryFn: async () => {
+      const response = await fetch(`/api/pagamentos/anuncio/${anuncioId}`);
+      if (response.status === 404) return null;
+      if (!response.ok) throw new Error("Erro ao buscar pagamento");
+      return response.json();
+    },
+    enabled: showPanel && statusPagamento === "pendente",
+  });
+  const pagamentoAnuncio = pagamentoData?.data;
+
+  const gerarPixAnuncioMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch("/api/pagamentos", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ anuncioId, valor: valorAnuncio || 19.9 }),
+      });
+      if (!response.ok) throw new Error((await response.json()).error || "Erro ao gerar Pix");
+      return response.json();
+    },
+    onSuccess: () => {
+      toast.success("Pix gerado! Escaneie o QR Code ou copie o código.");
+      refetchPagamento();
+    },
+    onError: (error) => toast.error(error instanceof Error ? error.message : "Erro ao gerar Pix"),
   });
 
   const { data: lancamentosData, isLoading } = useQuery({
@@ -113,7 +150,7 @@ export default function AnuncioFinanceiroPanel({
         className="flex items-center gap-2 px-4 py-2 border-2 border-vitrii-blue/30 text-vitrii-blue rounded-lg hover:bg-blue-50 transition-colors font-semibold text-sm"
       >
         <DollarSign className="w-4 h-4" />
-        Financeiro do Anúncio
+        Gestão Financeira
       </button>
 
       {showPanel && (
@@ -123,7 +160,7 @@ export default function AnuncioFinanceiroPanel({
               <div className="flex items-center gap-2">
                 <DollarSign className="w-6 h-6 text-vitrii-blue" />
                 <div>
-                  <h2 className="text-xl font-bold text-vitrii-text">Financeiro do Anúncio</h2>
+                  <h2 className="text-xl font-bold text-vitrii-text">Gestão Financeira</h2>
                   <p className="text-sm text-gray-500">{anuncioTitulo}</p>
                 </div>
               </div>
@@ -133,6 +170,56 @@ export default function AnuncioFinanceiroPanel({
             </div>
 
             <div className="p-6 space-y-4">
+              {statusPagamento === "pendente" && (
+                <div className="p-4 bg-yellow-50 border-2 border-yellow-200 rounded-lg space-y-3">
+                  <div className="flex items-center gap-2">
+                    <QrCode className="w-5 h-5 text-yellow-700" />
+                    <p className="font-semibold text-yellow-900 text-sm">
+                      Pagamento da publicação pendente
+                    </p>
+                  </div>
+                  {!pagamentoAnuncio ? (
+                    <>
+                      <p className="text-xs text-yellow-800">
+                        Gere o Pix para pagar a publicação deste anúncio à HeresTomorrow
+                        {valorAnuncio ? ` (${formatCurrencyDisplay(valorAnuncio)})` : ""}.
+                      </p>
+                      <button
+                        onClick={() => gerarPixAnuncioMutation.mutate()}
+                        disabled={gerarPixAnuncioMutation.isPending}
+                        className="w-full px-4 py-2 bg-yellow-600 text-white rounded-lg font-semibold hover:bg-yellow-700 transition-colors disabled:opacity-50 text-sm"
+                      >
+                        {gerarPixAnuncioMutation.isPending ? "Gerando..." : "Gerar Pix"}
+                      </button>
+                    </>
+                  ) : (
+                    <div className="space-y-3">
+                      <div className="flex justify-center">
+                        <div className="bg-white p-3 rounded-lg border-2 border-yellow-300">
+                          <QRCodeSVG value={pagamentoAnuncio.qrCode} size={160} />
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(pagamentoAnuncio.urlCopiaECola);
+                          setPixCopiado(true);
+                          toast.success("Código Pix copiado!");
+                          setTimeout(() => setPixCopiado(false), 2000);
+                        }}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-white border-2 border-yellow-300 text-yellow-900 rounded-lg font-semibold hover:bg-yellow-100 transition-colors text-sm"
+                      >
+                        {pixCopiado ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                        {pixCopiado ? "Copiado!" : "Copiar Código Pix"}
+                      </button>
+                      <p className="text-xs text-yellow-800 text-center">
+                        Após o pagamento, envie o comprovante na tela de Meus Anúncios para
+                        ativação.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+
               <button
                 onClick={() => setShowNovaCobranca(true)}
                 className="flex items-center gap-2 px-4 py-2 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors text-sm"

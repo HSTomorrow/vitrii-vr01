@@ -551,6 +551,8 @@ export default function AnuncioDetalhe() {
                       anuncioTitulo={anuncio.titulo}
                       anuncianteId={anuncio.anuncianteId}
                       userId={user?.id}
+                      statusPagamento={anuncio.statusPagamento}
+                      valorAnuncio={Number(anuncio.preco) || undefined}
                     />
 
                     {/* Admin-only: Toggle Featured status */}

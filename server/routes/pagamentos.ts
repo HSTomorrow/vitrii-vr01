@@ -3,7 +3,13 @@ import crypto from "crypto";
 import prisma from "../lib/prisma";
 import { z } from "zod";
 import { Decimal } from "@prisma/client/runtime/library";
-import { generateMockQRCode } from "../lib/mockPix";
+import { generatePixBRCode } from "../lib/pixBRCode";
+
+// Vitrii's own Pix key, used to receive ad-listing payments (as opposed to Financeiro's
+// anunciante-to-contato billing, which uses each anunciante's own chavePix).
+const PLATAFORMA_CHAVE_PIX = "contato@herestomorrow.com";
+const PLATAFORMA_NOME = "HERES TOMORROW";
+const PLATAFORMA_CIDADE = "SAO PAULO";
 
 // Schema validation
 const PagamentoCreateSchema = z.object({
@@ -93,10 +99,14 @@ export const createPagamento: RequestHandler = async (req, res) => {
       });
     }
 
-    // Generate Pix data (in a real scenario, this would call Mercado Pago API)
-    // For demo purposes, we'll create mock Pix data
     const pixId = `PIX-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
-    const qrCodeData = generateMockQRCode(validatedData.valor, pixId);
+    const pixPayload = generatePixBRCode({
+      chavePix: PLATAFORMA_CHAVE_PIX,
+      valor: validatedData.valor,
+      nomeRecebedor: PLATAFORMA_NOME,
+      cidadeRecebedor: PLATAFORMA_CIDADE,
+      txid: pixId,
+    });
     const expirationTime = new Date();
     expirationTime.setMinutes(expirationTime.getMinutes() + 30); // 30 minute expiration
 
@@ -107,8 +117,8 @@ export const createPagamento: RequestHandler = async (req, res) => {
         tipo: "pix",
         status: "pendente",
         pixId,
-        qrCode: qrCodeData.qrCode,
-        urlCopiaECola: qrCodeData.urlCopiaECola,
+        qrCode: pixPayload,
+        urlCopiaECola: pixPayload,
         dataExpiracao: expirationTime,
       },
       include: {
@@ -627,7 +637,7 @@ export const confirmarPagamento: RequestHandler = async (req, res) => {
     const dataValidade = new Date(hoje.getTime() + 30 * 24 * 60 * 60 * 1000);
 
     // Update payment status
-    const pagamentoAtualizado = await prisma.pagamento.update({
+    const pagamentoAtualizado = await prisma.pagamentos.update({
       where: { id: parseInt(id) },
       data: {
         status: "aprovado",
@@ -641,7 +651,7 @@ export const confirmarPagamento: RequestHandler = async (req, res) => {
       data: {
         status: "ativo",
         statusPagamento: "aprovado",
-        dataValidade: dataValidade,
+        dataFim: dataValidade,
       },
     });
 
