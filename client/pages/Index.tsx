@@ -37,10 +37,34 @@ const extractMunicipality = (endereco: string): string => {
   return endereco.split(" ").slice(-2, -1)[0] || "Localização";
 };
 
+const CATEGORIA_CHIP_ORDER_KEY = "vitrii_categoria_chip_order";
+const todayStr = () => new Date().toISOString().slice(0, 10);
+
+interface CategoriaChipOrderCache {
+  date: string;
+  order: number[];
+}
+
+function readCategoriaChipOrderCache(): CategoriaChipOrderCache | null {
+  try {
+    const raw = localStorage.getItem(CATEGORIA_CHIP_ORDER_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
 export default function Index() {
   const navigate = useNavigate();
   const { user, logout, isLoading } = useAuth();
   const queryClient = useQueryClient();
+
+  // Ranked by active-ad count once per day (first access) and cached in localStorage,
+  // so the category chip order doesn't reshuffle every visit as ad counts shift through
+  // the day - it only re-ranks on the first access of a new calendar day.
+  const [categoriaOrderCache, setCategoriaOrderCache] = useState<CategoriaChipOrderCache | null>(
+    readCategoriaChipOrderCache,
+  );
 
   // Debug log on mount and when user changes
   useEffect(() => {
@@ -314,9 +338,38 @@ export default function Index() {
     if (entry) entry.count++;
     else categoriaUsage.set(anuncio.categoriaId, { id: anuncio.categoriaId, descricao: anuncio.categoria, count: 1 });
   }
-  const topCategorias = Array.from(categoriaUsage.values())
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 10);
+  const allCategoriaEntries = Array.from(categoriaUsage.values());
+
+  const topCategorias =
+    categoriaOrderCache?.date === todayStr()
+      ? // Same-day revisit: keep today's ranking. New categories that appeared since the
+        // cache was written (rank unknown) sort after ranked ones, by their current count.
+        [...allCategoriaEntries]
+          .sort((a, b) => {
+            const rankA = categoriaOrderCache.order.indexOf(a.id);
+            const rankB = categoriaOrderCache.order.indexOf(b.id);
+            if (rankA !== -1 && rankB !== -1) return rankA - rankB;
+            if (rankA !== -1) return -1;
+            if (rankB !== -1) return 1;
+            return b.count - a.count;
+          })
+          .slice(0, 10)
+      : [...allCategoriaEntries].sort((a, b) => b.count - a.count).slice(0, 10);
+
+  // First access of a new day: persist today's freshly computed ranking so it stays
+  // stable for the rest of the day regardless of how ad counts shift.
+  useEffect(() => {
+    if (allAnuncios.length === 0) return;
+    if (categoriaOrderCache?.date === todayStr()) return;
+
+    const fresh: CategoriaChipOrderCache = {
+      date: todayStr(),
+      order: topCategorias.map((cat) => cat.id),
+    };
+    localStorage.setItem(CATEGORIA_CHIP_ORDER_KEY, JSON.stringify(fresh));
+    setCategoriaOrderCache(fresh);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allAnuncios.length]);
 
   const temFavoritos = favoritoIds.size > 0;
 
