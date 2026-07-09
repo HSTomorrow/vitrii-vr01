@@ -21,7 +21,7 @@ export default function TermsOfUse() {
             Direitos e responsabilidades ao usar o Vitrii Marketplace
           </p>
           <p className="text-sm text-vitrii-text-secondary mt-4">
-            Última atualização: Fevereiro de 2026
+            Última atualização: Julho de 2026
           </p>
         </div>
       </section>
@@ -202,6 +202,12 @@ export default function TermsOfUse() {
                 <p className="mt-4 pt-4 border-t border-gray-300">
                   <strong>Produtos Proibidos:</strong> Não é permitido vender armas, drogas, itens roubados ou outros produtos ilegais.
                 </p>
+                <p className="mt-4 pt-4 border-t border-gray-300">
+                  <strong>Valores, Preços e Promoções:</strong> Todos os preços, valores, condições comerciais e promoções exibidos na Plataforma têm caráter meramente informativo e são de responsabilidade exclusiva do anunciante que os publicou. Eventuais inconsistências, erros de digitação ou divergências entre o valor anunciado e o valor efetivamente cobrado são de responsabilidade única do anunciante, que tem total liberdade para alterar, aumentar, corrigir ou deixar de validar qualquer preço, condição ou promoção apresentada, a qualquer momento e sem qualquer ônus, multa ou obrigação de compensação ao comprador ou ao Vitrii. O Vitrii não garante, valida, audita previamente nem se responsabiliza pela exatidão, atualização ou cumprimento de qualquer valor exibido na Plataforma.
+                </p>
+                <p>
+                  <strong>Responsabilidade pelo Conteúdo do Anúncio:</strong> As informações de cada anúncio — incluindo descrição, fotos, valores, disponibilidade, produtos e demais dados — são de exclusiva responsabilidade do usuário que o publicou. O Vitrii pode, a seu exclusivo critério, submeter qualquer anúncio a auditoria, solicitar correções, restringir sua visibilidade ou removê-lo da Plataforma, a qualquer momento e com ou sem aviso prévio, quando identificar indícios de inconsistência, prática enganosa ou violação destes Termos.
+                </p>
               </div>
             </section>
 
@@ -325,6 +331,12 @@ export default function TermsOfUse() {
                   <li>Você assediar ou ameaçar outros usuários</li>
                   <li>Você não usar a conta por 2 anos consecutivos</li>
                 </ul>
+                <p className="mt-4 pt-4 border-t border-gray-300">
+                  <strong>Exclusão e Banimento de Anunciantes:</strong> Um anunciante pode ser excluído e banido definitivamente da Plataforma quando as informações fornecidas no cadastro, seu histórico de movimentações na Plataforma, ou informações públicas externas que o identifiquem, indicarem a prática de concorrência desleal, inconsistências reiteradas, má-fé, ou qualquer conduta que afete a integridade, a segurança ou o funcionamento da Plataforma. Nesses casos, o Vitrii não é obrigado a notificar previamente o anunciante nem a fornecer prazo para regularização, podendo agir de forma imediata para proteger a Plataforma e seus demais usuários.
+                </p>
+                <p>
+                  <strong>Auditoria de Anúncios:</strong> Todo anúncio publicado pode ou não ser submetido a auditorias, restrições de visibilidade ou remoção pelo Vitrii, a seu exclusivo critério, independentemente de reclamação prévia de terceiros.
+                </p>
                 <p className="mt-4 pt-4 border-t border-gray-300">
                   Você também pode encerrar sua conta a qualquer momento contactando-nos.
                 </p>

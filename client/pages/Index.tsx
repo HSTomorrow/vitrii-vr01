@@ -22,6 +22,8 @@ import {
   Users,
   Zap,
   User,
+  Store,
+  Gift,
 } from "lucide-react";
 
 const extractMunicipality = (endereco: string): string => {
@@ -441,22 +443,25 @@ export default function Index() {
       </section>
 
       {/* Featured Anunciantes Section */}
-      <section className="py-2 md:py-3 bg-white">
+      <section className="py-3 md:py-4 bg-gradient-to-r from-amber-50 to-vitrii-gray-light border-y border-amber-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-2">
-            <div>
-              <h2 className="text-h2 mb-0.5">
-                Anunciantes em Destaque
-              </h2>
-              <p className="text-label">
-                Conheça os principais anunciantes da plataforma
-              </p>
-              {user && !temFavoritos && (
-                <p className="text-xs text-vitrii-text-secondary mt-1 flex items-center gap-1">
-                  <Heart className="w-3.5 h-3.5" />
-                  Favorite lojas para vê-las aqui primeiro
+            <div className="flex items-center gap-2">
+              <Store className="w-6 h-6 text-amber-600 flex-shrink-0" />
+              <div>
+                <h2 className="text-xl md:text-2xl font-extrabold text-amber-700">
+                  Anunciantes em Destaque
+                </h2>
+                <p className="text-label text-amber-700">
+                  Conheça os principais anunciantes da plataforma
                 </p>
-              )}
+                {user && !temFavoritos && (
+                  <p className="text-xs text-vitrii-text-secondary mt-1 flex items-center gap-1">
+                    <Heart className="w-3.5 h-3.5" />
+                    Favorite lojas para vê-las aqui primeiro
+                  </p>
+                )}
+              </div>
             </div>
             <Link
               to="/browse"
@@ -487,17 +492,20 @@ export default function Index() {
       </section>
 
       {/* Free/Gratuito Listings Section */}
-      <section className="py-2 md:py-3 bg-vitrii-gray-light">
+      <section className="py-3 md:py-4 bg-gradient-to-r from-green-50 to-vitrii-gray-light border-y border-green-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-2">
-            <div>
-              <h2 className="text-h2 mb-0.5">
-                Doações, Brindes e Serviços Gratuitos
-              </h2>
-              <p className="text-label">
-                Doações, Brindes, Produtos, Serviços e Eventos disponíveis para
-                experimentação gratuitamente
-              </p>
+            <div className="flex items-center gap-2">
+              <Gift className="w-6 h-6 text-green-700 flex-shrink-0" />
+              <div>
+                <h2 className="text-xl md:text-2xl font-extrabold text-green-700">
+                  Doações, Brindes e Serviços Gratuitos
+                </h2>
+                <p className="text-label text-green-700">
+                  Doações, Brindes, Produtos, Serviços e Eventos disponíveis para
+                  experimentação gratuitamente
+                </p>
+              </div>
             </div>
             <div className="hidden md:flex items-center space-x-4">
               <Link

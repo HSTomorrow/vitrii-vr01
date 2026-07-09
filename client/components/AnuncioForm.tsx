@@ -7,6 +7,8 @@ import {
   AlertCircle,
   CheckCircle,
   Plus,
+  ChevronsUpDown,
+  Check,
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
@@ -15,6 +17,16 @@ import CreateAnuncianteModal from "./CreateLojaModal";
 import CreateProductoModal from "./CreateProductoModal";
 import MultiImageUpload from "./MultiImageUpload";
 import ImageGallery from "./ImageGallery";
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "./ui/command";
+import { cn } from "@/lib/utils";
 import { BRAZILIAN_STATES } from "@shared/brazilianStates";
 import { TIPO_ANUNCIO_OPTIONS, TIPO_ANUNCIO_DESCRIPTIONS } from "@/constants/anuncioTypes";
 import { parseCurrencyInput, formatNumberToCurrency } from "@/utils/formatCurrency";
@@ -82,6 +94,7 @@ export default function AnuncioForm({
   );
   const [showCreateLoja, setShowCreateLoja] = useState(false);
   const [showCreateProducto, setShowCreateProducto] = useState(false);
+  const [anuncianteComboOpen, setAnuncianteComboOpen] = useState(false);
   // Normalize anuncioTipo: if it's 'doacao', use 'produto' and set isDoacao to true
   const normalizeType = (typeParam: string | null | undefined) => {
     if (typeParam === "doacao") {
@@ -237,7 +250,9 @@ export default function AnuncioForm({
   });
 
   // Get data from queries BEFORE the effects
-  const anunciantes = anunciantesData?.data || [];
+  const anunciantes = [...(anunciantesData?.data || [])].sort((a, b) =>
+    a.nome.localeCompare(b.nome, "pt-BR"),
+  );
   const productos = productosData?.data || [];
   const equipes = equipesData?.data || [];
 
@@ -806,28 +821,61 @@ export default function AnuncioForm({
                   Novo Anunciante
                 </button>
               </div>
-              <select
-                value={selectedAnuncianteId}
-                onChange={(e) => {
-                  setSelectedAnuncianteId(parseInt(e.target.value));
-                  setFormData((prev) => ({
-                    ...prev,
-                    productId: 0,
-                    tabelaDePrecoId: 0,
-                  }));
-                }}
-                disabled={!!anuncioId || anunciantes.length === 0}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent disabled:bg-gray-100"
-              >
-                <option value={0}>
-                  {anunciantes.length === 0 ? "Carregando anunciantes..." : "Selecione um anunciante"}
-                </option>
-                {anunciantes.map((anunciante: Anunciante) => (
-                  <option key={anunciante.id} value={anunciante.id}>
-                    {anunciante.nome}
-                  </option>
-                ))}
-              </select>
+              <Popover open={anuncianteComboOpen} onOpenChange={setAnuncianteComboOpen}>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    role="combobox"
+                    aria-expanded={anuncianteComboOpen}
+                    disabled={!!anuncioId || anunciantes.length === 0}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent disabled:bg-gray-100 flex items-center justify-between text-left"
+                  >
+                    <span className={cn(!selectedAnuncianteId && "text-gray-500")}>
+                      {selectedAnuncianteId
+                        ? anunciantes.find((a: Anunciante) => a.id === selectedAnuncianteId)?.nome
+                        : anunciantes.length === 0
+                          ? "Carregando anunciantes..."
+                          : "Selecione um anunciante"}
+                    </span>
+                    <ChevronsUpDown className="w-4 h-4 opacity-50 flex-shrink-0" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                  <Command>
+                    <CommandInput placeholder="Digite o nome do anunciante..." />
+                    <CommandList>
+                      <CommandEmpty>Nenhum anunciante encontrado</CommandEmpty>
+                      <CommandGroup>
+                        {anunciantes.map((anunciante: Anunciante) => (
+                          <CommandItem
+                            key={anunciante.id}
+                            value={anunciante.nome}
+                            onSelect={() => {
+                              setSelectedAnuncianteId(anunciante.id);
+                              setFormData((prev) => ({
+                                ...prev,
+                                productId: 0,
+                                tabelaDePrecoId: 0,
+                              }));
+                              setAnuncianteComboOpen(false);
+                            }}
+                          >
+                            <Check
+                              className={cn(
+                                "mr-2 h-4 w-4",
+                                selectedAnuncianteId === anunciante.id
+                                  ? "opacity-100"
+                                  : "opacity-0",
+                              )}
+                            />
+                            {anunciante.nome}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
 
             {/* Tipo de Anúncio */}

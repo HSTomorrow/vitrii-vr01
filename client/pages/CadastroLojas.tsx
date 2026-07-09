@@ -93,8 +93,10 @@ export default function CadastroAnunciantes() {
     },
   });
 
-  // Ensure anunciantes is always an array
-  const anunciantes = Array.isArray(anunciantesData) ? anunciantesData : [];
+  // Ensure anunciantes is always an array, sorted alphabetically
+  const anunciantes = (Array.isArray(anunciantesData) ? anunciantesData : []).sort(
+    (a: Anunciante, b: Anunciante) => a.nome.localeCompare(b.nome, "pt-BR"),
+  );
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const anunciantesPagina = anunciantes.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 

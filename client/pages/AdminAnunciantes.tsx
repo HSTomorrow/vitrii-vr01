@@ -109,7 +109,7 @@ export default function AdminAnunciantes() {
         if (statusFilter === "all") return matchesSearch;
         return matchesSearch && a.status === statusFilter;
       })
-      .sort((a: any, b: any) => a.nome.localeCompare(b.nome));
+      .sort((a: any, b: any) => a.nome.localeCompare(b.nome, "pt-BR"));
   }, [anunciantesData?.data, searchTerm, statusFilter]);
 
   useEffect(() => {
