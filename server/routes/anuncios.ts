@@ -86,6 +86,7 @@ const AnuncioBaseSchema = z.object({
     .optional(),
   categoria: z.string().max(100).optional().nullable(),
   categoriaId: z.number().int().positive().optional().nullable(),
+  usarValorTabela: z.boolean().optional().default(false),
   dadosCategoria: z.string().optional().nullable(), // JSON string
   link: z
     .string()
@@ -206,6 +207,8 @@ export const getAnuncios: RequestHandler = async (req, res) => {
           preco: true,
           categoria: true,
           categoriaId: true,
+          usarValorTabela: true,
+          tabelaDePreco: { select: { preco: true, status: true } },
           imagem: true,
           link: true,
           status: true,
@@ -268,9 +271,17 @@ export const getAnuncios: RequestHandler = async (req, res) => {
       pageOffset,
     );
 
+    // When an anúncio is live-linked to a tabela de preço, always serve that table's
+    // current price instead of the stored copy, so price edits propagate automatically.
+    const anunciosComPrecoAoVivo = anuncios.map((a: any) =>
+      a.usarValorTabela && a.tabelaDePreco && a.tabelaDePreco.status === "ativo"
+        ? { ...a, preco: a.tabelaDePreco.preco }
+        : a,
+    );
+
     res.json({
       success: true,
-      data: anuncios,
+      data: anunciosComPrecoAoVivo,
       pagination: {
         count: anuncios.length,
         total,
@@ -351,6 +362,7 @@ export const getAnuncioById: RequestHandler = async (req, res) => {
           },
           orderBy: { ordem: "asc" },
         },
+        tabelaDePreco: { select: { preco: true, status: true } },
       },
     });
 
@@ -359,6 +371,15 @@ export const getAnuncioById: RequestHandler = async (req, res) => {
         success: false,
         error: "Anúncio não encontrado",
       });
+    }
+
+    // When live-linked to a tabela de preço, always serve its current price.
+    if (
+      anuncio.usarValorTabela &&
+      anuncio.tabelaDePreco &&
+      anuncio.tabelaDePreco.status === "ativo"
+    ) {
+      (anuncio as any).preco = anuncio.tabelaDePreco.preco;
     }
 
     // Check if ad is expired and redirect to announcer profile
@@ -437,6 +458,7 @@ export const createAnuncio: RequestHandler = async (req, res) => {
     }
 
     let tabelaDePrecoId: number | null = null;
+    let precoTabelaAtual: number | null = null;
     let anuncioTipo: string = validatedData.tipo || "produto";
 
     // Validate user contract and active ads limit
@@ -505,6 +527,9 @@ export const createAnuncio: RequestHandler = async (req, res) => {
         }
 
         tabelaDePrecoId = validatedData.tabelaDePrecoId;
+        if (validatedData.usarValorTabela) {
+          precoTabelaAtual = Number(tabelaDePreco.preco);
+        }
       }
     }
     // Note: tabelaDePrecoId can now be null for events, schedules, or when using manual price
@@ -618,9 +643,11 @@ export const createAnuncio: RequestHandler = async (req, res) => {
         descricao: validatedData.descricao || null,
         imagem: validatedData.fotoUrl || null,
         link: validatedData.link || null,
-        preco: precoAnuncio,
+        preco: precoTabelaAtual !== null ? precoTabelaAtual : precoAnuncio,
         categoria: validatedData.categoria,
         categoriaId: validatedData.categoriaId || null,
+        tabelaDePrecoId,
+        usarValorTabela: validatedData.usarValorTabela && precoTabelaAtual !== null,
         cidade: validatedData.cidade,
         estado: validatedData.estado,
         status,
@@ -762,6 +789,16 @@ export const updateAnuncio: RequestHandler = async (req, res) => {
       mappedData.categoria = updateData.categoria;
     if (updateData.categoriaId !== undefined)
       mappedData.categoriaId = updateData.categoriaId;
+    if (updateData.tabelaDePrecoId !== undefined)
+      mappedData.tabelaDePrecoId = updateData.tabelaDePrecoId;
+    if (updateData.usarValorTabela !== undefined)
+      mappedData.usarValorTabela = updateData.usarValorTabela;
+    if (updateData.usarValorTabela && updateData.tabelaDePrecoId) {
+      const tabela = await prisma.tabelas_preco.findUnique({
+        where: { id: updateData.tabelaDePrecoId },
+      });
+      if (tabela) mappedData.preco = Number(tabela.preco);
+    }
     if (updateData.cidade !== undefined) mappedData.cidade = updateData.cidade;
     if (updateData.estado !== undefined) mappedData.estado = updateData.estado;
     if (updateData.status !== undefined) mappedData.status = updateData.status;

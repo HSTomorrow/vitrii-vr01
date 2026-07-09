@@ -4,7 +4,7 @@ import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Plus, Trash2, Edit2 } from "lucide-react";
+import { Plus, Trash2, Edit2, Power } from "lucide-react";
 
 interface Anunciante {
   id: number;
@@ -22,6 +22,7 @@ interface TabelaDePreco {
   anuncianteId: number;
   preco: number;
   precoCusto?: number;
+  status?: "ativo" | "inativo";
   produto?: Producto;
   anunciante?: Anunciante;
 }
@@ -32,6 +33,7 @@ export default function CadastroTabelasPreco() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [selectedAnuncianteId, setSelectedAnuncianteId] = useState("");
   const [selectedGrupoId, setSelectedGrupoId] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"ativo" | "inativo" | "todos">("ativo");
   const [formData, setFormData] = useState({
     productId: "",
     anuncianteId: "",
@@ -88,13 +90,31 @@ export default function CadastroTabelasPreco() {
 
   // Fetch tabelas
   const { data: tabelas, refetch } = useQuery<TabelaDePreco[]>({
-    queryKey: ["tabelas-preco"],
+    queryKey: ["tabelas-preco", statusFilter],
     queryFn: async () => {
-      const response = await fetch("/api/tabelas-preco");
+      const response = await fetch(`/api/tabelas-preco?status=${statusFilter}`);
       if (!response.ok) throw new Error("Erro ao buscar tabelas");
       const result = await response.json();
       return result.data || [];
     },
+  });
+
+  // Toggle tabela status mutation
+  const toggleStatusMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: number; status: "ativo" | "inativo" }) => {
+      const response = await fetch(`/api/tabelas-preco/${id}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      if (!response.ok) throw new Error("Erro ao atualizar status");
+      return response.json();
+    },
+    onSuccess: (_data, variables) => {
+      toast.success(variables.status === "ativo" ? "Tabela ativada!" : "Tabela desativada!");
+      refetch();
+    },
+    onError: () => toast.error("Erro ao atualizar status da tabela"),
   });
 
   // Save tabela mutation
@@ -198,6 +218,16 @@ export default function CadastroTabelasPreco() {
           <h1 className="text-3xl font-bold text-vitrii-text">
             Cadastro de Tabelas de Preço
           </h1>
+          <div className="flex items-center gap-3">
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value as "ativo" | "inativo" | "todos")}
+            className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+          >
+            <option value="ativo">Ativas</option>
+            <option value="inativo">Desativadas</option>
+            <option value="todos">Todas</option>
+          </select>
           <button
             onClick={() => {
               setIsFormOpen(!isFormOpen);
@@ -216,6 +246,7 @@ export default function CadastroTabelasPreco() {
             <Plus className="w-5 h-5" />
             Nova Tabela
           </button>
+          </div>
         </div>
 
         {/* Form */}
@@ -377,6 +408,9 @@ export default function CadastroTabelasPreco() {
                     Preço de Custo
                   </th>
                   <th className="px-4 py-3 text-left text-sm font-semibold text-vitrii-text whitespace-nowrap">
+                    Status
+                  </th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold text-vitrii-text whitespace-nowrap">
                     Ações
                   </th>
                 </tr>
@@ -385,7 +419,7 @@ export default function CadastroTabelasPreco() {
                 {!tabelas || tabelas.length === 0 ? (
                   <tr>
                     <td
-                      colSpan={5}
+                      colSpan={6}
                       className="px-4 py-4 text-center text-gray-500"
                     >
                       Nenhuma tabela cadastrada
@@ -408,7 +442,34 @@ export default function CadastroTabelasPreco() {
                           ? `R$ ${parseFloat(tabela.precoCusto.toString()).toFixed(2)}`
                           : "-"}
                       </td>
+                      <td className="px-4 py-4 text-sm">
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                            tabela.status === "inativo"
+                              ? "bg-gray-200 text-gray-600"
+                              : "bg-green-100 text-green-700"
+                          }`}
+                        >
+                          {tabela.status === "inativo" ? "Desativada" : "Ativa"}
+                        </span>
+                      </td>
                       <td className="px-4 py-4 flex gap-2">
+                        <button
+                          onClick={() =>
+                            toggleStatusMutation.mutate({
+                              id: tabela.id,
+                              status: tabela.status === "inativo" ? "ativo" : "inativo",
+                            })
+                          }
+                          className={`p-2 rounded-lg transition-colors ${
+                            tabela.status === "inativo"
+                              ? "text-gray-400 hover:bg-gray-100"
+                              : "text-green-600 hover:bg-green-50"
+                          }`}
+                          title={tabela.status === "inativo" ? "Ativar" : "Desativar"}
+                        >
+                          <Power className="w-4 h-4" />
+                        </button>
                         <button
                           onClick={() => handleEdit(tabela)}
                           className="p-2 text-vitrii-blue hover:bg-blue-50 rounded-lg transition-colors"
@@ -463,6 +524,22 @@ export default function CadastroTabelasPreco() {
                       </div>
                       <div className="flex gap-1 flex-shrink-0">
                         <button
+                          onClick={() =>
+                            toggleStatusMutation.mutate({
+                              id: tabela.id,
+                              status: tabela.status === "inativo" ? "ativo" : "inativo",
+                            })
+                          }
+                          className={`p-2 rounded-lg transition-colors ${
+                            tabela.status === "inativo"
+                              ? "text-gray-400 hover:bg-gray-100"
+                              : "text-green-600 hover:bg-green-50"
+                          }`}
+                          title={tabela.status === "inativo" ? "Ativar" : "Desativar"}
+                        >
+                          <Power className="w-4 h-4" />
+                        </button>
+                        <button
                           onClick={() => handleEdit(tabela)}
                           className="p-2 text-vitrii-blue hover:bg-blue-50 rounded-lg transition-colors"
                           title="Editar"
@@ -485,6 +562,17 @@ export default function CadastroTabelasPreco() {
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                          tabela.status === "inativo"
+                            ? "bg-gray-200 text-gray-600"
+                            : "bg-green-100 text-green-700"
+                        }`}
+                      >
+                        {tabela.status === "inativo" ? "Desativada" : "Ativa"}
+                      </span>
                     </div>
                     <div className="grid grid-cols-2 gap-3 text-xs">
                       <div>

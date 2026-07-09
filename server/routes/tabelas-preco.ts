@@ -11,16 +11,18 @@ const TabelaPrecoCreateSchema = z.object({
   precoCusto: z.number().optional(),
   tamanho: z.string().optional(),
   cor: z.string().optional(),
+  status: z.enum(["ativo", "inativo"]).optional(),
 });
 
 // GET all tabelas
 export const getTabelas: RequestHandler = async (req, res) => {
   try {
-    const { anuncianteId, productId } = req.query;
+    const { anuncianteId, productId, status } = req.query;
 
     const where: any = {};
     if (anuncianteId) where.lojaId = parseInt(anuncianteId as string);
     if (productId) where.productId = parseInt(productId as string);
+    if (status && status !== "todos") where.status = status as string;
 
     const tabelas = await prisma.tabelas_preco.findMany({
       where,
@@ -139,6 +141,7 @@ export const createTabela: RequestHandler = async (req, res) => {
         precoCusto: validatedData.precoCusto
           ? new Decimal(validatedData.precoCusto.toString())
           : undefined,
+        status: validatedData.status || "ativo",
         dataAtualizacao: new Date(),
       },
       include: {
@@ -197,6 +200,9 @@ export const updateTabela: RequestHandler = async (req, res) => {
     if (validatedData.cor !== undefined) {
       updatePayload.cor = validatedData.cor || null;
     }
+    if (validatedData.status !== undefined) {
+      updatePayload.status = validatedData.status;
+    }
 
     const tabela = await prisma.tabelas_preco.update({
       where: { id },
@@ -228,6 +234,41 @@ export const updateTabela: RequestHandler = async (req, res) => {
     res.status(500).json({
       success: false,
       error: "Erro ao atualizar tabela de preço",
+    });
+  }
+};
+
+// UPDATE tabela status (ativar/desativar)
+export const updateTabelaStatus: RequestHandler = async (req, res) => {
+  try {
+    const id = parseInt(req.params.id as string);
+    const { status } = z
+      .object({ status: z.enum(["ativo", "inativo"]) })
+      .parse(req.body);
+
+    const tabela = await prisma.tabelas_preco.update({
+      where: { id },
+      data: { status, dataAtualizacao: new Date() },
+    });
+
+    res.json({
+      success: true,
+      data: tabela,
+      message: status === "ativo" ? "Tabela de preço ativada" : "Tabela de preço desativada",
+    });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return res.status(400).json({
+        success: false,
+        error: "Dados inválidos",
+        details: error.errors,
+      });
+    }
+
+    console.error("Error updating tabela status:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao atualizar status da tabela de preço",
     });
   }
 };

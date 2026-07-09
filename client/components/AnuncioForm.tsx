@@ -138,6 +138,7 @@ export default function AnuncioForm({
     tipo: normalizedTipo || "anuncio_padrao",
     permiteReservar: false,
     quantidadeMaximaReservas: 0,
+    usarValorTabela: false,
   });
   const [uploadedImages, setUploadedImages] = useState<
     Array<{ id?: string; url: string }>
@@ -376,6 +377,7 @@ export default function AnuncioForm({
         tipo: ad.tipo || "produto",
         permiteReservar: ad.permiteReservar || false,
         quantidadeMaximaReservas: ad.quantidadeMaximaReservas || 0,
+        usarValorTabela: ad.usarValorTabela || false,
       });
 
       toast.success("Anúncio carregado com sucesso");
@@ -438,6 +440,7 @@ export default function AnuncioForm({
         anuncianteId: selectedAnuncianteId,
         productId: data.productId > 0 ? data.productId : null,
         tabelaDePrecoId: data.tabelaDePrecoId > 0 ? data.tabelaDePrecoId : null,
+        usarValorTabela: data.usarValorTabela,
         dataValidade: data.dataValidade
           ? new Date(data.dataValidade).toISOString()
           : null,
@@ -1295,6 +1298,29 @@ export default function AnuncioForm({
                           Preço da Variante: R${" "}
                           {Number(selectedPriceTable.preco).toFixed(2)}
                         </p>
+                      )}
+                      {selectedPriceTable && (
+                        <div className="mt-3 flex items-center gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                          <input
+                            type="checkbox"
+                            id="usarValorTabela"
+                            checked={formData.usarValorTabela}
+                            onChange={(e) =>
+                              handleInputChange("usarValorTabela", e.target.checked)
+                            }
+                            className="w-5 h-5 text-vitrii-blue cursor-pointer rounded"
+                          />
+                          <label htmlFor="usarValorTabela" className="flex-1 cursor-pointer">
+                            <span className="text-sm font-semibold text-vitrii-text">
+                              Usar Valor da Tabela de Preços
+                            </span>
+                            <p className="text-xs text-gray-600 mt-1">
+                              O valor do anúncio será sempre o preço atual desta
+                              variante — se você atualizar a tabela de preços depois,
+                              o anúncio acompanha automaticamente.
+                            </p>
+                          </label>
+                        </div>
                       )}
                     </div>
                   )}

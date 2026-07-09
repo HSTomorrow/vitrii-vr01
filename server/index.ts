@@ -57,6 +57,7 @@ import {
   getTabelaById,
   createTabela,
   updateTabela,
+  updateTabelaStatus,
   deleteTabela,
 } from "./routes/tabelas-preco";
 import {
@@ -1031,6 +1032,7 @@ export function createServer() {
   app.get("/api/tabelas-preco/:id", getTabelaById);
   app.post("/api/tabelas-preco", extractUserId, createTabela);
   app.put("/api/tabelas-preco/:id", extractUserId, updateTabela);
+  app.patch("/api/tabelas-preco/:id/status", extractUserId, updateTabelaStatus);
   app.delete("/api/tabelas-preco/:id", extractUserId, deleteTabela);
 
   // Anúncios routes
