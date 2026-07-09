@@ -51,7 +51,8 @@ export const criarReserva = async (req: Request, res: Response) => {
       return res.status(409).json({ error: "Você já possui uma reserva ativa para este anúncio" });
     }
 
-    // Check quantity available (quantidade - active reservations)
+    // Check quantity available (quantidadeMaximaReservas - active reservations).
+    // null/unset quantidadeMaximaReservas means unlimited reservations.
     const activeReservas = await prisma.reservas_anuncio.count({
       where: {
         anuncioId: id,
@@ -59,13 +60,14 @@ export const criarReserva = async (req: Request, res: Response) => {
       },
     });
 
-    const quantidadeDisponivel = anuncio.quantidade - activeReservas;
-
-    if (quantidadeDisponivel <= 0) {
+    const limite = anuncio.quantidadeMaximaReservas;
+    if (limite !== null && activeReservas >= limite) {
       return res.status(400).json({
         error: "Este produto já foi totalmente reservado"
       });
     }
+
+    const quantidadeDisponivel = limite !== null ? limite - activeReservas : null;
 
     // Create or reactivate reservation
     let reserva;
@@ -174,9 +176,9 @@ export const criarReserva = async (req: Request, res: Response) => {
       // Don't fail the reservation if wishlist addition fails
     }
 
-    // Check if quantity reached 0 and update ad status to "Reservado"
-    const novaQuantidadeDisponivel = quantidadeDisponivel - 1;
-    if (novaQuantidadeDisponivel <= 0) {
+    // Check if quantity reached 0 and update ad status to "Reservado" (unlimited ads never do)
+    const novaQuantidadeDisponivel = quantidadeDisponivel !== null ? quantidadeDisponivel - 1 : null;
+    if (novaQuantidadeDisponivel !== null && novaQuantidadeDisponivel <= 0) {
       await prisma.anuncios.update({
         where: { id },
         data: { status: "Reservado" },
@@ -222,7 +224,7 @@ export const criarReserva = async (req: Request, res: Response) => {
       success: true,
       data: reserva,
       message: "Reserva criada com sucesso",
-      quantidadeDisponivel: Math.max(0, novaQuantidadeDisponivel),
+      quantidadeDisponivel: novaQuantidadeDisponivel !== null ? Math.max(0, novaQuantidadeDisponivel) : null,
     });
   } catch (error) {
     console.error("[reservas-anuncio] Error creating reservation:", error);
@@ -384,7 +386,7 @@ export const cancelarReserva = async (req: Request, res: Response) => {
     // Get ad to check ownership
     const anuncio = await prisma.anuncios.findUnique({
       where: { id: aId },
-      select: { usuarioId: true, status: true, quantidade: true },
+      select: { usuarioId: true, status: true, quantidadeMaximaReservas: true },
     });
 
     const isAdmin = user.tipoUsuario === "adm";
@@ -419,8 +421,9 @@ export const cancelarReserva = async (req: Request, res: Response) => {
         },
       });
 
-      // If now there's available quantity, reactivate the ad
-      if (ativasReservas < anuncio.quantidade) {
+      // If now there's available quantity (or the ad is unlimited), reactivate it
+      const limite = anuncio.quantidadeMaximaReservas;
+      if (limite === null || ativasReservas < limite) {
         await prisma.anuncios.update({
           where: { id: aId },
           data: { status: "ativo" },
@@ -548,7 +551,7 @@ export const getQuantidadeInfo = async (req: Request, res: Response) => {
       where: { id },
       select: {
         id: true,
-        quantidade: true,
+        quantidadeMaximaReservas: true,
         status: true,
       },
     });
@@ -564,12 +567,14 @@ export const getQuantidadeInfo = async (req: Request, res: Response) => {
       },
     });
 
-    const quantidadeDisponivel = Math.max(0, anuncio.quantidade - reservasAtivas);
+    // null quantidadeMaximaReservas means unlimited reservations for this ad.
+    const limite = anuncio.quantidadeMaximaReservas;
+    const quantidadeDisponivel = limite !== null ? Math.max(0, limite - reservasAtivas) : null;
 
     res.json({
       success: true,
       data: {
-        quantidade_total: anuncio.quantidade,
+        quantidade_total: limite,
         reservas_ativas: reservasAtivas,
         quantidade_disponivel: quantidadeDisponivel,
         status: anuncio.status,

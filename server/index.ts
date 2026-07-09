@@ -80,6 +80,7 @@ import {
   adminResetUserPassword,
   adminUpdateUserProfile,
   updateMaxAnunciosAtivos,
+  updateMaxAnunciantes,
   updateLocalidadePadrao,
   changePassword,
   resendVerificationEmail,
@@ -963,6 +964,12 @@ export function createServer() {
     extractUserId,
     requireAdmin,
     updateMaxAnunciosAtivos,
+  );
+  app.put(
+    "/api/admin/usracessos/:id/max-anunciantes",
+    extractUserId,
+    requireAdmin,
+    updateMaxAnunciantes,
   );
 
   // Admin routes for user password management

@@ -88,6 +88,9 @@ const AnuncioBaseSchema = z.object({
   categoria: z.string().max(100).optional().nullable(),
   categoriaId: z.number().int().positive().optional().nullable(),
   usarValorTabela: z.boolean().optional().default(false),
+  permiteReservar: z.boolean().optional().default(false),
+  // Max reservations for this ad; null/omitted = unlimited.
+  quantidadeMaximaReservas: z.number().int().positive().optional().nullable(),
   dadosCategoria: z.string().optional().nullable(), // JSON string
   link: z
     .string()
@@ -610,10 +613,11 @@ export const createAnuncio: RequestHandler = async (req, res) => {
     const isDoacao = validatedData.isDoacao || false;
     const precoAnuncio = isDoacao ? 0 : validatedData.precoAnuncio;
 
-    // Get anunciante info to determine tier (Padrão or Profissional)
+    // Get anunciante info: tier (Padrão or Profissional, used for dataFim duration) and
+    // its admin-editable ad-slot limits (maxAnunciosDestaque/maxAnunciosComuns, default 3/20).
     const anunciante = await prisma.anunciantes.findUnique({
       where: { id: validatedData.anuncianteId },
-      select: { tipo: true },
+      select: { tipo: true, maxAnunciosDestaque: true, maxAnunciosComuns: true },
     });
 
     if (!anunciante) {
@@ -623,32 +627,28 @@ export const createAnuncio: RequestHandler = async (req, res) => {
       });
     }
 
-    // Determine free ad limits based on anunciante type
-    // Padrão: 3 featured, 10 non-featured
-    // Profissional: 10 featured, 1000 non-featured
-    const isProfissional = anunciante.tipo === "Profissional";
-    const maxFeaturedSlots = isProfissional ? 10 : 3;
-    const maxNonFeaturedSlots = isProfissional ? 1000 : 10;
+    const maxFeaturedSlots = anunciante.maxAnunciosDestaque;
+    const maxNonFeaturedSlots = anunciante.maxAnunciosComuns;
 
-    // Count current active FEATURED ads from the user
+    // Count current active FEATURED ads for this anunciante
     const anunciosDestaqueCount = await prisma.anuncios.count({
       where: {
-        usuarioId: validatedData.usuarioId,
+        anuncianteId: validatedData.anuncianteId,
         status: { in: ["ativo", "pago"] },
         destaque: true,
       },
     });
 
-    // Count current active NON-FEATURED ads from the user
+    // Count current active NON-FEATURED ads for this anunciante
     const anunciosNaoDestaqueCount = await prisma.anuncios.count({
       where: {
-        usuarioId: validatedData.usuarioId,
+        anuncianteId: validatedData.anuncianteId,
         status: { in: ["ativo", "pago"] },
         destaque: false,
       },
     });
 
-    console.log(`[createAnuncio] User ${validatedData.usuarioId} (${anunciante.tipo}) has:`);
+    console.log(`[createAnuncio] Anunciante ${validatedData.anuncianteId} (${anunciante.tipo}) has:`);
     console.log(`  Featured: ${anunciosDestaqueCount}/${maxFeaturedSlots}`);
     console.log(`  Non-Featured: ${anunciosNaoDestaqueCount}/${maxNonFeaturedSlots}`);
 
@@ -727,6 +727,10 @@ export const createAnuncio: RequestHandler = async (req, res) => {
         aCombinar: validatedData.aCombinar || false,
         tipo: anuncioTipo,
         dataFim,
+        permiteReservar: validatedData.permiteReservar,
+        quantidadeMaximaReservas: validatedData.permiteReservar
+          ? validatedData.quantidadeMaximaReservas ?? null
+          : null,
         dataAtualizacao: new Date(),
         criadoPor: validatedData.usuarioId,
       },
@@ -883,6 +887,20 @@ export const updateAnuncio: RequestHandler = async (req, res) => {
       mappedData.aCombinar = updateData.aCombinar;
     if (updateData.destaque !== undefined)
       mappedData.destaque = updateData.destaque;
+    if (updateData.permiteReservar !== undefined)
+      mappedData.permiteReservar = updateData.permiteReservar;
+    if (
+      updateData.quantidadeMaximaReservas !== undefined ||
+      updateData.permiteReservar !== undefined
+    ) {
+      const permiteReservar =
+        updateData.permiteReservar !== undefined
+          ? updateData.permiteReservar
+          : mappedData.permiteReservar;
+      mappedData.quantidadeMaximaReservas = permiteReservar
+        ? updateData.quantidadeMaximaReservas ?? null
+        : null;
+    }
     if (updateData.anuncianteId !== undefined)
       mappedData.anuncianteId = updateData.anuncianteId;
 

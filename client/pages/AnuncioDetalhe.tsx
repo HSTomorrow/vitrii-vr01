@@ -703,13 +703,17 @@ export default function AnuncioDetalhe() {
                       {/* Quantidade Total */}
                       <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
                         <p className="text-xs text-gray-600 mb-1 font-medium">Quantidade Total</p>
-                        <p className="text-3xl font-bold text-vitrii-blue">{quantidadeInfo.quantidade_total}</p>
+                        <p className="text-3xl font-bold text-vitrii-blue">
+                          {quantidadeInfo.quantidade_total === null ? "Ilimitado" : quantidadeInfo.quantidade_total}
+                        </p>
                       </div>
 
                       {/* Disponível */}
                       <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
                         <p className="text-xs text-gray-600 mb-1 font-medium">Disponível</p>
-                        <p className="text-3xl font-bold text-gray-700">{quantidadeInfo.quantidade_disponivel}</p>
+                        <p className="text-3xl font-bold text-gray-700">
+                          {quantidadeInfo.quantidade_disponivel === null ? "Ilimitado" : quantidadeInfo.quantidade_disponivel}
+                        </p>
                       </div>
 
                       {/* Reservadas */}

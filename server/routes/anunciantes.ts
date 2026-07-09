@@ -27,6 +27,8 @@ const AnuncianteCreateSchema = z.object({
   categoriaPrincipalId: z.number().int().positive("Categoria Principal é obrigatória"),
   status: z.enum(["Ativo", "Desativado"]).default("Ativo"),
   temAgenda: z.boolean().default(false),
+  maxAnunciosDestaque: z.number().int().min(0).max(999).default(3),
+  maxAnunciosComuns: z.number().int().min(0).max(999).default(20),
 });
 
 // GET all anunciantes (with pagination and user filtering)
@@ -265,7 +267,7 @@ export const createAnunciante: RequestHandler = async (req, res) => {
     const requestingUser = usuarioId
       ? await prisma.usracessos.findUnique({
           where: { id: usuarioId },
-          select: { tipoUsuario: true },
+          select: { tipoUsuario: true, maxAnunciantes: true },
         })
       : null;
 
@@ -274,6 +276,20 @@ export const createAnunciante: RequestHandler = async (req, res) => {
     // Force tipo to "Padrão" if not admin (only admins can set Profissional)
     const tipoAnunciante = isAdmin ? validatedData.tipo : "Padrão";
     console.log(`[createAnunciante] 📋 Tipo de anunciante: ${tipoAnunciante} (admin: ${isAdmin})`);
+
+    // Enforce the per-user cap on how many anunciantes they can register (default 1,
+    // admin-editable up to 999 via updateMaxAnunciantes).
+    if (usuarioId && requestingUser) {
+      const anunciantesAtuais = await prisma.usuarios_anunciantes.count({
+        where: { usuarioId },
+      });
+      if (anunciantesAtuais >= requestingUser.maxAnunciantes) {
+        return res.status(400).json({
+          success: false,
+          error: `Limite de anunciantes atingido (máximo: ${requestingUser.maxAnunciantes})`,
+        });
+      }
+    }
 
     // Check if CNPJ/CPF is registered to a user (cross-validation)
     // Only prevent if it's for a regular user, allow admin exception
@@ -348,6 +364,9 @@ export const createAnunciante: RequestHandler = async (req, res) => {
         categoriaPrincipalId: validatedData.categoriaPrincipalId,
         status: validatedData.status,
         temAgenda: validatedData.temAgenda,
+        // Only admins can set custom ad-slot limits at creation time; everyone else gets the defaults.
+        maxAnunciosDestaque: isAdmin ? validatedData.maxAnunciosDestaque : 3,
+        maxAnunciosComuns: isAdmin ? validatedData.maxAnunciosComuns : 20,
         dataCriacao: new Date(),
         dataAtualizacao: new Date(),
         criadoPor: usuarioId ?? null,
@@ -461,6 +480,8 @@ const AnuncianteUpdateSchema = z.object({
   categoriaPrincipalId: z.number().int().positive("Categoria Principal é obrigatória").optional(),
   status: z.enum(["Ativo", "Desativado"]).optional(),
   tipoCobranca: z.enum(["Propria", "Vitrii"]).optional(),
+  maxAnunciosDestaque: z.number().int().min(0).max(999).optional(),
+  maxAnunciosComuns: z.number().int().min(0).max(999).optional(),
 });
 
 // UPDATE anunciante (only safe fields allowed)
@@ -577,6 +598,14 @@ export const updateAnunciante: RequestHandler = async (req, res) => {
           error: "tipoCobranca deve ser 'Propria' ou 'Vitrii'",
         });
       }
+    }
+
+    // Restrict ad-slot limits - only admin can change them
+    if ("maxAnunciosDestaque" in cleanedData && !isAdmin) {
+      delete cleanedData.maxAnunciosDestaque;
+    }
+    if ("maxAnunciosComuns" in cleanedData && !isAdmin) {
+      delete cleanedData.maxAnunciosComuns;
     }
 
     const updatedAnunciante = await prisma.anunciantes.update({

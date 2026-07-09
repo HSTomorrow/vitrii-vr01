@@ -32,6 +32,8 @@ model anunciantes {
   temAgenda                   Boolean                       @default(false) // Se sim, mostra o botão de agenda nos anuncios
   localidadeId                Int? // Default locality for filtering ads
   categoriaPrincipalId        Int? // Required on the cadastro form; fallback category for anuncios that don't have one directly or via grupo
+  maxAnunciosDestaque         Int                           @default(3) // Max featured (destaque) ads this anunciante can have active; admin-only
+  maxAnunciosComuns           Int                           @default(20) // Max non-featured ads this anunciante can have active; admin-only
   dataCriacao                 DateTime                      @default(now())
   dataAtualizacao             DateTime
   criadoPor                   Int?
@@ -304,6 +306,7 @@ model usracessos {
   numeroAnunciosAtivos         Int                         @default(0)
   numeroAnunciosAtivosDestaque Int                         @default(0)
   maxAnunciosAtivos            Int                         @default(10)
+  maxAnunciantes               Int                         @default(1) // Max anunciantes this user can register; admin-only, capped at 999
   localidadePadraoId           Int? // Default locality for filtering ads
   usuarios_anunciantes         usuarios_anunciantes[]
   membros_equipe               membros_equipe[]

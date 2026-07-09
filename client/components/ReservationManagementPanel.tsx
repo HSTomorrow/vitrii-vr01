@@ -23,9 +23,9 @@ interface Reservation {
 }
 
 interface QuantidadeInfo {
-  quantidade_total: number;
+  quantidade_total: number | null; // null = unlimited (quantidadeMaximaReservas not set)
   reservas_ativas: number;
-  quantidade_disponivel: number;
+  quantidade_disponivel: number | null;
   reservado: boolean;
   status: string;
 }
@@ -223,7 +223,7 @@ export default function ReservationManagementPanel({
                     <div>
                       <p className="text-xs text-gray-600 mb-1">Total</p>
                       <p className="text-2xl font-bold text-vitrii-text">
-                        {quantidadeInfo.quantidade_total}
+                        {quantidadeInfo.quantidade_total === null ? "Ilimitado" : quantidadeInfo.quantidade_total}
                       </p>
                     </div>
                     <div>
@@ -235,7 +235,7 @@ export default function ReservationManagementPanel({
                     <div>
                       <p className="text-xs text-gray-600 mb-1">Disponível</p>
                       <p className="text-2xl font-bold text-green-600">
-                        {quantidadeInfo.quantidade_disponivel}
+                        {quantidadeInfo.quantidade_disponivel === null ? "Ilimitado" : quantidadeInfo.quantidade_disponivel}
                       </p>
                     </div>
                   </div>

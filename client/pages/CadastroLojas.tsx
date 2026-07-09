@@ -34,6 +34,8 @@ interface Anunciante {
   tipoCobranca?: string;
   localidadeId?: number | null;
   categoriaPrincipalId?: number | null;
+  maxAnunciosDestaque?: number;
+  maxAnunciosComuns?: number;
 }
 
 interface Categoria {
@@ -81,6 +83,8 @@ export default function CadastroAnunciantes() {
     categoriaPrincipalId: null as number | null,
     status: "Ativo",
     tipoCobranca: "Propria",
+    maxAnunciosDestaque: 3,
+    maxAnunciosComuns: 20,
   });
 
   // Listen for the custom event dispatched by the bottom nav's "+" button on this page
@@ -111,6 +115,8 @@ export default function CadastroAnunciantes() {
         categoriaPrincipalId: null,
         status: "Ativo",
         tipoCobranca: "Propria",
+        maxAnunciosDestaque: 3,
+        maxAnunciosComuns: 20,
       });
     };
     window.addEventListener("novoAnunciante", handleNovoAnunciante);
@@ -268,6 +274,8 @@ export default function CadastroAnunciantes() {
         categoriaPrincipalId: null,
         status: "Ativo",
         tipoCobranca: "Propria",
+        maxAnunciosDestaque: 3,
+        maxAnunciosComuns: 20,
       });
       setEditingId(null);
       setIsFormOpen(false);
@@ -328,6 +336,8 @@ export default function CadastroAnunciantes() {
       categoriaPrincipalId: loja.categoriaPrincipalId || null,
       status: loja.status || "Ativo",
       tipoCobranca: loja.tipoCobranca || "Propria",
+      maxAnunciosDestaque: loja.maxAnunciosDestaque ?? 3,
+      maxAnunciosComuns: loja.maxAnunciosComuns ?? 20,
     });
     setEditingId(loja.id);
     setIsFormOpen(true);
@@ -450,6 +460,8 @@ export default function CadastroAnunciantes() {
                 categoriaPrincipalId: null,
                 status: "Ativo",
                 tipoCobranca: "Propria",
+                maxAnunciosDestaque: 3,
+                maxAnunciosComuns: 20,
               });
             }}
             className="flex items-center gap-2 px-4 py-2 bg-vitrii-yellow text-vitrii-text rounded-lg hover:bg-vitrii-yellow-dark transition-colors font-semibold"
@@ -503,6 +515,52 @@ export default function CadastroAnunciantes() {
                     <option value="Padrão">Padrão</option>
                     <option value="Profissional">Profissional</option>
                   </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                    Limite de Anúncios em Destaque
+                    {user?.tipoUsuario !== "adm" && (
+                      <span className="text-xs text-gray-500 ml-2">(Apenas admin pode alterar)</span>
+                    )}
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="999"
+                    value={formData.maxAnunciosDestaque}
+                    onChange={(e) =>
+                      user?.tipoUsuario === "adm" &&
+                      setFormData({ ...formData, maxAnunciosDestaque: parseInt(e.target.value) || 0 })
+                    }
+                    disabled={user?.tipoUsuario !== "adm"}
+                    className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50 bg-white ${
+                      user?.tipoUsuario !== "adm" ? "opacity-60 cursor-not-allowed" : ""
+                    }`}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-vitrii-text mb-2">
+                    Limite de Anúncios Comuns
+                    {user?.tipoUsuario !== "adm" && (
+                      <span className="text-xs text-gray-500 ml-2">(Apenas admin pode alterar)</span>
+                    )}
+                  </label>
+                  <input
+                    type="number"
+                    min="0"
+                    max="999"
+                    value={formData.maxAnunciosComuns}
+                    onChange={(e) =>
+                      user?.tipoUsuario === "adm" &&
+                      setFormData({ ...formData, maxAnunciosComuns: parseInt(e.target.value) || 0 })
+                    }
+                    disabled={user?.tipoUsuario !== "adm"}
+                    className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-vitrii-blue focus:ring-2 focus:ring-vitrii-blue focus:ring-opacity-50 bg-white ${
+                      user?.tipoUsuario !== "adm" ? "opacity-60 cursor-not-allowed" : ""
+                    }`}
+                  />
                 </div>
 
                 <div>

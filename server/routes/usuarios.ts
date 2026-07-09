@@ -84,6 +84,7 @@ export const getUsuarios: RequestHandler = async (req, res) => {
         dataVigenciaContrato: true,
         numeroAnunciosAtivos: true,
         maxAnunciosAtivos: true,
+        maxAnunciantes: true,
         endereco: true,
       },
       orderBy: {
@@ -136,6 +137,7 @@ export const getUsuarioById: RequestHandler = async (req, res) => {
         dataAtualizacao: true,
         numeroAnunciosAtivos: true,
         maxAnunciosAtivos: true,
+        maxAnunciantes: true,
         localidadePadraoId: true,
       },
     });
@@ -808,6 +810,7 @@ export const updateUsuario: RequestHandler = async (req, res) => {
         dataAtualizacao: true,
         numeroAnunciosAtivos: true,
         maxAnunciosAtivos: true,
+        maxAnunciantes: true,
         dataVigenciaContrato: true,
       },
     });
@@ -949,6 +952,7 @@ export const updateMaxAnunciosAtivos: RequestHandler = async (req, res) => {
         email: true,
         numeroAnunciosAtivos: true,
         maxAnunciosAtivos: true,
+        maxAnunciantes: true,
         tipoUsuario: true,
       },
     });
@@ -963,6 +967,56 @@ export const updateMaxAnunciosAtivos: RequestHandler = async (req, res) => {
     res.status(500).json({
       success: false,
       error: "Erro ao atualizar limite de anúncios",
+    });
+  }
+};
+
+export const updateMaxAnunciantes: RequestHandler = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { maxAnunciantes } = req.body;
+
+    if (maxAnunciantes === undefined || maxAnunciantes === null) {
+      return res.status(400).json({
+        success: false,
+        error: "maxAnunciantes é obrigatório",
+      });
+    }
+
+    if (!Number.isInteger(maxAnunciantes) || maxAnunciantes < 1 || maxAnunciantes > 999) {
+      return res.status(400).json({
+        success: false,
+        error: "maxAnunciantes deve ser um número inteiro entre 1 e 999",
+      });
+    }
+
+    const userId = parseInt(id);
+
+    const usuario = await prisma.usracessos.update({
+      where: { id: userId },
+      data: {
+        maxAnunciantes,
+        atualizadoPor: req.userId ?? null,
+      },
+      select: {
+        id: true,
+        nome: true,
+        email: true,
+        maxAnunciantes: true,
+        tipoUsuario: true,
+      },
+    });
+
+    res.json({
+      success: true,
+      data: usuario,
+      message: `Limite de anunciantes atualizado para ${maxAnunciantes}`,
+    });
+  } catch (error) {
+    console.error("Error updating max anunciantes limit:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao atualizar limite de anunciantes",
     });
   }
 };
