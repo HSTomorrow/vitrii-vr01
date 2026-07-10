@@ -696,19 +696,30 @@ export default function AdminDashboard() {
                     {expandedUser === usuario.id && (
                       <div className="mt-4 pt-4 border-t border-gray-200 space-y-4">
                         {usuario.tipoUsuario === "adm" ? (
-                          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                            <div className="flex items-start gap-3">
-                              <AlertCircle className="w-5 h-5 text-yellow-700 mt-0.5 flex-shrink-0" />
-                              <div>
-                                <p className="font-semibold text-yellow-900">
-                                  Usuário Administrador
-                                </p>
-                                <p className="text-sm text-yellow-800 mt-1">
-                                  Este usuário tem acesso automático a todas as
-                                  funcionalidades do sistema.
-                                </p>
+                          <div className="space-y-3">
+                            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                              <div className="flex items-start gap-3">
+                                <AlertCircle className="w-5 h-5 text-yellow-700 mt-0.5 flex-shrink-0" />
+                                <div>
+                                  <p className="font-semibold text-yellow-900">
+                                    Usuário Administrador
+                                  </p>
+                                  <p className="text-sm text-yellow-800 mt-1">
+                                    Este usuário tem acesso automático a todas as
+                                    funcionalidades do sistema - não é necessário gerenciar
+                                    permissões individuais, mas os dados de cadastro
+                                    (nome, limites, etc.) ainda podem ser editados.
+                                  </p>
+                                </div>
                               </div>
                             </div>
+                            <button
+                              onClick={() => setEditingUser(usuario)}
+                              className="w-full px-3 py-2 bg-vitrii-yellow text-vitrii-text rounded-lg hover:bg-vitrii-yellow-dark transition flex items-center justify-center gap-2"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                              Editar
+                            </button>
                           </div>
                         ) : (
                           <div className="space-y-3">
