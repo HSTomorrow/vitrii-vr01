@@ -15,7 +15,7 @@ export default function ProfileCompletionGate({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]">
       <div className="bg-white rounded-lg shadow-lg max-w-md w-full mx-4 p-6">
         <div className="flex gap-3 mb-4">
           <AlertCircle className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-0.5" />

@@ -892,7 +892,7 @@ export default function AnuncioDetalhe() {
 
       {/* Modal: Solicitar Equipe de Vendas */}
       {showMembrosModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
           <div className="bg-white rounded-lg shadow-lg max-w-2xl w-full max-h-96 flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between p-6 border-b border-gray-200">

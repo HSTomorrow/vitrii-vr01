@@ -1201,7 +1201,7 @@ export default function Financeiro() {
 
       {/* Modal: Exportar Lançamentos */}
       {showExportLancamentos && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto p-6 space-y-4">
             <h2 className="text-xl font-bold text-vitrii-text">Exportar Lançamentos</h2>
             <p className="text-sm text-vitrii-text-secondary">
@@ -1331,7 +1331,7 @@ export default function Financeiro() {
 
       {/* Modal: Novo Lançamento */}
       {showNovoLancamento && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto p-6 space-y-4">
             <h2 className="text-xl font-bold text-vitrii-text">Novo Lançamento</h2>
             <div>
@@ -1431,7 +1431,7 @@ export default function Financeiro() {
 
       {/* Modal: Editar Lançamento */}
       {editingLancamento && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto p-6 space-y-4">
             <h2 className="text-xl font-bold text-vitrii-text">Editar Lançamento</h2>
             <div>
@@ -1518,7 +1518,7 @@ export default function Financeiro() {
 
       {/* Modal: Visualizar Lançamento (somente leitura) */}
       {viewingLancamento && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto p-6 space-y-4">
             <h2 className="text-xl font-bold text-vitrii-text">Visualizar Lançamento</h2>
             <div className="space-y-3 text-sm">
@@ -1608,7 +1608,7 @@ export default function Financeiro() {
 
       {/* Modal: Novo Contrato */}
       {showNovoContrato && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto p-6 space-y-4">
             <h2 className="text-xl font-bold text-vitrii-text">Novo Contrato</h2>
             <div>
@@ -1728,7 +1728,7 @@ export default function Financeiro() {
 
       {/* Modal: Editar Contrato */}
       {editingContrato && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto p-6 space-y-4">
             <h2 className="text-xl font-bold text-vitrii-text">Editar Contrato</h2>
             <p className="text-sm text-vitrii-text-secondary">
@@ -1828,7 +1828,7 @@ export default function Financeiro() {
 
       {/* Modal: Visualizar Contrato (somente leitura) */}
       {viewingContrato && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60] p-4">
           <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto p-6 space-y-4">
             <h2 className="text-xl font-bold text-vitrii-text">Visualizar Contrato</h2>
             <div className="space-y-3 text-sm">
