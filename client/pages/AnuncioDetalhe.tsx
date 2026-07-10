@@ -44,6 +44,7 @@ import {
   Copy,
   Check,
   QrCode,
+  ChevronRight,
 } from "lucide-react";
 
 interface MembroEquipe {
@@ -55,6 +56,24 @@ interface MembroEquipe {
 }
 
 const PIX_KEY = "00020101021126470014br.gov.bcb.pix0125contato@herestomorrow.com520400005303986540519.905802BR5914HERES TOMORROW6009SAO PAULO622905251KHC5J8MPZBEFKH86HJ3H33VE6304A7E5";
+
+// Deterministic color per category name so the badge always reads the same for a given
+// category, without needing a maintained category->color lookup table.
+const CATEGORIA_BADGE_CLASSES = [
+  "bg-purple-100 text-purple-700",
+  "bg-orange-100 text-orange-700",
+  "bg-blue-100 text-vitrii-blue-dark",
+  "bg-red-100 text-red-700",
+  "bg-green-100 text-green-700",
+];
+function getCategoriaBadgeClass(categoria?: string | null) {
+  if (!categoria) return "bg-gray-100 text-gray-700";
+  let hash = 0;
+  for (let i = 0; i < categoria.length; i++) {
+    hash = categoria.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return CATEGORIA_BADGE_CLASSES[Math.abs(hash) % CATEGORIA_BADGE_CLASSES.length];
+}
 
 export default function AnuncioDetalhe() {
   const { id } = useParams<{ id: string }>();
@@ -385,58 +404,187 @@ export default function AnuncioDetalhe() {
       <Header />
 
       {/* Main Content */}
-      <main className="flex-1 py-6 pb-32 md:pb-12">
+      <main className="flex-1 py-6 pb-56 md:pb-12">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Back Button */}
-          <button
-            onClick={() => navigate(-1)}
-            className="inline-flex items-center text-vitrii-blue hover:text-vitrii-blue-dark font-semibold mb-6"
-          >
-            <ChevronLeft className="w-5 h-5 mr-1" />
-            Voltar
-          </button>
-
-          {/* Header with Status */}
-          <div className="flex items-start justify-between mb-8">
-            <div>
-              <div className="flex items-center gap-4 mb-2 flex-wrap">
-                <h1 className="text-4xl font-bold text-vitrii-text">
-                  {anuncio.titulo}
-                </h1>
-                {canEdit && (
-                  <>
-                    <span
-                      className={`px-3 py-1 rounded-full text-sm font-semibold ${statusColors[anuncio.status] || statusColors.em_edicao}`}
-                    >
-                      {statusLabels[anuncio.status] || anuncio.status}
-                    </span>
-                    {isInactive && (
-                      <span className="px-3 py-1 rounded-full text-sm font-semibold bg-gray-400 text-white">
-                        Inativo
-                      </span>
-                    )}
-                  </>
+          {/* Owner/Admin toolbar - visually separated from buyer-facing content below */}
+          {canEdit && (
+            <div className="flex items-center justify-between gap-3 flex-wrap bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 mb-6">
+              <div className="flex items-center gap-2 text-xs font-semibold text-vitrii-warning">
+                <span className="w-1.5 h-1.5 rounded-full bg-vitrii-warning" />
+                Ferramentas do anunciante — visível só para você
+              </div>
+              <div className="flex gap-2 flex-wrap">
+                {!isInactive && (
+                  <Link
+                    to={`/anuncio/${id}/editar`}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors font-semibold text-sm"
+                  >
+                    <Edit className="w-4 h-4" />
+                    Editar
+                  </Link>
                 )}
+                <button
+                  onClick={() => {
+                    if (isInactive) {
+                      activateMutation.mutate();
+                    } else {
+                      if (
+                        confirm(
+                          "Tem certeza que deseja inativar este anúncio? Ele deixará de aparecer na busca.",
+                        )
+                      ) {
+                        inactivateMutation.mutate();
+                      }
+                    }
+                  }}
+                  disabled={
+                    inactivateMutation.isPending || activateMutation.isPending
+                  }
+                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg font-semibold text-sm transition-colors disabled:opacity-50 ${
+                    isInactive
+                      ? "bg-green-500 text-white hover:bg-green-600"
+                      : "bg-white text-vitrii-warning border border-amber-300 hover:bg-amber-100"
+                  }`}
+                >
+                  {isInactive ? (
+                    <>
+                      <RotateCcw className="w-4 h-4" />
+                      Reativar
+                    </>
+                  ) : (
+                    <>
+                      <Power className="w-4 h-4" />
+                      Inativar
+                    </>
+                  )}
+                </button>
+
+                {/* Reservation Management Panel */}
+                <ReservationManagementPanel
+                  anuncioId={anuncio.id}
+                  anuncioTitulo={anuncio.titulo}
+                  anuncianteId={anuncio.anuncianteId}
+                  isAdmin={user?.tipoUsuario === "adm"}
+                  userId={user?.id}
+                />
+
+                {/* Anúncio Financeiro Panel */}
+                <AnuncioFinanceiroPanel
+                  anuncioId={anuncio.id}
+                  anuncioTitulo={anuncio.titulo}
+                  anuncianteId={anuncio.anuncianteId}
+                  userId={user?.id}
+                  statusPagamento={anuncio.statusPagamento}
+                  valorAnuncio={Number(anuncio.preco) || undefined}
+                />
+
+                {/* Admin-only: Toggle Featured status */}
+                {user?.tipoUsuario === "adm" && (
+                  <button
+                    onClick={() => destacueMutation.mutate()}
+                    disabled={destacueMutation.isPending}
+                    className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg font-semibold text-sm transition-colors disabled:opacity-50 ${
+                      anuncio.destaque
+                        ? "bg-vitrii-yellow text-vitrii-text hover:bg-vitrii-yellow-dark"
+                        : "bg-white text-vitrii-text-secondary border border-amber-300 hover:bg-amber-100"
+                    }`}
+                  >
+                    <Star className="w-4 h-4" />
+                    {anuncio.destaque
+                      ? "Remover do Destaque"
+                      : "Adicionar ao Destaque"}
+                  </button>
+                )}
+
+                <button
+                  onClick={() => {
+                    if (
+                      confirm(
+                        "Tem certeza que deseja deletar este anúncio? Isso não pode ser desfeito.",
+                      )
+                    ) {
+                      deleteMutation.mutate();
+                    }
+                  }}
+                  disabled={deleteMutation.isPending}
+                  className="inline-flex items-center gap-2 px-3 py-1.5 bg-white text-vitrii-red border border-red-200 rounded-lg hover:bg-red-50 transition-colors font-semibold text-sm disabled:opacity-50"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  Deletar
+                </button>
               </div>
-              <div className="space-y-1 text-vitrii-text-secondary mt-2 mb-2">
-                <div className="flex items-center gap-1">
-                  <Eye className="w-4 h-4" />
-                  <span>Visualizações: {anuncio.visualizacoes || 0}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <MessageSquare className="w-4 h-4" />
-                  <span>ID: #{anuncio.id}</span>
-                </div>
-              </div>
-              <p className="text-sm text-vitrii-text-secondary min-h-[1.75rem] flex items-center">
-                Publicado por:{" "}
-                <span className="font-semibold text-vitrii-text ml-1">
+            </div>
+          )}
+
+          {/* Breadcrumb */}
+          <div className="flex items-center gap-1.5 text-xs sm:text-sm text-vitrii-text-secondary mb-5 flex-wrap">
+            <button
+              onClick={() => navigate(-1)}
+              className="inline-flex items-center text-vitrii-blue hover:text-vitrii-blue-dark font-semibold"
+            >
+              <ChevronLeft className="w-4 h-4 mr-0.5" />
+              Voltar
+            </button>
+            <span className="text-gray-300">•</span>
+            <Link to="/" className="hover:text-vitrii-blue">
+              Início
+            </Link>
+            {anuncio.categoria && (
+              <>
+                <ChevronRight className="w-3.5 h-3.5 text-gray-300" />
+                <span>{anuncio.categoria}</span>
+              </>
+            )}
+            <ChevronRight className="w-3.5 h-3.5 text-gray-300" />
+            <span className="text-vitrii-text font-semibold truncate max-w-[220px]">
+              {anuncio.titulo}
+            </span>
+          </div>
+
+          {/* Header */}
+          <div className="mb-8">
+            <div className="flex items-center gap-2 mb-3 flex-wrap">
+              {anuncio.categoria && (
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-bold ${getCategoriaBadgeClass(anuncio.categoria)}`}
+                >
+                  {anuncio.categoria}
+                </span>
+              )}
+              {canEdit && (
+                <>
+                  <span
+                    className={`px-3 py-1 rounded-full text-xs font-semibold ${statusColors[anuncio.status] || statusColors.em_edicao}`}
+                  >
+                    {statusLabels[anuncio.status] || anuncio.status}
+                  </span>
+                  {isInactive && (
+                    <span className="px-3 py-1 rounded-full text-xs font-semibold bg-gray-400 text-white">
+                      Inativo
+                    </span>
+                  )}
+                </>
+              )}
+            </div>
+            <h1 className="text-4xl font-bold text-vitrii-text mb-3">
+              {anuncio.titulo}
+            </h1>
+            <div className="flex items-center gap-4 text-sm text-vitrii-text-secondary flex-wrap">
+              <span className="flex items-center gap-1">
+                <Eye className="w-4 h-4" />
+                {anuncio.visualizacoes || 0} visualizações
+              </span>
+              <span className="flex items-center gap-1">
+                <MessageSquare className="w-4 h-4" />
+                ID #{anuncio.id}
+              </span>
+              <span>
+                Publicado por{" "}
+                <span className="font-semibold text-vitrii-text">
                   {anuncio.anunciantes?.nome || "Anunciante desconhecido"}
                 </span>
-              </p>
+              </span>
             </div>
-
-            {/* Action Buttons - Only show if user can edit */}
           </div>
 
           {/* Grid Layout */}
@@ -486,108 +634,6 @@ export default function AnuncioDetalhe() {
                 <p className="text-[0.8rem] text-vitrii-text-secondary whitespace-pre-wrap leading-relaxed">
                   {anuncio.descricao || "Sem descrição adicional"}
                 </p>
-
-                {/* Action Buttons - Below description */}
-                {canEdit && (
-                  <div className="flex gap-2 flex-wrap mt-6 pt-6 border-t border-gray-200">
-                    {!isInactive && (
-                      <Link
-                        to={`/anuncio/${id}/editar`}
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-vitrii-blue text-white rounded-lg hover:bg-vitrii-blue-dark transition-colors font-semibold"
-                      >
-                        <Edit className="w-4 h-4" />
-                        Editar
-                      </Link>
-                    )}
-                    <button
-                      onClick={() => {
-                        if (isInactive) {
-                          activateMutation.mutate();
-                        } else {
-                          if (
-                            confirm(
-                              "Tem certeza que deseja inativar este anúncio? Ele deixará de aparecer na busca.",
-                            )
-                          ) {
-                            inactivateMutation.mutate();
-                          }
-                        }
-                      }}
-                      disabled={
-                        inactivateMutation.isPending || activateMutation.isPending
-                      }
-                      className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors disabled:opacity-50 ${
-                        isInactive
-                          ? "bg-green-500 text-white hover:bg-green-600"
-                          : "bg-orange-500 text-white hover:bg-orange-600"
-                      }`}
-                    >
-                      {isInactive ? (
-                        <>
-                          <RotateCcw className="w-4 h-4" />
-                          Reativar
-                        </>
-                      ) : (
-                        <>
-                          <Power className="w-4 h-4" />
-                          Inativar
-                        </>
-                      )}
-                    </button>
-                    {/* Reservation Management Panel */}
-                    <ReservationManagementPanel
-                      anuncioId={anuncio.id}
-                      anuncioTitulo={anuncio.titulo}
-                      anuncianteId={anuncio.anuncianteId}
-                      isAdmin={user?.tipoUsuario === "adm"}
-                      userId={user?.id}
-                    />
-
-                    {/* Anúncio Financeiro Panel */}
-                    <AnuncioFinanceiroPanel
-                      anuncioId={anuncio.id}
-                      anuncioTitulo={anuncio.titulo}
-                      anuncianteId={anuncio.anuncianteId}
-                      userId={user?.id}
-                      statusPagamento={anuncio.statusPagamento}
-                      valorAnuncio={Number(anuncio.preco) || undefined}
-                    />
-
-                    {/* Admin-only: Toggle Featured status */}
-                    {user?.tipoUsuario === "adm" && (
-                      <button
-                        onClick={() => destacueMutation.mutate()}
-                        disabled={destacueMutation.isPending}
-                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-colors disabled:opacity-50 ${
-                          anuncio.destaque
-                            ? "bg-yellow-500 text-white hover:bg-yellow-600"
-                            : "bg-gray-400 text-white hover:bg-gray-500"
-                        }`}
-                      >
-                        <Star className="w-4 h-4" />
-                        {anuncio.destaque
-                          ? "Remover do Destaque"
-                          : "Adicionar ao Destaque"}
-                      </button>
-                    )}
-                    <button
-                      onClick={() => {
-                        if (
-                          confirm(
-                            "Tem certeza que deseja deletar este anúncio? Isso não pode ser desfeito.",
-                          )
-                        ) {
-                          deleteMutation.mutate();
-                        }
-                      }}
-                      disabled={deleteMutation.isPending}
-                      className="inline-flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors font-semibold disabled:opacity-50"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      Deletar
-                    </button>
-                  </div>
-                )}
               </div>
 
               {/* Product Details */}
@@ -650,10 +696,12 @@ export default function AnuncioDetalhe() {
                 {/* Category */}
                 <div className="bg-white rounded-lg border border-gray-200 p-6">
                   <h3 className="font-bold text-vitrii-text mb-3 text-[1.1875rem]">Categoria</h3>
-                  <p className="text-vitrii-text">
+                  <span
+                    className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${getCategoriaBadgeClass(anuncio.categoria)}`}
+                  >
                     {anuncio.categoria || "Sem categoria"}
-                  </p>
-                  <p className="text-sm text-vitrii-text-secondary mt-2">
+                  </span>
+                  <p className="text-sm text-vitrii-text-secondary mt-3">
                     Tipo: {anuncio.tipo}
                   </p>
                 </div>
@@ -662,74 +710,121 @@ export default function AnuncioDetalhe() {
 
             {/* Sidebar */}
             <div className="lg:col-span-1">
-              {/* Price Card */}
-              {anuncio.preco && anuncio.preco > 0 ? (
-                <div className="bg-vitrii-blue text-white rounded-lg p-6 mb-6">
+              {/* Price + Availability Card (unified) */}
+              {(anuncio.preco > 0 || anuncio.aCombinar || anuncio.isDoacao) ? (
+                <div
+                  className={`text-white rounded-lg p-6 mb-6 shadow-md ${
+                    anuncio.isDoacao && !(anuncio.preco > 0)
+                      ? "bg-gradient-to-br from-green-600 to-vitrii-green-dark"
+                      : "bg-gradient-to-br from-vitrii-blue to-vitrii-blue-dark"
+                  }`}
+                >
                   <p className="text-sm opacity-90 mb-1">Preço</p>
                   <div className="flex items-baseline">
                     <span className="text-4xl font-bold">
-                      {formatCurrencyDisplay(anuncio.preco)}
+                      {anuncio.preco > 0
+                        ? formatCurrencyDisplay(anuncio.preco)
+                        : anuncio.aCombinar
+                          ? "A combinar"
+                          : "Gratuito"}
                     </span>
                   </div>
-                </div>
-              ) : anuncio.aCombinar ? (
-                <div className="bg-vitrii-blue text-white rounded-lg p-6 mb-6">
-                  <p className="text-sm opacity-90 mb-1">Preço</p>
-                  <div className="flex items-baseline">
-                    <span className="text-4xl font-bold">A combinar</span>
-                  </div>
-                </div>
-              ) : anuncio.isDoacao ? (
-                <div className="bg-green-600 text-white rounded-lg p-6 mb-6">
-                  <p className="text-sm opacity-90 mb-1">Preço</p>
-                  <div className="flex items-baseline">
-                    <span className="text-4xl font-bold">Gratuito</span>
-                  </div>
-                </div>
-              ) : null}
 
-              {/* Quantity Card */}
-              {quantidadeInfo && (
-                <div className="rounded-lg p-6 mb-6 bg-white border border-gray-200">
-                  <p className="text-sm font-semibold text-gray-800 mb-4">Disponibilidade</p>
-
-                  {quantidadeInfo.reservado ? (
-                    <div className="bg-red-50 border-l-4 border-red-600 p-4 rounded">
-                      <p className="text-lg font-bold text-red-700">🔴 RESERVADO</p>
-                      <p className="text-sm text-red-600 mt-1">Todas as unidades foram reservadas</p>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                      {/* Quantidade Total */}
-                      <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
-                        <p className="text-xs text-gray-600 mb-1 font-medium">Quantidade Total</p>
-                        <p className="text-3xl font-bold text-vitrii-blue">
-                          {quantidadeInfo.quantidade_total === null ? "Ilimitado" : quantidadeInfo.quantidade_total}
-                        </p>
-                      </div>
-
-                      {/* Disponível */}
-                      <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                        <p className="text-xs text-gray-600 mb-1 font-medium">Disponível</p>
-                        <p className="text-3xl font-bold text-gray-700">
-                          {quantidadeInfo.quantidade_disponivel === null ? "Ilimitado" : quantidadeInfo.quantidade_disponivel}
-                        </p>
-                      </div>
-
-                      {/* Reservadas */}
-                      <div className="bg-orange-50 p-4 rounded-lg border border-orange-100 col-span-2 md:col-span-1">
-                        <p className="text-xs text-gray-600 mb-1 font-medium">Reservadas</p>
-                        <p className="text-3xl font-bold text-orange-600">{quantidadeInfo.reservas_ativas}</p>
-                      </div>
-                    </div>
+                  {quantidadeInfo && (
+                    <>
+                      <div className="h-px bg-white/20 my-4" />
+                      {quantidadeInfo.reservado ? (
+                        <div className="bg-white/10 rounded-lg p-3">
+                          <p className="text-sm font-bold">🔴 Reservado</p>
+                          <p className="text-xs opacity-80 mt-0.5">
+                            Todas as unidades foram reservadas
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          <div className="flex justify-between text-sm">
+                            <span className="opacity-80">Disponível</span>
+                            <span className="font-bold">
+                              {quantidadeInfo.quantidade_disponivel === null
+                                ? "Ilimitado"
+                                : quantidadeInfo.quantidade_disponivel}
+                              {quantidadeInfo.quantidade_total !== null &&
+                                ` de ${quantidadeInfo.quantidade_total}`}
+                            </span>
+                          </div>
+                          {quantidadeInfo.reservas_ativas > 0 && (
+                            <div className="flex justify-between text-sm">
+                              <span className="opacity-80">Reservadas</span>
+                              <span className="font-bold">
+                                {quantidadeInfo.reservas_ativas}
+                              </span>
+                            </div>
+                          )}
+                          {quantidadeInfo.quantidade_total !== null &&
+                            quantidadeInfo.quantidade_total > 0 && (
+                              <div className="h-1.5 rounded-full bg-white/20 overflow-hidden mt-1">
+                                <div
+                                  className="h-full bg-vitrii-yellow rounded-full"
+                                  style={{
+                                    width: `${Math.min(
+                                      100,
+                                      (quantidadeInfo.quantidade_disponivel /
+                                        quantidadeInfo.quantidade_total) *
+                                        100,
+                                    )}%`,
+                                  }}
+                                />
+                              </div>
+                            )}
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
+              ) : (
+                quantidadeInfo && (
+                  <div className="rounded-lg p-6 mb-6 bg-white border border-gray-200">
+                    <p className="text-sm font-semibold text-gray-800 mb-4">Disponibilidade</p>
+
+                    {quantidadeInfo.reservado ? (
+                      <div className="bg-red-50 border-l-4 border-red-600 p-4 rounded">
+                        <p className="text-lg font-bold text-red-700">🔴 RESERVADO</p>
+                        <p className="text-sm text-red-600 mt-1">Todas as unidades foram reservadas</p>
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                        {/* Quantidade Total */}
+                        <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                          <p className="text-xs text-gray-600 mb-1 font-medium">Quantidade Total</p>
+                          <p className="text-3xl font-bold text-vitrii-blue">
+                            {quantidadeInfo.quantidade_total === null ? "Ilimitado" : quantidadeInfo.quantidade_total}
+                          </p>
+                        </div>
+
+                        {/* Disponível */}
+                        <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                          <p className="text-xs text-gray-600 mb-1 font-medium">Disponível</p>
+                          <p className="text-3xl font-bold text-gray-700">
+                            {quantidadeInfo.quantidade_disponivel === null ? "Ilimitado" : quantidadeInfo.quantidade_disponivel}
+                          </p>
+                        </div>
+
+                        {/* Reservadas */}
+                        <div className="bg-orange-50 p-4 rounded-lg border border-orange-100 col-span-2 md:col-span-1">
+                          <p className="text-xs text-gray-600 mb-1 font-medium">Reservadas</p>
+                          <p className="text-3xl font-bold text-orange-600">{quantidadeInfo.reservas_ativas}</p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )
               )}
 
-              {/* Contact Actions */}
-              <div className="bg-white rounded-lg border border-gray-200 p-6 mb-6 space-y-3">
-                {/* Primary Action - Contact Seller Team */}
-                {equipes.length > 0 && (
+              {/* Contact Actions - reorganized by priority: primary CTA, secondary,
+                  quick-action row, then a light list for less-frequent actions */}
+              <div className="bg-white rounded-lg border border-gray-200 p-5 mb-6">
+                {/* Primary CTA */}
+                {equipes.length > 0 ? (
                   <button
                     onClick={() => {
                       if (equipes.length === 1) {
@@ -744,10 +839,7 @@ export default function AnuncioDetalhe() {
                     <Users className="w-4 h-4" />
                     Solicitar Equipe de Vendas
                   </button>
-                )}
-
-                {/* Direct Contact Methods */}
-                <div className="space-y-2 pt-2 border-t border-gray-200">
+                ) : (
                   <button
                     onClick={() => {
                       if (!user) {
@@ -759,49 +851,62 @@ export default function AnuncioDetalhe() {
                         `/chat?anuncianteId=${anuncio.anuncianteId}&anuncioId=${anuncio.id}`,
                       );
                     }}
-                    className="w-full px-4 py-2 border-2 border-vitrii-blue text-vitrii-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors flex items-center justify-center gap-2 text-sm"
+                    className="w-full px-4 py-3 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors flex items-center justify-center gap-2"
                   >
                     <MessageSquare className="w-4 h-4" />
                     Enviar Mensagem
                   </button>
-                  {anuncio.anunciantes?.whatsapp && (
-                    <a
-                      href={`https://wa.me/${anuncio.anunciantes.whatsapp.replace(/\D/g, "")}`}
-                      className="w-full px-4 py-2 bg-green-500 text-white rounded-lg font-semibold hover:bg-green-600 transition-colors flex items-center justify-center gap-2 text-sm"
-                    >
-                      <MessageCircle className="w-4 h-4" />
-                      WhatsApp
-                    </a>
-                  )}
+                )}
 
-                  {/* Agenda Button */}
-                  {temAgendaAtiva && (
-                    <button
-                      onClick={() => navigate(`/agenda/anunciante/${anuncio.anuncianteId}`)}
-                      className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors flex items-center justify-center gap-2 text-sm"
-                    >
-                      <Calendar className="w-4 h-4" />
-                      Ver Agenda
-                    </button>
-                  )}
-                </div>
+                {/* Secondary CTA - Enviar Mensagem (only shown here if it isn't already primary) */}
+                {equipes.length > 0 && (
+                  <button
+                    onClick={() => {
+                      if (!user) {
+                        toast.error("Faça login para enviar mensagens");
+                        navigate("/auth/signin");
+                        return;
+                      }
+                      navigate(
+                        `/chat?anuncianteId=${anuncio.anuncianteId}&anuncioId=${anuncio.id}`,
+                      );
+                    }}
+                    className="w-full mt-2 px-4 py-2 border-2 border-vitrii-blue text-vitrii-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors flex items-center justify-center gap-2 text-sm"
+                  >
+                    <MessageSquare className="w-4 h-4" />
+                    Enviar Mensagem
+                  </button>
+                )}
 
-                {/* Share & More Options */}
-                <div className="space-y-2 pt-2 border-t border-gray-200">
+                {anuncio.anunciantes?.whatsapp && (
+                  <a
+                    href={`https://wa.me/${anuncio.anunciantes.whatsapp.replace(/\D/g, "")}`}
+                    className="w-full mt-2 px-4 py-2 bg-green-500 text-white rounded-lg font-semibold hover:bg-green-600 transition-colors flex items-center justify-center gap-2 text-sm"
+                  >
+                    <MessageCircle className="w-4 h-4" />
+                    WhatsApp
+                  </a>
+                )}
+
+                {/* Quick actions row */}
+                <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-gray-200">
                   <button
                     onClick={() => setShowShareModal(true)}
-                    className="w-full px-4 py-2 border-2 border-gray-300 text-vitrii-text rounded-lg font-semibold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 text-sm"
+                    className="px-3 py-2 border border-gray-200 text-vitrii-text-secondary rounded-lg font-semibold hover:bg-vitrii-gray-light hover:text-vitrii-text transition-colors flex items-center justify-center gap-2 text-sm"
                   >
                     <Share2 className="w-4 h-4" />
                     Compartilhar
                   </button>
                   <button
                     onClick={() => setShowQRCodeModal(true)}
-                    className="w-full px-4 py-2 border-2 border-vitrii-blue text-vitrii-blue rounded-lg font-semibold hover:bg-blue-50 transition-colors flex items-center justify-center gap-2 text-sm"
+                    className="px-3 py-2 border border-gray-200 text-vitrii-text-secondary rounded-lg font-semibold hover:bg-vitrii-gray-light hover:text-vitrii-text transition-colors flex items-center justify-center gap-2 text-sm"
                   >
                     <QrCode className="w-4 h-4" />
                     QR Code
                   </button>
+                </div>
+
+                <div className="space-y-2 mt-2">
                   {anuncio.permiteReservar && (
                     <ReservarButton
                       anuncioId={anuncio.id}
@@ -823,34 +928,56 @@ export default function AnuncioDetalhe() {
                   />
                 </div>
 
-                {/* Additional Options */}
-                <div className="space-y-2 pt-2 border-t border-gray-200">
-                  {anuncio.link && (
-                    <a
-                      href={anuncio.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full px-4 py-2 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors flex items-center justify-center gap-2 text-sm"
-                    >
-                      <Globe className="w-4 h-4" />
-                      Acessar Anúncio Externo
-                    </a>
-                  )}
-                  {canEdit && anuncio.status === "em_edicao" && anuncio.statusPagamento === "pendente" && (
-                    <button
-                      onClick={() => setShowPaymentModal(true)}
-                      className="w-full px-4 py-2 bg-orange-500 text-white rounded-lg font-semibold hover:bg-orange-600 transition-colors flex items-center justify-center gap-2 text-sm"
-                    >
-                      <DollarSign className="w-4 h-4" />
-                      Efetuar Pagamento
-                    </button>
-                  )}
+                {/* Less-frequent actions - light list style, not competing visually with the CTAs above */}
+                {(temAgendaAtiva ||
+                  anuncio.link ||
+                  (canEdit &&
+                    anuncio.status === "em_edicao" &&
+                    anuncio.statusPagamento === "pendente")) && (
+                  <div className="mt-4 pt-3 border-t border-gray-200 space-y-0.5">
+                    {temAgendaAtiva && (
+                      <button
+                        onClick={() => navigate(`/agenda/anunciante/${anuncio.anuncianteId}`)}
+                        className="w-full flex items-center gap-3 px-2 py-2.5 rounded-lg hover:bg-vitrii-gray-light transition-colors text-sm font-medium text-vitrii-text"
+                      >
+                        <Calendar className="w-4 h-4 text-vitrii-purple" />
+                        <span className="flex-1 text-left">Ver Agenda</span>
+                        <ChevronRight className="w-4 h-4 text-gray-300" />
+                      </button>
+                    )}
+                    {anuncio.link && (
+                      <a
+                        href={anuncio.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full flex items-center gap-3 px-2 py-2.5 rounded-lg hover:bg-vitrii-gray-light transition-colors text-sm font-medium text-vitrii-text"
+                      >
+                        <Globe className="w-4 h-4 text-vitrii-text-secondary" />
+                        <span className="flex-1 text-left">Acessar Anúncio Externo</span>
+                        <ChevronRight className="w-4 h-4 text-gray-300" />
+                      </a>
+                    )}
+                    {canEdit && anuncio.status === "em_edicao" && anuncio.statusPagamento === "pendente" && (
+                      <button
+                        onClick={() => setShowPaymentModal(true)}
+                        className="w-full flex items-center gap-3 px-2 py-2.5 rounded-lg hover:bg-amber-50 transition-colors text-sm font-bold text-vitrii-warning"
+                      >
+                        <DollarSign className="w-4 h-4" />
+                        <span className="flex-1 text-left">Efetuar Pagamento</span>
+                        <ChevronRight className="w-4 h-4 text-amber-300" />
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                <div className="mt-1 pt-1">
                   <button
                     onClick={() => navigate(`/anunciante/${anuncio.anuncianteId}`)}
-                    className="w-full px-4 py-2 bg-gray-200 text-vitrii-text rounded-lg font-semibold hover:bg-gray-300 transition-colors flex items-center justify-center gap-2 text-sm"
+                    className="w-full flex items-center gap-3 px-2 py-2.5 rounded-lg hover:bg-vitrii-gray-light transition-colors text-sm font-medium text-vitrii-text"
                   >
-                    <User className="w-4 h-4" />
-                    Ver Anunciante
+                    <User className="w-4 h-4 text-vitrii-text-secondary" />
+                    <span className="flex-1 text-left">Ver Anunciante</span>
+                    <ChevronRight className="w-4 h-4 text-gray-300" />
                   </button>
                 </div>
               </div>
@@ -1214,8 +1341,11 @@ export default function AnuncioDetalhe() {
         </div>
       )}
 
-      {/* Sticky CTA Bar - Mobile Only */}
-      <div className="fixed bottom-0 left-0 right-0 md:hidden bg-white border-t border-gray-200 shadow-lg z-40 p-4 space-y-3">
+      {/* Sticky CTA Bar - Mobile Only. Anchored above BottomNavBar (h-16, z-50, fixed
+          bottom-0) rather than at bottom-0 itself, otherwise the nav bar renders on
+          top of it and its buttons become untappable - the same overlap bug fixed
+          across the app's modals. */}
+      <div className="fixed bottom-16 left-0 right-0 md:hidden bg-white border-t border-gray-200 shadow-lg z-40 p-4 space-y-3">
         {/* Contact Buttons Row */}
         <div className="flex gap-2">
           {/* Phone Contact */}
