@@ -15,6 +15,18 @@ function isValidEmail(email: string): boolean {
 
 // Create or get transporter based on current environment
 async function getTransporter() {
+  // Staging/homologação: never actually deliver email (the DB there is a copy of
+  // production, so real send calls would reach real users). jsonTransport accepts
+  // the message and returns it as JSON instead of sending anywhere.
+  if (process.env.DISABLE_NOTIFICATIONS === "true") {
+    if (!transporter || lastSmtpConfig !== "json") {
+      console.log("[getTransporter] ⚠️ DISABLE_NOTIFICATIONS=true — usando jsonTransport (nenhum email será enviado)");
+      transporter = nodemailer.createTransport({ jsonTransport: true } as any);
+      lastSmtpConfig = "json";
+    }
+    return transporter;
+  }
+
   // Check if SMTP configuration exists
   const currentConfig = `${process.env.SMTP_HOST}:${process.env.SMTP_PORT}`;
 
