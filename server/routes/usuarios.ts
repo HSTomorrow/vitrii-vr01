@@ -5,6 +5,7 @@ import bcryptjs from "bcryptjs";
 import { sendPasswordResetEmail, sendWelcomeEmail, sendEmailVerificationEmail } from "../lib/emailService";
 import { recalculateAdCounters } from "../lib/recalculateCounters";
 import { signAuthToken } from "../lib/jwt";
+import { normalizeBRPhone } from "../lib/phone";
 import crypto from "crypto";
 
 // NOTE: This file handles usracessos (User Access) model operations
@@ -577,6 +578,12 @@ export const createUsuario: RequestHandler = async (req, res) => {
       }
     }
 
+    // Ensure telefone always carries the +55 country code, otherwise wa.me links
+    // built from it elsewhere in the app silently fail.
+    if (validatedData.telefone && validatedData.telefone.trim()) {
+      validatedData.telefone = normalizeBRPhone(validatedData.telefone)!;
+    }
+
     // Check if phone number is already in use by another user
     if (validatedData.telefone && validatedData.telefone.trim()) {
       const existingPhone = await prisma.usracessos.findFirst({
@@ -741,6 +748,15 @@ export const updateUsuario: RequestHandler = async (req, res) => {
     // Normalize CPF/CNPJ to digits-only format
     if (validatedData.cpf && validatedData.cpf.trim()) {
       validatedData.cpf = validatedData.cpf.replace(/\D/g, "");
+    }
+
+    // Ensure telefone/whatsapp always carry the +55 country code, otherwise wa.me
+    // links built from these numbers elsewhere in the app silently fail.
+    if (validatedData.telefone && validatedData.telefone.trim()) {
+      validatedData.telefone = normalizeBRPhone(validatedData.telefone)!;
+    }
+    if (validatedData.whatsapp && validatedData.whatsapp.trim()) {
+      validatedData.whatsapp = normalizeBRPhone(validatedData.whatsapp)!;
     }
 
     // Check if CPF already exists for a different user
@@ -1706,6 +1722,15 @@ export const adminUpdateUserProfile: RequestHandler = async (req, res) => {
       }
 
       validatedData.cpf = digitsOnly;
+    }
+
+    // Ensure telefone/whatsapp always carry the +55 country code, otherwise wa.me
+    // links built from these numbers elsewhere in the app silently fail.
+    if (validatedData.telefone && validatedData.telefone.trim()) {
+      validatedData.telefone = normalizeBRPhone(validatedData.telefone)!;
+    }
+    if (validatedData.whatsapp && validatedData.whatsapp.trim()) {
+      validatedData.whatsapp = normalizeBRPhone(validatedData.whatsapp)!;
     }
 
     // Check if phone number already exists for a different user

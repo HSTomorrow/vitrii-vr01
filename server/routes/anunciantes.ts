@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import prisma from "../lib/prisma";
 import { z } from "zod";
+import { normalizeBRPhone } from "../lib/phone";
 
 // Schema validation
 const AnuncianteCreateSchema = z.object({
@@ -245,6 +246,15 @@ export const createAnunciante: RequestHandler = async (req, res) => {
     // Clean CEP - remove hyphen and spaces before validation
     if (req.body.cep) {
       req.body.cep = req.body.cep.trim().replace(/\D/g, '');
+    }
+
+    // Ensure telefone/whatsapp always carry the +55 country code, otherwise wa.me
+    // links built from these numbers elsewhere in the app silently fail.
+    if (req.body.telefone) {
+      req.body.telefone = normalizeBRPhone(req.body.telefone);
+    }
+    if (req.body.whatsapp) {
+      req.body.whatsapp = normalizeBRPhone(req.body.whatsapp);
     }
 
     // Clean empty fotoUrl to null
@@ -530,6 +540,15 @@ export const updateAnunciante: RequestHandler = async (req, res) => {
       } else {
         cleanedData[key] = value;
       }
+    }
+
+    // Ensure telefone/whatsapp always carry the +55 country code, otherwise wa.me
+    // links built from these numbers elsewhere in the app silently fail.
+    if (cleanedData.telefone) {
+      cleanedData.telefone = normalizeBRPhone(cleanedData.telefone);
+    }
+    if (cleanedData.whatsapp) {
+      cleanedData.whatsapp = normalizeBRPhone(cleanedData.whatsapp);
     }
 
     // Check if anunciante exists

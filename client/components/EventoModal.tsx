@@ -6,6 +6,7 @@ import ContatoSelectorModal from "./ContatoSelectorModal";
 import ContactDetailsModal from "./ContactDetailsModal";
 import { parseCurrencyInput, formatNumberToCurrency } from "@/utils/formatCurrency";
 import { TIME_SLOTS } from "@/lib/timeSlots";
+import { whatsappDigits } from "@/utils/phoneFormat";
 
 interface Evento {
   id: number;
@@ -137,11 +138,10 @@ export default function EventoModal({
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
 
-        const celular = contato.celular.replace(/\D/g, "");
         const mensagem = encodeURIComponent(
           `${texto}\n\nBaixamos o arquivo de agenda (.ics) — anexe-o nesta conversa para ${contato.nome} adicionar o compromisso ao calendário.`,
         );
-        window.open(`https://wa.me/55${celular}?text=${mensagem}`, "_blank");
+        window.open(`https://wa.me/${whatsappDigits(contato.celular)}?text=${mensagem}`, "_blank");
       }
       setShowShareOptions(false);
     } catch (error) {

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { X, MessageCircle, Clock } from "lucide-react";
+import { whatsappDigits } from "@/utils/phoneFormat";
 
 interface MensagemCobranca {
   id: number;
@@ -63,8 +64,7 @@ export default function CobrancaModal({
       toast.error("Escreva uma mensagem antes de enviar");
       return;
     }
-    const celular = contatoCelular.replace(/\D/g, "");
-    const url = `https://wa.me/55${celular}?text=${encodeURIComponent(texto)}`;
+    const url = `https://wa.me/${whatsappDigits(contatoCelular)}?text=${encodeURIComponent(texto)}`;
     window.open(url, "_blank");
     registrarMutation.mutate();
   };

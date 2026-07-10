@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import prisma from "../lib/prisma";
 import { z } from "zod";
+import { normalizeBRPhone } from "../lib/phone";
 
 // Schema para criar contato
 const ContatoCreateSchema = z.object({
@@ -125,6 +126,12 @@ export const createContato: RequestHandler = async (req, res) => {
     let validatedData;
     try {
       validatedData = ContatoCreateSchema.parse(req.body);
+      // Ensure celular/telefone always carry the +55 country code, otherwise wa.me
+      // links built from these numbers elsewhere in the app silently fail.
+      validatedData.celular = normalizeBRPhone(validatedData.celular)!;
+      if (validatedData.telefone) {
+        validatedData.telefone = normalizeBRPhone(validatedData.telefone);
+      }
       console.log("[createContato] ✅ Dados validados com sucesso:", JSON.stringify(validatedData, null, 2));
     } catch (validationError) {
       console.error("[createContato] ❌ ERRO DE VALIDAÇÃO:", validationError);
@@ -285,6 +292,15 @@ export const updateContato: RequestHandler = async (req, res) => {
     const { contatoId } = req.params;
     const usuarioId = req.userId;
     const validatedData = ContatoUpdateSchema.parse(req.body);
+
+    // Ensure celular/telefone always carry the +55 country code, otherwise wa.me
+    // links built from these numbers elsewhere in the app silently fail.
+    if (validatedData.celular) {
+      validatedData.celular = normalizeBRPhone(validatedData.celular)!;
+    }
+    if (validatedData.telefone) {
+      validatedData.telefone = normalizeBRPhone(validatedData.telefone);
+    }
 
     if (!usuarioId) {
       return res.status(401).json({

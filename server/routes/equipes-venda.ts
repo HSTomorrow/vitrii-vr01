@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import prisma from "../lib/prisma";
 import { z } from "zod";
+import { normalizeBRPhone } from "../lib/phone";
 
 // Schema validation
 const EquipeCreateSchema = z.object({
@@ -502,7 +503,9 @@ export const adicionarMembro: RequestHandler = async (req, res) => {
         usuarioId: usuarioId, // Preenchido automaticamente com o usuário autenticado
         nomeMembro: body.nomeMembro,
         email: body.email,
-        whatsapp: body.whatsapp || null,
+        // Ensure whatsapp always carries the +55 country code, otherwise wa.me
+        // links built from it elsewhere in the app silently fail.
+        whatsapp: body.whatsapp ? normalizeBRPhone(body.whatsapp) : null,
         status: body.status || "disponivel",
       },
       include: {
@@ -656,6 +659,12 @@ export const atualizarMembro: RequestHandler = async (req, res) => {
           error: "Você não tem permissão para atualizar este membro",
         });
       }
+    }
+
+    // Ensure whatsapp always carries the +55 country code, otherwise wa.me
+    // links built from it elsewhere in the app silently fail.
+    if (body.whatsapp) {
+      body.whatsapp = normalizeBRPhone(body.whatsapp)!;
     }
 
     const updated = await prisma.membros_equipe.update({
