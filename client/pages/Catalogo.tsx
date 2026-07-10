@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState, useMemo, useEffect } from "react";
@@ -61,15 +61,27 @@ export default function Catalogo() {
 
   // No anuncianteId in the URL: if the logged-in user manages one or more anunciantes,
   // let them pick which one's catalog to open.
-  const { data: meusAnunciantesData, isLoading: isLoadingMeusAnunciantes } = useQuery<{ data: Anunciante[] }>({
+  const {
+    data: meusAnunciantesData,
+    isLoading: isLoadingMeusAnunciantes,
+    error: meusAnunciantesError,
+  } = useQuery<{ data: Anunciante[] }>({
     queryKey: ["anunciantes", user?.id],
     queryFn: async () => {
       const response = await fetch("/api/anunciantes/do-usuario/listar");
+      if (response.status === 401) {
+        // Session expired/invalid - surfacing this as "no anunciante" would be
+        // misleading, since the user may well have one; force a distinct error path.
+        throw new Error("SESSION_EXPIRED");
+      }
       if (!response.ok) return { data: [] };
       return response.json();
     },
     enabled: !anuncianteId && !!user?.id,
+    retry: false,
   });
+  const sessaoExpirada =
+    meusAnunciantesError instanceof Error && meusAnunciantesError.message === "SESSION_EXPIRED";
 
   const anuncios = anunciosData?.data || [];
   const anunciante = anuncianteData?.data;
@@ -109,6 +121,18 @@ export default function Catalogo() {
             <Loader className="w-4 h-4 animate-spin" />
             Procurando anunciantes cadastrados...
           </p>
+        ) : sessaoExpirada ? (
+          <div className="text-center">
+            <p className="text-vitrii-text-secondary mb-3">
+              Sua sessão expirou. Faça login novamente para ver seus anunciantes.
+            </p>
+            <Link
+              to="/auth/signin"
+              className="inline-block px-4 py-2 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors"
+            >
+              Fazer login
+            </Link>
+          </div>
         ) : meusAnunciantes.length === 0 ? (
           <p className="text-vitrii-text-secondary">Você ainda não possui um anunciante.</p>
         ) : (
