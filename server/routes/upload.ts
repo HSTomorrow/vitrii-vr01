@@ -1,16 +1,18 @@
 import { RequestHandler } from "express";
 import multer from "multer";
 import path from "path";
-import fs from "fs";
 import crypto from "crypto";
+import { createClient } from "@supabase/supabase-js";
 
-// Configure multer for file uploads
-const uploadDir = path.join(process.cwd(), "public", "uploads");
-
-// Create uploads directory if it doesn't exist
-if (!fs.existsSync(uploadDir)) {
-  fs.mkdirSync(uploadDir, { recursive: true });
-}
+// Files are stored in Supabase Storage (a persistent, shared object store) rather than
+// local disk - the Fly.io container filesystem is ephemeral and this app runs multiple
+// machines with independent disks, so anything written to local disk becomes unreachable
+// as soon as a different machine serves the request, or after any redeploy.
+const supabase = createClient(
+  process.env.SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!,
+);
+const UPLOADS_BUCKET = "uploads";
 
 // Maps a *verified* mimetype to a fixed extension - the saved file's extension is never
 // taken from the client-supplied originalname, so an attacker can't upload e.g. "evil.html"
@@ -76,16 +78,9 @@ function matchesMagicBytes(mimetype: string, buffer: Buffer): boolean {
   return signatures.some((sig) => buffer.subarray(0, sig.length).equals(sig));
 }
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = `${Date.now()}-${crypto.randomBytes(6).toString("hex")}`;
-    const ext = EXT_BY_MIME[file.mimetype] || ".bin";
-    cb(null, `upload-${uniqueSuffix}${ext}`);
-  },
-});
+// Buffers the file in memory instead of writing to local disk - handleUpload streams it
+// straight to Supabase Storage from there.
+const storage = multer.memoryStorage();
 
 const fileFilter = (
   req: any,
@@ -131,7 +126,7 @@ export const uploadMiddleware = (
         field: err.field,
       });
 
-      if (err.code === "FILE_TOO_LARGE") {
+      if (err.code === "LIMIT_FILE_SIZE") {
         return res.status(413).json({
           success: false,
           error: "Arquivo muito grande",
@@ -171,7 +166,7 @@ export const uploadMiddleware = (
   });
 };
 
-export const handleUpload: RequestHandler = (req, res) => {
+export const handleUpload: RequestHandler = async (req, res) => {
   try {
     if (!req.file) {
       console.warn("[handleUpload] Nenhum arquivo foi enviado");
@@ -185,7 +180,6 @@ export const handleUpload: RequestHandler = (req, res) => {
     // Validate file properties
     if (!req.file.size || req.file.size === 0) {
       console.warn("[handleUpload] Arquivo vazio:", req.file.originalname);
-      fs.unlink(req.file.path, () => {});
       return res.status(400).json({
         success: false,
         error: "Arquivo vazio",
@@ -196,17 +190,11 @@ export const handleUpload: RequestHandler = (req, res) => {
     // fileFilter only checked the client-supplied Content-Type header, which an attacker
     // controls. Confirm the actual file bytes match the claimed format before accepting
     // the upload; otherwise a different file type could be smuggled onto the server.
-    const headerBytes = Buffer.alloc(12);
-    const fd = fs.openSync(req.file.path, "r");
-    fs.readSync(fd, headerBytes, 0, 12, 0);
-    fs.closeSync(fd);
-
-    if (!matchesMagicBytes(req.file.mimetype, headerBytes)) {
+    if (!matchesMagicBytes(req.file.mimetype, req.file.buffer.subarray(0, 12))) {
       console.warn("[handleUpload] Conteúdo do arquivo não corresponde ao tipo declarado:", {
         mimetype: req.file.mimetype,
-        filename: req.file.filename,
+        originalname: req.file.originalname,
       });
-      fs.unlink(req.file.path, () => {});
       return res.status(400).json({
         success: false,
         error: "Arquivo inválido",
@@ -214,25 +202,43 @@ export const handleUpload: RequestHandler = (req, res) => {
       });
     }
 
+    const uniqueSuffix = `${Date.now()}-${crypto.randomBytes(6).toString("hex")}`;
+    const ext = EXT_BY_MIME[req.file.mimetype] || ".bin";
+    const filename = `upload-${uniqueSuffix}${ext}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from(UPLOADS_BUCKET)
+      .upload(filename, req.file.buffer, {
+        contentType: req.file.mimetype,
+        upsert: false,
+      });
+
+    if (uploadError) {
+      console.error("[handleUpload] 🔴 Erro no Supabase Storage:", uploadError);
+      return res.status(500).json({
+        success: false,
+        error: "Erro ao fazer upload do arquivo",
+        details: "Não foi possível salvar o arquivo. Tente novamente.",
+      });
+    }
+
+    const { data: publicUrlData } = supabase.storage
+      .from(UPLOADS_BUCKET)
+      .getPublicUrl(filename);
+    const fileUrl = publicUrlData.publicUrl;
+
     // Log successful upload
     console.log("[handleUpload] ✓ Upload bem-sucedido:", {
-      filename: req.file.filename,
+      filename,
       originalname: req.file.originalname,
       size: `${(req.file.size / 1024).toFixed(2)}KB`,
       mimetype: req.file.mimetype,
     });
 
-    // Build the URL for the uploaded file
-    const relativePath = `/uploads/${req.file.filename}`;
-
-    // For mobile app compatibility, return absolute URL if APP_URL is set
-    const appUrl = process.env.APP_URL;
-    const fileUrl = appUrl ? `${appUrl}${relativePath}` : relativePath;
-
     res.status(200).json({
       success: true,
       url: fileUrl,
-      filename: req.file.filename,
+      filename,
       size: req.file.size,
       mimetype: req.file.mimetype,
       message: "Arquivo enviado com sucesso",
