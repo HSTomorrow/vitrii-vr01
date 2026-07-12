@@ -103,11 +103,11 @@ export default function BannerCarousel({
       <div className="absolute inset-0 bg-black/30 flex flex-col items-center justify-center p-2 z-10">
         {/* Content */}
         <div className="text-center text-white max-w-3xl px-2 sm:px-4">
-          <h2 className={`text-base sm:text-xl md:text-2xl lg:text-3xl font-bold mb-0.5 sm:mb-1.5 line-clamp-2 ${textColor}`}>
+          <h2 className={`text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-1 sm:mb-2 line-clamp-2 ${textColor}`}>
             {currentBanner.titulo}
           </h2>
           {currentBanner.descricao && (
-            <p className={`text-xs sm:text-sm md:text-base ${textColor} mb-2 sm:mb-4 line-clamp-2`}>
+            <p className={`text-sm sm:text-base md:text-lg ${textColor} mb-3 sm:mb-5 line-clamp-2`}>
               {currentBanner.descricao}
             </p>
           )}
@@ -117,14 +117,14 @@ export default function BannerCarousel({
               href={currentBanner.link}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block px-3 py-1.5 sm:px-5 sm:py-2 md:px-6 md:py-2.5 bg-vitrii-blue text-white rounded-lg font-semibold text-xs sm:text-sm hover:bg-vitrii-blue-dark transition-colors whitespace-nowrap"
+              className="inline-block px-4 py-2 sm:px-6 sm:py-2.5 md:px-8 md:py-3 bg-vitrii-blue text-white rounded-lg font-semibold text-sm sm:text-base hover:bg-vitrii-blue-dark transition-colors whitespace-nowrap"
             >
               Saiba Mais
             </a>
           ) : (
             <button
               disabled
-              className="inline-block px-3 py-1.5 sm:px-5 sm:py-2 md:px-6 md:py-2.5 bg-gray-400 text-white rounded-lg font-semibold text-xs sm:text-sm cursor-not-allowed opacity-50"
+              className="inline-block px-4 py-2 sm:px-6 sm:py-2.5 md:px-8 md:py-3 bg-gray-400 text-white rounded-lg font-semibold text-sm sm:text-base cursor-not-allowed opacity-50"
             >
               Link não configurado
             </button>
@@ -140,7 +140,7 @@ export default function BannerCarousel({
       {/* Main Carousel */}
       <div className="relative bg-vitrii-gray-light overflow-hidden rounded-lg">
         {/* Banner Container */}
-        <div className="relative w-full h-28 sm:h-32 md:h-40">
+        <div className="relative w-full h-40 sm:h-52 md:h-64 lg:h-72">
           <BannerContent />
 
           {/* Navigation Buttons */}
@@ -148,18 +148,18 @@ export default function BannerCarousel({
             <>
               <button
                 onClick={handlePrevious}
-                className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 p-2 bg-white/80 hover:bg-white rounded-full transition-all shadow-md hover:shadow-lg"
+                className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 z-20 p-2 sm:p-2.5 bg-white/80 hover:bg-white rounded-full transition-all shadow-md hover:shadow-lg"
                 aria-label="Banner anterior"
               >
-                <ChevronLeft className="w-5 h-5 text-vitrii-blue" />
+                <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6 text-vitrii-blue" />
               </button>
 
               <button
                 onClick={handleNext}
-                className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 p-2 bg-white/80 hover:bg-white rounded-full transition-all shadow-md hover:shadow-lg"
+                className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 p-2 sm:p-2.5 bg-white/80 hover:bg-white rounded-full transition-all shadow-md hover:shadow-lg"
                 aria-label="Próximo banner"
               >
-                <ChevronRight className="w-5 h-5 text-vitrii-blue" />
+                <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 text-vitrii-blue" />
               </button>
             </>
           )}
