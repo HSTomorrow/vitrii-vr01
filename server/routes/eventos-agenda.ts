@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import prisma from "../lib/prisma";
 import { createConversationForLinkedUsuarios } from "../lib/create-conversation";
+import { getVisibleContatoIds } from "../lib/contatoVisibility";
 
 // Fetches all active horarios for the announcer once, then computes each event's
 // status in memory, instead of one `agendas_horarios` query per event (N+1).
@@ -1278,5 +1279,56 @@ export const obterEventoICS: RequestHandler = async (req, res) => {
   } catch (error) {
     console.error("[obterEventoICS]", error);
     res.status(500).json({ error: "Erro ao gerar arquivo de agenda" });
+  }
+};
+
+// Cross-anunciante agenda commitments for the logged-in user, found via
+// contatos_usuarios_links (email/celular match) and gated by
+// contatos.visualizaAgenda so the anunciante must opt each contact in.
+export const getMeusCompromissosAgenda: RequestHandler = async (req, res) => {
+  try {
+    const userId = (req as any).userId;
+    if (!userId) {
+      return res.status(401).json({ error: "Usuário não autenticado" });
+    }
+
+    const { from, to } = req.query;
+
+    const visibleContatoIds = await getVisibleContatoIds(userId, "visualizaAgenda");
+
+    if (visibleContatoIds.length === 0) {
+      return res.json({ success: true, data: [] });
+    }
+
+    const eventos = await prisma.eventos_agenda_anunciante.findMany({
+      where: {
+        dataExclusao: null,
+        contatos: {
+          some: {
+            contatoId: { in: visibleContatoIds },
+          },
+        },
+        ...(typeof from === "string" && typeof to === "string"
+          ? { dataInicio: { gte: new Date(from), lte: new Date(to) } }
+          : {}),
+      },
+      include: {
+        anunciante: {
+          select: { id: true, nome: true },
+        },
+        contatos: {
+          select: {
+            contatoId: true,
+            contato: { select: { id: true, nome: true, email: true } },
+          },
+        },
+      },
+      orderBy: { dataInicio: "asc" },
+    });
+
+    res.json({ success: true, data: eventos });
+  } catch (error) {
+    console.error("[getMeusCompromissosAgenda]", error);
+    res.status(500).json({ error: "Erro ao buscar meus compromissos" });
   }
 };

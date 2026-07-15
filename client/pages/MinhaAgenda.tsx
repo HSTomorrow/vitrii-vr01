@@ -2,7 +2,8 @@ import { useState, useMemo, useEffect, useRef } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Trash2, Settings, Share2 } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { Trash2, Settings, Share2, MessageCircle, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import EventosAgendaCalendar from "@/components/EventosAgendaCalendar";
@@ -17,12 +18,15 @@ import ShareAgendaModal from "@/components/ShareAgendaModal";
 import RecurrenceModal, { RecurrenceData } from "@/components/RecurrenceModal";
 import DeleteFilterModal from "@/components/DeleteFilterModal";
 import SugerirCobrancaAgendaModal from "@/components/SugerirCobrancaAgendaModal";
+import { getRangeForView, shiftAnchor, CompromissosView } from "@/utils/dateRangeView";
+import { startChatWithAnunciante } from "@/utils/startChatWithAnunciante";
 
 interface Evento {
   id: number;
   anuncianteId: number;
-  anuncioId?: number | null;
   anuncio?: { id: number; titulo: string } | null;
+  anuncioId?: number | null;
+  anunciante?: { id: number; nome: string } | null;
   titulo: string;
   descricao?: string;
   dataInicio: string;
@@ -67,6 +71,7 @@ interface FilaEspera {
 
 export default function MinhaAgenda() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedEvento, setSelectedEvento] = useState<Evento | null>(null);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -77,7 +82,10 @@ export default function MinhaAgenda() {
   const [showShareModal, setShowShareModal] = useState(false);
   const [showRecurrenceModal, setShowRecurrenceModal] = useState(false);
   const [showDeleteFilterModal, setShowDeleteFilterModal] = useState(false);
-  const [activeTab, setActiveTab] = useState<"calendar" | "dia" | "fila-espera" | "status-agenda">("calendar");
+  const [activeTab, setActiveTab] = useState<"calendar" | "dia" | "fila-espera" | "status-agenda" | "meus-compromissos">("calendar");
+  const [compromissosView, setCompromissosView] = useState<CompromissosView>("semana");
+  const [compromissosAnchor, setCompromissosAnchor] = useState(new Date());
+  const [sendingMensagemFor, setSendingMensagemFor] = useState<number | null>(null);
   const [filterContatoId, setFilterContatoId] = useState<number | null>(null);
   const [filterContatoNome, setFilterContatoNome] = useState("");
   const [filterDescricao, setFilterDescricao] = useState("");
@@ -209,6 +217,46 @@ export default function MinhaAgenda() {
     retry: 2, // Retry up to 2 times on failure
     retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 10000), // Exponential backoff
   });
+
+  // Fetch cross-anunciante compromissos where the user's own email is registered
+  // as a contato (only visible once the anunciante sets contato.visualizaAgenda = Sim)
+  const compromissosRange = useMemo(
+    () => getRangeForView(compromissosView, compromissosAnchor),
+    [compromissosView, compromissosAnchor],
+  );
+
+  const {
+    data: meusCompromissos = [],
+    isLoading: isLoadingCompromissos,
+    error: compromissosError,
+  } = useQuery<Evento[]>({
+    queryKey: ["meus-compromissos-agenda", compromissosRange.from.toISOString(), compromissosRange.to.toISOString()],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      const headers: Record<string, string> = { "x-user-id": user.id.toString() };
+      const params = new URLSearchParams({
+        from: compromissosRange.from.toISOString(),
+        to: compromissosRange.to.toISOString(),
+      });
+      const response = await fetch(`/api/eventos-agenda/meus-compromissos?${params}`, { headers });
+      if (!response.ok) throw new Error("Erro ao buscar meus compromissos");
+      const result = await response.json();
+      return result.data || [];
+    },
+    enabled: activeTab === "meus-compromissos" && !!user?.id,
+  });
+
+  const handleEnviarMensagem = async (anuncianteId: number, assunto: string) => {
+    if (!user?.id) return;
+    setSendingMensagemFor(anuncianteId);
+    try {
+      await startChatWithAnunciante({ usuarioId: user.id, anuncianteId, assunto, navigate });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Erro ao abrir chat");
+    } finally {
+      setSendingMensagemFor(null);
+    }
+  };
 
   // Fetch reservas for selected evento
   const { data: reservas = [], refetch: refetchReservas } = useQuery({
@@ -790,6 +838,16 @@ export default function MinhaAgenda() {
                 >
                   📊 Status da Agenda
                 </button>
+                <button
+                  onClick={() => setActiveTab("meus-compromissos")}
+                  className={`px-4 py-3 font-semibold border-b-2 whitespace-nowrap transition-colors ${
+                    activeTab === "meus-compromissos"
+                      ? "border-vitrii-blue text-vitrii-blue"
+                      : "border-transparent text-gray-600 hover:text-gray-900"
+                  }`}
+                >
+                  🗓️ Meus Compromissos
+                </button>
               </div>
             </div>
 
@@ -1046,6 +1104,115 @@ export default function MinhaAgenda() {
                     }
                   }}
                 />
+              </div>
+            )}
+
+            {/* Meus Compromissos Tab */}
+            {activeTab === "meus-compromissos" && (
+              <div>
+                <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+                  <div className="flex gap-2">
+                    {(["dia", "semana", "mes"] as const).map((view) => (
+                      <button
+                        key={view}
+                        onClick={() => setCompromissosView(view)}
+                        className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                          compromissosView === view
+                            ? "bg-vitrii-blue text-white"
+                            : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                        }`}
+                      >
+                        {view === "dia" ? "Dia" : view === "semana" ? "Semana" : "Mês"}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setCompromissosAnchor((d) => shiftAnchor(compromissosView, d, -1))}
+                      className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50"
+                      aria-label="Anterior"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => setCompromissosAnchor(new Date())}
+                      className="px-3 py-2 rounded-lg border border-gray-300 text-sm font-semibold hover:bg-gray-50"
+                    >
+                      Hoje
+                    </button>
+                    <button
+                      onClick={() => setCompromissosAnchor((d) => shiftAnchor(compromissosView, d, 1))}
+                      className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50"
+                      aria-label="Próximo"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+
+                <p className="text-sm text-gray-500 mb-4">
+                  {compromissosRange.from.toLocaleDateString("pt-BR")} — {compromissosRange.to.toLocaleDateString("pt-BR")}
+                </p>
+
+                {compromissosError && (
+                  <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+                    <p className="text-red-800 font-semibold">Erro ao carregar compromissos</p>
+                    <p className="text-red-700 text-sm mt-1">
+                      {compromissosError instanceof Error ? compromissosError.message : "Erro desconhecido"}
+                    </p>
+                  </div>
+                )}
+
+                {isLoadingCompromissos ? (
+                  <div className="text-center py-12">
+                    <div className="inline-block animate-spin rounded-full h-10 w-10 border-b-2 border-vitrii-blue" />
+                  </div>
+                ) : meusCompromissos.length === 0 ? (
+                  <div className="bg-white rounded-lg shadow-md p-8 text-center text-gray-500">
+                    Nenhum compromisso encontrado neste período.
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {meusCompromissos.map((evento) => (
+                      <div
+                        key={evento.id}
+                        className="bg-white rounded-lg shadow-md p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+                      >
+                        <div>
+                          <p className="text-xs text-gray-500 mb-1">
+                            {new Date(evento.dataInicio).toLocaleString("pt-BR", {
+                              weekday: "short",
+                              day: "2-digit",
+                              month: "2-digit",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </p>
+                          <p className="font-semibold text-vitrii-text">{evento.titulo}</p>
+                          {evento.anunciante && (
+                            <Link
+                              to={`/anunciante/${evento.anunciante.id}`}
+                              className="inline-flex items-center gap-1 text-sm text-vitrii-blue hover:underline mt-1"
+                            >
+                              <ExternalLink className="w-3.5 h-3.5" />
+                              {evento.anunciante.nome}
+                            </Link>
+                          )}
+                        </div>
+                        {evento.anunciante && (
+                          <button
+                            onClick={() => handleEnviarMensagem(evento.anunciante!.id, evento.titulo)}
+                            disabled={sendingMensagemFor === evento.anunciante.id}
+                            className="flex items-center justify-center gap-2 px-4 py-2 border-2 border-vitrii-blue text-vitrii-blue rounded-lg hover:bg-blue-50 transition-colors font-semibold text-sm disabled:opacity-50"
+                          >
+                            <MessageCircle className="w-4 h-4" />
+                            {sendingMensagemFor === evento.anunciante.id ? "Abrindo..." : "Enviar mensagem"}
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </>

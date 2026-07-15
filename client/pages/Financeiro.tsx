@@ -2,8 +2,9 @@ import { useState, useMemo, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { Link, useNavigate } from "react-router-dom";
 import { QRCodeSVG } from "qrcode.react";
-import { DollarSign, Plus, Check, X, Copy, FileText, Share2, Mail, Download, Zap, Lock, Unlock, Pencil, MessageCircle, Eye } from "lucide-react";
+import { DollarSign, Plus, Check, X, Copy, FileText, Share2, Mail, Download, Zap, Lock, Unlock, Pencil, MessageCircle, Eye, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ContatoSelectorModal from "@/components/ContatoSelectorModal";
@@ -13,6 +14,8 @@ import AnexosUpload, { Anexo } from "@/components/AnexosUpload";
 import { formatCurrencyDisplay } from "@/utils/formatCurrency";
 import { exportToCsv } from "@/utils/exportCsv";
 import { exportToXlsx } from "@/utils/exportXlsx";
+import { getRangeForView, shiftAnchor, CompromissosView } from "@/utils/dateRangeView";
+import { startChatWithAnunciante } from "@/utils/startChatWithAnunciante";
 
 interface Anunciante {
   id: number;
@@ -38,6 +41,7 @@ interface Lancamento {
   dataCriacao: string;
   contato?: { id: number; nome: string; email?: string; celular?: string };
   evento?: { id: number; titulo: string };
+  anunciante?: { id: number; nome: string };
   documentos?: Anexo[];
 }
 
@@ -124,9 +128,13 @@ function templateCobranca(l: Lancamento): string {
 
 export default function Financeiro() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [selectedAnuncianteId, setSelectedAnuncianteId] = useState<number | null>(null);
-  const [activeTab, setActiveTab] = useState<"lancamentos" | "contratos">("lancamentos");
+  const [activeTab, setActiveTab] = useState<"lancamentos" | "contratos" | "meus-compromissos">("lancamentos");
+  const [compromissosView, setCompromissosView] = useState<CompromissosView>("mes");
+  const [compromissosAnchor, setCompromissosAnchor] = useState(new Date());
+  const [sendingMensagemFor, setSendingMensagemFor] = useState<number | null>(null);
   const [filterStatus, setFilterStatus] = useState("");
   const [filterCompetencia, setFilterCompetencia] = useState(currentMonthValue());
   const [filterDataDe, setFilterDataDe] = useState("");
@@ -246,6 +254,50 @@ export default function Financeiro() {
     },
     enabled: !!selectedAnuncianteId,
   });
+
+  // Cross-anunciante lançamentos where the user's own email is registered as a
+  // contato (only visible once the anunciante sets contato.visualizaFinanceiro = Sim)
+  const compromissosRange = useMemo(
+    () => getRangeForView(compromissosView, compromissosAnchor),
+    [compromissosView, compromissosAnchor],
+  );
+
+  const {
+    data: meusCompromissosFinanceiros = [],
+    isLoading: isLoadingCompromissosFinanceiros,
+    error: compromissosFinanceirosError,
+  } = useQuery<Lancamento[]>({
+    queryKey: [
+      "meus-compromissos-financeiro",
+      compromissosRange.from.toISOString(),
+      compromissosRange.to.toISOString(),
+    ],
+    queryFn: async () => {
+      if (!user?.id) return [];
+      const headers: Record<string, string> = { "x-user-id": user.id.toString() };
+      const params = new URLSearchParams({
+        from: compromissosRange.from.toISOString(),
+        to: compromissosRange.to.toISOString(),
+      });
+      const response = await fetch(`/api/lancamentos-financeiros/meus-compromissos?${params}`, { headers });
+      if (!response.ok) throw new Error("Erro ao buscar meus compromissos");
+      const result = await response.json();
+      return result.data || [];
+    },
+    enabled: activeTab === "meus-compromissos" && !!user?.id,
+  });
+
+  const handleEnviarMensagem = async (anuncianteId: number, assunto: string) => {
+    if (!user?.id) return;
+    setSendingMensagemFor(anuncianteId);
+    try {
+      await startChatWithAnunciante({ usuarioId: user.id, anuncianteId, assunto, navigate });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Erro ao abrir chat");
+    } finally {
+      setSendingMensagemFor(null);
+    }
+  };
 
   const lancamentosFiltrados = useMemo(() => {
     return lancamentos.filter((l) => {
@@ -684,7 +736,7 @@ export default function Financeiro() {
 
         {/* Tabs */}
         <div className="flex gap-2 mb-6 border-b border-gray-200">
-          {(["lancamentos", "contratos"] as const).map((tab) => (
+          {(["lancamentos", "contratos", "meus-compromissos"] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -694,7 +746,7 @@ export default function Financeiro() {
                   : "border-transparent text-vitrii-text-secondary hover:text-vitrii-text"
               }`}
             >
-              {tab === "lancamentos" ? "Lançamentos" : "Contratos"}
+              {tab === "lancamentos" ? "Lançamentos" : tab === "contratos" ? "Contratos" : "Meus Compromissos"}
             </button>
           ))}
         </div>
@@ -1195,6 +1247,120 @@ export default function Financeiro() {
                 ))
               )}
             </div>
+          </div>
+        )}
+
+        {activeTab === "meus-compromissos" && (
+          <div>
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
+              <div className="flex gap-2">
+                {(["dia", "semana", "mes"] as const).map((view) => (
+                  <button
+                    key={view}
+                    onClick={() => setCompromissosView(view)}
+                    className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                      compromissosView === view
+                        ? "bg-vitrii-blue text-white"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                  >
+                    {view === "dia" ? "Dia" : view === "semana" ? "Semana" : "Mês"}
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setCompromissosAnchor((d) => shiftAnchor(compromissosView, d, -1))}
+                  className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50"
+                  aria-label="Anterior"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => setCompromissosAnchor(new Date())}
+                  className="px-3 py-2 rounded-lg border border-gray-300 text-sm font-semibold hover:bg-gray-50"
+                >
+                  Hoje
+                </button>
+                <button
+                  onClick={() => setCompromissosAnchor((d) => shiftAnchor(compromissosView, d, 1))}
+                  className="p-2 rounded-lg border border-gray-300 hover:bg-gray-50"
+                  aria-label="Próximo"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            <p className="text-sm text-gray-500 mb-4">
+              Vencimento entre {compromissosRange.from.toLocaleDateString("pt-BR")} e{" "}
+              {compromissosRange.to.toLocaleDateString("pt-BR")}
+            </p>
+
+            {compromissosFinanceirosError && (
+              <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
+                <p className="text-red-800 font-semibold">Erro ao carregar compromissos</p>
+                <p className="text-red-700 text-sm mt-1">
+                  {compromissosFinanceirosError instanceof Error
+                    ? compromissosFinanceirosError.message
+                    : "Erro desconhecido"}
+                </p>
+              </div>
+            )}
+
+            {isLoadingCompromissosFinanceiros ? (
+              <div className="text-center py-12">
+                <div className="inline-block animate-spin rounded-full h-10 w-10 border-b-2 border-vitrii-blue" />
+              </div>
+            ) : meusCompromissosFinanceiros.length === 0 ? (
+              <div className="bg-white rounded-lg shadow-md p-8 text-center text-gray-500">
+                Nenhum lançamento encontrado neste período.
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {meusCompromissosFinanceiros.map((l) => (
+                  <div
+                    key={l.id}
+                    className="bg-white rounded-lg shadow-md p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+                  >
+                    <div>
+                      <p className="text-xs text-gray-500 mb-1">
+                        {l.vencimento
+                          ? `Vencimento: ${new Date(l.vencimento).toLocaleDateString("pt-BR")}`
+                          : "Sem vencimento definido"}
+                      </p>
+                      <p className="font-semibold text-vitrii-text">
+                        {l.descricao || CATEGORIA_LABELS[l.categoria] || l.categoria}
+                      </p>
+                      <p className="text-lg font-bold text-vitrii-blue">
+                        {formatCurrencyDisplay(parseFloat(l.valor))}
+                      </p>
+                      {l.anunciante && (
+                        <Link
+                          to={`/anunciante/${l.anunciante.id}`}
+                          className="inline-flex items-center gap-1 text-sm text-vitrii-blue hover:underline mt-1"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                          {l.anunciante.nome}
+                        </Link>
+                      )}
+                    </div>
+                    {l.anunciante && (
+                      <button
+                        onClick={() =>
+                          handleEnviarMensagem(l.anunciante!.id, l.descricao || CATEGORIA_LABELS[l.categoria] || l.categoria)
+                        }
+                        disabled={sendingMensagemFor === l.anunciante.id}
+                        className="flex items-center justify-center gap-2 px-4 py-2 border-2 border-vitrii-blue text-vitrii-blue rounded-lg hover:bg-blue-50 transition-colors font-semibold text-sm disabled:opacity-50"
+                      >
+                        <MessageCircle className="w-4 h-4" />
+                        {sendingMensagemFor === l.anunciante.id ? "Abrindo..." : "Enviar mensagem"}
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </main>

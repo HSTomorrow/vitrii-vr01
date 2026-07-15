@@ -3,6 +3,7 @@ import crypto from "crypto";
 import prisma from "../lib/prisma";
 import { generatePixBRCode } from "../lib/pixBRCode";
 import { sendReceiptEmail } from "../lib/emailService";
+import { getVisibleContatoIds } from "../lib/contatoVisibility";
 
 async function podeGerenciarAnunciante(userId: number, userType: string | undefined, anuncianteId: number): Promise<boolean> {
   if (userType === "adm") return true;
@@ -325,6 +326,47 @@ export const listarLancamentos: RequestHandler = async (req, res) => {
   } catch (error) {
     console.error("[listarLancamentos]", error);
     res.status(500).json({ error: "Erro ao buscar lançamentos" });
+  }
+};
+
+// Cross-anunciante lançamentos for the logged-in user, found via
+// contatos_usuarios_links (email/celular match) and gated by
+// contatos.visualizaFinanceiro so the anunciante must opt each contact in.
+export const listarMeusCompromissosFinanceiros: RequestHandler = async (req, res) => {
+  try {
+    const userId = req.userId;
+    if (!userId) {
+      return res.status(401).json({ error: "Usuário não autenticado" });
+    }
+
+    const { from, to } = req.query;
+
+    const visibleContatoIds = await getVisibleContatoIds(userId, "visualizaFinanceiro");
+
+    if (visibleContatoIds.length === 0) {
+      return res.json({ success: true, data: [] });
+    }
+
+    const lancamentos = await prisma.lancamentos_financeiros.findMany({
+      where: {
+        dataExclusao: null,
+        contatoId: { in: visibleContatoIds },
+        ...(typeof from === "string" && typeof to === "string"
+          ? { vencimento: { gte: new Date(from), lte: new Date(to) } }
+          : {}),
+      },
+      include: {
+        anunciante: { select: { id: true, nome: true } },
+        contato: { select: { id: true, nome: true, email: true } },
+        evento: { select: { id: true, titulo: true } },
+      },
+      orderBy: { vencimento: "asc" },
+    });
+
+    res.json({ success: true, data: lancamentos });
+  } catch (error) {
+    console.error("[listarMeusCompromissosFinanceiros]", error);
+    res.status(500).json({ error: "Erro ao buscar meus compromissos financeiros" });
   }
 };
 

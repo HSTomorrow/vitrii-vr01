@@ -22,6 +22,8 @@ const ContatoCreateSchema = z.object({
     .nullable(),
   status: z.enum(["ativo", "inativo", "analise"])
     .default("ativo"),
+  visualizaAgenda: z.boolean().default(false),
+  visualizaFinanceiro: z.boolean().default(false),
   tipoContato: z.string()
     .min(1, "Tipo de contato é obrigatório")
     .max(100, "Tipo de contato não pode ter mais de 100 caracteres"),
@@ -191,6 +193,8 @@ export const createContato: RequestHandler = async (req, res) => {
         telefone: validatedData.telefone || null,
         email: validatedData.email || null,
         status: validatedData.status || "ativo",
+        visualizaAgenda: validatedData.visualizaAgenda ?? false,
+        visualizaFinanceiro: validatedData.visualizaFinanceiro ?? false,
         tipoContato: validatedData.tipoContato,
         observacoes: validatedData.observacoes || null,
         imagem: validatedData.imagem || null,
@@ -366,6 +370,12 @@ export const updateContato: RequestHandler = async (req, res) => {
         }),
         ...(validatedData.email !== undefined && { email: validatedData.email }),
         ...(validatedData.status && { status: validatedData.status }),
+        ...(validatedData.visualizaAgenda !== undefined && {
+          visualizaAgenda: validatedData.visualizaAgenda,
+        }),
+        ...(validatedData.visualizaFinanceiro !== undefined && {
+          visualizaFinanceiro: validatedData.visualizaFinanceiro,
+        }),
         ...(validatedData.tipoContato && { tipoContato: validatedData.tipoContato }),
         ...(validatedData.observacoes !== undefined && {
           observacoes: validatedData.observacoes,

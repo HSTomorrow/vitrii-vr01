@@ -917,7 +917,7 @@ model pagamentos {
 // Filas de Espera para Eventos de Agenda (Waiting Queues)
 model filas_espera_agenda {
   id                   Int       @id @default(autoincrement())
-  eventoId             Int       @db.Integer
+  eventoId             Int?      @db.Integer
   usuarioSolicitanteId Int
   anuncianteAlvoId     Int // Anunciante cuja agenda está recebendo a solicitação
   titulo               String    @db.VarChar(255)
@@ -934,8 +934,8 @@ model filas_espera_agenda {
   dataCriacao          DateTime  @default(now())
   dataAtualizacao      DateTime  @updatedAt
 
-  evento             eventos_agenda_anunciante @relation(fields: [eventoId], references: [id], onDelete: Cascade)
-  usuarioSolicitante usracessos                @relation("fila_espera_usuario", fields: [usuarioSolicitanteId], references: [id], onDelete: Cascade)
+  evento             eventos_agenda_anunciante? @relation(fields: [eventoId], references: [id], onDelete: Cascade)
+  usuarioSolicitante usracessos                 @relation("fila_espera_usuario", fields: [usuarioSolicitanteId], references: [id], onDelete: Cascade)
   anuncianteAlvo     anunciantes               @relation("filas_espera_anunciante", fields: [anuncianteAlvoId], references: [id], onDelete: Cascade)
   permissoes         filas_espera_permissoes[]
 
@@ -1009,6 +1009,8 @@ model contatos {
   telefone        String?   @db.VarChar(20)
   email           String?   @db.VarChar(255)
   status          String    @default("ativo") @db.VarChar(20) // ativo, inativo, analise
+  visualizaAgenda      Boolean @default(false) // When true, usuarios linked by email/celular (contatos_usuarios_links) can see this contact's agenda commitments under "Meus Compromissos"
+  visualizaFinanceiro  Boolean @default(false) // Same as visualizaAgenda, but for lancamentos_financeiros
   tipoContato     String    @db.VarChar(100)
   observacoes     String?   @db.VarChar(1000) // Added limit: max 1000 characters
   imagem          String?   @db.VarChar(500)

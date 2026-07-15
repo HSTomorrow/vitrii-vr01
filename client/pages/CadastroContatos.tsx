@@ -35,6 +35,8 @@ interface Contato {
   telefone?: string;
   email?: string;
   status: "ativo" | "inativo" | "analise";
+  visualizaAgenda: boolean;
+  visualizaFinanceiro: boolean;
   tipoContato: string;
   observacoes?: string;
   imagem?: string;
@@ -62,6 +64,8 @@ interface FormData {
   telefone: string;
   email: string;
   status: "ativo" | "inativo" | "analise";
+  visualizaAgenda: boolean;
+  visualizaFinanceiro: boolean;
   tipoContato: string;
   observacoes: string;
   imagem: string;
@@ -76,6 +80,8 @@ const INITIAL_FORM_DATA: FormData = {
   telefone: "",
   email: "",
   status: "ativo",
+  visualizaAgenda: false,
+  visualizaFinanceiro: false,
   tipoContato: "Outro",
   observacoes: "",
   imagem: "",
@@ -297,6 +303,8 @@ export default function CadastroContatos() {
         telefone: data.telefone || null,
         email: data.email || null,
         status: data.status,
+        visualizaAgenda: data.visualizaAgenda,
+        visualizaFinanceiro: data.visualizaFinanceiro,
         tipoContato: data.tipoContato,
         observacoes: data.observacoes || null,
         imagem: data.imagem || null,
@@ -479,6 +487,8 @@ export default function CadastroContatos() {
       telefone: contato.telefone || "",
       email: contato.email || "",
       status: contato.status,
+      visualizaAgenda: contato.visualizaAgenda,
+      visualizaFinanceiro: contato.visualizaFinanceiro,
       tipoContato: contato.tipoContato,
       observacoes: contato.observacoes || "",
       imagem: contato.imagem || "",
@@ -822,6 +832,54 @@ export default function CadastroContatos() {
                     <option value="inativo">Inativo</option>
                     <option value="analise">Análise</option>
                   </select>
+                </div>
+
+                {/* Visualiza Agenda */}
+                <div>
+                  <label className="block text-sm font-medium text-vitrii-text mb-1">
+                    Visualiza Agenda
+                  </label>
+                  <select
+                    value={formData.visualizaAgenda ? "sim" : "nao"}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        visualizaAgenda: e.target.value === "sim",
+                      })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+                  >
+                    <option value="nao">Não</option>
+                    <option value="sim">Sim</option>
+                  </select>
+                  <p className="text-xs text-vitrii-text-secondary mt-1">
+                    Se Sim, usuários cadastrados com o mesmo e-mail deste contato podem ver
+                    esses compromissos de agenda em "Meus Compromissos".
+                  </p>
+                </div>
+
+                {/* Visualiza Financeiro */}
+                <div>
+                  <label className="block text-sm font-medium text-vitrii-text mb-1">
+                    Visualiza Financeiro
+                  </label>
+                  <select
+                    value={formData.visualizaFinanceiro ? "sim" : "nao"}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        visualizaFinanceiro: e.target.value === "sim",
+                      })
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+                  >
+                    <option value="nao">Não</option>
+                    <option value="sim">Sim</option>
+                  </select>
+                  <p className="text-xs text-vitrii-text-secondary mt-1">
+                    Se Sim, usuários cadastrados com o mesmo e-mail deste contato podem ver
+                    os lançamentos financeiros dele em "Meus Compromissos".
+                  </p>
                 </div>
 
                 {/* Anunciante (optional) */}

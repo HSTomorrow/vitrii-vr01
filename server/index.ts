@@ -139,6 +139,7 @@ import {
   canUserEditEvento,
   isUserAnunciante,
   obterEventoICS,
+  getMeusCompromissosAgenda,
 } from "./routes/eventos-agenda";
 import {
   getFilasEsperaParaAnunciante,
@@ -265,6 +266,7 @@ import {
   anexarDocumentoContrato,
   removerDocumentoContrato,
   listarLancamentos,
+  listarMeusCompromissosFinanceiros,
   obterLancamentoDoEvento,
   listarLancamentosDoAnuncio,
   criarLancamento,
@@ -1194,6 +1196,7 @@ export function createServer() {
   // Eventos de Agenda do Anunciante routes
   app.get("/api/eventos-agenda/anunciante/:anuncianteId", extractUserId, getEventosByAnunciante);
   app.get("/api/eventos-agenda/visiveis/:anuncianteId", getEventosVisivelsPara);
+  app.get("/api/eventos-agenda/meus-compromissos", extractUserId, getMeusCompromissosAgenda);
   app.get("/api/eventos-agenda/:anuncianteId/privacy-status", extractUserId, getAgendaPrivacyStatus);
   app.get("/api/eventos-agenda/:anuncianteId/is-announcer", extractUserId, isUserAnunciante);
   app.get("/api/eventos-agenda/:eventoId/can-edit", extractUserId, canUserEditEvento);
@@ -1396,6 +1399,7 @@ export function createServer() {
 
   // Lançamentos financeiros (cobranças de agenda, mensalidade e avulsas)
   app.get("/api/lancamentos-financeiros/anunciante/:anuncianteId", extractUserId, listarLancamentos);
+  app.get("/api/lancamentos-financeiros/meus-compromissos", extractUserId, listarMeusCompromissosFinanceiros);
   app.get("/api/lancamentos-financeiros/evento/:eventoId", extractUserId, obterLancamentoDoEvento);
   app.get("/api/lancamentos-financeiros/anuncio/:anuncioId", extractUserId, listarLancamentosDoAnuncio);
   app.post("/api/lancamentos-financeiros", extractUserId, criarLancamento);
