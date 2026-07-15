@@ -35,6 +35,9 @@ export default function MeusAnuncios() {
   const [selectedAdForPayment, setSelectedAdForPayment] = useState<any | null>(null);
   const [copied, setCopied] = useState(false);
   const [isMarkingPayment, setIsMarkingPayment] = useState(false);
+  const [filterStatus, setFilterStatus] = useState("todos");
+  const [filterStatusPagamento, setFilterStatusPagamento] = useState("todos");
+  const [filterCategoria, setFilterCategoria] = useState("todos");
 
   // Fallback copy function for older browsers
   const fallbackCopy = (text: string) => {
@@ -99,6 +102,33 @@ export default function MeusAnuncios() {
   }
 
   const anuncios = anunciosData?.data || [];
+
+  const categoriasDisponiveis: string[] = Array.from(
+    new Set<string>(
+      anuncios
+        .map((anuncio: any) => anuncio.categoria)
+        .filter((categoria: string | null | undefined): categoria is string => !!categoria),
+    ),
+  ).sort();
+
+  const anunciosFiltrados = anuncios.filter((anuncio: any) => {
+    if (filterStatus === "ativo" && !["pago", "ativo"].includes(anuncio.status))
+      return false;
+    if (
+      filterStatus !== "todos" &&
+      filterStatus !== "ativo" &&
+      anuncio.status !== filterStatus
+    )
+      return false;
+    if (
+      filterStatusPagamento !== "todos" &&
+      anuncio.statusPagamento !== filterStatusPagamento
+    )
+      return false;
+    if (filterCategoria !== "todos" && anuncio.categoria !== filterCategoria)
+      return false;
+    return true;
+  });
 
   const handleDeleteAd = async () => {
     const anuncioId = adToDeleteRef.current;
@@ -274,9 +304,73 @@ export default function MeusAnuncios() {
             Meus Anúncios
           </h1>
           <p className="text-vitrii-text-secondary">
-            {anuncios.length} anúncio{anuncios.length !== 1 ? "s" : ""}
+            {anunciosFiltrados.length} anúncio
+            {anunciosFiltrados.length !== 1 ? "s" : ""}
+            {anunciosFiltrados.length !== anuncios.length &&
+              ` (de ${anuncios.length})`}
           </p>
         </div>
+
+        {/* Filters */}
+        {!isLoading && anuncios.length > 0 && (
+          <div className="bg-white rounded-lg border border-gray-200 p-4 mb-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label className="text-xs font-semibold text-vitrii-text-secondary block mb-1">
+                Status
+              </label>
+              <select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+              >
+                <option value="todos">Todos</option>
+                <option value="em_edicao">Em Edição</option>
+                <option value="aguardando_pagamento">Aguardando Pagamento</option>
+                <option value="ativo">Ativo</option>
+                <option value="cancelado">Cancelado</option>
+                <option value="historico">Histórico</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="text-xs font-semibold text-vitrii-text-secondary block mb-1">
+                Status de Pagamento
+              </label>
+              <select
+                value={filterStatusPagamento}
+                onChange={(e) => setFilterStatusPagamento(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+              >
+                <option value="todos">Todos</option>
+                <option value="pendente">Pagamento Pendente</option>
+                <option value="comprovante_enviado">Comprovante Enviado</option>
+                <option value="aguardando_confirmacao_pagamento">
+                  Aguardando Confirmação
+                </option>
+                <option value="aprovado">Pagamento Aprovado</option>
+                <option value="rejeitado">Pagamento Rejeitado</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="text-xs font-semibold text-vitrii-text-secondary block mb-1">
+                Categoria
+              </label>
+              <select
+                value={filterCategoria}
+                onChange={(e) => setFilterCategoria(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-vitrii-blue"
+              >
+                <option value="todos">Todas</option>
+                {categoriasDisponiveis.map((categoria) => (
+                  <option key={categoria} value={categoria}>
+                    {categoria}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        )}
 
         {isLoading ? (
           <div className="space-y-4">
@@ -293,9 +387,16 @@ export default function MeusAnuncios() {
               </div>
             ))}
           </div>
-        ) : anuncios.length > 0 ? (
+        ) : anuncios.length > 0 && anunciosFiltrados.length === 0 ? (
+          <div className="text-center py-12">
+            <ShoppingBag className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <p className="text-vitrii-text-secondary text-lg">
+              Nenhum anúncio encontrado para os filtros selecionados
+            </p>
+          </div>
+        ) : anunciosFiltrados.length > 0 ? (
           <div className="space-y-4">
-            {anuncios.map((anuncio: any) => (
+            {anunciosFiltrados.map((anuncio: any) => (
               <div
                 key={anuncio.id}
                 className="vitrii-card overflow-hidden hover:shadow-lg transition-shadow"
