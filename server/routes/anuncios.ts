@@ -80,7 +80,7 @@ const AnuncioBaseSchema = z.object({
   ordem: z.number().int().positive().optional().default(10), // Default 10 for new ads (admin only)
   isActive: z.boolean().optional().default(true),
   status: z
-    .enum(["em_edicao", "aguardando_pagamento", "pago", "historico", "ativo"])
+    .enum(["em_edicao", "aguardando_pagamento", "pago", "historico", "ativo", "cancelado"])
     .optional(),
   statusPagamento: z
     .enum(["pendente", "aprovado", "recusado"])
@@ -1076,10 +1076,11 @@ export const updateAnuncioStatus: RequestHandler = async (req, res) => {
     const { status } = req.body;
 
     const validStatuses = [
-      "em_edicao",
-      "aguardando_pagamento",
-      "pago",
-      "historico",
+      ANUNCIO_STATUS.EM_EDICAO,
+      ANUNCIO_STATUS.AGUARDANDO_PAGAMENTO,
+      ANUNCIO_STATUS.PAGO,
+      ANUNCIO_STATUS.HISTORICO,
+      ANUNCIO_STATUS.CANCELADO,
     ];
     if (!validStatuses.includes(status)) {
       return res.status(400).json({
@@ -1165,11 +1166,12 @@ export const overrideAnuncioStatus: RequestHandler = async (req, res) => {
 
     // Validate status
     const validStatuses = [
-      "em_edicao",
-      "aguardando_pagamento",
-      "pago",
-      "ativo",
-      "historico",
+      ANUNCIO_STATUS.EM_EDICAO,
+      ANUNCIO_STATUS.AGUARDANDO_PAGAMENTO,
+      ANUNCIO_STATUS.PAGO,
+      ANUNCIO_STATUS.ATIVO,
+      ANUNCIO_STATUS.HISTORICO,
+      ANUNCIO_STATUS.CANCELADO,
     ];
     if (!validStatuses.includes(status)) {
       return res.status(400).json({
@@ -1662,9 +1664,14 @@ export const getAnunciosDUsuario: RequestHandler = async (req, res) => {
     }
 
     // Get total count and paginated data in parallel
+    const whereWithFilters = {
+      ...where,
+      dataExclusao: null,
+    };
+
     const [anuncios, total] = await Promise.all([
       prisma.anuncios.findMany({
-        where,
+        where: whereWithFilters,
         include: {
           anunciantes: {
             select: {
@@ -1681,7 +1688,7 @@ export const getAnunciosDUsuario: RequestHandler = async (req, res) => {
         take: pageLimit,
         skip: pageOffset,
       }),
-      prisma.anuncios.count({ where }),
+      prisma.anuncios.count({ where: whereWithFilters }),
     ]);
 
     // Map anuncios to ensure statusPagamento is explicitly included

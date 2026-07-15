@@ -9,6 +9,7 @@ export const ANUNCIO_STATUS = {
   EM_EDICAO: "em_edicao",
   AGUARDANDO_PAGAMENTO: "aguardando_pagamento",
   HISTORICO: "historico",
+  CANCELADO: "cancelado",
   INATIVO: "inativo",
 } as const;
 
@@ -21,6 +22,7 @@ export const VALID_UPDATE_STATUS = [
   ANUNCIO_STATUS.PAGO,
   ANUNCIO_STATUS.ATIVO,
   ANUNCIO_STATUS.HISTORICO,
+  ANUNCIO_STATUS.CANCELADO,
 ] as const;
 
 /**

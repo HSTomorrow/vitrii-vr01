@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
@@ -29,6 +29,8 @@ export default function MeusAnuncios() {
   const { user } = useAuth();
   const { toast: toastShadcn } = useToast();
   const [adToDelete, setAdToDelete] = useState<number | null>(null);
+  const adToDeleteRef = useRef<number | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [selectedAdForPayment, setSelectedAdForPayment] = useState<any | null>(null);
   const [copied, setCopied] = useState(false);
@@ -99,17 +101,20 @@ export default function MeusAnuncios() {
   const anuncios = anunciosData?.data || [];
 
   const handleDeleteAd = async () => {
-    if (!adToDelete) return;
+    const anuncioId = adToDeleteRef.current;
+    if (!anuncioId) return;
 
     setIsDeleting(true);
     try {
-      const response = await fetch(`/api/anuncios/${adToDelete}`, {
-        method: "DELETE",
+      const response = await fetch(`/api/anuncios/${anuncioId}/status`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: "cancelado" }),
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Erro ao deletar anúncio");
+        const error = await response.json().catch(() => ({}));
+        throw new Error(error.error || "Erro ao cancelar anúncio");
       }
 
       toastShadcn({
@@ -117,7 +122,9 @@ export default function MeusAnuncios() {
         description: "Anúncio cancelado com sucesso",
       });
 
+      setIsDeleteDialogOpen(false);
       setAdToDelete(null);
+      adToDeleteRef.current = null;
       refetch();
     } catch (error) {
       toastShadcn({
@@ -189,6 +196,11 @@ export default function MeusAnuncios() {
         bg: "bg-green-100",
         text: "text-green-800",
         label: "Ativo",
+      },
+      cancelado: {
+        bg: "bg-red-100",
+        text: "text-red-800",
+        label: "Cancelado",
       },
       historico: {
         bg: "bg-gray-100",
@@ -381,7 +393,11 @@ export default function MeusAnuncios() {
                       )}
 
                       <button
-                        onClick={() => setAdToDelete(anuncio.id)}
+                        onClick={() => {
+                          setAdToDelete(anuncio.id);
+                          adToDeleteRef.current = anuncio.id;
+                          setIsDeleteDialogOpen(true);
+                        }}
                         className="flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-lg font-semibold hover:bg-red-100 transition-colors text-sm border border-red-200"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -412,9 +428,12 @@ export default function MeusAnuncios() {
 
       {/* Delete confirmation dialog */}
       <AlertDialog
-        open={adToDelete !== null}
+        open={isDeleteDialogOpen}
         onOpenChange={(open) => {
-          if (!open) setAdToDelete(null);
+          setIsDeleteDialogOpen(open);
+          if (!open && !isDeleting) {
+            setAdToDelete(null);
+          }
         }}
       >
         <AlertDialogContent>
