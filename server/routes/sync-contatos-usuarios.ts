@@ -5,14 +5,13 @@ import prisma from "../lib/prisma";
 // scheduler (server/lib/scheduler.ts) so there's a single batched implementation
 // instead of two independently-maintained copies.
 export async function runContatosUsuariosSync(): Promise<{ linkedCount: number }> {
-  // Get all contatos with email or celular
+  // celular is a required (non-nullable) column, so every non-deleted contato already
+  // qualifies - `{ celular: { not: null } }` isn't valid Prisma syntax for a non-nullable
+  // field and throws "Argument `not` is missing" at the query engine, which was silently
+  // failing the entire hourly sync. No OR needed: just exclude soft-deleted rows.
   const contatos = await prisma.contatos.findMany({
     where: {
       dataExclusao: null,
-      OR: [
-        { email: { not: null } },
-        { celular: { not: null } }
-      ]
     },
     select: {
       id: true,
