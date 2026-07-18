@@ -56,6 +56,7 @@ export default function BannerInicialModal() {
             src={getAnuncioImage(anuncio)}
             alt={getImageAlt(anuncio.titulo)}
             className="w-full h-full object-cover"
+            containerClassName="w-full h-full"
           />
         </div>
 
