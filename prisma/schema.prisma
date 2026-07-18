@@ -34,6 +34,8 @@ model anunciantes {
   categoriaPrincipalId        Int? // Required on the cadastro form; fallback category for anuncios that don't have one directly or via grupo
   maxAnunciosDestaque         Int                           @default(3) // Max featured (destaque) ads this anunciante can have active; admin-only
   maxAnunciosComuns           Int                           @default(20) // Max non-featured ads this anunciante can have active; admin-only
+  destaque                    Boolean                       @default(false) // Shows this anunciante in the homepage "Anunciantes em Destaque" carousel; admin-only
+  ordemDestaque               Int                           @default(999) // Display order within the featured carousel (1 = first); admin-only
   dataCriacao                 DateTime                      @default(now())
   dataAtualizacao             DateTime
   criadoPor                   Int?

@@ -27,6 +27,7 @@ import {
 import { updateAnuncioOrdem } from "./routes/anuncios-ordem";
 import {
   getAnunciantes,
+  getAnunciantesDestaque,
   getAnuncianteById,
   createAnunciante,
   updateAnunciante,
@@ -1008,6 +1009,7 @@ export function createServer() {
     getAnunciantesByUsuario,
   );
   app.get("/api/anunciantes", optionalAuth, getAnunciantes);
+  app.get("/api/anunciantes/destaque", getAnunciantesDestaque);
   app.get("/api/anunciantes/:id", getAnuncianteById);
   app.post("/api/anunciantes", extractUserId, createAnunciante);
   app.put("/api/anunciantes/:id", extractUserId, updateAnunciante);

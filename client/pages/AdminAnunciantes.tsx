@@ -18,6 +18,8 @@ interface Anunciante {
   status: string;
   localidadeId?: number | null;
   dataCriacao: string;
+  destaque?: boolean;
+  ordemDestaque?: number;
 }
 
 interface Localidade {
@@ -35,6 +37,8 @@ interface EditingData {
   iconColor?: string;
   localidadeId?: number | null;
   status?: string;
+  destaque?: boolean;
+  ordemDestaque?: number;
 }
 
 export default function AdminAnunciantes() {
@@ -140,6 +144,8 @@ export default function AdminAnunciantes() {
       iconColor: anunciante.iconColor,
       localidadeId: anunciante.localidadeId,
       status: anunciante.status,
+      destaque: anunciante.destaque ?? false,
+      ordemDestaque: anunciante.ordemDestaque ?? 999,
     });
   };
 
@@ -255,6 +261,12 @@ export default function AdminAnunciantes() {
                   </th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
                     Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
+                    Destaque
+                  </th>
+                  <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
+                    Ordem Destaque
                   </th>
                   <th className="px-6 py-3 text-left text-sm font-semibold text-vitrii-text">
                     Ações
@@ -409,6 +421,54 @@ export default function AdminAnunciantes() {
                     </td>
                     <td className="px-6 py-4 text-sm">
                       {editingId === anunciante.id ? (
+                        <select
+                          value={editingData.destaque ? "sim" : "nao"}
+                          onChange={(e) =>
+                            setEditingData({
+                              ...editingData,
+                              destaque: e.target.value === "sim",
+                            })
+                          }
+                          className="px-3 py-1 border border-gray-300 rounded focus:outline-none focus:border-vitrii-blue"
+                        >
+                          <option value="nao">Não</option>
+                          <option value="sim">Sim</option>
+                        </select>
+                      ) : (
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                            anunciante.destaque
+                              ? "bg-yellow-100 text-yellow-700"
+                              : "bg-gray-100 text-gray-700"
+                          }`}
+                        >
+                          {anunciante.destaque ? "Sim" : "Não"}
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-sm">
+                      {editingId === anunciante.id ? (
+                        <input
+                          type="number"
+                          min={1}
+                          max={999}
+                          value={editingData.ordemDestaque ?? 999}
+                          onChange={(e) =>
+                            setEditingData({
+                              ...editingData,
+                              ordemDestaque: parseInt(e.target.value) || 999,
+                            })
+                          }
+                          className="w-20 px-2 py-1 border border-gray-300 rounded focus:outline-none focus:border-vitrii-blue"
+                        />
+                      ) : (
+                        <span className="text-vitrii-text-secondary">
+                          {anunciante.ordemDestaque ?? 999}
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-sm">
+                      {editingId === anunciante.id ? (
                         <div className="flex gap-2">
                           <button
                             onClick={() => handleSave(anunciante.id)}
@@ -525,6 +585,32 @@ export default function AdminAnunciantes() {
                       <option value="vermelho">Vermelho</option>
                       <option value="laranja">Laranja</option>
                     </select>
+                    <div className="grid grid-cols-2 gap-2">
+                      <select
+                        value={editingData.destaque ? "sim" : "nao"}
+                        onChange={(e) =>
+                          setEditingData({ ...editingData, destaque: e.target.value === "sim" })
+                        }
+                        className="px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-vitrii-blue"
+                      >
+                        <option value="nao">Destaque: Não</option>
+                        <option value="sim">Destaque: Sim</option>
+                      </select>
+                      <input
+                        type="number"
+                        min={1}
+                        max={999}
+                        value={editingData.ordemDestaque ?? 999}
+                        onChange={(e) =>
+                          setEditingData({
+                            ...editingData,
+                            ordemDestaque: parseInt(e.target.value) || 999,
+                          })
+                        }
+                        placeholder="Ordem"
+                        className="px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:border-vitrii-blue"
+                      />
+                    </div>
                     <div className="flex gap-2 pt-1">
                       <button
                         onClick={() => handleSave(anunciante.id)}
@@ -563,6 +649,24 @@ export default function AdminAnunciantes() {
                         <p className="text-xs text-vitrii-text-secondary">Localização</p>
                         <p className="text-vitrii-text">{localidadeLabel(anunciante.localidadeId)}</p>
                       </div>
+                      <div>
+                        <p className="text-xs text-vitrii-text-secondary">Destaque</p>
+                        <span
+                          className={`inline-block mt-0.5 px-2 py-0.5 rounded-full text-xs font-semibold ${
+                            anunciante.destaque
+                              ? "bg-yellow-100 text-yellow-700"
+                              : "bg-gray-100 text-gray-700"
+                          }`}
+                        >
+                          {anunciante.destaque ? "Sim" : "Não"}
+                        </span>
+                      </div>
+                      {anunciante.destaque && (
+                        <div>
+                          <p className="text-xs text-vitrii-text-secondary">Ordem Destaque</p>
+                          <p className="text-vitrii-text">{anunciante.ordemDestaque ?? 999}</p>
+                        </div>
+                      )}
                     </div>
                     <button
                       onClick={() => handleEdit(anunciante)}

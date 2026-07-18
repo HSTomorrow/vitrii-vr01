@@ -111,6 +111,8 @@ export const getAnunciantes: RequestHandler = async (req, res) => {
           status: true,
           localidadeId: true,
           categoriaPrincipalId: true,
+          destaque: true,
+          ordemDestaque: true,
           dataCriacao: true,
           dataAtualizacao: true,
         },
@@ -137,6 +139,47 @@ export const getAnunciantes: RequestHandler = async (req, res) => {
     res.status(500).json({
       success: false,
       error: "Erro ao buscar anunciantes",
+    });
+  }
+};
+
+// GET anunciantes for the homepage "Anunciantes em Destaque" carousel - public,
+// unscoped by logged-in user (unlike getAnunciantes, which restricts non-admins
+// to their own anunciantes), gated purely by the admin-only destaque flag.
+export const getAnunciantesDestaque: RequestHandler = async (_req, res) => {
+  try {
+    const anunciantes = await prisma.anunciantes.findMany({
+      where: { destaque: true, status: "Ativo", dataExclusao: null },
+      select: {
+        id: true,
+        nome: true,
+        tipo: true,
+        descricao: true,
+        telefone: true,
+        endereco: true,
+        cidade: true,
+        estado: true,
+        site: true,
+        instagram: true,
+        facebook: true,
+        whatsapp: true,
+        fotoUrl: true,
+        iconColor: true,
+        status: true,
+        localidadeId: true,
+        categoriaPrincipalId: true,
+        ordemDestaque: true,
+      },
+      orderBy: [{ ordemDestaque: "asc" }, { dataCriacao: "desc" }],
+      take: 50,
+    });
+
+    res.json({ success: true, data: anunciantes });
+  } catch (error) {
+    console.error("Error fetching anunciantes em destaque:", error);
+    res.status(500).json({
+      success: false,
+      error: "Erro ao buscar anunciantes em destaque",
     });
   }
 };
@@ -492,6 +535,8 @@ const AnuncianteUpdateSchema = z.object({
   tipoCobranca: z.enum(["Propria", "Vitrii"]).optional(),
   maxAnunciosDestaque: z.number().int().min(0).max(999).optional(),
   maxAnunciosComuns: z.number().int().min(0).max(999).optional(),
+  destaque: z.boolean().optional(),
+  ordemDestaque: z.number().int().min(1).max(999).optional(),
 });
 
 // UPDATE anunciante (only safe fields allowed)
@@ -625,6 +670,14 @@ export const updateAnunciante: RequestHandler = async (req, res) => {
     }
     if ("maxAnunciosComuns" in cleanedData && !isAdmin) {
       delete cleanedData.maxAnunciosComuns;
+    }
+
+    // Restrict featured-carousel fields - only admin can change them
+    if ("destaque" in cleanedData && !isAdmin) {
+      delete cleanedData.destaque;
+    }
+    if ("ordemDestaque" in cleanedData && !isAdmin) {
+      delete cleanedData.ordemDestaque;
     }
 
     const updatedAnunciante = await prisma.anunciantes.update({

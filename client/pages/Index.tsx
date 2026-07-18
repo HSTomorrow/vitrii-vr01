@@ -167,11 +167,11 @@ export default function Index() {
     gcTime: 5 * 60 * 1000, // 5 minutes
   });
 
-  // Fetch all anunciantes
+  // Fetch anunciantes em destaque (admin-curated, ordered by ordemDestaque) for the homepage carousel
   const { data: anunciantesData, isLoading: anunciantesLoading } = useQuery({
-    queryKey: ["anunciantes-all"],
+    queryKey: ["anunciantes-destaque"],
     queryFn: async () => {
-      const response = await fetch("/api/anunciantes?limit=50&offset=0");
+      const response = await fetch("/api/anunciantes/destaque");
       if (!response.ok) throw new Error("Erro ao buscar anunciantes");
       return response.json();
     },
