@@ -160,7 +160,7 @@ export async function sendPasswordResetEmail(
             <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
             
             <p style="color: #999; font-size: 12px; text-align: center; margin: 0;">
-              © 2025 Vitrii. Todos os direitos reservados.
+              © 2026 Vitrii. Todos os direitos reservados.
             </p>
           </div>
         </div>
@@ -178,7 +178,7 @@ export async function sendPasswordResetEmail(
         
         Se você não solicitou uma redefinição de senha, pode ignorar este email.
         
-        © 2025 Vitrii
+        © 2026 Vitrii
       `,
     };
 
@@ -271,7 +271,7 @@ export async function sendEmailVerificationEmail(
             <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
 
             <p style="color: #999; font-size: 12px; text-align: center; margin: 0;">
-              © 2025 Vitrii. Todos os direitos reservados.
+              © 2026 Vitrii. Todos os direitos reservados.
             </p>
           </div>
         </div>
@@ -289,7 +289,7 @@ export async function sendEmailVerificationEmail(
 
         Se você não criou uma conta, pode ignorar este email.
 
-        © 2025 Vitrii
+        © 2026 Vitrii
       `,
     };
 
@@ -389,7 +389,7 @@ export async function sendQRCodeExpiredEmail(
             <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
 
             <p style="color: #999; font-size: 12px; text-align: center; margin: 0;">
-              © 2025 Vitrii. Todos os direitos reservados.
+              © 2026 Vitrii. Todos os direitos reservados.
             </p>
           </div>
         </div>
@@ -405,7 +405,7 @@ export async function sendQRCodeExpiredEmail(
 
         Para renovar ou criar novo anúncio, acesse sua conta na plataforma.
 
-        © 2025 Vitrii
+        © 2026 Vitrii
       `,
     };
 
@@ -541,7 +541,7 @@ export async function sendWelcomeEmail(
             <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
 
             <p style="color: #999; font-size: 12px; text-align: center; margin: 0;">
-              © 2025 Vitrii. Todos os direitos reservados.
+              © 2026 Vitrii. Todos os direitos reservados.
             </p>
           </div>
         </div>
@@ -557,7 +557,7 @@ export async function sendWelcomeEmail(
 
         Se tiver dúvidas, entre em contato conosco.
 
-        © 2025 Vitrii
+        © 2026 Vitrii
       `,
     };
 

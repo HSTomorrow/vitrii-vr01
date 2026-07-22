@@ -32,10 +32,11 @@ model anunciantes {
   temAgenda                   Boolean                       @default(false) // Se sim, mostra o botão de agenda nos anuncios
   localidadeId                Int? // Default locality for filtering ads
   categoriaPrincipalId        Int? // Required on the cadastro form; fallback category for anuncios that don't have one directly or via grupo
-  maxAnunciosDestaque         Int                           @default(3) // Max featured (destaque) ads this anunciante can have active; admin-only
-  maxAnunciosComuns           Int                           @default(20) // Max non-featured ads this anunciante can have active; admin-only
   destaque                    Boolean                       @default(false) // Shows this anunciante in the homepage "Anunciantes em Destaque" carousel; admin-only
   ordemDestaque               Int                           @default(999) // Display order within the featured carousel (1 = first); admin-only
+  isSuporte                   Boolean                       @default(false) // Marks the reserved anunciante used as the "other side" of support chat conversas
+  ocultarEndereco             Boolean                       @default(true) // Hides the street address on this anunciante's ads and profile page (owner-editable)
+  ocultarCnpj                 Boolean                       @default(true) // Hides the CPF/CNPJ on this anunciante's ads and profile page (owner-editable)
   dataCriacao                 DateTime                      @default(now())
   dataAtualizacao             DateTime
   criadoPor                   Int?
@@ -92,6 +93,7 @@ model anuncios {
   anuncianteId             Int
   titulo                   String                      @db.VarChar(255)
   descricao                String?
+  condicao                 String                      @default("Novo") @db.VarChar(20) // "Novo" | "Semi Novo" | "Usado"
   preco                    Decimal?                    @db.Decimal(10, 2)
   categoria                String?                     @db.VarChar(100)
   categoriaId              Int?
@@ -307,7 +309,8 @@ model usracessos {
   dataVigenciaContrato         DateTime                    @default(now())
   numeroAnunciosAtivos         Int                         @default(0)
   numeroAnunciosAtivosDestaque Int                         @default(0)
-  maxAnunciosAtivos            Int                         @default(10)
+  maxAnunciosAtivos            Int                         @default(10) // Total ad-slot limit (destaque + comum combined); admin-only
+  maxAnunciosDestaque          Int                         @default(3) // Featured (destaque) ad-slot limit, counts toward maxAnunciosAtivos too; admin-only
   maxAnunciantes               Int                         @default(1) // Max anunciantes this user can register; admin-only, capped at 999
   localidadePadraoId           Int? // Default locality for filtering ads
   usuarios_anunciantes         usuarios_anunciantes[]
@@ -414,6 +417,7 @@ model banners {
   ordem           Int      @default(0)
   ativo           Boolean  @default(true)
   corFonte        String   @default("amarelo") @db.VarChar(20) // "branco", "preto", "amarelo"
+  mostrarTitulo   Boolean  @default(true)
   dataCriacao     DateTime @default(now())
   dataAtualizacao DateTime @updatedAt
 
@@ -902,7 +906,7 @@ model pagamentos {
   dataPagamento DateTime?
 
   // Comprovante
-  comprovantePagamento String?   @db.VarChar(500) // URL do comprovante (storage)
+  comprovantePagamento String?   @db.Text // URL/base64 do comprovante (storage)
   dataComprovante      DateTime?
 
   // Controle

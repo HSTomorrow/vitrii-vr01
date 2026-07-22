@@ -18,6 +18,8 @@ import {
   X,
 } from "lucide-react";
 
+const MAX_BANNERS = 10;
+
 interface Banner {
   id: number;
   titulo: string;
@@ -27,6 +29,7 @@ interface Banner {
   ordem: number;
   ativo: boolean;
   corFonte?: string;
+  mostrarTitulo?: boolean;
   dataCriacao: string;
 }
 
@@ -44,6 +47,7 @@ export default function AdminBanners() {
     link: "",
     ativo: true,
     corFonte: "amarelo",
+    mostrarTitulo: true,
   });
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string>("");
@@ -404,6 +408,7 @@ export default function AdminBanners() {
       link: "",
       ativo: true,
       corFonte: "amarelo",
+      mostrarTitulo: true,
     });
     setUploadedFile(null);
     setPreviewUrl("");
@@ -420,6 +425,7 @@ export default function AdminBanners() {
       link: banner.link || "",
       ativo: banner.ativo,
       corFonte: banner.corFonte || "amarelo",
+      mostrarTitulo: banner.mostrarTitulo !== false,
     });
     setEditingId(banner.id);
     setIsCreating(false);
@@ -428,6 +434,20 @@ export default function AdminBanners() {
   };
 
   const handleSubmit = () => {
+    if (formData.ativo) {
+      const activeCount = banners.filter(
+        (b: Banner) => b.ativo && b.id !== editingId,
+      ).length;
+      if (activeCount >= MAX_BANNERS) {
+        console.warn("[handleSubmit] Limite de banners ativos atingido:", activeCount);
+        toast.error("❌ Limite de banners ativos atingido", {
+          description: `Máximo de ${MAX_BANNERS} banners ativos. Desative ou delete um banner existente, ou salve este como inativo.`,
+          duration: 4000,
+        });
+        return;
+      }
+    }
+
     // Validate required fields
     const missing = [];
     if (!formData.titulo) missing.push("título");
@@ -683,6 +703,25 @@ export default function AdminBanners() {
                   </label>
                 </div>
 
+                <div>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={formData.mostrarTitulo}
+                      onChange={(e) =>
+                        setFormData({ ...formData, mostrarTitulo: e.target.checked })
+                      }
+                      className="w-4 h-4"
+                    />
+                    <span className="text-sm font-semibold text-vitrii-text">
+                      Exibir título e descrição sobre o banner
+                    </span>
+                  </label>
+                  <p className="text-xs text-vitrii-text-secondary mt-1">
+                    Desmarque para mostrar o banner sem título (apenas a imagem e o botão)
+                  </p>
+                </div>
+
                 {/* Missing Fields Alert */}
                 {(!formData.titulo || !formData.imagemUrl || !formData.link) && (
                   <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
@@ -702,10 +741,7 @@ export default function AdminBanners() {
                     onClick={handleSubmit}
                     disabled={
                       createBannerMutation.isPending ||
-                      updateBannerMutation.isPending ||
-                      !formData.titulo ||
-                      !formData.imagemUrl ||
-                      !formData.link
+                      updateBannerMutation.isPending
                     }
                     className="flex-1 px-4 py-3 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
@@ -837,7 +873,7 @@ export default function AdminBanners() {
                 💡 Dica
               </p>
               <ul className="text-sm text-vitrii-text-secondary space-y-1">
-                <li>• Máximo de 5 banners ativos</li>
+                <li>• Máximo de {MAX_BANNERS} banners ativos</li>
                 <li>• Use imagens em proporção 4:1 (1200x300px recomendado)</li>
                 <li>• Banners inativos não aparecem na página principal</li>
                 <li>• A ordem define a sequência de exibição no carousel</li>

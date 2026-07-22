@@ -12,7 +12,9 @@ import {
   updateAnuncioStatus,
   overrideAnuncioStatus,
   deleteAnuncio,
+  bulkDeleteAnuncios,
   inactivateAnuncio,
+  bulkInactivateAnuncios,
   activateAnuncio,
   getProdutosParaAnuncio,
   canEditAnuncio,
@@ -202,6 +204,10 @@ import {
   getUnreadMessagesCount,
 } from "./routes/mensagens";
 import {
+  getOrStartSuporteConversa,
+  getSuporteConversasAdmin,
+} from "./routes/suporte";
+import {
   getFuncionalidades,
   getFuncionalidadeById,
   getFuncionalidadesByUsuario,
@@ -219,6 +225,7 @@ import {
   revokeAllFuncionalidades,
 } from "./routes/usuario-funcionalidades";
 import { uploadMiddleware, handleUpload } from "./routes/upload";
+import { suggestLocalidade } from "./routes/geolocation";
 import {
   getLocalidades,
   getLocalidadeById,
@@ -230,6 +237,7 @@ import {
   removeAnuncianteFromLocalidade,
 } from "./routes/localidades";
 import { extractUserId, requireAdmin, optionalAuth } from "./middleware/permissionGuard";
+import { authRateLimiter } from "./middleware/rateLimit";
 import {
   getBanners,
   getBannerById,
@@ -312,10 +320,18 @@ export function createServer() {
     .split(",")
     .map((o) => o.trim())
     .filter(Boolean);
+  const isProduction = process.env.NODE_ENV === "production";
+  if (isProduction && allowedOrigins.length === 0) {
+    // Fail closed, not open: previously this fell through to cors(undefined), which
+    // permits ANY origin. Missing config should block cross-origin requests, not widen them.
+    console.error(
+      "[CORS] ⚠️ ALLOWED_ORIGINS/APP_URL not set in production — blocking all cross-origin requests. Set ALLOWED_ORIGINS to restore access.",
+    );
+  }
   app.use(
     cors(
-      process.env.NODE_ENV === "production" && allowedOrigins.length > 0
-        ? { origin: allowedOrigins }
+      isProduction
+        ? { origin: allowedOrigins.length > 0 ? allowedOrigins : false }
         : undefined,
     ),
   );
@@ -455,16 +471,16 @@ export function createServer() {
   app.get("/api/usracessos", extractUserId, requireAdmin, getUsuarios);
   app.get("/api/usracessos/:id", extractUserId, getUsuarioById);
   app.get("/api/usracessos/:id/validate-status", validateUserStatus);
-  app.get("/api/auth/check-status-by-email", checkUserStatusByEmail);
+  app.get("/api/auth/check-status-by-email", authRateLimiter, checkUserStatusByEmail);
   app.patch("/api/usracessos/:id/status", extractUserId, requireAdmin, toggleUserStatus);
   app.patch("/api/usracessos/:id/unlock", extractUserId, requireAdmin, unlockUserAccount);
-  app.post("/api/auth/signin", signInUsuario);
-  app.post("/api/auth/signup", signUpUsuario);
-  app.post("/api/auth/forgot-password", forgotPassword);
-  app.post("/api/auth/reset-password", resetPassword);
+  app.post("/api/auth/signin", authRateLimiter, signInUsuario);
+  app.post("/api/auth/signup", authRateLimiter, signUpUsuario);
+  app.post("/api/auth/forgot-password", authRateLimiter, forgotPassword);
+  app.post("/api/auth/reset-password", authRateLimiter, resetPassword);
   app.get("/api/auth/validate-reset-token", validateResetToken);
   app.get("/api/auth/verify-email", verifyEmail);
-  app.post("/api/auth/resend-verification-email", resendVerificationEmail);
+  app.post("/api/auth/resend-verification-email", authRateLimiter, resendVerificationEmail);
   app.post("/api/admin/recalculate-ad-counters", extractUserId, recalculateAdCountersAdmin);
 
   // DEBUG endpoint - Check email verification tokens and user status
@@ -1088,11 +1104,15 @@ export function createServer() {
     requireAdmin,
     updateAnuncioOrdem,
   );
-  app.patch("/api/anuncios/:id/inactivate", inactivateAnuncio);
-  app.patch("/api/anuncios/:id/activate", activateAnuncio);
-  app.delete("/api/anuncios/:id", deleteAnuncio);
+  app.patch("/api/anuncios/:id/inactivate", extractUserId, inactivateAnuncio);
+  app.patch("/api/anuncios/:id/activate", extractUserId, activateAnuncio);
+  app.delete("/api/anuncios/:id", extractUserId, deleteAnuncio);
   app.get("/api/anuncios/:id/can-edit", optionalAuth, canEditAnuncio);
   app.post("/api/anuncios/:id/view", optionalAuth, recordAnuncioView);
+  // Distinct "anuncios-bulk" prefix (rather than nesting under /api/anuncios) so these
+  // never collide with the ":id" routes above regardless of registration order.
+  app.patch("/api/anuncios-bulk/inactivate", extractUserId, bulkInactivateAnuncios);
+  app.post("/api/anuncios-bulk/delete", extractUserId, bulkDeleteAnuncios);
 
   // Anúncio Photos routes
   app.get("/api/anuncios/:id/fotos", getAnuncioFotos);
@@ -1283,6 +1303,16 @@ export function createServer() {
   app.delete("/api/mensagens/:id", deleteMensagem);
   app.get("/api/mensagens/unread-count", extractUserId, getUnreadMessagesCount);
 
+  // Suporte (Support Chat) routes - reuses the conversas/mensagens system above,
+  // with a reserved "Suporte" anunciante as the other side of the conversation.
+  app.get("/api/suporte/conversa", extractUserId, getOrStartSuporteConversa);
+  app.get(
+    "/api/suporte/admin/conversas",
+    extractUserId,
+    requireAdmin,
+    getSuporteConversasAdmin,
+  );
+
   // Dashboard endpoints - Get stats for user dashboard
   app.get("/api/reservas-evento/pending-count", extractUserId, getPendingAppointmentsCount);
   app.get("/api/filas-espera/user-count", extractUserId, getWaitingListCount);
@@ -1347,6 +1377,9 @@ export function createServer() {
   app.put("/api/banners/:id", extractUserId, requireAdmin, updateBanner);
   app.delete("/api/banners/:id", extractUserId, requireAdmin, deleteBanner);
   app.post("/api/banners/reorder", extractUserId, requireAdmin, reorderBanners);
+
+  // Best-effort IP -> localidade suggestion for the anonymous-visitor onboarding modal.
+  app.get("/api/geolocation/suggest-localidade", suggestLocalidade);
 
   // Localidades routes (admin only)
   app.get("/api/localidades", getLocalidades);

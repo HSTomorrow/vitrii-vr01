@@ -48,6 +48,7 @@ import AdminFinanceiro from "./pages/AdminFinanceiro";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminManageAds from "./pages/AdminManageAds";
 import AdminManageUsers from "./pages/AdminManageUsers";
+import AdminSuporte from "./pages/AdminSuporte";
 import AdminBanners from "./pages/AdminBanners";
 import AdminAnunciantes from "./pages/AdminAnunciantes";
 import AdminPagamentos from "./pages/AdminPagamentos";
@@ -70,6 +71,7 @@ import VerifyEmail from "./pages/VerifyEmail";
 import TestEmail from "./pages/TestEmail";
 import BottomNavBar from "@/components/BottomNavBar";
 import PageTransition from "@/components/PageTransition";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -167,7 +169,7 @@ function AppContent() {
           <Route path="/verificar-email" element={<VerifyEmail />} />
           <Route path="/test-email" element={<TestEmail />} />
           <Route path="/debug/anunciantes" element={<DebugAnunciantes />} />
-          <Route path="/lista-desejos" element={<ListaDesejos />} />
+          <Route path="/lista-desejos" element={<ProtectedRoute><ListaDesejos /></ProtectedRoute>} />
           <Route path="/anunciantes-favoritos" element={<AnunciantesFavoritos />} />
           <Route path="/catalogo" element={<Catalogo />} />
           <Route path="/catalogo/:anuncianteId" element={<Catalogo />} />
@@ -175,13 +177,13 @@ function AppContent() {
               for the physical-store kiosk keep working after the rename to Catálogo. */}
           <Route path="/totem" element={<Navigate to="/catalogo" replace />} />
           <Route path="/totem/:anuncianteId" element={<RedirectToCatalogo />} />
-          <Route path="/meus-anuncios" element={<MeusAnuncios />} />
-          <Route path="/minha-agenda" element={<MinhaAgenda />} />
+          <Route path="/meus-anuncios" element={<ProtectedRoute><MeusAnuncios /></ProtectedRoute>} />
+          <Route path="/minha-agenda" element={<ProtectedRoute><MinhaAgenda /></ProtectedRoute>} />
           <Route path="/agenda/:anuncianteId" element={<AgendaAnunciante />} />
           <Route path="/agenda/anunciante/:anuncianteId" element={<AgendaAnunciante />} />
-          <Route path="/perfil" element={<PerfilUsuario />} />
-          <Route path="/perfil/:id" element={<PerfilUsuario />} />
-          <Route path="/profile" element={<PerfilUsuario />} />
+          <Route path="/perfil" element={<ProtectedRoute><PerfilUsuario /></ProtectedRoute>} />
+          <Route path="/perfil/:id" element={<ProtectedRoute><PerfilUsuario /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><PerfilUsuario /></ProtectedRoute>} />
           <Route path="/anuncio/criar" element={<CriarAnuncio />} />
           <Route path="/anuncio/:id" element={<AnuncioDetalhe />} />
           <Route path="/anuncio/:id/editar" element={<EditarAnuncio />} />
@@ -206,16 +208,17 @@ function AppContent() {
           <Route path="/chat" element={<Chat />} />
           <Route path="/financeiro" element={<Financeiro />} />
           <Route path="/recibo/:token" element={<Recibo />} />
-          <Route path="/admin/financeiro" element={<AdminFinanceiro />} />
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          <Route path="/admin/anuncios" element={<AdminManageAds />} />
-          <Route path="/admin/usuarios" element={<AdminManageUsers />} />
-          <Route path="/admin/banners" element={<AdminBanners />} />
-          <Route path="/admin/anunciantes" element={<AdminAnunciantes />} />
-          <Route path="/admin/pagamentos" element={<AdminPagamentos />} />
-          <Route path="/admin/localidades" element={<AdminLocalidades />} />
-          <Route path="/admin/categorias-lancamento" element={<AdminCategoriasLancamento />} />
-          <Route path="/admin/categorias" element={<AdminCategorias />} />
+          <Route path="/admin/financeiro" element={<ProtectedRoute adminOnly><AdminFinanceiro /></ProtectedRoute>} />
+          <Route path="/admin/dashboard" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
+          <Route path="/admin/anuncios" element={<ProtectedRoute adminOnly><AdminManageAds /></ProtectedRoute>} />
+          <Route path="/admin/usuarios" element={<ProtectedRoute adminOnly><AdminManageUsers /></ProtectedRoute>} />
+          <Route path="/admin/suporte" element={<ProtectedRoute adminOnly><AdminSuporte /></ProtectedRoute>} />
+          <Route path="/admin/banners" element={<ProtectedRoute adminOnly><AdminBanners /></ProtectedRoute>} />
+          <Route path="/admin/anunciantes" element={<ProtectedRoute adminOnly><AdminAnunciantes /></ProtectedRoute>} />
+          <Route path="/admin/pagamentos" element={<ProtectedRoute adminOnly><AdminPagamentos /></ProtectedRoute>} />
+          <Route path="/admin/localidades" element={<ProtectedRoute adminOnly><AdminLocalidades /></ProtectedRoute>} />
+          <Route path="/admin/categorias-lancamento" element={<ProtectedRoute adminOnly><AdminCategoriasLancamento /></ProtectedRoute>} />
+          <Route path="/admin/categorias" element={<ProtectedRoute adminOnly><AdminCategorias /></ProtectedRoute>} />
           <Route path="/cadastro-lojas" element={<CadastroLojas />} />
           <Route
             path="/cadastro-grupos-productos"

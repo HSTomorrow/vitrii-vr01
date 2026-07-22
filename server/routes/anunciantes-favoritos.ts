@@ -5,23 +5,41 @@ export const listarAnunciantesFavoritos: RequestHandler = async (req, res) => {
   try {
     const favoritos = await prisma.anunciantes_favoritos.findMany({
       where: { usuarioId: req.userId! },
-      include: {
-        anunciante: {
-          select: {
-            id: true,
-            nome: true,
-            descricao: true,
-            fotoUrl: true,
-            tipo: true,
-            cidade: true,
-            estado: true,
-          },
-        },
-      },
       orderBy: { dataCriacao: "desc" },
     });
 
-    res.json({ success: true, data: favoritos.map((f) => f.anunciante) });
+    const anunciantes = await prisma.anunciantes.findMany({
+      where: { id: { in: favoritos.map((f) => f.anuncianteId) } },
+      select: {
+        id: true,
+        nome: true,
+        descricao: true,
+        fotoUrl: true,
+        tipo: true,
+        cidade: true,
+        estado: true,
+      },
+    });
+    const anuncianteById = new Map(anunciantes.map((a) => [a.id, a]));
+
+    // A favorito can outlive its anunciante if the anunciante row was ever hard-deleted
+    // without the FK cascade running - querying with `include` would 500 the whole list
+    // in that case (Prisma treats the relation as required). Drop the orphan here and
+    // clean it up so it stops showing up on future requests for this user.
+    const orphanIds = favoritos
+      .filter((f) => !anuncianteById.has(f.anuncianteId))
+      .map((f) => f.id);
+    if (orphanIds.length > 0) {
+      await prisma.anunciantes_favoritos.deleteMany({
+        where: { id: { in: orphanIds } },
+      });
+    }
+
+    const data = favoritos
+      .map((f) => anuncianteById.get(f.anuncianteId))
+      .filter((a): a is NonNullable<typeof a> => !!a);
+
+    res.json({ success: true, data });
   } catch (error) {
     console.error("[listarAnunciantesFavoritos]", error);
     res.status(500).json({ error: "Erro ao buscar anunciantes favoritos" });

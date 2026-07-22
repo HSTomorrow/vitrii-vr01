@@ -2,6 +2,8 @@ import { RequestHandler } from "express";
 import prisma from "../lib/prisma";
 import { z } from "zod";
 
+const MAX_BANNERS = 10;
+
 const BannerSchema = z.object({
   titulo: z
     .string()
@@ -20,6 +22,7 @@ const BannerSchema = z.object({
   ordem: z.number().int().nonnegative().default(0),
   ativo: z.boolean().default(true),
   corFonte: z.enum(["amarelo", "branco", "preto"]).default("amarelo").optional(),
+  mostrarTitulo: z.boolean().default(true).optional(),
 });
 
 const BannerUpdateSchema = z.object({
@@ -55,6 +58,7 @@ const BannerUpdateSchema = z.object({
   ordem: z.number().int().nonnegative().optional(),
   ativo: z.boolean().optional(),
   corFonte: z.enum(["amarelo", "branco", "preto"]).optional(),
+  mostrarTitulo: z.boolean().optional(),
 }).strict();
 
 // GET all banners
@@ -73,6 +77,10 @@ export const getBanners: RequestHandler = async (req, res) => {
       where,
       orderBy: { ordem: "asc" },
     });
+
+    // An edit in /admin/banners must show up immediately on refetch - no caching layer
+    // (browser or intermediary) should ever serve a pre-edit list here.
+    res.set("Cache-Control", "no-store, no-cache, must-revalidate");
 
     console.log("[getBanners] ✓ Recuperados", banners.length, "banners", {
       filtro: ativo ? `ativo=${ativo}` : "nenhum",
@@ -111,6 +119,7 @@ export const getBannerById: RequestHandler = async (req, res) => {
       });
     }
 
+    res.set("Cache-Control", "no-store, no-cache, must-revalidate");
     res.json({
       success: true,
       data: banner,
@@ -135,6 +144,18 @@ export const createBanner: RequestHandler = async (req, res) => {
 
     const validatedData = BannerSchema.parse(req.body);
     console.log("[createBanner] ✓ Validação bem-sucedida");
+
+    if (validatedData.ativo) {
+      const activeCount = await prisma.banners.count({ where: { ativo: true } });
+      if (activeCount >= MAX_BANNERS) {
+        console.warn("[createBanner] ❌ Limite de banners ativos atingido:", activeCount);
+        return res.status(400).json({
+          success: false,
+          error: "Limite de banners ativos atingido",
+          details: `Máximo de ${MAX_BANNERS} banners ativos. Desative ou delete um banner existente, ou salve este como inativo.`,
+        });
+      }
+    }
 
     // Get the maximum order and add 1
     const maxBanner = await prisma.banners.findFirst({
@@ -207,6 +228,24 @@ export const updateBanner: RequestHandler = async (req, res) => {
     });
 
     const validatedData = BannerUpdateSchema.parse(req.body);
+
+    if (validatedData.ativo) {
+      const existing = await prisma.banners.findUnique({
+        where: { id: parseInt(id) },
+        select: { ativo: true },
+      });
+      if (existing && !existing.ativo) {
+        const activeCount = await prisma.banners.count({ where: { ativo: true } });
+        if (activeCount >= MAX_BANNERS) {
+          console.warn("[updateBanner] ❌ Limite de banners ativos atingido:", activeCount);
+          return res.status(400).json({
+            success: false,
+            error: "Limite de banners ativos atingido",
+            details: `Máximo de ${MAX_BANNERS} banners ativos. Desative ou delete um banner existente antes de ativar este.`,
+          });
+        }
+      }
+    }
 
     const banner = await prisma.banners.update({
       where: { id: parseInt(id) },

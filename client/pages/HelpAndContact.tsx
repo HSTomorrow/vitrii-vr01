@@ -1,12 +1,16 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useAuth } from "@/contexts/AuthContext";
+import { startChatWithSuporte } from "@/utils/startChatWithSuporte";
 import {
   ChevronDown,
   Mail,
   Phone,
   MessageCircle,
+  MessagesSquare,
   Clock,
   HelpCircle,
   MapPin,
@@ -181,6 +185,23 @@ function FAQAccordion() {
 }
 
 export default function HelpAndContact() {
+  const navigate = useNavigate();
+  const { isLoggedIn } = useAuth();
+
+  const handleChatComSuporte = async () => {
+    if (!isLoggedIn) {
+      navigate(
+        `/auth/signin?reason=unauthenticated&redirect=${encodeURIComponent("/ajuda-e-contato")}`,
+      );
+      return;
+    }
+    try {
+      await startChatWithSuporte(navigate);
+    } catch {
+      toast.error("Erro ao iniciar chat com suporte. Tente novamente.");
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Header />
@@ -274,6 +295,20 @@ export default function HelpAndContact() {
                       </a>
                       <p className="text-xs text-vitrii-text-secondary text-center">
                         Resposta imediata quando disponível
+                      </p>
+                    </div>
+
+                    {/* Chat de Suporte (para quem não usa WhatsApp) */}
+                    <div className="space-y-2 pt-4 border-t border-gray-200">
+                      <button
+                        onClick={handleChatComSuporte}
+                        className="flex items-center gap-2 w-full px-4 py-3 bg-vitrii-blue text-white rounded-lg font-semibold hover:bg-vitrii-blue-dark transition-colors"
+                      >
+                        <MessagesSquare className="w-5 h-5" />
+                        Chat com Suporte
+                      </button>
+                      <p className="text-xs text-vitrii-text-secondary text-center">
+                        Fale conosco direto pelo app
                       </p>
                     </div>
                   </div>
