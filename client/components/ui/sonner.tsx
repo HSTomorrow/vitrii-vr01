@@ -10,6 +10,10 @@ const Toaster = ({ ...props }: ToasterProps) => {
     <Sonner
       theme={theme as ToasterProps["theme"]}
       className="toaster group"
+      // "bottom-right" (sonner's default) renders underneath the fixed, z-50
+      // BottomNavBar shown on mobile (client/components/BottomNavBar.tsx) — toasts were
+      // firing correctly but invisible on phones. Top-center never conflicts with it.
+      position="top-center"
       toastOptions={{
         classNames: {
           toast:

@@ -70,26 +70,26 @@ export default function AdminBanners() {
 
   // Create banner mutation
   const createBannerMutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (payload: typeof formData) => {
       console.log("[createBannerMutation] Iniciando criação de banner");
 
-      if (!formData.titulo || !formData.imagemUrl || !formData.link) {
+      if (!payload.titulo || !payload.imagemUrl || !payload.link) {
         const missing = [];
-        if (!formData.titulo) missing.push("título");
-        if (!formData.imagemUrl) missing.push("imagem");
-        if (!formData.link) missing.push("link");
+        if (!payload.titulo) missing.push("título");
+        if (!payload.imagemUrl) missing.push("imagem");
+        if (!payload.link) missing.push("link");
         const err = `Preencha os campos obrigatórios: ${missing.join(", ")}`;
         console.warn("[createBannerMutation]", err);
         throw new Error(err);
       }
 
       console.log("[createBannerMutation] Enviando dados:", {
-        titulo: formData.titulo,
-        descricao: formData.descricao,
-        ativo: formData.ativo,
-        corFonte: formData.corFonte,
-        link: formData.link,
-        imagemUrl: formData.imagemUrl?.substring(0, 50) + "...",
+        titulo: payload.titulo,
+        descricao: payload.descricao,
+        ativo: payload.ativo,
+        corFonte: payload.corFonte,
+        link: payload.link,
+        imagemUrl: payload.imagemUrl?.substring(0, 50) + "...",
       });
 
       const response = await fetch("/api/banners", {
@@ -98,7 +98,7 @@ export default function AdminBanners() {
           "Content-Type": "application/json",
           "x-user-id": user?.id ? String(user.id) : "",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       console.log("[createBannerMutation] Status da resposta:", response.status);
@@ -150,7 +150,7 @@ export default function AdminBanners() {
 
   // Update banner mutation
   const updateBannerMutation = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (payload: typeof formData) => {
       console.log("[updateBannerMutation] Iniciando atualização de banner ID:", editingId);
 
       if (!editingId) {
@@ -161,12 +161,12 @@ export default function AdminBanners() {
 
       console.log("[updateBannerMutation] Enviando dados:", {
         id: editingId,
-        titulo: formData.titulo,
-        descricao: formData.descricao,
-        ativo: formData.ativo,
-        corFonte: formData.corFonte,
-        link: formData.link,
-        imagemUrl: formData.imagemUrl?.substring(0, 50) + "...",
+        titulo: payload.titulo,
+        descricao: payload.descricao,
+        ativo: payload.ativo,
+        corFonte: payload.corFonte,
+        link: payload.link,
+        imagemUrl: payload.imagemUrl?.substring(0, 50) + "...",
       });
 
       const response = await fetch(`/api/banners/${editingId}`, {
@@ -175,7 +175,7 @@ export default function AdminBanners() {
           "Content-Type": "application/json",
           "x-user-id": user?.id ? String(user.id) : "",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(payload),
       });
 
       console.log("[updateBannerMutation] Status da resposta:", response.status);
@@ -463,22 +463,33 @@ export default function AdminBanners() {
       return;
     }
 
-    // Validate link is a URL if provided
-    if (formData.link && !formData.link.startsWith("http")) {
+    // Users routinely paste links without a protocol (e.g. "www.site.com"), which both
+    // startsWith("http") and the server's z.string().url() would reject outright with no
+    // clear feedback - normalize instead of just rejecting.
+    const trimmedLink = formData.link.trim();
+    const normalizedLink = /^https?:\/\//i.test(trimmedLink)
+      ? trimmedLink
+      : `https://${trimmedLink}`;
+    try {
+      new URL(normalizedLink);
+    } catch {
       console.warn("[handleSubmit] Link inválido:", formData.link);
       toast.error("❌ Link inválido", {
-        description: "O link deve começar com http:// ou https://",
+        description: `"${formData.link}" não é uma URL válida.`,
         duration: 4000,
       });
       return;
     }
 
+    const payload = { ...formData, link: normalizedLink };
+    setFormData(payload);
+
     if (editingId) {
-      console.log("[handleSubmit] Atualizando banner:", { id: editingId, ...formData });
-      updateBannerMutation.mutate();
+      console.log("[handleSubmit] Atualizando banner:", { id: editingId, ...payload });
+      updateBannerMutation.mutate(payload);
     } else {
-      console.log("[handleSubmit] Criando novo banner:", formData);
-      createBannerMutation.mutate();
+      console.log("[handleSubmit] Criando novo banner:", payload);
+      createBannerMutation.mutate(payload);
     }
   };
 
