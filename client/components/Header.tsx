@@ -150,8 +150,6 @@ export default function Header() {
                     </div>
                   )}
 
-                  <LocalidadeButton />
-
                   <UserButton />
                 </>
               ) : (
@@ -172,6 +170,8 @@ export default function Header() {
                   </Link>
                 </>
               )}
+
+              <LocalidadeButton />
             </div>
           </div>
 
