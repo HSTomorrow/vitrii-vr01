@@ -44,6 +44,7 @@ const AnuncioBaseSchema = z.object({
     .min(5, "Título deve ter pelo menos 5 caracteres")
     .max(50, "Título não pode ter mais de 50 caracteres"),
   descricao: z.string().optional().nullable(),
+  condicao: z.enum(["Novo", "Seminovo", "Usado", "Serviço/Projeto"]).optional().default("Novo"),
   fotoUrl: z.string().optional().nullable(),
   precoAnuncio: z
     .number()
@@ -83,7 +84,7 @@ const AnuncioBaseSchema = z.object({
     .enum(["em_edicao", "aguardando_pagamento", "pago", "historico", "ativo", "cancelado"])
     .optional(),
   statusPagamento: z
-    .enum(["pendente", "aprovado", "recusado"])
+    .enum(["pendente", "aprovado", "recusado", "gratuito"])
     .optional(),
   categoria: z.string().max(100).optional().nullable(),
   categoriaId: z.number().int().positive().optional().nullable(),
@@ -208,6 +209,7 @@ export const getAnuncios: RequestHandler = async (req, res) => {
           anuncianteId: true,
           titulo: true,
           descricao: true,
+          condicao: true,
           preco: true,
           categoria: true,
           categoriaId: true,
@@ -263,6 +265,8 @@ export const getAnuncios: RequestHandler = async (req, res) => {
               iconColor: true,
               categoriaPrincipalId: true,
               categoriaPrincipal: { select: { descricao: true } },
+              ocultarEndereco: true,
+              ocultarCnpj: true,
             },
           },
         },
@@ -393,6 +397,8 @@ export const getAnuncioById: RequestHandler = async (req, res) => {
             fotoUrl: true,
             categoriaPrincipalId: true,
             categoriaPrincipal: { select: { descricao: true } },
+            ocultarEndereco: true,
+            ocultarCnpj: true,
           },
         },
         fotos: {
@@ -508,6 +514,11 @@ export const createAnuncio: RequestHandler = async (req, res) => {
     // Prevent creating an ad under someone else's account: the body's usuarioId must
     // match the authenticated caller (admins may act on behalf of any user).
     if (validatedData.usuarioId !== req.userId && req.userType !== "adm") {
+      console.warn("[createAnuncio] 403 usuarioId mismatch:", {
+        bodyUsuarioId: validatedData.usuarioId,
+        tokenUserId: req.userId,
+        tokenUserType: req.userType,
+      });
       return res.status(403).json({
         success: false,
         error: "Você não tem permissão para criar anúncios para este usuário",
@@ -520,6 +531,10 @@ export const createAnuncio: RequestHandler = async (req, res) => {
         where: { usuarioId: req.userId, anuncianteId: validatedData.anuncianteId },
       });
       if (!membership) {
+        console.warn("[createAnuncio] 403 no membership:", {
+          tokenUserId: req.userId,
+          anuncianteId: validatedData.anuncianteId,
+        });
         return res.status(403).json({
           success: false,
           error: "Você não tem permissão para publicar anúncios para este anunciante",
@@ -537,7 +552,9 @@ export const createAnuncio: RequestHandler = async (req, res) => {
       select: {
         dataVigenciaContrato: true,
         numeroAnunciosAtivos: true,
+        numeroAnunciosAtivosDestaque: true,
         maxAnunciosAtivos: true,
+        maxAnunciosDestaque: true,
         tipoUsuario: true,
       },
     });
@@ -549,17 +566,17 @@ export const createAnuncio: RequestHandler = async (req, res) => {
       });
     }
 
+    // Admins are exempt from contract validity and ad limits
+    const isAdmin = usuario.tipoUsuario === "adm";
+
     // Check if contract is still valid
     const today = new Date();
-    if (usuario.dataVigenciaContrato < today) {
+    if (!isAdmin && usuario.dataVigenciaContrato < today) {
       return res.status(403).json({
         success: false,
         error: "Contrato vencido. Entre em contato com o suporte.",
       });
     }
-
-    // Admins are exempt from ad limits
-    const isAdmin = usuario.tipoUsuario === "adm";
 
     // Only validate product if one is provided (product is optional)
     if (validatedData.productId && validatedData.productId > 0) {
@@ -613,11 +630,11 @@ export const createAnuncio: RequestHandler = async (req, res) => {
     const isDoacao = validatedData.isDoacao || false;
     const precoAnuncio = isDoacao ? 0 : validatedData.precoAnuncio;
 
-    // Get anunciante info: tier (Padrão or Profissional, used for dataFim duration) and
-    // its admin-editable ad-slot limits (maxAnunciosDestaque/maxAnunciosComuns, default 3/20).
+    // Get anunciante info: tier (Padrão or Profissional, used for dataFim duration only —
+    // ad-slot limits now live on the usuario, not the anunciante, see usuario query above).
     const anunciante = await prisma.anunciantes.findUnique({
       where: { id: validatedData.anuncianteId },
-      select: { tipo: true, maxAnunciosDestaque: true, maxAnunciosComuns: true },
+      select: { tipo: true },
     });
 
     if (!anunciante) {
@@ -627,32 +644,14 @@ export const createAnuncio: RequestHandler = async (req, res) => {
       });
     }
 
-    const maxFeaturedSlots = anunciante.maxAnunciosDestaque;
-    const maxNonFeaturedSlots = anunciante.maxAnunciosComuns;
+    console.log(`[createAnuncio] Usuario ${validatedData.usuarioId} has:`);
+    console.log(`  Featured: ${usuario.numeroAnunciosAtivosDestaque}/${usuario.maxAnunciosDestaque}`);
+    console.log(`  Total: ${usuario.numeroAnunciosAtivos}/${usuario.maxAnunciosAtivos}`);
 
-    // Count current active FEATURED ads for this anunciante
-    const anunciosDestaqueCount = await prisma.anuncios.count({
-      where: {
-        anuncianteId: validatedData.anuncianteId,
-        status: { in: ["ativo", "pago"] },
-        destaque: true,
-      },
-    });
-
-    // Count current active NON-FEATURED ads for this anunciante
-    const anunciosNaoDestaqueCount = await prisma.anuncios.count({
-      where: {
-        anuncianteId: validatedData.anuncianteId,
-        status: { in: ["ativo", "pago"] },
-        destaque: false,
-      },
-    });
-
-    console.log(`[createAnuncio] Anunciante ${validatedData.anuncianteId} (${anunciante.tipo}) has:`);
-    console.log(`  Featured: ${anunciosDestaqueCount}/${maxFeaturedSlots}`);
-    console.log(`  Non-Featured: ${anunciosNaoDestaqueCount}/${maxNonFeaturedSlots}`);
-
-    // Determine status and payment based on ad type and limits
+    // Determine status and payment based on ad type and the account's (not the anunciante's)
+    // free-slot limits: maxAnunciosDestaque caps featured ads specifically, maxAnunciosAtivos
+    // caps the account's ads overall (destaque + comum combined) — a featured ad must fit
+    // within both to auto-publish.
     let status: string;
     let statusPagamento: string;
     let destaque: boolean = validatedData.destaque || false; // Use user's destaque preference
@@ -662,29 +661,36 @@ export const createAnuncio: RequestHandler = async (req, res) => {
       status = "ativo";
       statusPagamento = "aprovado";
       destaque = true;
+    } else if (isAdmin) {
+      // Admins always publish directly, regardless of their configured limits.
+      console.log("[createAnuncio] Auto-publishing (admin, limits not enforced)");
+      status = "ativo";
+      statusPagamento = "aprovado";
+    } else if (anunciante.tipo === "Profissional") {
+      // Profissional anunciantes have no free tier at all - every ad requires payment,
+      // regardless of the account's destaque/total ad counters.
+      console.log("[createAnuncio] Payment required (Profissional anunciante has no free tier)");
+      status = "aguardando_pagamento";
+      statusPagamento = "pendente";
     } else if (destaque) {
-      // User wants this ad to be featured (destaque)
-      if (anunciosDestaqueCount < maxFeaturedSlots) {
-        // Still has free featured slots
-        console.log("[createAnuncio] Auto-publishing featured ad (free slots available)");
+      const cabeDestaque = usuario.numeroAnunciosAtivosDestaque < usuario.maxAnunciosDestaque;
+      const cabeTotal = usuario.numeroAnunciosAtivos < usuario.maxAnunciosAtivos;
+      if (cabeDestaque && cabeTotal) {
+        console.log("[createAnuncio] Auto-publishing featured ad as free (free slots available)");
         status = "ativo";
-        statusPagamento = "aprovado";
+        statusPagamento = "gratuito";
       } else {
-        // No more free featured slots, requires payment
         console.log("[createAnuncio] Payment required for featured ad (free slots exhausted)");
         status = "aguardando_pagamento";
         statusPagamento = "pendente";
       }
     } else {
-      // User wants this ad as non-featured
-      if (anunciosNaoDestaqueCount < maxNonFeaturedSlots) {
-        // Still has free non-featured slots
-        console.log("[createAnuncio] Auto-publishing non-featured ad (free slots available)");
+      if (usuario.numeroAnunciosAtivos < usuario.maxAnunciosAtivos) {
+        console.log("[createAnuncio] Auto-publishing ad as free (free slots available)");
         status = "ativo";
-        statusPagamento = "aprovado";
+        statusPagamento = "gratuito";
       } else {
-        // No more free non-featured slots, requires payment
-        console.log("[createAnuncio] Payment required for non-featured ad (free slots exhausted)");
+        console.log("[createAnuncio] Payment required for ad (free slots exhausted)");
         status = "aguardando_pagamento";
         statusPagamento = "pendente";
       }
@@ -708,6 +714,7 @@ export const createAnuncio: RequestHandler = async (req, res) => {
         anuncianteId: validatedData.anuncianteId,
         titulo: validatedData.titulo,
         descricao: validatedData.descricao || null,
+        condicao: validatedData.condicao || "Novo",
         imagem: validatedData.fotoUrl || null,
         link: validatedData.link || null,
         preco: precoTabelaAtual !== null ? precoTabelaAtual : precoAnuncio,
@@ -853,6 +860,8 @@ export const updateAnuncio: RequestHandler = async (req, res) => {
     if (updateData.titulo !== undefined) mappedData.titulo = updateData.titulo;
     if (updateData.descricao !== undefined)
       mappedData.descricao = updateData.descricao;
+    if (updateData.condicao !== undefined)
+      mappedData.condicao = updateData.condicao;
     if (updateData.fotoUrl !== undefined)
       mappedData.imagem = updateData.fotoUrl;
     if (updateData.link !== undefined) mappedData.link = updateData.link;
@@ -954,6 +963,17 @@ export const updateAnuncio: RequestHandler = async (req, res) => {
           mappedData.dataFim = calculatedDataFim;
         }
       }
+    }
+
+    // Ordem de Exibição is admin-only (matches createAnuncio's gating).
+    if (updateData.ordem !== undefined) {
+      if (!isAdmin) {
+        return res.status(403).json({
+          success: false,
+          error: "Apenas administradores podem alterar a Ordem de Exibição",
+        });
+      }
+      mappedData.ordem = updateData.ordem;
     }
 
     // Banner Inicial (homepage popup) is admin-only, and only one ad may hold it at a time.
@@ -1246,106 +1266,216 @@ export const overrideAnuncioStatus: RequestHandler = async (req, res) => {
   }
 };
 
-// DELETE ad (physical deletion)
-export const deleteAnuncio: RequestHandler = async (req, res) => {
-  try {
-    const { id } = req.params;
+interface AnuncioActionResult {
+  id: number;
+  success: boolean;
+  error?: string;
+  statusCode?: number;
+}
 
-    const anuncioId = parseInt(id);
+// Shared core of DELETE ad, used by both the single-item route and the bulk endpoint.
+async function deleteOneAnuncio(
+  anuncioId: number,
+  req: { userId?: number; userType?: string },
+): Promise<AnuncioActionResult> {
+  const anuncio = await prisma.anuncios.findUnique({
+    where: { id: anuncioId, dataExclusao: null },
+    select: {
+      status: true,
+      usuarioId: true,
+      imagem: true,
+    },
+  });
 
-    // Get ad details before deletion to check status
-    const anuncio = await prisma.anuncios.findUnique({
-      where: { id: anuncioId, dataExclusao: null },
-      select: {
-        status: true,
-        usuarioId: true,
-        imagem: true,
-      },
-    });
+  if (!anuncio) {
+    return { id: anuncioId, success: false, statusCode: 404, error: "Anúncio não encontrado" };
+  }
 
-    if (!anuncio) {
-      return res.status(404).json({
-        success: false,
-        error: "Anúncio não encontrado",
-      });
-    }
+  if (anuncio.usuarioId !== req.userId && req.userType !== "adm") {
+    return {
+      id: anuncioId,
+      success: false,
+      statusCode: 403,
+      error: "Você não tem permissão para excluir este anúncio",
+    };
+  }
 
-    // A paid Financeiro charge is a financial record that must survive — block the delete
-    // entirely rather than losing the link. The client should offer "Inativar" instead.
-    const lancamentoPago = await prisma.lancamentos_financeiros.findFirst({
-      where: { anuncioId, status: "pago" },
-    });
-    if (lancamentoPago) {
-      return res.status(409).json({
-        success: false,
-        error: "Este anúncio possui um lançamento pago vinculado. Use 'Inativar' em vez de excluir.",
-      });
-    }
+  // Business rule: a regular user can only delete an ad that never became active -
+  // once it's gone live (or been paid for), they must "Inativar" it instead so the
+  // audit trail and any linked financial records stay intact. Admins are exempt: the
+  // /admin/anuncios panel exists specifically to let them remove problematic ads
+  // regardless of status.
+  if (req.userType !== "adm" && ["ativo", "pago"].includes(anuncio.status)) {
+    return {
+      id: anuncioId,
+      success: false,
+      statusCode: 409,
+      error: "Este anúncio já esteve ativo e não pode ser excluído. Use 'Inativar' em vez de excluir.",
+    };
+  }
 
-    // Any not-yet-paid charge tied to this ad is soft-deleted along with the ad itself.
-    await prisma.lancamentos_financeiros.updateMany({
-      where: { anuncioId, status: { not: "pago" }, dataExclusao: null },
-      data: { dataExclusao: new Date(), excluidoPor: req.userId ?? null },
-    });
+  // A paid Financeiro charge is a financial record that must survive — block the delete
+  // entirely rather than losing the link. The client should offer "Inativar" instead.
+  const lancamentoPago = await prisma.lancamentos_financeiros.findFirst({
+    where: { anuncioId, status: "pago" },
+  });
+  if (lancamentoPago) {
+    return {
+      id: anuncioId,
+      success: false,
+      statusCode: 409,
+      error: "Este anúncio possui um lançamento pago vinculado. Use 'Inativar' em vez de excluir.",
+    };
+  }
 
-    // Get all associated gallery photos before deletion
-    const fotos = await prisma.fotos_anuncio.findMany({
-      where: { anuncio_id: anuncioId },
-      select: { url: true },
-    });
+  // Any not-yet-paid charge tied to this ad is soft-deleted along with the ad itself.
+  await prisma.lancamentos_financeiros.updateMany({
+    where: { anuncioId, status: { not: "pago" }, dataExclusao: null },
+    data: { dataExclusao: new Date(), excluidoPor: req.userId ?? null },
+  });
 
-    // Delete physical files for all photos
-    const filesToDelete = [];
+  // Get all associated gallery photos before deletion
+  const fotos = await prisma.fotos_anuncio.findMany({
+    where: { anuncio_id: anuncioId },
+    select: { url: true },
+  });
 
-    // Include primary image if it exists
-    if (anuncio.imagem) {
-      filesToDelete.push(anuncio.imagem);
-    }
+  // Soft-delete the ad (gallery photo rows are left as-is — they aren't in the audit-trail
+  // scope and staying linked to a soft-deleted ad is harmless). This is the only part of
+  // the operation the caller needs to wait on; it flags the row via dataExclusao/
+  // excluidoPor rather than a real SQL DELETE, same pattern used everywhere else in the
+  // schema (contatos, anunciantes, lancamentos_financeiros, etc).
+  await prisma.anuncios.update({
+    where: { id: anuncioId },
+    data: { dataExclusao: new Date(), excluidoPor: req.userId ?? null },
+  });
 
-    // Include gallery photos
-    filesToDelete.push(...fotos.map(f => f.url));
+  // Physical file cleanup is best-effort housekeeping, not user-facing correctness -
+  // run it after responding instead of making the request (and, since this blocked the
+  // whole Node event loop via fs.*Sync, every OTHER concurrent request) wait on disk I/O.
+  const filesToDelete: string[] = [];
+  if (anuncio.imagem) filesToDelete.push(anuncio.imagem);
+  filesToDelete.push(...fotos.map((f) => f.url));
+  void deleteFilesInBackground(filesToDelete);
 
-    // Delete physical files
-    for (const fileUrl of filesToDelete) {
+  return { id: anuncioId, success: true };
+}
+
+async function deleteFilesInBackground(fileUrls: string[]): Promise<void> {
+  await Promise.all(
+    fileUrls.map(async (fileUrl) => {
       try {
         const urlPath = new URL(fileUrl, "http://localhost").pathname;
         const filename = path.basename(urlPath);
         const filePath = path.join(process.cwd(), "public", "uploads", filename);
 
-        if (fs.existsSync(filePath)) {
-          fs.unlinkSync(filePath);
-          console.log(`[deleteAnuncio] ✅ Arquivo deletado: ${filePath}`);
+        await fs.promises.unlink(filePath);
+        console.log(`[deleteAnuncio] ✅ Arquivo deletado: ${filePath}`);
+      } catch (fileError: any) {
+        if (fileError?.code !== "ENOENT") {
+          console.warn(`[deleteAnuncio] ⚠️ Erro ao deletar arquivo ${fileUrl}:`, fileError);
         }
-      } catch (fileError) {
-        console.warn(`[deleteAnuncio] ⚠️ Erro ao deletar arquivo ${fileUrl}:`, fileError);
-        // Don't fail the operation if file deletion fails
       }
+    }),
+  );
+}
+
+// Shared core of INACTIVATE ad, used by both the single-item route and the bulk endpoint.
+async function inactivateOneAnuncio(
+  anuncioId: number,
+  req: { userId?: number; userType?: string },
+): Promise<AnuncioActionResult> {
+  const anuncio = await prisma.anuncios.findUnique({
+    where: { id: anuncioId, dataExclusao: null },
+    select: {
+      status: true,
+      destaque: true,
+      usuarioId: true,
+    },
+  });
+
+  if (!anuncio) {
+    return { id: anuncioId, success: false, statusCode: 404, error: "Anúncio não encontrado" };
+  }
+
+  if (anuncio.usuarioId !== req.userId && req.userType !== "adm") {
+    return {
+      id: anuncioId,
+      success: false,
+      statusCode: 403,
+      error: "Você não tem permissão para inativar este anúncio",
+    };
+  }
+
+  await prisma.anuncios.update({
+    where: { id: anuncioId },
+    data: { isActive: false },
+  });
+
+  // Decrement active ads counter if ad was active
+  if (["ativo", "pago"].includes(anuncio.status)) {
+    console.log(`[inactivateAnuncio] Decrementing counter for inactivated ad ${anuncioId}`);
+    const counterUpdates: any = {
+      numeroAnunciosAtivos: { decrement: 1 },
+    };
+    if (anuncio.destaque) {
+      counterUpdates.numeroAnunciosAtivosDestaque = { decrement: 1 };
     }
-
-    // Soft-delete the ad (gallery photo rows are left as-is — they aren't in the audit-trail
-    // scope and staying linked to a soft-deleted ad is harmless).
-    await prisma.anuncios.update({
-      where: { id: anuncioId },
-      data: { dataExclusao: new Date(), excluidoPor: req.userId ?? null },
+    await prisma.usracessos.update({
+      where: { id: anuncio.usuarioId },
+      data: counterUpdates,
     });
+  }
 
-    // Decrement active ads counter if ad was active
-    if (["ativo", "pago"].includes(anuncio.status)) {
-      console.log(`[deleteAnuncio] Decrementing counter for deleted active ad ${id}`);
-      await prisma.usracessos.update({
-        where: { id: anuncio.usuarioId },
-        data: {
-          numeroAnunciosAtivos: {
-            decrement: 1,
-          },
-        },
-      });
+  return { id: anuncioId, success: true };
+}
+
+// Shared core of ACTIVATE ad, used by both the single-item route and the bulk endpoint.
+async function activateOneAnuncio(
+  anuncioId: number,
+  req: { userId?: number; userType?: string },
+): Promise<AnuncioActionResult> {
+  const anuncio = await prisma.anuncios.findUnique({
+    where: { id: anuncioId, dataExclusao: null },
+    select: { usuarioId: true },
+  });
+
+  if (!anuncio) {
+    return { id: anuncioId, success: false, statusCode: 404, error: "Anúncio não encontrado" };
+  }
+
+  if (anuncio.usuarioId !== req.userId && req.userType !== "adm") {
+    return {
+      id: anuncioId,
+      success: false,
+      statusCode: 403,
+      error: "Você não tem permissão para reativar este anúncio",
+    };
+  }
+
+  await prisma.anuncios.update({
+    where: { id: anuncioId },
+    data: { isActive: true },
+  });
+
+  return { id: anuncioId, success: true };
+}
+
+function statusFromResults(results: AnuncioActionResult[]): number {
+  if (results.every((r) => r.success)) return 200;
+  if (results.every((r) => !r.success)) return results[0]?.statusCode || 400;
+  return 207; // Multi-Status: mixed success/failure
+}
+
+// DELETE ad (physical deletion)
+export const deleteAnuncio: RequestHandler = async (req, res) => {
+  try {
+    const anuncioId = parseInt(req.params.id);
+    const result = await deleteOneAnuncio(anuncioId, req);
+    if (!result.success) {
+      return res.status(result.statusCode || 400).json({ success: false, error: result.error });
     }
-
-    res.json({
-      success: true,
-      message: "Anúncio deletado com sucesso",
-    });
+    res.json({ success: true, message: "Anúncio deletado com sucesso" });
   } catch (error) {
     console.error("Error deleting ad:", error);
     res.status(500).json({
@@ -1355,60 +1485,38 @@ export const deleteAnuncio: RequestHandler = async (req, res) => {
   }
 };
 
+// BULK DELETE ads
+export const bulkDeleteAnuncios: RequestHandler = async (req, res) => {
+  try {
+    const ids = req.body?.ids;
+    if (!Array.isArray(ids) || ids.length === 0 || !ids.every((v) => Number.isInteger(v))) {
+      return res.status(400).json({ success: false, error: "ids deve ser um array de números inteiros" });
+    }
+
+    const results: AnuncioActionResult[] = [];
+    for (const anuncioId of ids) {
+      results.push(await deleteOneAnuncio(anuncioId, req));
+    }
+
+    res.status(statusFromResults(results)).json({
+      success: results.some((r) => r.success),
+      results,
+    });
+  } catch (error) {
+    console.error("Error bulk deleting ads:", error);
+    res.status(500).json({ success: false, error: "Erro ao deletar anúncios" });
+  }
+};
+
 // INACTIVATE ad (logical deletion)
 export const inactivateAnuncio: RequestHandler = async (req, res) => {
   try {
-    const { id } = req.params;
-
-    // Get current status before inactivation
-    const anuncio = await prisma.anuncios.findUnique({
-      where: { id: parseInt(id) },
-      select: {
-        status: true,
-        destaque: true,
-        usuarioId: true,
-      },
-    });
-
-    if (!anuncio) {
-      return res.status(404).json({
-        success: false,
-        error: "Anúncio não encontrado",
-      });
+    const anuncioId = parseInt(req.params.id);
+    const result = await inactivateOneAnuncio(anuncioId, req);
+    if (!result.success) {
+      return res.status(result.statusCode || 400).json({ success: false, error: result.error });
     }
-
-    const updated = await prisma.anuncios.update({
-      where: { id: parseInt(id) },
-      data: { isActive: false },
-      include: {
-        anunciantes: true,
-      },
-    });
-
-    // Decrement active ads counter if ad was active
-    if (["ativo", "pago"].includes(anuncio.status)) {
-      console.log(`[inactivateAnuncio] Decrementing counter for inactivated ad ${id}`);
-      const counterUpdates: any = {
-        numeroAnunciosAtivos: {
-          decrement: 1,
-        },
-      };
-      if (anuncio.destaque) {
-        counterUpdates.numeroAnunciosAtivosDestaque = {
-          decrement: 1,
-        };
-      }
-      await prisma.usracessos.update({
-        where: { id: anuncio.usuarioId },
-        data: counterUpdates,
-      });
-    }
-
-    res.json({
-      success: true,
-      message: "Anúncio inativado com sucesso",
-      data: updated,
-    });
+    res.json({ success: true, message: "Anúncio inativado com sucesso" });
   } catch (error) {
     console.error("Error inactivating ad:", error);
     res.status(500).json({
@@ -1418,24 +1526,38 @@ export const inactivateAnuncio: RequestHandler = async (req, res) => {
   }
 };
 
+// BULK INACTIVATE ads
+export const bulkInactivateAnuncios: RequestHandler = async (req, res) => {
+  try {
+    const ids = req.body?.ids;
+    if (!Array.isArray(ids) || ids.length === 0 || !ids.every((v) => Number.isInteger(v))) {
+      return res.status(400).json({ success: false, error: "ids deve ser um array de números inteiros" });
+    }
+
+    const results: AnuncioActionResult[] = [];
+    for (const anuncioId of ids) {
+      results.push(await inactivateOneAnuncio(anuncioId, req));
+    }
+
+    res.status(statusFromResults(results)).json({
+      success: results.some((r) => r.success),
+      results,
+    });
+  } catch (error) {
+    console.error("Error bulk inactivating ads:", error);
+    res.status(500).json({ success: false, error: "Erro ao inativar anúncios" });
+  }
+};
+
 // ACTIVATE ad (reactivate inactive ad)
 export const activateAnuncio: RequestHandler = async (req, res) => {
   try {
-    const { id } = req.params;
-
-    const anuncio = await prisma.anuncios.update({
-      where: { id: parseInt(id) },
-      data: { isActive: true },
-      include: {
-        anunciantes: true,
-      },
-    });
-
-    res.json({
-      success: true,
-      message: "Anúncio reativado com sucesso",
-      data: anuncio,
-    });
+    const anuncioId = parseInt(req.params.id);
+    const result = await activateOneAnuncio(anuncioId, req);
+    if (!result.success) {
+      return res.status(result.statusCode || 400).json({ success: false, error: result.error });
+    }
+    res.json({ success: true, message: "Anúncio reativado com sucesso" });
   } catch (error) {
     console.error("Error activating ad:", error);
     res.status(500).json({
