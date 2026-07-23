@@ -9,6 +9,8 @@ import BannerCarousel from "@/components/BannerCarousel";
 import AnunciosCarousel from "@/components/AnunciosCarousel";
 import AnunciantesCarousel from "@/components/AnunciantesCarousel";
 import BannerInicialModal from "@/components/BannerInicialModal";
+import LocalidadeOnboardingModal from "@/components/LocalidadeOnboardingModal";
+import { useLocalidade } from "@/contexts/LocalidadeContext";
 import {
   Star,
   ArrowRight,
@@ -58,6 +60,7 @@ export default function Index() {
   const navigate = useNavigate();
   const { user, logout, isLoading } = useAuth();
   const queryClient = useQueryClient();
+  const { localidadeId: userLocalidadeId, hasChosen, isSuggestion, selectLocalidade } = useLocalidade();
 
   // Ranked by active-ad count once per day (first access) and cached in localStorage,
   // so the category chip order doesn't reshuffle every visit as ad counts shift through
@@ -132,28 +135,6 @@ export default function Index() {
     staleTime: 5 * 60 * 1000, // 5 minutes
     gcTime: 10 * 60 * 1000, // 10 minutes
   });
-
-  // Fetch user's default localidade
-  const { data: userLocalidadeData } = useQuery({
-    queryKey: ["user-localidade"],
-    queryFn: async () => {
-      if (!user?.id) return null;
-
-      const response = await fetch(`/api/usracessos/${user.id}`, {
-        headers: {
-          "x-user-id": user.id.toString(),
-        },
-      });
-
-      if (!response.ok) throw new Error("Erro ao buscar localidade do usuário");
-      return response.json();
-    },
-    enabled: !!user?.id,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
-  });
-
-  const userLocalidadeId = userLocalidadeData?.data?.localidadePadraoId || null;
 
   // Fetch all active ads without status filter - we'll filter on client side
   const { data: allAnunciosData, isLoading: allAnunciosLoading } = useQuery({
@@ -239,11 +220,6 @@ export default function Index() {
     }
   }, [allAnuncios]);
 
-  // Filter anuncios by type and gratuito status
-  // Helper to check if an anuncio is free (donation or price = 0)
-  const isGratis = (anuncio: any) =>
-    anuncio.isDoacao || anuncio.preco === 0 || anuncio.preco === "0";
-
   // Helper to filter by localidade if user has one selected
   const matchesLocalidade = (anuncio: any) => {
     if (!userLocalidadeId) return true; // Show all if no localidade selected
@@ -264,7 +240,7 @@ export default function Index() {
     .filter(
       (anuncio: any) =>
         isMainPageEligible(anuncio) &&
-        !isGratis(anuncio) &&
+        !anuncio.isDoacao &&
         ["anuncio_padrao", "produto", "servico"].includes(anuncio.tipo) &&
         matchesLocalidade(anuncio),
     )
@@ -298,7 +274,7 @@ export default function Index() {
     .filter(
       (anuncio: any) =>
         isMainPageEligible(anuncio) &&
-        !isGratis(anuncio) &&
+        !anuncio.isDoacao &&
         anuncio.tipo === "evento" &&
         matchesLocalidade(anuncio),
     )
@@ -378,6 +354,14 @@ export default function Index() {
       <Header />
       <BannerInicialModal />
 
+      {!isLoading && !user && (
+        <LocalidadeOnboardingModal
+          open={!hasChosen}
+          onChoose={selectLocalidade}
+          suggestedLocalidadeId={isSuggestion ? userLocalidadeId : null}
+        />
+      )}
+
       {/* Banner Carousel Section */}
       <section className="py-0 md:py-1 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -423,6 +407,26 @@ export default function Index() {
           </div>
         </section>
       )}
+
+      {/* Condição Quick Filters */}
+      <section className="py-2 bg-white border-b border-gray-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+            <span className="flex-shrink-0 px-3 py-1.5 text-xs font-semibold text-vitrii-text-secondary self-center">
+              Condição:
+            </span>
+            {["Novo", "Seminovo", "Usado", "Serviço/Projeto"].map((condicao) => (
+              <Link
+                key={condicao}
+                to={`/browse?condicao=${encodeURIComponent(condicao)}`}
+                className="flex-shrink-0 px-4 py-1.5 rounded-full text-sm font-semibold bg-vitrii-gray-light text-vitrii-text hover:bg-blue-50 hover:text-vitrii-blue transition-colors"
+              >
+                {condicao}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* Featured Listings Section - Carousel 1 (the hero row: bigger heading + a
           highlighted band so it visually outranks the other curated rows below it) */}
@@ -812,7 +816,7 @@ export default function Index() {
                 Comunidade Ativa
               </h3>
               <p className="text-sm text-vitrii-text-secondary">
-                Conecte-se com milhares de vendedores e compradores. Cresça sua
+                Conecte-se dinamicamente com vendedores e compradores. Cresça sua
                 rede e suas vendas.
               </p>
             </div>

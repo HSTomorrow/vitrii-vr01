@@ -129,11 +129,13 @@ export default function PerfilUsuario() {
       if (user?.id) {
         queryClient.invalidateQueries({ queryKey: ["user", user.id] });
       }
+      // Also refresh LocalidadeContext (header/Browse/Index) in case localidadePadraoId changed here
+      queryClient.invalidateQueries({ queryKey: ["user-localidade"] });
       toast.success("Perfil atualizado com sucesso!");
       // Dismiss validation alert
       setShowValidationAlert(false);
       // Mark CPF as saved if it was just filled
-      if (data.cpf) {
+      if (formData.cpf) {
         setCpfSaved(true);
       }
       setTimeout(() => {

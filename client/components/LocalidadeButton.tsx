@@ -1,8 +1,7 @@
-import { useEffect, useState, useRef } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "@/contexts/AuthContext";
+import { useState, useRef, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { MapPin, ChevronDown } from "lucide-react";
-import { toast } from "sonner";
+import { useLocalidade } from "@/contexts/LocalidadeContext";
 
 interface Localidade {
   id: number;
@@ -14,10 +13,8 @@ interface Localidade {
 }
 
 export default function LocalidadeButton() {
-  const queryClient = useQueryClient();
-  const { user } = useAuth();
+  const { localidadeId, selectLocalidade } = useLocalidade();
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedLocalidade, setSelectedLocalidade] = useState<Localidade | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Fetch all active localidades
@@ -29,84 +26,6 @@ export default function LocalidadeButton() {
       return response.json();
     },
   });
-
-  // Update localidade mutation
-  const updateLocalidadeMutation = useMutation({
-    mutationFn: async (localidadeId: number | null) => {
-      if (!user?.id) return;
-
-      const response = await fetch(`/api/usracessos/${user.id}/localidade-padrao`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-          "x-user-id": user.id.toString(),
-        },
-        body: JSON.stringify({ localidadePadraoId: localidadeId }),
-      });
-
-      if (!response.ok) throw new Error("Erro ao atualizar localidade padrão");
-      return response.json();
-    },
-    onSuccess: () => {
-      toast.success("Localidade padrão atualizada!");
-      setIsOpen(false);
-
-      // Invalidate queries to refresh pages
-      queryClient.invalidateQueries({ queryKey: ["user-localidade"] });
-      queryClient.invalidateQueries({ queryKey: ["anuncios-all"] });
-      queryClient.invalidateQueries({ queryKey: ["browse-anuncios"] });
-      queryClient.invalidateQueries({ queryKey: ["localidade-anunciantes"] });
-    },
-    onError: () => {
-      toast.error("Erro ao atualizar localidade");
-    },
-  });
-
-  // Fetch user's default localidade on mount
-  useEffect(() => {
-    const getDefaultLocalidade = async () => {
-      if (!user?.id) return;
-
-      try {
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
-
-        const response = await fetch(`/api/usracessos/${user.id}`, {
-          headers: {
-            "x-user-id": user.id.toString(),
-          },
-          signal: controller.signal,
-        });
-
-        clearTimeout(timeoutId);
-
-        if (response.ok) {
-          const userData = await response.json();
-          if (userData.data?.localidadePadraoId && localidadesData?.data) {
-            const localidade = localidadesData.data.find(
-              (l: Localidade) => l.id === userData.data.localidadePadraoId,
-            );
-            if (localidade) {
-              setSelectedLocalidade(localidade);
-            }
-          }
-        }
-      } catch (error) {
-        // Silently handle network errors - they're expected in some contexts (e.g., iframes, offline)
-        if (error instanceof Error) {
-          if (error.name === 'AbortError') {
-            console.debug("[LocalidadeButton] Fetch timeout");
-          } else if (error.message === 'Failed to fetch') {
-            console.debug("[LocalidadeButton] Network error - retrying may help");
-          }
-        }
-      }
-    };
-
-    if (user?.id && localidadesData?.data) {
-      getDefaultLocalidade();
-    }
-  }, [user?.id, localidadesData?.data]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -122,9 +41,8 @@ export default function LocalidadeButton() {
     }
   }, [isOpen]);
 
-  if (!user) return null;
-
   const localidades = (localidadesData?.data || []) as Localidade[];
+  const selectedLocalidade = localidades.find((l) => l.id === localidadeId) || null;
   const displayText = selectedLocalidade
     ? selectedLocalidade.descricao || `${selectedLocalidade.municipio}, ${selectedLocalidade.estado}`
     : "Selecionar";
@@ -134,7 +52,7 @@ export default function LocalidadeButton() {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="flex flex-shrink-0 items-center gap-1.5 px-3 py-1.5 bg-cyan-50 rounded-lg border border-cyan-200 hover:bg-cyan-100 transition-colors"
-        title="Alterar localidade padrão"
+        title="Alterar localidade"
       >
         <MapPin className="w-4 h-4 text-cyan-600 flex-shrink-0" />
         <span
@@ -149,22 +67,21 @@ export default function LocalidadeButton() {
       {isOpen && (
         <div className="absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
           <div className="p-3 border-b border-gray-100">
-            <p className="text-xs font-semibold text-gray-700 mb-2">Selecionar Localidade Padrão</p>
+            <p className="text-xs font-semibold text-gray-700 mb-2">Selecionar Localidade</p>
             <div className="max-h-48 overflow-y-auto">
               {localidades.length > 0 ? (
                 localidades.map((localidade) => (
                   <button
                     key={localidade.id}
                     onClick={() => {
-                      setSelectedLocalidade(localidade);
-                      updateLocalidadeMutation.mutate(localidade.id);
+                      selectLocalidade(localidade.id);
+                      setIsOpen(false);
                     }}
-                    disabled={updateLocalidadeMutation.isPending}
                     className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${
-                      selectedLocalidade?.id === localidade.id
+                      localidadeId === localidade.id
                         ? "bg-cyan-100 text-cyan-800 font-semibold"
                         : "text-gray-700 hover:bg-gray-100"
-                    } disabled:opacity-50`}
+                    }`}
                   >
                     {localidade.descricao || `${localidade.municipio}, ${localidade.estado}`}
                   </button>
@@ -177,13 +94,12 @@ export default function LocalidadeButton() {
           {selectedLocalidade && (
             <button
               onClick={() => {
-                setSelectedLocalidade(null);
-                updateLocalidadeMutation.mutate(null);
+                selectLocalidade(null);
+                setIsOpen(false);
               }}
-              disabled={updateLocalidadeMutation.isPending}
-              className="w-full px-3 py-2 text-left text-xs text-gray-600 hover:bg-gray-50 transition-colors border-t border-gray-100 disabled:opacity-50"
+              className="w-full px-3 py-2 text-left text-xs text-gray-600 hover:bg-gray-50 transition-colors border-t border-gray-100"
             >
-              Limpar localidade padrão
+              Limpar localidade
             </button>
           )}
         </div>

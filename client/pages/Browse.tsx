@@ -8,10 +8,12 @@ import Pagination from "@/components/Pagination";
 import LocalidadeFilter from "@/components/LocalidadeFilter";
 import SearchOverlay from "@/components/SearchOverlay";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLocalidade } from "@/contexts/LocalidadeContext";
 import ImageWithFallback from "@/components/ImageWithFallback";
 import { getAnuncioImage, getImageAlt } from "@/utils/imageFallback";
 import { formatCurrencyDisplay } from "@/utils/formatCurrency";
 import { getEnderecoExibicao } from "@/utils/enderecoAnuncio";
+import { getCondicaoBadgeClass } from "@/utils/condicaoBadge";
 
 const TYPES = [
   { value: "produto", label: "Produto" },
@@ -21,33 +23,48 @@ const TYPES = [
   { value: "oportunidade", label: "Oportunidade/Vaga de Emprego" },
 ];
 
+const CONDICOES = ["Novo", "Seminovo", "Usado", "Serviço/Projeto"];
+
 export default function Browse() {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { localidadeId: contextLocalidadeId } = useLocalidade();
   const [searchParams] = useSearchParams();
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategoriaId, setSelectedCategoriaId] = useState("");
   const [selectedType, setSelectedType] = useState("");
+  const [selectedCondicao, setSelectedCondicao] = useState("");
   const [selectedLocation, setSelectedLocation] = useState("");
   const [selectedLocalidade, setSelectedLocalidade] = useState<number | null>(null);
+  const [localidadeSeeded, setLocalidadeSeeded] = useState(false);
   const [priceRange, setPriceRange] = useState({ min: "", max: "" });
   const [showFilters, setShowFilters] = useState(false);
   const itemsPerPage = 20;
   const anuncianteIdParam = searchParams.get("anuncianteId");
 
-  // Clear all filters on component mount, except a category carried over via
-  // ?categoriaId= (used by the home page's category chip row).
+  // Clear all filters on component mount, except a category or condição carried over
+  // via ?categoriaId=/?condicao= (used by the home page's quick-filter rows).
   useEffect(() => {
     setSearchTerm("");
     setSelectedCategoriaId(searchParams.get("categoriaId") || "");
     setSelectedType("");
+    setSelectedCondicao(searchParams.get("condicao") || "");
     setSelectedLocation("");
-    setSelectedLocalidade(null);
     setPriceRange({ min: "", max: "" });
     setCurrentPage(1);
     setShowFilters(false);
   }, []);
+
+  // Seed the page's localidade filter from the header/anonymous-suggestion context once
+  // it resolves (it may arrive async for anonymous visitors), but only until the visitor
+  // manually changes the filter on this page - after that, their manual pick wins.
+  useEffect(() => {
+    if (!localidadeSeeded) {
+      setSelectedLocalidade(contextLocalidadeId);
+      if (contextLocalidadeId !== null) setLocalidadeSeeded(true);
+    }
+  }, [contextLocalidadeId, localidadeSeeded]);
 
   // Fetch real categorias for the filter dropdown
   const { data: categorias = [] } = useQuery({
@@ -173,6 +190,11 @@ export default function Browse() {
         return false;
       }
 
+      // Filter by condição
+      if (selectedCondicao && anuncio.condicao !== selectedCondicao) {
+        return false;
+      }
+
       // Filter by location
       if (selectedLocation) {
         const endereco = anuncio.endereco || anuncio.anunciantes?.endereco;
@@ -214,6 +236,7 @@ export default function Browse() {
     searchTerm,
     selectedCategoriaId,
     selectedType,
+    selectedCondicao,
     selectedLocation,
     priceRange,
     anuncianteIdParam,
@@ -260,6 +283,11 @@ export default function Browse() {
     handleFilterChange();
   };
 
+  const handleCondicaoChange = (value: string) => {
+    setSelectedCondicao(value);
+    handleFilterChange();
+  };
+
   const handleLocationChange = (value: string) => {
     setSelectedLocation(value);
     handleFilterChange();
@@ -267,6 +295,7 @@ export default function Browse() {
 
   const handleLocalidadeChange = (value: number | null) => {
     setSelectedLocalidade(value);
+    setLocalidadeSeeded(true);
     handleFilterChange();
   };
 
@@ -279,6 +308,7 @@ export default function Browse() {
     setSearchTerm("");
     setSelectedCategoriaId("");
     setSelectedType("");
+    setSelectedCondicao("");
     setSelectedLocation("");
     setSelectedLocalidade(null);
     setPriceRange({ min: "", max: "" });
@@ -289,6 +319,7 @@ export default function Browse() {
     searchTerm ||
     selectedCategoriaId ||
     selectedType ||
+    selectedCondicao ||
     selectedLocation ||
     selectedLocalidade ||
     priceRange.min ||
@@ -421,6 +452,25 @@ export default function Browse() {
                     </select>
                   </div>
 
+                  {/* Condição Filter */}
+                  <div>
+                    <label className="block text-xs font-semibold text-vitrii-text mb-1">
+                      Condição
+                    </label>
+                    <select
+                      value={selectedCondicao}
+                      onChange={(e) => handleCondicaoChange(e.target.value)}
+                      className="w-full px-3 py-1.5 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-vitrii-blue focus:border-transparent"
+                    >
+                      <option value="">Todas</option>
+                      {CONDICOES.map((condicao) => (
+                        <option key={condicao} value={condicao}>
+                          {condicao}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
                   {/* Location Filter */}
                   {uniqueLocations.length > 0 && (
                     <div>
@@ -530,6 +580,12 @@ export default function Browse() {
                             <h3 className="font-semibold text-vitrii-text mb-2 line-clamp-2">
                               {anuncio.titulo}
                             </h3>
+
+                            {anuncio.condicao && (
+                              <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold mb-2 self-start ${getCondicaoBadgeClass(anuncio.condicao)}`}>
+                                {anuncio.condicao}
+                              </span>
+                            )}
 
                             {getEnderecoExibicao(anuncio) && (
                               <div className="flex items-center gap-1 mb-3 text-xs text-vitrii-text-secondary">

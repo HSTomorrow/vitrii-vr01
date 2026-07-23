@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "@/contexts/AuthContext";
 import { MapPin } from "lucide-react";
 
 interface Localidade {
@@ -27,15 +26,9 @@ export default function LocalidadeFilter({
   className = "",
   placeholder = "Selecione uma localidade",
 }: LocalidadeFilterProps) {
-  const { user } = useAuth();
   const [selectedLocalidade, setSelectedLocalidade] = useState<number | null>(
     value || null,
   );
-
-  // Only show filter for logged-in users
-  if (!user) {
-    return null;
-  }
 
   // Fetch all active localidades
   const { data: localidadesData } = useQuery({
@@ -46,36 +39,6 @@ export default function LocalidadeFilter({
       return response.json();
     },
   });
-
-  // Fetch user's default localidade on mount
-  useEffect(() => {
-    const getDefaultLocalidade = async () => {
-      if (!user?.id) return;
-
-      try {
-        const response = await fetch(`/api/usracessos/${user.id}`, {
-          headers: {
-            "x-user-id": user.id.toString(),
-          },
-        });
-
-        if (response.ok) {
-          const userData = await response.json();
-          if (userData.data?.localidadePadraoId) {
-            setSelectedLocalidade(userData.data.localidadePadraoId);
-            onChange(userData.data.localidadePadraoId);
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching user default localidade:", error);
-      }
-    };
-
-    // Only fetch if selectedLocalidade is not already set
-    if (!selectedLocalidade && value === undefined) {
-      getDefaultLocalidade();
-    }
-  }, [user?.id]);
 
   // Update selected localidade when prop changes
   useEffect(() => {
